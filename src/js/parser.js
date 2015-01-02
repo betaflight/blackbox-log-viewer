@@ -1,18 +1,15 @@
 "use strict";
 
-var FlightLogParser = function(logData) {
+var FlightLogIndex;
+
+var FlightLogParser = function(logData, logDataIndex) {
 	//Private constants:
 	var
-		LOG_START_MARKER = asciiStringToByteArray("H Product:Blackbox flight data recorder by Nicholas Sherlock\n"),
-		
 		FLIGHT_LOG_MAX_FIELDS = 128,
 		FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
 		
 		FIRMWARE_TYPE_BASEFLIGHT = 0,
 		FIRMWARE_TYPE_CLEANFLIGHT = 1,
-		
-		FLIGHT_LOG_FIELD_INDEX_ITERATION = 0,
-		FLIGHT_LOG_FIELD_INDEX_TIME = 1,
 		
 		// Flight log field conditions:
 		
@@ -108,38 +105,16 @@ var FlightLogParser = function(logData) {
 	
 	//Public fields:
 	this.logIndex = -1;
-	this.logBeginOffsets = [-1];
 	
+	/* 
+	 * Event handler of the signature (frameValid, frame, frameType, frameOffset, frameSize)
+	 * called when a frame has been decoded.
+	 */
 	this.onFrameReady = null;
 	
 	//Private methods:
 	function utf8ArrayToString(arr) {
 		return new TextDecoder("utf-8").decode(arr);
-	}
-	
-	/* Check how many logs exist in the log file (each time the FC is rearmed, a new log is appended) */
-	function locateLogs(stream) {
-	    var 
-	    	logStart,
-	    	logIndex,
-	    	logBeginOffsets = [];
-
-	    for (logIndex = 0; ; logIndex++) {
-	    	logStart = stream.nextOffsetOf(LOG_START_MARKER);
-
-			if (logStart == -1) {
-				//No more logs found in the file
-		    	logBeginOffsets.push(stream.end);
-				break; 
-	    	}
-
-	    	logBeginOffsets.push(logStart);
-	    	
-	    	//Restart the search after this header
-	    	stream.pos += LOG_START_MARKER.length;
-		}
-	    
-	    return logBeginOffsets;
 	}
 	
 	function parseCommaSeparatedIntegers(string) {
@@ -299,14 +274,14 @@ var FlightLogParser = function(logData) {
 			}
 		}
 	}
-	
+
 	function completeIntraframe(frameType, frameStart, frameEnd, raw) {
         mainStreamIsValid = true;
 
         updateFieldStatistics(mainHistory[0]);
 
 	    if (that.onFrameReady)
-	        that.onFrameReady(mainStreamIsValid, mainHistory[0], frameType, that.mainFieldCount, frameStart, frameEnd - frameStart);
+	        that.onFrameReady(mainStreamIsValid, mainHistory[0], frameType, frameStart, frameEnd - frameStart);
 
         // Rotate history buffers
 
@@ -340,7 +315,7 @@ var FlightLogParser = function(logData) {
 		previous = mainHistory[1];
 
 		if (previous) {
-	        for (var frameIndex = previous[FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++) {
+	        for (var frameIndex = previous[that.FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++) {
 	            that.stats.intentionallyAbsentIterations++;
 	        }
 	    }
@@ -401,7 +376,7 @@ var FlightLogParser = function(logData) {
 	    //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
 
 	    if (that.onFrameReady)
-	        that.onFrameReady(mainStreamIsValid, mainHistory[0], frameType, that.mainFieldCount, frameStart, frameEnd - frameStart);
+	        that.onFrameReady(mainStreamIsValid, mainHistory[0], frameType, frameStart, frameEnd - frameStart);
 
 	    if (mainStreamIsValid) {
 	        // Rotate history buffers
@@ -462,7 +437,7 @@ var FlightLogParser = function(logData) {
 
 		if (previous) {
 	        //Work out how many frames we skipped to get to this one, based on the log sampling rate
-	        for (frameIndex = previous[FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++)
+	        for (frameIndex = previous[that.FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++)
 	            skippedFrames++;
 	    }
 
@@ -497,7 +472,7 @@ var FlightLogParser = function(logData) {
 
 						//Apply the predictors for the fields:
 						for (j = 0; j < 4; j++, i++)
-						    current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs['P'].predictor[i], values[j]);
+						    current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], values[j]);
 
 						continue;
 					break;
@@ -506,7 +481,7 @@ var FlightLogParser = function(logData) {
 
 						//Apply the predictors for the fields:
 						for (j = 0; j < 3; j++, i++)
-						    current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs['P'].predictor[i], values[j]);
+						    current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], values[j]);
 
 						continue;
 					break;
@@ -521,7 +496,7 @@ var FlightLogParser = function(logData) {
 					    stream.readTag8_8SVB(values, groupCount);
 
 					    for (j = 0; j < groupCount; j++, i++)
-	                        current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs['P'].predictor[i], values[j]);
+	                        current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], values[j]);
 
 	                    continue;
 					break;
@@ -530,10 +505,10 @@ var FlightLogParser = function(logData) {
 					    value = 0;
 					break;
 					default:
-						throw "Unsupported P-field encoding %d\n" + frameDefs['P'].encoding[i];
+						throw "Unsupported P-field encoding %d\n" + frameDefs["P"].encoding[i];
 				}
 
-				current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs['P'].predictor[i], value);
+				current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], value);
 				i++;
 			}
 		}
@@ -562,7 +537,7 @@ var FlightLogParser = function(logData) {
     this.parseHeader = function(logIndex) {
     	this.logIndex = logIndex;
     	
-		if (logIndex < 0 || logIndex >= this.getLogCount())
+		if (logIndex < 0 || logIndex >= logDataIndex.getLogCount())
 			return false;
 
 		//Reset any parsed information from previous parses
@@ -587,9 +562,9 @@ var FlightLogParser = function(logData) {
 		motor0Index = -1;
 
 		//Set parsing ranges up for the log the caller selected
-		stream.start = this.logBeginOffsets[logIndex];
+		stream.start = logDataIndex.getLogBeginOffset(logIndex);
 	    stream.pos = stream.start;
-	    stream.end = this.logBeginOffsets[logIndex + 1];
+	    stream.end = logDataIndex.getLogBeginOffset(logIndex + 1);
 	    stream.eof = false;
 
 		while (true) {
@@ -683,7 +658,7 @@ var FlightLogParser = function(logData) {
 
                     //Let the caller know there was a corrupt frame (don't give them a pointer to the frame data because it is totally worthless)
                     if (this.onFrameReady)
-                        this.onFrameReady(false, 0, lastFrameType.marker, 0, frameStart, lastFrameSize);
+                        this.onFrameReady(false, null, lastFrameType.marker, frameStart, lastFrameSize);
 
                     /*
                      * Start the search for a frame beginning after the first byte of the previous corrupt frame.
@@ -732,7 +707,9 @@ var FlightLogParser = function(logData) {
 	
 	stream = new ArrayDataStream(logData);
 	
-	this.logBeginOffsets = locateLogs(stream);
+	if (!logDataIndex) {
+		logDataIndex = new FlightLogIndex(logData);
+	}
 };
 
 FlightLogParser.prototype.resetStats = function() {
@@ -752,12 +729,142 @@ FlightLogParser.prototype.resetStats = function() {
 	};
 }
 
-FlightLogParser.prototype.getLogCount = function() {
-	return this.logBeginOffsets.length - 1;
-};
+FlightLogParser.prototype.FLIGHT_LOG_START_MARKER = asciiStringToByteArray("H Product:Blackbox flight data recorder by Nicholas Sherlock\n");
 
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_UNSIGNED = 0;
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_SIGNED   = 1;
 
 FlightLogParser.prototype.FLIGHT_LOG_EVENT_SYNC_BEEP = 0;
 FlightLogParser.prototype.FLIGHT_LOG_EVENT_LOG_END = 255;
+
+FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION = 0;
+FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME = 1;
+
+function FlightLogIndex(logData) {
+	//Private:
+	var 
+		that = this,
+		logBeginOffsets = false,
+		logCount = false,
+		intraframeIndexes = false;
+		
+	function buildLogOffsetsIndex() {
+		var 
+			stream = new ArrayDataStream(logData), 
+	    	i, logStart;
+	    
+	    logBeginOffsets = [];
+	
+	    for (i = 0; ; i++) {
+	    	logStart = stream.nextOffsetOf(FlightLogParser.prototype.FLIGHT_LOG_START_MARKER);
+	
+			if (logStart == -1) {
+				//No more logs found in the file
+		    	logBeginOffsets.push(stream.end);
+				break; 
+	    	}
+	
+	    	logBeginOffsets.push(logStart);
+	    	
+	    	//Restart the search after this header
+	    	stream.pos += FlightLogParser.prototype.FLIGHT_LOG_START_MARKER.length;
+		}
+	}
+	
+	function buildIntraframeIndex() {
+		var 
+			parser = new FlightLogParser(logData, that);
+		
+		intraframeIndexes = [];
+
+		for (var i = 0; i < that.getLogCount(); i++) {
+			var 
+				intraIndex = {
+					times: [],
+					offsets: []
+				};
+			
+			parser.parseHeader(i);
+			
+			parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
+				if (frameValid && frameType == 'I') {
+					intraIndex.times.push(frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
+					intraIndex.offsets.push(frameOffset);
+				}
+			};
+
+			parser.parseLog(false);
+			
+			intraframeIndexes.push(intraIndex);
+		}
+	}
+	
+	//Public: 
+	this.loadFromJSON = function(json) {
+		
+	};
+	
+	this.saveToJSON = function() {
+		var 
+			intraframeIndexes = this.getIntraframeIndexes(),
+			i, j, 
+			resultIndexes = new Array(intraframeIndexes.length);
+		
+		for (i = 0; i < intraframeIndexes.length; i++) {
+			var 
+				lastTime, lastLastTime, 
+				lastOffset, lastLastOffset,
+				
+				sourceIndex = intraframeIndexes[i],
+				
+				resultIndex = {
+					times: new Array(sourceIndex.times.length), 
+					offsets: new Array(sourceIndex.offsets.length)
+				};
+			
+			if (sourceIndex.times.length > 0) {
+				resultIndex.times[0] = sourceIndex.times[0];
+				resultIndex.offsets[0] = sourceIndex.offsets[0];
+				
+				lastLastTime = lastTime = sourceIndex.times[0];
+				lastLastOffset = lastOffset = sourceIndex.offsets[0];
+				
+				for (j = 1; j < sourceIndex.times.length; j++) {
+					resultIndex.times[j] = sourceIndex.times[j] - 2 * lastTime + lastLastTime;
+					resultIndex.offsets[j] = sourceIndex.offsets[j] - 2 * lastOffset + lastLastOffset;
+					
+					lastLastTime = lastTime;
+					lastTime = sourceIndex.times[j];
+	
+					lastLastOffset = lastOffset;
+					lastOffset = sourceIndex.offsets[j];
+				}
+			}
+			
+			resultIndexes[i] = resultIndex;
+	}
+		
+		return JSON.stringify(resultIndexes);
+	};	
+	
+	this.getLogBeginOffset = function(index) {
+		if (!logBeginOffsets)
+			buildLogOffsetsIndex();
+		
+		return logBeginOffsets[index];
+	}
+	
+	this.getLogCount = function() {
+		if (!logBeginOffsets)
+			buildLogOffsetsIndex();
+
+		return logBeginOffsets.length - 1;
+	};
+	
+	this.getIntraframeIndexes = function() {
+		if (!intraframeIndexes)
+			buildIntraframeIndex();
+		
+		return intraframeIndexes;
+	}
+};

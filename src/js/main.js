@@ -21,22 +21,11 @@ $(document).ready(function() {
 
 		    reader.onload = (function(theFile) {
 		        return function(e) {
-		        	var dataArray = new Uint8Array(e.target.result);
+		        	var 
+		        		dataArray = new Uint8Array(e.target.result),
+		        		flightLog = new FlightLog(dataArray);
 		        	
-		        	var parser = new FlightLogParser(dataArray);
 		        	
-		        	parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-		        		if (frameValid) {
-		        			var copy = frame.slice(0);
-		        			copy.push(frameType);
-		        			acc.push(copy);
-		        		}
-		        	};
-		        	
-		        	parser.parseHeader(0);
-		        	parser.parseLog();
-
-		        	console.log(parser.stats);
 		        	
 		        	alert("Done!");
 		        };
