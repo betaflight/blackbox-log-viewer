@@ -665,7 +665,7 @@ var FlightLogParser = function(logData, logDataIndex) {
                      * This way we can find the start of the next frame after the corrupt frame if the corrupt frame
                      * was truncated.
                      */
-                    stream.pos = frameStart;
+                    stream.pos = frameStart + 1;
                     lastFrameType = null;
                     prematureEof = false;
                     stream.eof = false;
@@ -677,7 +677,7 @@ var FlightLogParser = function(logData, logDataIndex) {
                 break;
 
 			frameType = getFrameType(command);
-			frameStart = stream.pos;
+			frameStart = stream.pos - 1;
 
 			if (frameType) {
 			    frameType.parse(raw);
@@ -771,7 +771,7 @@ function FlightLogIndex(logData) {
 		}
 	}
 	
-	function buildIntraframeIndex() {
+	function buildIntraframeIndexes() {
 		var 
 			parser = new FlightLogParser(logData, that);
 		
@@ -782,17 +782,22 @@ function FlightLogIndex(logData) {
 				intraIndex = {
 					times: [],
 					offsets: []
-				};
+				},
+				skipIndex = 0;
 			
 			parser.parseHeader(i);
 			
 			parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
 				if (frameValid && frameType == 'I') {
-					intraIndex.times.push(frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
-					intraIndex.offsets.push(frameOffset);
+					if (skipIndex % 4 == 0) {
+						intraIndex.times.push(frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
+						intraIndex.offsets.push(frameOffset);
+					}
+					
+					skipIndex++;
 				}
 			};
-
+			
 			parser.parseLog(false);
 			
 			intraframeIndexes.push(intraIndex);
@@ -863,7 +868,7 @@ function FlightLogIndex(logData) {
 	
 	this.getIntraframeIndexes = function() {
 		if (!intraframeIndexes)
-			buildIntraframeIndex();
+			buildIntraframeIndexes();
 		
 		return intraframeIndexes;
 	}

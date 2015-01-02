@@ -3,7 +3,7 @@
 function FlightLog(logData, logIndex) {
 	var
 		index = new FlightLogIndex(logData),
-		parser = new FlightLogParser(logData);
+		parser = new FlightLogParser(logData, index);
 	
 	console.log(index.saveToJSON());
 	
