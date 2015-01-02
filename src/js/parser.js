@@ -417,7 +417,8 @@ var FlightLogParser = function(logData, logDataIndex) {
 				value += 2 * previous[fieldIndex] - previous2[fieldIndex];
 			break;
 			case FLIGHT_LOG_FIELD_PREDICTOR_AVERAGE_2:
-				value += (previous[fieldIndex] + previous2[fieldIndex]) / 2;
+				//Round toward zero like C would do for integer division:
+				value += ~~((previous[fieldIndex] + previous2[fieldIndex]) / 2);
 			break;
 			default:
 				throw "Unsupported P-field predictor %d\n" + predictor;
@@ -537,8 +538,8 @@ var FlightLogParser = function(logData, logDataIndex) {
     this.parseHeader = function(logIndex) {
     	this.logIndex = logIndex;
     	
-		if (logIndex < 0 || logIndex >= logDataIndex.getLogCount())
-			return false;
+		if (logIndex === undefined || logIndex < 0 || logIndex >= logDataIndex.getLogCount())
+    		throw "Bad log index to parseHeader()";
 
 		//Reset any parsed information from previous parses
 		this.resetStats();
@@ -567,6 +568,7 @@ var FlightLogParser = function(logData, logDataIndex) {
 	    stream.end = logDataIndex.getLogBeginOffset(logIndex + 1);
 	    stream.eof = false;
 
+	    mainloop:
 		while (true) {
 			var command = stream.readChar();
 
@@ -575,22 +577,25 @@ var FlightLogParser = function(logData, logDataIndex) {
 					parseHeaderLine();
 				break;
 				case EOF:
-					throw "Data file contained no events";
-					return false;
+					break mainloop;
 				default:
+					/* 
+					 * If we see something that looks like the beginning of a data frame, assume it
+					 * is and terminate the header.
+					 */
 				    if (getFrameType(command)) {
                         stream.unreadChar(command);
 
-                        if (this.mainFieldCount == 0) {
-                        	throw "Data file is missing field name definitions";
-                            return false;
-                        }
-                        
-                        return true;
+                        break mainloop;
                     } // else skip garbage which apparently precedes the first data frame
                 break;
 			}
 		}
+	    
+        if (this.mainFieldCount == 0) {
+        	throw "Data file is missing field name definitions";
+            return false;
+        }	    
     };
 	
 	this.parseLog = function(raw, startOffset, endOffset) {
@@ -746,7 +751,7 @@ function FlightLogIndex(logData) {
 		that = this,
 		logBeginOffsets = false,
 		logCount = false,
-		intraframeIndexes = false;
+		intraframeDirectories = false;
 		
 	function buildLogOffsetsIndex() {
 		var 
@@ -771,36 +776,51 @@ function FlightLogIndex(logData) {
 		}
 	}
 	
-	function buildIntraframeIndexes() {
+	function buildIntraframeDirectories() {
 		var 
 			parser = new FlightLogParser(logData, that);
 		
-		intraframeIndexes = [];
+		intraframeDirectories = [];
 
 		for (var i = 0; i < that.getLogCount(); i++) {
 			var 
 				intraIndex = {
 					times: [],
-					offsets: []
+					offsets: [],
+					minTime: false,
+					maxTime: false
 				},
 				skipIndex = 0;
 			
 			parser.parseHeader(i);
 			
 			parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-				if (frameValid && frameType == 'I') {
-					if (skipIndex % 4 == 0) {
-						intraIndex.times.push(frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
-						intraIndex.offsets.push(frameOffset);
+				if (frameValid) {
+					var 
+						frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+					
+					if (intraIndex.minTime === false) {
+						intraIndex.minTime = frameTime;
 					}
 					
-					skipIndex++;
+					if (intraIndex.maxTime === false || frameTime > intraIndex.maxTime) {
+						intraIndex.maxTime = frameTime;
+					}
+					
+					if (frameType == 'I') {
+						if (skipIndex % 4 == 0) {
+							intraIndex.times.push(frameTime);
+							intraIndex.offsets.push(frameOffset);
+						}
+						
+						skipIndex++;
+					}
 				}
 			};
 			
 			parser.parseLog(false);
 			
-			intraframeIndexes.push(intraIndex);
+			intraframeDirectories.push(intraIndex);
 		}
 	}
 	
@@ -811,20 +831,22 @@ function FlightLogIndex(logData) {
 	
 	this.saveToJSON = function() {
 		var 
-			intraframeIndexes = this.getIntraframeIndexes(),
+			intraframeDirectories = this.getIntraframeDirectory(),
 			i, j, 
-			resultIndexes = new Array(intraframeIndexes.length);
+			resultIndexes = new Array(intraframeDirectories.length);
 		
-		for (i = 0; i < intraframeIndexes.length; i++) {
+		for (i = 0; i < intraframeDirectories.length; i++) {
 			var 
 				lastTime, lastLastTime, 
 				lastOffset, lastLastOffset,
 				
-				sourceIndex = intraframeIndexes[i],
+				sourceIndex = intraframeDirectories[i],
 				
 				resultIndex = {
 					times: new Array(sourceIndex.times.length), 
-					offsets: new Array(sourceIndex.offsets.length)
+					offsets: new Array(sourceIndex.offsets.length),
+					minTime: sourceIndex.minTime,
+					maxTime: sourceIndex.maxTime
 				};
 			
 			if (sourceIndex.times.length > 0) {
@@ -866,10 +888,17 @@ function FlightLogIndex(logData) {
 		return logBeginOffsets.length - 1;
 	};
 	
-	this.getIntraframeIndexes = function() {
-		if (!intraframeIndexes)
-			buildIntraframeIndexes();
+	this.getintraframeDirectories = function() {
+		if (!intraframeDirectories)
+			buildIntraframeDirectories();
 		
-		return intraframeIndexes;
+		return intraframeDirectories;
+	}	
+	
+	this.getIntraframeDirectory = function(logIndex) {
+		if (!intraframeDirectories)
+			buildIntraframeDirectories();
+		
+		return intraframeDirectories[logIndex];
 	}
 };

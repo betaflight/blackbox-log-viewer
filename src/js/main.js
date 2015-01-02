@@ -23,9 +23,17 @@ $(document).ready(function() {
 		        return function(e) {
 		        	var 
 		        		dataArray = new Uint8Array(e.target.result),
-		        		flightLog = new FlightLog(dataArray);
+		        		flightLog = new FlightLog(dataArray, 0);
 		        	
+		        	var chunks = flightLog.getChunksInRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 1000000);
 		        	
+		        	for (var i = 0; i < chunks.length; i++) {
+		        		var chunk = chunks[i];
+		        		
+		        		for (var j = 0; j < chunk.length; j++) {
+		        			console.log(chunk[j].join(",") + "\n");
+		        		}
+		        	}
 		        	
 		        	alert("Done!");
 		        };

@@ -78,3 +78,37 @@ function memmem(haystack, needle, startIndex) {
 	
 	return -1;
 }
+
+/**
+ * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
+ * of the next-smaller element (or -1 if `item` is smaller than all values in `list`).
+ * @param list
+ * @param item
+ * @returns
+ */
+function binarySearchOrPrevious(list, item) {
+	var
+		min = 0,
+		max = list.length - 1,
+		guess;
+	
+	if (list.length == 0)
+		return -1;
+		
+	while (min <= max) {
+		//Use ceil so if we get down to two elements we examine the top one which can shrink our max
+		guess = Math.ceil((min + max) / 2);
+		
+		if (list[guess] === item)
+			return guess;
+		else if (list[guess] < item)
+			if (min == max) //Wouldn't make any progress if min == max, so...
+				return guess;
+			else
+				min = guess; 
+		else
+			max = guess - 1;
+	}
+	
+	return -1;
+}
