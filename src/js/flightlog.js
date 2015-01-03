@@ -18,7 +18,15 @@ function FlightLog(logData, logIndex) {
 	};
 	
 	parser.parseHeader(logIndex);
-
+	
+	this.getMainFieldCount = function() {
+		return parser.mainFieldCount;
+	}
+	
+	this.getMainFieldNames = function() {
+		return parser.mainFieldNames;
+	}
+	
 	this.getMinTime = function() {
 		return iframeDirectory.minTime;
 	};

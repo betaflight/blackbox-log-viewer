@@ -105,6 +105,8 @@ var FlightLogParser = function(logData, logDataIndex) {
 	
 	//Public fields:
 	this.logIndex = -1;
+	this.mainFieldNames = [];
+	this.mainFieldCount = 0;
 	
 	/* 
 	 * Event handler of the signature (frameValid, frame, frameType, frameOffset, frameSize)
@@ -113,22 +115,6 @@ var FlightLogParser = function(logData, logDataIndex) {
 	this.onFrameReady = null;
 	
 	//Private methods:
-	function utf8ArrayToString(arr) {
-		return new TextDecoder("utf-8").decode(arr);
-	}
-	
-	function parseCommaSeparatedIntegers(string) {
-		var 
-			parts = string.split(","),
-			result = new Array(parts.length);
-		
-		for (var i = 0; i < parts.length; i++) {
-			result[i] = parseInt(parts[i], 10);
-		}
-
-		return result;
-	}
-
 	function parseHeaderLine() {
 		var 
 			COLON = ":".charCodeAt(0),

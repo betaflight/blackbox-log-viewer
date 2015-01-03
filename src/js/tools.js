@@ -79,6 +79,22 @@ function memmem(haystack, needle, startIndex) {
 	return -1;
 }
 
+function parseCommaSeparatedIntegers(string) {
+	var 
+		parts = string.split(","),
+		result = new Array(parts.length);
+	
+	for (var i = 0; i < parts.length; i++) {
+		result[i] = parseInt(parts[i], 10);
+	}
+
+	return result;
+}
+
+function utf8ArrayToString(arr) {
+	return new TextDecoder("utf-8").decode(arr);
+}
+
 /**
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
  * of the next-smaller element (or -1 if `item` is smaller than all values in `list`).
