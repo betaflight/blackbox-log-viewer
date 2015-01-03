@@ -10,7 +10,9 @@ if (!supportsRequiredAPIs()) {
 
 var
 	GRAPH_STATE_PAUSED = 0,
-	GRAPH_STATE_PLAY = 1;
+	GRAPH_STATE_PLAY = 1,
+	
+	SMALL_JUMP_TIME = 100 * 1000;
 
 var
 	graphState = GRAPH_STATE_PAUSED,
@@ -33,6 +35,10 @@ function renderGraph() {
 	if (graphState == GRAPH_STATE_PLAY) {
 		lastRenderTime = now;
 		requestAnimationFrame(renderGraph);
+		
+		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
+	} else {
+		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
 	}
 }
 
@@ -73,9 +79,7 @@ function renderLogInfo() {
 function setGraphState(newState) {
 	graphState = newState;
 	
-	if (newState == GRAPH_STATE_PAUSED) {
-		lastRenderTime = false;
-	}
+	lastRenderTime = false;
 	
 	renderGraph();
 }
@@ -93,7 +97,7 @@ function loadLog(bytes) {
 }
 
 $(document).ready(function() {
-	$("#logfile").change(function(e) {
+	$("#logfile-open").change(function(e) {
 		var 
 			files = e.target.files,
 			reader;
@@ -106,6 +110,38 @@ $(document).ready(function() {
 	        };
 
 		    reader.readAsArrayBuffer(files[0]);
+		}
+	});
+	
+	$(window).resize(function() {
+		renderGraph();
+	});
+	
+	$(".log-jump-back").click(function() {
+		currentBlackboxTime -= SMALL_JUMP_TIME;
+		setGraphState(GRAPH_STATE_PAUSED);
+	});
+
+	$(".log-jump-forward").click(function() {
+		currentBlackboxTime += SMALL_JUMP_TIME;
+		setGraphState(GRAPH_STATE_PAUSED);
+	});		
+	
+	$(".log-jump-start").click(function() {
+		currentBlackboxTime = flightLog.getMinTime();
+		setGraphState(GRAPH_STATE_PAUSED);
+	});
+
+	$(".log-jump-end").click(function() {
+		currentBlackboxTime = flightLog.getMaxTime();
+		setGraphState(GRAPH_STATE_PAUSED);
+	});	
+	
+	$(".log-play-pause").click(function() {
+		if (graphState == GRAPH_STATE_PAUSED) {
+			setGraphState(GRAPH_STATE_PLAY);
+		} else {
+			setGraphState(GRAPH_STATE_PAUSED);
 		}
 	});
 });
