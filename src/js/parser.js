@@ -701,6 +701,25 @@ var FlightLogParser = function(logData) {
 	stream = new ArrayDataStream(logData);
 };
 
+FlightLogParser.prototype.vbatToMillivolts = function(vbat) {
+    // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
+    return (vbat * 330 * this.sysConfig.vbatscale) / 0xFFF;
+};
+
+FlightLogParser.prototype.estimateNumCells = function() {
+	var 
+		i, refVoltage;
+
+    refVoltage = this.vbatToMillivolts(this.sysConfig.vbatref) / 100;
+
+    for (i = 1; i < 8; i++) {
+        if (refVoltage < i * this.sysConfig.vbatmaxcellvoltage)
+            break;
+    }
+
+    return i;
+};
+
 FlightLogParser.prototype.resetStats = function() {
 	this.stats = {
 		totalBytes: 0,

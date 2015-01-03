@@ -89,6 +89,7 @@ function renderLogInfo() {
 	$(".log-start-time").text(formatTime(flightLog.getMinTime() / 1000, false));
 	$(".log-end-time").text(formatTime(flightLog.getMaxTime() / 1000, false));
 	$(".log-duration").text(formatTime(Math.ceil((flightLog.getMaxTime() - flightLog.getMinTime()) / 1000), false));
+	$(".log-cells").text(flightLog.parser.estimateNumCells() + "S");
 }
 
 function setGraphState(newState) {
