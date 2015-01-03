@@ -78,9 +78,12 @@ function FlightLogGrapher(flightLog, canvas) {
 	accCurve = expoCurveCreate(0, 0.7, 5000, 1.0, 10);
 	pidCurve = expoCurveCreate(0, 0.7, 500, 1.0, 10);*/
 
+	var
+		sysConfig = flightLog.getSysConfig();
+	
 	var 
-		motorCurve = new ExpoCurve(-(flightLog.parser.maxthrottle + flightLog.parser.minthrottle) / 2, 1.0,
-				(flightLog.parser.maxthrottle - flightLog.parser.minthrottle) / 2, 1.0, 0);
+		motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
+				(sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0);
 	
 	this.render = function(windowCenterTimeMicros) {
 		windowCenterTime = windowCenterTimeMicros;

@@ -1,26 +1,18 @@
 "use strict";
 
+/**
+ * Uses a FlightLogParser to provide on-demand parsing (and caching) a flight data log. An index is computed
+ * to allow efficient seeking.
+ */
 function FlightLog(logData, logIndex) {
 	var
 		logIndexes = new FlightLogIndex(logData),
-		parser = new FlightLogParser(logData, logIndexes),
+		parser = new FlightLogParser(logData),
 		
 		iframeDirectory = logIndexes.getIntraframeDirectory(logIndex),
 		
 		chunkCache = {};
-	
-	this.parser = parser;
-		
-	parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-		if (frameValid) {
-			var copy = frame.slice(0);
-			copy.push(frameType);
-			acc.push(copy);
-		}
-	};
-	
-	parser.parseHeader(logIndex);
-	
+
 	this.getMainFieldCount = function() {
 		return parser.mainFieldCount;
 	}
@@ -36,6 +28,10 @@ function FlightLog(logData, logIndex) {
 	this.getMaxTime = function() {
 		return iframeDirectory.maxTime;
 	};
+	
+	this.getSysConfig = function() {
+		return parser.sysConfig;
+	}
 	
 	/**
 	 * Get an array of chunks which span times from the given start to end time.
@@ -76,6 +72,7 @@ function FlightLog(logData, logIndex) {
 				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset);
 				parser.parseLog(false, chunkStartOffset, chunkEndOffset);
 				
+				//TODO limit size of chunk cache by applying some sort of LRU policy
 				chunkCache[chunkIndex] = chunk;
 			}
 			
@@ -84,4 +81,16 @@ function FlightLog(logData, logIndex) {
 		
 		return resultChunks;
 	};
+	
+	this.parser = parser;
+	
+	parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
+		if (frameValid) {
+			var copy = frame.slice(0);
+			copy.push(frameType);
+			acc.push(copy);
+		}
+	};
+	
+	parser.parseHeader(logIndexes.getLogBeginOffset(0));	
 }

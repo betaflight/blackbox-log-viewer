@@ -2,7 +2,7 @@
 
 var FlightLogIndex;
 
-var FlightLogParser = function(logData, logDataIndex) {
+var FlightLogParser = function(logData) {
 	//Private constants:
 	var
 		FLIGHT_LOG_MAX_FIELDS = 128,
@@ -91,6 +91,23 @@ var FlightLogParser = function(logData, logDataIndex) {
 		frameDefs = {},
 		dataVersion, motor0Index,
 		
+		defaultSysConfig = {
+			frameIntervalI: 32,
+			frameIntervalPNum: 1,
+			frameIntervalPDenom: 1,
+			firmwareType: 0,
+			rcRate: 90,
+			vbatscale: 110,
+			vbatref: 4095,
+			vbatmincellvoltage: 33,
+			vbatmaxcellvoltage:43,
+			vbatwarningcellvoltage: 35,
+			gyroScale: 0.0001, // Not even close to the default, but it's hardware specific so we can't do much better
+			acc_1G: 4096, // Ditto ^
+			minthrottle: 1150,
+			maxthrottle: 1850
+		},
+			
 		frameTypes,
 		
 		//Current decoder state:
@@ -104,9 +121,10 @@ var FlightLogParser = function(logData, logDataIndex) {
 		stream;
 	
 	//Public fields:
-	this.logIndex = -1;
 	this.mainFieldNames = [];
 	this.mainFieldCount = 0;
+	
+	this.sysConfig = Object.create(defaultSysConfig);
 	
 	/* 
 	 * Event handler of the signature (frameValid, frame, frameType, frameOffset, frameSize)
@@ -164,16 +182,16 @@ var FlightLogParser = function(logData, logDataIndex) {
 				that.mainFieldSigned = parseCommaSeparatedIntegers(fieldValue);
 			break;
 			case "I interval":
-				that.frameIntervalI = parseInt(fieldValue, 10);
-				if (that.frameIntervalI < 1)
-					that.frameIntervalI = 1;
+				that.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
+				if (that.sysConfig.frameIntervalI < 1)
+					that.sysConfig.frameIntervalI = 1;
 			break;
 			case "P interval":
 				var matches = fieldValue.match(/(\d+)\/(\d+)/);
 				
 				if (matches) {
-					that.frameIntervalPNum = parseInt(matches[1], 10);
-					that.frameIntervalPDenom = parseInt(matches[2], 10);
+					that.sysConfig.frameIntervalPNum = parseInt(matches[1], 10);
+					that.sysConfig.frameIntervalPDenom = parseInt(matches[2], 10);
 				}
 			break;
 			case "Data version":
@@ -182,46 +200,46 @@ var FlightLogParser = function(logData, logDataIndex) {
 			case "Firmware type":
 				switch (fieldValue) {
 					case "Cleanflight":
-						that.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
+						that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
 					break;
 					default:
-						that.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
+						that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
 				}
 			break;
 			case "minthrottle":
-				that.minthrottle = parseInt(fieldValue, 10);
+				that.sysConfig.minthrottle = parseInt(fieldValue, 10);
 			break;
 			case "maxthrottle":
-				that.maxthrottle = parseInt(fieldValue, 10);
+				that.sysConfig.maxthrottle = parseInt(fieldValue, 10);
 			break;
 			case "rcRate":
-				that.rcRate = parseInt(fieldValue, 10);
+				that.sysConfig.rcRate = parseInt(fieldValue, 10);
 			break;
 			case "vbatscale":
-				that.vbatscale = parseInt(fieldValue, 10);
+				that.sysConfig.vbatscale = parseInt(fieldValue, 10);
 			break;
 			case "vbatref":
-				that.vbatref = parseInt(fieldValue, 10);
+				that.sysConfig.vbatref = parseInt(fieldValue, 10);
 			break;
 			case "vbatcellvoltage":
 				var vbatcellvoltage = fieldValue.split(",");
 	
-		        that.vbatmincellvoltage = vbatcellvoltage[0];
-		        that.vbatwarningcellvoltage = vbatcellvoltage[1];
-		        that.vbatmaxcellvoltage = vbatcellvoltage[2];
+		        that.sysConfig.vbatmincellvoltage = vbatcellvoltage[0];
+		        that.sysConfig.vbatwarningcellvoltage = vbatcellvoltage[1];
+		        that.sysConfig.vbatmaxcellvoltage = vbatcellvoltage[2];
 	        break;
 	        case "gyro.scale":
-				that.gyroScale = hexToFloat(fieldValue);
+				that.sysConfig.gyroScale = hexToFloat(fieldValue);
 		
 				/* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
 				 * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
 				 * match Baseflight so we can use Baseflight's IMU for both: */
 				if (that.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT) {
-					that.gyroScale = that.gyroScale * (PI / 180.0) * 0.000001;
+					that.sysConfig.gyroScale = that.sysConfig.gyroScale * (PI / 180.0) * 0.000001;
 				}
 			break;
 	        case "acc_1G":
-				that.acc_1G = parseInt(fieldValue);
+				that.sysConfig.acc_1G = parseInt(fieldValue);
 			break;
 			default:
 				if ((matches = fieldName.match(/^Field (.) predictor$/))) {
@@ -289,7 +307,8 @@ var FlightLogParser = function(logData, logDataIndex) {
 	 */
 	function shouldHaveFrame(frameIndex)
 	{
-	    return (frameIndex % that.frameIntervalI + that.frameIntervalPNum - 1) % that.frameIntervalPDenom < that.frameIntervalPNum;
+	    return (frameIndex % that.sysConfig.frameIntervalI + that.sysConfig.frameIntervalPNum - 1) 
+	    	% that.sysConfig.frameIntervalPDenom < that.sysConfig.frameIntervalPNum;
 	}	
 	
 	function parseIntraframe(raw) {
@@ -330,7 +349,7 @@ var FlightLogParser = function(logData, logDataIndex) {
 						//No-op
 					break;
 					case FLIGHT_LOG_FIELD_PREDICTOR_MINTHROTTLE:
-						value += that.minthrottle;
+						value += that.sysConfig.minthrottle;
 					break;
 					case FLIGHT_LOG_FIELD_PREDICTOR_1500:
 						value += 1500;
@@ -342,7 +361,7 @@ var FlightLogParser = function(logData, logDataIndex) {
 						value += current[motor0Index];
 					break;
 					case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
-					    value += that.vbatref;
+					    value += that.sysConfig.vbatref;
 					break;
 					default:
 						throw "Unsupported I-field predictor " + frameDefs["I"].predictor[i];
@@ -521,37 +540,21 @@ var FlightLogParser = function(logData, logDataIndex) {
     	return frameTypes[command];
     }
     
-    this.parseHeader = function(logIndex) {
-    	this.logIndex = logIndex;
-    	
-		if (logIndex === undefined || logIndex < 0 || logIndex >= logDataIndex.getLogCount())
-    		throw "Bad log index to parseHeader()";
-
+    this.parseHeader = function(startOffset, endOffset) {
 		//Reset any parsed information from previous parses
 		this.resetStats();
 		this.mainFieldCount = 0;
 		this.gpsFieldCount = 0;
 				
-		//Default to MW's defaults
-		this.minthrottle = 1150;
-		this.maxthrottle = 1850;
-
-		this.vbatref = 4095;
-		this.vbatscale = 110;
-		this.vbatmincellvoltage = 33;
-		this.vbatmaxcellvoltage = 43;
-		this.vbatwarningcellvoltage = 35;
-
-		this.frameIntervalI = 32;
-		this.frameIntervalPNum = 1;
-		this.frameIntervalPDenom = 1;
-
+		//Reset system configuration to MW's defaults
+		this.sysConfig = Object.create(defaultSysConfig);
+		
 		motor0Index = -1;
 
-		//Set parsing ranges up for the log the caller selected
-		stream.start = logDataIndex.getLogBeginOffset(logIndex);
+		//Set parsing ranges up
+		stream.start = startOffset === undefined ? stream.pos : startOffset;
 	    stream.pos = stream.start;
-	    stream.end = logDataIndex.getLogBeginOffset(logIndex + 1);
+	    stream.end = endOffset === undefined ? stream.end : endOffset;
 	    stream.eof = false;
 
 	    mainloop:
@@ -697,10 +700,6 @@ var FlightLogParser = function(logData, logDataIndex) {
 	};
 	
 	stream = new ArrayDataStream(logData);
-	
-	if (!logDataIndex) {
-		logDataIndex = new FlightLogIndex(logData);
-	}
 };
 
 FlightLogParser.prototype.resetStats = function() {
@@ -778,7 +777,7 @@ function FlightLogIndex(logData) {
 				},
 				skipIndex = 0;
 			
-			parser.parseHeader(i);
+			parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
 			
 			parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
 				if (frameValid) {
