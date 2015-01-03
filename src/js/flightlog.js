@@ -8,6 +8,8 @@ function FlightLog(logData, logIndex) {
 		iframeDirectory = logIndexes.getIntraframeDirectory(logIndex),
 		
 		chunkCache = {};
+	
+	this.parser = parser;
 		
 	parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
 		if (frameValid) {

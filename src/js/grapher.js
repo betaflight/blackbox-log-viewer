@@ -1,3 +1,5 @@
+"use strict";
+
 function FlightLogGrapher(flightLog, canvas) {
 	
 	var
@@ -10,15 +12,18 @@ function FlightLogGrapher(flightLog, canvas) {
 			gapless:false
 		};
 	
-	function plotField(chunks, startChunkIndex, startFrameIndex, fieldIndex, plotHeight, color) {
+	/**
+	 * Plot the given field within the specified time period. When the output from the curve applied to a field
+	 * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
+	 */
+	function plotField(chunks, startChunkIndex, startFrameIndex, fieldIndex, curve, plotHeight, color) {
 		var
 			GAP_WARNING_BOX_RADIUS = 4,
 			chunkIndex, frameIndex,
 			drawingLine = false,
 			lastX, lastY,
-			yScale = -plotHeight / 500, //TODO divide by field maximum
-			xScale = canvas.width / windowWidthMicros,
-			points = 0;
+			yScale = -plotHeight,
+			xScale = canvas.width / windowWidthMicros;
 
 		//Draw points from this line until we leave the window
 		
@@ -35,7 +40,7 @@ function FlightLogGrapher(flightLog, canvas) {
 					frameTime = chunks[chunkIndex][frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
 					nextX, nextY;
 	
-				nextY = fieldValue  * yScale;
+				nextY = curve.lookup(fieldValue) * yScale;
 				nextX = (frameTime - windowStartTime) * xScale;
 	
 				if (drawingLine) {
@@ -55,7 +60,6 @@ function FlightLogGrapher(flightLog, canvas) {
 				drawingLine = true;
 				lastX = nextX;
 				lastY = nextY;
-				points++;
 	
 				if (frameTime >= windowEndTime)
 					break plottingLoop;
@@ -67,7 +71,17 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.strokeStyle = color;
 		canvasContext.stroke();
 	}
-		
+	/*
+	pitchStickCurve = expoCurveCreate(0, 0.700, 500 * (flightLog->rcRate ? flightLog->rcRate : 100) / 100, 1.0, 10);
+
+	gyroCurve = expoCurveCreate(0, 0.2, 9.0e-6 / flightLog->gyroScale, 1.0, 10);
+	accCurve = expoCurveCreate(0, 0.7, 5000, 1.0, 10);
+	pidCurve = expoCurveCreate(0, 0.7, 500, 1.0, 10);*/
+
+	var 
+		motorCurve = new ExpoCurve(-(flightLog.parser.maxthrottle + flightLog.parser.minthrottle) / 2, 1.0,
+				(flightLog.parser.maxthrottle - flightLog.parser.minthrottle) / 2, 1.0, 0);
+	
 	this.render = function(windowCenterTimeMicros) {
 		windowCenterTime = windowCenterTimeMicros;
 		windowStartTime = windowCenterTime - windowWidthMicros / 2;
@@ -106,7 +120,8 @@ function FlightLogGrapher(flightLog, canvas) {
 			
 			canvasContext.translate(0, canvas.height / 2);
 			for (var i = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME + 1; i < flightLog.getMainFieldCount(); i++) {
-				plotField(chunks, startChunkIndex, startFrameIndex, i, canvas.height / 2, "#000");
+				if (flightLog.getMainFieldNames()[i].match(/^motor/))
+					plotField(chunks, startChunkIndex, startFrameIndex, i, motorCurve, canvas.height / 4, "#000");
 			}
 			
 			canvasContext.restore();
