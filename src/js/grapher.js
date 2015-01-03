@@ -116,7 +116,7 @@ function FlightLogGrapher(flightLog, canvas) {
 			canvasContext.translate(0, canvas.height / 2);
 			for (var i = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME + 1; i < flightLog.getMainFieldCount(); i++) {
 				if (flightLog.getMainFieldNames()[i].match(/^motor/))
-					plotField(chunks, startFrameIndex, i, motorCurve, canvas.height / 4, "#000");
+					plotField(chunks, startFrameIndex, i, motorCurve, canvas.height / 4, "#FFF");
 			}
 			
 			canvasContext.restore();

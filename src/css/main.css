@@ -26,6 +26,7 @@
 .log-graph {
 	height:500px;
 	position:relative;
+	margin-top:1em;
 }
 
 .log-graph canvas {
@@ -34,6 +35,7 @@
 	left:0;
 	width:100%;
 	height:100%;
+    background-color: black;
 }
 
 .log-graph video {
@@ -42,4 +44,16 @@
     left:0;
     width:100%;
     height:100%;
+}
+
+.log-graph.has-video {
+	height:auto;
+}
+.log-graph.has-video video {
+	position:relative;
+	width:100%;
+	height:auto;
+}
+.log-graph.has-video canvas {
+	background-color:rgba(0,0,0,0.25);
 }

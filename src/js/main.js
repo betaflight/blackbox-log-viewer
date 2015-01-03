@@ -19,27 +19,41 @@ var
 	currentBlackboxTime = 0,
 	lastRenderTime = false,
 	dataArray, flightLog, graph,
-	videoURL = false;
+	
+	video = $(".log-graph video")[0],
+	videoURL = false,
+	videoOffset = 0.0;
+
+function blackboxTimeFromVideoTime() {
+	return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
+}
 
 function renderGraph() {
 	var 
-		now = Date.now(), delta;
+		now = Date.now();
 	
-	if (lastRenderTime === false)
-		delta = 0;
-	else
-		delta = (now - lastRenderTime) * 1000;
-
-	currentBlackboxTime += delta;
+	if (!graph)
+		return;
+	
+	if (videoURL) {
+		currentBlackboxTime = blackboxTimeFromVideoTime();
+	} else {
+		var
+			delta;
+		
+		if (lastRenderTime === false)
+			delta = 0;
+		else
+			delta = (now - lastRenderTime) * 1000;
+	
+		currentBlackboxTime += delta;
+	}
+	
 	graph.render(currentBlackboxTime);
 
 	if (graphState == GRAPH_STATE_PLAY) {
 		lastRenderTime = now;
 		requestAnimationFrame(renderGraph);
-		
-		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
-	} else {
-		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
 	}
 }
 
@@ -82,7 +96,22 @@ function setGraphState(newState) {
 	
 	lastRenderTime = false;
 	
+	if (graphState == GRAPH_STATE_PLAY) {
+		video.play();
+		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
+	} else {
+		video.pause();
+		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
+	}
+	
 	renderGraph();
+}
+
+function setCurrentBlackboxTime(newTime) {
+	video.currentTime = (newTime - flightLog.getMinTime()) / 1000000 + videoOffset;
+	
+	//Assuming that the video snaps the currentTime to an actual frame boundary, read it back to use as our log position
+	currentBlackboxTime = blackboxTimeFromVideoTime();
 }
 
 function loadLog(bytes) {
@@ -125,31 +154,34 @@ $(document).ready(function() {
 			}
 			
 			videoURL = URL.createObjectURL(files[0]);
-			$(".log-graph video")[0].src = videoURL;
+			video.volume = 0.05;
+			video.src = videoURL;
+			
+			$(".log-graph").addClass("has-video");
 		}
-});
+	});
 	
 	$(window).resize(function() {
 		renderGraph();
 	});
 	
 	$(".log-jump-back").click(function() {
-		currentBlackboxTime -= SMALL_JUMP_TIME;
+		setCurrentBlackboxTime(currentBlackboxTime - SMALL_JUMP_TIME);
 		setGraphState(GRAPH_STATE_PAUSED);
 	});
 
 	$(".log-jump-forward").click(function() {
-		currentBlackboxTime += SMALL_JUMP_TIME;
+		setCurrentBlackboxTime(currentBlackboxTime + SMALL_JUMP_TIME);
 		setGraphState(GRAPH_STATE_PAUSED);
 	});		
 	
 	$(".log-jump-start").click(function() {
-		currentBlackboxTime = flightLog.getMinTime();
+		setCurrentBlackboxTime(flightLog.getMinTime());
 		setGraphState(GRAPH_STATE_PAUSED);
 	});
 
 	$(".log-jump-end").click(function() {
-		currentBlackboxTime = flightLog.getMaxTime();
+		setCurrentBlackboxTime(flightLog.getMaxTime());
 		setGraphState(GRAPH_STATE_PAUSED);
 	});	
 	
@@ -159,5 +191,20 @@ $(document).ready(function() {
 		} else {
 			setGraphState(GRAPH_STATE_PAUSED);
 		}
+	});
+	
+	$(".log-sync-here").click(function() {
+		videoOffset = video.currentTime;
+		renderGraph();
+	});
+	
+	$(".video-offset").change(function() {
+		var offset = parseFloat($(".video-offset").val());
+		
+		if (!isNaN(offset)) {
+			videoOffset = offset;
+			renderGraph();
+		} 
+			
 	});
 });
