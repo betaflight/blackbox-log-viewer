@@ -1,7 +1,6 @@
 "use strict";
 
 function FlightLogGrapher(flightLog, canvas) {
-	
 	var
 		windowWidthMicros = 1000000,
 		windowStartTime, windowCenterTime, windowEndTime,
@@ -12,11 +11,15 @@ function FlightLogGrapher(flightLog, canvas) {
 			gapless:false
 		};
 	
+	function drawCommandSticks() {
+		
+	}
+	
 	/**
 	 * Plot the given field within the specified time period. When the output from the curve applied to a field
 	 * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
 	 */
-	function plotField(chunks, startChunkIndex, startFrameIndex, fieldIndex, curve, plotHeight, color) {
+	function plotField(chunks, startFrameIndex, fieldIndex, curve, plotHeight, color) {
 		var
 			GAP_WARNING_BOX_RADIUS = 4,
 			chunkIndex, frameIndex,
@@ -33,7 +36,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.beginPath();
 		
 		plottingLoop:
-		for (chunkIndex = startChunkIndex; chunkIndex < chunks.length; chunkIndex++) {
+		for (chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
 			for (; frameIndex < chunks[chunkIndex].length; frameIndex++) {
 				var
 					fieldValue = chunks[chunkIndex][frameIndex][fieldIndex],
@@ -98,33 +101,22 @@ function FlightLogGrapher(flightLog, canvas) {
 		
 		if (chunks.length) {
 			//Find the first sample that lies inside the window
-			windowStartLoop:
-			for (var startChunkIndex = 0; startChunkIndex < chunks.length; startChunkIndex++) {
-				for (var startFrameIndex = 0; startFrameIndex < chunks[startChunkIndex].length; startFrameIndex++) {
-					if (chunks[startChunkIndex][startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= windowStartTime) {
-						break windowStartLoop;
-					}
+			for (var startFrameIndex = 0; startFrameIndex < chunks[0].length; startFrameIndex++) {
+				if (chunks[0][startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= windowStartTime) {
+					break;
 				}
 			}
 			
 			// Pick the sample before that to begin plotting from
-			startFrameIndex--;
-			if (startFrameIndex < 0) {
-				if (startChunkIndex == 0) {
-					startChunkIndex = 0;
-					startFrameIndex = 0;
-				} else {
-					startChunkIndex--;
-					startFrameIndex = chunks[startChunkIndex].length - 1;
-				}
-			}
+			if (startFrameIndex > 0)
+				startFrameIndex--;
 	
 			canvasContext.save();
 			
 			canvasContext.translate(0, canvas.height / 2);
 			for (var i = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME + 1; i < flightLog.getMainFieldCount(); i++) {
 				if (flightLog.getMainFieldNames()[i].match(/^motor/))
-					plotField(chunks, startChunkIndex, startFrameIndex, i, motorCurve, canvas.height / 4, "#000");
+					plotField(chunks, startFrameIndex, i, motorCurve, canvas.height / 4, "#000");
 			}
 			
 			canvasContext.restore();

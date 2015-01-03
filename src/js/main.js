@@ -18,7 +18,8 @@ var
 	graphState = GRAPH_STATE_PAUSED,
 	currentBlackboxTime = 0,
 	lastRenderTime = false,
-	dataArray, flightLog, graph;
+	dataArray, flightLog, graph,
+	videoURL = false;
 
 function renderGraph() {
 	var 
@@ -112,6 +113,21 @@ $(document).ready(function() {
 		    reader.readAsArrayBuffer(files[0]);
 		}
 	});
+	
+	$("#video-open").change(function(e) {
+		var 
+			files = e.target.files;
+		
+		if (files.length > 0) {
+			if (videoURL) {
+				URL.revokeObjectURL(videoURL);
+				videoURL = false;
+			}
+			
+			videoURL = URL.createObjectURL(files[0]);
+			$(".log-graph video")[0].src = videoURL;
+		}
+});
 	
 	$(window).resize(function() {
 		renderGraph();

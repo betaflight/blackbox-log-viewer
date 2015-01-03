@@ -30,8 +30,9 @@ body {
 			</div>
 			<div id="navbar" class="navbar-collapse collapse">
 				<div class="navbar-form navbar-right" role="form">
-					<span class="btn btn-primary btn-file"> Open log file... <input type="file" id="logfile-open">
-					</span>
+                    <span class="btn btn-default btn-file"> Open video <input type="file" id="video-open"></span>
+
+					<span class="btn btn-primary btn-file"> Open log file <input type="file" id="logfile-open"></span>
 				</div>
 			</div>
 			<!--/.navbar-collapse -->
@@ -63,6 +64,7 @@ body {
 		</div>
 
 		<div class="log-graph">
+		    <video></video>
 			<canvas width="1280" height="600" id="graph"></canvas>
 		</div>
 
