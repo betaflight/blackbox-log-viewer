@@ -24,9 +24,25 @@ $(document).ready(function() {
 		        	var 
 		        		dataArray = new Uint8Array(e.target.result),
 		        		flightLog = new FlightLog(dataArray, 0),
-		        		graph = new FlightLogGrapher(flightLog, $("#graph")[0]);
+		        		graph = new FlightLogGrapher(flightLog, $("#graph")[0]),
+		        		
+		        		currentTime = flightLog.getMinTime();
 		        	
-		        	graph.render();
+		        	var lastRender = Date.now();
+		        	
+		        	function render() {
+		        		var 
+		        			now = Date.now(),
+		        			delta = (now - lastRender) * 1000;
+
+		        		currentTime += delta;
+		        		graph.render(currentTime);
+		        		
+		        		lastRender = now;
+		        		requestAnimationFrame(render);
+		        	}
+		        	
+		        	render();
 		        };
 		    })(file);
 

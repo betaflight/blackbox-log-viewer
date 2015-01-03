@@ -15,12 +15,17 @@ function FlightLogGrapher(flightLog, canvas) {
 			GAP_WARNING_BOX_RADIUS = 4,
 			chunkIndex, frameIndex,
 			drawingLine = false,
-			lastX, lastY;
+			lastX, lastY,
+			yScale = -plotHeight / 500, //TODO divide by field maximum
+			xScale = canvas.width / windowWidthMicros,
+			points = 0;
 
 		//Draw points from this line until we leave the window
 		
 		//We may start partway through the first chunk:
 		frameIndex = startFrameIndex;
+		
+		canvasContext.beginPath();
 		
 		plottingLoop:
 		for (chunkIndex = startChunkIndex; chunkIndex < chunks.length; chunkIndex++) {
@@ -30,8 +35,8 @@ function FlightLogGrapher(flightLog, canvas) {
 					frameTime = chunks[chunkIndex][frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
 					nextX, nextY;
 	
-				nextY = -fieldValue / 500 * plotHeight;
-				nextX = (frameTime - windowStartTime) / windowWidthMicros * canvas.width;
+				nextY = fieldValue  * yScale;
+				nextX = (frameTime - windowStartTime) * xScale;
 	
 				if (drawingLine) {
 					/*if (!options.gapless && datapointsGetGapStartsAtIndex(points, frameIndex - 1)) {
@@ -50,6 +55,7 @@ function FlightLogGrapher(flightLog, canvas) {
 				drawingLine = true;
 				lastX = nextX;
 				lastY = nextY;
+				points++;
 	
 				if (frameTime >= windowEndTime)
 					break plottingLoop;
@@ -61,11 +67,13 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.strokeStyle = color;
 		canvasContext.stroke();
 	}
-	
-	this.render = function() {
-		windowCenterTime = flightLog.getMinTime();
+		
+	this.render = function(windowCenterTimeMicros) {
+		windowCenterTime = windowCenterTimeMicros;
 		windowStartTime = windowCenterTime - windowWidthMicros / 2;
 		windowEndTime = windowStartTime + windowWidthMicros;
+		
+		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 		
 		var 
 			chunks = flightLog.getChunksInRange(windowStartTime, windowEndTime),
@@ -94,11 +102,14 @@ function FlightLogGrapher(flightLog, canvas) {
 				}
 			}
 	
+			canvasContext.save();
+			
 			canvasContext.translate(0, canvas.height / 2);
-			for (var i = 0; i < flightLog.getMainFieldCount(); i++) {
+			for (var i = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME + 1; i < flightLog.getMainFieldCount(); i++) {
 				plotField(chunks, startChunkIndex, startFrameIndex, i, canvas.height / 2, "#000");
 			}
-			canvasContext.resetTransform();
+			
+			canvasContext.restore();
 		}
 		
 		/*var chunks = flightLog.getChunksInRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 1000000);

@@ -71,6 +71,7 @@ function FlightLog(logData, logIndex) {
 					}
 				};
 
+				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset);
 				parser.parseLog(false, chunkStartOffset, chunkEndOffset);
 				
 				chunkCache[chunkIndex] = chunk;

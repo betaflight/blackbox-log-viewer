@@ -145,8 +145,8 @@ var FlightLogParser = function(logData, logDataIndex) {
 
 		lineEnd = stream.pos;
 
-		fieldName = utf8ArrayToString(stream.data.subarray(lineStart, separatorPos));
-		fieldValue = utf8ArrayToString(stream.data.subarray(separatorPos + 1, lineEnd));
+		fieldName = asciiArrayToString(stream.data.subarray(lineStart, separatorPos));
+		fieldValue = asciiArrayToString(stream.data.subarray(separatorPos + 1, lineEnd));
 
 		switch (fieldName) {
 			case "Field I name":

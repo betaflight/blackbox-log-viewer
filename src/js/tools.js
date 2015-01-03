@@ -10,6 +10,10 @@ function hexToFloat(string) {
 	return floatArr[0];	
 }
 
+function asciiArrayToString(arr) {
+	return String.fromCharCode.apply(null, arr);
+}
+
 function asciiStringToByteArray(s) {
     var bytes = [];
     
@@ -89,10 +93,6 @@ function parseCommaSeparatedIntegers(string) {
 	}
 
 	return result;
-}
-
-function utf8ArrayToString(arr) {
-	return new TextDecoder("utf-8").decode(arr);
 }
 
 /**
