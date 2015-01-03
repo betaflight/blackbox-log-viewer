@@ -33,6 +33,22 @@ function FlightLog(logData, logIndex) {
 		return parser.sysConfig;
 	}
 	
+	this.getFrameAtTime = function(startTime) {
+		var
+			chunks = this.getChunksInRange(startTime),
+			chunk = chunks[0];
+		
+		if (chunk) {
+			for (var i = 0; i < chunk.length; i++) {
+				if (chunk[i][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] > startTime)
+					break;
+			}
+			
+			return chunk[i - 1];
+		} else
+			return false;
+	};
+	
 	/**
 	 * Get an array of chunks which span times from the given start to end time.
 	 * Each chunk is an array of log frames.
@@ -70,7 +86,7 @@ function FlightLog(logData, logIndex) {
 				};
 
 				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset);
-				parser.parseLog(false, chunkStartOffset, chunkEndOffset);
+				parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
 				
 				//TODO limit size of chunk cache by applying some sort of LRU policy
 				chunkCache[chunkIndex] = chunk;

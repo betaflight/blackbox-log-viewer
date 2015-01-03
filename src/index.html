@@ -1,76 +1,87 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<html class="no-js">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title></title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="css/bootstrap.min.css">
-        <style>
-            body {
-                padding-top: 50px;
-                padding-bottom: 20px;
-            }
-        </style>
-        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<style>
+body {
+	padding-top: 50px;
+	padding-bottom: 20px;
+}
+</style>
+<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="css/main.css">
 
-        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-    </head>
-    <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Cleanflight Blackbox Explorer</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
-        </div><!--/.navbar-collapse -->
-      </div>
-    </nav>
+<script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+</head>
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Cleanflight Blackbox Explorer</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+				<form class="navbar-form navbar-right" role="form">
+					<div class="form-group">
+						<input type="text" placeholder="Email" class="form-control">
+					</div>
+					<div class="form-group">
+						<input type="password" placeholder="Password" class="form-control">
+					</div>
+					<button type="submit" class="btn btn-success">Sign in</button>
+				</form>
+			</div>
+			<!--/.navbar-collapse -->
+		</div>
+	</nav>
 
-    <div class="container">
-      <div>
-        <input type="file" id="logfile" name="logfile" />
-        
-        <canvas width="1024" height="500" id="graph"></canvas> 
-      </div>
+	<div class="container">
+		<div>
+			<input type="file" id="logfile" name="logfile" />
+		</div>
+		<h4>Log statistics</h4>
+		<dl class="log-info dl-horizontal">
+		    <dt>Start time</dt>
+		    <dd class="log-start-time"></dd>
+		    
+            <dt>End time</dt>
+            <dd class="log-end-time"></dd>
+            
+            <dt>Duration</dt>
+            <dd class="log-duration"></dd>
+		</dl>
+		<div>
+			<canvas width="1024" height="500" id="graph"></canvas>
+		</div>
 
-      <hr>
+		<hr>
 
-      <footer>
-        <p>&copy; Nicholas Sherlock 2015</p>
-      </footer>
-    </div> <!-- /container -->      <!--   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  -->
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
+		<footer>
+			<p>&copy; Nicholas Sherlock 2015</p>
+		</footer>
+	</div>
+	<!-- /container -->
+	<!--   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  -->
+	<script>
+		window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')
+	</script>
 
-        <script src="js/vendor/bootstrap.min.js"></script>
-        <script src="js/tools.js"></script>
-        <script src="js/expo.js"></script>
-        <script src="js/datastream.js"></script>
-        <script src="js/decoders.js"></script>
-        <script src="js/parser.js"></script>
-        <script src="js/flightlog.js"></script>
-        <script src="js/grapher.js"></script>
-        <script src="js/main.js"></script>
-    </body>
+	<script src="js/vendor/bootstrap.min.js"></script>
+	<script src="js/tools.js"></script>
+	<script src="js/expo.js"></script>
+	<script src="js/datastream.js"></script>
+	<script src="js/decoders.js"></script>
+	<script src="js/parser.js"></script>
+	<script src="js/flightlog.js"></script>
+	<script src="js/grapher.js"></script>
+	<script src="js/main.js"></script>
+</body>
 </html>

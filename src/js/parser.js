@@ -320,9 +320,8 @@ var FlightLogParser = function(logData) {
 		previous = mainHistory[1];
 
 		if (previous) {
-	        for (var frameIndex = previous[that.FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++) {
+	        for (var frameIndex = previous[that.FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++)
 	            that.stats.intentionallyAbsentIterations++;
-	        }
 	    }
 
 		for (i = 0; i < that.mainFieldCount; i++) {
@@ -584,10 +583,10 @@ var FlightLogParser = function(logData) {
         if (this.mainFieldCount == 0) {
         	throw "Data file is missing field name definitions";
             return false;
-        }	    
+        }
     };
 	
-	this.parseLog = function(raw, startOffset, endOffset) {
+	this.parseLogData = function(raw, startOffset, endOffset) {
 		var 
 			looksLikeFrameCompleted = false,
 			prematureEof = false,
@@ -803,7 +802,7 @@ function FlightLogIndex(logData) {
 				}
 			};
 			
-			parser.parseLog(false);
+			parser.parseLogData(false);
 			
 			intraframeDirectories.push(intraIndex);
 		}
