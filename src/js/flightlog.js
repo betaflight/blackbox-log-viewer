@@ -12,7 +12,9 @@ function FlightLog(logData, logIndex) {
 		iframeDirectory = logIndexes.getIntraframeDirectory(logIndex),
 		
 		chunkCache = {};
-
+	
+	this.parser = parser;
+	
 	this.getMainFieldCount = function() {
 		return parser.mainFieldCount;
 	}
@@ -97,9 +99,7 @@ function FlightLog(logData, logIndex) {
 		
 		return resultChunks;
 	};
-	
-	this.parser = parser;
-	
+		
 	parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
 		if (frameValid) {
 			var copy = frame.slice(0);
@@ -110,3 +110,22 @@ function FlightLog(logData, logIndex) {
 	
 	parser.parseHeader(logIndexes.getLogBeginOffset(0));	
 }
+
+FlightLog.prototype.vbatToMillivolts = function(vbat) {
+    // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
+    return (vbat * 330 * this.getSysConfig().vbatscale) / 0xFFF;
+};
+
+FlightLog.prototype.estimateNumCells = function() {
+	var 
+		i, refVoltage;
+
+    refVoltage = this.vbatToMillivolts(this.getSysConfig().vbatref) / 100;
+
+    for (i = 1; i < 8; i++) {
+        if (refVoltage < i * this.getSysConfig().vbatmaxcellvoltage)
+            break;
+    }
+
+    return i;
+};

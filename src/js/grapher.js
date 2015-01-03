@@ -2,14 +2,164 @@
 
 function FlightLogGrapher(flightLog, canvas) {
 	var
+		PID_P = 0,
+		PID_I = 0,
+		PID_D = 0,
+		
+		WHITE = "white",
+		
+		lineColors = [
+            "#fb8072",
+			"#8dd3c7",
+			"#ffffb3",
+			"#bebada",
+			"#80b1d3",
+			"#fdb462",
+			"#b3de69",
+			"#fccde5",
+			"#d9d9d9",
+			"#bc80bd",
+			"#ccebc5",
+			"#ffed6f"
+		];
+	
+	var
 		windowWidthMicros = 1000000,
 		windowStartTime, windowCenterTime, windowEndTime,
 		
 		canvasContext = canvas.getContext("2d"),
 		
 		options = {
-			gapless:false
+			gapless:false,
+			plotPIDs:true, plotGyros:true, plotMotors:true,
+			drawCraft:true, drawPidTable:true, drawSticks:true,  drawTime:true
+		},
+		
+		idents;
+	
+	function identifyFields() {
+		var 
+			motorGraphColorIndex = 0,
+			fieldIndex,
+			fieldNames = flightLog.getMainFieldNames();
+		
+		idents = {
+			rcCommandFields:[],
+			motorFields:[],
+			motorColors:[],
+
+			axisPIDFields: [[], [], []],  //First dimension is [P, I, D], second dimension is axis
+			PIDAxisColors: [[], [], []], //PID, axis
+			PIDLineStyle: [], //Indexed by PID_P etc
+
+			gyroFields:[],
+			gyroColors:[],
+
+			accFields:[],
+			accColors:[],
+
+			servoFields:[],
+			servoColors:[],
+
+			vbatField:-1,
+			numCells:-1,
+			baroField:-1,
+
+			miscFields:[],
+			miscColors:[],
+
+			//Synthetic fields:
+			roll:-1,
+			pitch:-1,
+			heading:-1,
+			axisPIDSum:[]
 		};
+		
+		for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
+		    var 
+		    	fieldName = fieldNames[fieldIndex],
+		    	matches;
+
+			if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
+				var motorIndex = matches[1];
+
+				idents.motorFields[motorIndex] = fieldIndex;
+				idents.motorColors[motorIndex] = lineColors[(motorGraphColorIndex++) % lineColors.length];
+			} else if ((matches = fieldName.match(/^rcCommand\[(\d+)]$/))) {
+				var rcCommandIndex = matches[1];
+
+				if (rcCommandIndex >= 0 && rcCommandIndex < 4) {
+					idents.rcCommandFields[rcCommandIndex] = fieldIndex;
+				}
+			} else if ((matches = fieldName.match(/^axisPID\[(\d+)]$/))) {
+				var axisIndex = matches[1];
+
+				idents.axisPIDSum[axisIndex] = fieldIndex;
+			} else if ((matches = fieldName.match(/^axis(.)\[(\d+)]$/))) {
+				var axisIndex = matches[2];
+				
+				idents.axisPIDFields[matches[1]] = axisIndex;
+				idents.hasPIDs = true;
+
+				if (options.plotPids) {
+					idents.PIDAxisColors[PID_P][axisIndex] = lineColors[0];
+					idents.PIDAxisColors[PID_I][axisIndex] = lineColors[1];
+					idents.PIDAxisColors[PID_D][axisIndex] = lineColors[2];
+				} else {
+					idents.PIDAxisColors[PID_P][axisIndex] = WHITE;
+					idents.PIDAxisColors[PID_I][axisIndex] = WHITE;
+					idents.PIDAxisColors[PID_D][axisIndex] = WHITE;
+				}
+
+				idents.PIDLineStyle[axisIndex] = 0; //TODO
+			} else if ((matches = fieldName.match(/^gyroData\[(\d+)]$/))) {
+				var axisIndex = matches[1];
+
+				idents.gyroFields[axisIndex] = fieldIndex;
+
+				if (options.plotGyros) {
+					if (options.bottomGraphSplitAxes)
+						idents.gyroColors[axisIndex] = lineColors[(PID_D + 2) % lineColors.length];
+					else
+						idents.gyroColors[axisIndex] = lineColors[axisIndex % lineColors.length];
+				} else
+					idents.gyroColors[axisIndex] = WHITE;
+			} else if ((matches = fieldName.match(/^accSmooth\[(\d+)]$/))) {
+				var axisIndex = matches[1];
+
+				idents.accFields[axisIndex] = fieldIndex;
+				idents.accColors[axisIndex] = lineColors[axisIndex % lineColors.length];
+			} else if ((matches = fieldName.match(/^servo\[(\d+)]$/))) {
+				var servoIndex = matches[1];
+
+				idents.numServos++;
+				idents.servoFields[servoIndex] = fieldIndex;
+				idents.servoColors[servoIndex] = lineColors[(motorGraphColorIndex++) % lineColors.length];
+			} else {
+				switch (fieldName) {
+					case "vbatLatest":
+						idents.vbatField = fieldIndex;
+						idents.numCells = flightLog.estimateNumCells();
+					break;
+					case "BaroAlt":
+						idents.baroField = fieldIndex;
+					break;
+					case "roll":
+						idents.roll = fieldIndex;
+					break;
+					case "pitch":
+						idents.pitch = fieldIndex;
+					break;
+					case "heading":
+						idents.heading = fieldIndex;
+					break;
+					default:
+						idents.miscFields.push(fieldIndex);
+						idents.miscColors.push(lineColors[idents.miscColors.length % lineColors.length]);
+				}
+			}
+		}
+	}
 	
 	function drawCommandSticks() {
 		
@@ -114,9 +264,9 @@ function FlightLogGrapher(flightLog, canvas) {
 			canvasContext.save();
 			
 			canvasContext.translate(0, canvas.height / 2);
-			for (var i = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME + 1; i < flightLog.getMainFieldCount(); i++) {
-				if (flightLog.getMainFieldNames()[i].match(/^motor/))
-					plotField(chunks, startFrameIndex, i, motorCurve, canvas.height / 4, "#FFF");
+			
+			for (var i = 0; i < idents.motorFields.length; i++) {
+				plotField(chunks, startFrameIndex, idents.motorFields[i], motorCurve, canvas.height / 4, idents.motorColors[i]);
 			}
 			
 			canvasContext.restore();
@@ -132,4 +282,6 @@ function FlightLogGrapher(flightLog, canvas) {
     		}
     	}*/
 	};
+	
+	identifyFields();
 }
