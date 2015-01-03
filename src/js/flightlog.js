@@ -11,7 +11,7 @@ function FlightLog(logData, logIndex) {
 		
 		iframeDirectory = logIndexes.getIntraframeDirectory(logIndex),
 		
-		chunkCache = {};
+		chunkCache = new FIFOCache(2);
 	
 	this.parser = parser;
 	
@@ -69,10 +69,11 @@ function FlightLog(logData, logIndex) {
 		
 		for (var chunkIndex = startIndex; chunkIndex <= endIndex; chunkIndex++) {
 			var 
-				chunkStartOffset, chunkEndOffset;
+				chunkStartOffset, chunkEndOffset,
+				chunk = chunkCache.get(chunkIndex);
 			
-			if (!chunkCache[chunkIndex]) {
-				var chunk = [];
+			if (!chunk) {
+				chunk = [];
 				
 				chunkStartOffset = iframeDirectory.offsets[chunkIndex];
 				
@@ -90,12 +91,15 @@ function FlightLog(logData, logIndex) {
 				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset);
 				parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
 				
-				//TODO limit size of chunk cache by applying some sort of LRU policy
-				chunkCache[chunkIndex] = chunk;
+				chunkCache.add(chunkIndex, chunk);
 			}
 			
-			resultChunks.push(chunkCache[chunkIndex]);
+			resultChunks.push(chunk);
 		}
+		
+		//Assume caller asked for about a screen-full. Try to cache about three screens worth.
+		if (chunkCache.capacity < resultChunks.length * 3 + 1)
+			chunkCache.capacity = resultChunks.length * 3 + 1;
 		
 		return resultChunks;
 	};

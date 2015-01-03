@@ -21,6 +21,7 @@ var
 	dataArray, flightLog, graph,
 	
 	video = $(".log-graph video")[0],
+	canvas = $(".log-graph canvas")[0],
 	videoURL = false,
 	videoOffset = 0.0;
 
@@ -55,6 +56,12 @@ function renderGraph() {
 		lastRenderTime = now;
 		requestAnimationFrame(renderGraph);
 	}
+}
+
+function updateCanvasSize() {
+	canvas.width = canvas.offsetWidth;
+	canvas.height = canvas.offsetHeight;
+	renderGraph();
 }
 
 function leftPad(string, pad, minLength) {
@@ -118,7 +125,7 @@ function setCurrentBlackboxTime(newTime) {
 function loadLog(bytes) {
 	dataArray = new Uint8Array(bytes);
 	flightLog = new FlightLog(dataArray, 0);
-	graph = new FlightLogGrapher(flightLog, $("#graph")[0]);
+	graph = new FlightLogGrapher(flightLog, canvas);
 	
 	// Rewind:
 	currentBlackboxTime = flightLog.getMinTime();
@@ -160,10 +167,6 @@ $(document).ready(function() {
 			
 			$(".log-graph").addClass("has-video");
 		}
-	});
-	
-	$(window).resize(function() {
-		renderGraph();
 	});
 	
 	$(".log-jump-back").click(function() {
@@ -208,4 +211,8 @@ $(document).ready(function() {
 		} 
 			
 	});
+	
+	$(window).resize(updateCanvasSize);
+	
+	updateCanvasSize();
 });
