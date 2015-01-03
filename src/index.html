@@ -56,24 +56,31 @@ body {
 			
 		</dl>
 
-		<h4>Playback</h4>
-		<div>
-			<div class="btn-group" role="group">
-				<button type="button" class="btn btn-default log-jump-start"><span class="glyphicon glyphicon-fast-backward"></span></button>
-                <button type="button" class="btn btn-default log-jump-back"><span class="glyphicon glyphicon-step-backward"></span></button>
-				<button type="button" class="btn btn-default log-play-pause"><span class="glyphicon glyphicon-play"></span></button>
-                <button type="button" class="btn btn-default log-jump-forward"><span class="glyphicon glyphicon-step-forward"></span></button>
-                <button type="button" class="btn btn-default log-jump-end"><span class="glyphicon glyphicon-fast-forward"></span></button>
-			</div>
-		</div>
-		
-		<h4>Log sync</h4>
-		<div class="form-inline">
-		    <div class="form-group">
-		       <button type="button" class="btn btn-default log-sync-here">Start log here</button>
-		       <input type="text" class="form-control video-offset" value="+0.0">
-		    </div>
-		</div>
+        <ul class="video-top-controls list-unstyled">
+            <li>
+				<h4>Playback</h4>
+				<div>
+					<div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default video-jump-start"><span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span></button>
+						<button type="button" class="btn btn-default log-jump-start"><span class="glyphicon glyphicon-fast-backward"></span></button>
+		                <button type="button" class="btn btn-default log-jump-back"><span class="glyphicon glyphicon-step-backward"></span></button>
+						<button type="button" class="btn btn-default log-play-pause"><span class="glyphicon glyphicon-play"></span></button>
+		                <button type="button" class="btn btn-default log-jump-forward"><span class="glyphicon glyphicon-step-forward"></span></button>
+		                <button type="button" class="btn btn-default log-jump-end"><span class="glyphicon glyphicon-fast-forward"></span></button>
+                        <button type="button" class="btn btn-default video-jump-end"><span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span></button>
+					</div>
+				</div>
+			</li>
+			<li>
+				<h4>Log sync</h4>
+				<div class="form-inline">
+				    <div class="form-group">
+				       <button type="button" class="btn btn-default log-sync-here">Start log here</button>
+				       <input type="text" class="form-control video-offset" value="+0.0">
+				    </div>
+				</div>
+			</li>
+		</ul>
 
 		<div class="log-graph">
 		    <video></video>

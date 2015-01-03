@@ -122,6 +122,13 @@ function setCurrentBlackboxTime(newTime) {
 	currentBlackboxTime = blackboxTimeFromVideoTime();
 }
 
+function setVideoTime(newTime) {
+	video.currentTime = newTime;
+	
+	//Assuming that the video snaps the currentTime to an actual frame boundary, read it back to use as our log position
+	currentBlackboxTime = blackboxTimeFromVideoTime();
+}
+
 function loadLog(bytes) {
 	dataArray = new Uint8Array(bytes);
 	flightLog = new FlightLog(dataArray, 0);
@@ -177,7 +184,7 @@ $(document).ready(function() {
 	$(".log-jump-forward").click(function() {
 		setCurrentBlackboxTime(currentBlackboxTime + SMALL_JUMP_TIME);
 		setGraphState(GRAPH_STATE_PAUSED);
-	});		
+	});
 	
 	$(".log-jump-start").click(function() {
 		setCurrentBlackboxTime(flightLog.getMinTime());
@@ -187,7 +194,17 @@ $(document).ready(function() {
 	$(".log-jump-end").click(function() {
 		setCurrentBlackboxTime(flightLog.getMaxTime());
 		setGraphState(GRAPH_STATE_PAUSED);
-	});	
+	});
+	
+	$(".video-jump-start").click(function() {
+		setVideoTime(0);
+		setGraphState(GRAPH_STATE_PAUSED);
+	});
+
+	$(".video-jump-end").click(function() {
+		setVideoTime(video.duration);
+		setGraphState(GRAPH_STATE_PAUSED);
+	});
 	
 	$(".log-play-pause").click(function() {
 		if (graphState == GRAPH_STATE_PAUSED) {
@@ -199,6 +216,7 @@ $(document).ready(function() {
 	
 	$(".log-sync-here").click(function() {
 		videoOffset = video.currentTime;
+		$(".video-offset").val((videoOffset >= 0 ? "+" : "") + videoOffset);
 		renderGraph();
 	});
 	
