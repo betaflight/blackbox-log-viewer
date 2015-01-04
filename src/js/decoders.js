@@ -156,7 +156,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
 				if (nibbleIndex == 0) {
 					values[i] = signExtend8Bit(this.readByte());
 				} else {
-					char1 = buffer << 4;
+					char1 = (buffer & 0x0F) << 4;
 					buffer = this.readByte();
 
 					char1 |= buffer >> 4;
@@ -178,7 +178,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
 					char1 = this.readByte();
 					char2 = this.readByte();
 
-					values[i] = signExtend16Bit((buffer << 12) | (char1 << 4) | (char2 >> 4));
+					values[i] = signExtend16Bit(((buffer & 0x0F) << 12) | (char1 << 4) | (char2 >> 4));
 
 					buffer = char2;
 				}
