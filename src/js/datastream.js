@@ -6,7 +6,7 @@ var ArrayDataStream;
 	var EOF = -1;
 	
 	/*
-	 * Take an array of byte data and present it as a stream with various methods
+	 * Take an array of unsigned byte data and present it as a stream with various methods
 	 * for reading data in different formats.
 	 */
 	ArrayDataStream = function(data, start, end) {
@@ -17,6 +17,12 @@ var ArrayDataStream;
 		this.pos = this.start;
 	}
 	
+	/**
+	 * Read a single byte from the string and turn it into a JavaScript string (assuming ASCII).
+	 * 
+	 * @returns String containing one character, or EOF if the end of file was reached (eof flag
+	 * is set).
+	 */
 	ArrayDataStream.prototype.readChar = function() {
 		if (this.pos < this.end)
 			return String.fromCharCode(this.data[this.pos++]);
@@ -24,7 +30,12 @@ var ArrayDataStream;
 		this.eof = true;
 		return EOF;
 	};
-		
+	
+	/**
+	 * Read one unsigned byte from the stream
+	 * 
+	 * @returns Unsigned byte, or EOF if the end of file was reached (eof flag is set).
+	 */
 	ArrayDataStream.prototype.readByte = function() {
 		if (this.pos < this.end)
 			return this.data[this.pos++];

@@ -3,10 +3,17 @@
 function FlightLogGrapher(flightLog, canvas) {
 	var
 		PID_P = 0,
-		PID_I = 0,
-		PID_D = 0,
+		PID_I = 1,
+		PID_D = 2,
 		
 		WHITE = "white",
+		
+		DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
+		
+		FONTSIZE_CURRENT_VALUE_LABEL = 10,
+		FONTSIZE_PID_TABLE_LABEL = 34,
+		FONTSIZE_AXIS_LABEL = 34,
+		FONTSIZE_FRAME_LABEL = 32,
 		
 		lineColors = [
             "#fb8072",
@@ -21,10 +28,13 @@ function FlightLogGrapher(flightLog, canvas) {
 			"#bc80bd",
 			"#ccebc5",
 			"#ffed6f"
-		];
+		],
+		
+		craftColor = "rgba(76,76,76,1)",
+		
+		windowWidthMicros = 1000000;
 	
 	var
-		windowWidthMicros = 1000000,
 		windowStartTime, windowCenterTime, windowEndTime,
 		
 		canvasContext = canvas.getContext("2d"),
@@ -35,7 +45,16 @@ function FlightLogGrapher(flightLog, canvas) {
 			drawCraft:true, drawPidTable:true, drawSticks:true,  drawTime:true
 		},
 		
-		idents;
+		idents,
+		
+		sysConfig = flightLog.getSysConfig(),
+
+		motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
+			(sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0),
+		pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
+		gyroCurve = new ExpoCurve(0, 0.2, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
+		accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
+		pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10);
 	
 	function identifyFields() {
 		var 
@@ -161,8 +180,96 @@ function FlightLogGrapher(flightLog, canvas) {
 		}
 	}
 	
-	function drawCommandSticks() {
+	function drawCommandSticks(frame) {
+		var
+			stickSurroundRadius = canvas.height / 11, 
+			stickSpacing = stickSurroundRadius * 3,
+			yawStickMax = 500,
+			
+			stickColor = "rgba(255,102,102,1.0)",
+			stickAreaColor = "rgba(76,76,76,0.8)",
+			crosshairColor = "rgba(191,191,191,0.5)";
 		
+		var
+			stickIndex,
+			rcCommand = [],
+			stickPositions = [],
+			stickLabel, extent ;
+
+		for (stickIndex = 0; stickIndex < 4; stickIndex++) {
+			//Check that stick data is present to be drawn:
+			if (idents.rcCommandFields[stickIndex] === undefined)
+				return;
+
+			rcCommand[stickIndex] = frame[idents.rcCommandFields[stickIndex]];
+		}
+
+		//Compute the position of the sticks in the range [-1..1] (left stick x, left stick y, right stick x, right stick y)
+		stickPositions[0] = -rcCommand[2] / yawStickMax; //Yaw
+		stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
+		stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
+		stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
+
+		for (stickIndex = 0; stickIndex < 4; stickIndex++) {
+			//Clamp to [-1..1]
+			stickPositions[stickIndex] = stickPositions[stickIndex] > 1 ? 1 : (stickPositions[stickIndex] < -1 ? -1 : stickPositions[stickIndex]);
+
+			//Scale to our stick size
+			stickPositions[stickIndex] *= stickSurroundRadius;
+		}
+
+		canvasContext.save();
+
+		// Move origin to center of left stick
+		canvasContext.translate(-stickSpacing / 2, 0);
+
+		//For each stick
+		for (var i = 0; i < 2; i++) {
+			//Fill in background
+			canvasContext.beginPath();
+			canvasContext.fillStyle = stickAreaColor;
+			canvasContext.rect(-stickSurroundRadius, -stickSurroundRadius, stickSurroundRadius * 2, stickSurroundRadius * 2);
+			canvasContext.fill();
+
+			//Draw crosshair
+			canvasContext.beginPath();
+			canvasContext.lineWidth = 1;
+			canvasContext.strokeStyle = crosshairColor;
+			
+			canvasContext.moveTo(-stickSurroundRadius, 0);
+			canvasContext.lineTo(stickSurroundRadius, 0);
+			
+			canvasContext.moveTo(0, -stickSurroundRadius);
+			canvasContext.lineTo(0, stickSurroundRadius);
+			
+			canvasContext.stroke();
+
+			//Draw circle to represent stick position
+			canvasContext.beginPath();
+			canvasContext.fillStyle = stickColor;
+			canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], stickSurroundRadius / 5, 0, 2 * Math.PI);
+			canvasContext.fill();
+
+			canvasContext.fillStyle = WHITE;
+			canvasContext.font = FONTSIZE_CURRENT_VALUE_LABEL + "pt " + DEFAULT_FONT_FACE;
+			
+			//Draw horizontal stick label
+			stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 0]] + "";
+			extent = canvasContext.measureText(stickLabel);
+
+			canvasContext.fillText(stickLabel, -extent.width / 2, stickSurroundRadius + FONTSIZE_CURRENT_VALUE_LABEL + 8);
+
+			//Draw vertical stick label
+			stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 1]] + "";
+			extent = canvasContext.measureText(stickLabel);
+			
+			canvasContext.fillText(stickLabel, -stickSurroundRadius - extent.width - 8, FONTSIZE_CURRENT_VALUE_LABEL / 2);
+
+			//Advance to next stick
+			canvasContext.translate(stickSpacing, 0);
+		}
+
+		canvasContext.restore();
 	}
 	
 	/**
@@ -199,10 +306,10 @@ function FlightLogGrapher(flightLog, canvas) {
 				if (drawingLine) {
 					/*if (!options.gapless && datapointsGetGapStartsAtIndex(points, frameIndex - 1)) {
 						//Draw a warning box at the beginning and end of the gap to mark it
-						cairo_rectangle(cr, lastX - GAP_WARNING_BOX_RADIUS, lastY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
-						cairo_rectangle(cr, nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
+						cairo_rectangle(lastX - GAP_WARNING_BOX_RADIUS, lastY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
+						cairo_rectangle(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
 	
-						cairo_move_to(cr, nextX, nextY);
+						cairo_moveTo(nextX, nextY);
 					} else {*/
 						canvasContext.lineTo(nextX, nextY);
 					//}
@@ -224,19 +331,6 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.strokeStyle = color;
 		canvasContext.stroke();
 	}
-	/*
-	pitchStickCurve = expoCurveCreate(0, 0.700, 500 * (flightLog->rcRate ? flightLog->rcRate : 100) / 100, 1.0, 10);
-
-	gyroCurve = expoCurveCreate(0, 0.2, 9.0e-6 / flightLog->gyroScale, 1.0, 10);
-	accCurve = expoCurveCreate(0, 0.7, 5000, 1.0, 10);
-	pidCurve = expoCurveCreate(0, 0.7, 500, 1.0, 10);*/
-
-	var
-		sysConfig = flightLog.getSysConfig();
-	
-	var 
-		motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
-				(sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0);
 	
 	this.render = function(windowCenterTimeMicros) {
 		windowCenterTime = windowCenterTimeMicros;
@@ -270,9 +364,26 @@ function FlightLogGrapher(flightLog, canvas) {
 			}
 			
 			canvasContext.restore();
+			
+			var
+				centerFrame = flightLog.getFrameAtTime(windowCenterTime);
+			
+			if (centerFrame) {
+				
+				if (options.drawSticks) {
+					canvasContext.save();
+					
+					canvasContext.translate(0.75 * canvas.width, 0.20 * canvas.height);
+					
+					drawCommandSticks(centerFrame);
+					
+					canvasContext.restore();
+				}
+			}
 		}
 		
-		/*var chunks = flightLog.getChunksInRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 1000000);
+		/* //Debugging: 
+		var chunks = flightLog.getChunksInRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 2000000);
     	
     	for (var i = 0; i < chunks.length; i++) {
     		var chunk = chunks[i];
@@ -280,7 +391,8 @@ function FlightLogGrapher(flightLog, canvas) {
     		for (var j = 0; j < chunk.length; j++) {
     			console.log(chunk[j].join(",") + "\n");
     		}
-    	}*/
+    	}
+    	*/
 	};
 	
 	identifyFields();

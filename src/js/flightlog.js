@@ -37,7 +37,7 @@ function FlightLog(logData, logIndex) {
 	
 	this.getFrameAtTime = function(startTime) {
 		var
-			chunks = this.getChunksInRange(startTime),
+			chunks = this.getChunksInRange(startTime, startTime),
 			chunk = chunks[0];
 		
 		if (chunk) {
