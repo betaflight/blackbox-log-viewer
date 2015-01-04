@@ -30,9 +30,7 @@ body {
 			</div>
 			<div id="navbar" class="navbar-collapse collapse">
 				<div class="navbar-form navbar-right" role="form">
-                    <span class="btn btn-default btn-file"> Open video <input type="file" id="video-open"></span>
-
-					<span class="btn btn-primary btn-file"> Open log file <input type="file" id="logfile-open"></span>
+					<span class="btn btn-default btn-file"> Open video <input type="file" id="video-open"></span> <span class="btn btn-primary btn-file"> Open log file <input type="file" id="logfile-open"></span>
 				</div>
 			</div>
 			<!--/.navbar-collapse -->
@@ -40,50 +38,61 @@ body {
 	</nav>
 
 	<div class="container">
-		<h4>Log statistics</h4>
-		<dl class="log-info dl-horizontal">
-			<dt>Start time</dt>
-			<dd class="log-start-time"></dd>
+		<div class="log-metadata">
+			<h3 class="log-filename"></h3>
+			<dl class="log-info dl-horizontal">
+				<dt>Timespan</dt>
+				<dd>
+					<span class="log-start-time"></span> to <span class="log-end-time"></span> (<span class="log-duration"></span> total)
+				</dd>
 
-			<dt>End time</dt>
-			<dd class="log-end-time"></dd>
+				<dt>Battery</dt>
+				<dd class="log-cells"></dd>
+			</dl>
+		</div>
 
-			<dt>Duration</dt>
-			<dd class="log-duration"></dd>
-			
-            <dt>Battery</dt>
-            <dd class="log-cells"></dd>
-			
-		</dl>
-
-        <ul class="video-top-controls list-unstyled">
-            <li>
+		<ul class="video-top-controls list-unstyled">
+			<li class="log-playback-panel">
 				<h4>Playback</h4>
 				<div>
 					<div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default video-jump-start"><span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span></button>
-						<button type="button" class="btn btn-default log-jump-start"><span class="glyphicon glyphicon-fast-backward"></span></button>
-		                <button type="button" class="btn btn-default log-jump-back"><span class="glyphicon glyphicon-step-backward"></span></button>
-						<button type="button" class="btn btn-default log-play-pause"><span class="glyphicon glyphicon-play"></span></button>
-		                <button type="button" class="btn btn-default log-jump-forward"><span class="glyphicon glyphicon-step-forward"></span></button>
-		                <button type="button" class="btn btn-default log-jump-end"><span class="glyphicon glyphicon-fast-forward"></span></button>
-                        <button type="button" class="btn btn-default video-jump-end"><span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span></button>
+						<button type="button" class="btn btn-default video-jump-start">
+							<span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span>
+						</button>
+						<button type="button" class="btn btn-default log-jump-start">
+							<span class="glyphicon glyphicon-fast-backward"></span>
+						</button>
+						<button type="button" class="btn btn-default log-jump-back">
+							<span class="glyphicon glyphicon-step-backward"></span>
+						</button>
+						<button type="button" class="btn btn-default log-play-pause">
+							<span class="glyphicon glyphicon-play"></span>
+						</button>
+						<button type="button" class="btn btn-default log-jump-forward">
+							<span class="glyphicon glyphicon-step-forward"></span>
+						</button>
+						<button type="button" class="btn btn-default log-jump-end">
+							<span class="glyphicon glyphicon-fast-forward"></span>
+						</button>
+						<button type="button" class="btn btn-default video-jump-end">
+							<span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
+						</button>
 					</div>
 				</div>
 			</li>
-			<li>
+			<li class="log-sync-panel">
 				<h4>Log sync</h4>
 				<div class="form-inline">
-				    <div class="form-group">
-				       <button type="button" class="btn btn-default log-sync-here">Start log here</button>
-				       <input type="text" class="form-control video-offset" value="+0.0">
-				    </div>
+					<div class="form-group">
+						<button type="button" class="btn btn-default log-sync-here">Start log here</button>
+						<input type="text" class="form-control video-offset" value="+0.0">
+					</div>
 				</div>
 			</li>
 		</ul>
 
 		<div class="log-graph">
-		    <video></video>
+			<video></video>
 			<canvas width="200" height="100" id="graph"></canvas>
 		</div>
 
@@ -101,7 +110,7 @@ body {
 
 	<script src="js/vendor/bootstrap.min.js"></script>
 	<script src="js/tools.js"></script>
-    <script src="js/cache.js"></script>
+	<script src="js/cache.js"></script>
 	<script src="js/expo.js"></script>
 	<script src="js/datastream.js"></script>
 	<script src="js/decoders.js"></script>

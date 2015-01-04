@@ -20,6 +20,7 @@ var
 	lastRenderTime = false,
 	dataArray, flightLog, graph,
 	
+	hasVideo = false, hasLog = false,
 	video = $(".log-graph video")[0],
 	canvas = $(".log-graph canvas")[0],
 	videoURL = false,
@@ -29,14 +30,21 @@ function blackboxTimeFromVideoTime() {
 	return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
 }
 
-function renderGraph() {
+function syncLogToVideo() {
+	if (hasLog) {
+		//Assuming that the video snaps the currentTime to an actual frame boundary, read it back to use as our log position
+		currentBlackboxTime = blackboxTimeFromVideoTime();
+	}
+}
+
+function animationLoop() {
 	var 
 		now = Date.now();
 	
 	if (!graph)
 		return;
 	
-	if (videoURL) {
+	if (hasVideo) {
 		currentBlackboxTime = blackboxTimeFromVideoTime();
 	} else {
 		var
@@ -54,14 +62,20 @@ function renderGraph() {
 
 	if (graphState == GRAPH_STATE_PLAY) {
 		lastRenderTime = now;
-		requestAnimationFrame(renderGraph);
+		requestAnimationFrame(animationLoop);
 	}
+}
+
+function invalidateGraph() {
+	if (graphState != GRAPH_STATE_PLAY)
+		animationLoop();
 }
 
 function updateCanvasSize() {
 	canvas.width = canvas.offsetWidth;
 	canvas.height = canvas.offsetHeight;
-	renderGraph();
+		
+	invalidateGraph();
 }
 
 function leftPad(string, pad, minLength) {
@@ -92,11 +106,12 @@ function formatTime(msec, displayMsec) {
 		+ (displayMsec ? "." + leftPad(msec, "0", 3) : "");
 }
 
-function renderLogInfo() {
+function renderLogInfo(file) {
+	$(".log-filename").text(file.name);
 	$(".log-start-time").text(formatTime(flightLog.getMinTime() / 1000, false));
 	$(".log-end-time").text(formatTime(flightLog.getMaxTime() / 1000, false));
 	$(".log-duration").text(formatTime(Math.ceil((flightLog.getMaxTime() - flightLog.getMinTime()) / 1000), false));
-	$(".log-cells").text(flightLog.estimateNumCells() + "S");
+	$(".log-cells").text(flightLog.estimateNumCells() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
 }
 
 function setGraphState(newState) {
@@ -105,40 +120,57 @@ function setGraphState(newState) {
 	lastRenderTime = false;
 	
 	if (graphState == GRAPH_STATE_PLAY) {
-		video.play();
+		if (hasVideo)
+			video.play();
+		
 		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
 	} else {
-		video.pause();
+		if (hasVideo)
+			video.pause();
+		
 		$(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
 	}
 	
-	renderGraph();
+	animationLoop();
 }
 
 function setCurrentBlackboxTime(newTime) {
 	video.currentTime = (newTime - flightLog.getMinTime()) / 1000000 + videoOffset;
 	
-	//Assuming that the video snaps the currentTime to an actual frame boundary, read it back to use as our log position
-	currentBlackboxTime = blackboxTimeFromVideoTime();
+	syncLogToVideo();
 }
 
 function setVideoTime(newTime) {
 	video.currentTime = newTime;
-	
-	//Assuming that the video snaps the currentTime to an actual frame boundary, read it back to use as our log position
-	currentBlackboxTime = blackboxTimeFromVideoTime();
+
+	syncLogToVideo();
 }
 
-function loadLog(bytes) {
-	dataArray = new Uint8Array(bytes);
-	flightLog = new FlightLog(dataArray, 0);
-	graph = new FlightLogGrapher(flightLog, canvas);
-	
-	// Rewind:
-	currentBlackboxTime = flightLog.getMinTime();
-	
-	setGraphState(GRAPH_STATE_PAUSED);
-	renderLogInfo();
+function loadLog(file) {
+	var reader = new FileReader();
+
+    reader.onload = function(e) {
+    	var bytes = e.target.result;
+    	
+    	dataArray = new Uint8Array(bytes);
+    	flightLog = new FlightLog(dataArray, 0);
+    	graph = new FlightLogGrapher(flightLog, canvas);
+    	
+    	if (hasVideo)
+    		syncLogToVideo();
+    	else {
+	    	// Start at beginning:
+	    	currentBlackboxTime = flightLog.getMinTime();
+    	}
+    	
+    	renderLogInfo(file);
+    	setGraphState(GRAPH_STATE_PAUSED);
+    	
+		$("html").addClass("has-log");
+		updateCanvasSize();
+    };
+
+    reader.readAsArrayBuffer(file);
 }
 
 $(document).ready(function() {
@@ -148,13 +180,7 @@ $(document).ready(function() {
 			reader;
 		
 		if (files.length > 0) {
-			reader = new FileReader();
-
-		    reader.onload = function(e) {
-		    	loadLog(e.target.result);
-	        };
-
-		    reader.readAsArrayBuffer(files[0]);
+			loadLog(files[0]);
 		}
 	});
 	
@@ -171,18 +197,31 @@ $(document).ready(function() {
 			videoURL = URL.createObjectURL(files[0]);
 			video.volume = 0.05;
 			video.src = videoURL;
+			hasVideo = true;
 			
-			$(".log-graph").addClass("has-video");
+			$("html").addClass("has-video");
+			
+			setGraphState(GRAPH_STATE_PAUSED);
 		}
 	});
 	
 	$(".log-jump-back").click(function() {
-		setCurrentBlackboxTime(currentBlackboxTime - SMALL_JUMP_TIME);
+		if (hasVideo) {
+			setVideoTime(video.currentTime - SMALL_JUMP_TIME / 1000000);
+		} else {
+			setCurrentBlackboxTime(currentBlackboxTime - SMALL_JUMP_TIME);
+		}
+		
 		setGraphState(GRAPH_STATE_PAUSED);
 	});
 
 	$(".log-jump-forward").click(function() {
-		setCurrentBlackboxTime(currentBlackboxTime + SMALL_JUMP_TIME);
+		if (hasVideo) {
+			setVideoTime(video.currentTime + SMALL_JUMP_TIME / 1000000);
+		} else {
+			setCurrentBlackboxTime(currentBlackboxTime + SMALL_JUMP_TIME);
+		}
+		
 		setGraphState(GRAPH_STATE_PAUSED);
 	});
 	
@@ -217,7 +256,7 @@ $(document).ready(function() {
 	$(".log-sync-here").click(function() {
 		videoOffset = video.currentTime;
 		$(".video-offset").val((videoOffset >= 0 ? "+" : "") + videoOffset);
-		renderGraph();
+		invalidateGraph();
 	});
 	
 	$(".video-offset").change(function() {
@@ -225,12 +264,12 @@ $(document).ready(function() {
 		
 		if (!isNaN(offset)) {
 			videoOffset = offset;
-			renderGraph();
-		} 
-			
+			invalidateGraph();
+		}
 	});
 	
 	$(window).resize(updateCanvasSize);
+	$(video).on('loadedmetadata', updateCanvasSize);
 	
 	updateCanvasSize();
 });

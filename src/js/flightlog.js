@@ -73,8 +73,6 @@ function FlightLog(logData, logIndex) {
 				chunk = chunkCache.get(chunkIndex);
 			
 			if (!chunk) {
-				chunk = [];
-				
 				chunkStartOffset = iframeDirectory.offsets[chunkIndex];
 				
 				if (chunkIndex + 1 < iframeDirectory.offsets.length)
@@ -82,6 +80,8 @@ function FlightLog(logData, logIndex) {
 				else
 					chunkEndOffset = undefined;
 
+				chunk = [];
+				
 				parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
 					if (frameValid) {
 						chunk.push(frame.slice(0)); /* Clone the frame data since parser reuses that array */
@@ -113,6 +113,10 @@ function FlightLog(logData, logIndex) {
 	};
 	
 	parser.parseHeader(logIndexes.getLogBeginOffset(0));	
+}
+
+FlightLog.prototype.getReferenceVoltageMillivolts = function() {
+	return this.vbatToMillivolts(this.getSysConfig().vbatref);
 }
 
 FlightLog.prototype.vbatToMillivolts = function(vbat) {

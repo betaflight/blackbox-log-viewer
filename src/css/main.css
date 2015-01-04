@@ -46,19 +46,59 @@
     height:100%;
 }
 
-.log-graph.has-video {
+html.has-video .log-graph {
 	height:auto;
 }
-.log-graph.has-video video {
+html.has-video .log-graph video {
 	position:relative;
 	width:100%;
 	height:auto;
 }
-.log-graph.has-video canvas {
+html.has-video .log-graph canvas {
 	background-color:rgba(0,0,0,0.25);
 }
 
 .video-top-controls > li {
 	display:inline-block;
 	margin-right:1em;
+}
+
+.video-top-controls > .log-sync-panel {
+	display:none;
+}
+html.has-video.has-log .video-top-controls > .log-sync-panel {
+	display:inline-block;
+}
+html .video-jump-start,
+html .video-jump-end,
+html .log-jump-start,
+html .log-jump-end {
+	display:none;
+}
+html.has-video .video-jump-start,
+html.has-video .video-jump-end {
+    display:block;
+}
+html.has-log .log-jump-start,
+html.has-log .log-jump-end {
+    display:block;
+}
+
+.log-metadata {
+	display:none;
+}
+html.has-log .log-metadata {
+	display:block;
+}
+
+.video-top-controls,
+.log-graph {
+	display:none;
+}
+
+html.has-video .video-top-controls,
+html.has-log .video-top-controls,
+html.has-video .log-graph,
+html.has-log .log-graph {
+	display:block;
 }
