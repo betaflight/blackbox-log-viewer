@@ -12,7 +12,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		
 		FONTSIZE_CURRENT_VALUE_LABEL = 10,
 		FONTSIZE_PID_TABLE_LABEL = 34,
-		FONTSIZE_AXIS_LABEL = 34,
+		FONTSIZE_AXIS_LABEL = 9,
 		FONTSIZE_FRAME_LABEL = 32,
 		
 		lineColors = [
@@ -332,6 +332,34 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.stroke();
 	}
 	
+	//Draw an origin line for a graph (at the origin and spanning the window)
+	function drawAxisLine() {
+		canvasContext.save();
+
+		canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
+		canvasContext.lineWidth = 1;
+		
+		canvasContext.beginPath();
+		canvasContext.moveTo(0, 0);
+		canvasContext.lineTo(canvas.width, 0);
+		
+		canvasContext.stroke();
+
+		canvasContext.restore();
+	}
+
+	function drawAxisLabel(axisLabel) {
+		var 
+			extent;
+
+		canvasContext.font = FONTSIZE_AXIS_LABEL + "pt " + DEFAULT_FONT_FACE;
+		canvasContext.fillStyle = "rgba(255,255,255,0.9)";
+
+		extent = canvasContext.measureText(axisLabel);
+		
+		canvasContext.fillText(axisLabel, canvas.width - 8 - extent.width, -8);
+	}
+	
 	this.render = function(windowCenterTimeMicros) {
 		windowCenterTime = windowCenterTimeMicros;
 		windowStartTime = windowCenterTime - windowWidthMicros / 2;
@@ -355,21 +383,41 @@ function FlightLogGrapher(flightLog, canvas) {
 			if (startFrameIndex > 0)
 				startFrameIndex--;
 	
+			// Plot motors
 			canvasContext.save();
-			
-			canvasContext.translate(0, canvas.height / 2);
-			
-			for (var i = 0; i < idents.motorFields.length; i++) {
-				plotField(chunks, startFrameIndex, idents.motorFields[i], motorCurve, canvas.height / 4, idents.motorColors[i]);
+			{
+				canvasContext.translate(0, canvas.height * 0.25);
+				
+				drawAxisLine();
+				
+				for (var i = 0; i < idents.motorFields.length; i++) {
+					plotField(chunks, startFrameIndex, idents.motorFields[i], motorCurve, canvas.height * 0.20, idents.motorColors[i]);
+				}
+				
+				drawAxisLabel("Motors");
 			}
-			
 			canvasContext.restore();
 			
+			// Plot gyros
+			canvasContext.save();
+			{
+				canvasContext.translate(0, canvas.height * 0.70);
+				
+				drawAxisLine();
+				
+				for (var i = 0; i < idents.gyroFields.length; i++) {
+					plotField(chunks, startFrameIndex, idents.gyroFields[i], gyroCurve, canvas.height * 0.25, idents.gyroColors[i]);
+				}
+				
+				drawAxisLabel("Gyros");
+			}
+			canvasContext.restore();
+			
+			// Draw details at the current time
 			var
 				centerFrame = flightLog.getFrameAtTime(windowCenterTime);
 			
 			if (centerFrame) {
-				
 				if (options.drawSticks) {
 					canvasContext.save();
 					

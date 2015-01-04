@@ -95,7 +95,7 @@ var FlightLogParser = function(logData) {
 			frameIntervalI: 32,
 			frameIntervalPNum: 1,
 			frameIntervalPDenom: 1,
-			firmwareType: 0,
+			firmwareType: FIRMWARE_TYPE_BASEFLIGHT,
 			rcRate: 90,
 			vbatscale: 110,
 			vbatref: 4095,
@@ -234,8 +234,8 @@ var FlightLogParser = function(logData) {
 				/* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
 				 * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
 				 * match Baseflight so we can use Baseflight's IMU for both: */
-				if (that.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT) {
-					that.sysConfig.gyroScale = that.sysConfig.gyroScale * (PI / 180.0) * 0.000001;
+				if (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT) {
+					that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
 				}
 			break;
 	        case "acc_1G":
