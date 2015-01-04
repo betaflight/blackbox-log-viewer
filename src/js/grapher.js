@@ -13,7 +13,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		FONTSIZE_CURRENT_VALUE_LABEL = 10,
 		FONTSIZE_PID_TABLE_LABEL = 34,
 		FONTSIZE_AXIS_LABEL = 9,
-		FONTSIZE_FRAME_LABEL = 32,
+		FONTSIZE_FRAME_LABEL = 9,
 		
 		lineColors = [
             "#fb8072",
@@ -42,7 +42,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		options = {
 			gapless:false,
 			plotPIDs:true, plotGyros:true, plotMotors:true,
-			drawCraft:true, drawPidTable:true, drawSticks:true,  drawTime:true
+			drawCraft:true, drawPidTable:true, drawSticks:true, drawTime:true
 		},
 		
 		idents,
@@ -52,7 +52,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
 			(sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0),
 		pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
-		gyroCurve = new ExpoCurve(0, 0.2, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
+		gyroCurve = new ExpoCurve(0, 0.25, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
 		accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
 		pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10);
 	
@@ -272,6 +272,21 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.restore();
 	}
 	
+	function drawFrameLabel(frameIndex, timeMsec)
+	{
+		var 
+			extentFrameNumber, extentFrameTime;
+
+		canvasContext.font = FONTSIZE_FRAME_LABEL + "pt " + DEFAULT_FONT_FACE;
+		canvasContext.fillStyle = "rgba(255,255,255,0.65)";
+
+		extentFrameNumber = canvasContext.measureText("#0000000");
+		canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - extentFrameNumber.width - 8, canvas.height - 8);
+
+		extentFrameTime = canvasContext.measureText("00:00.000");
+		canvasContext.fillText(formatTime(timeMsec, true), canvas.width - extentFrameTime.width - 8, canvas.height - 8 - FONTSIZE_FRAME_LABEL - 8);
+	}
+	
 	/**
 	 * Plot the given field within the specified time period. When the output from the curve applied to a field
 	 * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
@@ -334,8 +349,6 @@ function FlightLogGrapher(flightLog, canvas) {
 	
 	//Draw an origin line for a graph (at the origin and spanning the window)
 	function drawAxisLine() {
-		canvasContext.save();
-
 		canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
 		canvasContext.lineWidth = 1;
 		
@@ -344,8 +357,6 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.lineTo(canvas.width, 0);
 		
 		canvasContext.stroke();
-
-		canvasContext.restore();
 	}
 
 	function drawAxisLabel(axisLabel) {
@@ -426,6 +437,10 @@ function FlightLogGrapher(flightLog, canvas) {
 					drawCommandSticks(centerFrame);
 					
 					canvasContext.restore();
+				}
+				
+				if (options.drawTime) {
+					drawFrameLabel(centerFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION], Math.round((windowCenterTime - flightLog.getMinTime()) / 1000));
 				}
 			}
 		}
