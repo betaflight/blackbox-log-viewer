@@ -390,7 +390,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 		
 		var 
-			chunks = flightLog.getChunksInRange(windowStartTime, windowEndTime),
+			chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
 			startChunkIndex, startFrameIndex;
 		
 		if (chunks.length) {
@@ -457,7 +457,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		}
 		
 		/* //Debugging: 
-		var chunks = flightLog.getChunksInRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 2000000);
+		var chunks = flightLog.getChunksInTimeRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 2000000);
     	
     	for (var i = 0; i < chunks.length; i++) {
     		var chunk = chunks[i];
@@ -470,4 +470,11 @@ function FlightLogGrapher(flightLog, canvas) {
 	};
 	
 	identifyFields();
+	
+	var smoothing = [];
+	
+	for (var i = 0; i < idents.motorFields.length; i++)
+		smoothing.push({field:idents.motorFields[i], radius:100 * 1000});
+		
+	flightLog.setFieldSmoothing(smoothing);
 }

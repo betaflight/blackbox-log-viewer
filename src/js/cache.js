@@ -38,4 +38,9 @@ function FIFOCache(initialCapacity) {
 	this.get = function(key) {
 		return items[key];
 	};
+	
+	this.clear = function() {
+		queue = [];
+		items = {};
+	};
 }

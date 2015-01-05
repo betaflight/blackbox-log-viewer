@@ -11,7 +11,12 @@ function FlightLog(logData, logIndex) {
 		
 		iframeDirectory = logIndexes.getIntraframeDirectory(logIndex),
 		
-		chunkCache = new FIFOCache(2);
+		chunkCache = new FIFOCache(2),
+		
+		fieldSmoothing = [],
+		maxSmoothing = 0,
+		
+		smoothedCache = new FIFOCache(2);
 	
 	/** TODO remove debug code 
 	console.log(logIndexes.saveToJSON());
@@ -49,7 +54,7 @@ function FlightLog(logData, logIndex) {
 	
 	this.getFrameAtTime = function(startTime) {
 		var
-			chunks = this.getChunksInRange(startTime, startTime),
+			chunks = this.getChunksInTimeRange(startTime, startTime),
 			chunk = chunks[0];
 		
 		if (chunk) {
@@ -64,19 +69,18 @@ function FlightLog(logData, logIndex) {
 	};
 	
 	/**
-	 * Get an array of chunks which span times from the given start to end time.
-	 * Each chunk is an array of log frames.
+	 * Get the raw chunks in the range [startIndex...endIndex] (inclusive)
 	 */
-	this.getChunksInRange = function(startTime, endTime) {
-		var 
-			startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime),
-			endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime),
-			resultChunks = [];
+	function getChunksInIndexRange(startIndex, endIndex) {
+		var resultChunks = [];
 		
 		if (startIndex < 0)
 			startIndex = 0;
+
+		if (endIndex > iframeDirectory.offsets.length - 2)
+			endIndex = iframeDirectory.offsets.length - 2;
 		
-		if (endIndex < 0)
+		if (endIndex < startIndex)
 			return [];
 		
 		for (var chunkIndex = startIndex; chunkIndex <= endIndex; chunkIndex++) {
@@ -93,6 +97,7 @@ function FlightLog(logData, logIndex) {
 					chunkEndOffset = logIndexes.getLogBeginOffset(logIndex + 1);
 
 				chunk = {
+					index: chunkIndex,
 					frames: [],
 					gapStartsHere: {}
 				};
@@ -105,7 +110,7 @@ function FlightLog(logData, logIndex) {
 					}
 				};
 
-				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset);
+				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset); //TODO remove debugging print
 				parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
 				
 				chunkCache.add(chunkIndex, chunk);
@@ -115,8 +120,232 @@ function FlightLog(logData, logIndex) {
 		}
 		
 		//Assume caller asked for about a screen-full. Try to cache about three screens worth.
-		if (chunkCache.capacity < resultChunks.length * 3 + 1)
+		if (chunkCache.capacity < resultChunks.length * 3 + 1) {
 			chunkCache.capacity = resultChunks.length * 3 + 1;
+			
+			//And while we're here, use the same size for the smoothed cache
+			smoothedCache.capacity = chunkCache.capacity;
+		}
+		
+		return resultChunks;
+	}
+	
+	/**
+	 * Get an array of chunks which span times from the given start to end time.
+	 * Each chunk is an array of log frames.
+	 */
+	this.getChunksInTimeRange = function(startTime, endTime) {
+		var 
+			startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime),
+			endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime);
+		
+		return getChunksInIndexRange(startIndex, endIndex);
+	};
+	
+	/* 
+	 * Smoothing is an array of {field:1, radius:100000} where radius is in us. You only need to specify fields
+	 * which need to be smoothed.
+	 */
+	this.setFieldSmoothing = function(newSmoothing) {
+		smoothedCache.clear();
+		fieldSmoothing = newSmoothing;
+		
+		maxSmoothing = 0;
+		
+		for (var i = 0; i < newSmoothing.length; i++)
+			if (newSmoothing[i].radius > maxSmoothing)
+				maxSmoothing = newSmoothing[i].radius;
+	}
+	
+	this.getSmoothedChunksInTimeRange = function(startTime, endTime) {
+		var 
+			chunks,
+			resultChunks, resultChunk,
+			chunkAlreadyDone, allDone,
+			timeFieldIndex = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME;
+		
+		if (maxSmoothing == 0)
+			return this.getChunksInTimeRange(startTime, endTime);
+		
+		var
+			/* 
+			 * Ensure that the range that the caller asked for will be cached in its entirety by
+			 * expanding the request by 1 chunk on either side (since the chunks on the edge of the
+			 * query cannot be fully smoothed, they can't be cached).
+			 */
+			startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime - maxSmoothing) - 1,
+			endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime + maxSmoothing) + 1;
+		
+		chunks = getChunksInIndexRange(startIndex, endIndex);
+
+		//Create an independent copy of the raw frame data to smooth out:
+		resultChunks = new Array(chunks.length - 2);
+		chunkAlreadyDone = new Array(chunks.length);
+		
+		allDone = true;
+		
+		//Don't smooth the edge chunks since they can't be fully smoothed
+		for (var i = 1; i < chunks.length - 1; i++) {
+			var resultChunk = smoothedCache.get(chunks[i].index);
+			
+			chunkAlreadyDone[i] = !!resultChunk;
+			
+			//If we haven't already smoothed this chunk
+			if (!chunkAlreadyDone[i]) {
+				allDone = false;
+				
+				resultChunk = {
+					index: chunks[i].index,
+					frames: new Array(chunks[i].frames.length),
+					gapStartsHere: chunks[i].gapStartsHere
+				};
+				
+				for (var j = 0; j < resultChunk.frames.length; j++) {
+					resultChunk.frames[j] = chunks[i].frames[j].slice(0);
+				}
+				
+				smoothedCache.add(resultChunk.index, resultChunk);
+			}
+			
+			resultChunks[i - 1] = resultChunk;
+		}
+
+		if (!allDone) {
+			for (var i = 0; i < fieldSmoothing.length; i++) {
+				var 
+					radius = fieldSmoothing[i].radius,
+					fieldIndex = fieldSmoothing[i].field,
+					
+					//The position we're currently computing the smoothed value for:
+					centerChunkIndex, centerFrameIndex;
+					
+				//The outer two loops are used to begin a new partition to smooth within
+				mainLoop:
+				
+				// Don't bother to smooth the first and last source chunks, since we can't smooth them completely
+				for (centerChunkIndex = 1; centerChunkIndex < chunks.length - 1; centerChunkIndex++) {
+					if (chunkAlreadyDone[centerChunkIndex])
+						continue;
+					
+					for (centerFrameIndex = 0; centerFrameIndex < chunks[centerChunkIndex].frames.length; ) {
+						var
+							//Current beginning & end of the smoothing window:
+							leftChunkIndex = centerChunkIndex,
+							leftFrameIndex = centerFrameIndex,
+						
+							rightChunkIndex, rightFrameIndex,
+	
+							/* 
+							 * The end of the current data partition,
+							 * We'll refine this guess for the end of the partition later if we find discontinuities:
+							 */
+							endChunkIndex = chunks.length - 2,
+							endFrameIndex = chunks[endChunkIndex].frames.length,
+		
+							partitionEnded = false,
+							accumulator = 0,
+							valuesInHistory = 0,
+							 
+							centerTime = chunks[centerChunkIndex].frames[centerFrameIndex][timeFieldIndex];
+		
+						/* 
+						 * This may not be the left edge of a partition, we may just have skipped the previous chunk due to
+						 * it having already been cached. If so, we can read the values from the previous chunk in order
+						 * to prime our history window. Move the left&right indexes to the left so the main loop will read
+						 * those earlier values.
+						 */
+						while (leftFrameIndex > 0 || leftFrameIndex == 0 && leftChunkIndex > 0) {
+							var
+								oldleftChunkIndex = leftChunkIndex,
+								oldleftFrameIndex = leftFrameIndex;
+							
+							//Try moving it left
+							if (leftFrameIndex == 0) {
+								leftChunkIndex--;
+								leftFrameIndex = chunks[leftChunkIndex].frames.length - 1;
+							} else {
+								leftFrameIndex--;
+							}
+							
+							if (chunks[leftChunkIndex].gapStartsHere[leftFrameIndex] || chunks[leftChunkIndex].frames[leftFrameIndex][timeFieldIndex] < centerTime - radius) {
+								//We moved the left index one step too far, shift it back
+								leftChunkIndex = oldleftChunkIndex;
+								leftFrameIndex = oldleftFrameIndex;
+								
+								break;
+							}
+						}
+						
+						rightChunkIndex = leftChunkIndex;
+						rightFrameIndex = leftFrameIndex;
+						
+						//The main loop, where we march our smoothing window along until we exhaust this partition
+						while (centerChunkIndex < endChunkIndex || centerChunkIndex == endChunkIndex && centerFrameIndex < endFrameIndex) {
+							// Old values fall out of the window
+							while (chunks[leftChunkIndex].frames[leftFrameIndex][timeFieldIndex] < centerTime - radius) {
+								accumulator -= chunks[leftChunkIndex].frames[leftFrameIndex][fieldIndex];
+								valuesInHistory--;
+								
+								leftFrameIndex++;
+								if (leftFrameIndex == chunks[leftChunkIndex].frames.length) {
+									leftFrameIndex = 0;
+									leftChunkIndex++;
+								}
+							}
+		
+							//New values are added to the window
+							while (!partitionEnded && chunks[rightChunkIndex].frames[rightFrameIndex][timeFieldIndex] <= centerTime + radius) {
+								accumulator += chunks[rightChunkIndex].frames[rightFrameIndex][fieldIndex];
+								valuesInHistory++;
+		
+								//If there is a discontinuity after this point, stop trying to add further values
+								if (chunks[rightChunkIndex].gapStartsHere[rightFrameIndex]) {
+									partitionEnded = true;
+								}
+									
+								//Advance the right index onward since we read a value
+								rightFrameIndex++;
+								if (rightFrameIndex == chunks[rightChunkIndex].frames.length) {
+									rightFrameIndex = 0;
+									rightChunkIndex++;
+									
+									if (rightChunkIndex == chunks.length) {
+										//We reached the end of the region of interest!
+										partitionEnded = true;
+									}
+								}
+	
+								if (partitionEnded) {
+									//Let the center-storing loop know not to advance the center to this position: 
+									endChunkIndex = rightChunkIndex;
+									endFrameIndex = rightFrameIndex;
+								}
+							}
+		
+							// Store the average of the history window into the frame in the center of the window
+							resultChunks[centerChunkIndex - 1].frames[centerFrameIndex][fieldIndex] = Math.round(accumulator / valuesInHistory);
+							
+							// Advance the center so we can start computing the next value
+							centerFrameIndex++;
+							if (centerFrameIndex == chunks[centerChunkIndex].frames.length) {
+								centerFrameIndex = 0;
+								centerChunkIndex++;
+	
+								//Is the next chunk already cached? Then we have nothing to write into there
+								if (chunkAlreadyDone[centerChunkIndex])
+									continue mainLoop;
+								
+								//Have we covered the whole ROI?
+								if (centerChunkIndex == chunks.length - 1)
+									break mainLoop;
+							}
+							
+							centerTime = chunks[centerChunkIndex].frames[centerFrameIndex][timeFieldIndex];
+						}
+					}
+				}
+			}
+		}
 		
 		return resultChunks;
 	};
