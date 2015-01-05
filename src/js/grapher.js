@@ -293,9 +293,10 @@ function FlightLogGrapher(flightLog, canvas) {
 	 */
 	function plotField(chunks, startFrameIndex, fieldIndex, curve, plotHeight, color) {
 		var
-			GAP_WARNING_BOX_RADIUS = 4,
+			GAP_WARNING_BOX_RADIUS = 3,
 			chunkIndex, frameIndex,
 			drawingLine = false,
+			inGap = false,
 			lastX, lastY,
 			yScale = -plotHeight,
 			xScale = canvas.width / windowWidthMicros;
@@ -305,37 +306,48 @@ function FlightLogGrapher(flightLog, canvas) {
 		//We may start partway through the first chunk:
 		frameIndex = startFrameIndex;
 		
+		canvasContext.strokeStyle = color;
+
 		canvasContext.beginPath();
 		
 		plottingLoop:
 		for (chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-			for (; frameIndex < chunks[chunkIndex].length; frameIndex++) {
+			var 
+				chunk = chunks[chunkIndex];
+			
+			for (; frameIndex < chunk.frames.length; frameIndex++) {
 				var
-					fieldValue = chunks[chunkIndex][frameIndex][fieldIndex],
-					frameTime = chunks[chunkIndex][frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
+					fieldValue = chunk.frames[frameIndex][fieldIndex],
+					frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
 					nextX, nextY;
 	
 				nextY = curve.lookup(fieldValue) * yScale;
 				nextX = (frameTime - windowStartTime) * xScale;
 	
 				if (drawingLine) {
-					/*if (!options.gapless && datapointsGetGapStartsAtIndex(points, frameIndex - 1)) {
-						//Draw a warning box at the beginning and end of the gap to mark it
-						cairo_rectangle(lastX - GAP_WARNING_BOX_RADIUS, lastY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
-						cairo_rectangle(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
-	
-						cairo_moveTo(nextX, nextY);
-					} else {*/
-						canvasContext.lineTo(nextX, nextY);
-					//}
+					canvasContext.lineTo(nextX, nextY);
+
+					if (!options.gapless && chunk.gapStartsHere[frameIndex]) {
+						canvasContext.strokeRect(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
+						inGap = true;
+						drawingLine = false;
+						continue;
+					} 
 				} else {
 					canvasContext.moveTo(nextX, nextY);
+					
+					if (!options.gapless && inGap) {
+						canvasContext.strokeRect(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
+						
+						if (chunk.gapStartsHere[frameIndex])
+							continue;
+						else
+							inGap = false;
+					}
 				}
-	
+
 				drawingLine = true;
-				lastX = nextX;
-				lastY = nextY;
-	
+				
 				if (frameTime >= windowEndTime)
 					break plottingLoop;
 			}
@@ -343,7 +355,6 @@ function FlightLogGrapher(flightLog, canvas) {
 			frameIndex = 0;
 		}
 
-		canvasContext.strokeStyle = color;
 		canvasContext.stroke();
 	}
 	
@@ -384,8 +395,8 @@ function FlightLogGrapher(flightLog, canvas) {
 		
 		if (chunks.length) {
 			//Find the first sample that lies inside the window
-			for (var startFrameIndex = 0; startFrameIndex < chunks[0].length; startFrameIndex++) {
-				if (chunks[0][startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= windowStartTime) {
+			for (var startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
+				if (chunks[0].frames[startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= windowStartTime) {
 					break;
 				}
 			}

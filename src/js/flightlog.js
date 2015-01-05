@@ -53,12 +53,12 @@ function FlightLog(logData, logIndex) {
 			chunk = chunks[0];
 		
 		if (chunk) {
-			for (var i = 0; i < chunk.length; i++) {
-				if (chunk[i][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] > startTime)
+			for (var i = 0; i < chunk.frames.length; i++) {
+				if (chunk.frames[i][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] > startTime)
 					break;
 			}
 			
-			return chunk[i - 1];
+			return chunk.frames[i - 1];
 		} else
 			return false;
 	};
@@ -92,11 +92,16 @@ function FlightLog(logData, logIndex) {
 				else // We're at the end so parse till end-of-log
 					chunkEndOffset = logIndexes.getLogBeginOffset(logIndex + 1);
 
-				chunk = [];
+				chunk = {
+					frames: [],
+					gapStartsHere: {}
+				};
 				
 				parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
 					if (frameValid) {
-						chunk.push(frame.slice(0)); /* Clone the frame data since parser reuses that array */
+						chunk.frames.push(frame.slice(0)); /* Clone the frame data since parser reuses that array */
+					} else {
+						chunk.gapStartsHere[chunk.frames.length - 1] = true;
 					}
 				};
 
