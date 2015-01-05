@@ -18,6 +18,7 @@ function SeekBar(canvas) {
 		backgroundContext = background.getContext("2d"),
 		
 		backgroundValid = false,
+		dirtyRegion = false,
 		
 		//Current time cursor:
 		CURSOR_WIDTH = 2.5,
@@ -87,6 +88,8 @@ function SeekBar(canvas) {
 		BAR_INSET = CURSOR_WIDTH; 
 		
 		invalidateBackground();
+		
+		that.repaint();
 	};
 	
 	this.setActivityRange = function(min, max) {
@@ -160,10 +163,16 @@ function SeekBar(canvas) {
 	};
 	
 	this.repaint = function() {
-		if (!backgroundValid)
+		if (!backgroundValid) {
+			dirtyRegion = false;
 			rebuildBackground();
+		}
 		
-		canvasContext.drawImage(background, 0, 0);
+		if (dirtyRegion === false)
+			canvasContext.drawImage(background, 0, 0);
+		else {
+			canvasContext.drawImage(background, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
+		}
 		
 		//Draw cursor
 		var 
@@ -172,6 +181,13 @@ function SeekBar(canvas) {
 
 		canvasContext.fillStyle = 'rgba(0,0,0,0.5)';
 		canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
+		
+		dirtyRegion = {
+			x: Math.floor(cursorX - CURSOR_WIDTH - 1),
+			y: 0,
+			width: Math.ceil(CURSOR_WIDTH * 2 + 2),
+			height: canvas.height
+		};
 	};
 	
 	background.style.display = 'none';
