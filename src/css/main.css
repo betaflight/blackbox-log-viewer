@@ -23,8 +23,14 @@
     display: block;
 }
 
+.log-seek-bar canvas {
+	width:100%;
+	height:50px;
+	margin-top:0.5em;
+}
+
 .log-graph {
-	height:500px;
+	height:600px;
 	position:relative;
 	margin-top:1em;
 }
@@ -82,6 +88,14 @@ html.has-video .video-jump-end {
 html.has-log .log-jump-start,
 html.has-log .log-jump-end {
     display:block;
+}
+
+.log-seek-bar {
+	display:none;
+}
+html.has-video .log-seek-bar,
+html.has-log .log-seek-bar {
+	display:block;
 }
 
 .log-metadata {

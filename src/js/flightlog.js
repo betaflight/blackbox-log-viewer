@@ -13,6 +13,11 @@ function FlightLog(logData, logIndex) {
 		
 		chunkCache = new FIFOCache(2);
 	
+	/** TODO remove debug code 
+	console.log(logIndexes.saveToJSON());
+	console.log("Length " + logIndexes.saveToJSON().length);
+	*/
+	
 	this.parser = parser;
 	
 	this.getMainFieldCount = function() {
@@ -34,6 +39,13 @@ function FlightLog(logData, logIndex) {
 	this.getSysConfig = function() {
 		return parser.sysConfig;
 	}
+	
+	this.getThrottleActivity = function() {
+		return {
+			avgThrottle: logIndexes.getIntraframeDirectory(logIndex).avgThrottle,
+			times: logIndexes.getIntraframeDirectory(logIndex).times
+		};
+	},
 	
 	this.getFrameAtTime = function(startTime) {
 		var
@@ -77,8 +89,8 @@ function FlightLog(logData, logIndex) {
 				
 				if (chunkIndex + 1 < iframeDirectory.offsets.length)
 					chunkEndOffset = iframeDirectory.offsets[chunkIndex + 1];
-				else
-					chunkEndOffset = undefined;
+				else // We're at the end so parse till end-of-log
+					chunkEndOffset = logIndexes.getLogBeginOffset(logIndex + 1);
 
 				chunk = [];
 				
@@ -112,7 +124,7 @@ function FlightLog(logData, logIndex) {
 		}
 	};
 	
-	parser.parseHeader(logIndexes.getLogBeginOffset(0));	
+	parser.parseHeader(logIndexes.getLogBeginOffset(0));
 }
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {

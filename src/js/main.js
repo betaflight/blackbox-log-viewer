@@ -24,7 +24,12 @@ var
 	video = $(".log-graph video")[0],
 	canvas = $(".log-graph canvas")[0],
 	videoURL = false,
-	videoOffset = 0.0;
+	videoOffset = 0.0,
+	
+	graphRendersCount = 0,
+	
+	seekBarCanvas = $(".log-seek-bar canvas")[0],
+	seekBar = new SeekBar(seekBarCanvas);
 
 function blackboxTimeFromVideoTime() {
 	return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -56,13 +61,28 @@ function animationLoop() {
 			delta = (now - lastRenderTime) * 1000;
 	
 		currentBlackboxTime += delta;
+		
+		if (graphState == GRAPH_STATE_PLAY) {
+			if (currentBlackboxTime > flightLog.getMaxTime()) {
+				currentBlackboxTime = flightLog.getMaxTime();
+				setGraphState(GRAPH_STATE_PAUSED);
+			}
+		}
 	}
 	
 	graph.render(currentBlackboxTime);
+	graphRendersCount++;
+	
+	seekBar.setCurrentTime(currentBlackboxTime);
 
 	if (graphState == GRAPH_STATE_PLAY) {
+		if (graphRendersCount % 8 == 0)
+			seekBar.repaint();
+		
 		lastRenderTime = now;
 		requestAnimationFrame(animationLoop);
+	} else {
+		seekBar.repaint();
 	}
 }
 
@@ -74,6 +94,8 @@ function invalidateGraph() {
 function updateCanvasSize() {
 	canvas.width = canvas.offsetWidth;
 	canvas.height = canvas.offsetHeight;
+	
+	seekBarCanvas.width = canvas.offsetWidth;
 		
 	invalidateGraph();
 }
@@ -107,9 +129,15 @@ function setGraphState(newState) {
 }
 
 function setCurrentBlackboxTime(newTime) {
-	video.currentTime = (newTime - flightLog.getMinTime()) / 1000000 + videoOffset;
+	if (hasVideo) {
+		video.currentTime = (newTime - flightLog.getMinTime()) / 1000000 + videoOffset;
 	
-	syncLogToVideo();
+		syncLogToVideo();
+	} else {
+		currentBlackboxTime = newTime;
+		
+		invalidateGraph();
+	}
 }
 
 function setVideoTime(newTime) {
@@ -127,13 +155,21 @@ function loadLog(file) {
     	dataArray = new Uint8Array(bytes);
     	flightLog = new FlightLog(dataArray, 0);
     	graph = new FlightLogGrapher(flightLog, canvas);
-    	
+
+    	hasLog = true;
+
     	if (hasVideo)
     		syncLogToVideo();
     	else {
 	    	// Start at beginning:
 	    	currentBlackboxTime = flightLog.getMinTime();
     	}
+
+    	seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
+    	seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
+    	
+    	var throttleActivity = flightLog.getThrottleActivity();
+    	seekBar.setActivity(throttleActivity.avgThrottle, throttleActivity.times);
     	
     	renderLogInfo(file);
     	setGraphState(GRAPH_STATE_PAUSED);
@@ -143,6 +179,12 @@ function loadLog(file) {
     };
 
     reader.readAsArrayBuffer(file);
+}
+
+function seekBarSeek(time) {
+	setCurrentBlackboxTime(time);
+	
+	invalidateGraph();
 }
 
 $(document).ready(function() {
@@ -244,4 +286,6 @@ $(document).ready(function() {
 	$(video).on('loadedmetadata', updateCanvasSize);
 	
 	updateCanvasSize();
+	
+	seekBar.onSeek = seekBarSeek;
 });
