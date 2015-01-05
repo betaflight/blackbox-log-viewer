@@ -11,8 +11,13 @@ function SeekBar(canvas) {
 		activityStrength, activityTime,
 		//Expect to be plotting PWM-like data by default:
 		activityMin = 1000, activityMax = 2000,
-		
+
 		canvasContext = canvas.getContext("2d"),
+		
+		background = document.createElement('canvas'),
+		backgroundContext = background.getContext("2d"),
+		
+		backgroundValid = false,
 		
 		//Current time cursor:
 		CURSOR_WIDTH = 2.5,
@@ -40,6 +45,12 @@ function SeekBar(canvas) {
 		
 		if (that.onSeek)
 			that.onSeek(time);
+		
+		that.repaint();
+	}
+	
+	function invalidateBackground() {
+		backgroundValid = false;
 	}
 	
 	function onMouseMove(e) {
@@ -48,15 +59,19 @@ function SeekBar(canvas) {
 	}
 	
 	$(canvas).mousedown(function(e) {
-		seekToDOMPixel(e.offsetX);
-		
-		//"capture" the mouse so we can drag outside the boundaries of the seek bar
-		$(document).on("mousemove", onMouseMove);
-		
-		//Release the capture when the mouse is released
-		$(document).one("mouseup", function () {
-			$(document).off("mousemove", onMouseMove);
-		});
+		e.preventDefault();
+
+		if (e.which == 1) { //Left mouse button only for seeking
+			seekToDOMPixel(e.offsetX);
+			
+			//"capture" the mouse so we can drag outside the boundaries of the seek bar
+			$(document).on("mousemove", onMouseMove);
+			
+			//Release the capture when the mouse is released
+			$(document).one("mouseup", function () {
+				$(document).off("mousemove", onMouseMove);
+			});
+		}
 	});
 	
 	this.resize = function(width, height) {
@@ -65,45 +80,56 @@ function SeekBar(canvas) {
 		canvas.width = width * ratio;
 		canvas.height = height * ratio;
 		
+		background.width = width * ratio;
+		background.height = height * ratio;
+		
 		CURSOR_WIDTH = 2.5 * ratio;
 		BAR_INSET = CURSOR_WIDTH; 
+		
+		invalidateBackground();
 	};
 	
 	this.setActivityRange = function(min, max) {
 		activityMin = min;
 		activityMax = max;
+		
+		invalidateBackground();
 	};
 	
 	this.setTimeRange = function(newMin, newMax, newCurrent) {
 		min = newMin;
 		max = newMax;
 		current = newCurrent;
+		
+		invalidateBackground();
 	};
 	
 	this.setActivity = function(newActivityStrengths, newActivityTimes) {
 		activityStrength = newActivityStrengths;
 		activityTime = newActivityTimes;
+		
+		invalidateBackground();
 	};
 	
 	this.setCurrentTime = function(newTime) {
 		current = newTime;
 	};
 	
-	this.repaint = function() {
+	function rebuildBackground() {
 		var 
 			x, activityIndex = 0,
 			pixelTimeStep;
 		
-		canvasContext.fillStyle = '#eee';
-		canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+		backgroundContext.fillStyle = '#eee';
+		backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 		
 		if (max > min) {
 			pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2);
 			
 			//Draw activity bars
 			if (activityTime.length) {
-				canvasContext.strokeStyle = '#AAF';
-				canvasContext.beginPath();
+				backgroundContext.strokeStyle = '#AAF';
+				backgroundContext.beginPath();
 				
 				var 
 					time = min;
@@ -120,21 +146,35 @@ function SeekBar(canvas) {
 						activity = 0;
 					else {
 						activity = (activityStrength[activityIndex] - activityMin) / (activityMax - activityMin) * canvas.height;
-						canvasContext.moveTo(x, canvas.height);
-						canvasContext.lineTo(x, canvas.height - activity);
+						backgroundContext.moveTo(x, canvas.height);
+						backgroundContext.lineTo(x, canvas.height - activity);
 					}
 					
 					time += pixelTimeStep;
 				}
 				
-				canvasContext.stroke();
+				backgroundContext.stroke();
 			}
-			
-			//Draw cursor
-			var cursorX = (current - min) / pixelTimeStep + BAR_INSET;
-
-			canvasContext.fillStyle = 'rgba(0,0,0,0.5)';
-			canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
+			backgroundValid = true;
 		}
 	};
+	
+	this.repaint = function() {
+		if (!backgroundValid)
+			rebuildBackground();
+		
+		canvasContext.drawImage(background, 0, 0);
+		
+		//Draw cursor
+		var 
+			pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2),
+			cursorX = (current - min) / pixelTimeStep + BAR_INSET;
+
+		canvasContext.fillStyle = 'rgba(0,0,0,0.5)';
+		canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
+	};
+	
+	background.style.display = 'none';
+	background.width = canvas.width;
+	background.height = canvas.height;
 }
