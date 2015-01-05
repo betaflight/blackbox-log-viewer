@@ -95,7 +95,7 @@ function updateCanvasSize() {
 	canvas.width = canvas.offsetWidth;
 	canvas.height = canvas.offsetHeight;
 	
-	seekBarCanvas.width = canvas.offsetWidth;
+	seekBar.resize(canvas.offsetWidth, 50);
 		
 	invalidateGraph();
 }

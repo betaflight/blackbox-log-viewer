@@ -22,9 +22,15 @@ function SeekBar(canvas) {
 	
 	this.onSeek = false;
 	
-	function seekToPixel(x) {
-		var 
-			time = (x - BAR_INSET) * (max - min) / (canvas.width - 1 - BAR_INSET * 2) + min;
+	function seekToDOMPixel(x) {
+		var
+			bounding = canvas.getBoundingClientRect(),
+			time; 
+
+		// Compensate for canvas being stretched on the page
+		x = x / (bounding.right - bounding.left) * canvas.width;
+		
+		time = (x - BAR_INSET) * (max - min) / (canvas.width - 1 - BAR_INSET * 2) + min;
 	
 		if (time < min)
 			time = min;
@@ -38,11 +44,11 @@ function SeekBar(canvas) {
 	
 	function onMouseMove(e) {
 		if (e.which == 1)
-			seekToPixel(e.pageX - $(canvas).offset().left);
+			seekToDOMPixel(e.pageX - $(canvas).offset().left);
 	}
 	
 	$(canvas).mousedown(function(e) {
-		seekToPixel(e.offsetX);
+		seekToDOMPixel(e.offsetX);
 		
 		//"capture" the mouse so we can drag outside the boundaries of the seek bar
 		$(document).on("mousemove", onMouseMove);
@@ -52,6 +58,16 @@ function SeekBar(canvas) {
 			$(document).off("mousemove", onMouseMove);
 		});
 	});
+	
+	this.resize = function(width, height) {
+		var ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+		
+		canvas.width = width * ratio;
+		canvas.height = height * ratio;
+		
+		CURSOR_WIDTH = 2.5 * ratio;
+		BAR_INSET = CURSOR_WIDTH; 
+	};
 	
 	this.setActivityRange = function(min, max) {
 		activityMin = min;
