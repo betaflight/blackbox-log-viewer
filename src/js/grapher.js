@@ -397,7 +397,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 		
 		var 
-			chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
+			chunks = flightLog.getChunksInTimeRange(windowStartTime, windowEndTime),
 			startChunkIndex, startFrameIndex;
 		
 		if (chunks.length) {
@@ -482,5 +482,5 @@ function FlightLogGrapher(flightLog, canvas) {
 		for (var j = 0; j < chunk.frames.length; j++) {
 			console.log(chunk.frames[j].join(",") + "\n");
 		}
-	}*/	
+	}*/
 }

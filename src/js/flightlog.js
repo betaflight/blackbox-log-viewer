@@ -77,8 +77,8 @@ function FlightLog(logData, logIndex) {
 		if (startIndex < 0)
 			startIndex = 0;
 
-		if (endIndex > iframeDirectory.offsets.length - 2)
-			endIndex = iframeDirectory.offsets.length - 2;
+		if (endIndex > iframeDirectory.offsets.length - 1)
+			endIndex = iframeDirectory.offsets.length - 1;
 		
 		if (endIndex < startIndex)
 			return [];
@@ -174,18 +174,35 @@ function FlightLog(logData, logIndex) {
 			 * query cannot be fully smoothed, they can't be cached).
 			 */
 			startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime - maxSmoothing) - 1,
-			endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime + maxSmoothing) + 1;
+			endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime + maxSmoothing) + 1,
+			
+			//Count of chunks at the beginning and end of the range that we will only look at, not smooth
+			leadingROChunks, trailingROChunks;
+		
+		if (startIndex < 0) {
+			startIndex = 0;
+			leadingROChunks = 0;
+		} else {
+			leadingROChunks = 1;
+		}
+		
+		if (endIndex > iframeDirectory.offsets.length - 1) {
+			endIndex = iframeDirectory.offsets.length - 1;
+			trailingROChunks = 0;
+		} else {
+			trailingROChunks = 1;
+		}
 		
 		chunks = getChunksInIndexRange(startIndex, endIndex);
 
 		//Create an independent copy of the raw frame data to smooth out:
-		resultChunks = new Array(chunks.length - 2);
+		resultChunks = new Array(chunks.length - leadingROChunks - trailingROChunks);
 		chunkAlreadyDone = new Array(chunks.length);
 		
 		allDone = true;
 		
 		//Don't smooth the edge chunks since they can't be fully smoothed
-		for (var i = 1; i < chunks.length - 1; i++) {
+		for (var i = leadingROChunks; i < chunks.length - trailingROChunks; i++) {
 			var resultChunk = smoothedCache.get(chunks[i].index);
 			
 			chunkAlreadyDone[i] = !!resultChunk;
@@ -207,7 +224,7 @@ function FlightLog(logData, logIndex) {
 				smoothedCache.add(resultChunk.index, resultChunk);
 			}
 			
-			resultChunks[i - 1] = resultChunk;
+			resultChunks[i - leadingROChunks] = resultChunk;
 		}
 
 		if (!allDone) {
@@ -223,7 +240,7 @@ function FlightLog(logData, logIndex) {
 				mainLoop:
 				
 				// Don't bother to smooth the first and last source chunks, since we can't smooth them completely
-				for (centerChunkIndex = 1; centerChunkIndex < chunks.length - 1; centerChunkIndex++) {
+				for (centerChunkIndex = leadingROChunks; centerChunkIndex < chunks.length - trailingROChunks; centerChunkIndex++) {
 					if (chunkAlreadyDone[centerChunkIndex])
 						continue;
 					
@@ -239,7 +256,7 @@ function FlightLog(logData, logIndex) {
 							 * The end of the current data partition,
 							 * We'll refine this guess for the end of the partition later if we find discontinuities:
 							 */
-							endChunkIndex = chunks.length - 2,
+							endChunkIndex = chunks.length - leadingROChunks - trailingROChunks,
 							endFrameIndex = chunks[endChunkIndex].frames.length,
 		
 							partitionEnded = false,
@@ -323,7 +340,7 @@ function FlightLog(logData, logIndex) {
 							}
 		
 							// Store the average of the history window into the frame in the center of the window
-							resultChunks[centerChunkIndex - 1].frames[centerFrameIndex][fieldIndex] = Math.round(accumulator / valuesInHistory);
+							resultChunks[centerChunkIndex - leadingROChunks].frames[centerFrameIndex][fieldIndex] = Math.round(accumulator / valuesInHistory);
 							
 							// Advance the center so we can start computing the next value
 							centerFrameIndex++;
@@ -336,7 +353,7 @@ function FlightLog(logData, logIndex) {
 									continue mainLoop;
 								
 								//Have we covered the whole ROI?
-								if (centerChunkIndex == chunks.length - 1)
+								if (centerChunkIndex == chunks.length - trailingROChunks)
 									break mainLoop;
 							}
 							
