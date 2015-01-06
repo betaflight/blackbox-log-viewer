@@ -110,7 +110,6 @@ function FlightLog(logData, logIndex) {
 					}
 				};
 
-				console.log("Parse " + chunkStartOffset +" to " + chunkEndOffset); //TODO remove debugging print
 				parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
 				
 				chunkCache.add(chunkIndex, chunk);

@@ -92,9 +92,8 @@ function invalidateGraph() {
 }
 
 function updateCanvasSize() {
-	canvas.width = canvas.offsetWidth;
-	canvas.height = canvas.offsetHeight;
-	
+	if (graph)
+		graph.resize(canvas.offsetWidth, canvas.offsetHeight);
 	seekBar.resize(canvas.offsetWidth, 50);
 		
 	invalidateGraph();
@@ -171,11 +170,12 @@ function loadLog(file) {
     	var throttleActivity = flightLog.getThrottleActivity();
     	seekBar.setActivity(throttleActivity.avgThrottle, throttleActivity.times);
     	
+    	$("html").addClass("has-log");
+    	updateCanvasSize();
+    	
     	renderLogInfo(file);
     	setGraphState(GRAPH_STATE_PAUSED);
     	
-		$("html").addClass("has-log");
-		updateCanvasSize();
     };
 
     reader.readAsArrayBuffer(file);

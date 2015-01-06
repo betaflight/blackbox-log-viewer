@@ -30,7 +30,7 @@ function FlightLogGrapher(flightLog, canvas) {
 			"#ffed6f"
 		],
 		
-		craftColor = "rgba(76,76,76,1)",
+		craftColor = "rgb(76,76,76)",
 		
 		windowWidthMicros = 1000000;
 	
@@ -38,6 +38,8 @@ function FlightLogGrapher(flightLog, canvas) {
 		windowStartTime, windowCenterTime, windowEndTime,
 		
 		canvasContext = canvas.getContext("2d"),
+		
+		craftParameters,
 		
 		options = {
 			gapless:false,
@@ -56,6 +58,12 @@ function FlightLogGrapher(flightLog, canvas) {
 		accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
 		pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10);
 	
+	function makeColorHalfStrength(color) {
+		color = parseInt(color.substring(1), 16);
+		
+		return "rgba(" + ((color >> 16) & 0xFF) + "," + ((color >> 8) & 0xFF) + "," + (color & 0xFF) + ",0.5)";
+	}
+	
 	function identifyFields() {
 		var 
 			motorGraphColorIndex = 0,
@@ -66,6 +74,7 @@ function FlightLogGrapher(flightLog, canvas) {
 			rcCommandFields:[],
 			motorFields:[],
 			motorColors:[],
+			motorShadeColors:[],
 
 			axisPIDFields: [[], [], []],  //First dimension is [P, I, D], second dimension is axis
 			PIDAxisColors: [[], [], []], //PID, axis
@@ -104,6 +113,7 @@ function FlightLogGrapher(flightLog, canvas) {
 
 				idents.motorFields[motorIndex] = fieldIndex;
 				idents.motorColors[motorIndex] = lineColors[(motorGraphColorIndex++) % lineColors.length];
+				idents.motorShadeColors[motorIndex] = makeColorHalfStrength(idents.motorColors[motorIndex]);
 			} else if ((matches = fieldName.match(/^rcCommand\[(\d+)]$/))) {
 				var rcCommandIndex = matches[1];
 
@@ -180,6 +190,154 @@ function FlightLogGrapher(flightLog, canvas) {
 		}
 	}
 	
+	function decideCraftParameters() {
+		craftParameters ={
+			bladeLength: canvas.height / 14
+		};
+		
+		craftParameters.tipBezierWidth = 0.2 * craftParameters.bladeLength;
+		craftParameters.tipBezierHeight = 0.1 * craftParameters.bladeLength;
+		craftParameters.motorSpacing = craftParameters.bladeLength * 1.7;
+		
+		switch (idents.motorFields.length) {
+			case 3:
+				craftParameters.motors = [
+  				    {
+  				    	x: 0,
+  				    	y: 1,
+  				    	direction: -1,
+  				    	color: idents.motorColors[0]
+  				    }, {
+  				    	x: .71,
+  				    	y: -.71,
+  				    	direction: -1,
+  				    	color: idents.motorColors[1]
+  				    }, {
+  				    	x: -.71,
+  				    	y: -.71,
+  				    	direction: -1,
+  				    	color: idents.motorColors[2]
+  				    }
+  				];
+			break;
+			case 4:
+				craftParameters.motors = [
+				    {
+				    	x: .71,
+				    	y: .71,
+				    	direction: 1,
+				    	color: idents.motorColors[0]
+				    }, {
+				    	x: .71,
+				    	y: -.71,
+				    	direction: -1,
+				    	color: idents.motorColors[1]
+				    }, {
+				    	x: -.71,
+				    	y: .71,
+				    	direction: -1,
+				    	color: idents.motorColors[2]
+				    }, {
+				    	x: -.71,
+				    	y: -.71,
+				    	direction: 1,
+				    	color: idents.motorColors[3]
+				    }
+				];
+			break;
+			default:
+				craftParameters.motors = [];
+			
+				for (var i = 0; i < idents.motorFields.length; i++) {
+					craftParameters.motors.push({
+						x: Math.cos(i / idents.motorFields.length * Math.PI * 2),
+						y: Math.sin(i / idents.motorFields.length * Math.PI * 2),
+						direction: Math.pow(-1, i),
+						color: idents.motorColors[i]
+					});
+				}
+			break;
+		}
+	}
+	
+	function drawCraft(frame) {
+		var 
+			motorIndex;
+		
+		//Draw arms
+		canvasContext.lineWidth = craftParameters.bladeLength * 0.30;
+		
+		canvasContext.lineCap = "round";
+		canvasContext.strokeStyle = craftColor;
+		
+		canvasContext.beginPath();
+		
+		for (motorIndex = 0; motorIndex < idents.motorFields.length; motorIndex++) {
+			canvasContext.moveTo(0, 0);
+
+			canvasContext.lineTo(
+				craftParameters.motorSpacing * craftParameters.motors[motorIndex].x * 1.2,
+				craftParameters.motorSpacing * craftParameters.motors[motorIndex].y * 1.2
+			);
+		}
+
+		canvasContext.stroke();
+
+		//Draw the central hub
+		canvasContext.beginPath();
+		
+		canvasContext.moveTo(0, 0);
+		canvasContext.arc(0, 0, craftParameters.motorSpacing * 0.3, 0, 2 * Math.PI);
+		
+		canvasContext.fillStyle = craftColor;
+		canvasContext.fill();
+
+		canvasContext.font = FONTSIZE_CURRENT_VALUE_LABEL + "pt " + DEFAULT_FONT_FACE;
+
+		for (motorIndex = 0; motorIndex < idents.motorFields.length; motorIndex++) {
+			canvasContext.save();
+			{
+				//Move to the motor center
+				canvasContext.translate(
+					craftParameters.motorSpacing * craftParameters.motors[motorIndex].x,
+					craftParameters.motorSpacing * craftParameters.motors[motorIndex].y
+				);
+
+				canvasContext.fillStyle = idents.motorShadeColors[motorIndex];
+
+				canvasContext.beginPath();
+				
+				canvasContext.moveTo(0, 0);
+				canvasContext.arc(0, 0, craftParameters.bladeLength, 0, Math.PI * 2, false);
+				
+				canvasContext.fill();
+
+				canvasContext.fillStyle = craftParameters.motors[motorIndex].color;
+
+				canvasContext.beginPath();
+
+				canvasContext.moveTo(0, 0);
+				canvasContext.arc(0, 0, craftParameters.bladeLength, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 
+						* Math.max(frame[idents.motorFields[motorIndex]] - sysConfig.minthrottle, 0) / (sysConfig.maxthrottle - sysConfig.minthrottle), false);
+				
+				canvasContext.fill();
+
+				var
+					motorLabel = "" + frame[idents.motorFields[motorIndex]],
+					extent = canvasContext.measureText(motorLabel);
+
+				if (craftParameters.motors[motorIndex].x > 0)
+					canvasContext.translate(craftParameters.bladeLength + 10, 0);
+				else
+					canvasContext.translate(-(craftParameters.bladeLength + 10 + extent.width), 0);
+
+				canvasContext.fillText(motorLabel, 0, 0);
+			}
+			
+			canvasContext.restore();
+		}
+	}
+	
 	function drawCommandSticks(frame) {
 		var
 			stickSurroundRadius = canvas.height / 11, 
@@ -217,8 +375,6 @@ function FlightLogGrapher(flightLog, canvas) {
 			//Scale to our stick size
 			stickPositions[stickIndex] *= stickSurroundRadius;
 		}
-
-		canvasContext.save();
 
 		// Move origin to center of left stick
 		canvasContext.translate(-stickSpacing / 2, 0);
@@ -268,8 +424,6 @@ function FlightLogGrapher(flightLog, canvas) {
 			//Advance to next stick
 			canvasContext.translate(stickSpacing, 0);
 		}
-
-		canvasContext.restore();
 	}
 	
 	function drawFrameLabel(frameIndex, timeMsec)
@@ -389,6 +543,13 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.fillText(axisLabel, canvas.width - 8 - extent.width, -8);
 	}
 	
+	this.resize = function(width, height) {
+		canvas.width = width;
+		canvas.height = height;
+		
+		decideCraftParameters();
+	};
+	
 	this.render = function(windowCenterTimeMicros) {
 		windowCenterTime = windowCenterTimeMicros;
 		windowStartTime = windowCenterTime - windowWidthMicros / 2;
@@ -460,12 +621,22 @@ function FlightLogGrapher(flightLog, canvas) {
 				if (options.drawTime) {
 					drawFrameLabel(centerFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION], Math.round((windowCenterTime - flightLog.getMinTime()) / 1000));
 				}
+				
+				if (options.drawCraft) {
+					canvasContext.save();
+				
+					canvasContext.translate(0.25 * canvas.width, 0.20 * canvas.height);
+
+					drawCraft(centerFrame);
+					
+					canvasContext.restore();
+				}
 			}
 		}
 	};
 	
 	identifyFields();
-	
+		
 	var smoothing = [];
 	
 	for (var i = 0; i < idents.motorFields.length; i++)
