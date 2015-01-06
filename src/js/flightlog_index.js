@@ -27,7 +27,7 @@ function FlightLogIndex(logData) {
 	    	logBeginOffsets.push(logStart);
 	    	
 	    	//Restart the search after this header
-	    	stream.pos += FlightLogParser.prototype.FLIGHT_LOG_START_MARKER.length;
+	    	stream.pos = logStart + FlightLogParser.prototype.FLIGHT_LOG_START_MARKER.length;
 		}
 	}
 	
