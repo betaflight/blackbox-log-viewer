@@ -323,15 +323,16 @@ function FlightLogGrapher(flightLog, canvas) {
 				canvasContext.fill();
 
 				var
-					motorLabel = "" + frame[idents.motorFields[motorIndex]],
-					extent = canvasContext.measureText(motorLabel);
+					motorLabel = "" + frame[idents.motorFields[motorIndex]];
 
-				if (craftParameters.motors[motorIndex].x > 0)
-					canvasContext.translate(craftParameters.bladeLength + 10, 0);
-				else
-					canvasContext.translate(-(craftParameters.bladeLength + 10 + extent.width), 0);
+				if (craftParameters.motors[motorIndex].x > 0) {
+					canvasContext.textAlign = 'left';
+					canvasContext.fillText(motorLabel, craftParameters.bladeLength + 10, 0);
+				} else {
+					canvasContext.textAlign = 'right';
+					canvasContext.fillText(motorLabel, -(craftParameters.bladeLength + 10), 0);
+				}
 
-				canvasContext.fillText(motorLabel, 0, 0);
 			}
 			
 			canvasContext.restore();
@@ -352,7 +353,7 @@ function FlightLogGrapher(flightLog, canvas) {
 			stickIndex,
 			rcCommand = [],
 			stickPositions = [],
-			stickLabel, extent ;
+			stickLabel;
 
 		for (stickIndex = 0; stickIndex < 4; stickIndex++) {
 			//Check that stick data is present to be drawn:
@@ -378,6 +379,8 @@ function FlightLogGrapher(flightLog, canvas) {
 
 		// Move origin to center of left stick
 		canvasContext.translate(-stickSpacing / 2, 0);
+
+		canvasContext.font = FONTSIZE_CURRENT_VALUE_LABEL + "pt " + DEFAULT_FONT_FACE;
 
 		//For each stick
 		for (var i = 0; i < 2; i++) {
@@ -407,24 +410,27 @@ function FlightLogGrapher(flightLog, canvas) {
 			canvasContext.fill();
 
 			canvasContext.fillStyle = WHITE;
-			canvasContext.font = FONTSIZE_CURRENT_VALUE_LABEL + "pt " + DEFAULT_FONT_FACE;
 			
 			//Draw horizontal stick label
 			stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 0]] + "";
-			extent = canvasContext.measureText(stickLabel);
 
-			canvasContext.fillText(stickLabel, -extent.width / 2, stickSurroundRadius + FONTSIZE_CURRENT_VALUE_LABEL + 8);
+			canvasContext.textAlign = 'center';
+			canvasContext.fillText(stickLabel, 0, stickSurroundRadius + FONTSIZE_CURRENT_VALUE_LABEL + 8);
 
 			//Draw vertical stick label
 			stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 1]] + "";
-			extent = canvasContext.measureText(stickLabel);
 			
-			canvasContext.fillText(stickLabel, -stickSurroundRadius - extent.width - 8, FONTSIZE_CURRENT_VALUE_LABEL / 2);
+			canvasContext.textAlign = 'right';
+			canvasContext.fillText(stickLabel, -stickSurroundRadius - 8, FONTSIZE_CURRENT_VALUE_LABEL / 2);
 
 			//Advance to next stick
 			canvasContext.translate(stickSpacing, 0);
 		}
 	}
+	
+	var
+		frameLabelTextWidthFrameNumber,
+		frameLabelTextWidthFrameTime;
 	
 	function drawFrameLabel(frameIndex, timeMsec)
 	{
@@ -434,11 +440,15 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.font = FONTSIZE_FRAME_LABEL + "pt " + DEFAULT_FONT_FACE;
 		canvasContext.fillStyle = "rgba(255,255,255,0.65)";
 
-		extentFrameNumber = canvasContext.measureText("#0000000");
-		canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - extentFrameNumber.width - 8, canvas.height - 8);
+		if (frameLabelTextWidthFrameNumber === undefined)
+			frameLabelTextWidthFrameNumber = canvasContext.measureText("#0000000").width;
+		
+		canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - frameLabelTextWidthFrameNumber - 8, canvas.height - 8);
 
-		extentFrameTime = canvasContext.measureText("00:00.000");
-		canvasContext.fillText(formatTime(timeMsec, true), canvas.width - extentFrameTime.width - 8, canvas.height - 8 - FONTSIZE_FRAME_LABEL - 8);
+		if (frameLabelTextWidthFrameTime === undefined)
+			frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
+		
+		canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - FONTSIZE_FRAME_LABEL - 8);
 	}
 	
 	/**
@@ -532,15 +542,11 @@ function FlightLogGrapher(flightLog, canvas) {
 	}
 
 	function drawAxisLabel(axisLabel) {
-		var 
-			extent;
-
 		canvasContext.font = FONTSIZE_AXIS_LABEL + "pt " + DEFAULT_FONT_FACE;
 		canvasContext.fillStyle = "rgba(255,255,255,0.9)";
-
-		extent = canvasContext.measureText(axisLabel);
+		canvasContext.textAlign = 'right';
 		
-		canvasContext.fillText(axisLabel, canvas.width - 8 - extent.width, -8);
+		canvasContext.fillText(axisLabel, canvas.width - 8, -8);
 	}
 	
 	this.resize = function(width, height) {
