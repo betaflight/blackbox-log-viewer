@@ -181,6 +181,22 @@ function loadLog(file) {
     reader.readAsArrayBuffer(file);
 }
 
+function loadVideo(file) {
+	if (videoURL) {
+		URL.revokeObjectURL(videoURL);
+		videoURL = false;
+	}
+	
+	videoURL = URL.createObjectURL(file);
+	video.volume = 0.05;
+	video.src = videoURL;
+	hasVideo = true;
+	
+	$("html").addClass("has-video");
+	
+	setGraphState(GRAPH_STATE_PAUSED);
+}
+
 function seekBarSeek(time) {
 	setCurrentBlackboxTime(time);
 	
@@ -188,34 +204,27 @@ function seekBarSeek(time) {
 }
 
 $(document).ready(function() {
-	$("#logfile-open").change(function(e) {
+	$("#file-open").change(function(e) {
 		var 
 			files = e.target.files,
-			reader;
+			i;
 		
-		if (files.length > 0) {
-			loadLog(files[0]);
-		}
-	});
-	
-	$("#video-open").change(function(e) {
-		var 
-			files = e.target.files;
-		
-		if (files.length > 0) {
-			if (videoURL) {
-				URL.revokeObjectURL(videoURL);
-				videoURL = false;
+		for (i = 0; i < files.length; i++) {
+			var
+				isLog = files[i].name.match(/\.TXT$/i),
+				isVideo = files[i].name.match(/\.(AVI|MOV|MP4|MPEG)$/i);
+			
+			if (!isLog && !isVideo) {
+				if (files[i].size < 10 * 1024 * 1024)
+					isLog = true; //Assume small files are logs rather than videos
+				else
+					isVideo = true;
 			}
 			
-			videoURL = URL.createObjectURL(files[0]);
-			video.volume = 0.05;
-			video.src = videoURL;
-			hasVideo = true;
-			
-			$("html").addClass("has-video");
-			
-			setGraphState(GRAPH_STATE_PAUSED);
+			if (isLog)
+				loadLog(files[i]);
+			else if (isVideo)
+				loadVideo(files[i]);
 		}
 	});
 	
