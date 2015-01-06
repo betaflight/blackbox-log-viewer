@@ -336,13 +336,20 @@ function FlightLogGrapher(flightLog, canvas) {
 				} else {
 					canvasContext.moveTo(nextX, nextY);
 					
-					if (!options.gapless && inGap) {
-						canvasContext.strokeRect(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
-						
-						if (chunk.gapStartsHere[frameIndex])
+					if (!options.gapless) {
+						// Is this the end of a gap to be marked?
+						if (inGap) {
+							canvasContext.strokeRect(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
+							
+							if (chunk.gapStartsHere[frameIndex])
+								continue;
+							else
+								inGap = false;
+						} else if (chunk.gapStartsHere[frameIndex]) {
+							//Must be right at the beginning of drawing
+							inGap = true;
 							continue;
-						else
-							inGap = false;
+						}
 					}
 				}
 
@@ -455,18 +462,6 @@ function FlightLogGrapher(flightLog, canvas) {
 				}
 			}
 		}
-		
-		/* //Debugging: 
-		var chunks = flightLog.getChunksInTimeRange(flightLog.getMinTime() - 500, flightLog.getMinTime() + 2000000);
-    	
-    	for (var i = 0; i < chunks.length; i++) {
-    		var chunk = chunks[i];
-    		
-    		for (var j = 0; j < chunk.length; j++) {
-    			console.log(chunk[j].join(",") + "\n");
-    		}
-    	}
-    	*/
 	};
 	
 	identifyFields();
@@ -474,7 +469,18 @@ function FlightLogGrapher(flightLog, canvas) {
 	var smoothing = [];
 	
 	for (var i = 0; i < idents.motorFields.length; i++)
-		smoothing.push({field:idents.motorFields[i], radius:100 * 1000});
+		smoothing.push({field:idents.motorFields[i], radius:4 * 1000});
 		
 	flightLog.setFieldSmoothing(smoothing);
+	
+	 //Debugging: 
+	/*var chunks = flightLog.getChunksInTimeRange(flightLog.getMinTime(), flightLog.getMaxTime());
+	
+	for (var i = 0; i < chunks.length; i++) {
+		var chunk = chunks[i];
+		
+		for (var j = 0; j < chunk.frames.length; j++) {
+			console.log(chunk.frames[j].join(",") + "\n");
+		}
+	}*/	
 }

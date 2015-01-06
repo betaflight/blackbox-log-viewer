@@ -280,9 +280,17 @@ var FlightLogParser = function(logData) {
 	}
 
 	function completeIntraframe(frameType, frameStart, frameEnd, raw) {
-        mainStreamIsValid = true;
+	    // Only accept this frame as valid if time and iteration count are moving forward:
+	    if (raw || !mainHistory[1] 
+	    	|| mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] >= mainHistory[1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION]
+	    	&& mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= mainHistory[1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]) {
 
-        updateFieldStatistics(mainHistory[0]);
+	        mainStreamIsValid = true;
+
+	        updateFieldStatistics(mainHistory[0]);
+	    } else {
+	        invalidateStream();
+	    }
 
 	    if (that.onFrameReady)
 	        that.onFrameReady(mainStreamIsValid, mainHistory[0], frameType, frameStart, frameEnd - frameStart);
