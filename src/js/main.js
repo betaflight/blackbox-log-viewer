@@ -283,7 +283,14 @@ function loadLog(file) {
     	var bytes = e.target.result;
     	
     	dataArray = new Uint8Array(bytes);
-    	flightLog = new FlightLog(dataArray);
+    	
+    	try {
+    	    flightLog = new FlightLog(dataArray);
+    	} catch (e) {
+    	    alert("Sorry, an error occured while trying to open this log:\n\n" + e);
+    	    return;
+    	}
+    	
     	graph = new FlightLogGrapher(flightLog, canvas);
 
     	hasLog = true;
