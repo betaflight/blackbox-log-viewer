@@ -168,7 +168,7 @@ function FlightLogGrapher(flightLog, canvas) {
 				switch (fieldName) {
 					case "vbatLatest":
 						idents.vbatField = fieldIndex;
-						idents.numCells = flightLog.estimateNumCells();
+						idents.numCells = flightLog.getNumCellsEstimate();
 					break;
 					case "BaroAlt":
 						idents.baroField = fieldIndex;
@@ -564,7 +564,7 @@ function FlightLogGrapher(flightLog, canvas) {
 		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 		
 		var 
-			chunks = flightLog.getChunksInTimeRange(windowStartTime, windowEndTime),
+			chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
 			startChunkIndex, startFrameIndex;
 		
 		if (chunks.length) {

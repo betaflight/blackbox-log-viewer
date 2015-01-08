@@ -98,10 +98,11 @@ html.has-log .log-seek-bar {
 	display:block;
 }
 
-.log-metadata {
+.log-metadata, .log-field-values {
 	display:none;
 }
-html.has-log .log-metadata {
+html.has-log .log-metadata,
+html.has-log .log-field-values {
 	display:block;
 }
 

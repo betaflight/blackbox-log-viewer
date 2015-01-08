@@ -12,7 +12,45 @@ var
 	GRAPH_STATE_PAUSED = 0,
 	GRAPH_STATE_PLAY = 1,
 	
-	SMALL_JUMP_TIME = 100 * 1000;
+	SMALL_JUMP_TIME = 100 * 1000,
+	
+	FRIENDLY_FIELD_NAMES = {
+        'axisP[0]': 'PID_P[roll]',
+        'axisP[1]': 'PID_P[pitch]',
+        'axisP[2]': 'PID_P[yaw]',
+        'axisI[0]': 'PID_I[roll]',
+        'axisI[1]': 'PID_I[pitch]',
+        'axisI[2]': 'PID_I[yaw]',
+        'axisD[0]': 'PID_D[roll]',
+        'axisD[1]': 'PID_D[pitch]',
+        'axisD[2]': 'PID_D[yaw]',
+        
+        'rcCommand[0]': 'rcCommand[roll]',
+        'rcCommand[1]': 'rcCommand[pitch]',
+        'rcCommand[2]': 'rcCommand[yaw]',
+        'rcCommand[3]': 'rcCommand[throttle]',
+
+        'gyroData[0]': 'gyro[roll]',
+        'gyroData[1]': 'gyro[pitch]',
+        'gyroData[2]': 'gyro[yaw]',
+
+        'accSmooth[0]': 'acc[X]',
+        'accSmooth[1]': 'acc[Y]',
+        'accSmooth[2]': 'acc[Z]',
+        
+        'magADC[0]': 'mag[X]',
+        'magADC[1]': 'mag[Y]',
+        'magADC[2]': 'mag[Z]',
+
+        'vbatLatest': 'vbat',
+        'BaroAlt': 'baro',
+        
+        'servo[5]': 'tail servo',
+        
+        //End-users prefer 1-based indexing
+        'motor[0]': 'motor[1]', 'motor[1]': 'motor[2]', 'motor[2]': 'motor[3]', 'motor[3]': 'motor[4]',
+        'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]'
+    };
 
 var
 	graphState = GRAPH_STATE_PAUSED,
@@ -29,7 +67,12 @@ var
 	graphRendersCount = 0,
 	
 	seekBarCanvas = $(".log-seek-bar canvas")[0],
-	seekBar = new SeekBar(seekBarCanvas);
+	seekBar = new SeekBar(seekBarCanvas),
+	
+	seekBarRepaintRateLimited = $.throttle(200, $.proxy(seekBar.repaint, seekBar)),
+	
+	updateValuesChartRateLimited,
+	friendlyFieldNames = [];
 
 function blackboxTimeFromVideoTime() {
 	return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -41,6 +84,84 @@ function syncLogToVideo() {
 		currentBlackboxTime = blackboxTimeFromVideoTime();
 	}
 }
+
+function buildFriendlyFieldNames() {
+    var
+        i, fieldNames = flightLog.getMainFieldNames();
+    
+    friendlyFieldNames = [];
+    
+    for (i = 0; i < fieldNames.length; i++) {
+        if (FRIENDLY_FIELD_NAMES[fieldNames[i]])
+            friendlyFieldNames.push(FRIENDLY_FIELD_NAMES[fieldNames[i]]);
+        else
+            friendlyFieldNames.push(fieldNames[i]);
+    }
+}
+
+/**
+ * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
+ * no better representation is available.
+ * 
+ * @param fieldName Name of the field
+ * @param value Value of the field
+ */
+function decodeFieldToFriendly(fieldName, value) {
+    if (value === undefined)
+        return "";
+    
+    switch (fieldName) {
+        case 'time':
+            return formatTime(value / 1000, true);
+        case 'gyroData[0]':
+        case 'gyroData[1]':
+        case 'gyroData[2]':
+            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
+            
+        case 'accSmooth[0]':
+        case 'accSmooth[1]':
+        case 'accSmooth[2]':
+            return flightLog.accRawToGs(value).toFixed(2) + "g";
+            
+        default:
+            return "";
+    }
+}
+
+function updateValuesChart() {
+    var 
+        table = $(".log-field-values table"),
+        i,
+        frame = flightLog.getFrameAtTime(currentBlackboxTime),
+        fieldNames = flightLog.getMainFieldNames();
+    
+    $("tr:not(:first)", table).remove();
+    
+    if (frame) {
+        var 
+            rows = [],
+            rowCount = Math.ceil(fieldNames.length / 2);
+        
+        for (i = 0; i < rowCount; i++) {
+            var 
+                row = 
+                    "<tr><td>" + friendlyFieldNames[i] + "</td><td>" + frame[i] + '</td><td>' + decodeFieldToFriendly(fieldNames[i], frame[i]) + "</td>",
+                secondColumn = i + rowCount;
+            
+            if (secondColumn < fieldNames.length) {
+                row += "<td>" + friendlyFieldNames[secondColumn] + "</td><td>" + frame[secondColumn] + '</td><td>' + decodeFieldToFriendly(fieldNames[secondColumn], frame[secondColumn]) + "</td>";
+            }
+            
+            row += "</tr>";
+            
+            rows.push(row);
+        }
+        
+        table.append(rows.join(""));
+    }
+}
+
+updateValuesChartRateLimited = $.throttle(250, updateValuesChart);
 
 function animationLoop() {
 	var 
@@ -75,11 +196,12 @@ function animationLoop() {
 	
 	seekBar.setCurrentTime(currentBlackboxTime);
 
+	updateValuesChartRateLimited();
+	
 	if (graphState == GRAPH_STATE_PLAY) {
-		if (graphRendersCount % 8 == 0)
-			seekBar.repaint();
-		
-		lastRenderTime = now;
+	    lastRenderTime = now;
+	    
+	    seekBarRepaintRateLimited();
 		requestAnimationFrame(animationLoop);
 	} else {
 		seekBar.repaint();
@@ -104,7 +226,13 @@ function renderLogInfo(file) {
 	$(".log-start-time").text(formatTime(flightLog.getMinTime() / 1000, false));
 	$(".log-end-time").text(formatTime(flightLog.getMaxTime() / 1000, false));
 	$(".log-duration").text(formatTime(Math.ceil((flightLog.getMaxTime() - flightLog.getMinTime()) / 1000), false));
-	$(".log-cells").text(flightLog.estimateNumCells() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
+	
+	if (flightLog.getNumCellsEstimate()) {
+		$(".log-cells").text(flightLog.getNumCellsEstimate() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
+        $(".log-cells-header,.log-cells").css('display', 'block');
+	} else {
+	    $(".log-cells-header,.log-cells").css('display', 'none');
+	}
 }
 
 function setGraphState(newState) {
@@ -152,7 +280,7 @@ function loadLog(file) {
     	var bytes = e.target.result;
     	
     	dataArray = new Uint8Array(bytes);
-    	flightLog = new FlightLog(dataArray, 0);
+    	flightLog = new FlightLog(dataArray);
     	graph = new FlightLogGrapher(flightLog, canvas);
 
     	hasLog = true;
@@ -164,6 +292,8 @@ function loadLog(file) {
 	    	currentBlackboxTime = flightLog.getMinTime();
     	}
 
+    	buildFriendlyFieldNames();
+    	
     	seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
     	seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
     	

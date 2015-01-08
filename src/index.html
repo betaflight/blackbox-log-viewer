@@ -46,7 +46,7 @@ body {
 					<span class="log-start-time"></span> to <span class="log-end-time"></span> (<span class="log-duration"></span> total)
 				</dd>
 
-				<dt>Battery</dt>
+				<dt class="log-cells-header">Battery</dt>
 				<dd class="log-cells"></dd>
 			</dl>
 		</div>
@@ -100,11 +100,19 @@ body {
             <canvas width="200" height="100"></canvas>
         </div>
 
-		<hr>
-
-		<footer>
-			<p>&copy; Nicholas Sherlock 2015</p>
-		</footer>
+        <div class="log-field-values">
+            <h4>Field values</h4>
+            <table class="table table-condensed">
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>Raw value</th>
+                    <th>Decoded</th>
+                    <th>&nbsp;</th>
+                    <th>Raw value</th>
+                    <th>Decoded</th>
+                </tr>
+            </table>
+        </div>
 	</div>
 	<!-- /container -->
 	<!--   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  -->
@@ -113,6 +121,7 @@ body {
 	</script>
 
 	<script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
 	<script src="js/tools.js"></script>
 	<script src="js/cache.js"></script>
 	<script src="js/expo.js"></script>

@@ -4,17 +4,21 @@
  * Uses a FlightLogParser to provide on-demand parsing (and caching) a flight data log. An index is computed
  * to allow efficient seeking.
  */
-function FlightLog(logData, logIndex) {
+function FlightLog(logData) {
 	var
+		that = this,
+		logIndex = false,
 		logIndexes = new FlightLogIndex(logData),
 		parser = new FlightLogParser(logData),
 		
-		iframeDirectory = logIndexes.getIntraframeDirectory(logIndex),
+		iframeDirectory,
 		
 		chunkCache = new FIFOCache(2),
 		
 		fieldSmoothing = [],
 		maxSmoothing = 0,
+		
+		numCells = false,
 		
 		smoothedCache = new FIFOCache(2);
 	
@@ -66,6 +70,37 @@ function FlightLog(logData, logIndex) {
 			return chunk.frames[i - 1];
 		} else
 			return false;
+	};
+	
+	function estimateNumCells() {
+		var 
+			i, 
+			fieldNames = that.getMainFieldNames(),
+			sysConfig = that.getSysConfig(),
+			refVoltage = that.vbatToMillivolts(sysConfig.vbatref) / 100,
+			found = false;
+
+		//Are we even logging VBAT?
+		for (i = 0; i < fieldNames.length; i++) {
+			if (fieldNames[i] == 'vbatLatest') {
+				found = true;
+			}
+		}
+		
+		if (!found) {
+			numCells = false;
+		} else {
+		    for (i = 1; i < 8; i++) {
+		        if (refVoltage < i * sysConfig.vbatmaxcellvoltage)
+		            break;
+		    }
+	
+		    numCells = i;
+		}
+	};
+	
+	this.getNumCellsEstimate = function() {
+		return numCells;
 	};
 	
 	/**
@@ -374,8 +409,26 @@ function FlightLog(logData, logIndex) {
 		}
 	};
 	
-	parser.parseHeader(logIndexes.getLogBeginOffset(0));
+	this.openLog = function(index) {
+	    logIndex = index;
+	    
+	    iframeDirectory = logIndexes.getIntraframeDirectory(logIndex);
+	    
+		parser.parseHeader(logIndexes.getLogBeginOffset(index));
+		
+		estimateNumCells();
+	};
+	
+	this.openLog(0);
 }
+
+FlightLog.prototype.accRawToGs = function(value) {
+    return value / this.getSysConfig().acc_1G;
+};
+
+FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
+    return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
+};
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
 	return this.vbatToMillivolts(this.getSysConfig().vbatref);
@@ -384,18 +437,4 @@ FlightLog.prototype.getReferenceVoltageMillivolts = function() {
 FlightLog.prototype.vbatToMillivolts = function(vbat) {
     // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
     return (vbat * 330 * this.getSysConfig().vbatscale) / 0xFFF;
-};
-
-FlightLog.prototype.estimateNumCells = function() {
-	var 
-		i, refVoltage;
-
-    refVoltage = this.vbatToMillivolts(this.getSysConfig().vbatref) / 100;
-
-    for (i = 1; i < 8; i++) {
-        if (refVoltage < i * this.getSysConfig().vbatmaxcellvoltage)
-            break;
-    }
-
-    return i;
 };
