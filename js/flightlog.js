@@ -118,6 +118,14 @@ function FlightLog(logData) {
         if (endIndex < startIndex)
             return [];
         
+        //Assume caller asked for about a screen-full. Try to cache about three screens worth.
+        if (chunkCache.capacity < (endIndex - startIndex + 1) * 3 + 1) {
+            chunkCache.capacity = (endIndex - startIndex + 1) * 3 + 1;
+            
+            //And while we're here, use the same size for the smoothed cache
+            smoothedCache.capacity = chunkCache.capacity;
+        }        
+        
         for (var chunkIndex = startIndex; chunkIndex <= endIndex; chunkIndex++) {
             var 
                 chunkStartOffset, chunkEndOffset,
@@ -131,34 +139,53 @@ function FlightLog(logData) {
                 else // We're at the end so parse till end-of-log
                     chunkEndOffset = logIndexes.getLogBeginOffset(logIndex + 1);
 
-                chunk = {
-                    index: chunkIndex,
-                    frames: [],
-                    gapStartsHere: {}
-                };
+                chunk = chunkCache.recycle();
+                
+                if (chunk) {
+                    chunk.index = chunkIndex;
+                    chunk.gapStartsHere = {};
+                    //Reuse the old chunk's frame array
+                } else {
+                    chunk = {
+                        index: chunkIndex,
+                        frames: [],
+                        gapStartsHere: {}
+                    };
+                }
+                
+                var
+                    frameIndex = 0;
                 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                     if (frameValid) {
-                        chunk.frames.push(frame.slice(0)); /* Clone the frame data since parser reuses that array */
+                        //The parser re-uses the "frame" array so we must copy that data somewhere else
+                        
+                        //Do we have a recycled chunk to copy on top of?
+                        if (chunk.frames[frameIndex]) {
+                            chunk.frames[frameIndex].length = frame.length;
+                            
+                            for (var i = 0; i < frame.length; i++) {
+                                chunk.frames[frameIndex][i] = frame[i];
+                            }
+                        } else {
+                            //Otherwise allocate a new copy of it
+                            chunk.frames.push(frame.slice(0)); 
+                        }
+                        frameIndex++;
                     } else {
-                        chunk.gapStartsHere[chunk.frames.length - 1] = true;
+                        chunk.gapStartsHere[frameIndex - 1] = true;
                     }
                 };
 
                 parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
                 
+                //Truncate the array to fit just in case it was recycled and the new one is shorter
+                chunk.frames.length = frameIndex;
+                
                 chunkCache.add(chunkIndex, chunk);
             }
             
             resultChunks.push(chunk);
-        }
-        
-        //Assume caller asked for about a screen-full. Try to cache about three screens worth.
-        if (chunkCache.capacity < resultChunks.length * 3 + 1) {
-            chunkCache.capacity = resultChunks.length * 3 + 1;
-            
-            //And while we're here, use the same size for the smoothed cache
-            smoothedCache.capacity = chunkCache.capacity;
         }
         
         return resultChunks;
@@ -245,14 +272,38 @@ function FlightLog(logData) {
             if (!chunkAlreadyDone[i]) {
                 allDone = false;
                 
-                resultChunk = {
-                    index: chunks[i].index,
-                    frames: new Array(chunks[i].frames.length),
-                    gapStartsHere: chunks[i].gapStartsHere
-                };
+                resultChunk = smoothedCache.recycle();
                 
-                for (var j = 0; j < resultChunk.frames.length; j++) {
-                    resultChunk.frames[j] = chunks[i].frames[j].slice(0);
+                if (resultChunk) {
+                    //Reuse the memory from the expired chunk to reduce garbage
+                    resultChunk.index = chunks[i].index;
+                    resultChunk.frames.length = chunks[i].frames.length;
+                    resultChunk.gapStartsHere = chunks[i].gapStartsHere;
+                    
+                    for (var j = 0; j < resultChunk.frames.length; j++) {
+                        if (resultChunk.frames[j]) {
+                            //Copy on top of the recycled array:
+                            resultChunk.frames[j].length = chunks[i].frames[j].length;
+                            
+                            for (var k = 0; k < resultChunk.frames[j].length; k++) {
+                                resultChunk.frames[j][k] = chunks[i].frames[j][k];
+                            }
+                        } else {
+                            //Allocate a new copy of the raw array:
+                            resultChunk.frames[j] = chunks[i].frames[j].slice(0);
+                        }
+                    }
+                } else {
+                    //Allocate a new chunk
+                    resultChunk = {
+                        index: chunks[i].index,
+                        frames: new Array(chunks[i].frames.length),
+                        gapStartsHere: chunks[i].gapStartsHere
+                    };
+                    
+                    for (var j = 0; j < resultChunk.frames.length; j++) {
+                        resultChunk.frames[j] = chunks[i].frames[j].slice(0);
+                    }
                 }
                 
                 smoothedCache.add(resultChunk.index, resultChunk);
@@ -399,14 +450,6 @@ function FlightLog(logData) {
         }
         
         return resultChunks;
-    };
-        
-    parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-        if (frameValid) {
-            var copy = frame.slice(0);
-            copy.push(frameType);
-            acc.push(copy);
-        }
     };
     
     this.openLog = function(index) {
