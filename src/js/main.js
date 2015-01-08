@@ -122,6 +122,9 @@ function decodeFieldToFriendly(fieldName, value) {
         case 'accSmooth[1]':
         case 'accSmooth[2]':
             return flightLog.accRawToGs(value).toFixed(2) + "g";
+        
+        case 'vbatLatest':
+            return (flightLog.vbatToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
             
         default:
             return "";

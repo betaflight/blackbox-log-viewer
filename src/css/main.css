@@ -1,3 +1,7 @@
+body {
+	padding-bottom:2em;
+}
+
 .log-info {
 	max-width: 30em;
 }
@@ -50,6 +54,16 @@
     left:0;
     width:100%;
     height:100%;
+    display:block;
+}
+
+/* Prevent field value columns from jumping as their contents change */
+.log-field-values th,
+.log-field-values td {
+	width:15%;
+}
+.log-field-values td {
+	font-family: monospace;
 }
 
 html.has-video .log-graph {
