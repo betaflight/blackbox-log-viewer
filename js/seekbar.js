@@ -163,6 +163,9 @@ function SeekBar(canvas) {
 	};
 	
 	this.repaint = function() {
+	    if (canvas.width == 0 || canvas.height == 0)
+	        return;
+	    
 		if (!backgroundValid) {
 			dirtyRegion = false;
 			rebuildBackground();
@@ -183,7 +186,7 @@ function SeekBar(canvas) {
 		canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
 		
 		dirtyRegion = {
-			x: Math.floor(cursorX - CURSOR_WIDTH - 1),
+			x: Math.max(Math.floor(cursorX - CURSOR_WIDTH - 1), 0),
 			y: 0,
 			width: Math.ceil(CURSOR_WIDTH * 2 + 2),
 			height: canvas.height

@@ -56,7 +56,7 @@ var
 	graphState = GRAPH_STATE_PAUSED,
 	currentBlackboxTime = 0,
 	lastRenderTime = false,
-	dataArray, flightLog, graph,
+	dataArray, flightLog, graph = null,
 	
 	hasVideo = false, hasLog = false,
 	video = $(".log-graph video")[0],
@@ -217,11 +217,16 @@ function invalidateGraph() {
 }
 
 function updateCanvasSize() {
-	if (graph)
-		graph.resize(canvas.offsetWidth, canvas.offsetHeight);
-	seekBar.resize(canvas.offsetWidth, 50);
+    var
+        width = $(canvas).width(),
+        height = $(canvas).height();
+    
+	if (graph) {
+		graph.resize(width, height);
+		seekBar.resize(canvas.offsetWidth, 50);
 		
-	invalidateGraph();
+		invalidateGraph();
+	}
 }
 
 function renderLogInfo(file) {
@@ -327,20 +332,32 @@ function loadVideo(file) {
 		videoURL = false;
 	}
 	
+	if (!URL.createObjectURL) {
+	    alert("Sorry, your web browser doesn't support showing videos from your local computer. Try Google Chrome instead.");
+	    return;
+	}
+	    
 	videoURL = URL.createObjectURL(file);
 	video.volume = 0.05;
 	video.src = videoURL;
-	hasVideo = true;
-	
-	$("html").addClass("has-video");
-	
-	setGraphState(GRAPH_STATE_PAUSED);
+}
+
+function videoLoaded(e) {
+    hasVideo = true;
+    
+    $("html").addClass("has-video");
+    
+    setGraphState(GRAPH_STATE_PAUSED);
 }
 
 function seekBarSeek(time) {
 	setCurrentBlackboxTime(time);
 	
 	invalidateGraph();
+}
+
+function reportVideoError(e) {
+    alert("Your video could not be loaded, your browser might not support this kind of video. Try Google Chrome instead.");
 }
 
 $(document).ready(function() {
@@ -404,8 +421,10 @@ $(document).ready(function() {
 	});
 
 	$(".video-jump-end").click(function() {
-		setVideoTime(video.duration);
-		setGraphState(GRAPH_STATE_PAUSED);
+	    if (video.duration) {
+    		setVideoTime(video.duration);
+    		setGraphState(GRAPH_STATE_PAUSED);
+	    }
 	});
 	
 	$(".log-play-pause").click(function() {
@@ -432,7 +451,12 @@ $(document).ready(function() {
 	});
 	
 	$(window).resize(updateCanvasSize);
-	$(video).on('loadedmetadata', updateCanvasSize);
+	
+	$(video).on({
+	    loadedmetadata: updateCanvasSize,
+	    error: reportVideoError,
+	    loadeddata: videoLoaded
+	});
 	
 	updateCanvasSize();
 	
