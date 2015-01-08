@@ -642,12 +642,16 @@ function FlightLogGrapher(flightLog, canvas) {
 	};
 	
 	identifyFields();
-		
+	
+	//TODO main.js should be supplying us smoothing chosen by the user
 	var smoothing = [];
 	
 	for (var i = 0; i < idents.motorFields.length; i++)
-		smoothing.push({field:idents.motorFields[i], radius:4 * 1000});
-		
+		smoothing.push({field:idents.motorFields[i], radius:5 * 1000});
+
+    for (var i = 0; i < idents.gyroFields.length; i++)
+        smoothing.push({field:idents.gyroFields[i], radius:3 * 1000});
+
 	flightLog.setFieldSmoothing(smoothing);
 	
 	 //Debugging: 
