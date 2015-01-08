@@ -609,6 +609,20 @@ function FlightLogGrapher(flightLog, canvas) {
 			}
 			canvasContext.restore();
 			
+	        //Draw a bar highlighting the current time if we are drawing any graphs
+	        if (options.plotGyros || options.plotMotors || options.plotPids || options.plotPidSum) {
+	            var 
+	                centerX = canvas.width / 2;
+
+	            canvasContext.strokeStyle = 'rgba(255, 64, 64, 0.2)';
+	            canvasContext.lineWidth = 10;
+
+	            canvasContext.beginPath();
+	            canvasContext.moveTo(centerX, 0);
+	            canvasContext.lineTo(centerX, canvas.height);
+	            canvasContext.stroke();
+	        }			
+			
 			// Draw details at the current time
 			var
 				centerFrame = flightLog.getFrameAtTime(windowCenterTime);
