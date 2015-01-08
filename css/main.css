@@ -1,9 +1,9 @@
 body {
-	padding-bottom:2em;
+    padding-bottom:2em;
 }
 
 .log-info {
-	max-width: 30em;
+    max-width: 30em;
 }
 
 /* Bootstrap-styled file inputs by abeautifulsite http://www.abeautifulsite.net/whipping-file-inputs-into-shape-with-bootstrap-3/ */
@@ -28,23 +28,23 @@ body {
 }
 
 .log-seek-bar canvas {
-	width:100%;
-	height:50px;
-	margin-top:0.5em;
+    width:100%;
+    height:50px;
+    margin-top:0.5em;
 }
 
 .log-graph {
-	height:600px;
-	position:relative;
-	margin-top:1em;
+    height:600px;
+    position:relative;
+    margin-top:1em;
 }
 
 .log-graph canvas {
-	position:absolute;
-	top:0;
-	left:0;
-	width:100%;
-	height:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
     background-color: black;
 }
 
@@ -60,40 +60,40 @@ body {
 /* Prevent field value columns from jumping as their contents change */
 .log-field-values th,
 .log-field-values td {
-	width:15%;
+    width:15%;
 }
 .log-field-values td {
-	font-family: monospace;
+    font-family: monospace;
 }
 
 html.has-video .log-graph {
-	height:auto;
+    height:auto;
 }
 html.has-video .log-graph video {
-	position:relative;
-	width:100%;
-	height:auto;
+    position:relative;
+    width:100%;
+    height:auto;
 }
 html.has-video .log-graph canvas {
-	background-color:rgba(0,0,0,0.25);
+    background-color:rgba(0,0,0,0.25);
 }
 
 .video-top-controls > li {
-	display:inline-block;
-	margin-right:1em;
+    display:inline-block;
+    margin-right:1em;
 }
 
 .video-top-controls > .log-sync-panel {
-	display:none;
+    display:none;
 }
 html.has-video.has-log .video-top-controls > .log-sync-panel {
-	display:inline-block;
+    display:inline-block;
 }
 html .video-jump-start,
 html .video-jump-end,
 html .log-jump-start,
 html .log-jump-end {
-	display:none;
+    display:none;
 }
 html.has-video .video-jump-start,
 html.has-video .video-jump-end {
@@ -105,29 +105,29 @@ html.has-log .log-jump-end {
 }
 
 .log-seek-bar {
-	display:none;
+    display:none;
 }
 html.has-video .log-seek-bar,
 html.has-log .log-seek-bar {
-	display:block;
+    display:block;
 }
 
 .log-metadata, .log-field-values {
-	display:none;
+    display:none;
 }
 html.has-log .log-metadata,
 html.has-log .log-field-values {
-	display:block;
+    display:block;
 }
 
 .video-top-controls,
 .log-graph {
-	display:none;
+    display:none;
 }
 
 html.has-video .video-top-controls,
 html.has-log .video-top-controls,
 html.has-video .log-graph,
 html.has-log .log-graph {
-	display:block;
+    display:block;
 }

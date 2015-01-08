@@ -2,25 +2,25 @@
 
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
 function hexToFloat(string) {
-	var arr = new Uint32Array(1);
-	arr[0] = parseInt(string, 16);
-	
-	var floatArr = new Float32Array(arr.buffer);
-	
-	return floatArr[0];	
+    var arr = new Uint32Array(1);
+    arr[0] = parseInt(string, 16);
+    
+    var floatArr = new Float32Array(arr.buffer);
+    
+    return floatArr[0]; 
 }
 
 function asciiArrayToString(arr) {
-	return String.fromCharCode.apply(null, arr);
+    return String.fromCharCode.apply(null, arr);
 }
 
 function asciiStringToByteArray(s) {
     var bytes = [];
     
-	for (var i = 0; i < s.length; i++)
-		bytes.push(s.charCodeAt(i));
-	
-	return bytes;
+    for (var i = 0; i < s.length; i++)
+        bytes.push(s.charCodeAt(i));
+    
+    return bytes;
 }
 
 function signExtend24Bit(u) {
@@ -68,31 +68,31 @@ function signExtend2Bit(byte) {
  * @returns {Number}
  */
 function memmem(haystack, needle, startIndex) {
-	var i, j, found;
-	
-	for (var i = startIndex ? startIndex : 0; i <= haystack.length - needle.length; i++) {
-		if (haystack[i] == needle[0]) {
-			for (var j = 1; j < needle.length && haystack[i + j] == needle[j]; j++)
-				;
-		
-			if (j == needle.length)
-				return i;
-		}
-	}
-	
-	return -1;
+    var i, j, found;
+    
+    for (var i = startIndex ? startIndex : 0; i <= haystack.length - needle.length; i++) {
+        if (haystack[i] == needle[0]) {
+            for (var j = 1; j < needle.length && haystack[i + j] == needle[j]; j++)
+                ;
+        
+            if (j == needle.length)
+                return i;
+        }
+    }
+    
+    return -1;
 }
 
 function parseCommaSeparatedIntegers(string) {
-	var 
-		parts = string.split(","),
-		result = new Array(parts.length);
-	
-	for (var i = 0; i < parts.length; i++) {
-		result[i] = parseInt(parts[i], 10);
-	}
+    var 
+        parts = string.split(","),
+        result = new Array(parts.length);
+    
+    for (var i = 0; i < parts.length; i++) {
+        result[i] = parseInt(parts[i], 10);
+    }
 
-	return result;
+    return result;
 }
 
 /**
@@ -103,56 +103,56 @@ function parseCommaSeparatedIntegers(string) {
  * @returns
  */
 function binarySearchOrPrevious(list, item) {
-	var
-		min = 0,
-		max = list.length - 1,
-		guess;
-	
-	if (list.length == 0)
-		return -1;
-		
-	while (min <= max) {
-		//Use ceil so if we get down to two elements we examine the top one which can shrink our max
-		guess = Math.ceil((min + max) / 2);
-		
-		if (list[guess] === item)
-			return guess;
-		else if (list[guess] < item)
-			if (min == max) //Wouldn't make any progress if min == max, so...
-				return guess;
-			else
-				min = guess; 
-		else
-			max = guess - 1;
-	}
-	
-	return -1;
+    var
+        min = 0,
+        max = list.length - 1,
+        guess;
+    
+    if (list.length == 0)
+        return -1;
+        
+    while (min <= max) {
+        //Use ceil so if we get down to two elements we examine the top one which can shrink our max
+        guess = Math.ceil((min + max) / 2);
+        
+        if (list[guess] === item)
+            return guess;
+        else if (list[guess] < item)
+            if (min == max) //Wouldn't make any progress if min == max, so...
+                return guess;
+            else
+                min = guess; 
+        else
+            max = guess - 1;
+    }
+    
+    return -1;
 }
 
 function leftPad(string, pad, minLength) {
-	string = "" + string;
-	
-	while (string.length < minLength)
-		string = pad + string;
-	
-	return string;
+    string = "" + string;
+    
+    while (string.length < minLength)
+        string = pad + string;
+    
+    return string;
 }
 
 function formatTime(msec, displayMsec) {
-	var
-		secs, mins, hours, msec;
-	
-	msec = Math.round(msec);
-	
-	secs = Math.floor(msec / 1000);
-	msec %= 1000;
+    var
+        secs, mins, hours, msec;
+    
+    msec = Math.round(msec);
+    
+    secs = Math.floor(msec / 1000);
+    msec %= 1000;
 
-	mins = Math.floor(secs / 60);
-	secs %= 60;
+    mins = Math.floor(secs / 60);
+    secs %= 60;
 
-	hours = Math.floor(mins / 60);	
-	mins %= 60;
-	
-	return (hours ? leftPad(hours, "0", 2) + ":" : "") + leftPad(mins, "0", 2) + ":" + leftPad(secs, "0", 2)
-		+ (displayMsec ? "." + leftPad(msec, "0", 3) : "");
+    hours = Math.floor(mins / 60);  
+    mins %= 60;
+    
+    return (hours ? leftPad(hours, "0", 2) + ":" : "") + leftPad(mins, "0", 2) + ":" + leftPad(secs, "0", 2)
+        + (displayMsec ? "." + leftPad(msec, "0", 3) : "");
 }

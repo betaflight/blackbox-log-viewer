@@ -14,83 +14,83 @@
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
 <body>
-	<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">Cleanflight Blackbox Explorer</a>
-			</div>
-			<div id="navbar" class="navbar-collapse collapse">
-				<div class="navbar-form navbar-right" role="form">
-					<span class="btn btn-primary btn-file"> Open log file/video <input type="file" id="file-open" multiple></span>
-				</div>
-			</div>
-			<!--/.navbar-collapse -->
-		</div>
-	</nav>
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Cleanflight Blackbox Explorer</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <div class="navbar-form navbar-right" role="form">
+                    <span class="btn btn-primary btn-file"> Open log file/video <input type="file" id="file-open" multiple></span>
+                </div>
+            </div>
+            <!--/.navbar-collapse -->
+        </div>
+    </nav>
 
-	<div class="container">
-		<div class="log-metadata">
-			<h3 class="log-filename"></h3>
-			<dl class="log-info dl-horizontal">
-				<dt>Timespan</dt>
-				<dd>
-					<span class="log-start-time"></span> to <span class="log-end-time"></span> (<span class="log-duration"></span> total)
-				</dd>
+    <div class="container">
+        <div class="log-metadata">
+            <h3 class="log-filename"></h3>
+            <dl class="log-info dl-horizontal">
+                <dt>Timespan</dt>
+                <dd>
+                    <span class="log-start-time"></span> to <span class="log-end-time"></span> (<span class="log-duration"></span> total)
+                </dd>
 
-				<dt class="log-cells-header">Battery</dt>
-				<dd class="log-cells"></dd>
-			</dl>
-		</div>
+                <dt class="log-cells-header">Battery</dt>
+                <dd class="log-cells"></dd>
+            </dl>
+        </div>
 
-		<ul class="video-top-controls list-unstyled">
-			<li class="log-playback-panel">
-				<h4>Playback</h4>
-				<div>
-					<div class="btn-group" role="group">
-						<button type="button" class="btn btn-default video-jump-start">
-							<span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span>
-						</button>
-						<button type="button" class="btn btn-default log-jump-start">
-							<span class="glyphicon glyphicon-fast-backward"></span>
-						</button>
-						<button type="button" class="btn btn-default log-jump-back">
-							<span class="glyphicon glyphicon-step-backward"></span>
-						</button>
-						<button type="button" class="btn btn-default log-play-pause">
-							<span class="glyphicon glyphicon-play"></span>
-						</button>
-						<button type="button" class="btn btn-default log-jump-forward">
-							<span class="glyphicon glyphicon-step-forward"></span>
-						</button>
-						<button type="button" class="btn btn-default log-jump-end">
-							<span class="glyphicon glyphicon-fast-forward"></span>
-						</button>
-						<button type="button" class="btn btn-default video-jump-end">
-							<span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
-						</button>
-					</div>
-				</div>
-			</li>
-			<li class="log-sync-panel">
-				<h4>Log sync</h4>
-				<div class="form-inline">
-					<div class="form-group">
-						<button type="button" class="btn btn-default log-sync-here">Start log here</button>
-						<input type="text" class="form-control video-offset" value="+0.0">
-					</div>
-				</div>
-			</li>
-		</ul>
+        <ul class="video-top-controls list-unstyled">
+            <li class="log-playback-panel">
+                <h4>Playback</h4>
+                <div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default video-jump-start">
+                            <span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span>
+                        </button>
+                        <button type="button" class="btn btn-default log-jump-start">
+                            <span class="glyphicon glyphicon-fast-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default log-jump-back">
+                            <span class="glyphicon glyphicon-step-backward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default log-play-pause">
+                            <span class="glyphicon glyphicon-play"></span>
+                        </button>
+                        <button type="button" class="btn btn-default log-jump-forward">
+                            <span class="glyphicon glyphicon-step-forward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default log-jump-end">
+                            <span class="glyphicon glyphicon-fast-forward"></span>
+                        </button>
+                        <button type="button" class="btn btn-default video-jump-end">
+                            <span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
+                        </button>
+                    </div>
+                </div>
+            </li>
+            <li class="log-sync-panel">
+                <h4>Log sync</h4>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default log-sync-here">Start log here</button>
+                        <input type="text" class="form-control video-offset" value="+0.0">
+                    </div>
+                </div>
+            </li>
+        </ul>
 
-		<div class="log-graph">
-			<video></video>
-			<canvas width="200" height="100" id="graph"></canvas>
-		</div>
-		
-		<div class="log-seek-bar">
+        <div class="log-graph">
+            <video></video>
+            <canvas width="200" height="100" id="graph"></canvas>
+        </div>
+        
+        <div class="log-seek-bar">
             <canvas width="200" height="100"></canvas>
         </div>
 
@@ -107,25 +107,25 @@
                 </tr>
             </table>
         </div>
-	</div>
-	<!-- /container -->
-	<!--   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  -->
-	<script>
-		window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')
-	</script>
+    </div>
+    <!-- /container -->
+    <!--   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  -->
+    <script>
+        window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')
+    </script>
 
-	<script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
     <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
-	<script src="js/tools.js"></script>
-	<script src="js/cache.js"></script>
-	<script src="js/expo.js"></script>
-	<script src="js/datastream.js"></script>
-	<script src="js/decoders.js"></script>
-	<script src="js/flightlog_parser.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/cache.js"></script>
+    <script src="js/expo.js"></script>
+    <script src="js/datastream.js"></script>
+    <script src="js/decoders.js"></script>
+    <script src="js/flightlog_parser.js"></script>
     <script src="js/flightlog_index.js"></script>
-	<script src="js/flightlog.js"></script>
-	<script src="js/grapher.js"></script>
+    <script src="js/flightlog.js"></script>
+    <script src="js/grapher.js"></script>
     <script src="js/seekbar.js"></script>
-	<script src="js/main.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
