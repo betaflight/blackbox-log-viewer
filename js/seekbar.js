@@ -160,7 +160,7 @@ function SeekBar(canvas) {
             }
             backgroundValid = true;
         }
-    };
+    }
     
     this.repaint = function() {
         if (canvas.width == 0 || canvas.height == 0)

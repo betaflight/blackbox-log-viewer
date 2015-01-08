@@ -151,7 +151,7 @@ function FlightLogIndex(logData) {
             }
             
             resultIndexes[i] = resultIndex;
-    }
+        }
         
         return JSON.stringify(resultIndexes);
     };  
@@ -161,7 +161,7 @@ function FlightLogIndex(logData) {
             buildLogOffsetsIndex();
         
         return logBeginOffsets[index];
-    }
+    };
     
     this.getLogCount = function() {
         if (!logBeginOffsets)
@@ -175,12 +175,9 @@ function FlightLogIndex(logData) {
             buildIntraframeDirectories();
         
         return intraframeDirectories;
-    }   
+    };
     
     this.getIntraframeDirectory = function(logIndex) {
-        if (!intraframeDirectories)
-            buildIntraframeDirectories();
-        
-        return intraframeDirectories[logIndex];
-    }
+        return this.getIntraframeDirectories()[logIndex];
+    };
 }

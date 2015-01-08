@@ -13,12 +13,12 @@ function FlightLog(logData) {
         
         iframeDirectory,
         
+        numCells = false,
+
         chunkCache = new FIFOCache(2),
         
         fieldSmoothing = [],
         maxSmoothing = 0,
-        
-        numCells = false,
         
         smoothedCache = new FIFOCache(2);
     
@@ -31,11 +31,11 @@ function FlightLog(logData) {
     
     this.getMainFieldCount = function() {
         return parser.mainFieldCount;
-    }
+    };
     
     this.getMainFieldNames = function() {
         return parser.mainFieldNames;
-    }
+    };
     
     this.getMinTime = function() {
         return iframeDirectory.minTime;
@@ -47,14 +47,14 @@ function FlightLog(logData) {
     
     this.getSysConfig = function() {
         return parser.sysConfig;
-    }
+    };
     
     this.getThrottleActivity = function() {
         return {
             avgThrottle: logIndexes.getIntraframeDirectory(logIndex).avgThrottle,
             times: logIndexes.getIntraframeDirectory(logIndex).times
         };
-    },
+    };
     
     this.getFrameAtTime = function(startTime) {
         var
@@ -216,7 +216,7 @@ function FlightLog(logData) {
         for (var i = 0; i < newSmoothing.length; i++)
             if (newSmoothing[i].radius > maxSmoothing)
                 maxSmoothing = newSmoothing[i].radius;
-    }
+    };
     
     this.getSmoothedChunksInTimeRange = function(startTime, endTime) {
         var 
@@ -475,7 +475,7 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
     return this.vbatToMillivolts(this.getSysConfig().vbatref);
-}
+};
 
 FlightLog.prototype.vbatToMillivolts = function(vbat) {
     // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100

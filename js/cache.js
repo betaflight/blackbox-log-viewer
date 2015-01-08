@@ -1,10 +1,10 @@
 /**
- * Create a FIFO cache to hold a key-pair mappings. Its capacity will be at least the intialCapacity
+ * A FIFO cache to hold key-pair mappings. Its capacity will be at least the intialCapacity
  * supplied on creation, which you can increase by increasing the "capacity" property. 
  * 
- * One extra element beyond the set capacity will be stored which can be fetching by calling "recycle".
- * This allows the oldest value to be removed in order to be filled with new data, instead of leaving
- * it to be collected by the garbage collector.
+ * One extra element beyond the set capacity will be stored which can be fetched by calling "recycle()".
+ * This allows the oldest value to be removed in order to be reused, instead of leaving it to be collected 
+ * by the garbage collector.
  */
 function FIFOCache(initialCapacity) {
     //Private:
@@ -12,9 +12,6 @@ function FIFOCache(initialCapacity) {
         queue = [],
         items = {};
 
-    //Public:
-    this.capacity = initialCapacity;
-    
     function removeFromQueue(key) {
         for (var i = 0; i < queue.length; i++) {
             if (queue[i] == key) {
@@ -29,8 +26,11 @@ function FIFOCache(initialCapacity) {
         }
     }
     
+    //Public:
+    this.capacity = initialCapacity;
+    
     /**
-     * Remove and return the oldest value from the cache, or null if the cache wasn't full.
+     * Remove and return the oldest value from the cache to be reused, or null if the cache wasn't full.
      */
     this.recycle = function() {
         if (queue.length > this.capacity) {
@@ -44,7 +44,7 @@ function FIFOCache(initialCapacity) {
         }
         
         return null;
-    }
+    };
     
     /**
      * Add a mapping for the given key to the cache. If an existing value with that key was
