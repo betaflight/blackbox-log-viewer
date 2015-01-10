@@ -590,7 +590,13 @@ var FlightLogParser = function(logData) {
         
         if (this.mainFieldCount == 0) {
             throw "Data file is missing field name definitions";
-            return false;
+        }
+        
+        if (!frameDefs["P"] || !frameDefs["P"].encoding || !frameDefs["P"].predictor) {
+            throw "Log is missing required definitions for P frames, header may be corrupt";
+        }
+        if (!frameDefs["I"] || !frameDefs["I"].encoding || !frameDefs["I"].predictor) {
+            throw "Log is missing required definitions for I frames, header may be corrupt";
         }
     };
     
