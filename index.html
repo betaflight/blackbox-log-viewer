@@ -50,10 +50,10 @@
                 <h4>Playback</h4>
                 <div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default video-jump-start">
+                        <button type="button" class="btn btn-default video-jump-start" title="Jump to start of video">
                             <span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span>
                         </button>
-                        <button type="button" class="btn btn-default log-jump-start">
+                        <button type="button" class="btn btn-default log-jump-start" title="Jump to start of log">
                             <span class="glyphicon glyphicon-fast-backward"></span>
                         </button>
                         <button type="button" class="btn btn-default log-jump-back">
@@ -65,10 +65,10 @@
                         <button type="button" class="btn btn-default log-jump-forward">
                             <span class="glyphicon glyphicon-step-forward"></span>
                         </button>
-                        <button type="button" class="btn btn-default log-jump-end">
+                        <button type="button" class="btn btn-default log-jump-end" title="Jump to end of log">
                             <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
-                        <button type="button" class="btn btn-default video-jump-end">
+                        <button type="button" class="btn btn-default video-jump-end" title="Jump to end of video">
                             <span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
                     </div>
@@ -78,8 +78,16 @@
                 <h4>Log sync</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <button type="button" class="btn btn-default log-sync-here">Start log here</button>
-                        <input type="text" class="form-control video-offset" value="+0.0">
+                        <div class="btn-group" role="group">
+	                        <button type="button" class="btn btn-default log-sync-back" title="Move log earlier">
+	                            <span class="glyphicon glyphicon-step-backward"></span>
+	                        </button>
+	                        <button type="button" class="btn btn-default log-sync-here">Start log here</button>
+	                        <button type="button" class="btn btn-default log-sync-forward" title="Move log later">
+	                            <span class="glyphicon glyphicon-step-forward"></span>
+	                        </button>
+	                    </div>
+                        <input type="text" class="form-control video-offset" value="+0.0" size="5">
                     </div>
                 </div>
             </li>

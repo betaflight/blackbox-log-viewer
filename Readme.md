@@ -14,14 +14,16 @@ the zip somewhere on your computer, and double click "index.html" file to open i
 one).
 
 You can scroll through the log by clicking or dragging on the seek bar that appears underneath the main graph. The 
-current time is represented by the vertical red bar in the center of the graph.
+current time is represented by the vertical red bar in the center of the graph. You can also click and drag left and
+right on the graph area to scrub backwards and forwards.
 
 ## Syncing your log to your flight video
 
 The blackbox plays a short beep on the buzzer when arming, and this corresponds with the start of the logged data.
 You can sync your log against your flight video by pressing the "start log here" button when you hear the beep in the
-video. You can tune the alignment of the log manually by editing the value in the "log sync" box. Positive values
-move the log toward the end of the video, negative values move it towards the beginning.
+video. You can tune the alignment of the log manually by pressing the nudge left and nudge right buttons in the log
+sync section, or by editing the value in the "log sync" box. Positive values move the log toward the end of the video, 
+negative values move it towards the beginning.
 
 ## Notes
 
@@ -38,7 +40,6 @@ This tool is currently in the Alpha stage, so a number of features have yet to b
 - You can only view the first log within a given log file 
 - There is no option for choosing which values you want to graph
 - There is no control over the amount of smoothing applied to the graph lines
-- There are no buttons to help you nudge the log alignment with the video
 - There is no way to single-step between loop iterations with the arrow keys
 
 ## License

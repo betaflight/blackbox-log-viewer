@@ -72,7 +72,9 @@ var
     seekBarRepaintRateLimited = $.throttle(200, $.proxy(seekBar.repaint, seekBar)),
     
     updateValuesChartRateLimited,
-    friendlyFieldNames = [];
+    friendlyFieldNames = [],
+    
+    animationFrameIsQueued = false;
 
 function blackboxTimeFromVideoTime() {
     return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -80,9 +82,20 @@ function blackboxTimeFromVideoTime() {
 
 function syncLogToVideo() {
     if (hasLog) {
-        //Assuming that the video snaps the currentTime to an actual frame boundary, read it back to use as our log position
         currentBlackboxTime = blackboxTimeFromVideoTime();
     }
+}
+
+function setVideoOffset(offset) {
+    videoOffset = offset;
+    
+    /* 
+     * Round to 2 dec places for display and put a plus at the start for positive values to emphasize the fact it's
+     * an offset
+     */
+    $(".video-offset").val((videoOffset >= 0 ? "+" : "") + (videoOffset.toFixed(2) != videoOffset ? videoOffset.toFixed(2) : videoOffset));
+    
+    invalidateGraph();
 }
 
 function buildFriendlyFieldNames() {
@@ -205,15 +218,21 @@ function animationLoop() {
         lastRenderTime = now;
         
         seekBarRepaintRateLimited();
+        
+        animationFrameIsQueued = true;
         requestAnimationFrame(animationLoop);
-    } else {
+    } else {        
         seekBar.repaint();
+        
+        animationFrameIsQueued = false;
     }
 }
 
 function invalidateGraph() {
-    if (graphState != GRAPH_STATE_PLAY)
-        animationLoop();
+    if (!animationFrameIsQueued) {
+        animationFrameIsQueued = true;
+        requestAnimationFrame(animationLoop);
+    }
 }
 
 function updateCanvasSize() {
@@ -270,9 +289,9 @@ function setCurrentBlackboxTime(newTime) {
         syncLogToVideo();
     } else {
         currentBlackboxTime = newTime;
-        
-        invalidateGraph();
     }
+    
+    invalidateGraph();
 }
 
 function setVideoTime(newTime) {
@@ -296,8 +315,23 @@ function loadLog(file) {
             return;
         }
         
+        if (graph)
+            graph.destroy();
+        
         graph = new FlightLogGrapher(flightLog, canvas);
 
+        graph.onSeek = function(offset) {
+            //Seek faster
+            offset *= 2;
+            
+            if (hasVideo) {
+                setVideoTime(video.currentTime + offset / 1000000);
+            } else {
+                setCurrentBlackboxTime(currentBlackboxTime + offset);
+            }
+            invalidateGraph();
+        };
+        
         hasLog = true;
 
         if (hasVideo)
@@ -436,11 +470,17 @@ $(document).ready(function() {
     });
     
     $(".log-sync-here").click(function() {
-        videoOffset = video.currentTime;
-        $(".video-offset").val((videoOffset >= 0 ? "+" : "") + videoOffset);
-        invalidateGraph();
+        setVideoOffset(video.currentTime);
     });
     
+    $(".log-sync-back").click(function() {
+        setVideoOffset(videoOffset - 1 / 15);
+    });
+
+    $(".log-sync-forward").click(function() {
+        setVideoOffset(videoOffset + 1 / 15);
+    });
+
     $(".video-offset").change(function() {
         var offset = parseFloat($(".video-offset").val());
         

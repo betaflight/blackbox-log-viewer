@@ -56,7 +56,41 @@ function FlightLogGrapher(flightLog, canvas) {
         pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
         gyroCurve = new ExpoCurve(0, 0.25, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
         accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
-        pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10);
+        pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10),
+        
+        lastMouseX, lastMouseY,
+        that = this;
+    
+    this.onSeek = null;
+    
+    function onMouseMove(e) {
+        e.preventDefault();
+        
+        if (that.onSeek) {
+            //Reverse the seek direction so that it looks like you're dragging the data with the mouse
+            that.onSeek((lastMouseX - e.pageX) / canvas.width * windowWidthMicros); 
+        }
+        
+        lastMouseX = e.pageX;
+        lastMouseY = e.pageY;
+    }
+    
+    function onMouseDown(e) {
+        if (e.which == 1) { //Left mouse button only for seeking
+            lastMouseX = e.pageX;
+            lastMouseY = e.pageY;
+            
+            //"capture" the mouse so we can drag outside the boundaries of canvas
+            $(document).on("mousemove", onMouseMove);
+            
+            //Release the capture when the mouse is released
+            $(document).one("mouseup", function () {
+                $(document).off("mousemove", onMouseMove);
+            });
+            
+            e.preventDefault();
+        }
+    }
     
     function makeColorHalfStrength(color) {
         color = parseInt(color.substring(1), 16);
@@ -655,6 +689,10 @@ function FlightLogGrapher(flightLog, canvas) {
         }
     };
     
+    this.destroy = function() {
+        $(canvas).off("mousedown", onMouseDown);
+    };
+    
     identifyFields();
     
     //TODO main.js should be supplying us smoothing chosen by the user
@@ -667,6 +705,9 @@ function FlightLogGrapher(flightLog, canvas) {
         smoothing.push({field:idents.gyroFields[i], radius:3 * 1000});
 
     flightLog.setFieldSmoothing(smoothing);
+        
+    //Handle dragging events
+    $(canvas).on("mousedown", onMouseDown);
     
      //Debugging: 
     /*var chunks = flightLog.getChunksInTimeRange(flightLog.getMinTime(), flightLog.getMaxTime());

@@ -66,11 +66,11 @@ function SeekBar(canvas) {
             seekToDOMPixel(e.offsetX);
             
             //"capture" the mouse so we can drag outside the boundaries of the seek bar
-            $(document).on("mousemove", onMouseMove);
+            $("body").on("mousemove", onMouseMove);
             
             //Release the capture when the mouse is released
-            $(document).one("mouseup", function () {
-                $(document).off("mousemove", onMouseMove);
+            $("body").one("mouseup", function () {
+                $("body").off("mousemove", onMouseMove);
             });
         }
     });
@@ -182,7 +182,7 @@ function SeekBar(canvas) {
             pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2),
             cursorX = (current - min) / pixelTimeStep + BAR_INSET;
 
-        canvasContext.fillStyle = 'rgba(0,0,0,0.5)';
+        canvasContext.fillStyle = 'rgba(255, 64, 64, 0.75)';
         canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
         
         dirtyRegion = {
