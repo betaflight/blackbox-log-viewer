@@ -43,7 +43,7 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
         
         options = {
             gapless:false,
-            drawCraft:"2D", drawPidTable:true, drawSticks:true, drawTime:true
+            drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true
         },
         
         idents,
