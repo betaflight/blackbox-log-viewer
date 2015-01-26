@@ -1,6 +1,6 @@
 "use strict";
 
-function FlightLogGrapher(flightLog, canvas) {
+function FlightLogGrapher(flightLog, canvas, craftCanvas) {
     var
         PID_P = 0,
         PID_I = 1,
@@ -43,22 +43,19 @@ function FlightLogGrapher(flightLog, canvas) {
         
         options = {
             gapless:false,
-            plotPIDs:true, plotGyros:true, plotMotors:true,
-            drawCraft:true, drawPidTable:true, drawSticks:true, drawTime:true
+            drawCraft:"2D", drawPidTable:true, drawSticks:true, drawTime:true
         },
         
         idents,
         
         sysConfig = flightLog.getSysConfig(),
 
-        motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
-            (sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0),
         pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
-        gyroCurve = new ExpoCurve(0, 0.25, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
-        accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
-        pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10),
-        
+
         lastMouseX, lastMouseY,
+        
+        craft3D,
+        
         that = this;
     
     this.onSeek = null;
@@ -294,7 +291,7 @@ function FlightLogGrapher(flightLog, canvas) {
         }
     }
     
-    function drawCraft(frame) {
+    function drawCraft2D(frame) {
         var 
             motorIndex;
         
@@ -599,7 +596,8 @@ function FlightLogGrapher(flightLog, canvas) {
         
         var 
             chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
-            startChunkIndex, startFrameIndex;
+            startChunkIndex, startFrameIndex,
+            i, j;
         
         if (chunks.length) {
             //Find the first sample that lies inside the window
@@ -612,39 +610,34 @@ function FlightLogGrapher(flightLog, canvas) {
             // Pick the sample before that to begin plotting from
             if (startFrameIndex > 0)
                 startFrameIndex--;
-    
-            // Plot motors
-            canvasContext.save();
-            {
-                canvasContext.translate(0, canvas.height * 0.25);
-                
-                drawAxisLine();
-                
-                for (var i = 0; i < idents.motorFields.length; i++) {
-                    plotField(chunks, startFrameIndex, idents.motorFields[i], motorCurve, canvas.height * 0.20, idents.motorColors[i]);
-                }
-                
-                drawAxisLabel("Motors");
-            }
-            canvasContext.restore();
             
-            // Plot gyros
-            canvasContext.save();
-            {
-                canvasContext.translate(0, canvas.height * 0.70);
-                
-                drawAxisLine();
-                
-                for (var i = 0; i < idents.gyroFields.length; i++) {
-                    plotField(chunks, startFrameIndex, idents.gyroFields[i], gyroCurve, canvas.height * 0.25, idents.gyroColors[i]);
+            // Plot graphs
+            for (i = 0; i < this.graphSetup.length; i++) {
+                var 
+                    graph = this.graphSetup[i],
+                    field;
+            
+                canvasContext.save();
+                {
+                    canvasContext.translate(0, canvas.height * graph.y);
+                    
+                    drawAxisLine();
+                    
+                    for (j = 0; j < graph.fields.length; j++) {
+                        var field = graph.fields[j];
+                        
+                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, lineColors[j]);
+                    }
+                    
+                    if (graph.label) {
+                        drawAxisLabel(graph.label);
+                    }
                 }
-                
-                drawAxisLabel("Gyros");
+                canvasContext.restore();
             }
-            canvasContext.restore();
             
             //Draw a bar highlighting the current time if we are drawing any graphs
-            if (options.plotGyros || options.plotMotors || options.plotPids || options.plotPidSum) {
+            if (this.graphSetup.length) {
                 var 
                     centerX = canvas.width / 2;
 
@@ -655,11 +648,11 @@ function FlightLogGrapher(flightLog, canvas) {
                 canvasContext.moveTo(centerX, 0);
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
-            }           
+            }
             
             // Draw details at the current time
             var
-                centerFrame = flightLog.getFrameAtTime(windowCenterTime);
+                centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);
             
             if (centerFrame) {
                 if (options.drawSticks) {
@@ -676,12 +669,14 @@ function FlightLogGrapher(flightLog, canvas) {
                     drawFrameLabel(centerFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION], Math.round((windowCenterTime - flightLog.getMinTime()) / 1000));
                 }
                 
-                if (options.drawCraft) {
+                if (options.drawCraft == '3D') {
+                    craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
+                } else if (options.drawCraft == '2D') {
                     canvasContext.save();
                 
                     canvasContext.translate(0.25 * canvas.width, 0.20 * canvas.height);
 
-                    drawCraft(centerFrame);
+                    drawCraft2D(centerFrame);
                     
                     canvasContext.restore();
                 }
@@ -689,23 +684,42 @@ function FlightLogGrapher(flightLog, canvas) {
         }
     };
     
+    this.setGraphSetup = function(graphSetup) {
+        this.graphSetup = graphSetup;
+        
+        var 
+            smoothing = [];
+        
+        for (var i = 0; i < graphSetup.length; i++) {
+            for (var j = 0; j < graphSetup[i].fields.length; j++) {
+                var field = graphSetup[i].fields[j];
+                
+                field.index = flightLog.getMainFieldIndexByName(field.name);
+                
+                if (field.smoothing > 0) {
+                    smoothing.push({field:field.index, radius: field.smoothing});
+                }
+            }
+        }
+
+        flightLog.setFieldSmoothing(smoothing);
+    };
+    
     this.destroy = function() {
         $(canvas).off("mousedown", onMouseDown);
     };
     
     identifyFields();
-    
-    //TODO main.js should be supplying us smoothing chosen by the user
-    var smoothing = [];
-    
-    for (var i = 0; i < idents.motorFields.length; i++)
-        smoothing.push({field:idents.motorFields[i], radius:5 * 1000});
 
-    for (var i = 0; i < idents.gyroFields.length; i++)
-        smoothing.push({field:idents.gyroFields[i], radius:3 * 1000});
-
-    flightLog.setFieldSmoothing(smoothing);
-        
+    if (options.drawCraft == '3D') {
+        craftCanvas.width = 300;
+        craftCanvas.height = 300;
+        craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
+    } else {
+        craftCanvas.width = 0;
+        craftCanvas.height = 0;
+    }
+    
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);
     

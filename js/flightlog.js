@@ -6,6 +6,8 @@
  */
 function FlightLog(logData) {
     var
+        ADDITIONAL_COMPUTED_FIELD_COUNT = 3,
+    
         that = this,
         logIndex = false,
         logIndexes = new FlightLogIndex(logData),
@@ -14,27 +16,27 @@ function FlightLog(logData) {
         iframeDirectory,
         
         numCells = false,
+        
+        fieldNames = [],
+        fieldNameToIndex = {},
 
         chunkCache = new FIFOCache(2),
         
         fieldSmoothing = [],
         maxSmoothing = 0,
         
-        smoothedCache = new FIFOCache(2);
-    
-    /** TODO remove debug code 
-    console.log(logIndexes.saveToJSON());
-    console.log("Length " + logIndexes.saveToJSON().length);
-    */
+        smoothedCache = new FIFOCache(2),
+        
+        imu = new IMU();
     
     this.parser = parser;
     
     this.getMainFieldCount = function() {
-        return parser.mainFieldCount;
+        return fieldNames.length;
     };
     
     this.getMainFieldNames = function() {
-        return parser.mainFieldNames;
+        return fieldNames;
     };
     
     this.getMinTime = function() {
@@ -56,6 +58,14 @@ function FlightLog(logData) {
         };
     };
     
+    this.getMainFieldIndexByName = function(name) {
+        return fieldNameToIndex[name];
+    };
+
+    this.getMainFieldIndexes = function(name) {
+        return fieldNameToIndex;
+    };
+
     this.getFrameAtTime = function(startTime) {
         var
             chunks = this.getChunksInTimeRange(startTime, startTime),
@@ -72,6 +82,39 @@ function FlightLog(logData) {
             return false;
     };
     
+    this.getSmoothedFrameAtTime = function(startTime) {
+        var
+            chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
+            chunk = chunks[0];
+        
+        if (chunk) {
+            for (var i = 0; i < chunk.frames.length; i++) {
+                if (chunk.frames[i][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] > startTime)
+                    break;
+            }
+            
+            return chunk.frames[i - 1];
+        } else
+            return false;
+    };
+    
+    function buildFieldNames() {
+        var 
+            i, sourceNames;
+        
+        sourceNames = parser.mainFieldNames;
+        
+        // Make an independent copy
+        fieldNames = sourceNames.slice(0);
+        
+        fieldNames.push("heading[0]", "heading[1]", "heading[2]");
+        
+        fieldNameToIndex = {};
+        for (i = 0; i < fieldNames.length; i++) {
+            fieldNameToIndex[fieldNames[i]] = i;
+        }
+    }
+    
     function estimateNumCells() {
         var 
             i, 
@@ -81,13 +124,7 @@ function FlightLog(logData) {
             found = false;
 
         //Are we even logging VBAT?
-        for (i = 0; i < fieldNames.length; i++) {
-            if (fieldNames[i] == 'vbatLatest') {
-                found = true;
-            }
-        }
-        
-        if (!found) {
+        if (!fieldNameToIndex['vbatLatest']) {
             numCells = false;
         } else {
             for (i = 1; i < 8; i++) {
@@ -218,9 +255,61 @@ function FlightLog(logData) {
                 maxSmoothing = newSmoothing[i].radius;
     };
     
+    function injectComputedFields(sourceChunks, resultChunks) {
+        var
+            gyroData = [fieldNameToIndex["gyroData[0]"], fieldNameToIndex["gyroData[1]"], fieldNameToIndex["gyroData[2]"]], 
+            accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]],
+            magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
+            
+            sysConfig, acc_1G, gyroScale,
+            
+            attitude;
+        
+        if (!magADC[0])
+            magADC = false;
+        
+        // Get the data we need ready in local vars
+        sysConfig = that.getSysConfig();
+        
+        acc_1G = sysConfig.acc_1G;
+        gyroScale = sysConfig.gyroScale;
+        
+        imu.reset();
+        
+        for (var i = 0; i < resultChunks.length; i++) {
+            var chunk = resultChunks[i];
+            
+            if (chunk.hasAdditionalFields)
+                continue;
+            
+            chunk.hasAdditionalFields = true;
+            
+            // Start our IMU state with the state the last chunk ended at, if that info exists
+            var chunkIMU = new IMU(i > 0 ? resultChunks[i - 1].finalIMU : false);
+            
+            for (var j = 0; j < chunk.frames.length; j++) {
+                var frame = chunk.frames[j];
+                
+                attitude = chunkIMU.getEstimatedAttitude(
+                    [frame[gyroData[0]], frame[gyroData[1]], frame[gyroData[2]]],
+                    [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
+                    frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
+                    acc_1G, 
+                    gyroScale, 
+                    magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false);
+                
+                frame[frame.length - 3] = attitude.roll;
+                frame[frame.length - 2] = attitude.pitch;
+                frame[frame.length - 1] = attitude.heading;
+            }
+            
+            chunk.finalIMU = chunkIMU;
+        }
+    };
+    
     this.getSmoothedChunksInTimeRange = function(startTime, endTime) {
         var 
-            chunks,
+            sourceChunks,
             resultChunks, resultChunk,
             chunkAlreadyDone, allDone,
             timeFieldIndex = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME;
@@ -240,6 +329,10 @@ function FlightLog(logData) {
             //Count of chunks at the beginning and end of the range that we will only look at, not smooth
             leadingROChunks, trailingROChunks;
         
+        /* 
+         * We can smooth the first and last chunks of the log because they don't have a neighbor on the outside
+         * to smooth against anyway.
+         */
         if (startIndex < 0) {
             startIndex = 0;
             leadingROChunks = 0;
@@ -254,19 +347,19 @@ function FlightLog(logData) {
             trailingROChunks = 1;
         }
         
-        chunks = getChunksInIndexRange(startIndex, endIndex);
+        sourceChunks = getChunksInIndexRange(startIndex, endIndex);
 
         //Create an independent copy of the raw frame data to smooth out:
-        resultChunks = new Array(chunks.length - leadingROChunks - trailingROChunks);
-        chunkAlreadyDone = new Array(chunks.length);
+        resultChunks = new Array(sourceChunks.length - leadingROChunks - trailingROChunks);
+        chunkAlreadyDone = new Array(sourceChunks.length);
         
         allDone = true;
         
         //Don't smooth the edge chunks since they can't be fully smoothed
-        for (var i = leadingROChunks; i < chunks.length - trailingROChunks; i++) {
-            var resultChunk = smoothedCache.get(chunks[i].index);
+        for (var i = leadingROChunks; i < sourceChunks.length - trailingROChunks; i++) {
+            var resultChunk = smoothedCache.get(sourceChunks[i].index);
             
-            chunkAlreadyDone[i] = !!resultChunk;
+            chunkAlreadyDone[i] = resultChunk ? true : false;
             
             //If we haven't already smoothed this chunk
             if (!chunkAlreadyDone[i]) {
@@ -276,33 +369,36 @@ function FlightLog(logData) {
                 
                 if (resultChunk) {
                     //Reuse the memory from the expired chunk to reduce garbage
-                    resultChunk.index = chunks[i].index;
-                    resultChunk.frames.length = chunks[i].frames.length;
-                    resultChunk.gapStartsHere = chunks[i].gapStartsHere;
+                    resultChunk.index = sourceChunks[i].index;
+                    resultChunk.frames.length = sourceChunks[i].frames.length;
+                    resultChunk.gapStartsHere = sourceChunks[i].gapStartsHere;
+                    resultChunk.hasAdditionalFields = false;
                     
                     for (var j = 0; j < resultChunk.frames.length; j++) {
                         if (resultChunk.frames[j]) {
                             //Copy on top of the recycled array:
-                            resultChunk.frames[j].length = chunks[i].frames[j].length;
+                            resultChunk.frames[j].length = sourceChunks[i].frames[j].length + ADDITIONAL_COMPUTED_FIELD_COUNT;
                             
-                            for (var k = 0; k < resultChunk.frames[j].length; k++) {
-                                resultChunk.frames[j][k] = chunks[i].frames[j][k];
+                            for (var k = 0; k < sourceChunks[i].frames[j].length; k++) {
+                                resultChunk.frames[j][k] = sourceChunks[i].frames[j][k];
                             }
                         } else {
                             //Allocate a new copy of the raw array:
-                            resultChunk.frames[j] = chunks[i].frames[j].slice(0);
+                            resultChunk.frames[j] = sourceChunks[i].frames[j].slice(0);
+                            resultChunk.frames[j].length += ADDITIONAL_COMPUTED_FIELD_COUNT;
                         }
                     }
                 } else {
                     //Allocate a new chunk
                     resultChunk = {
-                        index: chunks[i].index,
-                        frames: new Array(chunks[i].frames.length),
-                        gapStartsHere: chunks[i].gapStartsHere
+                        index: sourceChunks[i].index,
+                        frames: new Array(sourceChunks[i].frames.length),
+                        gapStartsHere: sourceChunks[i].gapStartsHere
                     };
                     
                     for (var j = 0; j < resultChunk.frames.length; j++) {
-                        resultChunk.frames[j] = chunks[i].frames[j].slice(0);
+                        resultChunk.frames[j] = sourceChunks[i].frames[j].slice(0);
+                        resultChunk.frames[j].length += ADDITIONAL_COMPUTED_FIELD_COUNT;
                     }
                 }
                 
@@ -325,11 +421,11 @@ function FlightLog(logData) {
                 mainLoop:
                 
                 // Don't bother to smooth the first and last source chunks, since we can't smooth them completely
-                for (centerChunkIndex = leadingROChunks; centerChunkIndex < chunks.length - trailingROChunks; centerChunkIndex++) {
+                for (centerChunkIndex = leadingROChunks; centerChunkIndex < sourceChunks.length - trailingROChunks; centerChunkIndex++) {
                     if (chunkAlreadyDone[centerChunkIndex])
                         continue;
                     
-                    for (centerFrameIndex = 0; centerFrameIndex < chunks[centerChunkIndex].frames.length; ) {
+                    for (centerFrameIndex = 0; centerFrameIndex < sourceChunks[centerChunkIndex].frames.length; ) {
                         var
                             //Current beginning & end of the smoothing window:
                             leftChunkIndex = centerChunkIndex,
@@ -338,17 +434,19 @@ function FlightLog(logData) {
                             rightChunkIndex, rightFrameIndex,
     
                             /* 
-                             * The end of the current data partition,
+                             * The end of the current partition to be smoothed (exclusive, so the partition doesn't 
+                             * contain the value pointed to by chunks[endChunkIndex][endFrameIndex]).
+                             * 
                              * We'll refine this guess for the end of the partition later if we find discontinuities:
                              */
-                            endChunkIndex = chunks.length - leadingROChunks - trailingROChunks,
-                            endFrameIndex = chunks[endChunkIndex].frames.length,
+                            endChunkIndex = sourceChunks.length - 1 - trailingROChunks,
+                            endFrameIndex = sourceChunks[endChunkIndex].frames.length,
         
                             partitionEnded = false,
                             accumulator = 0,
                             valuesInHistory = 0,
                              
-                            centerTime = chunks[centerChunkIndex].frames[centerFrameIndex][timeFieldIndex];
+                            centerTime = sourceChunks[centerChunkIndex].frames[centerFrameIndex][timeFieldIndex];
         
                         /* 
                          * This may not be the left edge of a partition, we may just have skipped the previous chunk due to
@@ -364,12 +462,12 @@ function FlightLog(logData) {
                             //Try moving it left
                             if (leftFrameIndex == 0) {
                                 leftChunkIndex--;
-                                leftFrameIndex = chunks[leftChunkIndex].frames.length - 1;
+                                leftFrameIndex = sourceChunks[leftChunkIndex].frames.length - 1;
                             } else {
                                 leftFrameIndex--;
                             }
                             
-                            if (chunks[leftChunkIndex].gapStartsHere[leftFrameIndex] || chunks[leftChunkIndex].frames[leftFrameIndex][timeFieldIndex] < centerTime - radius) {
+                            if (sourceChunks[leftChunkIndex].gapStartsHere[leftFrameIndex] || sourceChunks[leftChunkIndex].frames[leftFrameIndex][timeFieldIndex] < centerTime - radius) {
                                 //We moved the left index one step too far, shift it back
                                 leftChunkIndex = oldleftChunkIndex;
                                 leftFrameIndex = oldleftFrameIndex;
@@ -384,34 +482,34 @@ function FlightLog(logData) {
                         //The main loop, where we march our smoothing window along until we exhaust this partition
                         while (centerChunkIndex < endChunkIndex || centerChunkIndex == endChunkIndex && centerFrameIndex < endFrameIndex) {
                             // Old values fall out of the window
-                            while (chunks[leftChunkIndex].frames[leftFrameIndex][timeFieldIndex] < centerTime - radius) {
-                                accumulator -= chunks[leftChunkIndex].frames[leftFrameIndex][fieldIndex];
+                            while (sourceChunks[leftChunkIndex].frames[leftFrameIndex][timeFieldIndex] < centerTime - radius) {
+                                accumulator -= sourceChunks[leftChunkIndex].frames[leftFrameIndex][fieldIndex];
                                 valuesInHistory--;
                                 
                                 leftFrameIndex++;
-                                if (leftFrameIndex == chunks[leftChunkIndex].frames.length) {
+                                if (leftFrameIndex == sourceChunks[leftChunkIndex].frames.length) {
                                     leftFrameIndex = 0;
                                     leftChunkIndex++;
                                 }
                             }
         
                             //New values are added to the window
-                            while (!partitionEnded && chunks[rightChunkIndex].frames[rightFrameIndex][timeFieldIndex] <= centerTime + radius) {
-                                accumulator += chunks[rightChunkIndex].frames[rightFrameIndex][fieldIndex];
+                            while (!partitionEnded && sourceChunks[rightChunkIndex].frames[rightFrameIndex][timeFieldIndex] <= centerTime + radius) {
+                                accumulator += sourceChunks[rightChunkIndex].frames[rightFrameIndex][fieldIndex];
                                 valuesInHistory++;
         
                                 //If there is a discontinuity after this point, stop trying to add further values
-                                if (chunks[rightChunkIndex].gapStartsHere[rightFrameIndex]) {
+                                if (sourceChunks[rightChunkIndex].gapStartsHere[rightFrameIndex]) {
                                     partitionEnded = true;
                                 }
                                     
                                 //Advance the right index onward since we read a value
                                 rightFrameIndex++;
-                                if (rightFrameIndex == chunks[rightChunkIndex].frames.length) {
+                                if (rightFrameIndex == sourceChunks[rightChunkIndex].frames.length) {
                                     rightFrameIndex = 0;
                                     rightChunkIndex++;
                                     
-                                    if (rightChunkIndex == chunks.length) {
+                                    if (rightChunkIndex == sourceChunks.length) {
                                         //We reached the end of the region of interest!
                                         partitionEnded = true;
                                     }
@@ -429,7 +527,7 @@ function FlightLog(logData) {
                             
                             // Advance the center so we can start computing the next value
                             centerFrameIndex++;
-                            if (centerFrameIndex == chunks[centerChunkIndex].frames.length) {
+                            if (centerFrameIndex == sourceChunks[centerChunkIndex].frames.length) {
                                 centerFrameIndex = 0;
                                 centerChunkIndex++;
     
@@ -438,16 +536,18 @@ function FlightLog(logData) {
                                     continue mainLoop;
                                 
                                 //Have we covered the whole ROI?
-                                if (centerChunkIndex == chunks.length - trailingROChunks)
+                                if (centerChunkIndex == sourceChunks.length - trailingROChunks)
                                     break mainLoop;
                             }
                             
-                            centerTime = chunks[centerChunkIndex].frames[centerFrameIndex][timeFieldIndex];
+                            centerTime = sourceChunks[centerChunkIndex].frames[centerFrameIndex][timeFieldIndex];
                         }
                     }
                 }
             }
         }
+        
+        injectComputedFields(sourceChunks, resultChunks);
         
         return resultChunks;
     };
@@ -459,6 +559,7 @@ function FlightLog(logData) {
         
         parser.parseHeader(logIndexes.getLogBeginOffset(index));
         
+        buildFieldNames();
         estimateNumCells();
     };
     

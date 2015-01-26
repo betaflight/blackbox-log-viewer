@@ -47,6 +47,10 @@ var
         
         'servo[5]': 'tail servo',
         
+        'heading[0]': 'heading[roll]',
+        'heading[1]': 'heading[pitch]',
+        'heading[2]': 'heading[yaw]',
+        
         //End-users prefer 1-based indexing
         'motor[0]': 'motor[1]', 'motor[1]': 'motor[2]', 'motor[2]': 'motor[3]', 'motor[3]': 'motor[4]',
         'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]'
@@ -60,7 +64,8 @@ var
     
     hasVideo = false, hasLog = false,
     video = $(".log-graph video")[0],
-    canvas = $(".log-graph canvas")[0],
+    canvas = $("#graphCanvas")[0],
+    craftCanvas = $("#craftCanvas")[0],
     videoURL = false,
     videoOffset = 0.0,
     
@@ -138,17 +143,29 @@ function decodeFieldToFriendly(fieldName, value) {
         
         case 'vbatLatest':
             return (flightLog.vbatToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+        
+        case 'heading[0]':
+        case 'heading[1]':
+        case 'heading[2]':
+            return (value / Math.PI * 180).toFixed(1) + "°";
             
         default:
             return "";
     }
 }
 
+function atMost2DecPlaces(value) {
+    if (value == (value | 0))
+        return value; //it's an integer already
+    
+    return value.toFixed(2);
+}
+
 function updateValuesChart() {
     var 
         table = $(".log-field-values table"),
         i,
-        frame = flightLog.getFrameAtTime(currentBlackboxTime),
+        frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
         fieldNames = flightLog.getMainFieldNames();
     
     $("tr:not(:first)", table).remove();
@@ -161,11 +178,11 @@ function updateValuesChart() {
         for (i = 0; i < rowCount; i++) {
             var 
                 row = 
-                    "<tr><td>" + friendlyFieldNames[i] + "</td><td>" + frame[i] + '</td><td>' + decodeFieldToFriendly(fieldNames[i], frame[i]) + "</td>",
+                    "<tr><td>" + friendlyFieldNames[i] + '</td><td class="raw-value">' + atMost2DecPlaces(frame[i]) + '</td><td>' + decodeFieldToFriendly(fieldNames[i], frame[i]) + "</td>",
                 secondColumn = i + rowCount;
             
             if (secondColumn < fieldNames.length) {
-                row += "<td>" + friendlyFieldNames[secondColumn] + "</td><td>" + frame[secondColumn] + '</td><td>' + decodeFieldToFriendly(fieldNames[secondColumn], frame[secondColumn]) + "</td>";
+                row += "<td>" + friendlyFieldNames[secondColumn] + "</td><td>" + atMost2DecPlaces(frame[secondColumn]) + '</td><td>' + decodeFieldToFriendly(fieldNames[secondColumn], frame[secondColumn]) + "</td>";
             }
             
             row += "</tr>";
@@ -300,6 +317,44 @@ function setVideoTime(newTime) {
     syncLogToVideo();
 }
 
+function configureGraphs() {
+    var 
+        sysConfig = flightLog.getSysConfig(),
+    
+        motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
+            (sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0),
+        gyroCurve = new ExpoCurve(0, 0.25, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
+        accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
+        pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10),
+        
+        motorSmoothing = 5000,
+        gyroSmoothing = 3000;
+    
+    graph.setGraphSetup([
+         {
+             label: "Motors",
+             fields: [
+                 {name: "motor[0]", curve: motorCurve, smoothing: motorSmoothing},
+                 {name: "motor[1]", curve: motorCurve, smoothing: motorSmoothing},
+                 {name: "motor[2]", curve: motorCurve, smoothing: motorSmoothing},
+                 {name: "motor[3]", curve: motorCurve, smoothing: motorSmoothing}
+             ],
+             y: 0.25,
+             height: 0.40
+         },
+         {
+             label: "Gyros",
+             fields: [
+                 {name: "gyroData[0]", curve: gyroCurve, smoothing: gyroSmoothing},
+                 {name: "gyroData[1]", curve: gyroCurve, smoothing: gyroSmoothing},
+                 {name: "gyroData[2]", curve: gyroCurve, smoothing: gyroSmoothing},
+             ],
+             y: 0.70,
+             height: 0.50
+        }
+    ]);
+}
+
 function loadLog(file) {
     var reader = new FileReader();
 
@@ -318,7 +373,7 @@ function loadLog(file) {
         if (graph)
             graph.destroy();
         
-        graph = new FlightLogGrapher(flightLog, canvas);
+        graph = new FlightLogGrapher(flightLog, canvas, craftCanvas);
 
         graph.onSeek = function(offset) {
             //Seek faster
@@ -352,9 +407,10 @@ function loadLog(file) {
         $("html").addClass("has-log");
         updateCanvasSize();
         
+        configureGraphs();
+        
         renderLogInfo(file);
         setGraphState(GRAPH_STATE_PAUSED);
-        
     };
 
     reader.readAsArrayBuffer(file);
@@ -488,6 +544,11 @@ $(document).ready(function() {
             videoOffset = offset;
             invalidateGraph();
         }
+    });
+    
+    $(".open-graph-configuration-dialog").click(function(e) {
+        e.preventDefault();
+        $("#dlgGraphConfiguration").modal('show');
     });
     
     $(window).resize(updateCanvasSize);

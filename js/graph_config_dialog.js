@@ -1,0 +1,3 @@
+function GraphConfigurationDialog(dialog, config) {
+    
+}

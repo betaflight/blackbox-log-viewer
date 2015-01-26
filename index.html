@@ -27,7 +27,6 @@
                     <span class="btn btn-primary btn-file"> Open log file/video <input type="file" id="file-open" multiple></span>
                 </div>
             </div>
-            <!--/.navbar-collapse -->
         </div>
     </nav>
 
@@ -79,25 +78,34 @@
                 <div class="form-inline">
                     <div class="form-group">
                         <div class="btn-group" role="group">
-	                        <button type="button" class="btn btn-default log-sync-back" title="Move log earlier">
-	                            <span class="glyphicon glyphicon-step-backward"></span>
-	                        </button>
-	                        <button type="button" class="btn btn-default log-sync-here">Start log here</button>
-	                        <button type="button" class="btn btn-default log-sync-forward" title="Move log later">
-	                            <span class="glyphicon glyphicon-step-forward"></span>
-	                        </button>
-	                    </div>
+                            <button type="button" class="btn btn-default log-sync-back" title="Move log earlier">
+                                <span class="glyphicon glyphicon-step-backward"></span>
+                            </button>
+                            <button type="button" class="btn btn-default log-sync-here">Start log here</button>
+                            <button type="button" class="btn btn-default log-sync-forward" title="Move log later">
+                                <span class="glyphicon glyphicon-step-forward"></span>
+                            </button>
+                        </div>
                         <input type="text" class="form-control video-offset" value="+0.0" size="5">
                     </div>
                 </div>
             </li>
         </ul>
 
+        <div class="craft">
+            
+        </div>
+
         <div class="log-graph">
             <video></video>
-            <canvas width="200" height="100" id="graph"></canvas>
+            <canvas width="200" height="100" id="graphCanvas"></canvas>
+            <canvas width="0" height="0" id="craftCanvas"></canvas>
         </div>
-        
+
+        <div class="log-graph-legend" style="display:none">
+            <button type="button" class="btn btn-default open-graph-configuration-dialog">Configure graphs</button>
+        </div>
+
         <div class="log-seek-bar">
             <canvas width="200" height="100"></canvas>
         </div>
@@ -117,18 +125,45 @@
         </div>
     </div>
     <!-- /container -->
-    <!--   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  -->
+
+    <div class="modal fade" id="dlgGraphConfiguration">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Configure graphs</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
         window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')
     </script>
 
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
+    <script src="js/vendor/three.min.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/cache.js"></script>
     <script src="js/expo.js"></script>
     <script src="js/datastream.js"></script>
     <script src="js/decoders.js"></script>
+    <script src="js/imu.js"></script>
+    <script src="js/craft3d.js"></script>
     <script src="js/flightlog_parser.js"></script>
     <script src="js/flightlog_index.js"></script>
     <script src="js/flightlog.js"></script>
