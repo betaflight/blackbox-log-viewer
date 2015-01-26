@@ -88,6 +88,18 @@ var ArrayDataStream;
         return (unsigned >>> 1) ^ -(unsigned & 1);
     };
     
+    ArrayDataStream.prototype.readString = function(length) {
+        var 
+            chars = new Array(length),
+            i;
+        
+        for (i = 0; i < length; i++) {
+            chars[i] = this.readChar();
+        }
+        
+        return chars.join("");
+    };
+    
     /**
      * Search for the string 'needle' beginning from the current stream position up
      * to the end position. Return the offset of the first occurance found.

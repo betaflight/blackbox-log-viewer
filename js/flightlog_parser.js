@@ -8,37 +8,9 @@ var FlightLogParser = function(logData) {
         FLIGHT_LOG_MAX_FIELDS = 128,
         FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
         
-        FIRMWARE_TYPE_BASEFLIGHT = 0,
-        FIRMWARE_TYPE_CLEANFLIGHT = 1,
-        
-        // Flight log field conditions:
-        
-        FLIGHT_LOG_FIELD_CONDITION_ALWAYS = 0,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_1 = 1,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_2 = 2,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_3 = 3,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_4 = 4,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_5 = 5,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_6 = 6,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_7 = 7,
-        FLIGHT_LOG_FIELD_CONDITION_AT_LEAST_MOTORS_8 = 8,
-        FLIGHT_LOG_FIELD_CONDITION_TRICOPTER,
-
-        FLIGHT_LOG_FIELD_CONDITION_MAG = 20,
-        FLIGHT_LOG_FIELD_CONDITION_BARO = 21,
-        FLIGHT_LOG_FIELD_CONDITION_VBAT = 22,
-
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_P_0 = 40,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_P_1 = 41,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_P_2 = 42,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_I_0 = 43,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_I_1 = 44,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_I_2 = 45,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_D_0 = 46,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_D_1 = 47,
-        FLIGHT_LOG_FIELD_CONDITION_NONZERO_PID_D_2 = 48,
-
-        FLIGHT_LOG_FIELD_CONDITION_NEVER = 255,
+        FIRMWARE_TYPE_UNKNOWN = 0,
+        FIRMWARE_TYPE_BASEFLIGHT = 1,
+        FIRMWARE_TYPE_CLEANFLIGHT = 2,
 
         // Flight log field predictors:
         
@@ -71,7 +43,14 @@ var FlightLogParser = function(logData) {
 
         //Predict vbatref, the reference ADC level stored in the header
         FLIGHT_LOG_FIELD_PREDICTOR_VBATREF        = 9,
+        
+        //Predict the last time value written in the main stream
+        FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME = 10,
 
+        //Home coord predictors appear in pairs (two copies of FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD). Rewrite the second
+        //one we see to this to make parsing easier
+        FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1   = 256,
+        
         FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB       = 0, // Signed variable-byte
         FLIGHT_LOG_FIELD_ENCODING_UNSIGNED_VB     = 1, // Unsigned variable-byte
         FLIGHT_LOG_FIELD_ENCODING_NEG_14BIT       = 3, // Unsigned variable-byte but we negate the value before storing, value is 14 bits
@@ -79,6 +58,11 @@ var FlightLogParser = function(logData) {
         FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32       = 7,
         FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16       = 8,
         FLIGHT_LOG_FIELD_ENCODING_NULL            = 9, // Nothing is written to the file, take value to be zero
+        
+        FLIGHT_LOG_EVENT_SYNC_BEEP = 0,
+        FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START = 10,
+        FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_RESULT = 11,
+        FLIGHT_LOG_EVENT_LOG_END = 255,
         
         EOF = ArrayDataStream.prototype.EOF,
         NEWLINE  = '\n'.charCodeAt(0);
@@ -95,7 +79,7 @@ var FlightLogParser = function(logData) {
             frameIntervalI: 32,
             frameIntervalPNum: 1,
             frameIntervalPDenom: 1,
-            firmwareType: FIRMWARE_TYPE_BASEFLIGHT,
+            firmwareType: FIRMWARE_TYPE_UNKNOWN,
             rcRate: 90,
             vbatscale: 110,
             vbatref: 4095,
@@ -540,7 +524,50 @@ var FlightLogParser = function(logData) {
     }
     
     function parseEventFrame(raw) {
-        
+        var 
+            END_OF_LOG_MESSAGE = "End of log\0",
+            
+            eventType = stream.readByte();
+
+        lastEvent = {
+            event: eventType,
+            data: {}
+        };
+
+        switch (eventType) {
+            case FLIGHT_LOG_EVENT_SYNC_BEEP:
+                lastEvent.data.time = stream.readUnsignedVB();
+            break;
+            case FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START:
+                lastEvent.data.phase = stream.readByte();
+                lastEvent.data.cycle = stream.readByte();
+                lastEvent.data.p = stream.readByte();
+                lastEvent.data.i = stream.readByte();
+                lastEvent.data.d = stream.readByte();
+            break;
+            case FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_RESULT:
+                lastEvent.data.overshot = stream.readByte();
+                lastEvent.data.p = stream.readByte();
+                lastEvent.data.i = stream.readByte();
+                lastEvent.data.d = stream.readByte();;
+            break;
+            case FLIGHT_LOG_EVENT_LOG_END:
+                var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
+
+                if (endMessage == END_OF_LOG_MESSAGE) {
+                    //Adjust the end of stream so we stop reading, this log is done
+                    stream.end = stream.pos;
+                } else {
+                    /*
+                     * This isn't the real end of log message, it's probably just some bytes that happened to look like
+                     * an event header.
+                     */
+                    lastEvent = null;
+                }
+            break;
+            default:
+                lastEvent = null;
+        }
     }
     
     function getFrameType(command) {
