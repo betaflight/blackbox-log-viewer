@@ -59,11 +59,6 @@ var FlightLogParser = function(logData) {
         FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16       = 8,
         FLIGHT_LOG_FIELD_ENCODING_NULL            = 9, // Nothing is written to the file, take value to be zero
         
-        FLIGHT_LOG_EVENT_SYNC_BEEP = 0,
-        FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START = 10,
-        FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_RESULT = 11,
-        FLIGHT_LOG_EVENT_AUTOTUNE_TARGETS = 12,
-        
         FLIGHT_LOG_EVENT_LOG_END = 255,
         
         EOF = ArrayDataStream.prototype.EOF,
@@ -545,11 +540,11 @@ var FlightLogParser = function(logData) {
         };
 
         switch (eventType) {
-            case FLIGHT_LOG_EVENT_SYNC_BEEP:
+            case FlightLogEvent.SYNC_BEEP:
                 lastEvent.data.time = stream.readUnsignedVB();
                 lastEvent.time = lastEvent.data.time;
             break;
-            case FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START:
+            case FlightLogEvent.AUTOTUNE_CYCLE_START:
                 lastEvent.data.phase = stream.readByte();
                 
                 var cycleAndRising = stream.readByte();
@@ -561,13 +556,13 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.i = stream.readByte();
                 lastEvent.data.d = stream.readByte();
             break;
-            case FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_RESULT:
+            case FlightLogEvent.AUTOTUNE_CYCLE_RESULT:
                 lastEvent.data.overshot = stream.readByte();
                 lastEvent.data.p = stream.readByte();
                 lastEvent.data.i = stream.readByte();
                 lastEvent.data.d = stream.readByte();;
             break;
-            case FLIGHT_LOG_EVENT_AUTOTUNE_TARGETS:
+            case FlightLogEvent.AUTOTUNE_TARGETS:
                 //Convert the angles from decidegrees back to plain old degrees for ease of use
                 lastEvent.data.currentAngle = stream.readS16() / 10.0;
                 
@@ -577,7 +572,7 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.firstPeakAngle = stream.readS16() / 10.0;
                 lastEvent.data.secondPeakAngle = stream.readS16() / 10.0;
             break;
-            case FLIGHT_LOG_EVENT_LOG_END:
+            case FlightLogEvent.LOG_END:
                 var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
 
                 if (endMessage == END_OF_LOG_MESSAGE) {
@@ -787,9 +782,6 @@ FlightLogParser.prototype.FLIGHT_LOG_START_MARKER = asciiStringToByteArray("H Pr
 
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_UNSIGNED = 0;
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_SIGNED   = 1;
-
-FlightLogParser.prototype.FLIGHT_LOG_EVENT_SYNC_BEEP = 0;
-FlightLogParser.prototype.FLIGHT_LOG_EVENT_LOG_END = 255;
 
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION = 0;
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME = 1;

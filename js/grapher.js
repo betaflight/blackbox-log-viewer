@@ -584,8 +584,15 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
         var x = canvas.width / windowWidthMicros * (event.time - windowStartTime);
         
         canvasContext.beginPath();
-        canvasContext.moveTo(x, 0);
-        canvasContext.lineTo(x, canvas.height);
+        
+        if (event.event == FlightLogEvent.AUTOTUNE_TARGETS) {
+            canvasContext.moveTo(x, canvas.height / 2 - 25);
+            canvasContext.lineTo(x, canvas.height / 2 + 25);
+        } else {
+            canvasContext.moveTo(x, 0);
+            canvasContext.lineTo(x, canvas.height);
+        }
+        
         canvasContext.stroke();
     }
     
