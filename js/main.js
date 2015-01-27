@@ -401,8 +401,10 @@ function loadLog(file) {
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
         seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
         
-        var throttleActivity = flightLog.getThrottleActivity();
-        seekBar.setActivity(throttleActivity.avgThrottle, throttleActivity.times);
+        var 
+            activity = flightLog.getActivitySummary();
+        
+        seekBar.setActivity(activity.times, activity.avgThrottle, activity.hasEvent);
         
         $("html").addClass("has-log");
         updateCanvasSize();

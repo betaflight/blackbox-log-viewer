@@ -43,6 +43,7 @@ function FlightLogIndex(logData) {
                     times: [],
                     offsets: [],
                     avgThrottle: [],
+                    hasEvent: [],
                     minTime: false,
                     maxTime: false
                 },
@@ -50,52 +51,65 @@ function FlightLogIndex(logData) {
                 motorFields = [],
                 fieldNames,
                 matches,
-                throttleTotal;
+                throttleTotal,
+                eventInThisChunk = null;
             
             parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
             
+            // Identify motor fields so they can be used to show the activity summary bar
             fieldNames = parser.mainFieldNames;
             
-            for (var j = 0; j < fieldNames.length; j++)
-                if ((matches = fieldNames[j].match(/^motor\[\d+]$/)))
+            for (var j = 0; j < fieldNames.length; j++) {
+                if ((matches = fieldNames[j].match(/^motor\[\d+]$/))) {
                     motorFields.push(j);
+                }
+            }
             
             parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                 if (frameValid) {
-                    var 
-                        frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-                    
-                    if (intraIndex.minTime === false) {
-                        intraIndex.minTime = frameTime;
-                    }
-                    
-                    if (intraIndex.maxTime === false || frameTime > intraIndex.maxTime) {
-                        intraIndex.maxTime = frameTime;
-                    }
-                    
-                    if (frameType == 'I') {
-                        if (skipIndex % 4 == 0) {
-                            intraIndex.times.push(frameTime);
-                            intraIndex.offsets.push(frameOffset);
-                            
-                            if (motorFields.length) {
-                                throttleTotal = 0;
-                                for (var j = 0; j < motorFields.length; j++)
-                                    throttleTotal += frame[motorFields[j]];
-                                
-                                intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
-                            }
+                    if (frameType == 'P' || frameType == 'I') {
+                        var 
+                            frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                        
+                        if (intraIndex.minTime === false) {
+                            intraIndex.minTime = frameTime;
                         }
                         
-                        skipIndex++;
+                        if (intraIndex.maxTime === false || frameTime > intraIndex.maxTime) {
+                            intraIndex.maxTime = frameTime;
+                        }
+                        
+                        if (frameType == 'I') {
+                            if (skipIndex % 4 == 0) {
+                                intraIndex.times.push(frameTime);
+                                intraIndex.offsets.push(frameOffset);
+                                
+                                if (motorFields.length) {
+                                    throttleTotal = 0;
+                                    for (var j = 0; j < motorFields.length; j++)
+                                        throttleTotal += frame[motorFields[j]];
+                                    
+                                    intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
+                                }
+                            }
+                            
+                            skipIndex++;
+                        }
+                    } else if (frameType == 'E') {
+                        // Mark that there was an event inside the current chunk
+                        if (intraIndex.times.length > 0) {
+                            intraIndex.hasEvent[intraIndex.times.length - 1] = true;
+                        }
                     }
                 }
             };
             
             parser.parseLogData(false);
-            
+        
             intraframeDirectories.push(intraIndex);
         }
+        
+        console.log(intraframeDirectories);
     }
     
     //Public: 

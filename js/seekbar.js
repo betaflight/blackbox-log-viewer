@@ -9,6 +9,10 @@ function SeekBar(canvas) {
         
         //Activity to display on bar:
         activityStrength, activityTime,
+        
+        //Whether a special event exists at the given time:
+        hasEvent,
+        
         //Expect to be plotting PWM-like data by default:
         activityMin = 1000, activityMax = 2000,
 
@@ -19,6 +23,13 @@ function SeekBar(canvas) {
         
         backgroundValid = false,
         dirtyRegion = false,
+        
+        BACKGROUND_STYLE = '#eee',
+        EVENT_BAR_STYLE = '#8d8',
+        ACTIVITY_BAR_STYLE = 'rgba(170,170,255, 0.9)',
+        
+        // Suggested to be the same as that used by the graph's center mark in order to tie them together
+        CURSOR_STYLE = 'rgba(255, 64, 64, 0.75)',
         
         //Current time cursor:
         CURSOR_WIDTH = 2.5,
@@ -107,9 +118,10 @@ function SeekBar(canvas) {
         invalidateBackground();
     };
     
-    this.setActivity = function(newActivityStrengths, newActivityTimes) {
-        activityStrength = newActivityStrengths;
+    this.setActivity = function(newActivityTimes, newActivityStrengths, newHasEvent) {
         activityTime = newActivityTimes;
+        activityStrength = newActivityStrengths;
+        hasEvent = newHasEvent;
         
         invalidateBackground();
     };
@@ -120,37 +132,69 @@ function SeekBar(canvas) {
     
     function rebuildBackground() {
         var 
-            x, activityIndex = 0,
-            pixelTimeStep;
+            x, activityIndex,
+            pixelTimeStep, time;
         
-        backgroundContext.fillStyle = '#eee';
+        backgroundContext.fillStyle = BACKGROUND_STYLE;
         backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
         
         if (max > min) {
             pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2);
             
-            //Draw activity bars
             if (activityTime.length) {
-                backgroundContext.strokeStyle = '#AAF';
+                //Draw events
+                backgroundContext.strokeStyle = EVENT_BAR_STYLE;
                 backgroundContext.beginPath();
                 
-                var 
-                    time = min;
+                time = min;
+                activityIndex = 0;
                 
                 for (x = BAR_INSET; x < canvas.width - BAR_INSET; x++) {
                     var 
                         activity;
                     
                     //Advance to the right entry in the activity array for this time
-                    while (activityIndex < activityTime.length && time >= activityTime[activityIndex])
+                    while (activityIndex < activityTime.length && time >= activityTime[activityIndex]) {
                         activityIndex++;
+                    }
                     
-                    if (activityIndex == activityTime.length)
-                        activity = 0;
-                    else {
+                    activityIndex--;
+                    
+                    if (activityIndex > 0) {
+                        if (hasEvent[activityIndex]) {
+                            backgroundContext.moveTo(x, canvas.height);
+                            backgroundContext.lineTo(x, 0);
+                        }
+                    }
+                    
+                    time += pixelTimeStep;
+                }
+
+                backgroundContext.stroke();
+                
+                //Draw activity bars
+                backgroundContext.strokeStyle = ACTIVITY_BAR_STYLE;
+                backgroundContext.beginPath();
+                
+                time = min;
+                activityIndex = 0;
+
+                for (x = BAR_INSET; x < canvas.width - BAR_INSET; x++) {
+                    var 
+                        activity;
+                    
+                    //Advance to the right entry in the activity array for this time
+                    while (activityIndex < activityTime.length && time >= activityTime[activityIndex]) {
+                        activityIndex++;
+                    }
+                    
+                    activityIndex--;
+                    
+                    if (activityIndex > 0) {
                         activity = (activityStrength[activityIndex] - activityMin) / (activityMax - activityMin) * canvas.height;
                         backgroundContext.moveTo(x, canvas.height);
                         backgroundContext.lineTo(x, canvas.height - activity);
+                        
                     }
                     
                     time += pixelTimeStep;
@@ -158,6 +202,7 @@ function SeekBar(canvas) {
                 
                 backgroundContext.stroke();
             }
+            
             backgroundValid = true;
         }
     }
@@ -182,7 +227,7 @@ function SeekBar(canvas) {
             pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2),
             cursorX = (current - min) / pixelTimeStep + BAR_INSET;
 
-        canvasContext.fillStyle = 'rgba(255, 64, 64, 0.75)';
+        canvasContext.fillStyle = CURSOR_STYLE;
         canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
         
         dirtyRegion = {

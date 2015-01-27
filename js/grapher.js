@@ -580,6 +580,35 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
         canvasContext.fillText(axisLabel, canvas.width - 8, -8);
     }
     
+    function drawEvent(event) {
+        var x = canvas.width / windowWidthMicros * (event.time - windowStartTime);
+        
+        canvasContext.beginPath();
+        canvasContext.moveTo(x, 0);
+        canvasContext.lineTo(x, canvas.height);
+        canvasContext.stroke();
+    }
+    
+    function drawEvents(chunks) {
+        canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
+        canvasContext.lineWidth = 1;
+
+        for (var i = 0; i < chunks.length; i++) {
+            if (chunks[i].events.length > 0) {
+                var events = chunks[i].events;
+                
+                for (var j = 0; j < events.length; j++) {
+                    if (events[j].time > windowEndTime)
+                        return;
+                    
+                    if (events[j].time >= windowStartTime) {
+                        drawEvent(events[j]);
+                    } 
+                }
+            }
+        }
+    }
+    
     this.resize = function(width, height) {
         canvas.width = width;
         canvas.height = height;
@@ -649,6 +678,9 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
             }
+            
+            // Draw events
+            drawEvents(chunks);
             
             // Draw details at the current time
             var

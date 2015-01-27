@@ -51,10 +51,16 @@ function FlightLog(logData) {
         return parser.sysConfig;
     };
     
-    this.getThrottleActivity = function() {
+    /**
+     * Return a coarse summary of throttle position and events across the entire log.
+     */
+    this.getActivitySummary = function() {
+        var directory = logIndexes.getIntraframeDirectory(logIndex);
+        
         return {
-            avgThrottle: logIndexes.getIntraframeDirectory(logIndex).avgThrottle,
-            times: logIndexes.getIntraframeDirectory(logIndex).times
+            times: directory.times,
+            avgThrottle: directory.avgThrottle,
+            hasEvent: directory.hasEvent
         };
     };
     
@@ -142,9 +148,13 @@ function FlightLog(logData) {
     
     /**
      * Get the raw chunks in the range [startIndex...endIndex] (inclusive)
+     * 
+     * When the cache misses, this will result in parsing the original log file to create chunks.
      */
     function getChunksInIndexRange(startIndex, endIndex) {
-        var resultChunks = [];
+        var 
+            resultChunks = [],
+            eventNeedsTimestamp = null;
         
         if (startIndex < 0)
             startIndex = 0;
@@ -161,14 +171,21 @@ function FlightLog(logData) {
             
             //And while we're here, use the same size for the smoothed cache
             smoothedCache.capacity = chunkCache.capacity;
-        }        
+        }
         
         for (var chunkIndex = startIndex; chunkIndex <= endIndex; chunkIndex++) {
             var 
                 chunkStartOffset, chunkEndOffset,
                 chunk = chunkCache.get(chunkIndex);
             
-            if (!chunk) {
+            // Did we cache this chunk already?
+            if (chunk) {
+                if (eventNeedsTimestamp) {
+                    eventNeedsTimestamp.time = chunk.frames[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                    eventNeedsTimestamp = null;
+                }
+            } else {
+                // Parse the log file to create this chunk
                 chunkStartOffset = iframeDirectory.offsets[chunkIndex];
                 
                 if (chunkIndex + 1 < iframeDirectory.offsets.length)
@@ -181,48 +198,74 @@ function FlightLog(logData) {
                 if (chunk) {
                     chunk.index = chunkIndex;
                     chunk.gapStartsHere = {};
-                    //Reuse the old chunk's frame array
+                    chunk.events.length = 0;
+                    //Reuse the old chunk's frames array
                 } else {
                     chunk = {
                         index: chunkIndex,
                         frames: [],
-                        gapStartsHere: {}
+                        gapStartsHere: {},
+                        events: []
                     };
                 }
                 
                 var
-                    frameIndex = 0;
+                    mainFrameIndex = 0;
                 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                     if (frameValid) {
-                        //The parser re-uses the "frame" array so we must copy that data somewhere else
-                        
-                        //Do we have a recycled chunk to copy on top of?
-                        if (chunk.frames[frameIndex]) {
-                            chunk.frames[frameIndex].length = frame.length;
+                        if (frameType == 'P' || frameType == 'I') {
+                            //The parser re-uses the "frame" array so we must copy that data somewhere else
                             
-                            for (var i = 0; i < frame.length; i++) {
-                                chunk.frames[frameIndex][i] = frame[i];
+                            //Do we have a recycled chunk to copy on top of?
+                            if (chunk.frames[mainFrameIndex]) {
+                                chunk.frames[mainFrameIndex].length = frame.length;
+                                
+                                for (var i = 0; i < frame.length; i++) {
+                                    chunk.frames[mainFrameIndex][i] = frame[i];
+                                }
+                            } else {
+                                //Otherwise allocate a new copy of it
+                                chunk.frames.push(frame.slice(0)); 
                             }
-                        } else {
-                            //Otherwise allocate a new copy of it
-                            chunk.frames.push(frame.slice(0)); 
+                            
+                            if (eventNeedsTimestamp) {
+                                eventNeedsTimestamp.time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                                eventNeedsTimestamp = null;
+                            }
+                            
+                            mainFrameIndex++;
+                        } else if (frameType == 'E') {
+                            /* 
+                             * If the event was logged during a loop iteration, it will appear in the log
+                             * before that loop iteration does (since the main log stream is logged at the very
+                             * end of the loop). 
+                             * 
+                             * So we want to use the timestamp of that later event as the timestamp of the loop 
+                             * iteration this event was logged in.
+                             */
+                            eventNeedsTimestamp = frame;
+                            chunk.events.push(frame);
                         }
-                        frameIndex++;
                     } else {
-                        chunk.gapStartsHere[frameIndex - 1] = true;
+                        chunk.gapStartsHere[mainFrameIndex - 1] = true;
                     }
                 };
 
                 parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
                 
                 //Truncate the array to fit just in case it was recycled and the new one is shorter
-                chunk.frames.length = frameIndex;
+                chunk.frames.length = mainFrameIndex;
                 
                 chunkCache.add(chunkIndex, chunk);
             }
             
             resultChunks.push(chunk);
+        }
+        
+        if (eventNeedsTimestamp) {
+            var lastChunk = resultChunks[resultChunks.length - 1];
+            eventNeedsTimestamp.time = lastChunk.frames[lastChunk.frames.length - 1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
         }
         
         return resultChunks;
@@ -255,6 +298,13 @@ function FlightLog(logData) {
                 maxSmoothing = newSmoothing[i].radius;
     };
     
+    /**
+     * Use the data in sourceChunks to compute additional fields (like IMU attitude) and add those into the 
+     * resultChunks. 
+     * 
+     * The idea is that sourceChunks will be unsmoothed original data for reference and resultChunks
+     * will be smoothed chunks to add data on to.
+     */
     function injectComputedFields(sourceChunks, resultChunks) {
         var
             gyroData = [fieldNameToIndex["gyroData[0]"], fieldNameToIndex["gyroData[1]"], fieldNameToIndex["gyroData[2]"]], 
@@ -265,6 +315,7 @@ function FlightLog(logData) {
             
             attitude;
         
+        // Do we have mag fields? If not mark that data as absent
         if (!magADC[0])
             magADC = false;
         
@@ -307,6 +358,10 @@ function FlightLog(logData) {
         }
     };
     
+    /**
+     * Get an array of chunk data which has been smoothed by the previously-configured smoothing settings. The frames
+     * in the chunks will at least span the range given by [startTime...endTime].
+     */
     this.getSmoothedChunksInTimeRange = function(startTime, endTime) {
         var 
             sourceChunks,
@@ -357,7 +412,9 @@ function FlightLog(logData) {
         
         //Don't smooth the edge chunks since they can't be fully smoothed
         for (var i = leadingROChunks; i < sourceChunks.length - trailingROChunks; i++) {
-            var resultChunk = smoothedCache.get(sourceChunks[i].index);
+            var 
+                sourceChunk = sourceChunks[i],
+                resultChunk = smoothedCache.get(sourceChunk.index);
             
             chunkAlreadyDone[i] = resultChunk ? true : false;
             
@@ -369,35 +426,38 @@ function FlightLog(logData) {
                 
                 if (resultChunk) {
                     //Reuse the memory from the expired chunk to reduce garbage
-                    resultChunk.index = sourceChunks[i].index;
-                    resultChunk.frames.length = sourceChunks[i].frames.length;
-                    resultChunk.gapStartsHere = sourceChunks[i].gapStartsHere;
+                    resultChunk.index = sourceChunk.index;
+                    resultChunk.frames.length = sourceChunk.frames.length;
+                    resultChunk.gapStartsHere = sourceChunk.gapStartsHere;
+                    resultChunk.events = sourceChunk.events;
                     resultChunk.hasAdditionalFields = false;
                     
+                    //Copy frames onto the expired chunk:
                     for (var j = 0; j < resultChunk.frames.length; j++) {
                         if (resultChunk.frames[j]) {
                             //Copy on top of the recycled array:
-                            resultChunk.frames[j].length = sourceChunks[i].frames[j].length + ADDITIONAL_COMPUTED_FIELD_COUNT;
+                            resultChunk.frames[j].length = sourceChunk.frames[j].length + ADDITIONAL_COMPUTED_FIELD_COUNT;
                             
-                            for (var k = 0; k < sourceChunks[i].frames[j].length; k++) {
-                                resultChunk.frames[j][k] = sourceChunks[i].frames[j][k];
+                            for (var k = 0; k < sourceChunk.frames[j].length; k++) {
+                                resultChunk.frames[j][k] = sourceChunk.frames[j][k];
                             }
                         } else {
                             //Allocate a new copy of the raw array:
-                            resultChunk.frames[j] = sourceChunks[i].frames[j].slice(0);
+                            resultChunk.frames[j] = sourceChunk.frames[j].slice(0);
                             resultChunk.frames[j].length += ADDITIONAL_COMPUTED_FIELD_COUNT;
                         }
                     }
                 } else {
                     //Allocate a new chunk
                     resultChunk = {
-                        index: sourceChunks[i].index,
-                        frames: new Array(sourceChunks[i].frames.length),
-                        gapStartsHere: sourceChunks[i].gapStartsHere
+                        index: sourceChunk.index,
+                        frames: new Array(sourceChunk.frames.length),
+                        gapStartsHere: sourceChunk.gapStartsHere,
+                        events: sourceChunk.events
                     };
                     
                     for (var j = 0; j < resultChunk.frames.length; j++) {
-                        resultChunk.frames[j] = sourceChunks[i].frames[j].slice(0);
+                        resultChunk.frames[j] = sourceChunk.frames[j].slice(0);
                         resultChunk.frames[j].length += ADDITIONAL_COMPUTED_FIELD_COUNT;
                     }
                 }

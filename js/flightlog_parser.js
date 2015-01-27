@@ -519,8 +519,16 @@ var FlightLogParser = function(logData) {
         
     }
 
-    function completeEventFrame() {
+    function completeEventFrame(frameType, frameStart, frameEnd, raw) {
+        if (lastEvent) {
+            if (that.onFrameReady) {
+                that.onFrameReady(true, lastEvent, frameType, frameStart, frameEnd - frameStart);
+            }
+            
+            return true;
+        }
         
+        return false;
     }
     
     function parseEventFrame(raw) {
@@ -640,9 +648,7 @@ var FlightLogParser = function(logData) {
         
         invalidateStream();
         
-        lastEvent = {
-            event: -1   
-        };
+        lastEvent = null;
 
         //Set parsing ranges up for the log the caller selected
         stream.start = startOffset === undefined ? stream.pos : startOffset;
