@@ -62,6 +62,8 @@ var FlightLogParser = function(logData) {
         FLIGHT_LOG_EVENT_SYNC_BEEP = 0,
         FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START = 10,
         FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_RESULT = 11,
+        FLIGHT_LOG_EVENT_AUTOTUNE_TARGETS = 12,
+        
         FLIGHT_LOG_EVENT_LOG_END = 255,
         
         EOF = ArrayDataStream.prototype.EOF,
@@ -548,7 +550,12 @@ var FlightLogParser = function(logData) {
             break;
             case FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START:
                 lastEvent.data.phase = stream.readByte();
-                lastEvent.data.cycle = stream.readByte();
+                
+                var cycleAndRising = stream.readByte();
+                
+                lastEvent.data.cycle = cycleAndRising & 0x7F;
+                lastEvent.data.rising = (cycleAndRising >> 7) & 0x01;
+                
                 lastEvent.data.p = stream.readByte();
                 lastEvent.data.i = stream.readByte();
                 lastEvent.data.d = stream.readByte();
@@ -558,6 +565,15 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.p = stream.readByte();
                 lastEvent.data.i = stream.readByte();
                 lastEvent.data.d = stream.readByte();;
+            break;
+            case FLIGHT_LOG_EVENT_AUTOTUNE_TARGETS:
+                lastEvent.data.currentAngle = stream.readS16();
+                
+                lastEvent.data.targetAngle = stream.readS8();
+                lastEvent.data.targetAngleAtPeak = stream.readS8();
+                
+                lastEvent.data.firstPeakAngle = stream.readS16();
+                lastEvent.data.secondPeakAngle = stream.readS16();
             break;
             case FLIGHT_LOG_EVENT_LOG_END:
                 var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);

@@ -43,7 +43,14 @@ var ArrayDataStream;
         this.eof = true;
         return EOF;
     };
-        
+    
+    //Synonym:
+    ArrayDataStream.prototype.readU8 = ArrayDataStream.prototype.readByte;
+    
+    ArrayDataStream.prototype.readS8 = function() {
+        return signExtend8Bit(this.readByte());
+    };
+    
     ArrayDataStream.prototype.unreadChar = function(c) {
         this.pos--;
     };
@@ -98,6 +105,22 @@ var ArrayDataStream;
         }
         
         return chars.join("");
+    };
+    
+    ArrayDataStream.prototype.readS16 = function() {
+        var 
+            b1 = this.readByte(),
+            b2 = this.readByte();
+        
+        return signExtend16Bit(b1 | (b2 << 8)); 
+    };
+    
+    ArrayDataStream.prototype.readU16 = function() {
+        var 
+            b1 = this.readByte(),
+            b2 = this.readByte();
+        
+        return b1 | (b2 << 8); 
     };
     
     /**
