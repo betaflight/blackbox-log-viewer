@@ -5,6 +5,8 @@
  * One extra element beyond the set capacity will be stored which can be fetched by calling "recycle()".
  * This allows the oldest value to be removed in order to be reused, instead of leaving it to be collected 
  * by the garbage collector.
+ * 
+ * Element age is determined by the time it was added or last get()'d from the cache.
  */
 function FIFOCache(initialCapacity) {
     //Private:
@@ -69,7 +71,14 @@ function FIFOCache(initialCapacity) {
      * expired or had never been stored.
      */
     this.get = function(key) {
-        return items[key];
+        var item = items[key];
+        
+        if (item) {
+            removeFromQueue(key);
+            queue.push(key);
+        }
+        
+        return item;
     };
  
     /**
