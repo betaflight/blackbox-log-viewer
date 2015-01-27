@@ -547,6 +547,7 @@ var FlightLogParser = function(logData) {
         switch (eventType) {
             case FLIGHT_LOG_EVENT_SYNC_BEEP:
                 lastEvent.data.time = stream.readUnsignedVB();
+                lastEvent.time = lastEvent.data.time;
             break;
             case FLIGHT_LOG_EVENT_AUTOTUNE_CYCLE_START:
                 lastEvent.data.phase = stream.readByte();
@@ -567,13 +568,14 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.d = stream.readByte();;
             break;
             case FLIGHT_LOG_EVENT_AUTOTUNE_TARGETS:
-                lastEvent.data.currentAngle = stream.readS16();
+                //Convert the angles from decidegrees back to plain old degrees for ease of use
+                lastEvent.data.currentAngle = stream.readS16() / 10.0;
                 
                 lastEvent.data.targetAngle = stream.readS8();
                 lastEvent.data.targetAngleAtPeak = stream.readS8();
                 
-                lastEvent.data.firstPeakAngle = stream.readS16();
-                lastEvent.data.secondPeakAngle = stream.readS16();
+                lastEvent.data.firstPeakAngle = stream.readS16() / 10.0;
+                lastEvent.data.secondPeakAngle = stream.readS16() / 10.0;
             break;
             case FLIGHT_LOG_EVENT_LOG_END:
                 var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);

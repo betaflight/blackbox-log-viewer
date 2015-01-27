@@ -154,7 +154,7 @@ function FlightLog(logData) {
     function getChunksInIndexRange(startIndex, endIndex) {
         var 
             resultChunks = [],
-            eventNeedsTimestamp = null;
+            eventNeedsTimestamp = [];
         
         if (startIndex < 0)
             startIndex = 0;
@@ -180,12 +180,15 @@ function FlightLog(logData) {
             
             // Did we cache this chunk already?
             if (chunk) {
-                if (eventNeedsTimestamp) {
-                    eventNeedsTimestamp.time = chunk.frames[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-                    eventNeedsTimestamp = null;
+                // Use the first event in the chunk to fill in event times at the trailing end of the previous one
+                var frame = chunk.frames[0];
+                
+                for (var i = 0; i < eventNeedsTimestamp.length; i++) {
+                    eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
                 }
+                eventNeedsTimestamp.length = 0;
             } else {
-                // Parse the log file to create this chunk
+                // Parse the log file to create this chunk since it wasn't cached
                 chunkStartOffset = iframeDirectory.offsets[chunkIndex];
                 
                 if (chunkIndex + 1 < iframeDirectory.offsets.length)
@@ -197,9 +200,15 @@ function FlightLog(logData) {
                 
                 if (chunk) {
                     chunk.index = chunkIndex;
+                    /* 
+                     * getSmoothedChunks would like to share this data, so we can't reuse the old arrays without
+                     * accidentally changing data that it might still want to reference:
+                     */
                     chunk.gapStartsHere = {};
-                    chunk.events.length = 0;
-                    //Reuse the old chunk's frames array
+                    chunk.events = [];
+                    delete chunk.needsEventTimes;
+                    
+                    //But reuse the old chunk's frames array since getSmoothedChunks has an independent copy
                 } else {
                     chunk = {
                         index: chunkIndex,
@@ -229,10 +238,10 @@ function FlightLog(logData) {
                                 chunk.frames.push(frame.slice(0)); 
                             }
                             
-                            if (eventNeedsTimestamp) {
-                                eventNeedsTimestamp.time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-                                eventNeedsTimestamp = null;
+                            for (var i = 0; i < eventNeedsTimestamp.length; i++) {
+                                eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
                             }
+                            eventNeedsTimestamp.length = 0;
                             
                             mainFrameIndex++;
                         } else if (frameType == 'E') {
@@ -241,10 +250,12 @@ function FlightLog(logData) {
                              * before that loop iteration does (since the main log stream is logged at the very
                              * end of the loop). 
                              * 
-                             * So we want to use the timestamp of that later event as the timestamp of the loop 
+                             * So we want to use the timestamp of that later frame as the timestamp of the loop 
                              * iteration this event was logged in.
                              */
-                            eventNeedsTimestamp = frame;
+                            if (!frame.time) {
+                                eventNeedsTimestamp.push(frame);
+                            }
                             chunk.events.push(frame);
                         }
                     } else {
@@ -263,9 +274,12 @@ function FlightLog(logData) {
             resultChunks.push(chunk);
         }
         
-        if (eventNeedsTimestamp) {
-            var lastChunk = resultChunks[resultChunks.length - 1];
-            eventNeedsTimestamp.time = lastChunk.frames[lastChunk.frames.length - 1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+        /* 
+         * If there is an event that trailed the all the chunks we were decoding, we can't give it an event time field 
+         * because we didn't get to see the time of the next frame.
+         */
+        if (eventNeedsTimestamp.length > 0) {
+            resultChunks[resultChunks.length - 1].needsEventTimes = true;
         }
         
         return resultChunks;
@@ -359,6 +373,63 @@ function FlightLog(logData) {
     };
     
     /**
+     * Add timestamps to events that getChunksInRange was unable to compute, because at the time it had trailing
+     * events in its chunk array but no next-chunk to take the times from for those events.
+     * 
+     * Set processLastChunk to true if the last chunk of this array is the final chunk in the file.
+     */
+    function addMissingEventTimes(chunks, processLastChunk) {
+        /* 
+         * If we're at the end of the file then we will compute event times for the last chunk, otherwise we'll
+         * wait until we have the next chunk to fill in times for this last chunk.
+         */
+        var 
+            endChunk = processLastChunk ? chunks.length : chunks.length - 1; 
+        
+        for (var i = 0; i < endChunk; i++) {
+            var chunk = chunks[i];
+            
+            if (chunk.needsEventTimes) {
+                // What is the time of the next frame after the chunk with the trailing events? We'll use that for the event times
+                var nextTime;
+                
+                if (i + 1 < chunks.length) {
+                    var nextChunk = chunks[i + 1];
+                    
+                    nextTime = nextChunk.frames[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                } else {
+                    //Otherwise we're at the end of the log so assume this event was logged sometime after the final frame
+                    nextTime = chunk.frames[chunk.frames.length - 1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                }
+                
+                for (var j = chunk.events.length - 1; j >= 0; j--) {
+                    if (chunk.events[j].time === undefined)  {
+                        chunk.events[j].time = nextTime;
+                    } else {
+                        // All events with missing timestamps should appear at the end of the chunk, so we're done
+                        break;
+                    }
+                }
+                
+                delete chunk.needsEventTimes;
+            }
+        }
+    }
+    
+    /*
+     * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
+     */
+    function verifyChunkIndexes(chunks) {
+        // Uncomment for debugging...
+        /* 
+        for (var i = 0; i < chunks.length - 1; i++) {
+            if (chunks[i].index + 1 != chunks[i+1].index) {
+                console.log("Bad chunk index, bug in chunk caching");
+            }
+        }*/
+    }
+    
+    /**
      * Get an array of chunk data which has been smoothed by the previously-configured smoothing settings. The frames
      * in the chunks will at least span the range given by [startTime...endTime].
      */
@@ -369,8 +440,8 @@ function FlightLog(logData) {
             chunkAlreadyDone, allDone,
             timeFieldIndex = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME;
         
-        if (maxSmoothing == 0)
-            return this.getChunksInTimeRange(startTime, endTime);
+        //if (maxSmoothing == 0) // TODO We can't bail early because we do things like add fields to the chunks at the end
+        //    return this.getChunksInTimeRange(startTime, endTime);
         
         var
             /* 
@@ -403,6 +474,8 @@ function FlightLog(logData) {
         }
         
         sourceChunks = getChunksInIndexRange(startIndex, endIndex);
+
+        verifyChunkIndexes(sourceChunks);
 
         //Create an independent copy of the raw frame data to smooth out:
         resultChunks = new Array(sourceChunks.length - leadingROChunks - trailingROChunks);
@@ -607,7 +680,11 @@ function FlightLog(logData) {
             }
         }
         
+        addMissingEventTimes(sourceChunks, trailingROChunks == 0);
         injectComputedFields(sourceChunks, resultChunks);
+        
+        verifyChunkIndexes(sourceChunks);
+        verifyChunkIndexes(resultChunks);
         
         return resultChunks;
     };

@@ -594,16 +594,15 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
         canvasContext.lineWidth = 1;
 
         for (var i = 0; i < chunks.length; i++) {
-            if (chunks[i].events.length > 0) {
-                var events = chunks[i].events;
+            var events = chunks[i].events;
+            
+            for (var j = 0; j < events.length; j++) {
+                if (events[j].time > windowEndTime) {
+                    return;
+                }
                 
-                for (var j = 0; j < events.length; j++) {
-                    if (events[j].time > windowEndTime)
-                        return;
-                    
-                    if (events[j].time >= windowStartTime) {
-                        drawEvent(events[j]);
-                    } 
+                if (events[j].time >= windowStartTime) {
+                    drawEvent(events[j]);
                 }
             }
         }
