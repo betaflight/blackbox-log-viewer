@@ -188,39 +188,39 @@ function IMU(copyFrom) {
         return attitude;
     }
     
-    this.reset = function() {
-        this.estimateGyro = {X: 0, Y: 0, Z: 0};
-        this.EstN = {X: 1, Y: 0, Z: 0};
-        this.estimateMag = {X: 0, Y: 0, Z: 0};
-
-        this.previousTime = false;
-    }
-    
-    this.copyStateFrom = function(that) {
-        this.estimateGyro = {
-            X: that.estimateGyro.X,
-            Y: that.estimateGyro.Y,
-            Z: that.estimateGyro.Z
-        };
-        
-        this.estimateMag = {
-            X: that.estimateMag.X,
-            Y: that.estimateMag.Y,
-            Z: that.estimateMag.Z
-        };
-
-        this.EstN = {
-            X: that.EstN.X,
-            Y: that.EstN.Y,
-            Z: that.EstN.Z
-        };
-
-        this.previousTime = that.previousTime;
-    };
-    
     if (copyFrom) {
         this.copyStateFrom(copyFrom);
     } else {
         this.reset();
     }
 }
+
+IMU.prototype.reset = function() {
+    this.estimateGyro = {X: 0, Y: 0, Z: 0};
+    this.EstN = {X: 1, Y: 0, Z: 0};
+    this.estimateMag = {X: 0, Y: 0, Z: 0};
+
+    this.previousTime = false;
+};
+
+IMU.prototype.copyStateFrom = function(that) {
+    this.estimateGyro = {
+        X: that.estimateGyro.X,
+        Y: that.estimateGyro.Y,
+        Z: that.estimateGyro.Z
+    };
+    
+    this.estimateMag = {
+        X: that.estimateMag.X,
+        Y: that.estimateMag.Y,
+        Z: that.estimateMag.Z
+    };
+
+    this.EstN = {
+        X: that.EstN.X,
+        Y: that.EstN.Y,
+        Z: that.EstN.Z
+    };
+
+    this.previousTime = that.previousTime;
+};
