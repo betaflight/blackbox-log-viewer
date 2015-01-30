@@ -68,9 +68,9 @@ var FlightLogParser = function(logData) {
     var
         that = this,
                 
-        //Information about fields which we need to decode them properly
+        //Information about fields which we need to decode them properly. Have "encoding" and "predictor" arrays.
         frameDefs = {},
-        dataVersion, motor0Index,
+        dataVersion,
         
         defaultSysConfig = {
             frameIntervalI: 32,
@@ -104,6 +104,7 @@ var FlightLogParser = function(logData) {
     //Public fields:
     this.mainFieldNames = [];
     this.mainFieldCount = 0;
+    this.mainFieldNameToIndex = {};
     
     this.sysConfig = Object.create(defaultSysConfig);
     
@@ -151,12 +152,10 @@ var FlightLogParser = function(logData) {
             case "Field I name":
                 that.mainFieldNames = fieldValue.split(",");
                 that.mainFieldCount = that.mainFieldNames.length; 
-    
-                for (i = 0; i < that.mainFieldNames.length; i++) {
-                    if (that.mainFieldNames[i] == "motor[0]") {
-                        motor0Index = i;
-                        break;
-                    }
+
+                that.mainFieldNameToIndex = {};
+                for (var i = 0; i < that.mainFieldNames.length; i++) {
+                    that.mainFieldNameToIndex[that.mainFieldNames[i]] = i;
                 }
             break;
             case "Field I signed":
@@ -343,10 +342,10 @@ var FlightLogParser = function(logData) {
                         value += 1500;
                     break;
                     case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
-                        if (motor0Index < 0) {
+                        if (that.mainFieldNameToIndex["motor[0]"] < 0) {
                             throw "Attempted to base I-field prediction on motor0 before it was read";
                         }
-                        value += current[motor0Index];
+                        value += current[that.mainFieldNameToIndex["motor[0]"]];
                     break;
                     case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
                         value += that.sysConfig.vbatref;
@@ -600,11 +599,13 @@ var FlightLogParser = function(logData) {
         this.resetStats();
         this.mainFieldCount = 0;
         this.gpsFieldCount = 0;
-                
+        
         //Reset system configuration to MW's defaults
         this.sysConfig = Object.create(defaultSysConfig);
         
-        motor0Index = -1;
+        this.mainFieldNames = [];
+        this.mainFieldCount = 0;
+        this.mainFieldNameToIndex = {};
 
         //Set parsing ranges up
         stream.start = startOffset === undefined ? stream.pos : startOffset;

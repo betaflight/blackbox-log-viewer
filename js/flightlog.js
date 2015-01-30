@@ -198,6 +198,7 @@ function FlightLog(logData) {
 
                 chunk = chunkCache.recycle();
                 
+                // Were we able to reuse memory from an expired chunk?
                 if (chunk) {
                     chunk.index = chunkIndex;
                     /* 
@@ -217,6 +218,8 @@ function FlightLog(logData) {
                         events: []
                     };
                 }
+                
+                chunk.initialIMU = iframeDirectory.initialIMU[chunkIndex];
                 
                 var
                     mainFrameIndex = 0;
@@ -307,9 +310,11 @@ function FlightLog(logData) {
         
         maxSmoothing = 0;
         
-        for (var i = 0; i < newSmoothing.length; i++)
-            if (newSmoothing[i].radius > maxSmoothing)
+        for (var i = 0; i < newSmoothing.length; i++) {
+            if (newSmoothing[i].radius > maxSmoothing) {
                 maxSmoothing = newSmoothing[i].radius;
+            }
+        }
     };
     
     /**
@@ -319,56 +324,65 @@ function FlightLog(logData) {
      * The idea is that sourceChunks will be unsmoothed original data for reference and resultChunks
      * will be smoothed chunks to add data on to.
      */
-    function injectComputedFields(sourceChunks, resultChunks) {
+    function injectComputedFields(sourceChunks, destChunks) {
         var
             gyroData = [fieldNameToIndex["gyroData[0]"], fieldNameToIndex["gyroData[1]"], fieldNameToIndex["gyroData[2]"]], 
             accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]],
             magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
             
-            sysConfig, acc_1G, gyroScale,
+            sourceChunkIndex, destChunkIndex,
             
+            sysConfig,
             attitude;
         
-        // Do we have mag fields? If not mark that data as absent
-        if (!magADC[0])
-            magADC = false;
+        if (destChunks.length == 0) {
+            return;
+        }
         
-        // Get the data we need ready in local vars
+        // Do we have mag fields? If not mark that data as absent
+        if (!magADC[0]) {
+            magADC = false;
+        }
+        
         sysConfig = that.getSysConfig();
         
-        acc_1G = sysConfig.acc_1G;
-        gyroScale = sysConfig.gyroScale;
+        sourceChunkIndex = 0;
+        destChunkIndex = 0;
         
-        imu.reset();
+        // Skip leading source chunks
+        while (sourceChunks[sourceChunkIndex].index < destChunks[destChunkIndex].index) {
+            sourceChunkIndex++;
+        }
         
-        for (var i = 0; i < resultChunks.length; i++) {
-            var chunk = resultChunks[i];
-            
-            if (chunk.hasAdditionalFields)
-                continue;
-            
-            chunk.hasAdditionalFields = true;
-            
-            // Start our IMU state with the state the last chunk ended at, if that info exists
-            var chunkIMU = new IMU(i > 0 ? resultChunks[i - 1].finalIMU : false);
-            
-            for (var j = 0; j < chunk.frames.length; j++) {
-                var frame = chunk.frames[j];
+        for (; destChunkIndex < destChunks.length; sourceChunkIndex++, destChunkIndex++) {
+            var 
+                destChunk = destChunks[destChunkIndex],
+                sourceChunk = sourceChunks[sourceChunkIndex];
+
+            if (!destChunk.hasAdditionalFields) {
+                destChunk.hasAdditionalFields = true;
+    
+                var 
+                    chunkIMU = new IMU(sourceChunks[sourceChunkIndex].initialIMU);
                 
-                attitude = chunkIMU.getEstimatedAttitude(
-                    [frame[gyroData[0]], frame[gyroData[1]], frame[gyroData[2]]],
-                    [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
-                    frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
-                    acc_1G, 
-                    gyroScale, 
-                    magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false);
-                
-                frame[frame.length - 3] = attitude.roll;
-                frame[frame.length - 2] = attitude.pitch;
-                frame[frame.length - 1] = attitude.heading;
+                for (var i = 0; i < sourceChunk.frames.length; i++) {
+                    var 
+                        srcFrame = sourceChunk.frames[i],
+                        destFrame = destChunk.frames[i];
+                    
+                    attitude = chunkIMU.updateEstimatedAttitude(
+                        [srcFrame[gyroData[0]], srcFrame[gyroData[1]], srcFrame[gyroData[2]]],
+                        [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
+                        srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
+                        sysConfig.acc_1G, 
+                        sysConfig.gyroScale, 
+                        magADC ? [srcFrame[magADC[0]], srcFrame[magADC[1]], srcFrame[magADC[2]]] : false);
+                    
+                    destFrame[destFrame.length - 3] = attitude.roll;
+                    destFrame[destFrame.length - 2] = attitude.pitch;
+                    destFrame[destFrame.length - 1] = attitude.heading;
+                }
             }
-            
-            chunk.finalIMU = chunkIMU;
         }
     };
     
@@ -445,32 +459,28 @@ function FlightLog(logData) {
         
         var
             /* 
-             * Ensure that the range that the caller asked for will be cached in its entirety by
-             * expanding the request by 1 chunk on either side (since the chunks on the edge of the
-             * query cannot be fully smoothed, they can't be cached).
+             * Ensure that the range that the caller asked for can be fully smoothed by expanding the request 
+             * for source chunks on either side of the range asked for (to smooth the chunks on the edges, we
+             * need to be able to see their neighbors)
              */
-            startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime - maxSmoothing) - 1,
-            endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime + maxSmoothing) + 1,
+            leadingROChunks = 1, trailingROChunks = 1,
             
-            //Count of chunks at the beginning and end of the range that we will only look at, not smooth
-            leadingROChunks, trailingROChunks;
+            startIndex = Math.max(binarySearchOrPrevious(iframeDirectory.times, startTime - maxSmoothing), 0) - leadingROChunks,
+            endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime + maxSmoothing) + trailingROChunks;
         
         /* 
-         * We can smooth the first and last chunks of the log because they don't have a neighbor on the outside
-         * to smooth against anyway.
+         * If our expanded source chunk range exceeds the actual source chunks available, trim down our leadingROChunks
+         * and trailingROChunks to match (i.e. we are allowed to smooth the first and last chunks of the file despite
+         * there not being a chunk past them to smooth against on one side).
          */
         if (startIndex < 0) {
+            leadingROChunks += startIndex;
             startIndex = 0;
-            leadingROChunks = 0;
-        } else {
-            leadingROChunks = 1;
         }
         
         if (endIndex > iframeDirectory.offsets.length - 1) {
+            trailingROChunks -= endIndex - (iframeDirectory.offsets.length - 1);
             endIndex = iframeDirectory.offsets.length - 1;
-            trailingROChunks = 0;
-        } else {
-            trailingROChunks = 1;
         }
         
         sourceChunks = getChunksInIndexRange(startIndex, endIndex);

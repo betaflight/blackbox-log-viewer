@@ -43,26 +43,41 @@ function FlightLogIndex(logData) {
                     times: [],
                     offsets: [],
                     avgThrottle: [],
+                    initialIMU: [],
                     hasEvent: [],
                     minTime: false,
                     maxTime: false
                 },
-                skipIndex = 0,
+                
+                imu = new IMU(),
+                gyroData, accSmooth, magADC,
+                
+                iframeCount = 0,
                 motorFields = [],
                 fieldNames,
                 matches,
                 throttleTotal,
-                eventInThisChunk = null;
+                eventInThisChunk = null,
+                sysConfig;
             
             parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
+
+            sysConfig = parser.sysConfig;
+            
+            gyroData = [parser.mainFieldNameToIndex["gyroData[0]"], parser.mainFieldNameToIndex["gyroData[1]"], parser.mainFieldNameToIndex["gyroData[2]"]];
+            accSmooth = [parser.mainFieldNameToIndex["accSmooth[0]"], parser.mainFieldNameToIndex["accSmooth[1]"], parser.mainFieldNameToIndex["accSmooth[2]"]];
+            magADC = [parser.mainFieldNameToIndex["magADC[0]"], parser.mainFieldNameToIndex["magADC[1]"], parser.mainFieldNameToIndex["magADC[2]"]];
             
             // Identify motor fields so they can be used to show the activity summary bar
-            fieldNames = parser.mainFieldNames;
-            
-            for (var j = 0; j < fieldNames.length; j++) {
-                if ((matches = fieldNames[j].match(/^motor\[\d+]$/))) {
-                    motorFields.push(j);
+            for (var j = 0; j < 8; j++) {
+                if (parser.mainFieldNameToIndex["motor[" + i + "]"] !== undefined) {
+                    motorFields.push(parser.mainFieldNameToIndex["motor[" + i + "]"]);
                 }
+            }
+            
+            // Do we have mag fields? If not mark that data as absent
+            if (magADC[0] === undefined) {
+                magADC = false;
             }
             
             parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
@@ -80,7 +95,9 @@ function FlightLogIndex(logData) {
                         }
                         
                         if (frameType == 'I') {
-                            if (skipIndex % 4 == 0) {
+                            // Start a new chunk on every 4th I-frame
+                            if (iframeCount % 4 == 0) {
+                                // Log the beginning of the new chunk
                                 intraIndex.times.push(frameTime);
                                 intraIndex.offsets.push(frameOffset);
                                 
@@ -91,10 +108,21 @@ function FlightLogIndex(logData) {
                                     
                                     intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
                                 }
+                                
+                                intraIndex.initialIMU.push(new IMU(imu));
                             }
                             
-                            skipIndex++;
+                            iframeCount++;
                         }
+                        
+                        imu.updateEstimatedAttitude(
+                            [frame[gyroData[0]], frame[gyroData[1]], frame[gyroData[2]]],
+                            [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
+                            frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
+                            sysConfig.acc_1G, 
+                            sysConfig.gyroScale, 
+                            magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
+                        );
                     } else if (frameType == 'E') {
                         // Mark that there was an event inside the current chunk
                         if (intraIndex.times.length > 0) {

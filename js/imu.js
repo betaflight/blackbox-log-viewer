@@ -130,7 +130,10 @@ function IMU(copyFrom) {
         return heading;
     }
     
-    this.getEstimatedAttitude = function(gyroData, accSmooth, currentTime, acc_1G, gyroScale, magADC) {
+    /**
+     * Using the given raw data, update the IMU state and return the new estimate for the attitude.
+     */
+    this.updateEstimatedAttitude = function(gyroData, accSmooth, currentTime, acc_1G, gyroScale, magADC) {
         var 
             accMag = 0,
             deltaTime,
