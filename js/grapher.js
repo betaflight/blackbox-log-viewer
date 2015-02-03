@@ -760,15 +760,4 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
     
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);
-    
-     //Debugging: 
-    /*var chunks = flightLog.getChunksInTimeRange(flightLog.getMinTime(), flightLog.getMaxTime());
-    
-    for (var i = 0; i < chunks.length; i++) {
-        var chunk = chunks[i];
-        
-        for (var j = 0; j < chunk.frames.length; j++) {
-            console.log(chunk.frames[j].join(",") + "\n");
-        }
-    }*/
 }

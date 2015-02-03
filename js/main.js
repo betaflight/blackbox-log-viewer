@@ -209,10 +209,11 @@ function animationLoop() {
         var
             delta;
         
-        if (lastRenderTime === false)
+        if (lastRenderTime === false) {
             delta = 0;
-        else
+        } else {
             delta = (now - lastRenderTime) * 1000;
+        }
     
         currentBlackboxTime += delta;
         
@@ -238,7 +239,7 @@ function animationLoop() {
         
         animationFrameIsQueued = true;
         requestAnimationFrame(animationLoop);
-    } else {        
+    } else {
         seekBar.repaint();
         
         animationFrameIsQueued = false;
@@ -265,11 +266,58 @@ function updateCanvasSize() {
     }
 }
 
-function renderLogInfo(file) {
+function renderLogFileInfo(file) {
     $(".log-filename").text(file.name);
-    $(".log-start-time").text(formatTime(flightLog.getMinTime() / 1000, false));
-    $(".log-end-time").text(formatTime(flightLog.getMaxTime() / 1000, false));
-    $(".log-duration").text(formatTime(Math.ceil((flightLog.getMaxTime() - flightLog.getMinTime()) / 1000), false));
+    
+    var 
+        logIndexContainer = $(".log-index"),
+        logIndexPicker,
+        logCount = flightLog.getLogCount(),
+        index;
+    
+    logIndexContainer.empty();
+    
+    if (logCount > 1) {
+        logIndexPicker = $('<select class="log-index form-control">');
+        
+        logIndexPicker.change(function() {
+            selectLog(parseInt($(this).val(), 10));
+        });
+    }
+    
+    for (index = 0; index < logCount; index++) {
+        var
+            logLabel = formatTime(flightLog.getMinTime(index) / 1000, false) 
+                + " - " + formatTime(flightLog.getMaxTime(index) / 1000 , false)
+                + " [" + formatTime(Math.ceil((flightLog.getMaxTime(index) - flightLog.getMinTime(index)) / 1000), false) + "]",
+            option, holder;
+        
+        if (logCount > 1) {
+            option = $("<option></option>");
+        
+            option.text((index + 1) + "/" + (flightLog.getLogCount()) + ": " + logLabel);
+            option.attr("value", index);
+            
+            logIndexPicker.append(option);
+        } else {
+            holder = $('<div class="form-control-static"></div>');
+            
+            holder.text(logLabel);
+            logIndexContainer.append(holder);
+        }
+    }
+
+    if (logCount > 1) {
+        logIndexPicker.val(0);
+        logIndexContainer.append(logIndexPicker);
+    }
+}
+
+/**
+ * Update the metadata displays to show information about the currently selected log index.
+ */
+function renderSelectedLogInfo() {
+    $(".log-index").val(flightLog.getLogIndex());
     
     if (flightLog.getNumCellsEstimate()) {
         $(".log-cells").text(flightLog.getNumCellsEstimate() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
@@ -277,6 +325,16 @@ function renderLogInfo(file) {
     } else {
         $(".log-cells-header,.log-cells").css('display', 'none');
     }
+    
+    seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
+    seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
+    
+    var 
+        activity = flightLog.getActivitySummary();
+    
+    seekBar.setActivity(activity.times, activity.avgThrottle, activity.hasEvent);
+    
+    seekBar.repaint();
 }
 
 function setGraphState(newState) {
@@ -355,7 +413,48 @@ function configureGraphs() {
     ]);
 }
 
-function loadLog(file) {
+/**
+ * Set the index of the log from the log file that should be viewed.
+ */
+function selectLog(logIndex) {
+    flightLog.openLog(logIndex);
+    
+    if (graph) {
+        graph.destroy();
+    }
+    
+    graph = new FlightLogGrapher(flightLog, canvas, craftCanvas);
+
+    graph.onSeek = function(offset) {
+        //Seek faster
+        offset *= 2;
+        
+        if (hasVideo) {
+            setVideoTime(video.currentTime + offset / 1000000);
+        } else {
+            setCurrentBlackboxTime(currentBlackboxTime + offset);
+        }
+        invalidateGraph();
+    };
+    
+    if (hasVideo) {
+        syncLogToVideo();
+    } else {
+        // Start at beginning:
+        currentBlackboxTime = flightLog.getMinTime();
+    }
+    
+    buildFriendlyFieldNames();
+    
+    renderSelectedLogInfo();
+    
+    updateCanvasSize();
+    configureGraphs();
+    
+    setGraphState(GRAPH_STATE_PAUSED);
+}
+
+function loadLogFile(file) {
     var reader = new FileReader();
 
     reader.onload = function(e) {
@@ -370,49 +469,12 @@ function loadLog(file) {
             return;
         }
         
-        if (graph)
-            graph.destroy();
-        
-        graph = new FlightLogGrapher(flightLog, canvas, craftCanvas);
-
-        graph.onSeek = function(offset) {
-            //Seek faster
-            offset *= 2;
-            
-            if (hasVideo) {
-                setVideoTime(video.currentTime + offset / 1000000);
-            } else {
-                setCurrentBlackboxTime(currentBlackboxTime + offset);
-            }
-            invalidateGraph();
-        };
+        renderLogFileInfo(file);
         
         hasLog = true;
-
-        if (hasVideo)
-            syncLogToVideo();
-        else {
-            // Start at beginning:
-            currentBlackboxTime = flightLog.getMinTime();
-        }
-
-        buildFriendlyFieldNames();
-        
-        seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
-        seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
-        
-        var 
-            activity = flightLog.getActivitySummary();
-        
-        seekBar.setActivity(activity.times, activity.avgThrottle, activity.hasEvent);
-        
         $("html").addClass("has-log");
-        updateCanvasSize();
         
-        configureGraphs();
-        
-        renderLogInfo(file);
-        setGraphState(GRAPH_STATE_PAUSED);
+        selectLog(0);
     };
 
     reader.readAsArrayBuffer(file);
@@ -470,10 +532,11 @@ $(document).ready(function() {
                     isVideo = true;
             }
             
-            if (isLog)
-                loadLog(files[i]);
-            else if (isVideo)
+            if (isLog) {
+                loadLogFile(files[i]);
+            } else if (isVideo) {
                 loadVideo(files[i]);
+            }
         }
     });
     

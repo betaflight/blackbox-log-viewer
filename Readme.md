@@ -37,7 +37,6 @@ time.
 
 This tool is currently in the Alpha stage, so a number of features have yet to be implemented:
 
-- You can only view the first log within a given log file 
 - There is no option for choosing which values you want to graph
 - There is no control over the amount of smoothing applied to the graph lines
 - There is no way to single-step between loop iterations with the arrow keys

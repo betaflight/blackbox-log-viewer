@@ -25,10 +25,9 @@ function FlightLog(logData) {
         fieldSmoothing = [],
         maxSmoothing = 0,
         
-        smoothedCache = new FIFOCache(2),
-        
-        imu = new IMU();
+        smoothedCache = new FIFOCache(2);
     
+    //Public fields:
     this.parser = parser;
     
     this.getMainFieldCount = function() {
@@ -39,16 +38,46 @@ function FlightLog(logData) {
         return fieldNames;
     };
     
-    this.getMinTime = function() {
-        return iframeDirectory.minTime;
+    /**
+     * Get the earliest time seen in the log of the given index, or leave off the logIndex
+     * argument to fetch details for the current log.
+     */
+    this.getMinTime = function(logIndex) {
+        if (logIndex === undefined) {
+            return iframeDirectory.minTime;
+        } else {
+            return logIndexes.getIntraframeDirectory(logIndex).minTime;
+        }
     };
     
-    this.getMaxTime = function() {
-        return iframeDirectory.maxTime;
+    /**
+     * Get the latest time seen in the log of the given index, or leave off the logIndex
+     * argument to fetch details for the current log.
+     */
+    this.getMaxTime = function(logIndex) {
+        if (logIndex === undefined) {
+            return iframeDirectory.maxTime;
+        } else {
+            return logIndexes.getIntraframeDirectory(logIndex).maxTime;
+        }
     };
     
+    /**
+     * Get the flight controller system information that was parsed for the current log file.
+     */
     this.getSysConfig = function() {
         return parser.sysConfig;
+    };
+    
+    /**
+     * Get the index of the currently selected log.
+     */
+    this.getLogIndex = function() {
+        return logIndex;
+    }
+    
+    this.getLogCount = function() {
+        return logIndexes.getLogCount();
     };
     
     /**
@@ -106,12 +135,10 @@ function FlightLog(logData) {
     
     function buildFieldNames() {
         var 
-            i, sourceNames;
-        
-        sourceNames = parser.mainFieldNames;
+            i;
         
         // Make an independent copy
-        fieldNames = sourceNames.slice(0);
+        fieldNames = parser.mainFieldNames.slice(0);
         
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         
@@ -702,15 +729,16 @@ function FlightLog(logData) {
     this.openLog = function(index) {
         logIndex = index;
         
-        iframeDirectory = logIndexes.getIntraframeDirectory(logIndex);
+        chunkCache.clear();
+        smoothedCache.clear();
         
-        parser.parseHeader(logIndexes.getLogBeginOffset(index));
+        iframeDirectory = logIndexes.getIntraframeDirectory(index);
+        
+        parser.parseHeader(logIndexes.getLogBeginOffset(index), logIndexes.getLogBeginOffset(index + 1));
         
         buildFieldNames();
         estimateNumCells();
     };
-    
-    this.openLog(0);
 }
 
 FlightLog.prototype.accRawToGs = function(value) {

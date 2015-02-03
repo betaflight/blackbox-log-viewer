@@ -70,8 +70,8 @@ function FlightLogIndex(logData) {
             
             // Identify motor fields so they can be used to show the activity summary bar
             for (var j = 0; j < 8; j++) {
-                if (parser.mainFieldNameToIndex["motor[" + i + "]"] !== undefined) {
-                    motorFields.push(parser.mainFieldNameToIndex["motor[" + i + "]"]);
+                if (parser.mainFieldNameToIndex["motor[" + j + "]"] !== undefined) {
+                    motorFields.push(parser.mainFieldNameToIndex["motor[" + j + "]"]);
                 }
             }
             
@@ -136,8 +136,6 @@ function FlightLogIndex(logData) {
         
             intraframeDirectories.push(intraIndex);
         }
-        
-        console.log(intraframeDirectories);
     }
     
     //Public: 

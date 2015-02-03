@@ -5,6 +5,9 @@ body {
 .log-info {
     max-width: 30em;
 }
+.log-info .form-group {
+    margin-bottom:10px;
+}
 
 /* Bootstrap-styled file inputs by abeautifulsite http://www.abeautifulsite.net/whipping-file-inputs-into-shape-with-bootstrap-3/ */
 .btn-file {
