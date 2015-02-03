@@ -15,7 +15,8 @@ function FlightLog(logData) {
         
         iframeDirectory,
         
-        numCells = false,
+        // We cache these details so they don't have to be recomputed on every request:
+        numCells = false, numMotors = false,
         
         fieldNames = [],
         fieldNameToIndex = {},
@@ -148,12 +149,24 @@ function FlightLog(logData) {
         }
     }
     
+    function estimateNumMotors() {
+        var count = 0;
+        
+        for (var j = 0; j < 8; j++) {
+            if (that.getMainFieldIndexByName("motor[" + j + "]") !== undefined) {
+                count++;
+            }
+        }
+        
+        numMotors = count;
+    }
+    
     function estimateNumCells() {
         var 
             i, 
             fieldNames = that.getMainFieldNames(),
             sysConfig = that.getSysConfig(),
-            refVoltage = that.vbatToMillivolts(sysConfig.vbatref) / 100,
+            refVoltage = that.vbatADCToMillivolts(sysConfig.vbatref) / 100,
             found = false;
 
         //Are we even logging VBAT?
@@ -171,6 +184,10 @@ function FlightLog(logData) {
     
     this.getNumCellsEstimate = function() {
         return numCells;
+    };
+    
+    this.getNumMotors = function() {
+        return numMotors;
     };
     
     /**
@@ -737,6 +754,8 @@ function FlightLog(logData) {
         parser.parseHeader(logIndexes.getLogBeginOffset(index), logIndexes.getLogBeginOffset(index + 1));
         
         buildFieldNames();
+        
+        estimateNumMotors();
         estimateNumCells();
     };
 }
@@ -750,10 +769,23 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
 };
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
-    return this.vbatToMillivolts(this.getSysConfig().vbatref);
+    return this.vbatADCToMillivolts(this.getSysConfig().vbatref);
 };
 
-FlightLog.prototype.vbatToMillivolts = function(vbat) {
+FlightLog.prototype.vbatADCToMillivolts = function(vbatADC) {
+    var
+        ADCVREF = 33;
+    
     // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
-    return (vbat * 330 * this.getSysConfig().vbatscale) / 0xFFF;
+    return (vbatADC * ADCVREF * 10 * this.getSysConfig().vbatscale) / 0xFFF;
+};
+
+FlightLog.prototype.amperageADCToMillivolts = function(amperageADC) {
+    var
+        ADCVREF = 33,
+        millivolts = (amperageADC * ADCVREF * 100) / 4095;
+    
+    millivolts -= this.getSysConfig().currentMeterOffset;
+
+    return millivolts * 10000 / this.getSysConfig().currentMeterScale;
 };

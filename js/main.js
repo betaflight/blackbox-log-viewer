@@ -142,8 +142,11 @@ function decodeFieldToFriendly(fieldName, value) {
             return flightLog.accRawToGs(value).toFixed(2) + "g";
         
         case 'vbatLatest':
-            return (flightLog.vbatToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
-        
+            return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+
+        case 'amperageLatest':
+            return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+
         case 'heading[0]':
         case 'heading[1]':
         case 'heading[2]':

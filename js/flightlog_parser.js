@@ -86,7 +86,9 @@ var FlightLogParser = function(logData) {
             gyroScale: 0.0001, // Not even close to the default, but it's hardware specific so we can't do much better
             acc_1G: 4096, // Ditto ^
             minthrottle: 1150,
-            maxthrottle: 1850
+            maxthrottle: 1850,
+            currentMeterOffset: 0,
+            currentMeterScale: 400
         },
             
         frameTypes,
@@ -202,11 +204,17 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.vbatref = parseInt(fieldValue, 10);
             break;
             case "vbatcellvoltage":
-                var vbatcellvoltage = fieldValue.split(",");
+                var vbatcellvoltageParams = parseCommaSeparatedIntegers(fieldValue);
     
-                that.sysConfig.vbatmincellvoltage = vbatcellvoltage[0];
-                that.sysConfig.vbatwarningcellvoltage = vbatcellvoltage[1];
-                that.sysConfig.vbatmaxcellvoltage = vbatcellvoltage[2];
+                that.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
+                that.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
+                that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
+            break;
+            case "currentMeter":
+                var currentMeterParams = parseCommaSeparatedIntegers(fieldValue);
+                
+                that.sysConfig.currentMeterOffset = currentMeterParams[0];
+                that.sysConfig.currentMeterScale = currentMeterParams[1];
             break;
             case "gyro.scale":
                 that.sysConfig.gyroScale = hexToFloat(fieldValue);
@@ -219,7 +227,7 @@ var FlightLogParser = function(logData) {
                 }
             break;
             case "acc_1G":
-                that.sysConfig.acc_1G = parseInt(fieldValue);
+                that.sysConfig.acc_1G = parseInt(fieldValue, 10);
             break;
             default:
                 if ((matches = fieldName.match(/^Field (.) predictor$/))) {
