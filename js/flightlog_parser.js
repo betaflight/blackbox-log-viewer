@@ -602,8 +602,8 @@ var FlightLogParser = function(logData) {
         return frameTypes[command];
     }
     
-    this.parseHeader = function(startOffset, endOffset) {
-        //Reset any parsed information from previous parses
+    //Reset any parsed information from previous parses
+    this.resetState = function() {
         this.resetStats();
         
         //Reset system configuration to MW's defaults
@@ -612,6 +612,10 @@ var FlightLogParser = function(logData) {
         this.mainFieldNames = [];
         this.mainFieldCount = 0;
         this.mainFieldNameToIndex = {};
+    };
+    
+    this.parseHeader = function(startOffset, endOffset) {
+        this.resetState();
         
         //Set parsing ranges up
         stream.start = startOffset === undefined ? stream.pos : startOffset;

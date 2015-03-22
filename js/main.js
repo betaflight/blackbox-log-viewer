@@ -290,16 +290,28 @@ function renderLogFileInfo(file) {
     
     for (index = 0; index < logCount; index++) {
         var
+            logLabel,
+            option, holder,
+            error;
+        
+        error = flightLog.getLogError(index);
+        
+        if (error) {
+            logLabel = "Error: " + error;
+        } else {
             logLabel = formatTime(flightLog.getMinTime(index) / 1000, false) 
                 + " - " + formatTime(flightLog.getMaxTime(index) / 1000 , false)
-                + " [" + formatTime(Math.ceil((flightLog.getMaxTime(index) - flightLog.getMinTime(index)) / 1000), false) + "]",
-            option, holder;
+                + " [" + formatTime(Math.ceil((flightLog.getMaxTime(index) - flightLog.getMinTime(index)) / 1000), false) + "]";
+        }
         
         if (logCount > 1) {
             option = $("<option></option>");
         
             option.text((index + 1) + "/" + (flightLog.getLogCount()) + ": " + logLabel);
             option.attr("value", index);
+            
+            if (error)
+                option.attr("disabled", "disabled");
             
             logIndexPicker.append(option);
         } else {

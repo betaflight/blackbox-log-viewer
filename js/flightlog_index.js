@@ -58,9 +58,18 @@ function FlightLogIndex(logData) {
                 matches,
                 throttleTotal,
                 eventInThisChunk = null,
-                sysConfig;
+                sysConfig,
+                parsedHeader;
             
-            parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
+            try {
+                parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
+                parsedHeader = true;
+            } catch (e) {
+                console.log("Error parsing header of log #" + (i + 1) + ": " + e);
+                intraIndex.error = e;
+                
+                parsedHeader = false;
+            }
 
             sysConfig = parser.sysConfig;
             
@@ -132,7 +141,10 @@ function FlightLogIndex(logData) {
                 }
             };
             
-            parser.parseLogData(false);
+            // Only attempt to parse the log if the header wasn't corrupt
+            if (parsedHeader) {
+                parser.parseLogData(false);
+            }
         
             intraframeDirectories.push(intraIndex);
         }

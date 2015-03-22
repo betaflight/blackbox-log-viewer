@@ -40,6 +40,20 @@ function FlightLog(logData) {
     };
     
     /**
+     * Get the parse error encountered when reading the log with the given index, or false if no error
+     * was encountered.
+     */
+    this.getLogError = function(logIndex) {
+        var
+            error = logIndexes.getIntraframeDirectory(logIndex).error;
+        
+        if (error)
+            return error;
+        
+        return false;
+    };
+    
+    /**
      * Get the earliest time seen in the log of the given index, or leave off the logIndex
      * argument to fetch details for the current log.
      */
