@@ -97,36 +97,56 @@ function parseCommaSeparatedIntegers(string) {
 
 /**
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
- * of the next-smaller element (or -1 if `item` is smaller than all values in `list`).
- * @param list
- * @param item
- * @returns
+ * of the next-smaller element (or 0 if `item` is smaller than all values in `list`).
  */
 function binarySearchOrPrevious(list, item) {
     var
         min = 0,
-        max = list.length - 1,
-        guess;
+        max = list.length,
+        mid, 
+        result = 0;
     
-    if (list.length == 0)
-        return -1;
+    while (min < max) {
+        mid = Math.floor((min + max) / 2);
         
-    while (min <= max) {
-        //Use ceil so if we get down to two elements we examine the top one which can shrink our max
-        guess = Math.ceil((min + max) / 2);
-        
-        if (list[guess] === item)
-            return guess;
-        else if (list[guess] < item)
-            if (min == max) //Wouldn't make any progress if min == max, so...
-                return guess;
-            else
-                min = guess; 
-        else
-            max = guess - 1;
+        if (list[mid] === item)
+            return mid;
+        else if (list[mid] < item) {
+            // This might be the largest element smaller than item, but we have to continue the search right to find out
+            result = mid;
+            min = mid + 1;
+        } else
+            max = mid;
     }
     
-    return -1;
+    return result;
+}
+
+/**
+ * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
+ * of the next-larger element (or the index of the last item if `item` is larger than all values in `list`).
+ */
+function binarySearchOrNext(list, item) {
+    var
+        min = 0,
+        max = list.length,
+        mid, 
+        result = list.length - 1;
+    
+    while (min < max) {
+        mid = Math.floor((min + max) / 2);
+        
+        if (list[mid] === item)
+            return mid;
+        else if (list[mid] > item) {
+            // This might be the smallest element larger than item, but we have to continue the search left to find out
+            max = mid;
+            result = mid;
+        } else
+            min = mid + 1;
+    }
+    
+    return result;
 }
 
 function leftPad(string, pad, minLength) {

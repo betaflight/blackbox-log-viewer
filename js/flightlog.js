@@ -523,8 +523,8 @@ function FlightLog(logData) {
              */
             leadingROChunks = 1, trailingROChunks = 1,
             
-            startIndex = Math.max(binarySearchOrPrevious(iframeDirectory.times, startTime - maxSmoothing), 0) - leadingROChunks,
-            endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime + maxSmoothing) + trailingROChunks;
+            startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime - maxSmoothing) - leadingROChunks,
+            endIndex = binarySearchOrNext(iframeDirectory.times, endTime + maxSmoothing) + trailingROChunks;
         
         /* 
          * If our expanded source chunk range exceeds the actual source chunks available, trim down our leadingROChunks
