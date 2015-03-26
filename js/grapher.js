@@ -16,10 +16,10 @@ function FlightLogGrapher(flightLog, canvas, craftCanvas) {
         FONTSIZE_FRAME_LABEL = 9,
         
         lineColors = [
-            "#fb8072",
-            "#8dd3c7",
-            "#ffffb3",
-            "#bebada",
+            "#fb8072", // Red
+            "#8dd3c7", // Cyan
+            "#ffffb3", // Yellow
+            "#bebada", // Purple
             "#80b1d3",
             "#fdb462",
             "#b3de69",

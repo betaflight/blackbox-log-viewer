@@ -146,7 +146,9 @@ function Craft3D(flightLog, canvas, propColors) {
         propShells = new Array(numMotors),
         
         motorOrder,
-        sysInfo = flightLog.getSysConfig();
+        sysInfo = flightLog.getSysConfig(),
+        
+        yawOffset;
     
     scene.add(craft);
     
@@ -156,6 +158,12 @@ function Craft3D(flightLog, canvas, propColors) {
     camera.position.y = 0;
     camera.position.z = 5;
     
+    if (numMotors == 3) {
+        yawOffset = -Math.PI / 2;
+    } else {
+        yawOffset = Math.PI / 4; // Change from "plus" orientation to "X"
+    }
+    
     for (var i = 0; i < numMotors; i++) {
         propMaterials[i] = new THREE.MeshLambertMaterial({color: propColors[i]});
 
@@ -163,16 +171,20 @@ function Craft3D(flightLog, canvas, propColors) {
         
         propShells[i] = propShell;
         
-        propShell.translateX(Math.sin(i / numMotors * Math.PI * 2) * ARM_LENGTH);
-        propShell.translateY(Math.cos(i / numMotors * Math.PI * 2) * ARM_LENGTH);
+        propShell.translateX(Math.cos(i / numMotors * Math.PI * 2) * ARM_LENGTH);
+        propShell.translateY(Math.sin(i / numMotors * Math.PI * 2) * ARM_LENGTH);
         propShell.translateZ(0.10);
         
         craft.add(propShell);
     }
     
+    // Motor numbering in counter-clockwise order starting from the 3 o'clock position
     switch (numMotors) {
+        case 3:
+            motorOrder = [0, 1, 2]; // Put motor 1 at the right
+        break;
         case 4:
-            motorOrder = [1, 0, 2, 3];
+            motorOrder = [1, 3, 2, 0]; // Numbering for quad-plus
         break;
         default:
             motorOrder = new Array(numMotors);
@@ -201,7 +213,7 @@ function Craft3D(flightLog, canvas, propColors) {
         
         craft.rotation.x = -frame[flightLog.getMainFieldIndexByName('heading[1]')] /*- Math.PI / 2*/; // pitch
         craft.rotation.y = frame[flightLog.getMainFieldIndexByName('heading[0]')]; // roll
-        craft.rotation.z = -Math.PI / 4; // Change from "plus" orientation to "X"
+        craft.rotation.z = yawOffset;
         
         //craft.rotation.z -= frame[flightLog.getMainFieldIndexByName('heading[2]')]; // yaw
         
