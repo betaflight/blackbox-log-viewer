@@ -206,13 +206,18 @@ function Craft3D(flightLog, canvas, propColors) {
 
             prop.scale.set(0.95, 0.95, 0.95);
             
+            // Tricopter tail servo
+            /*if (i == 0 && numMotors == 3 && frameFieldIndexes["servo[5]"] !== undefined) {
+                propShells[i].rotation.x = -(frame[frameFieldIndexes["servo[5]"]] - 1500) / 1000 * Math.PI;
+            }*/
+            
             propShells[i].add(prop);
             
             props[i] = prop;
         }
         
-        craft.rotation.x = -frame[flightLog.getMainFieldIndexByName('heading[1]')] /*- Math.PI / 2*/; // pitch
-        craft.rotation.y = frame[flightLog.getMainFieldIndexByName('heading[0]')]; // roll
+        craft.rotation.x = -frame[frameFieldIndexes['heading[1]']] /*- Math.PI / 2*/; // pitch
+        craft.rotation.y = frame[frameFieldIndexes['heading[0]']]; // roll
         craft.rotation.z = yawOffset;
         
         //craft.rotation.z -= frame[flightLog.getMainFieldIndexByName('heading[2]')]; // yaw

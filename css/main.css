@@ -36,10 +36,37 @@ body {
     margin-top:0.5em;
 }
 
-.log-graph {
-    height:600px;
-    position:relative;
+.graph-row {
     margin-top:1em;
+    height:600px;
+    display:none;
+}
+
+.log-graph,
+.log-graph-config {
+    height:100%;
+}
+
+.log-graph {
+    position:relative;
+    flex-grow: 1;
+}
+
+.log-graph-config {
+    flex-basis: 135px;
+}
+
+.log-graph-config {
+    background-color:#222;
+    color:#bbb;
+    padding:1em;
+}
+.log-graph-config h2 {
+    font-size:180%;
+    margin-top:10px;
+}
+.log-graph-config h3 {
+    font-size:130%;
 }
 
 #graphCanvas {
@@ -77,6 +104,20 @@ body {
 
 .log-field-values .raw-value {
     max-width:5em;
+}
+
+.graph-legend-field {
+    padding-bottom:0.1em;
+    margin-bottom:0.3em;
+}
+
+.graph-row {
+    display:none;
+}
+
+html.has-video .graph-row,
+html.has-log .graph-row {
+    display:flex;
 }
 
 html.has-video .log-graph {

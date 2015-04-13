@@ -34,14 +34,15 @@
         <div class="log-metadata">
             <h3 class="log-filename"></h3>
             <div class="log-info form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Log</label>
-                <div class="col-sm-9 log-index">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Log</label>
+                    <div class="col-sm-9 log-index">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Battery</label>
-                <div class="col-sm-9 log-cells form-control-static">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Battery</label>
+                    <div class="col-sm-9 log-cells form-control-static">
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,16 +99,21 @@
             
         </div>
 
-        <div class="log-graph">
-            <video></video>
-            <canvas width="200" height="100" id="graphCanvas"></canvas>
-            <canvas width="0" height="0" id="craftCanvas"></canvas>
+        <div class="graph-row">
+            <div class="log-graph">
+                <video></video>
+                <canvas width="200" height="100" id="graphCanvas"></canvas>
+                <canvas width="0" height="0" id="craftCanvas"></canvas>
+            </div>
+    
+            <div class="log-graph-config">
+                <h2>Legend</h2>
+                <div class="log-graph-legend">
+                </div>
+                <button type="button" style="display:none" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
+            </div>
         </div>
-
-        <div class="log-graph-legend" style="display:none">
-            <button type="button" class="btn btn-default open-graph-configuration-dialog">Configure graphs</button>
-        </div>
-
+        
         <div class="log-seek-bar">
             <canvas width="200" height="100"></canvas>
         </div>
@@ -138,7 +144,6 @@
                     <h4 class="modal-title">Configure graphs</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -165,12 +170,16 @@
     <script src="js/datastream.js"></script>
     <script src="js/decoders.js"></script>
     <script src="js/imu.js"></script>
-    <script src="js/craft3d.js"></script>
+    <script src="js/craft_2d.js"></script>
+    <script src="js/craft_3d.js"></script>
     <script src="js/flightlog_fielddefs.js"></script>
+    <script src="js/flightlog_fields_presenter.js"></script>
     <script src="js/flightlog_parser.js"></script>
     <script src="js/flightlog_index.js"></script>
     <script src="js/flightlog.js"></script>
     <script src="js/grapher.js"></script>
+    <script src="js/graph_config.js"></script>
+    <script src="js/graph_legend.js"></script>
     <script src="js/seekbar.js"></script>
     <script src="js/main.js"></script>
 </body>
