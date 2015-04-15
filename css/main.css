@@ -50,6 +50,7 @@ body {
 .log-graph {
     position:relative;
     flex-grow: 1;
+    background-color: black;
 }
 
 .log-graph-config {
