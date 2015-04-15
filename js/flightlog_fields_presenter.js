@@ -46,6 +46,55 @@ function FlightlogFieldPresenter() {
         'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]'
     };
     
+    FlightlogFieldPresenter.getDefaultCurveForField = function(flightLog, fieldName) {
+        var
+            sysConfig = flightLog.getSysConfig();
+        
+        if (fieldName.match(/^motor\[/)) {
+            return {
+                offset: -(sysConfig.maxthrottle + sysConfig.minthrottle) / 2,
+                power: 1.0,
+                inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^servo\[/)) {
+            return {
+                offset: -1500,
+                power: 1.0,
+                inputRange: 500,
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^gyroData\[/)) {
+            return {
+                offset: 0,
+                power: 0.25,
+                inputRange: 9.0e-6 / sysConfig.gyroScale,
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^accSmooth\[/)) {
+            return {
+                offset: 0,
+                power: 0.7,
+                inputRange: 5000,
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^axis.\[/)) {
+            return {
+                offset: 0,
+                power: 0.7,
+                inputRange: 500,
+                outputRange: 1.0
+            };
+        } else {
+            return {
+                offset: 0,
+                power: 1.0,
+                inputRange: 500,
+                outputRange: 500
+            };
+        }
+    };
+    
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
      * no better representation is available.

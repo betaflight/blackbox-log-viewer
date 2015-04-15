@@ -39,6 +39,11 @@ function ExpoCurve(offset, power, inputRange, outputRange, steps) {
         return result;      
     };
     
+    // If steps argument isn't supplied, use a reasonable default
+    if (steps == undefined) {
+        steps = 10;
+    }
+    
     if (steps <= 2 || power == 1.0) {
         //Curve is actually a straight line
         steps = 0;

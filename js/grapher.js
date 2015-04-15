@@ -48,6 +48,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         
         sysConfig = flightLog.getSysConfig(),
 
+        graphs = [],
         pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
 
         lastMouseX, lastMouseY,
@@ -525,9 +526,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 startFrameIndex--;
             
             // Plot graphs
-            var
-                graphs = graphConfig.getGraphs();
-            
             for (i = 0; i < graphs.length; i++) {
                 var 
                     graph = graphs[i],
@@ -542,7 +540,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                     for (j = 0; j < graph.fields.length; j++) {
                         var field = graph.fields[j];
                         
-                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length]);
+                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, 
+                            field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length]);
                     }
                     
                     if (graph.label) {
@@ -606,14 +605,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     
     function refreshGraphConfig() {
         var 
-            graphs = graphConfig.getGraphs(),
             smoothing = [];
+        
+        graphs = jQuery.extend(true, [], graphConfig.getGraphs());
         
         for (var i = 0; i < graphs.length; i++) {
             for (var j = 0; j < graphs[i].fields.length; j++) {
                 var field = graphs[i].fields[j];
                 
                 field.index = flightLog.getMainFieldIndexByName(field.name);
+                
+                // Convert the field's curve settings into an actual expo curve object:
+                field.curve = new ExpoCurve(field.curve.offset, field.curve.power, field.curve.inputRange, 
+                    field.curve.outputRange, field.curve.steps); 
                 
                 if (field.smoothing > 0) {
                     smoothing.push({field:field.index, radius: field.smoothing});

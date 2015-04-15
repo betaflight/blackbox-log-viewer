@@ -307,14 +307,9 @@ function setVideoTime(newTime) {
 
 function configureGraphs() {
     var 
-        sysConfig = flightLog.getSysConfig(),
-    
-        motorCurve = new ExpoCurve(-(sysConfig.maxthrottle + sysConfig.minthrottle) / 2, 1.0,
-            (sysConfig.maxthrottle - sysConfig.minthrottle) / 2, 1.0, 0),
-        servoCurve = new ExpoCurve(-1500, 1.0, 500, 1.0, 0),
-        gyroCurve = new ExpoCurve(0, 0.25, 9.0e-6 / sysConfig.gyroScale, 1.0, 10),
-        accCurve = new ExpoCurve(0, 0.7, 5000, 1.0, 10),
-        pidCurve = new ExpoCurve(0, 0.7, 500, 1.0, 10),
+        motorCurve = FlightlogFieldPresenter.getDefaultCurveForField(flightLog, "motor[0]"),
+        servoCurve = FlightlogFieldPresenter.getDefaultCurveForField(flightLog, "servo[5]"),
+        gyroCurve = FlightlogFieldPresenter.getDefaultCurveForField(flightLog, "gyroData[0]"),
         
         motorSmoothing = 5000,
         gyroSmoothing = 3000,
@@ -556,7 +551,10 @@ $(document).ready(function() {
     
     $(".open-graph-configuration-dialog").click(function(e) {
         e.preventDefault();
-        $("#dlgGraphConfiguration").modal('show');
+        
+        var dialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), graphConfig);
+        
+        dialog.show();
     });
     
     $(window).resize(updateCanvasSize);
