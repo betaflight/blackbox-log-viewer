@@ -54,7 +54,7 @@ body {
 }
 
 .log-graph-config {
-    flex-basis: 135px;
+    min-width: 135px;
 }
 
 .log-graph-config {
