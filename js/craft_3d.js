@@ -1,22 +1,23 @@
+"use strict";
+
 function Craft3D(flightLog, canvas, propColors) {
     var 
         // Sets the distance between the center point and the center of the motor mount
         ARM_LENGTH = 1,
-        
         NUM_PROP_LEVELS = 100,
-        PROP_RADIUS = 0.5 * ARM_LENGTH,
+        
+        numMotors = propColors.length,
+        propRadius = numMotors == 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
         
         craftMaterial = new THREE.MeshLambertMaterial({ color : 0xA0A0A0 }),
         propMaterials = new Array(propColors),
         propShellMaterial = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, opacity: 0.20, transparent: true});
-        
-        numMotors = propColors.length;
 
     function buildPropGeometry() {
         var 
             props = new Array(NUM_PROP_LEVELS),
             extrudeSettings = {
-                amount: 0.1 * PROP_RADIUS,
+                amount: 0.1 * propRadius,
                 steps: 1,
                 bevelEnabled: false
             };
@@ -30,11 +31,11 @@ function Craft3D(flightLog, canvas, propColors) {
                 
                 if (i == NUM_PROP_LEVELS - 1) {
                     //work around three.js bug that requires the initial point to be on the radius to complete a full circle
-                    shape.moveTo(PROP_RADIUS, 0);
-                    shape.absarc(0, 0, PROP_RADIUS, 0, Math.PI * 2 * i / (NUM_PROP_LEVELS - 1));
+                    shape.moveTo(propRadius, 0);
+                    shape.absarc(0, 0, propRadius, 0, Math.PI * 2 * i / (NUM_PROP_LEVELS - 1));
                 } else {
                     shape.moveTo(0, 0);
-                    shape.absarc(0, 0, PROP_RADIUS, 0, Math.PI * 2 * i / (NUM_PROP_LEVELS - 1));
+                    shape.absarc(0, 0, propRadius, 0, Math.PI * 2 * i / (NUM_PROP_LEVELS - 1));
                 }
 
                 props[i] = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -158,12 +159,6 @@ function Craft3D(flightLog, canvas, propColors) {
     camera.position.y = 0;
     camera.position.z = 5;
     
-    if (numMotors == 3) {
-        yawOffset = -Math.PI / 2;
-    } else {
-        yawOffset = Math.PI / 4; // Change from "plus" orientation to "X"
-    }
-    
     for (var i = 0; i < numMotors; i++) {
         propMaterials[i] = new THREE.MeshLambertMaterial({color: propColors[i]});
 
@@ -182,9 +177,15 @@ function Craft3D(flightLog, canvas, propColors) {
     switch (numMotors) {
         case 3:
             motorOrder = [0, 1, 2]; // Put motor 1 at the right
+            yawOffset = -Math.PI / 2;
         break;
         case 4:
             motorOrder = [1, 3, 2, 0]; // Numbering for quad-plus
+            yawOffset = Math.PI / 4; // Change from "plus" orientation to "X"
+        break;
+        case 8:
+            motorOrder = [5, 1, 4, 0, 7, 3, 6, 2];
+            yawOffset = Math.PI / 8; // Put two motors at the front
         break;
         default:
             motorOrder = new Array(numMotors);
