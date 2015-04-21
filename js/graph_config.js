@@ -199,8 +199,8 @@ GraphConfig.PALETTE = [
         } else if (fieldName.match(/^accSmooth\[/)) {
             return {
                 offset: 0,
-                power: 0.7,
-                inputRange: 5000,
+                power: 0.5,
+                inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
                 outputRange: 1.0
             };
         } else if (fieldName.match(/^axis.\[/)) {
@@ -210,12 +210,33 @@ GraphConfig.PALETTE = [
                 inputRange: 500,
                 outputRange: 1.0
             };
+        } else if (fieldName == "rcCommand[3]") { // Throttle
+            return {
+                offset: -1500,
+                power: 1.0,
+                inputRange: 500,
+                outputRange: 1.0
+            };
+        } else if (fieldName == "rcCommand[2]") { // Yaw
+            return {
+                offset: 0,
+                power: 0.8,
+                inputRange: 500,
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^rcCommand\[/)) {
+            return {
+                offset: 0,
+                power: 0.8,
+                inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
+                outputRange: 1.0
+            };
         } else {
             return {
                 offset: 0,
                 power: 1.0,
                 inputRange: 500,
-                outputRange: 500
+                outputRange: 1.0
             };
         }
     };
