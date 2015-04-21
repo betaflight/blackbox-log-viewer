@@ -605,11 +605,17 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     
     function refreshGraphConfig() {
         var 
-            smoothing = [];
+            smoothing = [],
+            heightSum = 0, allocatedHeight, graphHeight,
+            i, graph;
         
         graphs = jQuery.extend(true, [], graphConfig.getGraphs());
         
-        for (var i = 0; i < graphs.length; i++) {
+        for (i = 0; i < graphs.length; i++) {
+            graph = graphs[i];
+            
+            heightSum += graph.height ? graph.height : 1.0;
+            
             for (var j = 0; j < graphs[i].fields.length; j++) {
                 var field = graphs[i].fields[j];
                 
@@ -623,6 +629,25 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                     smoothing.push({field:field.index, radius: field.smoothing});
                 }
             }
+        }
+        
+        // Lay out the graphs vertically downwards in order
+        allocatedHeight = 0;
+        for (i = 0; i < graphs.length; i++) {
+            graph = graphs[i];
+            
+            graphHeight = graph.height / heightSum;
+            
+            graph.y = allocatedHeight + graphHeight / 2;
+            
+            allocatedHeight += graphHeight;
+        }
+        
+        // Scale the graph heights so they don't overlap
+        for (i = 0; i < graphs.length; i++) {
+            graph = graphs[i];
+
+            graph.height = graph.height / heightSum * 0.95;
         }
     
         flightLog.setFieldSmoothing(smoothing);

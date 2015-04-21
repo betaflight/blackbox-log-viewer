@@ -20,8 +20,13 @@ var
     lastRenderTime = false,
     dataArray, flightLog, 
     graph = null, 
+
+    // JSON graph configuration:
+    graphConfig = {},
     
-    graphConfig = new GraphConfig(),
+    // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
+    activeGraphConfig = new GraphConfig(),
+    
     graphLegend = null,
     fieldPresenter = FlightlogFieldPresenter,
     
@@ -305,51 +310,6 @@ function setVideoTime(newTime) {
     syncLogToVideo();
 }
 
-function configureGraphs() {
-    var 
-        motorCurve = FlightlogFieldPresenter.getDefaultCurveForField(flightLog, "motor[0]"),
-        servoCurve = FlightlogFieldPresenter.getDefaultCurveForField(flightLog, "servo[5]"),
-        gyroCurve = FlightlogFieldPresenter.getDefaultCurveForField(flightLog, "gyroData[0]"),
-        
-        motorSmoothing = 5000,
-        gyroSmoothing = 3000,
-        
-        motorGraphs = {
-            label: "Motors",
-            fields: [],
-            y: 0.25,
-            height: 0.40
-        },
-        
-        i;
-    
-    for (i = 0; i < flightLog.getNumMotors(); i++) {
-        motorGraphs.fields.push({
-            name: "motor[" + i + "]", curve: motorCurve, smoothing: motorSmoothing, color: GraphConfig.PALETTE[i % GraphConfig.PALETTE.length]
-        });
-    }
-    
-    if (flightLog.getMainFieldIndexByName("servo[5]") !== undefined) {
-        motorGraphs.fields.push({
-            name: "servo[5]", curve: servoCurve, smoothing: motorSmoothing, color: GraphConfig.PALETTE[flightLog.getNumMotors() % GraphConfig.PALETTE.length]
-        });
-    }
-    
-    graphConfig.setGraphs([
-         motorGraphs,
-         {
-             label: "Gyros",
-             fields: [
-                 {name: "gyroData[0]", curve: gyroCurve, smoothing: gyroSmoothing, color: GraphConfig.PALETTE[0]},
-                 {name: "gyroData[1]", curve: gyroCurve, smoothing: gyroSmoothing, color: GraphConfig.PALETTE[1]},
-                 {name: "gyroData[2]", curve: gyroCurve, smoothing: gyroSmoothing, color: GraphConfig.PALETTE[2]},
-             ],
-             y: 0.70,
-             height: 0.50
-        }
-    ]);
-}
-
 /**
  * Set the index of the log from the log file that should be viewed.
  */
@@ -360,9 +320,9 @@ function selectLog(logIndex) {
         graph.destroy();
     }
     
-    graph = new FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas);
+    graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas);
 
-    configureGraphs();
+    activeGraphConfig.adaptGraphs(flightLog, graphConfig);
     
     graph.onSeek = function(offset) {
         //Seek faster
@@ -450,8 +410,21 @@ function reportVideoError(e) {
     alert("Your video could not be loaded, your browser might not support this kind of video. Try Google Chrome instead.");
 }
 
+// Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
+$(document).off('.data-api');
+
+graphConfig = JSON.parse(window.localStorage.getItem('graphConfig'));
+
+if (!graphConfig) {
+    graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
+}
+
+activeGraphConfig.addListener(function() {
+    invalidateGraph();
+});
+
 $(document).ready(function() {
-    graphLegend = new GraphLegend($(".log-graph-legend"), graphConfig);
+    graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig);
     
     $("#file-open").change(function(e) {
         var 
@@ -549,12 +522,18 @@ $(document).ready(function() {
         }
     });
     
+    var graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
+        graphConfig = newConfig;
+        
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+        
+        window.localStorage.setItem('graphConfig', JSON.stringify(graphConfig));
+    });
+    
     $(".open-graph-configuration-dialog").click(function(e) {
         e.preventDefault();
         
-        var dialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), graphConfig);
-        
-        dialog.show();
+        graphConfigDialog.show(flightLog, graphConfig);
     });
     
     $(window).resize(updateCanvasSize);

@@ -108,6 +108,9 @@ function FlightLog(logData) {
         };
     };
     
+    /**
+     * Get the index of the field with the given name, or undefined if that field doesn't exist in the log.
+     */
     this.getMainFieldIndexByName = function(name) {
         return fieldNameToIndex[name];
     };

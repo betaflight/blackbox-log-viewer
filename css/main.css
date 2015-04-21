@@ -2,6 +2,13 @@ body {
     padding-bottom:2em;
 }
 
+/* Add an extended wide size to the page container for large monitors */
+@media (min-width: 1400px) {
+    .container {
+        width:1280px;
+    }
+}
+
 .log-info {
     max-width: 30em;
 }
@@ -47,6 +54,10 @@ body {
     height:100%;
 }
 
+.log-graph-legend {
+    font-size:85%;
+}
+
 .log-graph {
     position:relative;
     flex-grow: 1;
@@ -67,8 +78,27 @@ body {
     margin-top:10px;
 }
 .log-graph-config h3 {
-    font-size:130%;
+    font-size:125%;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
 }
+
+.config-graph {
+    margin:0.5em 0;
+}
+.config-graph dd {
+    margin-top:0.5em;
+}
+.config-graph-field {
+    margin:0.5em 0;
+}
+.config-graph-field select {
+    margin-right:4px;
+}
+.config-graph h4 button {
+    margin-left:0.5em;
+}
+
 
 #graphCanvas {
     position:absolute;

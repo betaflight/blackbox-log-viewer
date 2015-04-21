@@ -110,7 +110,7 @@
                 <h2>Legend</h2>
                 <div class="log-graph-legend">
                 </div>
-                <button type="button" style="display:none" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
+                <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
             </div>
         </div>
         
@@ -144,10 +144,19 @@
                     <h4 class="modal-title">Configure graphs</h4>
                 </div>
                 <div class="modal-body">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle config-graphs-add" data-toggle="dropdown" aria-expanded="false">
+                            Add graph <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                        </ul>
+                    </div>
+                    <ul class="list-unstyled config-graphs-list">
+                    </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-default graph-configuration-dialog-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal">Save changes</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -180,6 +189,7 @@
     <script src="js/grapher.js"></script>
     <script src="js/graph_config.js"></script>
     <script src="js/graph_legend.js"></script>
+    <script src="js/graph_config_dialog.js"></script>
     <script src="js/seekbar.js"></script>
     <script src="js/main.js"></script>
 </body>
