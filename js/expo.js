@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Creates a lookup-table based expo curve, which takes values that range between -inputrange and +inputRange, and
+ * scales them to -outputRange to +outputRange with the given power curve (curve <1.0 exaggerates values near the origin,
+ * curve = 1.0 is a straight line mapping). 
+ */
 function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     var
         curve,
@@ -36,7 +41,7 @@ function ExpoCurve(offset, power, inputRange, outputRange, steps) {
 
         if (input < 0)
             return -result;
-        return result;      
+        return result;
     };
     
     // If steps argument isn't supplied, use a reasonable default
