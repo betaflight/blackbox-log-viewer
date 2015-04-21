@@ -8,9 +8,10 @@ function GraphConfigurationDialog(dialog, onSave) {
         exampleGraphs = [];
     
     function renderFieldOption(fieldName, selectedName) {
-        var option = $("<option></option>")
-            .text(FlightlogFieldPresenter.fieldNameToFriendly(fieldName))
-            .attr("value", fieldName);
+        var 
+            option = $("<option></option>")
+                .text(FlightlogFieldPresenter.fieldNameToFriendly(fieldName))
+                .attr("value", fieldName);
     
         if (fieldName == selectedName) {
             option.attr("selected", "selected");
@@ -32,10 +33,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 + '</li>'
             ),
             select = $('select', elem),
-            removeButton = $('button', elem),
-            option,
             selectedFieldName = field ? field.name : false,
-            lastRoot = false,
             i;
         
         for (i = 0; i < offeredFieldNames.length; i++) {
@@ -194,6 +192,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 fieldName = fieldNames[i],
                 matches = fieldName.match(/^(.+)\[[0-9]+\]$/);
             
+            if (BLACKLISTED_FIELDS[fieldName])
+                continue;
+            
             if (matches) {
                 if (matches[1] != lastRoot) {
                     lastRoot = matches[1];
@@ -250,9 +251,10 @@ function GraphConfigurationDialog(dialog, onSave) {
     
     exampleGraphsMenu.on("click", "a", function(e) {
         var 
-            graph = exampleGraphs[$(this).data("graphIndex")];
+            graph = exampleGraphs[$(this).data("graphIndex")],
+            graphElem = renderGraph(flightLog, $(".config-graph", dialog).length, graph);
         
-        $(".config-graphs-list", dialog).append(renderGraph(flightLog, $(".config-graph", dialog).length, graph));
+        $(".config-graphs-list", dialog).append(graphElem);
         
         // Dismiss the dropdown button
         exampleGraphsButton.dropdown("toggle");
