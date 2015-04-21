@@ -231,13 +231,42 @@ GraphConfig.PALETTE = [
                 inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
                 outputRange: 1.0
             };
-        } else {
+        } else if (fieldName == "heading[2]") {
+            return {
+                offset: -Math.PI,
+                power: 1.0,
+                inputRange: Math.PI,
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^heading\[/)) {
             return {
                 offset: 0,
                 power: 1.0,
-                inputRange: 500,
+                inputRange: Math.PI,
                 outputRange: 1.0
             };
+        } else {
+            // Scale and center the field based on the whole-log observed ranges for that field
+            var
+                stats = flightLog.getStats(),
+                fieldIndex = flightLog.getMainFieldIndexByName(fieldName),
+                fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+            
+            if (fieldStat) {
+                return {
+                    offset: -(fieldStat.max + fieldStat.min) / 2,
+                    power: 1.0,
+                    inputRange: (fieldStat.max - fieldStat.min) / 2,
+                    outputRange: 1.0
+                };
+            } else {
+                return {
+                    offset: 0,
+                    power: 1.0,
+                    inputRange: 500,
+                    outputRange: 1.0
+                };
+            }
         }
     };
     

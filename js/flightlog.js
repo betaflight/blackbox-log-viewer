@@ -54,15 +54,23 @@ function FlightLog(logData) {
     };
     
     /**
+     * Get the stats for the log of the given index, or leave off the logIndex argument to fetch the stats
+     * for the current log.
+     */
+    this.getStats = function(logIndex) {
+        if (logIndex === undefined) {
+            return iframeDirectory.stats;
+        } else {
+            return logIndexes.getIntraframeDirectory(logIndex).stats;
+        }
+    };
+    
+    /**
      * Get the earliest time seen in the log of the given index, or leave off the logIndex
      * argument to fetch details for the current log.
      */
     this.getMinTime = function(logIndex) {
-        if (logIndex === undefined) {
-            return iframeDirectory.minTime;
-        } else {
-            return logIndexes.getIntraframeDirectory(logIndex).minTime;
-        }
+        return that.getStats(logIndex).field[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME].min;
     };
     
     /**
@@ -70,11 +78,7 @@ function FlightLog(logData) {
      * argument to fetch details for the current log.
      */
     this.getMaxTime = function(logIndex) {
-        if (logIndex === undefined) {
-            return iframeDirectory.maxTime;
-        } else {
-            return logIndexes.getIntraframeDirectory(logIndex).maxTime;
-        }
+        return that.getStats(logIndex).field[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME].max;
     };
     
     /**
