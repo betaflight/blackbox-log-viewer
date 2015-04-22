@@ -57,7 +57,7 @@ function GraphConfig(graphConfig) {
                     matches,
                     defaultCurve;
                 
-                function adaptField(field) {
+                var adaptField = function(field) {
                     defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
                     
                     if (field.curve === undefined) {
