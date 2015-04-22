@@ -54,6 +54,23 @@ body {
     height:100%;
 }
 
+.log-close-legend-dialog {
+	float: right;
+  	font-size: 14px;
+  	color: #bbb;
+  	position: relative;
+  	top: -10px;
+}
+
+.log-open-legend-dialog {
+	float: right;
+  	color: #bbb;
+ 	padding-right: 14px;
+ 	padding-top: 8px;
+ 	font-size: 14px;
+ 	display: none;
+}
+
 .log-graph-legend {
     font-size:85%;
     flex-grow:1;
@@ -157,9 +174,8 @@ html.has-video .log-graph {
     height:auto;
 }
 html.has-video .log-graph video {
-    position:relative;
     width:100%;
-    height:auto;
+    height:100%;
 }
 html.has-video #graphCanvas {
     background-color:rgba(0,0,0,0.25);

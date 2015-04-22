@@ -30,6 +30,18 @@ function GraphLegend(targetElem, config) {
             }
             
             targetElem.append(graphDiv);
+            
+            $('.log-close-legend-dialog').on('click', function() {
+            	$('.log-graph-config').hide();
+            	$('.log-open-legend-dialog').show();
+            	updateCanvasSize();
+            });
+            
+            $('.log-open-legend-dialog').on('click', function() {
+            	$('.log-graph-config').show();
+            	$('.log-open-legend-dialog').hide();
+            	updateCanvasSize();
+            });
         }
     }
     
