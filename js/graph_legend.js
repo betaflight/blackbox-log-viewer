@@ -1,6 +1,8 @@
 "use strict";
 
-function GraphLegend(targetElem, config) {
+function GraphLegend(targetElem, config, onVisibilityChange) {
+    var
+        that = this;
     
     function buildLegend() {
         var 
@@ -32,18 +34,32 @@ function GraphLegend(targetElem, config) {
             targetElem.append(graphDiv);
             
             $('.log-close-legend-dialog').on('click', function() {
-            	$('.log-graph-config').hide();
-            	$('.log-open-legend-dialog').show();
-            	updateCanvasSize();
+                that.hide();
             });
             
             $('.log-open-legend-dialog').on('click', function() {
-            	$('.log-graph-config').show();
-            	$('.log-open-legend-dialog').hide();
-            	updateCanvasSize();
+                that.show();
             });
         }
     }
+    
+    this.show = function() {
+        $('.log-graph-config').show();
+        $('.log-open-legend-dialog').hide();
+        
+        if (onVisibilityChange) {
+            onVisibilityChange(false);
+        }
+    };
+    
+    this.hide = function() {
+        $('.log-graph-config').hide();
+        $('.log-open-legend-dialog').show();
+        
+        if (onVisibilityChange) {
+            onVisibilityChange(true);
+        }
+    };
     
     config.addListener(buildLegend);
     

@@ -415,6 +415,11 @@ function reportVideoError(e) {
     alert("Your video could not be loaded, your browser might not support this kind of video. Try Google Chrome instead.");
 }
 
+function onLegendVisbilityChange(hidden) {
+    window.localStorage.setItem('log-legend-hidden', hidden);
+    updateCanvasSize();
+}
+
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');
 
@@ -429,7 +434,11 @@ activeGraphConfig.addListener(function() {
 });
 
 $(document).ready(function() {
-    graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig);
+    graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange);
+    
+    if (window.localStorage.getItem('log-legend-hidden') === "true") {
+        graphLegend.hide();
+    }
     
     $("#file-open").change(function(e) {
         var 
