@@ -256,7 +256,7 @@ GraphConfig.PALETTE = [
                 return {
                     offset: -(fieldStat.max + fieldStat.min) / 2,
                     power: 1.0,
-                    inputRange: (fieldStat.max - fieldStat.min) / 2,
+                    inputRange: Math.max((fieldStat.max - fieldStat.min) / 2, 1.0),
                     outputRange: 1.0
                 };
             } else {
