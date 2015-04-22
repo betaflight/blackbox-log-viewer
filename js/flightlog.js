@@ -23,7 +23,8 @@ function FlightLog(logData) {
 
         chunkCache = new FIFOCache(2),
         
-        fieldSmoothing = [],
+        // Map from field indexes to smoothing window size in microseconds
+        fieldSmoothing = {},
         maxSmoothing = 0,
         
         smoothedCache = new FIFOCache(2);
@@ -366,7 +367,7 @@ function FlightLog(logData) {
     };
     
     /* 
-     * Smoothing is an array of {field:1, radius:100000} where radius is in us. You only need to specify fields
+     * Smoothing is map from field index to smoothing radius, where radius is in us. You only need to specify fields
      * which need to be smoothed.
      */
     this.setFieldSmoothing = function(newSmoothing) {
@@ -375,9 +376,9 @@ function FlightLog(logData) {
         
         maxSmoothing = 0;
         
-        for (var i = 0; i < newSmoothing.length; i++) {
-            if (newSmoothing[i].radius > maxSmoothing) {
-                maxSmoothing = newSmoothing[i].radius;
+        for (var fieldIndex in newSmoothing) {
+            if (newSmoothing[fieldIndex] > maxSmoothing) {
+                maxSmoothing = newSmoothing[fieldIndex];
             }
         }
     };
@@ -617,10 +618,9 @@ function FlightLog(logData) {
         }
 
         if (!allDone) {
-            for (var i = 0; i < fieldSmoothing.length; i++) {
+            for (var fieldIndex in fieldSmoothing) {
                 var 
-                    radius = fieldSmoothing[i].radius,
-                    fieldIndex = fieldSmoothing[i].field,
+                    radius = fieldSmoothing[fieldIndex],
                     
                     //The position we're currently computing the smoothed value for:
                     centerChunkIndex, centerFrameIndex;

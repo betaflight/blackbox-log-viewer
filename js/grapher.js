@@ -605,7 +605,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     
     function refreshGraphConfig() {
         var 
-            smoothing = [],
+            smoothing = {},
             heightSum = 0, allocatedHeight, graphHeight,
             i, graph;
         
@@ -626,7 +626,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                     field.curve.outputRange, field.curve.steps); 
                 
                 if (field.smoothing > 0) {
-                    smoothing.push({field:field.index, radius: field.smoothing});
+                    smoothing[field.index] = field.smoothing;
                 }
             }
         }
