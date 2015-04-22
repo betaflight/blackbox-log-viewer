@@ -45,7 +45,7 @@ body {
 
 .graph-row {
     margin-top:1em;
-    height:600px;
+    height:630px;
     display:none;
 }
 
@@ -140,10 +140,6 @@ body {
 .graph-legend-field {
     padding-bottom:0.1em;
     margin-bottom:0.3em;
-}
-
-.graph-row {
-    display:none;
 }
 
 html.has-video .graph-row,
