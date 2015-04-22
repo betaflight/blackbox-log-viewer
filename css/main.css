@@ -55,20 +55,22 @@ body {
 }
 
 .log-close-legend-dialog {
-	float: right;
-  	font-size: 14px;
-  	color: #bbb;
-  	position: relative;
-  	top: -10px;
+    float: right;
+    font-size: 14px;
+    color: #bbb;
+    position: relative;
+    top: -10px;
+    cursor: pointer;
 }
 
 .log-open-legend-dialog {
-	float: right;
-  	color: #bbb;
- 	padding-right: 14px;
- 	padding-top: 8px;
- 	font-size: 14px;
- 	display: none;
+    float: right;
+    color: #bbb;
+    padding-right: 14px;
+    padding-top: 8px;
+    font-size: 14px;
+    display: none;
+    cursor: pointer;
 }
 
 .log-graph-legend {
