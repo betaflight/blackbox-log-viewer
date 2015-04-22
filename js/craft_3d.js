@@ -6,10 +6,17 @@ function Craft3D(flightLog, canvas, propColors) {
         ARM_LENGTH = 1,
         NUM_PROP_LEVELS = 100,
         
+        HUB_RADIUS = ARM_LENGTH * 0.3,
+
+        CRAFT_DEPTH = ARM_LENGTH * 0.08,
+        ARROW_DEPTH = CRAFT_DEPTH * 0.5,
+        
         numMotors = propColors.length,
         propRadius = numMotors == 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
         
         craftMaterial = new THREE.MeshLambertMaterial({ color : 0xA0A0A0 }),
+        arrowMaterial = new THREE.MeshLambertMaterial({ color : 0x404040 }),
+        
         propMaterials = new Array(propColors),
         propShellMaterial = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, opacity: 0.20, transparent: true});
 
@@ -45,13 +52,49 @@ function Craft3D(flightLog, canvas, propColors) {
         return props;
     }
     
+    // Build a direction arrow to go on top of the craft
+    function buildArrow() {
+        var
+            ARROW_STALK_RADIUS = HUB_RADIUS * 0.15,
+            ARROW_STALK_LENGTH = HUB_RADIUS * 0.8,
+            ARROW_HEAD_RADIUS = HUB_RADIUS * 0.55,
+            ARROW_HEAD_LENGTH = HUB_RADIUS * 0.55,
+            
+            ARROW_LENGTH = ARROW_STALK_LENGTH + ARROW_HEAD_LENGTH;
+        
+        var 
+            path = new THREE.Path(),
+            offset = -ARROW_LENGTH / 2;
+        
+        path.moveTo(-ARROW_STALK_RADIUS, 0 + offset);
+        path.lineTo(-ARROW_STALK_RADIUS, ARROW_STALK_LENGTH + offset);
+        path.lineTo(-ARROW_HEAD_RADIUS, ARROW_STALK_LENGTH + offset);
+        path.lineTo(0, ARROW_LENGTH + offset);
+        path.lineTo(ARROW_HEAD_RADIUS, ARROW_STALK_LENGTH + offset);
+        path.lineTo(ARROW_STALK_RADIUS, ARROW_STALK_LENGTH + offset);
+        path.lineTo(ARROW_STALK_RADIUS, 0 + offset);
+        
+        var 
+            shape = path.toShapes(true, false),
+            
+            extrudeSettings = {
+                amount: ARROW_DEPTH,
+                steps: 1,
+                bevelEnabled: false
+            },
+            
+            geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings),
+        
+            arrowMesh = new THREE.Mesh(geometry, arrowMaterial);
+
+        return arrowMesh;
+    }
+    
     function buildCraft() {
         var
             path = new THREE.Path(),
             
             ARM_WIDTH_RADIANS = 0.15,
-            
-            HUB_RADIUS = 0.3,
             
             //How much wider is the motor mount than the arm
             MOTOR_MOUNT_WIDTH_RATIO = 2.0,
@@ -62,9 +105,7 @@ function Craft3D(flightLog, canvas, propColors) {
             //What portion of the arm length is the bevel at the beginning and end of the motor mount
             MOTOR_BEVEL_DEPTH_RATIO = 0.04,
             
-            ARM_WIDTH = 2 * Math.sin(ARM_WIDTH_RADIANS) * HUB_RADIUS,
-            
-            CRAFT_DEPTH = ARM_LENGTH * 0.08;
+            ARM_WIDTH = 2 * Math.sin(ARM_WIDTH_RADIANS) * HUB_RADIUS;
 
         for (i = 0; i < numMotors; i++) {
             var 
@@ -138,9 +179,13 @@ function Craft3D(flightLog, canvas, propColors) {
     
         renderer = new THREE.WebGLRenderer({canvas : canvas, alpha: true}),
     
-        light = new THREE.HemisphereLight(0xd8d8ff, 0x304030, 1.1),
+        light = new THREE.HemisphereLight(0xe4e4ff, 0x405040, 1.1),
         
-        craft = buildCraft(),
+        craft = new THREE.Object3D(),
+        craftParent = new THREE.Object3D(),
+        
+        craftMesh = buildCraft(),
+        arrowMesh = buildArrow(),
         propGeometry = buildPropGeometry(),
         
         props = new Array(numMotors),
@@ -151,7 +196,19 @@ function Craft3D(flightLog, canvas, propColors) {
         
         yawOffset;
     
-    scene.add(craft);
+    // The craft object will hold the props and craft body
+    // We'll rotate this to bring the front direction of the model to the correct position
+    craft.add(craftMesh);
+    
+    // We put that in a container that we'll rotate based on the craft attitude
+    craftParent.add(craft);
+
+    // This allows us to add a craft directional arrow that'll point the same way as the craftMesh
+    arrowMesh.position.z = CRAFT_DEPTH;
+    
+    craftParent.add(arrowMesh);
+    
+    scene.add(craftParent);
     
     light.position.set(1, 1, 1).normalize();
     scene.add(light);
@@ -192,7 +249,11 @@ function Craft3D(flightLog, canvas, propColors) {
             for (var i = 0; i < numMotors; i++) {
                 motorOrder[i] = i;
             }
+            yawOffset = 0;
     }
+    
+    // Rotate the craft mesh and props to bring the board's direction arrow to the right direction
+    craft.rotation.z = yawOffset;
     
     this.render = function(frame, frameFieldIndexes) {
         for (var i = 0; i < numMotors; i++) {
@@ -217,11 +278,11 @@ function Craft3D(flightLog, canvas, propColors) {
             props[i] = prop;
         }
         
-        craft.rotation.x = -frame[frameFieldIndexes['heading[1]']] /*- Math.PI / 2*/; // pitch
-        craft.rotation.y = frame[frameFieldIndexes['heading[0]']]; // roll
-        craft.rotation.z = yawOffset;
+        // Display the craft's attitude
+        craftParent.rotation.x = -frame[frameFieldIndexes['heading[1]']] /*- Math.PI / 2*/; // pitch
+        craftParent.rotation.y = frame[frameFieldIndexes['heading[0]']]; // roll
         
-        //craft.rotation.z -= frame[flightLog.getMainFieldIndexByName('heading[2]')]; // yaw
+        //craftParent.rotation.z = -frame[flightLog.getMainFieldIndexByName('heading[2]')]; // yaw
         
         renderer.render(scene, camera);
     };
