@@ -206,7 +206,7 @@ GraphConfig.PALETTE = [
         } else if (fieldName.match(/^axis.\[/)) {
             return {
                 offset: 0,
-                power: 0.5,
+                power: 0.3,
                 inputRange: 400,
                 outputRange: 1.0
             };
