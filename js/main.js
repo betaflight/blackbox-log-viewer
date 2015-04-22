@@ -314,7 +314,12 @@ function setVideoTime(newTime) {
  * Set the index of the log from the log file that should be viewed.
  */
 function selectLog(logIndex) {
-    flightLog.openLog(logIndex);
+    try {
+        flightLog.openLog(logIndex);
+    } catch (e) {
+        alert("Error opening log: " + e);
+        return;
+    }
     
     if (graph) {
         graph.destroy();
