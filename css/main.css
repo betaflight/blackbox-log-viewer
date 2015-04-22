@@ -56,6 +56,10 @@ body {
 
 .log-graph-legend {
     font-size:85%;
+    flex-grow:1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom:1em;
 }
 
 .log-graph {
@@ -65,17 +69,19 @@ body {
 }
 
 .log-graph-config {
-    min-width: 135px;
-}
-
-.log-graph-config {
     background-color:#222;
     color:#bbb;
     padding:1em;
+    
+    min-width: 135px;
+    flex-grow: 0.02;
+    
+    display:flex;
+    flex-direction:column;
 }
 .log-graph-config h2 {
-    font-size:180%;
-    margin-top:10px;
+    font-size:160%;
+    margin-top:5px;
 }
 .log-graph-config h3 {
     font-size:125%;
