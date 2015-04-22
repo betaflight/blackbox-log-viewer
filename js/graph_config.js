@@ -206,8 +206,8 @@ GraphConfig.PALETTE = [
         } else if (fieldName.match(/^axis.\[/)) {
             return {
                 offset: 0,
-                power: 0.7,
-                inputRange: 500,
+                power: 0.5,
+                inputRange: 400,
                 outputRange: 1.0
             };
         } else if (fieldName == "rcCommand[3]") { // Throttle
