@@ -25,6 +25,12 @@ video. You can tune the alignment of the log manually by pressing the nudge left
 sync section, or by editing the value in the "log sync" box. Positive values move the log toward the end of the video, 
 negative values move it towards the beginning.
 
+## Customizing the graph display
+
+Click the "Graph Setup" button on the right side of the display in order to choose which fields should be plotted on
+the graph. You may, for example, want to remove the default gyro plot and add separate gyro plots for each rotation axis.
+Or you may want to plot vbat against throttle to examine your battery's performance.
+
 ## Notes
 
 This tool has not been tested on Internet Explorer, but definitely won't work on versions earlier than version 9.
@@ -35,9 +41,8 @@ H.264 videos on Mac, so if your video won't play, try Google Chrome instead.
 The best performing web browser tends to be Google Chrome, especially when trying to play your flight video at the same
 time.
 
-This tool is currently in the Alpha stage, so a number of features have yet to be implemented:
+This tool is currently in the Alpha stage, so a number of key features have yet to be implemented:
 
-- There is no option for choosing which values you want to graph
 - There is no control over the amount of smoothing applied to the graph lines
 - There is no way to single-step between loop iterations with the arrow keys
 
