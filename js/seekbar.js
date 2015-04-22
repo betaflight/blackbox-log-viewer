@@ -74,7 +74,7 @@ function SeekBar(canvas) {
         e.preventDefault();
 
         if (e.which == 1) { //Left mouse button only for seeking
-            seekToDOMPixel(e.offsetX);
+            seekToDOMPixel(e.pageX - $(this).offset().left);
             
             //"capture" the mouse so we can drag outside the boundaries of the seek bar
             $("body").on("mousemove", onMouseMove);
