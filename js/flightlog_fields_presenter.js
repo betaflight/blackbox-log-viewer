@@ -53,7 +53,13 @@ function FlightlogFieldPresenter() {
         //End-users prefer 1-based indexing
         'motor[all]': 'motors',
         'motor[0]': 'motor[1]', 'motor[1]': 'motor[2]', 'motor[2]': 'motor[3]', 'motor[3]': 'motor[4]',
-        'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]'
+        'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]',
+        
+        //Virtual fields
+        'PID_SUM[all]': 'PID SUM',
+        'PID_SUM[0]' : 'PID_SUM[roll]',
+        'PID_SUM[1]' : 'PID_SUM[pitch]',
+        'PID_SUM[2]' : 'PID_SUM[yaw]'
     };
 
     /**
