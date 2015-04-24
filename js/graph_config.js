@@ -164,7 +164,7 @@ GraphConfig.PALETTE = [
             return 3000;
         } else if (fieldName.match(/^accSmooth\[/)) {
             return 3000;
-        } else if (fieldName.match(/^axis.\[/)) {
+        } else if (fieldName.match(/^axis.+\[/)) {
             return 3000;
         } else {
             return 0;
@@ -203,7 +203,7 @@ GraphConfig.PALETTE = [
                 inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
                 outputRange: 1.0
             };
-        } else if (fieldName.match(/^axis.\[/)) {
+        } else if (fieldName.match(/^axis.+\[/)) {
             return {
                 offset: 0,
                 power: 0.3,

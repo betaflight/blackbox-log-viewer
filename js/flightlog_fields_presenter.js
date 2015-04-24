@@ -56,10 +56,10 @@ function FlightlogFieldPresenter() {
         'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]',
         
         //Virtual fields
-        'PID_SUM[all]': 'PID SUM',
-        'PID_SUM[0]' : 'PID_SUM[roll]',
-        'PID_SUM[1]' : 'PID_SUM[pitch]',
-        'PID_SUM[2]' : 'PID_SUM[yaw]'
+        'axisSum[all]': 'PID_sum',
+        'axisSum[0]' : 'PID_sum[roll]',
+        'axisSum[1]' : 'PID_sum[pitch]',
+        'axisSum[2]' : 'PID_sum[yaw]'
     };
 
     /**

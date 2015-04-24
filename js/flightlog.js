@@ -164,7 +164,7 @@ function FlightLog(logData) {
         fieldNames = parser.mainFieldNames.slice(0);
         
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
-        fieldNames.push("PID_SUM[0]", "PID_SUM[1]", "PID_SUM[2]");
+        fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
         
         fieldNameToIndex = {};
         for (i = 0; i < fieldNames.length; i++) {
@@ -402,7 +402,7 @@ function FlightLog(logData) {
             sysConfig,
             attitude,
             
-            PID_SUM = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"]],
+            axisSum = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"]],
                        [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"]],
                        [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"]]];
         
@@ -439,7 +439,8 @@ function FlightLog(logData) {
                 for (var i = 0; i < sourceChunk.frames.length; i++) {
                     var 
                         srcFrame = sourceChunk.frames[i],
-                        destFrame = destChunk.frames[i];
+                        destFrame = destChunk.frames[i],
+                        fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
                     
                     attitude = chunkIMU.updateEstimatedAttitude(
                         [srcFrame[gyroData[0]], srcFrame[gyroData[1]], srcFrame[gyroData[2]]],
@@ -449,16 +450,16 @@ function FlightLog(logData) {
                         sysConfig.gyroScale, 
                         magADC ? [srcFrame[magADC[0]], srcFrame[magADC[1]], srcFrame[magADC[2]]] : false);
                     
-                    destFrame[destFrame.length - 6] = attitude.roll;
-                    destFrame[destFrame.length - 5] = attitude.pitch;
-                    destFrame[destFrame.length - 4] = attitude.heading;
+                    destFrame[fieldIndex++] = attitude.roll;
+                    destFrame[fieldIndex++] = attitude.pitch;
+                    destFrame[fieldIndex++] = attitude.heading;
                     
                     // Add PID_SUM
-                    for (var axis=0; axis<3; axis++) {
-                    	 destFrame[destFrame.length - 3 + axis] = 
-                    		 	(PID_SUM[axis][0]!==undefined ? srcFrame[PID_SUM[axis][0]] : 0) + 
-                    		 	(PID_SUM[axis][1]!==undefined ? srcFrame[PID_SUM[axis][1]] : 0) +
-                    		 	(PID_SUM[axis][2]!==undefined ? srcFrame[PID_SUM[axis][2]] : 0);
+                    for (var axis = 0; axis < 3; axis++) {
+                        destFrame[fieldIndex++] = 
+                            (axisSum[axis][0] !== undefined ? srcFrame[axisSum[axis][0]] : 0) + 
+                            (axisSum[axis][1] !== undefined ? srcFrame[axisSum[axis][1]] : 0) +
+                            (axisSum[axis][2] !== undefined ? srcFrame[axisSum[axis][2]] : 0);
                     }
                 }
             }
