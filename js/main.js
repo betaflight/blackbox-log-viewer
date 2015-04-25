@@ -285,9 +285,9 @@ function setGraphState(newState) {
     
     if (graphState == GRAPH_STATE_PLAY) {
         if (hasVideo) {
-        	video.playbackRate = playbackRate;
+            video.playbackRate = playbackRate;
             video.play();
-    	}    
+        }    
         $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
     } else {
         if (hasVideo)
@@ -317,15 +317,15 @@ function setVideoTime(newTime) {
 }
 
 function resetPlaybackRate() {
-	$(".playback-rate-control").val(PLAYBACK_DEFAULT_RATE);
+    $(".playback-rate-control").val(PLAYBACK_DEFAULT_RATE);
 }
 
 function setPlaybackRate(rate) {
-	if (rate>=PLAYBACK_MIN_RATE && rate<=PLAYBACK_MAX_RATE) {
-	  	playbackRate = rate;
-	  	if (hasVideo) video.playbackRate = rate;
-	  	$(".playback-rate").val(rate);
-	}
+    if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
+          playbackRate = rate;
+          if (hasVideo) video.playbackRate = rate;
+          $(".playback-rate").val(rate);
+    }
 }
 
 /**
@@ -579,16 +579,16 @@ $(document).ready(function() {
     });
     
     $(".playback-rate-control").noUiSlider({
-    	start: playbackRate,
-    	connect: false,
-    	step: 0.1,
-    	range: {
-    		'min': [ PLAYBACK_MIN_RATE ],
-    		'50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
-    		'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
-    	}
+        start: playbackRate,
+        connect: false,
+        step: PLAYBACK_RATE_STEP,
+        range: {
+            'min': [ PLAYBACK_MIN_RATE ],
+            '50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
+            'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
+        }
     }).on("slide change set", function() {
-    	setPlaybackRate($(this).val());
+        setPlaybackRate($(this).val());
     });
     
     $(".playback-rate").change(function() {
