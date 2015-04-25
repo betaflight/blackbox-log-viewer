@@ -138,6 +138,10 @@ GraphConfig.PALETTE = [
                 fields: ["gyroData[all]"]
             },
             {
+                label: "PIDs",
+                fields: ["axisSum[all]"]
+            },
+            {
                 label: "Gyro + PID roll",
                 fields: ["axisP[0]", "axisI[0]", "axisD[0]", "gyroData[0]"]
             },
