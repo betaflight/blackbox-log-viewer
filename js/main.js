@@ -287,7 +287,7 @@ function setGraphState(newState) {
         if (hasVideo) {
             video.playbackRate = playbackRate;
             video.play();
-        }    
+        }
         $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
     } else {
         if (hasVideo)
@@ -323,7 +323,9 @@ function resetPlaybackRate() {
 function setPlaybackRate(rate) {
     if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
           playbackRate = rate;
-          if (hasVideo) video.playbackRate = rate;
+          if (hasVideo) {
+              video.playbackRate = rate;
+          }
           $(".playback-rate").val(rate);
     }
 }
@@ -593,7 +595,10 @@ $(document).ready(function() {
     
     $(".playback-rate").change(function() {
         var rate = parseFloat($(this).val());
-        if (!isNaN(rate)) $(".playback-rate-control").val(rate);
+        
+        if (!isNaN(rate)) {
+            $(".playback-rate-control").val(rate);
+        }
     });
     
     seekBar.onSeek = seekBarSeek;
