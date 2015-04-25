@@ -240,6 +240,10 @@ function Craft3D(flightLog, canvas, propColors) {
             motorOrder = [1, 3, 2, 0]; // Numbering for quad-plus
             yawOffset = Math.PI / 4; // Change from "plus" orientation to "X"
         break;
+        case 6:
+            motorOrder = [4, 1, 3, 5, 2, 0];
+            yawOffset = 0;
+        break;
         case 8:
             motorOrder = [5, 1, 4, 0, 7, 3, 6, 2];
             yawOffset = Math.PI / 8; // Put two motors at the front

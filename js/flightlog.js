@@ -164,7 +164,7 @@ function FlightLog(logData) {
         fieldNames = parser.mainFieldNames.slice(0);
         
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
-        fieldNames.push("PID_SUM[0]", "PID_SUM[1]", "PID_SUM[2]");
+        fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
         
         fieldNameToIndex = {};
         for (i = 0; i < fieldNames.length; i++) {
@@ -274,6 +274,7 @@ function FlightLog(logData) {
                      */
                     chunk.gapStartsHere = {};
                     chunk.events = [];
+                    delete chunk.hasAdditionalFields;
                     delete chunk.needsEventTimes;
                     
                     //But reuse the old chunk's frames array since getSmoothedChunks has an independent copy
@@ -292,20 +293,25 @@ function FlightLog(logData) {
                     mainFrameIndex = 0;
                 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
+                    var
+                        destFrame;
+                    
                     if (frameValid) {
                         if (frameType == 'P' || frameType == 'I') {
                             //The parser re-uses the "frame" array so we must copy that data somewhere else
                             
                             //Do we have a recycled chunk to copy on top of?
                             if (chunk.frames[mainFrameIndex]) {
-                                chunk.frames[mainFrameIndex].length = frame.length;
-                                
-                                for (var i = 0; i < frame.length; i++) {
-                                    chunk.frames[mainFrameIndex][i] = frame[i];
-                                }
+                                destFrame = chunk.frames[mainFrameIndex];
+                                destFrame.length = frame.length + ADDITIONAL_COMPUTED_FIELD_COUNT;
                             } else {
-                                //Otherwise allocate a new copy of it
-                                chunk.frames.push(frame.slice(0)); 
+                                // Otherwise allocate a new array
+                                destFrame = new Array(frame.length + ADDITIONAL_COMPUTED_FIELD_COUNT);
+                                chunk.frames.push(destFrame);
+                            }
+                            
+                            for (var i = 0; i < frame.length; i++) {
+                                destFrame[i] = frame[i];
                             }
                             
                             for (var i = 0; i < eventNeedsTimestamp.length; i++) {
@@ -352,6 +358,8 @@ function FlightLog(logData) {
             resultChunks[resultChunks.length - 1].needsEventTimes = true;
         }
         
+        injectComputedFields(resultChunks, resultChunks);
+        
         return resultChunks;
     }
     
@@ -386,10 +394,9 @@ function FlightLog(logData) {
     
     /**
      * Use the data in sourceChunks to compute additional fields (like IMU attitude) and add those into the 
-     * resultChunks. 
+     * resultChunks.
      * 
-     * The idea is that sourceChunks will be unsmoothed original data for reference and resultChunks
-     * will be smoothed chunks to add data on to.
+     * sourceChunks and destChunks can be the same array.
      */
     function injectComputedFields(sourceChunks, destChunks) {
         var
@@ -402,7 +409,7 @@ function FlightLog(logData) {
             sysConfig,
             attitude,
             
-            PID_SUM = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"]],
+            axisPID = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"]],
                        [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"]],
                        [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"]]];
         
@@ -420,7 +427,7 @@ function FlightLog(logData) {
         sourceChunkIndex = 0;
         destChunkIndex = 0;
         
-        // Skip leading source chunks
+        // Skip leading source chunks that don't appear in the destination
         while (sourceChunks[sourceChunkIndex].index < destChunks[destChunkIndex].index) {
             sourceChunkIndex++;
         }
@@ -439,7 +446,8 @@ function FlightLog(logData) {
                 for (var i = 0; i < sourceChunk.frames.length; i++) {
                     var 
                         srcFrame = sourceChunk.frames[i],
-                        destFrame = destChunk.frames[i];
+                        destFrame = destChunk.frames[i],
+                        fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
                     
                     attitude = chunkIMU.updateEstimatedAttitude(
                         [srcFrame[gyroData[0]], srcFrame[gyroData[1]], srcFrame[gyroData[2]]],
@@ -449,16 +457,16 @@ function FlightLog(logData) {
                         sysConfig.gyroScale, 
                         magADC ? [srcFrame[magADC[0]], srcFrame[magADC[1]], srcFrame[magADC[2]]] : false);
                     
-                    destFrame[destFrame.length - 6] = attitude.roll;
-                    destFrame[destFrame.length - 5] = attitude.pitch;
-                    destFrame[destFrame.length - 4] = attitude.heading;
+                    destFrame[fieldIndex++] = attitude.roll;
+                    destFrame[fieldIndex++] = attitude.pitch;
+                    destFrame[fieldIndex++] = attitude.heading;
                     
-                    // Add PID_SUM
-                    for (var axis=0; axis<3; axis++) {
-                    	 destFrame[destFrame.length - 3 + axis] = 
-                    		 	(PID_SUM[axis][0]!==undefined ? srcFrame[PID_SUM[axis][0]] : 0) + 
-                    		 	(PID_SUM[axis][1]!==undefined ? srcFrame[PID_SUM[axis][1]] : 0) +
-                    		 	(PID_SUM[axis][2]!==undefined ? srcFrame[PID_SUM[axis][2]] : 0);
+                    // Add the PID sum
+                    for (var axis = 0; axis < 3; axis++) {
+                        destFrame[fieldIndex++] = 
+                            (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) + 
+                            (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
+                            (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0);
                     }
                 }
             }
@@ -592,13 +600,12 @@ function FlightLog(logData) {
                     resultChunk.frames.length = sourceChunk.frames.length;
                     resultChunk.gapStartsHere = sourceChunk.gapStartsHere;
                     resultChunk.events = sourceChunk.events;
-                    resultChunk.hasAdditionalFields = false;
                     
                     //Copy frames onto the expired chunk:
                     for (var j = 0; j < resultChunk.frames.length; j++) {
                         if (resultChunk.frames[j]) {
                             //Copy on top of the recycled array:
-                            resultChunk.frames[j].length = sourceChunk.frames[j].length + ADDITIONAL_COMPUTED_FIELD_COUNT;
+                            resultChunk.frames[j].length = sourceChunk.frames[j].length;
                             
                             for (var k = 0; k < sourceChunk.frames[j].length; k++) {
                                 resultChunk.frames[j][k] = sourceChunk.frames[j][k];
@@ -606,7 +613,6 @@ function FlightLog(logData) {
                         } else {
                             //Allocate a new copy of the raw array:
                             resultChunk.frames[j] = sourceChunk.frames[j].slice(0);
-                            resultChunk.frames[j].length += ADDITIONAL_COMPUTED_FIELD_COUNT;
                         }
                     }
                 } else {
@@ -620,7 +626,6 @@ function FlightLog(logData) {
                     
                     for (var j = 0; j < resultChunk.frames.length; j++) {
                         resultChunk.frames[j] = sourceChunk.frames[j].slice(0);
-                        resultChunk.frames[j].length += ADDITIONAL_COMPUTED_FIELD_COUNT;
                     }
                 }
                 
@@ -769,7 +774,6 @@ function FlightLog(logData) {
         }
         
         addMissingEventTimes(sourceChunks, trailingROChunks == 0);
-        injectComputedFields(sourceChunks, resultChunks);
         
         verifyChunkIndexes(sourceChunks);
         verifyChunkIndexes(resultChunks);

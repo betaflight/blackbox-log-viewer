@@ -144,8 +144,12 @@ function FlightLogIndex(logData) {
             // Only attempt to parse the log if the header wasn't corrupt
             if (parsedHeader) {
                 parser.parseLogData(false);
-                
                 intraIndex.stats = parser.stats;
+            }
+            
+            // Did we not find any events in this log?
+            if (intraIndex.minTime === false) {
+                intraIndex.error = "Log is truncated, contains no data";
             }
         
             intraframeDirectories.push(intraIndex);
