@@ -9,6 +9,7 @@
 
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="css/jquery.nouislider.min.css">
 <link rel="stylesheet" href="css/main.css">
 
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
@@ -73,7 +74,16 @@
                         <button type="button" class="btn btn-default video-jump-end" title="Jump to end of video">
                             <span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
-                    </div>
+                      </div>
+                </div>
+            </li>
+            <li class="log-playback-rate-panel">
+                <h4>Playback Rate</h4>
+                <div class="form-inline">
+                    <div class="form-group">
+                    	<div class="playback-rate-control btn-group btn-group-vertical"></div> 
+                    	<input type="text" class="form-control playback-rate" value="1.0" size="4">
+                	</div>
                 </div>
             </li>
             <li class="log-sync-panel">
@@ -173,6 +183,7 @@
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
     <script src="js/vendor/three.min.js"></script>
+    <script src="js/vendor/jquery.nouislider.all.min.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/cache.js"></script>
     <script src="js/expo.js"></script>

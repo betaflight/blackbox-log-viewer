@@ -12,7 +12,11 @@ var
     GRAPH_STATE_PAUSED = 0,
     GRAPH_STATE_PLAY = 1,
     
-    SMALL_JUMP_TIME = 100 * 1000;
+    SMALL_JUMP_TIME = 100 * 1000,
+    PLAYBACK_MIN_RATE = 0.1,
+    PLAYBACK_MAX_RATE = 3,
+    PLAYBACK_DEFAULT_RATE = 1,
+    PLAYBACK_RATE_STEP = 0.1;
 
 var
     graphState = GRAPH_STATE_PAUSED,
@@ -46,7 +50,9 @@ var
     
     updateValuesChartRateLimited,
     
-    animationFrameIsQueued = false;
+    animationFrameIsQueued = false,
+    
+    playbackRate = PLAYBACK_DEFAULT_RATE;
 
 function blackboxTimeFromVideoTime() {
     return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -135,7 +141,7 @@ function animationLoop() {
         if (lastRenderTime === false) {
             delta = 0;
         } else {
-            delta = (now - lastRenderTime) * 1000;
+            delta = Math.floor((now - lastRenderTime) * 1000 * playbackRate);
         }
     
         currentBlackboxTime += delta;
@@ -278,14 +284,14 @@ function setGraphState(newState) {
     lastRenderTime = false;
     
     if (graphState == GRAPH_STATE_PLAY) {
-        if (hasVideo)
+        if (hasVideo) {
+        	video.playbackRate = playbackRate;
             video.play();
-        
+    	}    
         $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
     } else {
         if (hasVideo)
             video.pause();
-        
         $(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
     }
     
@@ -308,6 +314,18 @@ function setVideoTime(newTime) {
     video.currentTime = newTime;
 
     syncLogToVideo();
+}
+
+function resetPlaybackRate() {
+	$(".playback-rate-control").val(PLAYBACK_DEFAULT_RATE);
+}
+
+function setPlaybackRate(rate) {
+	if (rate>=PLAYBACK_MIN_RATE && rate<=PLAYBACK_MAX_RATE) {
+	  	playbackRate = rate;
+	  	if (hasVideo) video.playbackRate = rate;
+	  	$(".playback-rate").val(rate);
+	}
 }
 
 /**
@@ -376,6 +394,7 @@ function loadLogFile(file) {
         $("html").addClass("has-log");
         
         selectLog(0);
+        resetPlaybackRate();
     };
 
     reader.readAsArrayBuffer(file);
@@ -395,6 +414,7 @@ function loadVideo(file) {
     videoURL = URL.createObjectURL(file);
     video.volume = 0.05;
     video.src = videoURL;
+    resetPlaybackRate();
 }
 
 function videoLoaded(e) {
@@ -556,6 +576,24 @@ $(document).ready(function() {
         loadedmetadata: updateCanvasSize,
         error: reportVideoError,
         loadeddata: videoLoaded
+    });
+    
+    $(".playback-rate-control").noUiSlider({
+    	start: playbackRate,
+    	connect: false,
+    	step: 0.1,
+    	range: {
+    		'min': [ PLAYBACK_MIN_RATE ],
+    		'50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
+    		'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
+    	}
+    }).on("slide change set", function() {
+    	setPlaybackRate($(this).val());
+    });
+    
+    $(".playback-rate").change(function() {
+        var rate = parseFloat($(this).val());
+        if (!isNaN(rate)) $(".playback-rate-control").val(rate);
     });
     
     seekBar.onSeek = seekBarSeek;

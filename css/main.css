@@ -186,6 +186,7 @@ html.has-video #graphCanvas {
 .video-top-controls > li {
     display:inline-block;
     margin-right:1em;
+    vertical-align: top;
 }
 
 .video-top-controls > .log-sync-panel {
@@ -235,4 +236,9 @@ html.has-log .video-top-controls,
 html.has-video .log-graph,
 html.has-log .log-graph {
     display:block;
+}
+
+.playback-rate-control {
+	width: 100px;
+ 	margin-right: 13px;
 }
