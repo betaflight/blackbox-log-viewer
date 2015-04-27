@@ -75,6 +75,7 @@ body {
 
 .log-graph-legend {
     font-size:85%;
+    -webkit-flex-grow:1;
     flex-grow:1;
     overflow-y: auto;
     overflow-x: hidden;
@@ -83,6 +84,7 @@ body {
 
 .log-graph {
     position:relative;
+    -webkit-flex-grow: 1;
     flex-grow: 1;
     background-color: black;
 }
@@ -93,9 +95,14 @@ body {
     padding:1em;
     
     min-width: 135px;
+    
+    -webkit-flex-grow: 0.02;
     flex-grow: 0.02;
     
+    display:-webkit-flex;
     display:flex;
+    
+    -webkit-flex-direction:column;
     flex-direction:column;
 }
 .log-graph-config h2 {
@@ -169,6 +176,7 @@ body {
 
 html.has-video .graph-row,
 html.has-log .graph-row {
+    display:-webkit-flex;
     display:flex;
 }
 
