@@ -134,7 +134,7 @@ function animationLoop() {
     
     if (hasVideo) {
         currentBlackboxTime = blackboxTimeFromVideoTime();
-    } else {
+    } else if (graphState == GRAPH_STATE_PLAY) {
         var
             delta;
         
@@ -143,14 +143,12 @@ function animationLoop() {
         } else {
             delta = Math.floor((now - lastRenderTime) * 1000 * playbackRate);
         }
-    
+
         currentBlackboxTime += delta;
-        
-        if (graphState == GRAPH_STATE_PLAY) {
-            if (currentBlackboxTime > flightLog.getMaxTime()) {
-                currentBlackboxTime = flightLog.getMaxTime();
-                setGraphState(GRAPH_STATE_PAUSED);
-            }
+
+        if (currentBlackboxTime > flightLog.getMaxTime()) {
+            currentBlackboxTime = flightLog.getMaxTime();
+            setGraphState(GRAPH_STATE_PAUSED);
         }
     }
     
@@ -283,19 +281,23 @@ function setGraphState(newState) {
     
     lastRenderTime = false;
     
-    if (graphState == GRAPH_STATE_PLAY) {
-        if (hasVideo) {
-            video.playbackRate = playbackRate;
-            video.play();
-        }
-        $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
-    } else {
-        if (hasVideo)
-            video.pause();
-        $(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
+    switch (newState) {
+        case GRAPH_STATE_PLAY:
+            if (hasVideo) {
+                video.playbackRate = playbackRate;
+                video.play();
+            }
+            $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
+        break;
+        case GRAPH_STATE_PAUSED:
+            if (hasVideo) {
+                video.pause();
+            }
+            $(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
+        break;
     }
     
-    animationLoop();
+    invalidateGraph();
 }
 
 function setCurrentBlackboxTime(newTime) {
@@ -425,12 +427,6 @@ function videoLoaded(e) {
     $("html").addClass("has-video");
     
     setGraphState(GRAPH_STATE_PAUSED);
-}
-
-function seekBarSeek(time) {
-    setCurrentBlackboxTime(time);
-    
-    invalidateGraph();
 }
 
 function reportVideoError(e) {
@@ -601,5 +597,5 @@ $(document).ready(function() {
         }
     });
     
-    seekBar.onSeek = seekBarSeek;
+    seekBar.onSeek = setCurrentBlackboxTime;
 });
