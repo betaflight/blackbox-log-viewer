@@ -11,6 +11,12 @@ var FlightLogParser = function(logData) {
         FIRMWARE_TYPE_UNKNOWN = 0,
         FIRMWARE_TYPE_BASEFLIGHT = 1,
         FIRMWARE_TYPE_CLEANFLIGHT = 2,
+        
+        //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
+        MAXIMUM_TIME_JUMP_BETWEEN_FRAMES = (10 * 1000000),
+
+        //Likewise for iteration count
+        MAXIMUM_ITERATION_JUMP_BETWEEN_FRAMES = (500 * 10),
 
         // Flight log field predictors:
         
@@ -93,20 +99,47 @@ var FlightLogParser = function(logData) {
             
         frameTypes,
         
-        //Current decoder state:
+        // Blackbox state:
+        mainHistoryRing,
+        
+        /* Points into blackboxHistoryRing to give us a circular buffer.
+        *
+        * 0 - space to decode new frames into, 1 - previous frame, 2 - previous previous frame
+        *
+        * Previous frame pointers are null when no valid history exists of that age.
+        */
+        mainHistory = [null, null, null],
         mainStreamIsValid = false,
         
+        gpsHomeHistory = new Array(2), // 0 - space to decode new frames into, 1 - previous frame
+        gpsHomeIsValid = false,
+
+        //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
         lastEvent,
-        mainHistoryRing,
-        mainHistory,
+        lastGPS,
+    
+        // How many intentionally un-logged frames did we skip over before we decoded the current frame?
+        lastSkippedFrames,
+        
+        // Details about the last main frame that was successfully parsed
+        lastMainFrameIteration,
+        lastMainFrameTime,
         
         //The actual log data stream we're reading:
         stream;
-    
+
     //Public fields:
     this.mainFieldNames = [];
+    this.gpsFieldNames = [];
+    this.gpsHomeFieldNames = [];
+    
     this.mainFieldCount = 0;
+    this.gpsFieldCount = 0;
+    this.gpsHomeFieldCount = 0;
+    
     this.mainFieldNameToIndex = {};
+    this.gpsFieldNameToIndex = {};
+    this.gpsHomeFieldNameToIndex = {};
     
     this.sysConfig = Object.create(defaultSysConfig);
     
@@ -116,7 +149,17 @@ var FlightLogParser = function(logData) {
      */
     this.onFrameReady = null;
     
-    //Private methods:
+    function mapFieldNamesToIndex(fieldNames) {
+        var
+            result = {};
+        
+        for (var i = 0; i < fieldNames.length; i++) {
+            result[fieldNames[i]] = i;
+        }
+
+        return result;
+    }
+    
     function parseHeaderLine() {
         var 
             COLON = ":".charCodeAt(0),
@@ -155,10 +198,19 @@ var FlightLogParser = function(logData) {
                 that.mainFieldNames = fieldValue.split(",");
                 that.mainFieldCount = that.mainFieldNames.length; 
 
-                that.mainFieldNameToIndex = {};
-                for (var i = 0; i < that.mainFieldNames.length; i++) {
-                    that.mainFieldNameToIndex[that.mainFieldNames[i]] = i;
-                }
+                that.mainFieldNameToIndex = mapFieldNamesToIndex(that.mainFieldNames);
+            break;
+            case "Field G name":
+                that.gpsFieldNames = fieldValue.split(",");
+                that.gpsFieldCount = that.gpsFieldNames.length; 
+
+                that.gpsFieldNameToIndex = mapFieldNamesToIndex(that.gpsFieldNames);
+            break;
+            case "Field H name":
+                that.gpsHomeFieldNames = fieldValue.split(",");
+                that.gpsHomeFieldCount = that.gpsHomeFieldNames.length; 
+
+                that.gpsHomeFieldNameToIndex = mapFieldNamesToIndex(that.gpsHomeFieldNames);
             break;
             case "Field I signed":
                 that.mainFieldSigned = parseCommaSeparatedIntegers(fieldValue);
@@ -245,8 +297,10 @@ var FlightLogParser = function(logData) {
         }
     }
 
-    function invalidateStream() {
+    function invalidateMainStream() {
         mainStreamIsValid = false;
+        
+        mainHistory[0] = mainHistoryRing[0];
         mainHistory[1] = null;
         mainHistory[2] = null;
     }
@@ -268,16 +322,31 @@ var FlightLogParser = function(logData) {
     }
 
     function completeIntraframe(frameType, frameStart, frameEnd, raw) {
-        // Only accept this frame as valid if time and iteration count are moving forward:
-        if (raw || !mainHistory[1] 
-            || mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] >= mainHistory[1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION]
-            && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= mainHistory[1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]) {
+        var acceptFrame = true;
+
+        // Do we have a previous frame to use as a reference to validate field values against?
+        if (!raw && lastMainFrameIteration != -1) {
+            /*
+             * Check that iteration count and time both moved forward, and time didn't move forward too much.
+             */
+            acceptFrame =
+                mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] > lastMainFrameIteration
+                && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] < lastMainFrameIteration + MAXIMUM_ITERATION_JUMP_BETWEEN_FRAMES
+                && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= lastMainFrameTime
+                && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] < lastMainFrameTime + MAXIMUM_TIME_JUMP_BETWEEN_FRAMES;
+        }
+
+        if (acceptFrame) {
+            that.stats.intentionallyAbsentIterations += countIntentionallySkippedFramesTo(mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION]);
+
+            lastMainFrameIteration = mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION];
+            lastMainFrameTime = mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
 
             mainStreamIsValid = true;
 
             updateFieldStatistics(mainHistory[0]);
         } else {
-            invalidateStream();
+            invalidateMainStream();
         }
 
         if (that.onFrameReady)
@@ -305,74 +374,146 @@ var FlightLogParser = function(logData) {
     {
         return (frameIndex % that.sysConfig.frameIntervalI + that.sysConfig.frameIntervalPNum - 1) 
             % that.sysConfig.frameIntervalPDenom < that.sysConfig.frameIntervalPNum;
-    }   
+    }
     
-    function parseIntraframe(raw) {
-        var 
-            current, previous,
-            i;
+    /**
+     * Attempt to parse the frame of the given `frameType` into the supplied `frame` buffer using the encoding/predictor
+     * definitions from frameDefs[`frameType`].
+     *
+     * raw - Set to true to disable predictions (and so store raw values)
+     * skippedFrames - Set to the number of field iterations that were skipped over by rate settings since the last frame.
+     */
+    function parseFrame(frameType, current, previous, previous2, fieldCount, skippedFrames, raw)
+    {
+        var
+            predictor = frameDefs[frameType].predictor,
+            encoding = frameDefs[frameType].encoding,
+            values = new Array(8),
+            i, j, groupCount;
 
-        current = mainHistory[0];
-        previous = mainHistory[1];
+        i = 0;
+        while (i < fieldCount) {
+            var
+                value;
 
-        if (previous) {
-            for (var frameIndex = previous[that.FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++)
-                that.stats.intentionallyAbsentIterations++;
-        }
+            if (predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_INC) {
+                current[i] = skippedFrames + 1;
 
-        for (i = 0; i < that.mainFieldCount; i++) {
-            var value;
+                if (previous)
+                    current[i] += previous[i];
 
-            switch (frameDefs["I"].encoding[i]) {
-                case FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB:
-                    value = stream.readSignedVB();
-                break;
-                case FLIGHT_LOG_FIELD_ENCODING_UNSIGNED_VB:
-                    value = stream.readUnsignedVB();
-                break;
-                case FLIGHT_LOG_FIELD_ENCODING_NEG_14BIT:
-                    value = -signExtend14Bit(stream.readUnsignedVB());
-                break;
-                default:
-                    throw "Unsupported I-field encoding " + frameDefs["I"].encoding[i];
-            }
-
-            if (!raw) {
-                //Not many predictors can be used in I-frames since they can't depend on any other frame
-                switch (frameDefs["I"].predictor[i]) {
-                    case FLIGHT_LOG_FIELD_PREDICTOR_0:
-                        //No-op
+                i++;
+            } else {
+                switch (encoding[i]) {
+                    case FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB:
+                        value = stream.readSignedVB();
                     break;
-                    case FLIGHT_LOG_FIELD_PREDICTOR_MINTHROTTLE:
-                        value += that.sysConfig.minthrottle;
+                    case FLIGHT_LOG_FIELD_ENCODING_UNSIGNED_VB:
+                        value = stream.readUnsignedVB();
                     break;
-                    case FLIGHT_LOG_FIELD_PREDICTOR_1500:
-                        value += 1500;
+                    case FLIGHT_LOG_FIELD_ENCODING_NEG_14BIT:
+                        value = -signExtend14Bit(stream.readUnsignedVB());
                     break;
-                    case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
-                        if (that.mainFieldNameToIndex["motor[0]"] < 0) {
-                            throw "Attempted to base I-field prediction on motor0 before it was read";
-                        }
-                        value += current[that.mainFieldNameToIndex["motor[0]"]];
+                    case FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16:
+                        if (dataVersion < 2)
+                            stream.readTag8_4S16_v1(values);
+                        else
+                            stream.readTag8_4S16_v2(values);
+
+                        //Apply the predictors for the fields:
+                        for (j = 0; j < 4; j++, i++)
+                            current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
+
+                        continue;
                     break;
-                    case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
-                        value += that.sysConfig.vbatref;
+                    case FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32:
+                        stream.readTag2_3S32(values);
+
+                        //Apply the predictors for the fields:
+                        for (j = 0; j < 3; j++, i++)
+                            current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
+
+                        continue;
+                    break;
+                    case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
+                        //How many fields are in this encoded group? Check the subsequent field encodings:
+                        for (j = i + 1; j < i + 8 && j < that.mainFieldCount; j++)
+                            if (encoding[j] != FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB)
+                                break;
+
+                        groupCount = j - i;
+
+                        stream.readTag8_8SVB(values, groupCount);
+
+                        for (j = 0; j < groupCount; j++, i++)
+                            current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
+
+                        continue;
+                    break;
+                    case FLIGHT_LOG_FIELD_ENCODING_NULL:
+                        //Nothing to read
+                        value = 0;
                     break;
                     default:
-                        throw "Unsupported I-field predictor " + frameDefs["I"].predictor[i];
+                        throw "Unsupported field encoding " + encoding[i];
                 }
-            }
 
-            current[i] = value;
+                current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], value, current, previous, previous2);
+                i++;
+            }
         }
     }
     
-    function completeInterframe(frameType, frameStart, frameEnd, raw) {
-        if (mainStreamIsValid)
-            updateFieldStatistics(mainHistory[0]);
-        else
-            that.stats.frame["P"].desyncCount++;
+    function parseIntraframe(raw) {
+        var 
+            current = mainHistory[0],
+            previous = mainHistory[1];
 
+        parseFrame('I', current, previous, null, that.mainFieldCount, 0, raw);
+    }
+    
+    function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
+        //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
+        for (var i = 0; i < that.gpsHomeFieldCount; i++) {
+            gpsHomeHistory[1][i] = gpsHomeHistory[0][i];
+        }
+        
+        gpsHomeIsValid = true;
+
+        if (that.onFrameReady) {
+            that.onFrameReady(true, gpsHomeHistory[1], frameType, frameStart, frameEnd - frameStart);
+        }
+
+        return true;
+    }
+
+    function completeGPSFrame(frameType, frameStart, frameEnd, raw) {
+        if (that.onFrameReady) {
+            that.onFrameReady(gpsHomeIsValid, lastGPS, frameType, frameStart, frameEnd - frameStart);
+        }
+        
+        return true;
+    }
+    
+    function completeInterframe(frameType, frameStart, frameEnd, raw) {
+        // Reject this frame if the time or iteration count jumped too far
+        if (mainStreamIsValid && !raw
+                && (
+                    mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] > lastMainFrameTime + MAXIMUM_TIME_JUMP_BETWEEN_FRAMES
+                    || mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] > lastMainFrameIteration + MAXIMUM_ITERATION_JUMP_BETWEEN_FRAMES
+                )) {
+            mainStreamIsValid = false;
+        }
+        
+        if (mainStreamIsValid) {
+            lastMainFrameIteration = mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION];
+            lastMainFrameTime = mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+
+            that.stats.intentionallyAbsentIterations += lastSkippedFrames;
+
+            updateFieldStatistics(mainHistory[0]);
+        }
+        
         //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
 
         if (that.onFrameReady)
@@ -394,133 +535,140 @@ var FlightLogParser = function(logData) {
         }
     }
     
-    function applyInterPrediction(fieldIndex, predictor, value) {
-        var 
-            previous = mainHistory[1],
-            previous2 = mainHistory[2];
-
-        /*
-         * If we don't have a previous state to refer to (e.g. because previous frame was corrupt) don't apply
-         * a prediction. Instead just show the raw values.
-         */
-        if (!previous)
-            predictor = FLIGHT_LOG_FIELD_PREDICTOR_0;
-
+    /**
+     * Take the raw value for a a field, apply the prediction that is configured for it, and return it.
+     */
+    function applyPrediction(fieldIndex, predictor, value, current, previous, previous2)
+    {
         switch (predictor) {
             case FLIGHT_LOG_FIELD_PREDICTOR_0:
                 // No correction to apply
             break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_MINTHROTTLE:
+                value += that.sysConfig.minthrottle;
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_1500:
+                value += 1500;
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
+                if (that.mainFieldNameToIndex["motor[0]"] < 0) {
+                    throw "Attempted to base I-field prediction on motor0 before it was read";
+                }
+                value += current[that.mainFieldNameToIndex["motor[0]"]];
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
+                value += that.sysConfig.vbatref;
+            break;
             case FLIGHT_LOG_FIELD_PREDICTOR_PREVIOUS:
+                if (!previous)
+                    break;
+
                 value += previous[fieldIndex];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_STRAIGHT_LINE:
+                if (!previous)
+                    break;
+
                 value += 2 * previous[fieldIndex] - previous2[fieldIndex];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_AVERAGE_2:
+                if (!previous)
+                    break;
+
                 //Round toward zero like C would do for integer division:
                 value += ~~((previous[fieldIndex] + previous2[fieldIndex]) / 2);
             break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD:
+                if (that.gpsHomeFieldNameToIndex["GPS_home[0]"] === undefined) {
+                    throw "Attempted to base prediction on GPS home position without GPS home frame definition";
+                }
+
+                value += gpsHomeHistory[1][that.gpsHomeFieldNameToIndex["GPS_home[0]"]];
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1:
+                if (that.gpsHomeFieldNameToIndex["GPS_home[1]"] === undefined) {
+                    throw "Attempted to base prediction on GPS home position without GPS home frame definition";
+                }
+
+                value += gpsHomeHistory[1][that.gpsHomeFieldNameToIndex["GPS_home[1]"]];
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME:
+                if (mainHistory[1])
+                    value += mainHistory[1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+            break;
             default:
-                throw "Unsupported P-field predictor %d\n" + predictor;
+                throw "Unsupported field predictor " + predictor;
         }
 
         return value;
     }
-
-    function parseInterframe(raw) {
+    
+    /*
+     * Based on the log sampling rate, work out how many frames would have been skipped after the last frame that was
+     * parsed until we get to the next logged iteration.
+     */
+    function countIntentionallySkippedFrames()
+    {
         var 
-            i, j, groupCount,
+            count = 0, frameIndex;
 
-            current = mainHistory[0],
-            previous = mainHistory[1],
-            
-            frameIndex, skippedFrames = 0;
-
-        if (previous) {
-            //Work out how many frames we skipped to get to this one, based on the log sampling rate
-            for (frameIndex = previous[that.FLIGHT_LOG_FIELD_INDEX_ITERATION] + 1; !shouldHaveFrame(frameIndex); frameIndex++)
-                skippedFrames++;
-        }
-
-        that.stats.intentionallyAbsentIterations += skippedFrames;
-
-        i = 0;
-        while (i < that.mainFieldCount) {
-            var 
-                value, 
-                values = new Array(8);
-
-            if (frameDefs["P"].predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_INC) {
-                current[i] = skippedFrames + 1;
-
-                if (previous)
-                    current[i] += previous[i];
-
-                i++;
-            } else {
-                switch (frameDefs["P"].encoding[i]) {
-                    case FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB:
-                        value = stream.readSignedVB();
-                    break;
-                    case FLIGHT_LOG_FIELD_ENCODING_UNSIGNED_VB:
-                        value = stream.readUnsignedVB();
-                    break;
-                    case FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16:
-                        if (dataVersion < 2)
-                            stream.readTag8_4S16_v1(values);
-                        else
-                            stream.readTag8_4S16_v2(values);
-
-                        //Apply the predictors for the fields:
-                        for (j = 0; j < 4; j++, i++)
-                            current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], values[j]);
-
-                        continue;
-                    break;
-                    case FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32:
-                        stream.readTag2_3S32(values);
-
-                        //Apply the predictors for the fields:
-                        for (j = 0; j < 3; j++, i++)
-                            current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], values[j]);
-
-                        continue;
-                    break;
-                    case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
-                        //How many fields are in this encoded group? Check the subsequent field encodings:
-                        for (j = i + 1; j < i + 8 && j < that.mainFieldCount; j++)
-                            if (frameDefs["P"].encoding[j] != FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB)
-                                break;
-
-                        groupCount = j - i;
-
-                        stream.readTag8_8SVB(values, groupCount);
-
-                        for (j = 0; j < groupCount; j++, i++)
-                            current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], values[j]);
-
-                        continue;
-                    break;
-                    case FLIGHT_LOG_FIELD_ENCODING_NULL:
-                        //Nothing to read
-                        value = 0;
-                    break;
-                    default:
-                        throw "Unsupported P-field encoding %d\n" + frameDefs["P"].encoding[i];
-                }
-
-                current[i] = applyInterPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : frameDefs["P"].predictor[i], value);
-                i++;
+        if (lastMainFrameIteration == -1) {
+            // Haven't parsed a frame yet so there's no frames to skip
+            return 0;
+        } else {
+            for (frameIndex = lastMainFrameIteration + 1; !shouldHaveFrame(frameIndex); frameIndex++) {
+                count++;
             }
         }
+
+        return count;
+    }
+    
+    /*
+     * Based on the log sampling rate, work out how many frames would have been skipped after the last frame that was
+     * parsed until we get to the iteration with the given index.
+     */
+    function countIntentionallySkippedFramesTo(targetIteration)
+    {
+        var
+            count = 0, frameIndex;
+
+        if (lastMainFrameIteration == -1) {
+            // Haven't parsed a frame yet so there's no frames to skip
+            return 0;
+        } else {
+            for (frameIndex = lastMainFrameIteration + 1; frameIndex < targetIteration; frameIndex++) {
+                if (!shouldHaveFrame(frameIndex)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+    
+    function parseInterframe(raw) {
+        var
+            current = mainHistory[0],
+            previous = mainHistory[1],
+            previous2 = mainHistory[2];
+
+        lastSkippedFrames = countIntentionallySkippedFrames();
+
+        parseFrame('P', current, previous, previous2, that.mainFieldCount, lastSkippedFrames, raw);
     }
     
     function parseGPSFrame(raw) {
-        
+        // Only parse a GPS frame if we have GPS header definitions
+        if (that.gpsFieldCount > 0) {
+            parseFrame('G', lastGPS, null, null, that.gpsFieldCount, 0, raw);
+        }
     }
 
     function parseGPSHomeFrame(raw) {
-        
+        if (that.gpsHomeFieldCount > 0) {
+            parseFrame('H', gpsHomeHistory[0], null, null, that.gpsHomeFieldCount, 0, raw);
+        }
     }
 
     function completeEventFrame(frameType, frameStart, frameEnd, raw) {
@@ -610,8 +758,24 @@ var FlightLogParser = function(logData) {
         this.sysConfig = Object.create(defaultSysConfig);
         
         this.mainFieldNames = [];
+        this.gpsFieldNames = [];
+        this.gpsHomeFieldNames = [];
+        
         this.mainFieldCount = 0;
+        this.gpsFieldCount = 0;
+        this.gpsHomeFieldCount = 0;
+        
         this.mainFieldNameToIndex = {};
+        this.gpsFieldNameToIndex = {};
+        this.gpsHomeFieldNameToIndex = {};
+        
+        lastSkippedFrames = 0;
+        
+        lastMainFrameIteration = -1;
+        lastMainFrameTime = -1;
+        
+        mainStreamIsValid = false;
+        gpsHomeIsValid = false;
     };
     
     this.parseHeader = function(startOffset, endOffset) {
@@ -657,6 +821,21 @@ var FlightLogParser = function(logData) {
         if (!frameDefs["I"] || !frameDefs["I"].encoding || !frameDefs["I"].predictor) {
             throw "Log is missing required definitions for I frames, header may be corrupt";
         }
+        
+        // Now we know our field counts, we can allocate arrays to hold parsed data
+        mainHistoryRing = [new Array(this.mainFieldCount), new Array(this.mainFieldCount), new Array(this.mainFieldCount)];
+        gpsHomeHistory = [new Array(this.gpsHomeFieldCount), new Array(this.gpsHomeFieldCount)];
+        lastGPS = new Array(this.gpsFieldCount);
+        
+        /* Home coord predictors appear in pairs (lat/lon), but the predictor ID is the same for both. It's easier to
+         * apply the right predictor during parsing if we rewrite the predictor ID for the second half of the pair here:
+         */
+        for (var i = 1; i < that.gpsFieldCount; i++) {
+            if (frameDefs['G'].predictor[i - 1] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
+                    frameDefs['G'].predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD) {
+                frameDefs['G'].predictor[i] = FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
+            }
+        }
     };
     
     this.parseLogData = function(raw, startOffset, endOffset) {
@@ -667,10 +846,11 @@ var FlightLogParser = function(logData) {
             frameType = null,
             lastFrameType = null;
 
-        mainHistoryRing = [new Array(this.mainFieldCount), new Array(this.mainFieldCount), new Array(this.mainFieldCount)];
-        mainHistory = [mainHistoryRing[0], null, null];
+        invalidateMainStream();
         
-        invalidateStream();
+        lastSkippedFrames = 0;
+        lastMainFrameIteration = -1;
+        lastMainFrameTime = -1;
         
         lastEvent = null;
 
@@ -704,14 +884,19 @@ var FlightLogParser = function(logData) {
                 
                 // If we see what looks like the beginning of a new frame, assume that the previous frame was valid:
                 if (lastFrameSize <= FLIGHT_LOG_MAX_FRAME_LENGTH && looksLikeFrameCompleted) {
-                    //Update statistics for this frame type
-                    frameTypeStats.bytes += lastFrameSize;
-                    frameTypeStats.sizeCount[lastFrameSize]++;
-                    frameTypeStats.validCount++;
-
+                    var frameAccepted = true;
+                    
                     if (lastFrameType.complete)
-                        lastFrameType.complete(lastFrameType.marker, frameStart, stream.pos, raw);
-
+                        frameAccepted = lastFrameType.complete(lastFrameType.marker, frameStart, stream.pos, raw);
+                    
+                    if (frameAccepted) {
+                        //Update statistics for this frame type
+                        frameTypeStats.bytes += lastFrameSize;
+                        frameTypeStats.sizeCount[lastFrameSize]++;
+                        frameTypeStats.validCount++;
+                    } else {
+                        frameTypeStats.desyncCount++;
+                    }
                 } else {
                     //The previous frame was corrupt
 
@@ -764,8 +949,8 @@ var FlightLogParser = function(logData) {
     frameTypes = {
         "I": {marker: "I", parse: parseIntraframe,   complete: completeIntraframe},
         "P": {marker: "P", parse: parseInterframe,   complete: completeInterframe},
-        "G": {marker: "G", parse: parseGPSFrame,     complete: 0},
-        "H": {marker: "H", parse: parseGPSHomeFrame, complete: 0},
+        "G": {marker: "G", parse: parseGPSFrame,     complete: completeGPSFrame},
+        "H": {marker: "H", parse: parseGPSHomeFrame, complete: completeGPSHomeFrame},
         "E": {marker: "E", parse: parseEventFrame,   complete: completeEventFrame}
     };
     
