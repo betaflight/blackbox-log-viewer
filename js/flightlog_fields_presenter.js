@@ -96,6 +96,9 @@ function FlightlogFieldPresenter() {
             case 'heading[1]':
             case 'heading[2]':
                 return (value / Math.PI * 180).toFixed(1) + "°";
+            
+            case 'BaroAlt':
+                return (value / 100).toFixed(1) + "m";
                 
             default:
                 return "";
