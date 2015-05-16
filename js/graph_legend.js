@@ -32,15 +32,15 @@ function GraphLegend(targetElem, config, onVisibilityChange) {
             }
             
             targetElem.append(graphDiv);
-            
-            $('.log-close-legend-dialog').on('click', function() {
-                that.hide();
-            });
-            
-            $('.log-open-legend-dialog').on('click', function() {
-                that.show();
-            });
         }
+
+        $('.log-close-legend-dialog').on('click', function() {
+            that.hide();
+        });
+        
+        $('.log-open-legend-dialog').on('click', function() {
+            that.show();
+        });
     }
     
     this.show = function() {
