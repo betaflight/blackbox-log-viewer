@@ -61,6 +61,36 @@ function FlightLogFieldPresenter() {
         'axisSum[1]' : 'PID_sum[pitch]',
         'axisSum[2]' : 'PID_sum[yaw]'
     };
+    
+    function presentFlags(flags, flagNames) {
+        var 
+            printedFlag = false,
+            i,
+            result = "";
+        
+        i = 0;
+        
+        while (flags > 0) {
+            if ((flags & 1) != 0) {
+                if (printedFlag) {
+                    result += "|";
+                } else {
+                    printedFlag = true;
+                }
+                
+                result += flagNames[i];
+            }
+            
+            flags >>= 1;
+            i++;
+        }
+        
+        if (printedFlag) {
+            return result;
+        } else {
+            return "0"; //No flags set
+        }
+    }
 
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
@@ -99,6 +129,12 @@ function FlightLogFieldPresenter() {
             
             case 'BaroAlt':
                 return (value / 100).toFixed(1) + "m";
+            
+            case 'flightModeFlags':
+                return presentFlags(value, FLIGHT_LOG_FLIGHT_MODE_NAME);
+                
+            case 'stateFlags':
+                return presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
                 
             default:
                 return "";
