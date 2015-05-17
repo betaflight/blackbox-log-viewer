@@ -24,7 +24,7 @@ function GraphConfigurationDialog(dialog, onSave) {
      * Render the element for the "pick a field" dropdown box. Provide "field" from the config in order to set up the
      * initial selection.
      */
-    function renderField(flightLog, field) {
+    function renderField(field) {
         var 
             elem = $(
                 '<li class="config-graph-field">'
@@ -43,7 +43,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         return elem;
     }
     
-    function renderGraph(flightLog, index, graph) {
+    function renderGraph(index, graph) {
         var 
             graphElem = $(
                 '<li class="config-graph">'
@@ -75,14 +75,14 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         // "Add field" button
         $("button", graphElem).click(function(e) {
-            fieldList.append(renderField(flightLog, {}));
+            fieldList.append(renderField({}));
             e.preventDefault();
         });
         
         for (var i = 0; i < graph.fields.length; i++) {
             var 
                 field = graph.fields[i],
-                fieldElem = renderField(flightLog, field);
+                fieldElem = renderField(field);
             
             fieldList.append(fieldElem);
         }
@@ -104,14 +104,14 @@ function GraphConfigurationDialog(dialog, onSave) {
         return graphElem;
     }
     
-    function renderGraphs(flightLog, graphs) {
+    function renderGraphs(graphs) {
         var
             graphList = $(".config-graphs-list", dialog);
         
         graphList.empty();
         
         for (var i = 0; i < graphs.length; i++) {
-            graphList.append(renderGraph(flightLog, i, graphs[i]));
+            graphList.append(renderGraph(i, graphs[i]));
         }
     }
     
@@ -236,7 +236,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         buildOfferedFieldNamesList(flightLog, config);
 
         populateExampleGraphs(flightLog, exampleGraphsMenu);
-        renderGraphs(flightLog, config);
+        renderGraphs(config);
     }
  
     $(".graph-configuration-dialog-save").click(function(e) {
@@ -252,7 +252,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     exampleGraphsMenu.on("click", "a", function(e) {
         var 
             graph = exampleGraphs[$(this).data("graphIndex")],
-            graphElem = renderGraph(flightLog, $(".config-graph", dialog).length, graph);
+            graphElem = renderGraph($(".config-graph", dialog).length, graph);
         
         $(".config-graphs-list", dialog).append(graphElem);
         
