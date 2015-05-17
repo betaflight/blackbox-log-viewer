@@ -1,8 +1,13 @@
 "use strict";
 
 /**
- * Uses a FlightLogParser to provide on-demand parsing (and caching) a flight data log. An index is computed
- * to allow efficient seeking.
+ * Uses a FlightLogParser to provide on-demand parsing (and caching) of the flight data log. 
+ * 
+ * An index is computed to allow efficient seeking.
+ * 
+ * Multiple disparate frame types in the original log are aligned and merged together to provide one time series.
+ * Additional computed fields are derived from the original data set and added as new fields in the resulting data.
+ * Window based smoothing of fields is offered.
  */
 function FlightLog(logData) {
     var
@@ -58,7 +63,7 @@ function FlightLog(logData) {
      * Get the stats for the log of the given index, or leave off the logIndex argument to fetch the stats
      * for the current log.
      */
-    this.getStats = function(logIndex) {
+    function getRawStats(logIndex) {
         if (logIndex === undefined) {
             return iframeDirectory.stats;
         } else {
@@ -67,11 +72,32 @@ function FlightLog(logData) {
     };
     
     /**
+     * Get the stats for the log of the given index, or leave off the logIndex argument to fetch the stats
+     * for the current log.
+     * 
+     * Stats are modified to add a global field[] array which contains merged field stats for the different frame types
+     * that the flightlog presents as one merged frame.
+     */
+    this.getStats = function(logIndex) {
+        var
+            rawStats = getRawStats(logIndex);
+        
+        // Just modify the raw stats variable to add this field, the parser won't mind the extra field appearing:
+        if (rawStats.frame.S) {
+            rawStats.field = rawStats.frame.I.field.concat(rawStats.frame.S.field);
+        } else {
+            rawStats.field = rawStats.frame.I.field;
+        }
+        
+        return rawStats;
+    };
+    
+    /**
      * Get the earliest time seen in the log of the given index, or leave off the logIndex
      * argument to fetch details for the current log.
      */
     this.getMinTime = function(logIndex) {
-        return that.getStats(logIndex).field[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME].min;
+        return getRawStats(logIndex).frame["I"].field[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME].min;
     };
     
     /**
@@ -79,7 +105,7 @@ function FlightLog(logData) {
      * argument to fetch details for the current log.
      */
     this.getMaxTime = function(logIndex) {
-        return that.getStats(logIndex).field[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME].max;
+        return getRawStats(logIndex).frame["I"].field[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME].max;
     };
     
     /**

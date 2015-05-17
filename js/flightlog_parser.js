@@ -319,18 +319,24 @@ var FlightLogParser = function(logData) {
         mainHistory[2] = null;
     }
     
-    function updateMainFieldStatistics(fields) {
-        var i;
+    /**
+     * Use data from the given frame to update field statistics for the given frame type.
+     */
+    function updateFieldStatistics(frameType, frame) {
+        var 
+            i, fieldStats;
 
-        for (i = 0; i < that.frameDefs.I.count; i++) {
-            if (!that.stats.field[i]) {
-                that.stats.field[i] = {
-                    max: fields[i],
-                    min: fields[i]
+        fieldStats = that.stats.frame[frameType].field;
+        
+        for (i = 0; i < frame.length; i++) {
+            if (!fieldStats[i]) {
+                fieldStats[i] = {
+                    max: frame[i],
+                    min: frame[i]
                 };
             } else {
-                that.stats.field[i].max = fields[i] > that.stats.field[i].max ? fields[i] : that.stats.field[i].max;
-                that.stats.field[i].min = fields[i] < that.stats.field[i].min ? fields[i] : that.stats.field[i].min;
+                fieldStats[i].max = frame[i] > fieldStats[i].max ? frame[i] : fieldStats[i].max;
+                fieldStats[i].min = frame[i] < fieldStats[i].min ? frame[i] : fieldStats[i].min;
             }
         }
     }
@@ -358,7 +364,7 @@ var FlightLogParser = function(logData) {
 
             mainStreamIsValid = true;
 
-            updateMainFieldStatistics(mainHistory[0]);
+            updateFieldStatistics(frameType, mainHistory[0]);
         } else {
             invalidateMainStream();
         }
@@ -488,6 +494,8 @@ var FlightLogParser = function(logData) {
     }
     
     function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
+        updateFieldStatistics(frameType, gpsHomeHistory[0]);
+        
         that.setGPSHomeHistory(gpsHomeHistory[0]);
 
         if (that.onFrameReady) {
@@ -498,6 +506,10 @@ var FlightLogParser = function(logData) {
     }
 
     function completeGPSFrame(frameType, frameStart, frameEnd, raw) {
+        if (gpsHomeIsValid) {
+            updateFieldStatistics(frameType, lastGPS);
+        }
+        
         if (that.onFrameReady) {
             that.onFrameReady(gpsHomeIsValid, lastGPS, frameType, frameStart, frameEnd - frameStart);
         }
@@ -506,6 +518,8 @@ var FlightLogParser = function(logData) {
     }
     
     function completeSlowFrame(frameType, frameStart, frameEnd, raw) {
+        updateFieldStatistics(frameType, lastSlow);
+        
         if (that.onFrameReady) {
             that.onFrameReady(true, lastSlow, frameType, frameStart, frameEnd - frameStart);
         }
@@ -529,7 +543,7 @@ var FlightLogParser = function(logData) {
 
             that.stats.intentionallyAbsentIterations += lastSkippedFrames;
 
-            updateMainFieldStatistics(mainHistory[0]);
+            updateFieldStatistics(frameType, mainHistory[0]);
         }
         
         //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
@@ -938,7 +952,8 @@ var FlightLogParser = function(logData) {
                         bytes: 0,
                         sizeCount: new Int32Array(256), /* int32 arrays are zero-filled, handy! */
                         validCount: 0,
-                        corruptCount: 0
+                        corruptCount: 0,
+                        field: []
                     };
                 }
                 
@@ -1030,8 +1045,6 @@ FlightLogParser.prototype.resetStats = function() {
         //If our sampling rate is less than 1, we won't log every loop iteration, and that is accounted for here:
         intentionallyAbsentIterations: 0,
 
-        // Statistics for each field (min/max)
-        field: new Array(256),
         // Statistics for each frame type ("I", "P" etc) 
         frame: {}
     };
