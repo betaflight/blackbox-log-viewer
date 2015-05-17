@@ -79,6 +79,9 @@ function setVideoOffset(offset) {
 function atMost2DecPlaces(value) {
     if (value == (value | 0))
         return value; //it's an integer already
+
+    if (value === null)
+        return "(absent)";
     
     return value.toFixed(2);
 }

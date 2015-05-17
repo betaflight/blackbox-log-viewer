@@ -163,6 +163,14 @@ function FlightLog(logData) {
         // Make an independent copy
         fieldNames = parser.frameDefs.I.name.slice(0);
         
+        // Add names of slow fields which we'll merge into the main stream
+        if (parser.frameDefs.S) {
+            for (i = 0; i < parser.frameDefs.S.name.length; i++) {
+                fieldNames.push(parser.frameDefs.S.name[i]);
+            }
+        }
+        
+        // Add names for our ADDITIONAL_COMPUTED_FIELDS 
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
         
@@ -287,58 +295,86 @@ function FlightLog(logData) {
                     };
                 }
                 
+                // We need to store this in the chunk so we can refer to it later when we inject computed fields
                 chunk.initialIMU = iframeDirectory.initialIMU[chunkIndex];
                 
                 var
-                    mainFrameIndex = 0;
+                    mainFrameIndex = 0,
+                    slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
+                    lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [];
                 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                     var
                         destFrame;
                     
                     if (frameValid) {
-                        if (frameType == 'P' || frameType == 'I') {
-                            //The parser re-uses the "frame" array so we must copy that data somewhere else
-                            
-                            //Do we have a recycled chunk to copy on top of?
-                            if (chunk.frames[mainFrameIndex]) {
-                                destFrame = chunk.frames[mainFrameIndex];
-                                destFrame.length = frame.length + ADDITIONAL_COMPUTED_FIELD_COUNT;
-                            } else {
-                                // Otherwise allocate a new array
-                                destFrame = new Array(frame.length + ADDITIONAL_COMPUTED_FIELD_COUNT);
-                                chunk.frames.push(destFrame);
-                            }
-                            
-                            for (var i = 0; i < frame.length; i++) {
-                                destFrame[i] = frame[i];
-                            }
-                            
-                            for (var i = 0; i < eventNeedsTimestamp.length; i++) {
-                                eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-                            }
-                            eventNeedsTimestamp.length = 0;
-                            
-                            mainFrameIndex++;
-                        } else if (frameType == 'E') {
-                            /* 
-                             * If the event was logged during a loop iteration, it will appear in the log
-                             * before that loop iteration does (since the main log stream is logged at the very
-                             * end of the loop). 
-                             * 
-                             * So we want to use the timestamp of that later frame as the timestamp of the loop 
-                             * iteration this event was logged in.
-                             */
-                            if (!frame.time) {
-                                eventNeedsTimestamp.push(frame);
-                            }
-                            chunk.events.push(frame);
+                        switch (frameType) {
+                            case 'P':
+                            case 'I':
+                                //The parser re-uses the "frame" array so we must copy that data somewhere else
+                                
+                                var
+                                    numOutputFields = frame.length + slowFrameLength + ADDITIONAL_COMPUTED_FIELD_COUNT;
+                                
+                                //Do we have a recycled chunk to copy on top of?
+                                if (chunk.frames[mainFrameIndex]) {
+                                    destFrame = chunk.frames[mainFrameIndex];
+                                    destFrame.length = numOutputFields;
+                                } else {
+                                    // Otherwise allocate a new array
+                                    destFrame = new Array(numOutputFields);
+                                    chunk.frames.push(destFrame);
+                                }
+                                
+                                // Copy the main frame data in
+                                for (var i = 0; i < frame.length; i++) {
+                                    destFrame[i] = frame[i];
+                                }
+                                
+                                // Then merge in the last seen slow-frame data
+                                for (var i = 0; i < slowFrameLength; i++) {
+                                    destFrame[i + frame.length] = lastSlow[i] === undefined ? null : lastSlow[i];
+                                }
+                                
+                                for (var i = 0; i < eventNeedsTimestamp.length; i++) {
+                                    eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                                }
+                                eventNeedsTimestamp.length = 0;
+                                
+                                mainFrameIndex++;
+                            break;
+                            case 'E':
+                                /* 
+                                 * If the event was logged during a loop iteration, it will appear in the log
+                                 * before that loop iteration does (since the main log stream is logged at the very
+                                 * end of the loop). 
+                                 * 
+                                 * So we want to use the timestamp of that later frame as the timestamp of the loop 
+                                 * iteration this event was logged in.
+                                 */
+                                if (!frame.time) {
+                                    eventNeedsTimestamp.push(frame);
+                                }
+                                chunk.events.push(frame);
+                            break;
+                            case 'S':
+                                for (var i = 0; i < frame.length; i++) {
+                                    lastSlow[i] = frame[i];
+                                }
+                            break;
                         }
                     } else {
                         chunk.gapStartsHere[mainFrameIndex - 1] = true;
                     }
                 };
-
+                
+                parser.resetDataState();
+                
+                //Prime the parser with the previous state we get from the flightlog index, so it can base deltas off that data
+                if (iframeDirectory.initialGPSHome) {
+                    parser.setGPSHomeHistory(iframeDirectory.initialGPSHome[chunkIndex]);
+                }
+                
                 parser.parseLogData(false, chunkStartOffset, chunkEndOffset);
                 
                 //Truncate the array to fit just in case it was recycled and the new one is shorter

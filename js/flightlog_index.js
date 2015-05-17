@@ -44,6 +44,8 @@ function FlightLogIndex(logData) {
                     offsets: [],
                     avgThrottle: [],
                     initialIMU: [],
+                    initialSlow: [],
+                    initialGPSHome: [],
                     hasEvent: [],
                     minTime: false,
                     maxTime: false
@@ -57,7 +59,6 @@ function FlightLogIndex(logData) {
                 matches,
                 throttleTotal,
                 eventInThisChunk = null,
-                sysConfig, mainFrameDef,
                 parsedHeader;
             
             try {
@@ -72,12 +73,16 @@ function FlightLogIndex(logData) {
 
             // Only attempt to parse the log if the header wasn't corrupt
             if (parsedHeader) {
-                sysConfig = parser.sysConfig;
-                mainFrameDef = parser.frameDefs.I;
-                
-                gyroData = [mainFrameDef.nameToIndex["gyroData[0]"], mainFrameDef.nameToIndex["gyroData[1]"], mainFrameDef.nameToIndex["gyroData[2]"]];
-                accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]];
-                magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]];
+                var 
+                    sysConfig = parser.sysConfig,
+                    mainFrameDef = parser.frameDefs.I,
+                    
+                    gyroData = [mainFrameDef.nameToIndex["gyroData[0]"], mainFrameDef.nameToIndex["gyroData[1]"], mainFrameDef.nameToIndex["gyroData[2]"]],
+                    accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]],
+                    magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
+                    
+                    lastSlow = [],
+                    lastGPSHome = [];
                 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {
@@ -92,8 +97,13 @@ function FlightLogIndex(logData) {
                 }
                 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-                    if (frameValid) {
-                        if (frameType == 'P' || frameType == 'I') {
+                    if (!frameValid) {
+                        return;
+                    }
+                    
+                    switch (frameType) {
+                        case 'P':
+                        case 'I':
                             var 
                                 frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
                             
@@ -114,13 +124,20 @@ function FlightLogIndex(logData) {
                                     
                                     if (motorFields.length) {
                                         throttleTotal = 0;
-                                        for (var j = 0; j < motorFields.length; j++)
+                                        for (var j = 0; j < motorFields.length; j++) {
                                             throttleTotal += frame[motorFields[j]];
+                                        }
                                         
                                         intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
                                     }
                                     
+                                    /* To enable seeking to an arbitrary point in the log without re-reading anything
+                                     * that came before, we have to record the initial state of various items which aren't
+                                     * logged anew every iteration.
+                                     */ 
                                     intraIndex.initialIMU.push(new IMU(imu));
+                                    intraIndex.initialSlow.push(lastSlow);
+                                    intraIndex.initialGPSHome.push(lastGPSHome);
                                 }
                                 
                                 iframeCount++;
@@ -134,16 +151,33 @@ function FlightLogIndex(logData) {
                                 sysConfig.gyroScale, 
                                 magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
                             );
-                        } else if (frameType == 'E') {
+                        break;
+                        case 'H':
+                            lastGPSHome = frame.slice(0);
+                        break;
+                        case 'E':
                             // Mark that there was an event inside the current chunk
                             if (intraIndex.times.length > 0) {
                                 intraIndex.hasEvent[intraIndex.times.length - 1] = true;
                             }
-                        }
+                        break;
+                        case 'S':
+                            lastSlow = frame.slice(0);
+                        break;
                     }
                 };
             
                 parser.parseLogData(false);
+                
+                // Don't bother including the initial (empty) states for S and H frames if we didn't have any in the source data
+                if (!parser.frameDefs.S) {
+                    delete intraIndex.initialSlow;
+                }
+
+                if (!parser.frameDefs.H) {
+                    delete intraIndex.initialGPSHome;
+                }
+
                 intraIndex.stats = parser.stats;
             }
             

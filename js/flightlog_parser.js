@@ -115,6 +115,7 @@ var FlightLogParser = function(logData) {
         //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
         lastEvent,
         lastGPS,
+        lastSlow,
     
         // How many intentionally un-logged frames did we skip over before we decoded the current frame?
         lastSkippedFrames,
@@ -487,15 +488,10 @@ var FlightLogParser = function(logData) {
     }
     
     function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
-        //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
-        for (var i = 0; i < that.frameDefs.H.count; i++) {
-            gpsHomeHistory[1][i] = gpsHomeHistory[0][i];
-        }
-        
-        gpsHomeIsValid = true;
+        that.setGPSHomeHistory(gpsHomeHistory[0]);
 
         if (that.onFrameReady) {
-            that.onFrameReady(true, gpsHomeHistory[1], frameType, frameStart, frameEnd - frameStart);
+            that.onFrameReady(true, gpsHomeHistory[0], frameType, frameStart, frameEnd - frameStart);
         }
 
         return true;
@@ -504,6 +500,14 @@ var FlightLogParser = function(logData) {
     function completeGPSFrame(frameType, frameStart, frameEnd, raw) {
         if (that.onFrameReady) {
             that.onFrameReady(gpsHomeIsValid, lastGPS, frameType, frameStart, frameEnd - frameStart);
+        }
+        
+        return true;
+    }
+    
+    function completeSlowFrame(frameType, frameStart, frameEnd, raw) {
+        if (that.onFrameReady) {
+            that.onFrameReady(true, lastSlow, frameType, frameStart, frameEnd - frameStart);
         }
         
         return true;
@@ -682,6 +686,12 @@ var FlightLogParser = function(logData) {
     function parseGPSHomeFrame(raw) {
         if (that.frameDefs.H) {
             parseFrame(that.frameDefs.H, gpsHomeHistory[0], null, null, 0, raw);
+        }
+    }
+    
+    function parseSlowFrame(raw) {
+        if (that.frameDefs.S) {
+            parseFrame(that.frameDefs.S, lastSlow, null, null, 0, raw);
         }
     }
 
@@ -864,8 +874,38 @@ var FlightLogParser = function(logData) {
             gpsHomeHistory = [];
             lastGPS = [];
         }
+        
+        if (this.frameDefs.S) {
+            lastSlow = new Array(this.frameDefs.S.count);
+        } else {
+            lastSlow = [];
+        }
     };
     
+    /**
+     * Set the current GPS home data to the given frame. Pass an empty array in in order to invalidate the GPS home
+     * frame data.
+     * 
+     * (The data is stored in gpsHomeHistory[1])
+     */
+    this.setGPSHomeHistory = function(newGPSHome) {
+        if (newGPSHome.length == that.frameDefs.H.count) {
+            //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
+            for (var i = 0; i < newGPSHome.length; i++) {
+                gpsHomeHistory[1][i] = newGPSHome[i];
+            }
+            
+            gpsHomeIsValid = true;
+        } else {
+            gpsHomeIsValid = false;
+        }
+    };
+    
+    
+    /**
+     * Continue the current parse by scanning the given range of offsets for data. To begin an independent parse,
+     * call resetDataState() first.
+     */
     this.parseLogData = function(raw, startOffset, endOffset) {
         var 
             looksLikeFrameCompleted = false,
@@ -874,8 +914,8 @@ var FlightLogParser = function(logData) {
             frameType = null,
             lastFrameType = null;
 
-        this.resetDataState();
-
+        invalidateMainStream();
+        
         //Set parsing ranges up for the log the caller selected
         stream.start = startOffset === undefined ? stream.pos : startOffset;
         stream.pos = stream.start;
@@ -973,6 +1013,7 @@ var FlightLogParser = function(logData) {
         "P": {marker: "P", parse: parseInterframe,   complete: completeInterframe},
         "G": {marker: "G", parse: parseGPSFrame,     complete: completeGPSFrame},
         "H": {marker: "H", parse: parseGPSHomeFrame, complete: completeGPSHomeFrame},
+        "S": {marker: "S", parse: parseSlowFrame,    complete: completeSlowFrame},
         "E": {marker: "E", parse: parseEventFrame,   complete: completeEventFrame}
     };
     
