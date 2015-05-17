@@ -74,8 +74,6 @@ var FlightLogParser = function(logData) {
     var
         that = this,
                 
-        //Information about fields which we need to decode them properly. Have "encoding" and "predictor" arrays.
-        frameDefs = {},
         dataVersion,
         
         defaultSysConfig = {
@@ -129,17 +127,11 @@ var FlightLogParser = function(logData) {
         stream;
 
     //Public fields:
-    this.mainFieldNames = [];
-    this.gpsFieldNames = [];
-    this.gpsHomeFieldNames = [];
-    
-    this.mainFieldCount = 0;
-    this.gpsFieldCount = 0;
-    this.gpsHomeFieldCount = 0;
-    
-    this.mainFieldNameToIndex = {};
-    this.gpsFieldNameToIndex = {};
-    this.gpsHomeFieldNameToIndex = {};
+
+    /* Information about the frame types the log contains, along with details on their fields.
+     * Each entry is an object with field details {encoding:[], predictor:[], name:[], count:0, signed:[]}
+     */
+    this.frameDefs = {};
     
     this.sysConfig = Object.create(defaultSysConfig);
     
@@ -194,27 +186,6 @@ var FlightLogParser = function(logData) {
         fieldValue = asciiArrayToString(stream.data.subarray(separatorPos + 1, lineEnd));
 
         switch (fieldName) {
-            case "Field I name":
-                that.mainFieldNames = fieldValue.split(",");
-                that.mainFieldCount = that.mainFieldNames.length; 
-
-                that.mainFieldNameToIndex = mapFieldNamesToIndex(that.mainFieldNames);
-            break;
-            case "Field G name":
-                that.gpsFieldNames = fieldValue.split(",");
-                that.gpsFieldCount = that.gpsFieldNames.length; 
-
-                that.gpsFieldNameToIndex = mapFieldNamesToIndex(that.gpsFieldNames);
-            break;
-            case "Field H name":
-                that.gpsHomeFieldNames = fieldValue.split(",");
-                that.gpsHomeFieldCount = that.gpsHomeFieldNames.length; 
-
-                that.gpsHomeFieldNameToIndex = mapFieldNamesToIndex(that.gpsHomeFieldNames);
-            break;
-            case "Field I signed":
-                that.mainFieldSigned = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "I interval":
                 that.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
                 if (that.sysConfig.frameIntervalI < 1)
@@ -281,17 +252,59 @@ var FlightLogParser = function(logData) {
             case "acc_1G":
                 that.sysConfig.acc_1G = parseInt(fieldValue, 10);
             break;
+            case "Product":
+            case "Blackbox version":
+            case "Firmware revision":
+            case "Firmware date":
+                // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
+            break;
             default:
-                if ((matches = fieldName.match(/^Field (.) predictor$/))) {
-                    if (!frameDefs[matches[1]])
-                        frameDefs[matches[1]] = {};
+                if ((matches = fieldName.match(/^Field (.) (.+)$/))) {
+                    var 
+                        frameName = matches[1],
+                        frameInfo = matches[2],
+                        frameDef;
                     
-                    frameDefs[matches[1]].predictor = parseCommaSeparatedIntegers(fieldValue);
-                } else if ((matches = fieldName.match(/^Field (.) encoding$/))) {
-                    if (!frameDefs[matches[1]])
-                        frameDefs[matches[1]] = {};
+                    if (!that.frameDefs[frameName]) {
+                        that.frameDefs[frameName] = {
+                            name: [],
+                            nameToIndex: {},
+                            count: 0,
+                            signed: [],
+                            predictor: [],
+                            encoding: [],
+                        };
+                    }
                     
-                    frameDefs[matches[1]].encoding = parseCommaSeparatedIntegers(fieldValue);
+                    frameDef = that.frameDefs[frameName];
+                    
+                    switch (frameInfo) {
+                        case "predictor":
+                            frameDef.predictor = parseCommaSeparatedIntegers(fieldValue);
+                        break;
+                        case "encoding":
+                            frameDef.encoding = parseCommaSeparatedIntegers(fieldValue);
+                        break;
+                        case "name":
+                            frameDef.name = fieldValue.split(",");
+                            frameDef.count = frameDef.name.length;
+
+                            frameDef.nameToIndex = mapFieldNamesToIndex(frameDef.name);
+                            
+                            /* 
+                             * We could survive with the `signed` header just being filled with zeros, so if it is absent 
+                             * then resize it to length. 
+                             */
+                            frameDef.signed.length = frameDef.count;
+                        break;
+                        case "signed":
+                            frameDef.signed = parseCommaSeparatedIntegers(fieldValue);
+                        break;
+                        default:
+                            console.log("Saw unsupported field header \"" + fieldName + "\"");
+                    }
+                } else {
+                    console.log("Ignoring unsupported header \"" + fieldName + "\"");
                 }
             break;
         }
@@ -300,15 +313,15 @@ var FlightLogParser = function(logData) {
     function invalidateMainStream() {
         mainStreamIsValid = false;
         
-        mainHistory[0] = mainHistoryRing[0];
+        mainHistory[0] = mainHistoryRing ? mainHistoryRing[0]: null;
         mainHistory[1] = null;
         mainHistory[2] = null;
     }
     
-    function updateFieldStatistics(fields) {
+    function updateMainFieldStatistics(fields) {
         var i;
 
-        for (i = 0; i < that.mainFieldCount; i++) {
+        for (i = 0; i < that.frameDefs["I"].count; i++) {
             if (!that.stats.field[i]) {
                 that.stats.field[i] = {
                     max: fields[i],
@@ -344,7 +357,7 @@ var FlightLogParser = function(logData) {
 
             mainStreamIsValid = true;
 
-            updateFieldStatistics(mainHistory[0]);
+            updateMainFieldStatistics(mainHistory[0]);
         } else {
             invalidateMainStream();
         }
@@ -377,22 +390,23 @@ var FlightLogParser = function(logData) {
     }
     
     /**
-     * Attempt to parse the frame of the given `frameType` into the supplied `frame` buffer using the encoding/predictor
-     * definitions from frameDefs[`frameType`].
+     * Attempt to parse the frame of into the supplied `current` buffer using the encoding/predictor
+     * definitions from `frameDefs`. The previous frame values are used for predictions.
      *
+     * frameDef - The definition for the frame type being parsed (from this.frameDefs)
      * raw - Set to true to disable predictions (and so store raw values)
      * skippedFrames - Set to the number of field iterations that were skipped over by rate settings since the last frame.
      */
-    function parseFrame(frameType, current, previous, previous2, fieldCount, skippedFrames, raw)
+    function parseFrame(frameDef, current, previous, previous2, skippedFrames, raw)
     {
         var
-            predictor = frameDefs[frameType].predictor,
-            encoding = frameDefs[frameType].encoding,
+            predictor = frameDef.predictor,
+            encoding = frameDef.encoding,
             values = new Array(8),
             i, j, groupCount;
 
         i = 0;
-        while (i < fieldCount) {
+        while (i < frameDef.count) {
             var
                 value;
 
@@ -437,7 +451,7 @@ var FlightLogParser = function(logData) {
                     break;
                     case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
                         //How many fields are in this encoded group? Check the subsequent field encodings:
-                        for (j = i + 1; j < i + 8 && j < that.mainFieldCount; j++)
+                        for (j = i + 1; j < i + 8 && j < frameDef.count; j++)
                             if (encoding[j] != FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB)
                                 break;
 
@@ -469,12 +483,12 @@ var FlightLogParser = function(logData) {
             current = mainHistory[0],
             previous = mainHistory[1];
 
-        parseFrame('I', current, previous, null, that.mainFieldCount, 0, raw);
+        parseFrame(that.frameDefs["I"], current, previous, null, 0, raw);
     }
     
     function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
         //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
-        for (var i = 0; i < that.gpsHomeFieldCount; i++) {
+        for (var i = 0; i < that.frameDefs["H"].count; i++) {
             gpsHomeHistory[1][i] = gpsHomeHistory[0][i];
         }
         
@@ -511,7 +525,7 @@ var FlightLogParser = function(logData) {
 
             that.stats.intentionallyAbsentIterations += lastSkippedFrames;
 
-            updateFieldStatistics(mainHistory[0]);
+            updateMainFieldStatistics(mainHistory[0]);
         }
         
         //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
@@ -551,10 +565,10 @@ var FlightLogParser = function(logData) {
                 value += 1500;
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
-                if (that.mainFieldNameToIndex["motor[0]"] < 0) {
+                if (that.frameDefs["I"].nameToIndex["motor[0]"] < 0) {
                     throw "Attempted to base I-field prediction on motor0 before it was read";
                 }
-                value += current[that.mainFieldNameToIndex["motor[0]"]];
+                value += current[that.frameDefs["I"].nameToIndex["motor[0]"]];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
                 value += that.sysConfig.vbatref;
@@ -579,18 +593,18 @@ var FlightLogParser = function(logData) {
                 value += ~~((previous[fieldIndex] + previous2[fieldIndex]) / 2);
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD:
-                if (that.gpsHomeFieldNameToIndex["GPS_home[0]"] === undefined) {
+                if (!that.frameDefs["H"] || that.frameDefs["H"].nameToIndex["GPS_home[0]"] === undefined) {
                     throw "Attempted to base prediction on GPS home position without GPS home frame definition";
                 }
 
-                value += gpsHomeHistory[1][that.gpsHomeFieldNameToIndex["GPS_home[0]"]];
+                value += gpsHomeHistory[1][that.frameDefs["H"].nameToIndex["GPS_home[0]"]];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1:
-                if (that.gpsHomeFieldNameToIndex["GPS_home[1]"] === undefined) {
+                if (!that.frameDefs["H"] || that.frameDefs["H"].nameToIndex["GPS_home[1]"] === undefined) {
                     throw "Attempted to base prediction on GPS home position without GPS home frame definition";
                 }
 
-                value += gpsHomeHistory[1][that.gpsHomeFieldNameToIndex["GPS_home[1]"]];
+                value += gpsHomeHistory[1][that.frameDefs["H"].nameToIndex["GPS_home[1]"]];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME:
                 if (mainHistory[1])
@@ -655,19 +669,19 @@ var FlightLogParser = function(logData) {
 
         lastSkippedFrames = countIntentionallySkippedFrames();
 
-        parseFrame('P', current, previous, previous2, that.mainFieldCount, lastSkippedFrames, raw);
+        parseFrame(that.frameDefs["P"], current, previous, previous2, lastSkippedFrames, raw);
     }
     
     function parseGPSFrame(raw) {
         // Only parse a GPS frame if we have GPS header definitions
-        if (that.gpsFieldCount > 0) {
-            parseFrame('G', lastGPS, null, null, that.gpsFieldCount, 0, raw);
+        if (that.frameDefs["G"]) {
+            parseFrame(that.frameDefs["G"], lastGPS, null, null, 0, raw);
         }
     }
 
     function parseGPSHomeFrame(raw) {
-        if (that.gpsHomeFieldCount > 0) {
-            parseFrame('H', gpsHomeHistory[0], null, null, that.gpsHomeFieldCount, 0, raw);
+        if (that.frameDefs["H"]) {
+            parseFrame(that.frameDefs["H"], gpsHomeHistory[0], null, null, 0, raw);
         }
     }
 
@@ -750,36 +764,37 @@ var FlightLogParser = function(logData) {
         return frameTypes[command];
     }
     
-    //Reset any parsed information from previous parses
-    this.resetState = function() {
+    // Reset parsing state from the data section of the current log (don't reset header information). Useful for seeking.
+    this.resetDataState = function() {
+        lastSkippedFrames = 0;
+        
+        lastMainFrameIteration = -1;
+        lastMainFrameTime = -1;
+
+        invalidateMainStream();
+        gpsHomeIsValid = false;
+        lastEvent = null;
+    };
+    
+    // Reset any parsed information from previous parses (header & data)
+    this.resetAllState = function() {
         this.resetStats();
         
         //Reset system configuration to MW's defaults
         this.sysConfig = Object.create(defaultSysConfig);
         
-        this.mainFieldNames = [];
-        this.gpsFieldNames = [];
-        this.gpsHomeFieldNames = [];
+        this.frameDefs = {};
         
-        this.mainFieldCount = 0;
-        this.gpsFieldCount = 0;
-        this.gpsHomeFieldCount = 0;
-        
-        this.mainFieldNameToIndex = {};
-        this.gpsFieldNameToIndex = {};
-        this.gpsHomeFieldNameToIndex = {};
-        
-        lastSkippedFrames = 0;
-        
-        lastMainFrameIteration = -1;
-        lastMainFrameTime = -1;
-        
-        mainStreamIsValid = false;
-        gpsHomeIsValid = false;
+        this.resetDataState();
     };
     
+    // Check that the given frame definition contains some fields and the right number of predictors & encodings to match
+    function isFrameDefComplete(frameDef) {
+        return frameDef && frameDef.count > 0 && frameDef.encoding.length == frameDef.count && frameDef.predictor.length == frameDef.count;
+    }
+    
     this.parseHeader = function(startOffset, endOffset) {
-        this.resetState();
+        this.resetAllState();
         
         //Set parsing ranges up
         stream.start = startOffset === undefined ? stream.pos : startOffset;
@@ -811,30 +826,43 @@ var FlightLogParser = function(logData) {
             }
         }
         
-        if (this.mainFieldCount == 0) {
-            throw "Data file is missing field name definitions";
-        }
-        
-        if (!frameDefs["P"] || !frameDefs["P"].encoding || !frameDefs["P"].predictor) {
-            throw "Log is missing required definitions for P frames, header may be corrupt";
-        }
-        if (!frameDefs["I"] || !frameDefs["I"].encoding || !frameDefs["I"].predictor) {
+        if (!isFrameDefComplete(this.frameDefs["I"])) {
             throw "Log is missing required definitions for I frames, header may be corrupt";
         }
         
-        // Now we know our field counts, we can allocate arrays to hold parsed data
-        mainHistoryRing = [new Array(this.mainFieldCount), new Array(this.mainFieldCount), new Array(this.mainFieldCount)];
-        gpsHomeHistory = [new Array(this.gpsHomeFieldCount), new Array(this.gpsHomeFieldCount)];
-        lastGPS = new Array(this.gpsFieldCount);
+        if (!this.frameDefs["P"]) {
+            throw "Log is missing required definitions for P frames, header may be corrupt";
+        }
         
-        /* Home coord predictors appear in pairs (lat/lon), but the predictor ID is the same for both. It's easier to
-         * apply the right predictor during parsing if we rewrite the predictor ID for the second half of the pair here:
-         */
-        for (var i = 1; i < that.gpsFieldCount; i++) {
-            if (frameDefs['G'].predictor[i - 1] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
-                    frameDefs['G'].predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD) {
-                frameDefs['G'].predictor[i] = FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
+        // P frames are derived from I frames so copy over frame definition information to those
+        this.frameDefs["P"].count = this.frameDefs["I"].count;
+        this.frameDefs["P"].name = this.frameDefs["I"].name;
+        this.frameDefs["P"].nameToIndex = this.frameDefs["I"].nameToIndex;
+        this.frameDefs["P"].signed = this.frameDefs["I"].signed;
+        
+        if (!isFrameDefComplete(this.frameDefs["P"])) {
+            throw "Log is missing required definitions for P frames, header may be corrupt";
+        }
+        
+        // Now we know our field counts, we can allocate arrays to hold parsed data
+        mainHistoryRing = [new Array(this.frameDefs["I"].count), new Array(this.frameDefs["I"].count), new Array(this.frameDefs["I"].count)];
+        
+        if (this.frameDefs["H"] && this.frameDefs["G"]) {
+            gpsHomeHistory = [new Array(this.frameDefs["H"].count), new Array(this.frameDefs["H"].count)];
+            lastGPS = new Array(this.frameDefs["G"].count);
+            
+            /* Home coord predictors appear in pairs (lat/lon), but the predictor ID is the same for both. It's easier to
+             * apply the right predictor during parsing if we rewrite the predictor ID for the second half of the pair here:
+             */
+            for (var i = 1; i < this.frameDefs["G"].count; i++) {
+                if (this.frameDefs["G"].predictor[i - 1] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
+                        this.frameDefs["G"].predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD) {
+                    this.frameDefs["G"].predictor[i] = FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
+                }
             }
+        } else {
+            gpsHomeHistory = [];
+            lastGPS = [];
         }
     };
     
@@ -846,13 +874,7 @@ var FlightLogParser = function(logData) {
             frameType = null,
             lastFrameType = null;
 
-        invalidateMainStream();
-        
-        lastSkippedFrames = 0;
-        lastMainFrameIteration = -1;
-        lastMainFrameTime = -1;
-        
-        lastEvent = null;
+        this.resetDataState();
 
         //Set parsing ranges up for the log the caller selected
         stream.start = startOffset === undefined ? stream.pos : startOffset;

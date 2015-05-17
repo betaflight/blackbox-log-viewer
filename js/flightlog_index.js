@@ -54,11 +54,10 @@ function FlightLogIndex(logData) {
                 
                 iframeCount = 0,
                 motorFields = [],
-                fieldNames,
                 matches,
                 throttleTotal,
                 eventInThisChunk = null,
-                sysConfig,
+                sysConfig, mainFrameDef,
                 parsedHeader;
             
             try {
@@ -71,78 +70,79 @@ function FlightLogIndex(logData) {
                 parsedHeader = false;
             }
 
-            sysConfig = parser.sysConfig;
-            
-            gyroData = [parser.mainFieldNameToIndex["gyroData[0]"], parser.mainFieldNameToIndex["gyroData[1]"], parser.mainFieldNameToIndex["gyroData[2]"]];
-            accSmooth = [parser.mainFieldNameToIndex["accSmooth[0]"], parser.mainFieldNameToIndex["accSmooth[1]"], parser.mainFieldNameToIndex["accSmooth[2]"]];
-            magADC = [parser.mainFieldNameToIndex["magADC[0]"], parser.mainFieldNameToIndex["magADC[1]"], parser.mainFieldNameToIndex["magADC[2]"]];
-            
-            // Identify motor fields so they can be used to show the activity summary bar
-            for (var j = 0; j < 8; j++) {
-                if (parser.mainFieldNameToIndex["motor[" + j + "]"] !== undefined) {
-                    motorFields.push(parser.mainFieldNameToIndex["motor[" + j + "]"]);
-                }
-            }
-            
-            // Do we have mag fields? If not mark that data as absent
-            if (magADC[0] === undefined) {
-                magADC = false;
-            }
-            
-            parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-                if (frameValid) {
-                    if (frameType == 'P' || frameType == 'I') {
-                        var 
-                            frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-                        
-                        if (intraIndex.minTime === false) {
-                            intraIndex.minTime = frameTime;
-                        }
-                        
-                        if (intraIndex.maxTime === false || frameTime > intraIndex.maxTime) {
-                            intraIndex.maxTime = frameTime;
-                        }
-                        
-                        if (frameType == 'I') {
-                            // Start a new chunk on every 4th I-frame
-                            if (iframeCount % 4 == 0) {
-                                // Log the beginning of the new chunk
-                                intraIndex.times.push(frameTime);
-                                intraIndex.offsets.push(frameOffset);
-                                
-                                if (motorFields.length) {
-                                    throttleTotal = 0;
-                                    for (var j = 0; j < motorFields.length; j++)
-                                        throttleTotal += frame[motorFields[j]];
-                                    
-                                    intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
-                                }
-                                
-                                intraIndex.initialIMU.push(new IMU(imu));
-                            }
-                            
-                            iframeCount++;
-                        }
-                        
-                        imu.updateEstimatedAttitude(
-                            [frame[gyroData[0]], frame[gyroData[1]], frame[gyroData[2]]],
-                            [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
-                            frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
-                            sysConfig.acc_1G, 
-                            sysConfig.gyroScale, 
-                            magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
-                        );
-                    } else if (frameType == 'E') {
-                        // Mark that there was an event inside the current chunk
-                        if (intraIndex.times.length > 0) {
-                            intraIndex.hasEvent[intraIndex.times.length - 1] = true;
-                        }
-                    }
-                }
-            };
-            
             // Only attempt to parse the log if the header wasn't corrupt
             if (parsedHeader) {
+                sysConfig = parser.sysConfig;
+                mainFrameDef = parser.frameDefs["I"];
+                
+                gyroData = [mainFrameDef.nameToIndex["gyroData[0]"], mainFrameDef.nameToIndex["gyroData[1]"], mainFrameDef.nameToIndex["gyroData[2]"]];
+                accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]];
+                magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]];
+                
+                // Identify motor fields so they can be used to show the activity summary bar
+                for (var j = 0; j < 8; j++) {
+                    if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {
+                        motorFields.push(mainFrameDef.nameToIndex["motor[" + j + "]"]);
+                    }
+                }
+                
+                // Do we have mag fields? If not mark that data as absent
+                if (magADC[0] === undefined) {
+                    magADC = false;
+                }
+                
+                parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
+                    if (frameValid) {
+                        if (frameType == 'P' || frameType == 'I') {
+                            var 
+                                frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                            
+                            if (intraIndex.minTime === false) {
+                                intraIndex.minTime = frameTime;
+                            }
+                            
+                            if (intraIndex.maxTime === false || frameTime > intraIndex.maxTime) {
+                                intraIndex.maxTime = frameTime;
+                            }
+                            
+                            if (frameType == 'I') {
+                                // Start a new chunk on every 4th I-frame
+                                if (iframeCount % 4 == 0) {
+                                    // Log the beginning of the new chunk
+                                    intraIndex.times.push(frameTime);
+                                    intraIndex.offsets.push(frameOffset);
+                                    
+                                    if (motorFields.length) {
+                                        throttleTotal = 0;
+                                        for (var j = 0; j < motorFields.length; j++)
+                                            throttleTotal += frame[motorFields[j]];
+                                        
+                                        intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
+                                    }
+                                    
+                                    intraIndex.initialIMU.push(new IMU(imu));
+                                }
+                                
+                                iframeCount++;
+                            }
+                            
+                            imu.updateEstimatedAttitude(
+                                [frame[gyroData[0]], frame[gyroData[1]], frame[gyroData[2]]],
+                                [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
+                                frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
+                                sysConfig.acc_1G, 
+                                sysConfig.gyroScale, 
+                                magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
+                            );
+                        } else if (frameType == 'E') {
+                            // Mark that there was an event inside the current chunk
+                            if (intraIndex.times.length > 0) {
+                                intraIndex.hasEvent[intraIndex.times.length - 1] = true;
+                            }
+                        }
+                    }
+                };
+            
                 parser.parseLogData(false);
                 intraIndex.stats = parser.stats;
             }

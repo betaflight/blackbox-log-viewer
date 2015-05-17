@@ -161,7 +161,7 @@ function FlightLog(logData) {
             i;
         
         // Make an independent copy
-        fieldNames = parser.mainFieldNames.slice(0);
+        fieldNames = parser.frameDefs["I"].name.slice(0);
         
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
