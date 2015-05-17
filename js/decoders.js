@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Extend ArrayDataStream with decoders for advanced formats.
  */
@@ -81,7 +83,7 @@ ArrayDataStream.prototype.readTag8_4S16_v1 = function(values) {
     var
         selector, combinedChar,
         char1, char2,
-        i;
+        i,
 
         FIELD_ZERO  = 0,
         FIELD_4BIT  = 1,
@@ -119,7 +121,7 @@ ArrayDataStream.prototype.readTag8_4S16_v1 = function(values) {
 
         selector >>= 2;
     }
-}
+};
 
 ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
     var 
@@ -143,7 +145,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
                 values[i] = 0;
             break;
             case FIELD_4BIT:
-                if (nibbleIndex == 0) {
+                if (nibbleIndex === 0) {
                     buffer = this.readByte();
                     values[i] = signExtend4Bit(buffer >> 4);
                     nibbleIndex = 1;
@@ -153,7 +155,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
                 }
             break;
             case FIELD_8BIT:
-                if (nibbleIndex == 0) {
+                if (nibbleIndex === 0) {
                     values[i] = signExtend8Bit(this.readByte());
                 } else {
                     char1 = (buffer & 0x0F) << 4;
@@ -164,7 +166,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
                 }
             break;
             case FIELD_16BIT:
-                if (nibbleIndex == 0) {
+                if (nibbleIndex === 0) {
                     char1 = this.readByte();
                     char2 = this.readByte();
 

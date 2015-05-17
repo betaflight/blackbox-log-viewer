@@ -94,7 +94,7 @@ function FlightLog(logData) {
      */
     this.getLogIndex = function() {
         return logIndex;
-    }
+    };
     
     this.getLogCount = function() {
         return logIndexes.getLogCount();
@@ -161,7 +161,7 @@ function FlightLog(logData) {
             i;
         
         // Make an independent copy
-        fieldNames = parser.frameDefs["I"].name.slice(0);
+        fieldNames = parser.frameDefs.I.name.slice(0);
         
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
@@ -193,7 +193,7 @@ function FlightLog(logData) {
             found = false;
 
         //Are we even logging VBAT?
-        if (!fieldNameToIndex['vbatLatest']) {
+        if (!fieldNameToIndex.vbatLatest) {
             numCells = false;
         } else {
             for (i = 1; i < 8; i++) {
@@ -203,7 +203,7 @@ function FlightLog(logData) {
     
             numCells = i;
         }
-    };
+    }
     
     this.getNumCellsEstimate = function() {
         return numCells;
@@ -413,7 +413,7 @@ function FlightLog(logData) {
                        [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"]],
                        [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"]]];
         
-        if (destChunks.length == 0) {
+        if (destChunks.length === 0) {
             return;
         }
         
@@ -471,7 +471,7 @@ function FlightLog(logData) {
                 }
             }
         }
-    };
+    }
     
     /**
      * Add timestamps to events that getChunksInRange was unable to compute, because at the time it had trailing
@@ -537,7 +537,7 @@ function FlightLog(logData) {
     this.getSmoothedChunksInTimeRange = function(startTime, endTime) {
         var 
             sourceChunks,
-            resultChunks, resultChunk,
+            resultChunks, 
             chunkAlreadyDone, allDone,
             timeFieldIndex = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME;
         
@@ -680,13 +680,13 @@ function FlightLog(logData) {
                          * to prime our history window. Move the left&right indexes to the left so the main loop will read
                          * those earlier values.
                          */
-                        while (leftFrameIndex > 0 || leftFrameIndex == 0 && leftChunkIndex > 0) {
+                        while (leftFrameIndex > 0 || leftFrameIndex === 0 && leftChunkIndex > 0) {
                             var
                                 oldleftChunkIndex = leftChunkIndex,
                                 oldleftFrameIndex = leftFrameIndex;
                             
                             //Try moving it left
-                            if (leftFrameIndex == 0) {
+                            if (leftFrameIndex === 0) {
                                 leftChunkIndex--;
                                 leftFrameIndex = sourceChunks[leftChunkIndex].frames.length - 1;
                             } else {
@@ -773,7 +773,7 @@ function FlightLog(logData) {
             }
         }
         
-        addMissingEventTimes(sourceChunks, trailingROChunks == 0);
+        addMissingEventTimes(sourceChunks, trailingROChunks === 0);
         
         verifyChunkIndexes(sourceChunks);
         verifyChunkIndexes(resultChunks);

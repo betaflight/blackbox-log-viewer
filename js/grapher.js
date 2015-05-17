@@ -195,13 +195,13 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                         direction: -1,
                         color: idents.motorColors[0]
                     }, {
-                        x: .71,
-                        y: -.71,
+                        x: 0.71,
+                        y: -0.71,
                         direction: -1,
                         color: idents.motorColors[1]
                     }, {
-                        x: -.71,
-                        y: -.71,
+                        x: -0.71,
+                        y: -0.71,
                         direction: -1,
                         color: idents.motorColors[2]
                     }
@@ -210,23 +210,23 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             case 4:
                 craftParameters.motors = [
                     {
-                        x: .71,
-                        y: .71,
+                        x: 0.71,
+                        y: 0.71,
                         direction: 1,
                         color: idents.motorColors[0]
                     }, {
-                        x: .71,
-                        y: -.71,
+                        x: 0.71,
+                        y: -0.71,
                         direction: -1,
                         color: idents.motorColors[1]
                     }, {
-                        x: -.71,
-                        y: .71,
+                        x: -0.71,
+                        y: 0.71,
                         direction: -1,
                         color: idents.motorColors[2]
                     }, {
-                        x: -.71,
-                        y: -.71,
+                        x: -0.71,
+                        y: -0.71,
                         direction: 1,
                         color: idents.motorColors[3]
                     }
@@ -515,7 +515,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         
         if (chunks.length) {
             //Find the first sample that lies inside the window
-            for (var startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
+            for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
                 if (chunks[0].frames[startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= windowStartTime) {
                     break;
                 }
@@ -528,8 +528,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             // Plot graphs
             for (i = 0; i < graphs.length; i++) {
                 var 
-                    graph = graphs[i],
-                    field;
+                    graph = graphs[i];
             
                 canvasContext.save();
                 {

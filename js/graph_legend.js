@@ -25,7 +25,7 @@ function GraphLegend(targetElem, config, onVisibilityChange) {
                     field = graph.fields[j],
                     li = $('<li class="graph-legend-field"></li>');
                 
-                li.text(FlightlogFieldPresenter.fieldNameToFriendly(field.name));
+                li.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
                 li.css('border-bottom', "2px solid " + field.color);
                 
                 fieldList.append(li);

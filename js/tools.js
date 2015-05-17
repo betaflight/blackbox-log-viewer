@@ -160,7 +160,7 @@ function leftPad(string, pad, minLength) {
 
 function formatTime(msec, displayMsec) {
     var
-        secs, mins, hours, msec;
+        secs, mins, hours;
     
     msec = Math.round(msec);
     

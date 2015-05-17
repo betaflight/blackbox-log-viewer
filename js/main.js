@@ -32,7 +32,7 @@ var
     activeGraphConfig = new GraphConfig(),
     
     graphLegend = null,
-    fieldPresenter = FlightlogFieldPresenter,
+    fieldPresenter = FlightLogFieldPresenter,
     
     hasVideo = false, hasLog = false,
     video = $(".log-graph video")[0],
@@ -387,8 +387,8 @@ function loadLogFile(file) {
         
         try {
             flightLog = new FlightLog(dataArray);
-        } catch (e) {
-            alert("Sorry, an error occured while trying to open this log:\n\n" + e);
+        } catch (err) {
+            alert("Sorry, an error occured while trying to open this log:\n\n" + err);
             return;
         }
         

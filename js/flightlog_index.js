@@ -73,7 +73,7 @@ function FlightLogIndex(logData) {
             // Only attempt to parse the log if the header wasn't corrupt
             if (parsedHeader) {
                 sysConfig = parser.sysConfig;
-                mainFrameDef = parser.frameDefs["I"];
+                mainFrameDef = parser.frameDefs.I;
                 
                 gyroData = [mainFrameDef.nameToIndex["gyroData[0]"], mainFrameDef.nameToIndex["gyroData[1]"], mainFrameDef.nameToIndex["gyroData[2]"]];
                 accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]];
@@ -107,7 +107,7 @@ function FlightLogIndex(logData) {
                             
                             if (frameType == 'I') {
                                 // Start a new chunk on every 4th I-frame
-                                if (iframeCount % 4 == 0) {
+                                if (iframeCount % 4 === 0) {
                                     // Log the beginning of the new chunk
                                     intraIndex.times.push(frameTime);
                                     intraIndex.offsets.push(frameOffset);

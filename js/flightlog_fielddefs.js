@@ -1,3 +1,5 @@
+"use strict";
+
 var 
     FlightLogEvent = {
         SYNC_BEEP: 0,

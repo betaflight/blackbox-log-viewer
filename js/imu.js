@@ -48,7 +48,7 @@ function IMU(copyFrom) {
     function normalizeVector(src, dest) {
         var length = Math.sqrt(src.X * src.X + src.Y * src.Y + src.Z * src.Z);
         
-        if (length != 0) {
+        if (length !== 0) {
             dest.X = src.X / length;
             dest.Y = src.Y / length;
             dest.Z = src.Z / length;
@@ -189,7 +189,7 @@ function IMU(copyFrom) {
         }
         
         return attitude;
-    }
+    };
     
     if (copyFrom) {
         this.copyStateFrom(copyFrom);

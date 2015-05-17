@@ -7,8 +7,7 @@
  */
 function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     var
-        curve,
-        inputRange, outputRange, inputScale;
+        curve, inputScale;
     
     function lookupStraightLine(input) {
         return (input + offset) * inputScale;
@@ -60,7 +59,7 @@ function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     }
     
     // If steps argument isn't supplied, use a reasonable default
-    if (steps == undefined) {
+    if (steps === undefined) {
         steps = 12;
     }
     

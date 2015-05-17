@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * A FIFO cache to hold key-pair mappings. Its capacity will be at least the intialCapacity
  * supplied on creation, which you can increase by increasing the "capacity" property. 

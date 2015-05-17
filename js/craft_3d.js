@@ -30,7 +30,7 @@ function Craft3D(flightLog, canvas, propColors) {
             };
         
         for (var i = 0; i < NUM_PROP_LEVELS; i++) {
-            if (i == 0) {
+            if (i === 0) {
                 props[i] = new THREE.Geometry();
             } else {
                 var 
@@ -112,7 +112,7 @@ function Craft3D(flightLog, canvas, propColors) {
                 armStart = i / numMotors * Math.PI * 2 - ARM_WIDTH_RADIANS,
                 armEnd = armStart + ARM_WIDTH_RADIANS * 2;
             
-            if (i == 0) {
+            if (i === 0) {
                 path.moveTo(Math.cos(armStart) * HUB_RADIUS, Math.sin(armStart) * HUB_RADIUS);
             } else {
                 path.lineTo(Math.cos(armStart) * HUB_RADIUS, Math.sin(armStart) * HUB_RADIUS);
@@ -219,7 +219,7 @@ function Craft3D(flightLog, canvas, propColors) {
     for (var i = 0; i < numMotors; i++) {
         propMaterials[i] = new THREE.MeshLambertMaterial({color: propColors[i]});
 
-        var propShell = new THREE.Mesh(propGeometry[propGeometry.length - 1], propShellMaterial)
+        var propShell = new THREE.Mesh(propGeometry[propGeometry.length - 1], propShellMaterial);
         
         propShells[i] = propShell;
         
@@ -286,7 +286,7 @@ function Craft3D(flightLog, canvas, propColors) {
         craftParent.rotation.x = -frame[frameFieldIndexes['heading[1]']] /*- Math.PI / 2*/; // pitch
         craftParent.rotation.y = frame[frameFieldIndexes['heading[0]']]; // roll
         
-        //craftParent.rotation.z = -frame[flightLog.getMainFieldIndexByName('heading[2]')]; // yaw
+        //craftParent.rotation.z = -frame[frameFieldIndexes['heading[2]']]; // yaw
         
         renderer.render(scene, camera);
     };

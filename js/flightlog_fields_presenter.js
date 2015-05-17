@@ -1,6 +1,6 @@
 "use strict";
 
-function FlightlogFieldPresenter() {
+function FlightLogFieldPresenter() {
 }
 
 (function() {
@@ -69,7 +69,7 @@ function FlightlogFieldPresenter() {
      * @param fieldName Name of the field
      * @param value Value of the field
      */
-    FlightlogFieldPresenter.decodeFieldToFriendly = function(flightLog, fieldName, value) {
+    FlightLogFieldPresenter.decodeFieldToFriendly = function(flightLog, fieldName, value) {
         if (value === undefined)
             return "";
         
@@ -105,7 +105,7 @@ function FlightlogFieldPresenter() {
         }
     };
         
-    FlightlogFieldPresenter.fieldNameToFriendly = function(fieldName) {
+    FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName) {
         if (FRIENDLY_FIELD_NAMES[fieldName]) {
             return FRIENDLY_FIELD_NAMES[fieldName];
         }

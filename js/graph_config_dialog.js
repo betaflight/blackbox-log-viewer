@@ -10,7 +10,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     function renderFieldOption(fieldName, selectedName) {
         var 
             option = $("<option></option>")
-                .text(FlightlogFieldPresenter.fieldNameToFriendly(fieldName))
+                .text(FlightLogFieldPresenter.fieldNameToFriendly(fieldName))
                 .attr("value", fieldName);
     
         if (fieldName == selectedName) {
@@ -94,7 +94,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             $(this).parents('.config-graph-field').remove();
             
             // Remove the graph upon removal of the last field
-            if ($(".config-graph-field", parentGraph).length == 0) {
+            if ($(".config-graph-field", parentGraph).length === 0) {
                 parentGraph.remove();
             }
             
@@ -237,7 +237,7 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         populateExampleGraphs(flightLog, exampleGraphsMenu);
         renderGraphs(config);
-    }
+    };
  
     $(".graph-configuration-dialog-save").click(function(e) {
         onSave(convertUIToGraphConfig());

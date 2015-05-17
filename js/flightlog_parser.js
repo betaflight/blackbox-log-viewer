@@ -173,7 +173,7 @@ var FlightLogParser = function(logData) {
             if (separatorPos === false && stream.data[stream.pos] == COLON)
                 separatorPos = stream.pos;
             
-            if (stream.data[stream.pos] == NEWLINE || stream.data[stream.pos] == 0)
+            if (stream.data[stream.pos] == NEWLINE || stream.data[stream.pos] === 0)
                 break;
         }
 
@@ -192,7 +192,7 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.frameIntervalI = 1;
             break;
             case "P interval":
-                var matches = fieldValue.match(/(\d+)\/(\d+)/);
+                matches = fieldValue.match(/(\d+)\/(\d+)/);
                 
                 if (matches) {
                     that.sysConfig.frameIntervalPNum = parseInt(matches[1], 10);
@@ -321,7 +321,7 @@ var FlightLogParser = function(logData) {
     function updateMainFieldStatistics(fields) {
         var i;
 
-        for (i = 0; i < that.frameDefs["I"].count; i++) {
+        for (i = 0; i < that.frameDefs.I.count; i++) {
             if (!that.stats.field[i]) {
                 that.stats.field[i] = {
                     max: fields[i],
@@ -483,12 +483,12 @@ var FlightLogParser = function(logData) {
             current = mainHistory[0],
             previous = mainHistory[1];
 
-        parseFrame(that.frameDefs["I"], current, previous, null, 0, raw);
+        parseFrame(that.frameDefs.I, current, previous, null, 0, raw);
     }
     
     function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
         //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
-        for (var i = 0; i < that.frameDefs["H"].count; i++) {
+        for (var i = 0; i < that.frameDefs.H.count; i++) {
             gpsHomeHistory[1][i] = gpsHomeHistory[0][i];
         }
         
@@ -565,10 +565,10 @@ var FlightLogParser = function(logData) {
                 value += 1500;
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
-                if (that.frameDefs["I"].nameToIndex["motor[0]"] < 0) {
+                if (that.frameDefs.I.nameToIndex["motor[0]"] < 0) {
                     throw "Attempted to base I-field prediction on motor0 before it was read";
                 }
-                value += current[that.frameDefs["I"].nameToIndex["motor[0]"]];
+                value += current[that.frameDefs.I.nameToIndex["motor[0]"]];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
                 value += that.sysConfig.vbatref;
@@ -593,18 +593,18 @@ var FlightLogParser = function(logData) {
                 value += ~~((previous[fieldIndex] + previous2[fieldIndex]) / 2);
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD:
-                if (!that.frameDefs["H"] || that.frameDefs["H"].nameToIndex["GPS_home[0]"] === undefined) {
+                if (!that.frameDefs.H || that.frameDefs.H.nameToIndex["GPS_home[0]"] === undefined) {
                     throw "Attempted to base prediction on GPS home position without GPS home frame definition";
                 }
 
-                value += gpsHomeHistory[1][that.frameDefs["H"].nameToIndex["GPS_home[0]"]];
+                value += gpsHomeHistory[1][that.frameDefs.H.nameToIndex["GPS_home[0]"]];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1:
-                if (!that.frameDefs["H"] || that.frameDefs["H"].nameToIndex["GPS_home[1]"] === undefined) {
+                if (!that.frameDefs.H || that.frameDefs.H.nameToIndex["GPS_home[1]"] === undefined) {
                     throw "Attempted to base prediction on GPS home position without GPS home frame definition";
                 }
 
-                value += gpsHomeHistory[1][that.frameDefs["H"].nameToIndex["GPS_home[1]"]];
+                value += gpsHomeHistory[1][that.frameDefs.H.nameToIndex["GPS_home[1]"]];
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME:
                 if (mainHistory[1])
@@ -669,19 +669,19 @@ var FlightLogParser = function(logData) {
 
         lastSkippedFrames = countIntentionallySkippedFrames();
 
-        parseFrame(that.frameDefs["P"], current, previous, previous2, lastSkippedFrames, raw);
+        parseFrame(that.frameDefs.P, current, previous, previous2, lastSkippedFrames, raw);
     }
     
     function parseGPSFrame(raw) {
         // Only parse a GPS frame if we have GPS header definitions
-        if (that.frameDefs["G"]) {
-            parseFrame(that.frameDefs["G"], lastGPS, null, null, 0, raw);
+        if (that.frameDefs.G) {
+            parseFrame(that.frameDefs.G, lastGPS, null, null, 0, raw);
         }
     }
 
     function parseGPSHomeFrame(raw) {
-        if (that.frameDefs["H"]) {
-            parseFrame(that.frameDefs["H"], gpsHomeHistory[0], null, null, 0, raw);
+        if (that.frameDefs.H) {
+            parseFrame(that.frameDefs.H, gpsHomeHistory[0], null, null, 0, raw);
         }
     }
 
@@ -729,7 +729,7 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.overshot = stream.readByte();
                 lastEvent.data.p = stream.readByte();
                 lastEvent.data.i = stream.readByte();
-                lastEvent.data.d = stream.readByte();;
+                lastEvent.data.d = stream.readByte();
             break;
             case FlightLogEvent.AUTOTUNE_TARGETS:
                 //Convert the angles from decidegrees back to plain old degrees for ease of use
@@ -826,38 +826,38 @@ var FlightLogParser = function(logData) {
             }
         }
         
-        if (!isFrameDefComplete(this.frameDefs["I"])) {
+        if (!isFrameDefComplete(this.frameDefs.I)) {
             throw "Log is missing required definitions for I frames, header may be corrupt";
         }
         
-        if (!this.frameDefs["P"]) {
+        if (!this.frameDefs.P) {
             throw "Log is missing required definitions for P frames, header may be corrupt";
         }
         
         // P frames are derived from I frames so copy over frame definition information to those
-        this.frameDefs["P"].count = this.frameDefs["I"].count;
-        this.frameDefs["P"].name = this.frameDefs["I"].name;
-        this.frameDefs["P"].nameToIndex = this.frameDefs["I"].nameToIndex;
-        this.frameDefs["P"].signed = this.frameDefs["I"].signed;
+        this.frameDefs.P.count = this.frameDefs.I.count;
+        this.frameDefs.P.name = this.frameDefs.I.name;
+        this.frameDefs.P.nameToIndex = this.frameDefs.I.nameToIndex;
+        this.frameDefs.P.signed = this.frameDefs.I.signed;
         
-        if (!isFrameDefComplete(this.frameDefs["P"])) {
+        if (!isFrameDefComplete(this.frameDefs.P)) {
             throw "Log is missing required definitions for P frames, header may be corrupt";
         }
         
         // Now we know our field counts, we can allocate arrays to hold parsed data
-        mainHistoryRing = [new Array(this.frameDefs["I"].count), new Array(this.frameDefs["I"].count), new Array(this.frameDefs["I"].count)];
+        mainHistoryRing = [new Array(this.frameDefs.I.count), new Array(this.frameDefs.I.count), new Array(this.frameDefs.I.count)];
         
-        if (this.frameDefs["H"] && this.frameDefs["G"]) {
-            gpsHomeHistory = [new Array(this.frameDefs["H"].count), new Array(this.frameDefs["H"].count)];
-            lastGPS = new Array(this.frameDefs["G"].count);
+        if (this.frameDefs.H && this.frameDefs.G) {
+            gpsHomeHistory = [new Array(this.frameDefs.H.count), new Array(this.frameDefs.H.count)];
+            lastGPS = new Array(this.frameDefs.G.count);
             
             /* Home coord predictors appear in pairs (lat/lon), but the predictor ID is the same for both. It's easier to
              * apply the right predictor during parsing if we rewrite the predictor ID for the second half of the pair here:
              */
-            for (var i = 1; i < this.frameDefs["G"].count; i++) {
-                if (this.frameDefs["G"].predictor[i - 1] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
-                        this.frameDefs["G"].predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD) {
-                    this.frameDefs["G"].predictor[i] = FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
+            for (var i = 1; i < this.frameDefs.G.count; i++) {
+                if (this.frameDefs.G.predictor[i - 1] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
+                        this.frameDefs.G.predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD) {
+                    this.frameDefs.G.predictor[i] = FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
                 }
             }
         } else {
@@ -994,7 +994,7 @@ FlightLogParser.prototype.resetStats = function() {
         // Statistics for each frame type ("I", "P" etc) 
         frame: {}
     };
-}
+};
 
 FlightLogParser.prototype.FLIGHT_LOG_START_MARKER = asciiStringToByteArray("H Product:Blackbox flight data recorder by Nicholas Sherlock\n");
 

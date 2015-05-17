@@ -3,11 +3,12 @@
 function GraphConfig(graphConfig) {
     var
         graphs = graphConfig ? graphConfig : [],
-        listeners = [];
+        listeners = [],
+        that = this;
     
     function notifyListeners() {
         for (var i = 0; i < listeners.length; i++) {
-            listeners[i](this);
+            listeners[i](that);
         }
     }
     
@@ -80,7 +81,7 @@ function GraphConfig(graphConfig) {
                     }
                     
                     return field;
-                }
+                };
                 
                 if ((matches = field.name.match(/^(.+)\[all\]$/))) {
                     var 

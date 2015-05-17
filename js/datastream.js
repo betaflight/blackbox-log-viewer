@@ -15,7 +15,7 @@ var ArrayDataStream;
         this.start = start === undefined ? 0 : start;
         this.end = end === undefined ? data.length : end;
         this.pos = this.start;
-    }
+    };
     
     /**
      * Read a single byte from the string and turn it into a JavaScript string (assuming ASCII).
