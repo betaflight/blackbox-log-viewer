@@ -40,4 +40,11 @@ var
         "CALIBRATE_MAG",
         "SMALL_ANGLE",
         "FIXED_WING"
+    ]),
+    
+    FLIGHT_LOG_FAILSAFE_PHASE_NAME = makeReadOnly([
+        "IDLE",
+        "RX_LOSS_DETECTED",
+        "LANDING",
+        "LANDED"
     ]);

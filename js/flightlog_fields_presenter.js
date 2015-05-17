@@ -91,6 +91,13 @@ function FlightLogFieldPresenter() {
             return "0"; //No flags set
         }
     }
+    
+    function presentEnum(value, enumNames) {
+        if (enumNames[value] === undefined)
+            return value;
+        
+        return enumNames[value];
+    }
 
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
@@ -135,6 +142,9 @@ function FlightLogFieldPresenter() {
                 
             case 'stateFlags':
                 return presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
+                
+            case 'failsafePhase':
+                return presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
                 
             default:
                 return "";
