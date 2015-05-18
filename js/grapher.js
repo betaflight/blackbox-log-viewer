@@ -14,6 +14,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         FONTSIZE_PID_TABLE_LABEL = 34,
         FONTSIZE_AXIS_LABEL = 9,
         FONTSIZE_FRAME_LABEL = 9,
+        FONTSIZE_EVENT_LABEL = 8,
         
         lineColors = [
             "#fb8072", // Red
@@ -457,26 +458,54 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         canvasContext.fillText(axisLabel, canvas.width - 8, -8);
     }
     
-    function drawEvent(event) {
-        var x = canvas.width / windowWidthMicros * (event.time - windowStartTime);
+    function drawEventLine(x, label, color, width) {
+        width = width || 1.0;
+        
+        canvasContext.lineWidth = width;
+        canvasContext.strokeStyle = color || "rgba(255,255,255,0.5)";
         
         canvasContext.beginPath();
         
-        if (event.event == FlightLogEvent.AUTOTUNE_TARGETS) {
-            canvasContext.moveTo(x, canvas.height / 2 - 25);
-            canvasContext.lineTo(x, canvas.height / 2 + 25);
-        } else {
-            canvasContext.moveTo(x, 0);
-            canvasContext.lineTo(x, canvas.height);
-        }
+        canvasContext.moveTo(x, 0);
+        canvasContext.lineTo(x, canvas.height);
         
         canvasContext.stroke();
+        
+        if (label) {
+            canvasContext.fillText(label, x + width + 2, 4 + FONTSIZE_EVENT_LABEL);
+        }
+    }
+    
+    function drawEvent(event) {
+        var x = canvas.width / windowWidthMicros * (event.time - windowStartTime);
+        
+        switch (event.event) {
+            case FlightLogEvent.AUTOTUNE_TARGETS:
+                canvasContext.beginPath();
+
+                canvasContext.moveTo(x, canvas.height / 2 - 25);
+                canvasContext.lineTo(x, canvas.height / 2 + 25);
+                
+                canvasContext.stroke();
+            break;
+            case FlightLogEvent.SYNC_BEEP:
+                drawEventLine(x, "Arming beep begins", "rgba(0,0,255,0.75)", 3);
+            break;
+            default:
+                drawEventLine(x);
+        }
+        
     }
     
     function drawEvents(chunks) {
-        canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
-        canvasContext.lineWidth = 1;
-
+        var 
+            /* 
+             * Also draw events that are a little left of the window, so that their labels don't suddenly 
+             * disappear when they scroll out of view:
+             */ 
+            BEGIN_MARGIN_MICROSECONDS = 100000, 
+            shouldSetFont = true;
+        
         for (var i = 0; i < chunks.length; i++) {
             var events = chunks[i].events;
             
@@ -485,7 +514,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                     return;
                 }
                 
-                if (events[j].time >= windowStartTime) {
+                if (events[j].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
+                    // Avoid setting the font if we don't draw any events
+                    if (shouldSetFont) {
+                        canvasContext.fillStyle = "rgba(255, 255, 255, 0.8)";
+                        canvasContext.font = FONTSIZE_EVENT_LABEL + "pt " + DEFAULT_FONT_FACE;
+                        shouldSetFont = false;
+                    }
+                    
                     drawEvent(events[j]);
                 }
             }
