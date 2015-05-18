@@ -18,6 +18,8 @@ var
         AUTOTUNE_CYCLE_RESULT: 11,
         AUTOTUNE_TARGETS: 12,
         
+        GTUNE_CYCLE_RESULT: 20,
+        
         LOG_END: 255
     }),
     

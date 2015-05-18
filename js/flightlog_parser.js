@@ -765,6 +765,11 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.firstPeakAngle = stream.readS16() / 10.0;
                 lastEvent.data.secondPeakAngle = stream.readS16() / 10.0;
             break;
+            case FlightLogEvent.GTUNE_CYCLE_RESULT:
+                lastEvent.data.axis = stream.readU8();
+                lastEvent.data.gyroAVG = stream.readSignedVB();
+                lastEvent.data.newP = stream.readS16();
+            break;
             case FlightLogEvent.LOG_END:
                 var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
 

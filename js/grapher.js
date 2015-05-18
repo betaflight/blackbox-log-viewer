@@ -458,7 +458,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         canvasContext.fillText(axisLabel, canvas.width - 8, -8);
     }
     
-    function drawEventLine(x, label, color, width) {
+    function drawEventLine(x, labelY, label, color, width) {
         width = width || 1.0;
         
         canvasContext.lineWidth = width;
@@ -472,12 +472,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         canvasContext.stroke();
         
         if (label) {
-            canvasContext.fillText(label, x + width + 2, 4 + FONTSIZE_EVENT_LABEL);
+            canvasContext.fillText(label, x + width + 2, labelY);
         }
     }
     
-    function drawEvent(event) {
-        var x = canvas.width / windowWidthMicros * (event.time - windowStartTime);
+    function drawEvent(event, sequenceNum) {
+        var 
+            x = canvas.width / windowWidthMicros * (event.time - windowStartTime),
+            labelY = (sequenceNum + 1) * (FONTSIZE_EVENT_LABEL + 8);
         
         switch (event.event) {
             case FlightLogEvent.AUTOTUNE_TARGETS:
@@ -489,7 +491,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 canvasContext.stroke();
             break;
             case FlightLogEvent.SYNC_BEEP:
-                drawEventLine(x, "Arming beep begins", "rgba(0,0,255,0.75)", 3);
+                drawEventLine(x, labelY, "Arming beep begins", "rgba(0,0,255,0.75)", 3);
+            break;
+            case FlightLogEvent.GTUNE_CYCLE_RESULT:
+                drawEventLine(x, labelY, "GTune result - axis:" + event.data.axis + " gyroAVG:" + event.data.gyroAVG + " newP:" + event.data.newP, "rgba(255,255,255,0.5)");
             break;
             default:
                 drawEventLine(x);
@@ -504,7 +509,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
              * disappear when they scroll out of view:
              */ 
             BEGIN_MARGIN_MICROSECONDS = 100000, 
-            shouldSetFont = true;
+            shouldSetFont = true,
+            sequenceNum = 0;
         
         for (var i = 0; i < chunks.length; i++) {
             var events = chunks[i].events;
@@ -522,7 +528,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                         shouldSetFont = false;
                     }
                     
-                    drawEvent(events[j]);
+                    drawEvent(events[j], sequenceNum++);
                 }
             }
         }
