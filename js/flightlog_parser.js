@@ -523,8 +523,6 @@ var FlightLogParser = function(logData) {
         if (that.onFrameReady) {
             that.onFrameReady(true, lastSlow, frameType, frameStart, frameEnd - frameStart);
         }
-        
-        return true;
     }
     
     function completeInterframe(frameType, frameStart, frameEnd, raw) {
@@ -1007,20 +1005,22 @@ var FlightLogParser = function(logData) {
             if (command == EOF)
                 break;
 
-            frameType = getFrameType(command);
             frameStart = stream.pos - 1;
+            frameType = getFrameType(command);
 
-            if (frameType) {
+            // Reject the frame if it is one that we have no definitions for in the header
+            if (frameType && (command == 'E' || that.frameDefs[command])) {
+                lastFrameType = frameType;
                 frameType.parse(raw);
+                
+                //We shouldn't read an EOF during reading a frame (that'd imply the frame was truncated)
+                if (stream.eof) {
+                    prematureEof = true;
+                }
             } else {
                 mainStreamIsValid = false;
+                lastFrameType = null;
             }
-
-            //We shouldn't read an EOF during reading a frame (that'd imply the frame was truncated)
-            if (stream.eof)
-                prematureEof = true;
-
-            lastFrameType = frameType;
         }
         
         this.stats.totalBytes += stream.end - stream.start;

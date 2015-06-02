@@ -46,7 +46,7 @@ function FlightLog(logData) {
     };
     
     /**
-     * Get the parse error encountered when reading the log with the given index, or false if no error
+     * Get the fatal parse error encountered when reading the log with the given index, or false if no error
      * was encountered.
      */
     this.getLogError = function(logIndex) {
@@ -843,7 +843,14 @@ function FlightLog(logData) {
         return resultChunks;
     };
     
+    /**
+     * Attempt to open the log with the given index, returning true on success.
+     */
     this.openLog = function(index) {
+        if (this.getLogError(index)) {
+            return false;
+        }
+        
         logIndex = index;
         
         chunkCache.clear();
@@ -857,6 +864,8 @@ function FlightLog(logData) {
         
         estimateNumMotors();
         estimateNumCells();
+        
+        return true;
     };
 }
 

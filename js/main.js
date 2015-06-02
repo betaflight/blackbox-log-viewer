@@ -336,11 +336,28 @@ function setPlaybackRate(rate) {
 }
 
 /**
- * Set the index of the log from the log file that should be viewed.
+ * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
+ * available log.
  */
 function selectLog(logIndex) {
+    var
+        success = false;
+    
     try {
-        flightLog.openLog(logIndex);
+        if (logIndex === null) {
+            for (var i = 0; i < flightLog.getLogCount(); i++) {
+                if (flightLog.openLog(i)) {
+                    success = true;
+                    break;
+                }
+            }
+            
+            if (!success) {
+                throw "No logs in this file could be parsed successfully";
+            }
+        } else {
+            flightLog.openLog(logIndex);
+        }
     } catch (e) {
         alert("Error opening log: " + e);
         return;
@@ -400,7 +417,7 @@ function loadLogFile(file) {
         hasLog = true;
         $("html").addClass("has-log");
         
-        selectLog(0);
+        selectLog(null);
         resetPlaybackRate();
     };
 
