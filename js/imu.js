@@ -133,7 +133,7 @@ function IMU(copyFrom) {
     /**
      * Using the given raw data, update the IMU state and return the new estimate for the attitude.
      */
-    this.updateEstimatedAttitude = function(gyroData, accSmooth, currentTime, acc_1G, gyroScale, magADC) {
+    this.updateEstimatedAttitude = function(gyroADC, accSmooth, currentTime, acc_1G, gyroScale, magADC) {
         var 
             accMag = 0,
             deltaTime,
@@ -151,7 +151,7 @@ function IMU(copyFrom) {
         
         // Initialization
         for (var axis = 0; axis < 3; axis++) {
-            deltaGyroAngle[axis] = gyroData[axis] * scale;
+            deltaGyroAngle[axis] = gyroADC[axis] * scale;
         
             accMag += accSmooth[axis] * accSmooth[axis];
         }

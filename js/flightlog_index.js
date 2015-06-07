@@ -52,7 +52,7 @@ function FlightLogIndex(logData) {
                 },
                 
                 imu = new IMU(),
-                gyroData, accSmooth, magADC,
+                gyroADC, accSmooth, magADC,
                 
                 iframeCount = 0,
                 motorFields = [],
@@ -77,12 +77,18 @@ function FlightLogIndex(logData) {
                     sysConfig = parser.sysConfig,
                     mainFrameDef = parser.frameDefs.I,
                     
-                    gyroData = [mainFrameDef.nameToIndex["gyroData[0]"], mainFrameDef.nameToIndex["gyroData[1]"], mainFrameDef.nameToIndex["gyroData[2]"]],
+                    gyroADC, 
                     accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]],
                     magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
                     
                     lastSlow = [],
                     lastGPSHome = [];
+
+				if (mainFrameDef.nameToIndex["gyroData[0]"] > 0) {
+						gyroADC = [mainFrameDef.nameToIndex["gyroData[0]"], mainFrameDef.nameToIndex["gyroData[1]"], mainFrameDef.nameToIndex["gyroData[2]"]];
+					} else {
+						gyroADC = [mainFrameDef.nameToIndex["gyroADC[0]"], mainFrameDef.nameToIndex["gyroADC[1]"], mainFrameDef.nameToIndex["gyroADC[2]"]];
+					}
                 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {
@@ -144,7 +150,7 @@ function FlightLogIndex(logData) {
                             }
                             
                             imu.updateEstimatedAttitude(
-                                [frame[gyroData[0]], frame[gyroData[1]], frame[gyroData[2]]],
+                                [frame[gyroADC[0]], frame[gyroADC[1]], frame[gyroADC[2]]],
                                 [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
                                 frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
                                 sysConfig.acc_1G, 

@@ -150,6 +150,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 var axisIndex = matches[1];
 
                 idents.gyroFields[axisIndex] = fieldIndex;
+            } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
+                var axisIndex = matches[1];
+
+                idents.gyroFields[axisIndex] = fieldIndex;
             } else if ((matches = fieldName.match(/^accSmooth\[(\d+)]$/))) {
                 var axisIndex = matches[1];
 

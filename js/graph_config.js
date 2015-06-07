@@ -136,7 +136,7 @@ GraphConfig.PALETTE = [
             },
             {
                 label: "Gyros",
-                fields: ["gyroData[all]"]
+				fields: ["gyroADC[all]"]				
             },
             {
                 label: "PIDs",
@@ -144,15 +144,15 @@ GraphConfig.PALETTE = [
             },
             {
                 label: "Gyro + PID roll",
-                fields: ["axisP[0]", "axisI[0]", "axisD[0]", "gyroData[0]"]
+                fields: ["axisP[0]", "axisI[0]", "axisD[0]", "gyroADC[0]"]
             },
             {
                 label: "Gyro + PID pitch",
-                fields: ["axisP[1]", "axisI[1]", "axisD[1]", "gyroData[1]"]
+                fields: ["axisP[1]", "axisI[1]", "axisD[1]", "gyroADC[1]"]
             },
             {
                 label: "Gyro + PID yaw",
-                fields: ["axisP[2]", "axisI[2]", "axisD[2]", "gyroData[2]"]
+                fields: ["axisP[2]", "axisI[2]", "axisD[2]", "gyroADC[2]"]
             },
             {
                 label: "Accelerometers",
@@ -166,6 +166,8 @@ GraphConfig.PALETTE = [
         } else if (fieldName.match(/^servo\[/)) {
             return 5000;
         } else if (fieldName.match(/^gyroData\[/)) {
+            return 3000;
+        } else if (fieldName.match(/^gyroADC\[/)) {
             return 3000;
         } else if (fieldName.match(/^accSmooth\[/)) {
             return 3000;
@@ -194,7 +196,7 @@ GraphConfig.PALETTE = [
                 inputRange: 500,
                 outputRange: 1.0
             };
-        } else if (fieldName.match(/^gyroData\[/)) {
+        } else if (fieldName.match(/^gyroData\[/) || fieldName.match(/^gyroADC\[/)) {
             return {
                 offset: 0,
                 power: 0.25,

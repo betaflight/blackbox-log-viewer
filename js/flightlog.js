@@ -462,7 +462,7 @@ function FlightLog(logData) {
      */
     function injectComputedFields(sourceChunks, destChunks) {
         var
-            gyroData = [fieldNameToIndex["gyroData[0]"], fieldNameToIndex["gyroData[1]"], fieldNameToIndex["gyroData[2]"]], 
+            gyroADC, 
             accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]],
             magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
             
@@ -475,6 +475,12 @@ function FlightLog(logData) {
                        [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"]],
                        [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"]]];
         
+		if (fieldNameToIndex["gyroData[0]"] > 0) {
+ 			gyroADC = [fieldNameToIndex["gyroData[0]"], fieldNameToIndex["gyroData[1]"], fieldNameToIndex["gyroData[2]"]];
+		} else {
+ 			gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
+		}
+
         if (destChunks.length === 0) {
             return;
         }
@@ -512,7 +518,7 @@ function FlightLog(logData) {
                         fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
                     
                     attitude = chunkIMU.updateEstimatedAttitude(
-                        [srcFrame[gyroData[0]], srcFrame[gyroData[1]], srcFrame[gyroData[2]]],
+                        [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
                         [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
                         srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
                         sysConfig.acc_1G, 
