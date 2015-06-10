@@ -16,7 +16,11 @@ var
     PLAYBACK_MIN_RATE = 0.1,
     PLAYBACK_MAX_RATE = 3,
     PLAYBACK_DEFAULT_RATE = 1,
-    PLAYBACK_RATE_STEP = 0.1;
+    PLAYBACK_RATE_STEP = 0.1,
+    GRAPH_MIN_SCALE = 0.1,
+    GRAPH_MAX_SCALE = 20,
+    GRAPH_DEFAULT_SCALE = 1,
+    GRAPH_SCALE_STEP = 0.1;
 
 var
     graphState = GRAPH_STATE_PAUSED,
@@ -52,7 +56,9 @@ var
     
     animationFrameIsQueued = false,
     
-    playbackRate = PLAYBACK_DEFAULT_RATE;
+    playbackRate = PLAYBACK_DEFAULT_RATE,
+    
+    graphScale = GRAPH_DEFAULT_SCALE;
 
 function blackboxTimeFromVideoTime() {
     return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -335,6 +341,25 @@ function setPlaybackRate(rate) {
     }
 }
 
+function resetGraphScale() {
+    $(".graph-scale-control").val(GRAPH_DEFAULT_SCALE);
+    if (graph) {
+    	graph.setGraphScale(GRAPH_DEFAULT_SCALE);
+    }
+    invalidateGraph();
+}
+
+function setGraphScale(scale) {
+    if (scale >= GRAPH_MIN_SCALE && scale <= GRAPH_MAX_SCALE) {
+    	graphScale = scale;
+    	if (graph) {
+    		graph.setGraphScale(scale);
+    	}
+    	$(".graph-scale").val(scale);
+    	invalidateGraph();
+    }
+}
+
 /**
  * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
  * available log.
@@ -393,8 +418,8 @@ function selectLog(logIndex) {
     renderSelectedLogInfo();
     
     updateCanvasSize();
-    
     setGraphState(GRAPH_STATE_PAUSED);
+    setGraphScale(graphScale);
 }
 
 function loadLogFile(file) {
@@ -419,6 +444,7 @@ function loadLogFile(file) {
         
         selectLog(null);
         resetPlaybackRate();
+        console.log("XXX");
     };
 
     reader.readAsArrayBuffer(file);
@@ -608,12 +634,32 @@ $(document).ready(function() {
     }).on("slide change set", function() {
         setPlaybackRate($(this).val());
     });
-    
+     
     $(".playback-rate").change(function() {
         var rate = parseFloat($(this).val());
         
         if (!isNaN(rate)) {
             $(".playback-rate-control").val(rate);
+        }
+    });
+    
+    $(".graph-scale-control").noUiSlider({
+        start: graphScale,
+        connect: false,
+        step: GRAPH_SCALE_STEP,
+        range: {
+            'min': [ GRAPH_MIN_SCALE ],
+            '50%': [ GRAPH_DEFAULT_SCALE, GRAPH_SCALE_STEP ],
+            'max': [ GRAPH_MAX_SCALE, GRAPH_SCALE_STEP ]
+        }
+    }).on("slide change set", function() {
+        setGraphScale($(this).val());
+    });
+    
+    $(".graph-scale").change(function() {
+        var scale = parseFloat($(this).val());
+        if (!isNaN(scale)) {
+            $(".graph-scale-control").val(scale);
         }
     });
     

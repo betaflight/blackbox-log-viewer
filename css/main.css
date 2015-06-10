@@ -250,3 +250,8 @@ html.has-log .log-graph {
     width: 100px;
     margin-right: 13px;
 }
+
+.graph-scale-control {
+    width: 100px;
+    margin-right: 13px;
+}

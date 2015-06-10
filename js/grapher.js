@@ -30,8 +30,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             "#ccebc5",
             "#ffed6f"
         ],
-        
-        windowWidthMicros = 1000000;
+        WINDOW_WIDTH_MICROS_DEFAULT = 1000000,
+        windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT;
     
     var
         windowStartTime, windowCenterTime, windowEndTime,
@@ -697,6 +697,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     this.destroy = function() {
         $(canvas).off("mousedown", onMouseDown);
     };
+    
+    this.setGraphScale = function(scale) {
+    	windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT * scale);
+  }
     
     identifyFields();
     decideCraftParameters();
