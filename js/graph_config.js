@@ -127,6 +127,35 @@ GraphConfig.PALETTE = [
     "#ffed6f"
 ];
 
+GraphConfig.parse = function(text) {
+    var config = null;
+    
+    try {
+        config = JSON.parse(text);
+        
+        // Upgrade legacy configs to suit the newer standard by translating field names
+        if (config) {
+            for (var i = 0; i < config.length; i++) {
+                var graph = config[i];
+                
+                for (var j = 0; j < graph.fields.length; j++) {
+                    var 
+                        field = graph.fields[j],
+                        matches;
+                    
+                    if ((matches = field.name.match(/^gyroData(.+)$/))) {
+                        field.name = "gyroADC" + matches[1];
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.log("Failed to parse graph config: " + e);
+    }
+    
+    return config;
+};
+
 (function() {
     var
         EXAMPLE_GRAPHS = [
@@ -136,7 +165,7 @@ GraphConfig.PALETTE = [
             },
             {
                 label: "Gyros",
-				fields: ["gyroADC[all]"]				
+                fields: ["gyroADC[all]"]
             },
             {
                 label: "PIDs",
@@ -165,8 +194,6 @@ GraphConfig.PALETTE = [
             return 5000;
         } else if (fieldName.match(/^servo\[/)) {
             return 5000;
-        } else if (fieldName.match(/^gyroData\[/)) {
-            return 3000;
         } else if (fieldName.match(/^gyroADC\[/)) {
             return 3000;
         } else if (fieldName.match(/^accSmooth\[/)) {
@@ -196,7 +223,7 @@ GraphConfig.PALETTE = [
                 inputRange: 500,
                 outputRange: 1.0
             };
-        } else if (fieldName.match(/^gyroData\[/) || fieldName.match(/^gyroADC\[/)) {
+        } else if (fieldName.match(/^gyroADC\[/)) {
             return {
                 offset: 0,
                 power: 0.25,

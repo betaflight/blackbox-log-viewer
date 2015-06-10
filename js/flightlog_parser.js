@@ -153,6 +153,22 @@ var FlightLogParser = function(logData) {
         return result;
     }
     
+    /**
+     * Translates old field names in the given array to their modern equivalents and return the passed array.
+     */
+    function translateLegacyFieldNames(names) {
+        for (var i = 0; i < names.length; i++) {
+            var 
+                matches;
+            
+            if ((matches = names[i].match(/^gyroData(.+)$/))) {
+                names[i] = "gyroADC" + matches[1];
+            }
+        }
+        
+        return names;
+    }
+    
     function parseHeaderLine() {
         var 
             COLON = ":".charCodeAt(0),
@@ -287,7 +303,7 @@ var FlightLogParser = function(logData) {
                             frameDef.encoding = parseCommaSeparatedIntegers(fieldValue);
                         break;
                         case "name":
-                            frameDef.name = fieldValue.split(",");
+                            frameDef.name = translateLegacyFieldNames(fieldValue.split(","));
                             frameDef.count = frameDef.name.length;
 
                             frameDef.nameToIndex = mapFieldNamesToIndex(frameDef.name);

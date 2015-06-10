@@ -146,10 +146,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 
                 idents.axisPIDFields[matches[1]] = axisIndex;
                 idents.hasPIDs = true;
-            } else if ((matches = fieldName.match(/^gyroData\[(\d+)]$/))) {
-                var axisIndex = matches[1];
-
-                idents.gyroFields[axisIndex] = fieldIndex;
             } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
                 var axisIndex = matches[1];
 

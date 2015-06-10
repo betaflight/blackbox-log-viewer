@@ -461,7 +461,7 @@ function onLegendVisbilityChange(hidden) {
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');
 
-graphConfig = JSON.parse(window.localStorage.getItem('graphConfig'));
+graphConfig = GraphConfig.parse(window.localStorage.getItem('graphConfig'));
 
 if (!graphConfig) {
     graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);

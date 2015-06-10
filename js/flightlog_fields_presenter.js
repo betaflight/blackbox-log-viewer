@@ -24,11 +24,6 @@ function FlightLogFieldPresenter() {
         'rcCommand[2]': 'rcCommand[yaw]',
         'rcCommand[3]': 'rcCommand[throttle]',
     
-        'gyroData[all]': 'gyro',
-        'gyroData[0]': 'gyro[roll]',
-        'gyroData[1]': 'gyro[pitch]',
-        'gyroData[2]': 'gyro[yaw]',
-
         'gyroADC[all]': 'gyro',
         'gyroADC[0]': 'gyro[roll]',
         'gyroADC[1]': 'gyro[pitch]',
@@ -118,9 +113,7 @@ function FlightLogFieldPresenter() {
         switch (fieldName) {
             case 'time':
                 return formatTime(value / 1000, true);
-            case 'gyroData[0]':
-            case 'gyroData[1]':
-            case 'gyroData[2]':
+            
             case 'gyroADC[0]':
             case 'gyroADC[1]':
             case 'gyroADC[2]':
