@@ -138,8 +138,10 @@ function animationLoop() {
     var 
         now = Date.now();
     
-    if (!graph)
+    if (!graph) {
+        animationFrameIsQueued = false;
         return;
+    }
     
     if (hasVideo) {
         currentBlackboxTime = blackboxTimeFromVideoTime();
