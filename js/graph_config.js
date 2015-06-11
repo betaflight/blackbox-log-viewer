@@ -227,7 +227,7 @@ GraphConfig.parse = function(text) {
             return {
                 offset: 0,
                 power: 0.25,
-                inputRange: 9.0e-6 / sysConfig.gyroScale,
+                inputRange: 2.0e-5 / sysConfig.gyroScale,
                 outputRange: 1.0
             };
         } else if (fieldName.match(/^accSmooth\[/)) {

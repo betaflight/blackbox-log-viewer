@@ -698,9 +698,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         $(canvas).off("mousedown", onMouseDown);
     };
     
-    this.setGraphScale = function(scale) {
-    	windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT * scale);
-  }
+    this.setGraphZoom = function(zoom) {
+        windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
+    };
     
     identifyFields();
     decideCraftParameters();

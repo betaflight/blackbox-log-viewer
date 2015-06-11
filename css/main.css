@@ -193,7 +193,7 @@ html.has-video #graphCanvas {
 
 .video-top-controls > li {
     display:inline-block;
-    margin-right:1em;
+    margin-right: 17px;
     vertical-align: top;
 }
 
@@ -251,7 +251,7 @@ html.has-log .log-graph {
     margin-right: 13px;
 }
 
-.graph-scale-control {
+.graph-zoom-control {
     width: 100px;
     margin-right: 13px;
 }

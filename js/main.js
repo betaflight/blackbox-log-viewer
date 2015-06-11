@@ -13,14 +13,14 @@ var
     GRAPH_STATE_PLAY = 1,
     
     SMALL_JUMP_TIME = 100 * 1000,
-    PLAYBACK_MIN_RATE = 0.1,
-    PLAYBACK_MAX_RATE = 3,
-    PLAYBACK_DEFAULT_RATE = 1,
-    PLAYBACK_RATE_STEP = 0.1,
-    GRAPH_MIN_SCALE = 0.1,
-    GRAPH_MAX_SCALE = 20,
-    GRAPH_DEFAULT_SCALE = 1,
-    GRAPH_SCALE_STEP = 0.1;
+    PLAYBACK_MIN_RATE = 5,
+    PLAYBACK_MAX_RATE = 300,
+    PLAYBACK_DEFAULT_RATE = 100,
+    PLAYBACK_RATE_STEP = 5,
+    GRAPH_MIN_ZOOM = 10,
+    GRAPH_MAX_ZOOM = 1000,
+    GRAPH_DEFAULT_ZOOM = 100,
+    GRAPH_ZOOM_STEP = 10;
 
 var
     graphState = GRAPH_STATE_PAUSED,
@@ -58,7 +58,7 @@ var
     
     playbackRate = PLAYBACK_DEFAULT_RATE,
     
-    graphScale = GRAPH_DEFAULT_SCALE;
+    graphZoom = GRAPH_DEFAULT_ZOOM;
 
 function blackboxTimeFromVideoTime() {
     return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -150,7 +150,7 @@ function animationLoop() {
         if (lastRenderTime === false) {
             delta = 0;
         } else {
-            delta = Math.floor((now - lastRenderTime) * 1000 * playbackRate);
+            delta = Math.floor((now - lastRenderTime) * 1000 * playbackRate / 100);
         }
 
         currentBlackboxTime += delta;
@@ -293,7 +293,6 @@ function setGraphState(newState) {
     switch (newState) {
         case GRAPH_STATE_PLAY:
             if (hasVideo) {
-                video.playbackRate = playbackRate;
                 video.play();
             }
             $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
@@ -327,36 +326,24 @@ function setVideoTime(newTime) {
     syncLogToVideo();
 }
 
-function resetPlaybackRate() {
-    $(".playback-rate-control").val(PLAYBACK_DEFAULT_RATE);
-}
-
 function setPlaybackRate(rate) {
     if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
           playbackRate = rate;
-          if (hasVideo) {
-              video.playbackRate = rate;
+          
+          if (video) {
+              video.playbackRate = rate / 100;
           }
-          $(".playback-rate").val(rate);
     }
 }
 
-function resetGraphScale() {
-    $(".graph-scale-control").val(GRAPH_DEFAULT_SCALE);
-    if (graph) {
-    	graph.setGraphScale(GRAPH_DEFAULT_SCALE);
-    }
-    invalidateGraph();
-}
-
-function setGraphScale(scale) {
-    if (scale >= GRAPH_MIN_SCALE && scale <= GRAPH_MAX_SCALE) {
-    	graphScale = scale;
-    	if (graph) {
-    		graph.setGraphScale(scale);
-    	}
-    	$(".graph-scale").val(scale);
-    	invalidateGraph();
+function setGraphZoom(zoom) {
+    if (zoom >= GRAPH_MIN_ZOOM && zoom <= GRAPH_MAX_ZOOM) {
+        graphZoom = zoom;
+        
+        if (graph) {
+            graph.setGraphZoom(zoom / 100);
+            invalidateGraph();
+        }
     }
 }
 
@@ -418,8 +405,9 @@ function selectLog(logIndex) {
     renderSelectedLogInfo();
     
     updateCanvasSize();
+    
     setGraphState(GRAPH_STATE_PAUSED);
-    setGraphScale(graphScale);
+    setGraphZoom(graphZoom);
 }
 
 function loadLogFile(file) {
@@ -443,8 +431,6 @@ function loadLogFile(file) {
         $("html").addClass("has-log");
         
         selectLog(null);
-        resetPlaybackRate();
-        console.log("XXX");
     };
 
     reader.readAsArrayBuffer(file);
@@ -464,7 +450,9 @@ function loadVideo(file) {
     videoURL = URL.createObjectURL(file);
     video.volume = 0.05;
     video.src = videoURL;
-    resetPlaybackRate();
+    
+    // Reapply the last playbackRate to the new video
+    setPlaybackRate(playbackRate);
 }
 
 function videoLoaded(e) {
@@ -622,46 +610,48 @@ $(document).ready(function() {
         loadeddata: videoLoaded
     });
     
-    $(".playback-rate-control").noUiSlider({
-        start: playbackRate,
-        connect: false,
-        step: PLAYBACK_RATE_STEP,
-        range: {
-            'min': [ PLAYBACK_MIN_RATE ],
-            '50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
-            'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
+    var percentageFormat = {
+        to: function(value) {
+            return value.toFixed(0) + "%";
+        },
+        from: function(value) {
+            return parseFloat(value);
         }
-    }).on("slide change set", function() {
-        setPlaybackRate($(this).val());
-    });
-     
-    $(".playback-rate").change(function() {
-        var rate = parseFloat($(this).val());
-        
-        if (!isNaN(rate)) {
-            $(".playback-rate-control").val(rate);
-        }
-    });
+    };
     
-    $(".graph-scale-control").noUiSlider({
-        start: graphScale,
-        connect: false,
-        step: GRAPH_SCALE_STEP,
-        range: {
-            'min': [ GRAPH_MIN_SCALE ],
-            '50%': [ GRAPH_DEFAULT_SCALE, GRAPH_SCALE_STEP ],
-            'max': [ GRAPH_MAX_SCALE, GRAPH_SCALE_STEP ]
-        }
-    }).on("slide change set", function() {
-        setGraphScale($(this).val());
-    });
-    
-    $(".graph-scale").change(function() {
-        var scale = parseFloat($(this).val());
-        if (!isNaN(scale)) {
-            $(".graph-scale-control").val(scale);
-        }
-    });
+    $(".playback-rate-control")
+        .noUiSlider({
+            start: playbackRate,
+            connect: false,
+            step: PLAYBACK_RATE_STEP,
+            range: {
+                'min': [ PLAYBACK_MIN_RATE ],
+                '50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
+                'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
+            },
+            format: percentageFormat
+        })
+        .on("slide change set", function() {
+            setPlaybackRate(parseFloat($(this).val()));
+        })
+        .Link("lower").to($(".playback-rate"));
+
+    $(".graph-zoom-control")
+        .noUiSlider({
+            start: graphZoom,
+            connect: false,
+            step: GRAPH_ZOOM_STEP,
+            range: {
+                'min': [ GRAPH_MIN_ZOOM ],
+                '50%': [ GRAPH_DEFAULT_ZOOM, GRAPH_ZOOM_STEP ],
+                'max': [ GRAPH_MAX_ZOOM, GRAPH_ZOOM_STEP ]
+            },
+            format: percentageFormat
+        })
+        .on("slide change set", function() {
+            setGraphZoom(parseFloat($(this).val()));
+        })
+        .Link("lower").to($(".graph-zoom"));
     
     seekBar.onSeek = setCurrentBlackboxTime;
 });
