@@ -16,6 +16,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         FONTSIZE_FRAME_LABEL = 9,
         FONTSIZE_EVENT_LABEL = 8,
         
+        PLOT_LINE_WIDTH = 1.25,
+        
         lineColors = [
             "#fb8072", // Red
             "#8dd3c7", // Cyan
@@ -30,8 +32,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             "#ccebc5",
             "#ffed6f"
         ],
-        WINDOW_WIDTH_MICROS_DEFAULT = 1000000,
-        windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT;
+        
+        WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
     
     var
         windowStartTime, windowCenterTime, windowEndTime,
@@ -44,6 +46,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             gapless:false,
             drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true
         },
+        
+        windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
         
         idents,
         
@@ -380,7 +384,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         frameIndex = startFrameIndex;
         
         canvasContext.strokeStyle = color;
-
+        canvasContext.lineWidth = PLOT_LINE_WIDTH;
+        
         canvasContext.beginPath();
         
         plottingLoop:
