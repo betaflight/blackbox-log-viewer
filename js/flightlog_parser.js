@@ -68,7 +68,100 @@ var FlightLogParser = function(logData) {
         FLIGHT_LOG_EVENT_LOG_END = 255,
         
         EOF = ArrayDataStream.prototype.EOF,
-        NEWLINE  = '\n'.charCodeAt(0);
+        NEWLINE  = '\n'.charCodeAt(0),
+        
+        INFLIGHT_ADJUSTMENT_FUNCTIONS = [
+            {
+                name: 'None'
+            },
+            {
+                name: 'RC Rate',
+                scale: 0.01
+            },
+            {
+                name : 'RC Expo',
+                scale: 0.01
+            },
+            {
+                name: 'Throttle Expo',
+                scale: 0.01
+            },
+            {
+                name: 'Pitch & Roll Rate',
+                scale: 0.01
+            },
+            {
+                name: 'Yaw rate',
+                scale: 0.01
+            },
+            {
+                name: 'Pitch & Roll P',
+                scale: 0.1,
+                scalef: 1
+            },
+            {
+                name: 'Pitch & Roll I',
+                scale: 0.001,
+                scalef: 0.1
+            },
+            {
+                name: 'Pitch & Roll D',
+                scalef: 1000
+            },
+            {
+                name: 'Yaw P',
+                scale: 0.1,
+                scalef: 1
+            },
+            {
+                name: 'Yaw I',
+                scale: 0.001,
+                scalef: 0.1
+            }, 
+            {
+                name: 'Yaw D',
+                scalef: 1000
+            },
+            {
+                name: "Rare Profile"
+            }, 
+            {
+                name: 'Pitch Rate',
+                scale: 0.01
+            },
+            {
+                name: 'Roll Rate',
+                scale: 0.01
+            },
+            {
+                name: 'Pitch P',
+                scale: 0.1,
+                scalef: 1
+            },
+            {
+                name: 'Pitch I',
+                scale: 0.001,
+                scalef: 0.1
+            },
+            {
+                name: 'Pitch D',
+                scalef: 1000
+            },
+            {
+                name: 'Roll P',
+                scale: 0.1,
+                scalef: 1
+            },
+            {
+                name : 'Roll I',
+                scale: 0.001,
+                scalef: 0.1
+            },
+            {
+                name: 'Roll D',
+                scalef: 1000
+            }
+        ];
     
     //Private variables:
     var
@@ -783,6 +876,24 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.axis = stream.readU8();
                 lastEvent.data.gyroAVG = stream.readSignedVB();
                 lastEvent.data.newP = stream.readS16();
+            break;
+            case FlightLogEvent.INFLIGHT_ADJUSTMENT:
+                var tmp = stream.readU8();
+                lastEvent.data.name = 'Unknown';
+                lastEvent.data.func = tmp & 127;
+                lastEvent.data.value = tmp < 128 ? stream.readSignedVB() : uint32ToFloat(stream.readU32());
+                if (INFLIGHT_ADJUSTMENT_FUNCTIONS[lastEvent.data.func] !== undefined) {
+                    var descr = INFLIGHT_ADJUSTMENT_FUNCTIONS[lastEvent.data.func];
+                    lastEvent.data.name = descr.name;
+                    var scale = 1;
+                    if (descr.scale !== undefined) {
+                        scale = descr.scale;
+                    }
+                    if (tmp >= 128 && descr.scalef !== undefined) {
+                        scale = descr.scalef;
+                    }
+                    lastEvent.data.value = Math.round((lastEvent.data.value * scale) * 10000) / 10000;
+                }
             break;
             case FlightLogEvent.LOG_END:
                 var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);

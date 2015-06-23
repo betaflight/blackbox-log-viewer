@@ -34,7 +34,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         ],
         
         WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
-    
+
     var
         windowStartTime, windowCenterTime, windowEndTime,
         
@@ -500,6 +500,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             break;
             case FlightLogEvent.GTUNE_CYCLE_RESULT:
                 drawEventLine(x, labelY, "GTune result - axis:" + event.data.axis + " gyroAVG:" + event.data.gyroAVG + " newP:" + event.data.newP, "rgba(255,255,255,0.5)");
+            break;
+            case FlightLogEvent.INFLIGHT_ADJUSTMENT:
+                drawEventLine(x, labelY, event.data.name + " = " + event.data.value, "rgba(0,255,255,0.5)");
             break;
             default:
                 drawEventLine(x);

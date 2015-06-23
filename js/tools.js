@@ -10,6 +10,15 @@ function hexToFloat(string) {
     return floatArr[0]; 
 }
 
+function uint32ToFloat(value) {
+    var arr = new Uint32Array(1);
+    arr[0] = value;
+    
+    var floatArr = new Float32Array(arr.buffer);
+
+    return floatArr[0]; 
+}
+
 function asciiArrayToString(arr) {
     return String.fromCharCode.apply(null, arr);
 }
