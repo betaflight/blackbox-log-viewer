@@ -463,7 +463,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         canvasContext.fillText(axisLabel, canvas.width - 8, -8);
     }
     
-    function drawEventLine(x, labelY, label, color, width) {
+    function drawEventLine(x, labelY, label, color, width, labelColor) {
         width = width || 1.0;
         
         canvasContext.lineWidth = width;
@@ -477,14 +477,30 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         canvasContext.stroke();
         
         if (label) {
-            canvasContext.fillText(label, x + width + 2, labelY);
+            var margin = 8,
+                labelWidth = canvasContext.measureText(label).width + 2 * margin;
+            canvasContext.lineWidth = 1;
+            canvasContext.beginPath();
+            canvasContext.moveTo(x + width - 1, labelY - FONTSIZE_EVENT_LABEL/2);
+            canvasContext.lineTo(x + margin, labelY - FONTSIZE_EVENT_LABEL*1.5);
+            canvasContext.lineTo(x + labelWidth, labelY - FONTSIZE_EVENT_LABEL*1.5);
+            canvasContext.lineTo(x + labelWidth, labelY + FONTSIZE_EVENT_LABEL/2);
+            canvasContext.lineTo(x + margin, labelY + FONTSIZE_EVENT_LABEL/2);
+            canvasContext.lineTo(x + width - 1, labelY - FONTSIZE_EVENT_LABEL/2);
+            canvasContext.fillStyle = color || "rgba(255,255,255,0.5)";
+            canvasContext.fill();
+            canvasContext.stroke();
+            canvasContext.fillStyle= labelColor || "rgba(200,200,200,0.9)";
+            canvasContext.closePath();
+            canvasContext.fillText(label, x + width + 8, labelY);
+          
         }
     }
     
     function drawEvent(event, sequenceNum) {
         var 
             x = canvas.width / windowWidthMicros * (event.time - windowStartTime),
-            labelY = (sequenceNum + 1) * (FONTSIZE_EVENT_LABEL + 8);
+            labelY = (sequenceNum + 1) * (FONTSIZE_EVENT_LABEL + 10);
         
         switch (event.event) {
             case FlightLogEvent.AUTOTUNE_TARGETS:
@@ -502,7 +518,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 drawEventLine(x, labelY, "GTune result - axis:" + event.data.axis + " gyroAVG:" + event.data.gyroAVG + " newP:" + event.data.newP, "rgba(255,255,255,0.5)");
             break;
             case FlightLogEvent.INFLIGHT_ADJUSTMENT:
-                drawEventLine(x, labelY, event.data.name + " = " + event.data.value, "rgba(0,255,255,0.5)");
+                drawEventLine(x, labelY, event.data.name + " = " + event.data.value, "rgba(0,255,255,0.5)", 2);
             break;
             default:
                 drawEventLine(x);
