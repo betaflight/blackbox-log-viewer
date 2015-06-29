@@ -276,6 +276,13 @@ function renderSelectedLogInfo() {
         $(".log-cells-header,.log-cells").css('display', 'none');
     }
     
+    if (flightLog.getSysConfig().deviceUID != null) {
+        $(".log-device-uid").text(flightLog.getSysConfig().deviceUID);
+        $(".log-device-uid-header,.log-device-uid").css('display', 'block');
+    } else {
+       $(".log-device-uid-header,.log-device-uid").css('display', 'none');
+    }
+    
     seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
     seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
     
