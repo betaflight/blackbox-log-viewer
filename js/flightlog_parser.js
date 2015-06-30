@@ -185,7 +185,8 @@ var FlightLogParser = function(logData) {
             minthrottle: 1150,
             maxthrottle: 1850,
             currentMeterOffset: 0,
-            currentMeterScale: 400
+            currentMeterScale: 400,
+            deviceUID: null
         },
             
         frameTypes,
@@ -367,6 +368,9 @@ var FlightLogParser = function(logData) {
             case "Firmware revision":
             case "Firmware date":
                 // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
+            break;
+            case "Device UID":
+                that.sysConfig.deviceUID = fieldValue;
             break;
             default:
                 if ((matches = fieldName.match(/^Field (.) (.+)$/))) {
