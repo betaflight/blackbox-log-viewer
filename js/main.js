@@ -501,7 +501,7 @@ $(document).ready(function() {
         graphLegend.hide();
     }
     
-    $("#file-open").change(function(e) {
+    $(".file-open").change(function(e) {
         var 
             files = e.target.files,
             i;

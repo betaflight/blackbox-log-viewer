@@ -4,8 +4,14 @@ body {
 
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
-    .container {
+    .container.main-pane {
         width:1280px;
+    }
+}
+
+@media (min-width: 768px) {
+    .welcome-pane .panel-body {
+        min-height:320px;
     }
 }
 
@@ -255,4 +261,17 @@ html.has-log .log-graph {
 .graph-zoom-control {
     width: 100px;
     margin-right: 13px;
+}
+
+.main-pane {
+    display:none;
+}
+
+html.has-log .main-pane,
+html.has-video .main-pane {
+    display:block;
+}
+html.has-log .welcome-pane,
+html.has-video .welcome-pane {
+    display:none;
 }
