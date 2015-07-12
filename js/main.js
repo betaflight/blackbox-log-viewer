@@ -26,7 +26,7 @@ var
     graphState = GRAPH_STATE_PAUSED,
     currentBlackboxTime = 0,
     lastRenderTime = false,
-    dataArray, flightLog, 
+    flightLog, flightLogDataArray,
     graph = null, 
 
     // JSON graph configuration:
@@ -425,10 +425,10 @@ function loadLogFile(file) {
     reader.onload = function(e) {
         var bytes = e.target.result;
         
-        dataArray = new Uint8Array(bytes);
+        flightLogDataArray = new Uint8Array(bytes);
         
         try {
-            flightLog = new FlightLog(dataArray);
+            flightLog = new FlightLog(flightLogDataArray);
         } catch (err) {
             alert("Sorry, an error occured while trying to open this log:\n\n" + err);
             return;
