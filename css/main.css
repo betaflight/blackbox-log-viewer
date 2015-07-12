@@ -105,11 +105,10 @@ body {
     -webkit-flex-grow: 0.02;
     flex-grow: 0.02;
     
-    display:-webkit-flex;
-    display:flex;
-    
     -webkit-flex-direction:column;
     flex-direction:column;
+    
+    display:none;
 }
 .log-graph-config h2 {
     font-size:160%;
@@ -119,6 +118,10 @@ body {
     font-size:125%;
     margin-top: 1em;
     margin-bottom: 0.5em;
+}
+html.has-log .log-graph-config {
+    display:-webkit-flex;
+    display:flex;
 }
 
 .config-graph {
