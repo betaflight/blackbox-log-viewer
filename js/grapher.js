@@ -16,6 +16,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         FONTSIZE_FRAME_LABEL = 9,
         FONTSIZE_EVENT_LABEL = 8,
         
+        // How far the center of the craft and command sticks are from the top of the canvas, as a portion of height
+        COMMAND_STICK_POSITION_Y_PROPORTION = 0.20,
+        CRAFT_POSITION_Y_PROPORTION = 0.25,
+        
         PLOT_LINE_WIDTH = 1.25,
         
         lineColors = [
@@ -254,8 +258,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     
     function drawCommandSticks(frame) {
         var
-            stickSurroundRadius = canvas.height / 11, 
-            stickSpacing = stickSurroundRadius * 3,
+            stickSurroundRadius = Math.min(canvas.width / 10, canvas.height / 10), 
+            stickSpacing = stickSurroundRadius * Math.max(2.5, Math.min(3, canvas.width / 400)),
             yawStickMax = 500,
             
             stickColor = "rgba(255,102,102,1.0)",
@@ -564,6 +568,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         
         if (craft2D) {
             craft2D.resize(canvas.height / 3);
+        } else if (craft3D) {
+            var
+                craftSize;
+            
+            craftSize = Math.min(Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION * 2, canvas.width / 2.5), 350);
+            
+            craft3D.resize(craftSize, craftSize);
+            
+            // Recenter the craft canvas in the top left corner
+            $(craftCanvas).css({
+                left: Math.min(height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2, width / 4 - craftSize / 2) + "px",
+                top: (height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2) + "px",
+            });
         }
     };
     
@@ -641,7 +658,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 if (options.drawSticks) {
                     canvasContext.save();
                     
-                    canvasContext.translate(0.75 * canvas.width, 0.20 * canvas.height);
+                    canvasContext.translate(0.75 * canvas.width, COMMAND_STICK_POSITION_Y_PROPORTION * canvas.height);
                     
                     drawCommandSticks(centerFrame);
                     

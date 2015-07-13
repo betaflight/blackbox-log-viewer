@@ -290,4 +290,15 @@ function Craft3D(flightLog, canvas, propColors) {
         
         renderer.render(scene, camera);
     };
+    
+    this.resize = function(width, height) {
+        if (canvas.width != width || canvas.height != height) {
+            canvas.width = width;
+            canvas.height = height;
+            
+            renderer.setViewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+            camera.updateProjectionMatrix();
+        }
+    }
 }
