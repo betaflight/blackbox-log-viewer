@@ -662,5 +662,11 @@ $(document).ready(function() {
         })
         .Link("lower").to($(".graph-zoom"));
     
+    $('.navbar-toggle').click(function(e) {
+        $('.navbar-collapse').collapse('toggle');
+        
+        e.preventDefault();
+    });
+    
     seekBar.onSeek = setCurrentBlackboxTime;
 });
