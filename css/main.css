@@ -51,8 +51,25 @@ body {
 
 .graph-row {
     margin-top:1em;
-    height:630px;
     display:none;
+}
+
+/* Phone */
+.graph-row {
+    height:300px;
+}
+
+/* Desktop */
+@media (min-height:580px) {
+    .graph-row {
+        height:460px;
+    }
+}
+
+@media (min-height:720px) {
+    .graph-row {
+        height:630px;
+    }
 }
 
 .log-graph,
