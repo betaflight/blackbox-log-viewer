@@ -18,6 +18,7 @@ var
         AUTOTUNE_CYCLE_RESULT: 11,
         AUTOTUNE_TARGETS: 12,
         INFLIGHT_ADJUSTMENT: 13,
+        LOGGING_RESUME: 14,
         
         GTUNE_CYCLE_RESULT: 20,
         

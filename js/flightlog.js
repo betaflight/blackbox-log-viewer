@@ -370,6 +370,10 @@ function FlightLog(logData) {
                                 mainFrameIndex++;
                             break;
                             case 'E':
+                                if (frame.event == FlightLogEvent.LOGGING_RESUME) {
+                                    chunk.gapStartsHere[mainFrameIndex - 1] = true;
+                                }
+                                
                                 /* 
                                  * If the event was logged during a loop iteration, it will appear in the log
                                  * before that loop iteration does (since the main log stream is logged at the very

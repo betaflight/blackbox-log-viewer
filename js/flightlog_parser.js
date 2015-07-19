@@ -460,10 +460,10 @@ var FlightLogParser = function(logData) {
         // Do we have a previous frame to use as a reference to validate field values against?
         if (!raw && lastMainFrameIteration != -1) {
             /*
-             * Check that iteration count and time both moved forward, and time didn't move forward too much.
+             * Check that iteration count and time didn't move backwards, and didn't move forward too much.
              */
             acceptFrame =
-                mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] > lastMainFrameIteration
+                mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] >= lastMainFrameIteration
                 && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION] < lastMainFrameIteration + MAXIMUM_ITERATION_JUMP_BETWEEN_FRAMES
                 && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= lastMainFrameTime
                 && mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] < lastMainFrameTime + MAXIMUM_TIME_JUMP_BETWEEN_FRAMES;
@@ -822,6 +822,17 @@ var FlightLogParser = function(logData) {
 
     function completeEventFrame(frameType, frameStart, frameEnd, raw) {
         if (lastEvent) {
+            switch (lastEvent.event) {
+                case FlightLogEvent.LOGGING_RESUME:
+                    /*
+                     * Bring the "last time" and "last iteration" up to the new resume time so we accept the sudden jump into
+                     * the future.
+                     */
+                    lastMainFrameIteration = lastEvent.data.logIteration;
+                    lastMainFrameTime = lastEvent.data.currentTime;
+                break;
+            }
+            
             if (that.onFrameReady) {
                 that.onFrameReady(true, lastEvent, frameType, frameStart, frameEnd - frameStart);
             }
@@ -898,6 +909,10 @@ var FlightLogParser = function(logData) {
                     }
                     lastEvent.data.value = Math.round((lastEvent.data.value * scale) * 10000) / 10000;
                 }
+            break;
+            case FlightLogEvent.LOGGING_RESUME:
+                lastEvent.data.logIteration = stream.readUnsignedVB();
+                lastEvent.data.currentTime = stream.readUnsignedVB();
             break;
             case FlightLogEvent.LOG_END:
                 var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
