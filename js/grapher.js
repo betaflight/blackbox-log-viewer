@@ -481,8 +481,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         canvasContext.stroke();
         
         if (label) {
-            var margin = 8,
+            var 
+                margin = 8,
                 labelWidth = canvasContext.measureText(label).width + 2 * margin;
+            
             canvasContext.lineWidth = 1;
             canvasContext.beginPath();
             canvasContext.moveTo(x + width - 1, labelY - FONTSIZE_EVENT_LABEL/2);
@@ -494,7 +496,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             canvasContext.fillStyle = color || "rgba(255,255,255,0.5)";
             canvasContext.fill();
             canvasContext.stroke();
-            canvasContext.fillStyle= labelColor || "rgba(200,200,200,0.9)";
+            canvasContext.fillStyle = labelColor || "rgba(200,200,200,0.9)";
             canvasContext.closePath();
             canvasContext.fillText(label, x + width + 8, labelY);
           
@@ -514,6 +516,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 canvasContext.lineTo(x, canvas.height / 2 + 25);
                 
                 canvasContext.stroke();
+            break;
+            case FlightLogEvent.LOGGING_RESUME:
+                drawEventLine(x, labelY, "Logging resumed", "rgba(50,50,50,0.75)", 3);
             break;
             case FlightLogEvent.SYNC_BEEP:
                 drawEventLine(x, labelY, "Arming beep begins", "rgba(0,0,255,0.75)", 3);
