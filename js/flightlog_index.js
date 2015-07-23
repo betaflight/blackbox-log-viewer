@@ -59,7 +59,8 @@ function FlightLogIndex(logData) {
                 matches,
                 throttleTotal,
                 eventInThisChunk = null,
-                parsedHeader;
+                parsedHeader,
+                sawEndMarker = false;
             
             try {
                 parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
@@ -160,6 +161,10 @@ function FlightLogIndex(logData) {
                             if (intraIndex.times.length > 0) {
                                 intraIndex.hasEvent[intraIndex.times.length - 1] = true;
                             }
+                            
+                            if (frame.event == FlightLogEvent.LOG_END) {
+                                sawEndMarker = true;
+                            }
                         break;
                         case 'S':
                             lastSlow = frame.slice(0);
@@ -183,7 +188,11 @@ function FlightLogIndex(logData) {
             
             // Did we not find any events in this log?
             if (intraIndex.minTime === false) {
-                intraIndex.error = "Log is truncated, contains no data";
+                if (sawEndMarker) {
+                    intraIndex.error = "Logging was paused, no data recorded";
+                } else {
+                    intraIndex.error = "Log is truncated, contains no data";
+                }
             }
         
             intraframeDirectories.push(intraIndex);
