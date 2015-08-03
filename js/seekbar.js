@@ -21,12 +21,16 @@ function SeekBar(canvas) {
         background = document.createElement('canvas'),
         backgroundContext = background.getContext("2d"),
         
+        inTime = false,
+        outTime = false,
+        
         backgroundValid = false,
         dirtyRegion = false,
         
         BACKGROUND_STYLE = '#eee',
         EVENT_BAR_STYLE = '#8d8',
         ACTIVITY_BAR_STYLE = 'rgba(170,170,255, 0.9)',
+        OUTSIDE_EXPORT_RANGE_STYLE = 'rgba(100, 100, 100, 0.5)',
         
         // Suggested to be the same as that used by the graph's center mark in order to tie them together
         CURSOR_STYLE = 'rgba(255, 64, 64, 0.75)',
@@ -132,14 +136,14 @@ function SeekBar(canvas) {
     
     function rebuildBackground() {
         var 
-            x, activityIndex,
+            x, activityIndex, activity,
             pixelTimeStep, time;
         
         backgroundContext.fillStyle = BACKGROUND_STYLE;
         backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
         
         if (max > min) {
-            pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2);
+            pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2);
             
             if (activityTime.length) {
                 //Draw events
@@ -150,9 +154,6 @@ function SeekBar(canvas) {
                 activityIndex = 0;
                 
                 for (x = BAR_INSET; x < canvas.width - BAR_INSET; x++) {
-                    var 
-                        activity;
-                    
                     //Advance to the right entry in the activity array for this time
                     while (activityIndex < activityTime.length && time >= activityTime[activityIndex]) {
                         activityIndex++;
@@ -180,9 +181,6 @@ function SeekBar(canvas) {
                 activityIndex = 0;
 
                 for (x = BAR_INSET; x < canvas.width - BAR_INSET; x++) {
-                    var 
-                        activity;
-                    
                     //Advance to the right entry in the activity array for this time
                     while (activityIndex < activityTime.length && time >= activityTime[activityIndex]) {
                         activityIndex++;
@@ -201,6 +199,22 @@ function SeekBar(canvas) {
                 }
                 
                 backgroundContext.stroke();
+            }
+            
+            // Paint in/out region
+            if (inTime !== false || outTime !== false) {
+                backgroundContext.fillStyle = OUTSIDE_EXPORT_RANGE_STYLE;
+                
+                if (inTime !== false) {
+                    backgroundContext.fillRect(0, 0, (inTime - min) / pixelTimeStep + BAR_INSET, canvas.height);
+                }
+                
+                if (outTime !== false) {
+                    var 
+                        barStartX = (outTime - min) / pixelTimeStep + BAR_INSET;
+                    
+                    backgroundContext.fillRect(barStartX, 0, canvas.width - barStartX, canvas.height);
+                }
             }
             
             backgroundValid = true;
@@ -224,7 +238,7 @@ function SeekBar(canvas) {
         
         //Draw cursor
         var 
-            pixelTimeStep = (max - min) / (canvas.width - 1 - BAR_INSET * 2),
+            pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2),
             cursorX = (current - min) / pixelTimeStep + BAR_INSET;
 
         canvasContext.fillStyle = CURSOR_STYLE;
@@ -238,7 +252,16 @@ function SeekBar(canvas) {
         };
     };
     
-    background.style.display = 'none';
+    this.setInTime = function(newInTime) {
+        inTime = newInTime;
+        invalidateBackground();
+    };
+
+    this.setOutTime = function(newOutTime) {
+        outTime = newOutTime;
+        invalidateBackground();
+    };
+    
     background.width = canvas.width;
     background.height = canvas.height;
 }

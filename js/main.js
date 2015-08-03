@@ -29,7 +29,12 @@ function BlackboxLogViewer() {
         lastRenderTime = false,
         flightLog, flightLogDataArray,
         graph = null, 
-    
+        
+        prefs = new PrefStorage(),
+        
+        // User's video render config:
+        videoConfig = {},
+        
         // JSON graph configuration:
         graphConfig = {},
         
@@ -45,6 +50,9 @@ function BlackboxLogViewer() {
         craftCanvas = $("#craftCanvas")[0],
         videoURL = false,
         videoOffset = 0.0,
+        
+        videoExportInTime = false,
+        videoExportOutTime = false,
         
         graphRendersCount = 0,
         
@@ -336,6 +344,32 @@ function BlackboxLogViewer() {
         syncLogToVideo();
     }
     
+    function setVideoInTime(inTime) {
+        videoExportInTime = inTime;
+        
+        if (seekBar) {
+            seekBar.setInTime(videoExportInTime);
+        }
+        
+        if (graph) {
+            graph.setInTime(videoExportInTime);
+            invalidateGraph();
+        }
+    }
+    
+    function setVideoOutTime(outTime) {
+        videoExportOutTime = outTime;
+        
+        if (seekBar) {
+            seekBar.setOutTime(videoExportOutTime);
+        }
+        
+        if (graph) {
+            graph.setOutTime(videoExportOutTime);
+            invalidateGraph();
+        }
+    }
+    
     function setPlaybackRate(rate) {
         if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
               playbackRate = rate;
@@ -390,6 +424,9 @@ function BlackboxLogViewer() {
         }
         
         graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas);
+        
+        setVideoInTime(false);
+        setVideoOutTime(false);
     
         activeGraphConfig.adaptGraphs(flightLog, graphConfig);
         
@@ -478,15 +515,30 @@ function BlackboxLogViewer() {
     }
     
     function onLegendVisbilityChange(hidden) {
-        window.localStorage.setItem('log-legend-hidden', hidden);
+        prefs.set('log-legend-hidden', hidden);
         updateCanvasSize();
     }
     
-    graphConfig = GraphConfig.parse(window.localStorage.getItem('graphConfig'));
+    prefs.get('videoConfig', function(item) {
+        if (item) {
+            videoConfig = item;
+        } else {
+            videoConfig = {
+                width: 1280,
+                height: 720,
+                frameRate: 30,
+                videoDim: 0.4
+            };
+        }
+    });
     
-    if (!graphConfig) {
-        graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
-    }
+    prefs.get('graphConfig', function(item) {
+        graphConfig = GraphConfig.load(item);
+        
+        if (!graphConfig) {
+            graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
+        }
+    });
     
     activeGraphConfig.addListener(function() {
         invalidateGraph();
@@ -495,9 +547,11 @@ function BlackboxLogViewer() {
     $(document).ready(function() {
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange);
         
-        if (window.localStorage.getItem('log-legend-hidden') === "true") {
-            graphLegend.hide();
-        }
+        prefs.get('log-legend-hidden', function(item) {
+            if (item) {
+                graphLegend.hide();
+            }
+        });
         
         $(".file-open").change(function(e) {
             var 
@@ -595,21 +649,84 @@ function BlackboxLogViewer() {
             }
         });
         
-        var graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
-            graphConfig = newConfig;
+        var 
+            graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
+                graphConfig = newConfig;
+                
+                activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+                
+                prefs.set('graphConfig', graphConfig);
+            }),
             
-            activeGraphConfig.adaptGraphs(flightLog, graphConfig);
-            
-            window.localStorage.setItem('graphConfig', JSON.stringify(graphConfig));
-        });
+            exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
+                videoConfig = newConfig;
+                
+                prefs.set('videoConfig', newConfig);
+            });
+
         
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();
             
             graphConfigDialog.show(flightLog, graphConfig);
         });
-        
+
+        if (FlightLogVideoRenderer.isSupported()) {
+            $(".btn-video-export").click(function(e) {
+                setGraphState(GRAPH_STATE_PAUSED);
+    
+                exportDialog.show(flightLog, {
+                    graphConfig: activeGraphConfig,
+                    inTime: videoExportInTime,
+                    outTime: videoExportOutTime,
+                    flightVideo: hasVideo ? video.cloneNode() : false,
+                    flightVideoOffset: videoOffset
+                }, videoConfig);
+                
+                e.preventDefault();
+            });
+        } else {
+            $(".btn-video-export")
+                .addClass('disabled')
+                .css('pointer-events', 'all !important')
+                .attr({
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'bottom',
+                    'title': "Not supported by your browser, use Google Chrome instead"
+                })
+                .tooltip();
+        }
+
         $(window).resize(updateCanvasSize);
+        
+        $(document).keydown(function(e) {
+            if (graph) {
+                switch (event.which) {
+                    case "I".charCodeAt(0):
+                        if (!(e.altkey || e.shiftKey || e.ctrlKey || e.metaKey)) {
+                            if (videoExportInTime === currentBlackboxTime) {
+                                setVideoInTime(false)
+                            } else {
+                                setVideoInTime(currentBlackboxTime);
+                            }
+                            
+                            e.preventDefault();
+                        }
+                    break;
+                    case "O".charCodeAt(0):
+                        if (!(e.altkey || e.shiftKey || e.ctrlKey || e.metaKey)) {
+                            if (videoExportOutTime === currentBlackboxTime) {
+                                setVideoOutTime(false);
+                            } else {
+                                setVideoOutTime(currentBlackboxTime);
+                            }
+                            
+                            e.preventDefault();
+                        }
+                    break;
+                }
+            }
+        });
         
         $(video).on({
             loadedmetadata: updateCanvasSize,

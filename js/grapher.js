@@ -1,6 +1,6 @@
 "use strict";
 
-function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
+function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) {
     var
         PID_P = 0,
         PID_I = 1,
@@ -10,17 +10,23 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
         
-        FONTSIZE_CURRENT_VALUE_LABEL = 10,
-        FONTSIZE_PID_TABLE_LABEL = 34,
-        FONTSIZE_AXIS_LABEL = 9,
-        FONTSIZE_FRAME_LABEL = 9,
-        FONTSIZE_EVENT_LABEL = 8,
+        drawingParams = {
+            fontSizeCurrentValueLabel: null,
+            fontSizeCommandStickLabel: null,
+            fontSizePIDTableLabel: null,
+            fontSizeAxisLabel: null,
+            fontSizeFrameLabel: null,
+            fontSizeEventLabel: null,
+            
+            plotLineWidth: null,
+            
+            stickSpacing: null,
+            commandStickLabelMargin: null,
+        },
         
         // How far the center of the craft and command sticks are from the top of the canvas, as a portion of height
         COMMAND_STICK_POSITION_Y_PROPORTION = 0.20,
         CRAFT_POSITION_Y_PROPORTION = 0.25,
-        
-        PLOT_LINE_WIDTH = 1.25,
         
         lineColors = [
             "#fb8072", // Red
@@ -46,9 +52,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         
         craftParameters,
         
-        options = {
+        defaultOptions = {
             gapless:false,
-            drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true
+            drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
+            eraseBackground: true // Set to false if you want the graph to draw on top of an existing canvas image
         },
         
         windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
@@ -60,6 +67,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         graphs = [],
         pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
 
+        inTime = false, outTime = false,
+        
         lastMouseX, lastMouseY,
         
         craft3D = null, craft2D = null,
@@ -67,6 +76,21 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         that = this;
     
     this.onSeek = null;
+    
+    function extend(base, top) {
+        var 
+            target = {};
+        
+        [base, top].forEach(function(obj) {
+            for (var prop in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                    target[prop] = obj[prop];
+                }
+            }
+        });
+        
+        return target;
+    }
     
     function onMouseMove(e) {
         e.preventDefault();
@@ -258,8 +282,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     
     function drawCommandSticks(frame) {
         var
-            stickSurroundRadius = Math.min(canvas.width / 10, canvas.height / 10), 
-            stickSpacing = stickSurroundRadius * Math.max(2.5, Math.min(3, canvas.width / 400)),
+            // The total width available to draw both sticks in:
+            sticksDisplayWidth = canvas.width * 0.3,
+            
+            // Use that plus the inter-stick spacing that has been determined already to decide how big each stick should be:
+            stickSurroundRadius = Math.min((sticksDisplayWidth - drawingParams.stickSpacing) / 4, canvas.height / 10), 
             yawStickMax = 500,
             
             stickColor = "rgba(255,102,102,1.0)",
@@ -295,9 +322,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         }
 
         // Move origin to center of left stick
-        canvasContext.translate(-stickSpacing / 2, 0);
+        canvasContext.translate(-drawingParams.stickSpacing / 2 - stickSurroundRadius, 0);
 
-        canvasContext.font = FONTSIZE_CURRENT_VALUE_LABEL + "pt " + DEFAULT_FONT_FACE;
+        canvasContext.font = drawingParams.fontSizeCommandStickLabel + "pt " + DEFAULT_FONT_FACE;
 
         //For each stick
         for (var i = 0; i < 2; i++) {
@@ -326,22 +353,24 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], stickSurroundRadius / 5, 0, 2 * Math.PI);
             canvasContext.fill();
 
-            canvasContext.fillStyle = WHITE;
+            if (drawingParams.fontSizeCommandStickLabel) {
+                canvasContext.fillStyle = WHITE;
+                
+                //Draw horizontal stick label
+                stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 0]] + "";
+    
+                canvasContext.textAlign = 'center';
+                canvasContext.fillText(stickLabel, 0, stickSurroundRadius + drawingParams.fontSizeCurrentValueLabel + drawingParams.commandStickLabelMargin);
+    
+                //Draw vertical stick label
+                stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 1]] + "";
+                
+                canvasContext.textAlign = 'right';
+                canvasContext.fillText(stickLabel, -stickSurroundRadius - drawingParams.commandStickLabelMargin, drawingParams.fontSizeCurrentValueLabel / 2);
+            }
             
-            //Draw horizontal stick label
-            stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 0]] + "";
-
-            canvasContext.textAlign = 'center';
-            canvasContext.fillText(stickLabel, 0, stickSurroundRadius + FONTSIZE_CURRENT_VALUE_LABEL + 8);
-
-            //Draw vertical stick label
-            stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 1]] + "";
-            
-            canvasContext.textAlign = 'right';
-            canvasContext.fillText(stickLabel, -stickSurroundRadius - 8, FONTSIZE_CURRENT_VALUE_LABEL / 2);
-
             //Advance to next stick
-            canvasContext.translate(stickSpacing, 0);
+            canvasContext.translate(stickSurroundRadius + drawingParams.stickSpacing + stickSurroundRadius, 0);
         }
     }
     
@@ -354,7 +383,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         var 
             extentFrameNumber, extentFrameTime;
 
-        canvasContext.font = FONTSIZE_FRAME_LABEL + "pt " + DEFAULT_FONT_FACE;
+        canvasContext.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
         canvasContext.fillStyle = "rgba(255,255,255,0.65)";
 
         if (frameLabelTextWidthFrameNumber === undefined)
@@ -365,7 +394,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         if (frameLabelTextWidthFrameTime === undefined)
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
         
-        canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - FONTSIZE_FRAME_LABEL - 8);
+        canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
     }
     
     /**
@@ -388,7 +417,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         frameIndex = startFrameIndex;
         
         canvasContext.strokeStyle = color;
-        canvasContext.lineWidth = PLOT_LINE_WIDTH;
+        canvasContext.lineWidth = drawingParams.plotLineWidth;
         
         canvasContext.beginPath();
         
@@ -460,7 +489,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     }
 
     function drawAxisLabel(axisLabel) {
-        canvasContext.font = FONTSIZE_AXIS_LABEL + "pt " + DEFAULT_FONT_FACE;
+        canvasContext.font = drawingParams.fontSizeAxisLabel + "pt " + DEFAULT_FONT_FACE;
         canvasContext.fillStyle = "rgba(255,255,255,0.9)";
         canvasContext.textAlign = 'right';
         
@@ -487,12 +516,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             
             canvasContext.lineWidth = 1;
             canvasContext.beginPath();
-            canvasContext.moveTo(x + width - 1, labelY - FONTSIZE_EVENT_LABEL/2);
-            canvasContext.lineTo(x + margin, labelY - FONTSIZE_EVENT_LABEL*1.5);
-            canvasContext.lineTo(x + labelWidth, labelY - FONTSIZE_EVENT_LABEL*1.5);
-            canvasContext.lineTo(x + labelWidth, labelY + FONTSIZE_EVENT_LABEL/2);
-            canvasContext.lineTo(x + margin, labelY + FONTSIZE_EVENT_LABEL/2);
-            canvasContext.lineTo(x + width - 1, labelY - FONTSIZE_EVENT_LABEL/2);
+            canvasContext.moveTo(x + width - 1, labelY - drawingParams.fontSizeEventLabel/2);
+            canvasContext.lineTo(x + margin, labelY - drawingParams.fontSizeEventLabel*1.5);
+            canvasContext.lineTo(x + labelWidth, labelY - drawingParams.fontSizeEventLabel*1.5);
+            canvasContext.lineTo(x + labelWidth, labelY + drawingParams.fontSizeEventLabel/2);
+            canvasContext.lineTo(x + margin, labelY + drawingParams.fontSizeEventLabel/2);
+            canvasContext.lineTo(x + width - 1, labelY - drawingParams.fontSizeEventLabel/2);
             canvasContext.fillStyle = color || "rgba(255,255,255,0.5)";
             canvasContext.fill();
             canvasContext.stroke();
@@ -503,10 +532,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         }
     }
     
+    function timeToCanvasX(time) {
+        return canvas.width / windowWidthMicros * (time - windowStartTime);
+    }
+    
     function drawEvent(event, sequenceNum) {
         var 
-            x = canvas.width / windowWidthMicros * (event.time - windowStartTime),
-            labelY = (sequenceNum + 1) * (FONTSIZE_EVENT_LABEL + 10);
+            x = timeToCanvasX(event.time),
+            labelY = (sequenceNum + 1) * (drawingParams.fontSizeEventLabel + 10);
         
         switch (event.event) {
             case FlightLogEvent.AUTOTUNE_TARGETS:
@@ -557,7 +590,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                     // Avoid setting the font if we don't draw any events
                     if (shouldSetFont) {
                         canvasContext.fillStyle = "rgba(255, 255, 255, 0.8)";
-                        canvasContext.font = FONTSIZE_EVENT_LABEL + "pt " + DEFAULT_FONT_FACE;
+                        canvasContext.font = drawingParams.fontSizeEventLabel + "pt " + DEFAULT_FONT_FACE;
                         shouldSetFont = false;
                     }
                     
@@ -565,6 +598,72 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 }
             }
         }
+    }
+    
+    /**
+     *  Mark the in/out of the video region (if present) and dim the view outside this region
+     */
+    function drawInOutRegion() {
+        if (inTime !== false && inTime < windowEndTime || outTime !== false && outTime >= windowStartTime) {
+            var
+                inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
+                outMarkerX = outTime === false ? false : timeToCanvasX(outTime); 
+
+            canvasContext.fillStyle = "rgba(200,200,200,0.4)";
+            
+            if (inTime !== false && inTime >= windowStartTime) {
+                canvasContext.fillRect(0, 0, Math.min(inMarkerX, canvas.width), canvas.height);
+            } 
+            
+            if (outTime !== false && outTime < windowEndTime) {
+                var
+                    outMarkerXClipped = Math.max(outMarkerX, 0);
+                canvasContext.fillRect(outMarkerXClipped, 0, canvas.width - outMarkerXClipped, canvas.height);
+            }
+            
+            if (inMarkerX !== false && inMarkerX >= 0 && inMarkerX <= canvas.width || outMarkerX !== false && outMarkerX >= 0 && outMarkerX <= canvas.width) {
+                canvasContext.strokeStyle = 'rgb(200,200,200)';
+                canvasContext.lineWidth = 4;
+    
+                if (inMarkerX !== false && inMarkerX >= 0 && inMarkerX <= canvas.width) {
+                    canvasContext.beginPath();
+                    canvasContext.moveTo(inMarkerX, 0);
+                    canvasContext.lineTo(inMarkerX, canvas.height);
+                    canvasContext.stroke();
+                }
+    
+                if (outMarkerX !== false && outMarkerX >= 0 && outMarkerX <= canvas.width) {
+                    canvasContext.beginPath();
+                    canvasContext.moveTo(outMarkerX, 0);
+                    canvasContext.lineTo(outMarkerX, canvas.height);
+                    canvasContext.stroke();
+                }
+            }
+        }
+    }
+
+    function computeDrawingParameters() {
+        var
+            fontSizeBase = Math.max(10, canvas.height / 60),
+            
+            newParams = {
+                fontSizeCurrentValueLabel: fontSizeBase * 1.0,
+                fontSizePIDTableLabel:     fontSizeBase * 3.4,
+                fontSizeAxisLabel:         fontSizeBase * 0.9,
+                fontSizeFrameLabel:        fontSizeBase * 0.9,
+                fontSizeEventLabel:        fontSizeBase * 0.8,
+                
+                // We're concerned about the horizontal span of this text too: 
+                fontSizeCommandStickLabel: canvas.width < 500 ? 0 : Math.min(fontSizeBase, canvas.width / 60) * 1.0,
+                commandStickLabelMargin:   Math.min(canvas.width / 80, 8),
+                
+                plotLineWidth:             Math.max(1.25, canvas.height / 400),
+            };
+
+        /* Need enough space between sticks for the pitch axis label to fit */
+        newParams.stickSpacing = newParams.fontSizeCommandStickLabel * 4 + newParams.commandStickLabelMargin * 2;
+        
+        drawingParams = extend(drawingParams, newParams);
     }
     
     this.resize = function(width, height) {
@@ -577,16 +676,18 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
             var
                 craftSize;
             
-            craftSize = Math.min(Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION * 2, canvas.width / 2.5), 350);
+            craftSize = Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION * 2, canvas.width / 2.5);
             
             craft3D.resize(craftSize, craftSize);
             
             // Recenter the craft canvas in the top left corner
             $(craftCanvas).css({
-                left: Math.min(height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2, width / 4 - craftSize / 2) + "px",
-                top: (height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2) + "px",
+                left: Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2, canvas.width / 4 - craftSize / 2) + "px",
+                top: (canvas.height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2) + "px",
             });
         }
+        
+        computeDrawingParameters();
     };
     
     this.render = function(windowCenterTimeMicros) {
@@ -594,7 +695,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         windowStartTime = windowCenterTime - windowWidthMicros / 2;
         windowEndTime = windowStartTime + windowWidthMicros;
         
-        canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        if (options.eraseBackground) {
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        }
         
         var 
             chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
@@ -680,7 +783,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                     canvasContext.save();
                 
                     canvasContext.translate(0.25 * canvas.width, 0.20 * canvas.height);
-                    canvasContext.font = FONTSIZE_CURRENT_VALUE_LABEL + "pt " + DEFAULT_FONT_FACE;
+                    canvasContext.font = drawingParams.fontSizeCurrentValueLabel + "pt " + DEFAULT_FONT_FACE;
 
                     craft2D.render(canvasContext, centerFrame, flightLog.getMainFieldIndexes());
                     
@@ -688,6 +791,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
                 }
             }
         }
+        
+        drawInOutRegion();
     };
     
     function refreshGraphConfig() {
@@ -748,17 +853,38 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
         windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
     };
     
+    this.setInTime = function(time) {
+        inTime = time;
+        
+        if (outTime <= inTime) {
+            outTime = false;
+        }
+    };
+
+    this.setOutTime = function(time) {
+        outTime = time;
+        
+        if (inTime >= outTime) {
+            inTime = false;
+        }
+    };
+
+    // Use defaults for any options not provided
+    options = extend(defaultOptions, options || {});
+    
     identifyFields();
     decideCraftParameters();
     
-    if (options.drawCraft == '3D') {
-        craftCanvas.width = 300;
-        craftCanvas.height = 300;
+    if (options.drawCraft == '3D' && craftCanvas) {
         craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
-    } else {
-        craftCanvas.width = 0;
-        craftCanvas.height = 0;
+    } else if (options.drawCraft == '2D') {
+        if (craftCanvas) {
+            craftCanvas.width = 0;
+            craftCanvas.height = 0;
+        }
         craft2D = new Craft2D(flightLog, canvas, idents.motorColors, craftParameters);
+    } else {
+        options.drawCraft = false;
     }
     
     //Handle dragging events
@@ -766,4 +892,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas) {
     
     graphConfig.addListener(refreshGraphConfig);
     refreshGraphConfig();
+    
+    this.resize(canvas.width, canvas.height);
 }

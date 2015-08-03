@@ -93,7 +93,7 @@ function FlightLog(logData) {
     };
     
     /**
-     * Get the earliest time seen in the log of the given index, or leave off the logIndex
+     * Get the earliest time seen in the log of the given index (in microseconds), or leave off the logIndex
      * argument to fetch details for the current log.
      */
     this.getMinTime = function(logIndex) {
@@ -101,7 +101,7 @@ function FlightLog(logData) {
     };
     
     /**
-     * Get the latest time seen in the log of the given index, or leave off the logIndex
+     * Get the latest time seen in the log of the given index (in microseconds), or leave off the logIndex
      * argument to fetch details for the current log.
      */
     this.getMaxTime = function(logIndex) {

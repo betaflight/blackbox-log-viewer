@@ -25,6 +25,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <div class="navbar-form navbar-right" role="form">
+                    <a class="btn btn-default btn-video-export"> Export video...</a>
                     <span class="btn btn-primary btn-file"> Open log file/video <input type="file" class="file-open" multiple></span>
                 </div>
             </div>
@@ -115,9 +116,11 @@
                                 to convert your log file into a CSV file for analysis.
                             </p>
                             <p>
-                                If you want to turn your log into a video, you can use the <a href="https://github.com/cleanflight/blackbox-tools">blackbox_render tool</a>
-                                tool to turn your log into a series of PNG files. Alternatively, use a computer
-                                screen recording tool to record the playback of this log viewer. 
+                                If you want to share your log as a video, you can use the "export video" button at the 
+                                top to render a WebM video, or use the commandline 
+                                <a href="https://github.com/cleanflight/blackbox-tools">blackbox_render tool</a>
+                                tool to turn your log into a series of PNG files, or use a
+                                screen recording tool to record the playback of this log viewer.
                             </p>
                         </div>
                     </div>
@@ -137,12 +140,14 @@
                 </div>
                 <div class="form-group log-device-uid-header">
                     <label class="col-sm-3 control-label">Device UID</label>
-                    <div class="col-sm-9 log-device-uid form-control-static">
+                    <div class="col-sm-9">
+                        <p class="log-device-uid form-control-static"></p>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Battery</label>
-                    <div class="col-sm-9 log-cells form-control-static">
+                    <div class="col-sm-9">
+                        <p class="log-cells form-control-static"></p>
                     </div>
                 </div>
             </div>
@@ -278,17 +283,120 @@
                     <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal">Save changes</button>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
-    <!-- /.modal -->
+
+    <div class="modal fade" id="dlgVideoExport">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Export video</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="pane-video-settings form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Video duration</label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static video-duration"></p>
+                                <p>You can use the I (In) and O (Out) keys while
+                                viewing the log to mark the start and end points of the video</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Framerate</label>
+                            <div class="col-sm-9">
+                                <select class="form-control video-frame-rate">
+                                    <option value="15">15 fps</option>
+                                    <option value="30">30 fps</option>
+                                    <option value="60">60 fps</option>
+                                    <option value="120">120 fps</option>
+                                    <option value="240">240 fps</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Resolution</label>
+                            <div class="col-sm-9">
+                                <select class="form-control video-resolution">
+                                    <option value="854x480">480p</option>
+                                    <option value="1280x720">720p</option>
+                                    <option value="1920x1080">1080p</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group video-dim-section">
+                            <label class="col-sm-3 control-label">Dim flight video</label>
+                            <div class="col-sm-9">
+                                <select class="form-control video-dim">
+                                    <option value="0.0">0%</option>
+                                    <option value="0.2">20%</option>
+                                    <option value="0.4">40%</option>
+                                    <option value="0.5">50%</option>
+                                    <option value="0.6">60%</option>
+                                    <option value="0.8">80%</option>
+                                    <option value="1.0">100%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Video format</label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static video-format">WebM</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Audio format</label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static audio-format">Not supported yet (no audio will be included)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pane-video-progress">
+                        <progress max="100" value="0"></progress>
+
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Rendered frames</label>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static video-export-rendered-frames"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">File size</label>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static video-export-size"></p>
+                                    <div class="alert alert-danger" role="alert">You must install this tool as a Chrome App in order to export videos larger than 500MB</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Remaining time</label>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static video-export-remaining"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pane-video-complete">
+                        <p class="video-export-result"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default video-export-dialog-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default video-export-dialog-close" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary video-export-dialog-start">Begin export</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="js/vendor/jquery-1.11.3.min.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
     <script src="js/vendor/three.min.js"></script>
     <script src="js/vendor/jquery.nouislider.all.min.js"></script>
+    <script src="js/vendor/FileSaver.js"></script>
+    <script src="js/vendor/webm-writer-0.1.0.js"></script>
+    <script src="js/pref_storage.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/cache.js"></script>
     <script src="js/expo.js"></script>
@@ -307,6 +415,9 @@
     <script src="js/graph_legend.js"></script>
     <script src="js/graph_config_dialog.js"></script>
     <script src="js/seekbar.js"></script>
+    <script src="js/video_export_dialog.js"></script>
+    <script src="js/flightlog_video_renderer.js"></script>
+    <script src="js/graph_config.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

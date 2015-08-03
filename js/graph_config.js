@@ -127,30 +127,24 @@ GraphConfig.PALETTE = [
     "#ffed6f"
 ];
 
-GraphConfig.parse = function(text) {
-    var config = null;
-    
-    try {
-        config = JSON.parse(text);
-        
-        // Upgrade legacy configs to suit the newer standard by translating field names
-        if (config) {
-            for (var i = 0; i < config.length; i++) {
-                var graph = config[i];
+GraphConfig.load = function(config) {
+    // Upgrade legacy configs to suit the newer standard by translating field names
+    if (config) {
+        for (var i = 0; i < config.length; i++) {
+            var graph = config[i];
+            
+            for (var j = 0; j < graph.fields.length; j++) {
+                var 
+                    field = graph.fields[j],
+                    matches;
                 
-                for (var j = 0; j < graph.fields.length; j++) {
-                    var 
-                        field = graph.fields[j],
-                        matches;
-                    
-                    if ((matches = field.name.match(/^gyroData(.+)$/))) {
-                        field.name = "gyroADC" + matches[1];
-                    }
+                if ((matches = field.name.match(/^gyroData(.+)$/))) {
+                    field.name = "gyroADC" + matches[1];
                 }
             }
         }
-    } catch (e) {
-        console.log("Failed to parse graph config: " + e);
+    } else {
+        config = false;
     }
     
     return config;

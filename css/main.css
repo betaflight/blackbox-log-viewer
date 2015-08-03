@@ -2,6 +2,10 @@ body {
     padding-bottom:2em;
 }
 
+html, body {
+    overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
+}
+
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
     .container.main-pane {
@@ -294,4 +298,35 @@ html.has-video .main-pane {
 html.has-log .welcome-pane,
 html.has-video .welcome-pane {
     display:none;
+}
+
+.btn-video-export.disabled {
+    pointer-events:all !important;
+}
+.btn-video-export {
+    display:none;
+}
+html.has-log .btn-video-export {
+    display:inline-block;
+}
+
+.pane-video-settings, .pane-video-progress, .pane-video-complete {
+    display:none;
+}
+.video-export-mode-settings .pane-video-settings,
+.video-export-mode-progress .pane-video-progress,
+.video-export-mode-complete .pane-video-complete {
+    display:block;
+}
+
+.video-dim-section {
+    display:none;
+}
+html.has-video .video-dim-section {
+    display:block;
+}
+
+progress {
+    width:100%;
+    height:20px;
 }
