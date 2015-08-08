@@ -604,7 +604,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
      *  Mark the in/out of the video region (if present) and dim the view outside this region
      */
     function drawInOutRegion() {
-        if (inTime !== false && inTime < windowEndTime || outTime !== false && outTime >= windowStartTime) {
+        if (inTime !== false && inTime >= windowStartTime || outTime !== false && outTime < windowEndTime) {
             var
                 inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
                 outMarkerX = outTime === false ? false : timeToCanvasX(outTime); 
