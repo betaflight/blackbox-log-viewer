@@ -63,6 +63,12 @@ var ArrayDataStream;
         return EOF;
     };
     
+    /**
+     * Read a (maximally 32-bit) unsigned integer from the stream which was encoded in Variable Byte format.
+     * 
+     * @returns the unsigned integer, or 0 if a valid integer could not be read (EOF was reached or integer format
+     * was invalid).
+     */
     ArrayDataStream.prototype.readUnsignedVB = function() {
         var 
             i, b, 
@@ -78,8 +84,13 @@ var ArrayDataStream;
             result = result | ((b & ~0x80) << shift);
     
             // Final byte?
-            if (b < 128)
-                return result;
+            if (b < 128) {
+                /* 
+                 * Force the 32-bit integer to be reinterpreted as unsigned by doing an unsigned right shift, so that 
+                 * the top bit being set doesn't cause it to interpreted as a negative number.
+                 */
+                return result >>> 0; 
+            }
     
             shift += 7;
         }

@@ -91,8 +91,12 @@ function BlackboxLogViewer() {
         invalidateGraph();
     }
     
+    function isInteger(value) {
+        return (value | 0) == value || Math.trunc(value) == value;
+    }
+    
     function atMost2DecPlaces(value) {
-        if (value == (value | 0))
+        if (isInteger(value))
             return value; //it's an integer already
     
         if (value === null)
