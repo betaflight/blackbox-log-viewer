@@ -333,3 +333,6 @@ progress {
 .jumbotron {
     padding: 15px;
 }
+.navbar-inverse .navbar-brand {
+    color: #EAEAEA;
+}
