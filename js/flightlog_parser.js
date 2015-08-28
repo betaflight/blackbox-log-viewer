@@ -688,7 +688,13 @@ var FlightLogParser = function(logData) {
                 // No correction to apply
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_MINTHROTTLE:
-                value += that.sysConfig.minthrottle;
+                /* 
+                 * Force the value to be a *signed* 32-bit integer. Encoded motor values can be negative when motors are
+                 * below minthrottle, but despite this motor[0] is encoded in I-frames using *unsigned* encoding (to
+                 * save space for positive values). So we need to convert those very large unsigned values into their
+                 * corresponding 32-bit signed values.
+                 */
+                value = (value | 0) + that.sysConfig.minthrottle;
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_1500:
                 value += 1500;
