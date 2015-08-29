@@ -589,7 +589,10 @@ var FlightLogParser = function(logData) {
                         value = 0;
                     break;
                     default:
-                        throw "Unsupported field encoding " + encoding[i];
+                        if (encoding[i] === undefined)
+                            throw "Missing field encoding header for field #" + i + " '" + frameDef.name[i] + "'";
+                        else
+                            throw "Unsupported field encoding " + encoding[i];
                 }
 
                 current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], value, current, previous, previous2);

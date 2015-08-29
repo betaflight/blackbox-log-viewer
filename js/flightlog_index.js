@@ -172,7 +172,11 @@ function FlightLogIndex(logData) {
                     }
                 };
             
-                parser.parseLogData(false);
+                try {
+                    parser.parseLogData(false);
+                } catch (e) {
+                    intraIndex.error = e;
+                }
                 
                 // Don't bother including the initial (empty) states for S and H frames if we didn't have any in the source data
                 if (!parser.frameDefs.S) {
