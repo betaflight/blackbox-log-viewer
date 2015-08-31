@@ -60,7 +60,7 @@ function PrefStorage(keyPrefix) {
         }
     };
     
-    if (chrome && chrome.storage && chrome.storage.local) {
+    if (window.chrome && window.chrome.storage && window.chrome.storage.local) {
         mode = CHROME_STORAGE_LOCAL;
     } else {
         mode = LOCALSTORAGE;
