@@ -704,8 +704,8 @@ function BlackboxLogViewer() {
         $(window).resize(updateCanvasSize);
         
         $(document).keydown(function(e) {
-            if (graph && !(e.altkey || e.shiftKey || e.ctrlKey || e.metaKey) && $(event.target).parents('.modal').length == 0) {
-                switch (event.which) {
+            if (graph && !(e.altkey || e.shiftKey || e.ctrlKey || e.metaKey) && $(e.target).parents('.modal').length == 0) {
+                switch (e.which) {
                     case "I".charCodeAt(0):
                         if (videoExportInTime === currentBlackboxTime) {
                             setVideoInTime(false)
