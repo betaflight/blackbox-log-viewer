@@ -58,7 +58,8 @@ Or you may want to plot vbat against throttle to examine your battery's performa
 This tool has not been tested on Internet Explorer, but definitely won't work on versions earlier than version 9.
 
 Your web browser must support the video codec that your flight video uses in order to play it. Firefox doesn't support
-H.264 videos on Mac, so if your video won't play, try Google Chrome instead.
+H.264 videos on Mac, so if your video won't play, try Google Chrome instead. If it still won't play, follow the 
+instructions in the next section to convert your video using Handbrake.
 
 The best performing web browser tends to be Google Chrome, especially when trying to play your flight video at the same
 time.
@@ -67,6 +68,28 @@ This tool is currently in the Beta stage, so a number of key features have yet t
 
 - There is no control over the amount of smoothing applied to the graph lines
 - There is no way to single-step between loop iterations with the arrow keys
+
+## Flight video won't load, or jumpy flight video upon export
+
+Some flight video formats aren't supported by Chrome, so the viewer can't open them. You can fix this by re-encoding
+your video using the free tool [Handbrake][]. Open your original video using Handbrake. In the output settings, choose
+MP4 as the format, and H.264 as the video codec.
+
+Because of [Google Bug #66631][], Chrome is unable to accurately seek within H.264 videos that use B-frames. This is
+mostly fine when viewing the flight video inside Blackbox Explorer. However, if you use the "export video" feature, this
+bug will cause the flight video in the background of the exported video to occasionally jump backwards in time for a
+couple of frames, causing a very glitchy appearance.
+
+To fix that issue, you need to tell Handbrake to render every frame as an intraframe, which will avoid any problematic
+B-frames. Do that by adding "keyint=1" into the Additional Options box:
+
+![Handbrake settings](screenshots/handbrake.png)
+
+Hit start to begin re-encoding your video. Once it finishes, you should be able to load the new video into the Blackbox
+Explorer.
+
+[Handbrake]: https://handbrake.fr/
+[Google Bug #66631]: http://code.google.com/p/chromium/issues/detail?id=66631
 
 ## License
 

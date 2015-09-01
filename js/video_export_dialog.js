@@ -140,6 +140,8 @@ function VideoExportDialog(dialog, onSave) {
         
         videoDuration.text(formatTime(Math.round((logParameters.outTime - logParameters.inTime) / 1000000)));
         
+        $(".jumpy-video-note").toggle(!!logParameters.flightVideo);
+        
         dialog.modal('show');
         
         this.flightLog = flightLog;
