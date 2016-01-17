@@ -564,7 +564,7 @@ function BlackboxLogViewer() {
             
             for (i = 0; i < files.length; i++) {
                 var
-                    isLog = files[i].name.match(/\.TXT$/i),
+                    isLog = files[i].name.match(/\.(TXT|CFL|LOG)$/i),
                     isVideo = files[i].name.match(/\.(AVI|MOV|MP4|MPEG)$/i);
                 
                 if (!isLog && !isVideo) {
