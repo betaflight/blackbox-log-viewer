@@ -486,11 +486,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
 
         canvasContext.stroke();
     }
-
-	function plotAnalyser(chunks, startFrameIndex, fieldIndex, curve) {
-		analyser.plotSpectrum(chunks, startFrameIndex, fieldIndex, curve);
-	}
-	    
+    
     //Draw an origin line for a graph (at the origin and spanning the window)
     function drawAxisLine() {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
