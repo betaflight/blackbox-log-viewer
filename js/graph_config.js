@@ -161,6 +161,10 @@ GraphConfig.load = function(config) {
                 label: "Gyros",
                 fields: ["gyroADC[all]"]
             },
+            {	/* Add custom graph configurations to the main menu ! */
+                label: "RC Command",
+                fields: ["rcCommand[all]"]
+            },
             {
                 label: "PIDs",
                 fields: ["axisSum[all]"]
@@ -220,7 +224,7 @@ GraphConfig.load = function(config) {
         } else if (fieldName.match(/^gyroADC\[/)) {
             return {
                 offset: 0,
-                power: 0.25,
+                power: 0.25, /* Make this 1.0 to scale linearly */
                 inputRange: 2.0e-5 / sysConfig.gyroScale,
                 outputRange: 1.0
             };
