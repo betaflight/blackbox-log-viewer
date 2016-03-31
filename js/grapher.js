@@ -71,9 +71,15 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         
         craft3D = null, craft2D = null,
         
+    	analyser = null, /* define a new spectrum analyser */
+
         that = this;
     
+
     this.onSeek = null;
+    
+    /* Create the FlightLogAnalyser object */
+	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options);
     
     function extend(base, top) {
         var 
@@ -480,11 +486,28 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
 
         canvasContext.stroke();
     }
-    
+
+	function plotAnalyser(chunks, startFrameIndex, fieldIndex, curve) {
+		analyser.plotSpectrum(chunks, startFrameIndex, fieldIndex, curve);
+	}
+	    
     //Draw an origin line for a graph (at the origin and spanning the window)
     function drawAxisLine() {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
         canvasContext.lineWidth = 1;
+		canvasContext.setLineDash([5]); // Make the center line a dash        
+        canvasContext.beginPath();
+        canvasContext.moveTo(0, 0);
+        canvasContext.lineTo(canvas.width, 0);
+        
+        canvasContext.stroke();
+		canvasContext.setLineDash([]);        
+    }
+
+    //Draw an background for the line for a graph (at the origin and spanning the window)
+    function drawAxisBackground(plotHeight) {
+        canvasContext.strokeStyle = "rgba(255,255,255,0.1)";
+        canvasContext.lineWidth = plotHeight;
         
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
@@ -731,6 +754,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     canvasContext.translate(0, canvas.height * graph.y);
                     
                     drawAxisLine();
+                    drawAxisBackground(canvas.height * graph.height);
                     
                     for (j = 0; j < graph.fields.length; j++) {
                         var field = graph.fields[j];
@@ -794,6 +818,31 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     
                     canvasContext.restore();
                 }
+            }
+            
+            // Draw Analyser
+            if (analyser) { /* OK this is bad.. just pointing to the first graph for now! */
+
+				// Really should have method of selecting the graph/field I want an FFT for!
+                var graph = graphs[0]; 		// The first graph
+				var field = graph.fields[0]; // and the top one in the list	            
+                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve);
+
+            	//for (i = 0; i < 1 /*graphs.length*/; i++) {
+            	//    var 
+            	//        graph = graphs[i];
+            	//
+            	//    canvasContext.save();
+            	//    {
+            	//    	
+            	//        for (j = 0; j < 1 /*graph.fields.length*/; j++) {
+            	//            var field = graph.fields[j];                        
+            	//            plotAnalyser(chunks, startFrameIndex, field.index, field.curve);
+            	//        }
+            	//    }
+            	//    canvasContext.restore();
+            	//}
+            
             }
         }
         
