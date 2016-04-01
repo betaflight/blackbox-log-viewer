@@ -4,6 +4,14 @@ function FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options)
 
 var canvasCtx = canvas.getContext("2d");
 
+var // inefficient; copied from grapher.js
+
+        DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
+        
+        drawingParams = {
+            fontSizeFrameLabel: null
+        };
+
 	  
 var sampleRate = 8000;
 var frameCount = sampleRate * 2;
@@ -17,10 +25,14 @@ var audioCtx = new AudioContext();
 var oscillator = audioCtx.createOscillator();
 oscillator.type = 'sine';
 oscillator.frequency.value = 2000; // value in hertz;
+oscillator.start();
 
 var spectrumAnalyser = audioCtx.createAnalyser();	  
 	spectrumAnalyser.fftSize = 256;
     spectrumAnalyser.smoothingTimeConstant = 0.8;
+	spectrumAnalyser.minDecibels = -90;
+	spectrumAnalyser.maxDecibels = -10;
+    
 
 var myScriptProcessor = audioCtx.createScriptProcessor(2048,1,1);
     
@@ -31,11 +43,20 @@ var initialised = false;
 oscillator.connect(myScriptProcessor);
 myScriptProcessor.connect(spectrumAnalyser);
 
+
+var audioIterations = 0; // variable to monitor spectrum processing
+
 /* This event is triggered and re-loads the data from the current curve into the audiobuffer
    Definitely a place for some code optimisation... only update if the curve data changes perhaps? */   
 myScriptProcessor.onaudioprocess = function(audioProcessingEvent) {
 	var outputBuffer = audioProcessingEvent.outputBuffer;
 	dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, outputBuffer);
+	audioIterations++;
+}
+
+oscillator.onended = function() {
+/* function added to catch stopping of the oscillator */
+	oscillator.start();
 }
 
 function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer) {
@@ -102,8 +123,18 @@ function draw() {
 
         x += barWidth;
       }
+      drawAxisLabel('#' + leftPad(audioIterations, "0", 7), WIDTH - 8, HEIGHT - 10);
 	  canvasCtx.restore();
 	}
+
+
+function drawAxisLabel(axisLabel, X, Y) {
+        canvasCtx.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
+        canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
+        canvasCtx.textAlign = 'right';
+        
+        canvasCtx.fillText(axisLabel, X, Y);
+    }
 
 /* This function is called from the canvas drawing routines within grapher.js
    It is only used to record the current curve positions and draw the 
@@ -116,12 +147,7 @@ this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve) {
 		bufferStartFrameIndex = startFrameIndex;
 		bufferFieldIndex = fieldIndex;
 		bufferCurve = curve;
-				
-		// Get the audio context going.... Only once.....
-		if (!initialised) {
-			oscillator.start();
-			initialised = true;
-		}
+		
 		draw(); // draw the analyser on the canvas....
 	}
 }

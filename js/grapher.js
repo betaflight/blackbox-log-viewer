@@ -821,22 +821,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                 var graph = graphs[0]; 		// The first graph
 				var field = graph.fields[0]; // and the top one in the list	            
                 analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve);
-
-            	//for (i = 0; i < 1 /*graphs.length*/; i++) {
-            	//    var 
-            	//        graph = graphs[i];
-            	//
-            	//    canvasContext.save();
-            	//    {
-            	//    	
-            	//        for (j = 0; j < 1 /*graph.fields.length*/; j++) {
-            	//            var field = graph.fields[j];                        
-            	//            plotAnalyser(chunks, startFrameIndex, field.index, field.curve);
-            	//        }
-            	//    }
-            	//    canvasContext.restore();
-            	//}
-            
+                            
             }
         }
         
