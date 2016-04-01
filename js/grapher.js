@@ -53,6 +53,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         defaultOptions = {
             gapless:false,
             drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
+            drawAnalyser:true,    // add an analyser option
             eraseBackground: true // Set to false if you want the graph to draw on top of an existing canvas image
         },
         
@@ -77,9 +78,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
     
 
     this.onSeek = null;
-    
-    /* Create the FlightLogAnalyser object */
-	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options);
     
     function extend(base, top) {
         var 
@@ -817,7 +815,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             }
             
             // Draw Analyser
-            if (analyser) { /* OK this is bad.. just pointing to the first graph for now! */
+            if (options.drawAnalyser) { /* OK this is bad.. just pointing to the first graph for now! */
 
 				// Really should have method of selecting the graph/field I want an FFT for!
                 var graph = graphs[0]; 		// The first graph
@@ -954,6 +952,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
     identifyFields();
 
     initializeCraftModel();
+    
+    /* Create the FlightLogAnalyser object */
+	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options);
 
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);
