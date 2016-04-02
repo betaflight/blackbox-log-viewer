@@ -748,7 +748,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     canvasContext.translate(0, canvas.height * graph.y);
                     
                     drawAxisLine();
-                    drawAxisBackground(canvas.height * graph.height);
+                    if(graphs.length > 1) // only draw the background if more than one graph set.
+                        drawAxisBackground(canvas.height * graph.height);
                     
                     for (j = 0; j < graph.fields.length; j++) {
                         var field = graph.fields[j];

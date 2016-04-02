@@ -13,51 +13,30 @@ var // inefficient; copied from grapher.js
         };
 
 	  
-var sampleRate = 8000;
-var frameCount = sampleRate * 2;
+var frameCount = 2048;
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioCtx = new AudioContext();
 
-/* The oscillator node is used as a trigger for the .onaudioprocess event, the actual 
-   values the oscillator generates are discarded in the scriptProcessing node and replaced
-   by values from the currently plotted curve */ 
-var oscillator = audioCtx.createOscillator();
-oscillator.type = 'sine';
-oscillator.frequency.value = 2000; // value in hertz;
-oscillator.start();
+var audioBuffer   	= audioCtx.createBuffer(1, frameCount, audioCtx.sampleRate);
+var source        	= audioCtx.createBufferSource();
+	source.buffer 	= audioBuffer; 
+	source.loop	  	= true;
+	source.start();
 
 var spectrumAnalyser = audioCtx.createAnalyser();	  
 	spectrumAnalyser.fftSize = 256;
     spectrumAnalyser.smoothingTimeConstant = 0.8;
 	spectrumAnalyser.minDecibels = -90;
-	spectrumAnalyser.maxDecibels = -10;
-    
+	spectrumAnalyser.maxDecibels = -10;    
 
-var myScriptProcessor = audioCtx.createScriptProcessor(2048,1,1);
-    
 var bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve;
 var initialised = false;
 
 // Setup the audio path
-oscillator.connect(myScriptProcessor);
-myScriptProcessor.connect(spectrumAnalyser);
-
+source.connect(spectrumAnalyser);
 
 var audioIterations = 0; // variable to monitor spectrum processing
-
-/* This event is triggered and re-loads the data from the current curve into the audiobuffer
-   Definitely a place for some code optimisation... only update if the curve data changes perhaps? */   
-myScriptProcessor.onaudioprocess = function(audioProcessingEvent) {
-	var outputBuffer = audioProcessingEvent.outputBuffer;
-	dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, outputBuffer);
-	audioIterations++;
-}
-
-oscillator.onended = function() {
-/* function added to catch stopping of the oscillator */
-	oscillator.start();
-}
 
 function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer) {
 
@@ -81,6 +60,7 @@ function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer) {
             }
             frameIndex = 0;
         }
+		audioIterations++;
 }
 
 /* Function to actually draw the spectrum analyser overlay
@@ -147,7 +127,9 @@ this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve) {
 		bufferStartFrameIndex = startFrameIndex;
 		bufferFieldIndex = fieldIndex;
 		bufferCurve = curve;
-		
+		if (audioBuffer) {
+			dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, audioBuffer);
+		}
 		draw(); // draw the analyser on the canvas....
 	}
 }
