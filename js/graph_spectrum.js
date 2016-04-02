@@ -53,7 +53,7 @@ function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer) {
             var chunk = chunks[chunkIndex];
             for (; frameIndex < chunk.frames.length; frameIndex++) {
             	var fieldValue = chunk.frames[frameIndex][fieldIndex];
-                bufferData[i++] = (curve.lookup(fieldValue));
+                bufferData[i++] = (curve.lookupRaw(fieldValue));
 
                 if (i >= buffer.length)
                     break dataCollectionLoop;
@@ -91,7 +91,7 @@ function draw() {
       canvasCtx.fillStyle = 'rgba(255, 255, 255, .25)'; /* white */
       canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
       
-      var barWidth = (WIDTH / PLOTTED_BUFFER_LENGTH);// * 2.5;
+      var barWidth = (WIDTH / PLOTTED_BUFFER_LENGTH) - 1;// * 2.5;
       var barHeight;
       var x = 0;
       
@@ -101,17 +101,43 @@ function draw() {
         canvasCtx.fillStyle = 'rgba(0,255,0,0.3)'; /* green */
         canvasCtx.fillRect(x,HEIGHT-barHeight,barWidth,barHeight);
 
-        x += barWidth;
+        x += barWidth + 1;
       }
-      drawAxisLabel('#' + leftPad(audioIterations, "0", 7), WIDTH - 8, HEIGHT - 10);
+      drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT);
+      drawAxisLabel('#' + leftPad(audioIterations, "0", 7), WIDTH - 8, HEIGHT - 10, 'right');
 	  canvasCtx.restore();
 	}
 
+function drawGridLines(sampleRate, LEFT, TOP, WIDTH, HEIGHT) {
 
-function drawAxisLabel(axisLabel, X, Y) {
+	var ticks = 5;
+	var frequencyInterval = (sampleRate / ticks) / 4;
+	var frequency = 0;
+
+	for(var i=0; i<=ticks; i++) {
+		    canvasCtx.beginPath();
+            canvasCtx.lineWidth = 1;
+            canvasCtx.strokeStyle = "rgba(255,255,255,0.25)";
+            
+            canvasCtx.moveTo(i * (WIDTH / ticks), 0);
+            canvasCtx.lineTo(i * (WIDTH / ticks), HEIGHT);
+            
+            canvasCtx.stroke();
+            drawAxisLabel((frequency)+"Hz", i * (WIDTH / ticks), HEIGHT * 1.05, 'center');
+			frequency += frequencyInterval;
+	}	
+}
+
+function drawAxisLabel(axisLabel, X, Y, align) {
         canvasCtx.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
         canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
-        canvasCtx.textAlign = 'right';
+		if(align) {
+			 canvasCtx.textAlign = align;
+			 } else 
+			 {
+			 canvasCtx.textAlign = 'center';
+			 }
+
         
         canvasCtx.fillText(axisLabel, X, Y);
     }

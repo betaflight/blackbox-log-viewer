@@ -53,7 +53,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         defaultOptions = {
             gapless:false,
             drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
-            drawAnalyser:true,    // add an analyser option
+            drawAnalyser:true,              // add an analyser option
+            analyserSampleRate:2000/*Hz*/,  // the loop time for the log
             eraseBackground: true // Set to false if you want the graph to draw on top of an existing canvas image
         },
         
