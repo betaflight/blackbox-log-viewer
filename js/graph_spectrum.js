@@ -27,8 +27,8 @@ var source        	= audioCtx.createBufferSource();
 var spectrumAnalyser = audioCtx.createAnalyser();	  
 	spectrumAnalyser.fftSize = 256;
     spectrumAnalyser.smoothingTimeConstant = 0.8;
-	spectrumAnalyser.minDecibels = -90;
-	spectrumAnalyser.maxDecibels = -10;    
+	spectrumAnalyser.minDecibels = -120;
+	spectrumAnalyser.maxDecibels = -20;    
 
 var bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve;
 var initialised = false;
