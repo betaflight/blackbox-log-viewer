@@ -522,6 +522,10 @@ function BlackboxLogViewer() {
         prefs.set('log-legend-hidden', hidden);
         updateCanvasSize();
     }
+
+    function onLegendSelectionChange() {
+        updateCanvasSize();
+    }
     
     prefs.get('videoConfig', function(item) {
         if (item) {
@@ -549,7 +553,7 @@ function BlackboxLogViewer() {
     });
     
     $(document).ready(function() {
-        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange);
+        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange);
         
         prefs.get('log-legend-hidden', function(item) {
             if (item) {

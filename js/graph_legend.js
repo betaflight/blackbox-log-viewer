@@ -1,9 +1,9 @@
 "use strict";
 
-function GraphLegend(targetElem, config, onVisibilityChange) {
+function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange) {
     var
         that = this;
-    
+
     function buildLegend() {
         var 
             graphs = config.getGraphs(),
@@ -23,7 +23,7 @@ function GraphLegend(targetElem, config, onVisibilityChange) {
             for (j = 0; j < graph.fields.length; j++) {
                 var 
                     field = graph.fields[j],
-                    li = $('<li class="graph-legend-field"></li>');
+                    li = $('<li class="graph-legend-field" graph="' + i + '" field="' + j +'"></li>');
                 
                 li.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
                 li.css('border-bottom', "2px solid " + field.color);
@@ -33,6 +33,16 @@ function GraphLegend(targetElem, config, onVisibilityChange) {
             
             targetElem.append(graphDiv);
         }
+
+        // Add a trigger on legend; select the analyser graph/field to plot
+        $('.graph-legend-field').on('click', function() {
+               config.selectedFieldName     = this.innerText;
+               config.selectedGraphIndex    = $(this).attr('graph');
+               config.selectedFieldIndex    = $(this).attr('field');
+               if (onNewSelectionChange) {
+                   onNewSelectionChange();
+               }
+        });
 
         $('.log-close-legend-dialog').on('click', function() {
             that.hide();

@@ -32,6 +32,7 @@ var spectrumAnalyser = audioCtx.createAnalyser();
 
 var bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve;
 var initialised = false;
+var analyserFieldName; // Name of the field being analysed
 
 // Setup the audio path
 source.connect(spectrumAnalyser);
@@ -104,7 +105,7 @@ function draw() {
         x += barWidth + 1;
       }
       drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT);
-      drawAxisLabel('#' + leftPad(audioIterations, "0", 7), WIDTH - 8, HEIGHT - 10, 'right');
+      drawAxisLabel(analyserFieldName, WIDTH - 8, HEIGHT - 10, 'right');
 	  canvasCtx.restore();
 	}
 
@@ -143,16 +144,17 @@ function drawAxisLabel(axisLabel, X, Y, align) {
     }
 
 /* This function is called from the canvas drawing routines within grapher.js
-   It is only used to record the current curve positions and draw the 
-   analyser on screen; the actual data is collected within the
-   scriptProcessing node */
+   It is only used to record the current curve positions, collect the data and draw the 
+   analyser on screen*/
    
-this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve) {
+this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve, fieldName) {
 		// Store the data pointers
 		bufferChunks = chunks;
 		bufferStartFrameIndex = startFrameIndex;
 		bufferFieldIndex = fieldIndex;
 		bufferCurve = curve;
+	    analyserFieldName = fieldName;
+
 		if (audioBuffer) {
 			dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, audioBuffer);
 		}

@@ -77,7 +77,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
 
         that = this;
     
-
     this.onSeek = null;
     
     function extend(base, top) {
@@ -817,13 +816,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             }
             
             // Draw Analyser
-            if (options.drawAnalyser) { /* OK this is bad.. just pointing to the first graph for now! */
-
-				// Really should have method of selecting the graph/field I want an FFT for!
-                var graph = graphs[0]; 		// The first graph
-				var field = graph.fields[0]; // and the top one in the list	            
-                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve);
-                            
+            if (options.drawAnalyser && graphConfig.selectedFieldName) {
+                try{ // If we do not select a graph/field, then the analyser is hidden
+                var graph = graphs[graphConfig.selectedGraphIndex]; 		
+				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
+                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName);
+                } catch(err) {console.log('Cannot plot analyser');}            
             }
         }
         

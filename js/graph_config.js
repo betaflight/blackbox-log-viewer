@@ -12,6 +12,10 @@ function GraphConfig(graphConfig) {
         }
     }
     
+    this.selectedFieldName  = null;
+    this.selectedGraphIndex = 0;
+    this.selectedFieldIndex = 0;
+
     this.getGraphs = function() {
         return graphs;
     };
@@ -34,7 +38,7 @@ function GraphConfig(graphConfig) {
             
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
-        
+                    
         for (var i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
