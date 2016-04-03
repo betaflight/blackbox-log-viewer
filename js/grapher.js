@@ -820,7 +820,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                 try{ // If we do not select a graph/field, then the analyser is hidden
                 var graph = graphs[graphConfig.selectedGraphIndex]; 		
 				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
-                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName);
+                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName, windowEndTime);
                 } catch(err) {console.log('Cannot plot analyser');}            
             }
         }

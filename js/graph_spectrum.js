@@ -13,7 +13,7 @@ var // inefficient; copied from grapher.js
         };
 
 	  
-var frameCount = 2048;
+var frameCount = 4096;
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioCtx = new AudioContext();
@@ -30,7 +30,7 @@ var spectrumAnalyser = audioCtx.createAnalyser();
 	spectrumAnalyser.minDecibels = -120;
 	spectrumAnalyser.maxDecibels = -20;    
 
-var bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve;
+var bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, bufferWindowEndTime;
 var initialised = false;
 var analyserFieldName; // Name of the field being analysed
 
@@ -39,7 +39,7 @@ source.connect(spectrumAnalyser);
 
 var audioIterations = 0; // variable to monitor spectrum processing
 
-function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer) {
+function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer, windowEndTime) {
 
         var chunkIndex, frameIndex;
 		var i = 0;            
@@ -54,10 +54,13 @@ function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer) {
             var chunk = chunks[chunkIndex];
             for (; frameIndex < chunk.frames.length; frameIndex++) {
             	var fieldValue = chunk.frames[frameIndex][fieldIndex];
+            	var frameTime  = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]
                 bufferData[i++] = (curve.lookupRaw(fieldValue));
-
-                if (i >= buffer.length)
+                    
+                if (i >= buffer.length || frameTime >= windowEndTime) {
+					// console.log("Samples : " + i);
                     break dataCollectionLoop;
+                    }
             }
             frameIndex = 0;
         }
@@ -147,16 +150,18 @@ function drawAxisLabel(axisLabel, X, Y, align) {
    It is only used to record the current curve positions, collect the data and draw the 
    analyser on screen*/
    
-this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve, fieldName) {
+this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve, fieldName, windowEndTime) {
 		// Store the data pointers
 		bufferChunks = chunks;
 		bufferStartFrameIndex = startFrameIndex;
 		bufferFieldIndex = fieldIndex;
 		bufferCurve = curve;
+		bufferWindowEndTime = windowEndTime;
+
 	    analyserFieldName = fieldName;
 
 		if (audioBuffer) {
-			dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, audioBuffer);
+			dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, audioBuffer, bufferWindowEndTime);
 		}
 		draw(); // draw the analyser on the canvas....
 	}
