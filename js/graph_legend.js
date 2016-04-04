@@ -39,9 +39,19 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                config.selectedFieldName     = this.innerText;
                config.selectedGraphIndex    = $(this).attr('graph');
                config.selectedFieldIndex    = $(this).attr('field');
+               $('.hide-analyser-window').show();
                if (onNewSelectionChange) {
                    onNewSelectionChange();
                }
+        });
+
+        // Add a button to remove the analyser display
+        $('.hide-analyser-window').on('click', function() {
+            config.selectedFieldName = null;
+            $(this).hide();
+            if (onNewSelectionChange) {
+               onNewSelectionChange();
+               }            
         });
 
         $('.log-close-legend-dialog').on('click', function() {
@@ -51,6 +61,9 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         $('.log-open-legend-dialog').on('click', function() {
             that.show();
         });
+
+        // on first show, hide the analyser button
+        if(!config.selectedFieldName) $('.hide-analyser-window').hide();
     }
     
     this.show = function() {
