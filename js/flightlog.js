@@ -199,6 +199,7 @@ function FlightLog(logData) {
         // Add names for our ADDITIONAL_COMPUTED_FIELDS 
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
+        fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
         
         fieldNameToIndex = {};
         for (i = 0; i < fieldNames.length; i++) {
@@ -469,7 +470,8 @@ function FlightLog(logData) {
             gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]], 
             accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]],
             magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
-            
+            rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"]],
+
             sourceChunkIndex, destChunkIndex,
             
             sysConfig,
@@ -534,6 +536,15 @@ function FlightLog(logData) {
                             (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
                             (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0);
                     }
+
+                    // Calculate the PID Error
+                    for (var axis = 0; axis < 3; axis++) {
+                        destFrame[fieldIndex++] =  
+                            (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0) - 
+                            (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis) : 0);
+                        console.log()
+                    }
+
                 }
             }
         }
@@ -880,6 +891,43 @@ FlightLog.prototype.accRawToGs = function(value) {
 FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
     return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
 };
+
+// Convert rcCommand to degrees per second
+FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis) {
+
+    // Axis 0,1 refers to Roll and Pitch
+    // Axis 2 refers to Yaw.
+
+    var rRate  = 65;  // Roll Rate from configuration
+    var pRate  = 65;  // Pitch Rate from configuration
+    var yRate  = 65;  // Yaw Rate from configuration
+
+    var REWRITE = true; // Define that this is for the Rewrite Data - need to make dynamic!
+
+    if(REWRITE) // PID is ReWrite 
+    {
+        if(axis==0 /*ROLL*/) { 
+            return ((rRate + 27) * value ) >> 6;
+        }
+        if(axis==1 /*PITCH*/) {
+            return ((pRate + 27) * value ) >> 6;
+        }
+        if(axis==2 /*YAW*/) { 
+            return ((yRate + 27) * value ) >> 7;
+        }
+    } else { // PID is Luxfloat 
+        if(axis==0 /*ROLL*/) { 
+            return ((rRate+20)*value) / 50;
+        }
+        if(axis==1 /*PITCH*/) {
+            return ((pRate+20)*value) / 50;
+        }
+        if(axis==2 /*YAW*/) { 
+            return ((yRate+10)*value) / 50;
+        }
+    }
+};
+
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
     return this.vbatADCToMillivolts(this.getSysConfig().vbatref);

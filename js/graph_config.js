@@ -174,6 +174,10 @@ GraphConfig.load = function(config) {
                 fields: ["axisSum[all]"]
             },
             {
+                label: "Gyro Error",
+                fields: ["axisError[all]"]
+            },             
+            {
                 label: "Gyro + PID roll",
                 fields: ["axisP[0]", "axisI[0]", "axisD[0]", "gyroADC[0]"]
             },
@@ -237,6 +241,13 @@ GraphConfig.load = function(config) {
                 offset: 0,
                 power: 0.5,
                 inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^axisError\[/)) { // new PID error field
+            return {
+                offset: 0,
+                power: 0.8, /* Make this 1.0 to scale linearly */
+                inputRange: 1000, // Maximum error is hard coded to 1000 deg/s
                 outputRange: 1.0
             };
         } else if (fieldName.match(/^axis.+\[/)) {

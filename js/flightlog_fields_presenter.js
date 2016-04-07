@@ -59,7 +59,14 @@ function FlightLogFieldPresenter() {
         'axisSum[all]': 'PID_sum',
         'axisSum[0]' : 'PID_sum[roll]',
         'axisSum[1]' : 'PID_sum[pitch]',
-        'axisSum[2]' : 'PID_sum[yaw]'
+        'axisSum[2]' : 'PID_sum[yaw]',
+
+        //Virtual fields - Add the Error fields
+        'axisError[all]': 'PID_Error',
+        'axisError[0]' : 'PID_Error[roll]',
+        'axisError[1]' : 'PID_Error[pitch]',
+        'axisError[2]' : 'PID_Error[yaw]'
+
     };
     
     function presentFlags(flags, flagNames) {
@@ -119,6 +126,18 @@ function FlightLogFieldPresenter() {
             case 'gyroADC[2]':
                 return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
                 
+            case 'axisError[0]':
+            case 'axisError[1]':
+            case 'axisError[2]':
+                return Math.round(value) + " deg/s";
+
+            case 'rcCommand[0]':
+                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,0)) + " deg/s";
+            case 'rcCommand[1]':
+                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,1)) + " deg/s";
+            case 'rcCommand[2]':
+                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2)) + " deg/s";
+
             case 'accSmooth[0]':
             case 'accSmooth[1]':
             case 'accSmooth[2]':
