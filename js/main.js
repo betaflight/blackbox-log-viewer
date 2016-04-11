@@ -38,6 +38,9 @@ function BlackboxLogViewer() {
         // JSON graph configuration:
         graphConfig = {},
         
+        // JSON flightlog configuration
+        flightLogSettings = {},
+        
         // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
         activeGraphConfig = new GraphConfig(),
         
@@ -548,6 +551,33 @@ function BlackboxLogViewer() {
         }
     });
     
+    prefs.get('flightLogSettings', function(item) {
+        if(item) {
+            flightLogSettings = item;
+            } else {
+            flightLogSettings = [ // FlightLog Default Settings
+                { label: "Rates",
+                  parameters:
+                   [ 
+                    { // Index 0
+                      label: "Roll Rate",
+                      value: 75
+                    },
+                    { // Index 1
+                    label: "Pitch Rate",
+                    value: 75
+                    },
+                    { // Index 2
+                    label: "Yaw Rate",
+                    value: 45
+                    } 
+                   ]
+                },
+            ];
+            }
+    });
+    
+    
     activeGraphConfig.addListener(function() {
         invalidateGraph();
     });
@@ -666,6 +696,13 @@ function BlackboxLogViewer() {
                 prefs.set('graphConfig', graphConfig);
             }),
             
+            flightLogSetupDialog = new FlightLogSetupDialog($("#dlgFlightLogSetup"), function(newSettings) {
+                flightLog.settings = newSettings; // Store the settings to the flightlog
+
+                flightLogSettings = newSettings;  // Let's write this information to the local store
+                prefs.set('flightLogSettings', flightLogSettings);
+            }),
+
             exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
                 videoConfig = newConfig;
                 
@@ -679,6 +716,12 @@ function BlackboxLogViewer() {
             graphConfigDialog.show(flightLog, graphConfig);
         });
 
+        $(".open-log-setup-dialog").click(function(e) {
+            e.preventDefault();
+            
+            flightLogSetupDialog.show(flightLog, flightLogSettings);
+        });
+        
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
                 setGraphState(GRAPH_STATE_PAUSED);

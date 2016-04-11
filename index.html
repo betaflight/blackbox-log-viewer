@@ -235,6 +235,7 @@
                 <div class="log-graph-legend">
                 </div>
                 <button type="button" class="btn btn-default btn-block hide-analyser-window">Hide Analyser</button>
+                <button type="button" class="btn btn-default btn-block open-log-setup-dialog">Log Setup</button>
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
             </div>
         </div>
@@ -282,6 +283,31 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default graph-configuration-dialog-cancel" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="dlgFlightLogSetup">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Setup Log Viewer</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group">
+                        <ul class="dropdown-menu" role="menu">
+                        </ul>
+                    </div>
+                    <ul class="list-unstyled setup-flightlog-list">
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default flightlog-setup-dialog-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary flightlog-setup-dialog-save" data-dismiss="modal">Save changes</button>
                 </div>
             </div>
         </div>
@@ -420,6 +446,7 @@
     <script src="js/flightlog_fields_presenter.js"></script>
     <script src="js/flightlog_parser.js"></script>
     <script src="js/flightlog_index.js"></script>
+    <script src="js/flightlog_setup_dialog.js"></script>
     <script src="js/flightlog.js"></script>
     <script src="js/grapher.js"></script>
     <script src="js/graph_config.js"></script>

@@ -33,10 +33,31 @@ function FlightLog(logData) {
         maxSmoothing = 0,
         
         smoothedCache = new FIFOCache(2);
+               
     
     //Public fields:
     this.parser = parser;
     
+    this.settings = [ // FlightLog Settings
+                { label: "Rates",
+                  parameters:
+                   [ 
+                    { // Index 0
+                      label: "Roll Rate",
+                      value: 75
+                    },
+                    { // Index 1
+                    label: "Pitch Rate",
+                    value: 75
+                    },
+                    { // Index 2
+                    label: "Yaw Rate",
+                    value: 45
+                    } 
+                   ]
+                },
+        ];
+
     this.getMainFieldCount = function() {
         return fieldNames.length;
     };
@@ -898,34 +919,13 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis) {
     // Axis 0,1 refers to Roll and Pitch
     // Axis 2 refers to Yaw.
 
-    var rRate  = 65;  // Roll Rate from configuration
-    var pRate  = 65;  // Pitch Rate from configuration
-    var yRate  = 65;  // Yaw Rate from configuration
+    // ReWrite or LUXFloat only
 
-    var REWRITE = true; // Define that this is for the Rewrite Data - need to make dynamic!
-
-    if(REWRITE) // PID is ReWrite 
-    {
-        if(axis==0 /*ROLL*/) { 
-            return ((rRate + 27) * value ) >> 6;
+        if(axis==2 /*YAW*/) {
+            return ((this.settings[0].parameters[axis].value + 47) * value ) >> 7;
+        } else { /*ROLL or PITCH */
+            return ((this.settings[0].parameters[axis].value + 27) * value ) >> 6;
         }
-        if(axis==1 /*PITCH*/) {
-            return ((pRate + 27) * value ) >> 6;
-        }
-        if(axis==2 /*YAW*/) { 
-            return ((yRate + 27) * value ) >> 7;
-        }
-    } else { // PID is Luxfloat 
-        if(axis==0 /*ROLL*/) { 
-            return ((rRate+20)*value) / 50;
-        }
-        if(axis==1 /*PITCH*/) {
-            return ((pRate+20)*value) / 50;
-        }
-        if(axis==2 /*YAW*/) { 
-            return ((yRate+10)*value) / 50;
-        }
-    }
 };
 
 
