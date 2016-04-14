@@ -40,6 +40,40 @@ function BlackboxLogViewer() {
         
         // JSON flightlog configuration
         flightLogSettings = {},
+
+        flightLogDefaultSettings = [ // FlightLog Default Settings
+                { label: "Rates",
+                  parameters:
+                   [ 
+                    { // Index 0
+                      label: "Roll Rate",
+                      value: 75
+                    },
+                    { // Index 1
+                      label: "Pitch Rate",
+                      value: 75
+                    },
+                    { // Index 2
+                      label: "Yaw Rate",
+                      value: 45
+                    }, 
+                    { // Index 3
+                      label: "Yaw Expo",
+                      value: 20
+                    } 
+                   ]
+                },
+                { label: "Loop Time",
+                  parameters:
+                   [ 
+                    { // Index 0
+                      label: "Looptime",
+                      value: 500
+                    },
+                   ]
+                },
+            ],
+            
         
         // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
         activeGraphConfig = new GraphConfig(),
@@ -473,7 +507,7 @@ function BlackboxLogViewer() {
             flightLogDataArray = new Uint8Array(bytes);
             
             try {
-                flightLog = new FlightLog(flightLogDataArray);
+                flightLog = new FlightLog(flightLogDataArray, flightLogSettings);
             } catch (err) {
                 alert("Sorry, an error occured while trying to open this log:\n\n" + err);
                 return;
@@ -555,25 +589,7 @@ function BlackboxLogViewer() {
         if(item) {
             flightLogSettings = item;
             } else {
-            flightLogSettings = [ // FlightLog Default Settings
-                { label: "Rates",
-                  parameters:
-                   [ 
-                    { // Index 0
-                      label: "Roll Rate",
-                      value: 75
-                    },
-                    { // Index 1
-                    label: "Pitch Rate",
-                    value: 75
-                    },
-                    { // Index 2
-                    label: "Yaw Rate",
-                    value: 45
-                    } 
-                   ]
-                },
-            ];
+            flightLogSettings = flightLogDefaultSettings;
             }
     });
     

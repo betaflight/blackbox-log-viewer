@@ -65,7 +65,19 @@ function FlightLogFieldPresenter() {
         'axisError[all]': 'PID_Error',
         'axisError[0]' : 'PID_Error[roll]',
         'axisError[1]' : 'PID_Error[pitch]',
-        'axisError[2]' : 'PID_Error[yaw]'
+        'axisError[2]' : 'PID_Error[yaw]',
+
+        //Virtual fields - add the Scaled rcCommands
+        'rcCommands[all]': 'rcCommands',
+        'rcCommands[0]' : 'rcCommands[roll]',
+        'rcCommands[1]' : 'rcCommands[pitch]',
+        'rcCommands[2]' : 'rcCommands[yaw]',
+
+        //Virtual fields - add the Scaled gyros
+        'gyroADCs[all]': 'gyros',
+        'gyroADCs[0]': 'gyros[roll]',
+        'gyroADCs[1]': 'gyros[pitch]',
+        'gyroADCs[2]': 'gyros[yaw]'        
 
     };
     

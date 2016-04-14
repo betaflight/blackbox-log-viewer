@@ -174,7 +174,7 @@ GraphConfig.load = function(config) {
                 fields: ["axisSum[all]"]
             },
             {
-                label: "Gyro Error",
+                label: "PID Error",
                 fields: ["axisError[all]"]
             },             
             {
@@ -243,13 +243,27 @@ GraphConfig.load = function(config) {
                 inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
                 outputRange: 1.0
             };
-        } else if (fieldName.match(/^axisError\[/)) { // new PID error field
+        } else if (fieldName.match(/^axisError\[/)) { // Custom PID error field
             return {
                 offset: 0,
-                power: 0.8, /* Make this 1.0 to scale linearly */
-                inputRange: 1000, // Maximum error is hard coded to 1000 deg/s
+                power: 1.0, /* Make this 1.0 to scale linearly */
+                inputRange: 1200, // Maximum error is hard coded to 1200 deg/s
                 outputRange: 1.0
             };
+        } else if (fieldName.match(/^rcCommands\[/)) { // Custom scaled rcCommand scaling
+            return {
+                offset: 0,
+                power: 1.0,
+                inputRange: 1200,
+                outputRange: 1.0
+            };            
+        } else if (fieldName.match(/^gyroADCs\[/)) { // Custom gyroADC scaling
+            return {
+                offset: 0,
+                power: 1.0,
+                inputRange: 1200,
+                outputRange: 1.0
+            };             
         } else if (fieldName.match(/^axis.+\[/)) {
             return {
                 offset: 0,
@@ -277,7 +291,7 @@ GraphConfig.load = function(config) {
                 power: 0.8,
                 inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
                 outputRange: 1.0
-            };
+            };           
         } else if (fieldName == "heading[2]") {
             return {
                 offset: -Math.PI,
