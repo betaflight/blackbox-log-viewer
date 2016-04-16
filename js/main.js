@@ -46,21 +46,33 @@ function BlackboxLogViewer() {
                   parameters:
                    [ 
                     { // Index 0
+                      label: "RC Rate",
+                      value: 100
+                    },
+                    { // Index 1
+                      label: "RC Expo",
+                      value: 70
+                    },
+                    { // Index 2
                       label: "Roll Rate",
                       value: 75
                     },
-                    { // Index 1
+                    { // Index 3
                       label: "Pitch Rate",
                       value: 75
                     },
-                    { // Index 2
+                    { // Index 4
                       label: "Yaw Rate",
                       value: 45
                     }, 
-                    { // Index 3
+                    { // Index 5
                       label: "Yaw Expo",
                       value: 20
-                    } 
+                    },
+                    { // Index 6
+                      label: "Super Expo",
+                      value: 30
+                    }                     
                    ]
                 },
                 { label: "Loop Time",
@@ -461,10 +473,14 @@ function BlackboxLogViewer() {
         }
         
         // transfer the parameters from the log file into the settings data structure
-        if(flightLog.getSysConfig().loopTime != null) {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
-        if(flightLog.getSysConfig().rRate != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rRate; }
-        if(flightLog.getSysConfig().pRate != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().pRate; }
-        if(flightLog.getSysConfig().yRate != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().yRate; }
+        if(flightLog.getSysConfig().rcRate        != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }
+        if(flightLog.getSysConfig().rcExpo        != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }
+        if(flightLog.getSysConfig().rRate         != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }
+        if(flightLog.getSysConfig().pRate         != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }
+        if(flightLog.getSysConfig().yRate         != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }
+        if(flightLog.getSysConfig().rcYawExpo     != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }
+        if(flightLog.getSysConfig().superExpoRate != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoRate; }
+        if(flightLog.getSysConfig().loopTime      != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
 
         if (graph) {
             graph.destroy();

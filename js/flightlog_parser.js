@@ -194,11 +194,12 @@ var FlightLogParser = function(logData) {
         // At the moment they are entered on a dialog box.
         
         defaultSysConfigExtension = {
-            rcExpo:70,      // RC Expo
-            rRate:0,        // Roll Rate
-            pRate:0,        // Pitch Rate
-            yRate:45,       // Yaw Rate
-            yawExpo: 20,    // Yaw Expo
+            rcExpo:70,           // RC Expo
+            rRate:0,             // Roll Rate
+            pRate:0,             // Pitch Rate
+            yRate:45,            // Yaw Rate
+            rcYawExpo: 20,         // Yaw Expo
+            superExpoFactor: 30, // Super Expo Factor
             loopTime: 500,  // Looptime
         },
             
@@ -233,7 +234,7 @@ var FlightLogParser = function(logData) {
         
         //The actual log data stream we're reading:
         stream;
-
+        
     //Public fields:
 
     /* Information about the frame types the log contains, along with details on their fields.
@@ -358,7 +359,10 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.yRate = ratesParams[2];
             break;
             case "rcYawExpo":
-                that.sysConfig.yExpo = parseInt(fieldValue, 10);
+                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
+            break;
+            case "superExpoFactor":
+                that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
             break;
             case "looptime":
                 that.sysConfig.loopTime = parseInt(fieldValue, 10);
@@ -901,6 +905,10 @@ var FlightLogParser = function(logData) {
             case FlightLogEvent.SYNC_BEEP:
                 lastEvent.data.time = stream.readUnsignedVB();
                 lastEvent.time = lastEvent.data.time;
+            break;
+            case FlightLogEvent.FLIGHT_MODE: // get the flag status change
+                lastEvent.data.newFlags = stream.readUnsignedVB();
+                lastEvent.data.lastFlags = stream.readUnsignedVB();
             break;
             case FlightLogEvent.AUTOTUNE_CYCLE_START:
                 lastEvent.data.phase = stream.readByte();
