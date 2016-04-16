@@ -472,16 +472,19 @@ function BlackboxLogViewer() {
             return;
         }
         
+        try {
         // transfer the parameters from the log file into the settings data structure
-        if(flightLog.getSysConfig().rcRate        != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }
-        if(flightLog.getSysConfig().rcExpo        != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }
-        if(flightLog.getSysConfig().rRate         != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }
-        if(flightLog.getSysConfig().pRate         != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }
-        if(flightLog.getSysConfig().yRate         != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }
-        if(flightLog.getSysConfig().rcYawExpo     != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }
-        if(flightLog.getSysConfig().superExpoRate != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoRate; }
-        if(flightLog.getSysConfig().loopTime      != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
-
+        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }
+        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }
+        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }
+        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }
+        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }
+        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }
+        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }
+        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
+        } catch(e) {
+            console.log('FlightLog Settings archive fault... ignoring');
+        }
         if (graph) {
             graph.destroy();
         }
