@@ -460,6 +460,12 @@ function BlackboxLogViewer() {
             return;
         }
         
+        // transfer the parameters from the log file into the settings data structure
+        if(flightLog.getSysConfig().loopTime != null) {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
+        if(flightLog.getSysConfig().rRate != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rRate; }
+        if(flightLog.getSysConfig().pRate != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().pRate; }
+        if(flightLog.getSysConfig().yRate != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().yRate; }
+
         if (graph) {
             graph.destroy();
         }

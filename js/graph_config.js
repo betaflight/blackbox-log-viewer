@@ -246,21 +246,21 @@ GraphConfig.load = function(config) {
         } else if (fieldName.match(/^axisError\[/)) { // Custom PID error field
             return {
                 offset: 0,
-                power: 1.0, /* Make this 1.0 to scale linearly */
+                power: 0.25, /* Make this 1.0 to scale linearly */
                 inputRange: 1200, // Maximum error is hard coded to 1200 deg/s
                 outputRange: 1.0
             };
         } else if (fieldName.match(/^rcCommands\[/)) { // Custom scaled rcCommand scaling
             return {
                 offset: 0,
-                power: 1.0,
+                power: 0.25,
                 inputRange: 1200,
                 outputRange: 1.0
             };            
         } else if (fieldName.match(/^gyroADCs\[/)) { // Custom gyroADC scaling
             return {
                 offset: 0,
-                power: 1.0,
+                power: 0.25,
                 inputRange: 1200,
                 outputRange: 1.0
             };             

@@ -347,27 +347,24 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.rcRate = parseInt(fieldValue, 10);
             break;
            
-            /* In future these fields may exist int the blackbox log
+            // In future these fields may exist int the blackbox log
             case "rcExpo":
                 that.sysConfig.rcExpo = parseInt(fieldValue, 10);
             break;
-            case "rRate":
-                that.sysConfig.rRate = parseInt(fieldValue, 10);
+            case "rates":
+                var ratesParams = parseCommaSeparatedIntegers(fieldValue);
+                that.sysConfig.rRate = ratesParams[0];
+                that.sysConfig.pRate = ratesParams[1];
+                that.sysConfig.yRate = ratesParams[2];
             break;
-            case "pRate":
-                that.sysConfig.pRate = parseInt(fieldValue, 10);
-            break;
-            case "yRate":
-                that.sysConfig.yRate = parseInt(fieldValue, 10);
-            break;
-            case "yExpo":
+            case "rcYawExpo":
                 that.sysConfig.yExpo = parseInt(fieldValue, 10);
             break;
-            case "loopTime":
+            case "looptime":
                 that.sysConfig.loopTime = parseInt(fieldValue, 10);
             break;
-            *******/
- 
+            /****************************/
+            
             case "vbatscale":
                 that.sysConfig.vbatscale = parseInt(fieldValue, 10);
             break;

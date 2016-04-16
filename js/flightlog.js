@@ -916,18 +916,17 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis) {
     // ReWrite or LUXFloat only
 
 
-        if(axis==2 /*YAW*/) {
-            return ((this.settings[0].parameters[axis].value + 47) * value ) >> 7;
-        } else { /*ROLL or PITCH */
-            return ((this.settings[0].parameters[axis].value + 27) * value ) >> 6;
-        }
-
-//        var sysConfig = this.getSysConfig();
 //        if(axis==2 /*YAW*/) {
-//            return ((this.getSysConfig().yRate + 47) * value ) >> 7;
+//            return ((this.settings[0].parameters[axis].value + 47) * value ) >> 7;
 //        } else { /*ROLL or PITCH */
-//            return ((((axis==0)?this.getSysConfig().rRate:this.getSysConfig().pRate) + 27) * value ) >> 6;
+//            return ((this.settings[0].parameters[axis].value + 27) * value ) >> 6;
 //        }
+
+        if(axis==2 /*YAW*/) {
+            return ((this.getSysConfig().yRate + 47) * value ) >> 7;
+        } else { /*ROLL or PITCH */
+            return ((((axis==0)?this.getSysConfig().rRate:this.getSysConfig().pRate) + 27) * value ) >> 6;
+        }
 };
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
