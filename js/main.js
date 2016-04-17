@@ -489,7 +489,14 @@ function BlackboxLogViewer() {
             graph.destroy();
         }
         
-        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas);
+        var graphOptions = {
+            drawAnalyser:true,              // add an analyser option
+            analyserSampleRate:2000/*Hz*/,  // the loop time for the log
+            };
+
+        if(flightLog.getSysConfig().loopTime        != null)    {graphOptions.analyserSampleRate = 1000000 / flightLog.getSysConfig().loopTime; }
+
+        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, graphOptions);
         
         setVideoInTime(false);
         setVideoOutTime(false);
