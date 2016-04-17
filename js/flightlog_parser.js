@@ -194,13 +194,13 @@ var FlightLogParser = function(logData) {
         // At the moment they are entered on a dialog box.
         
         defaultSysConfigExtension = {
-            rcExpo:70,           // RC Expo
-            rRate:0,             // Roll Rate
-            pRate:0,             // Pitch Rate
-            yRate:45,            // Yaw Rate
-            rcYawExpo: 20,         // Yaw Expo
-            superExpoFactor: 30, // Super Expo Factor
-            loopTime: 500,  // Looptime
+            rcExpo:null,//70,           // RC Expo
+            rRate:null,//0,             // Roll Rate
+            pRate:null,//0,             // Pitch Rate
+            yRate:null,//45,            // Yaw Rate
+            rcYawExpo: null,//20,         // Yaw Expo
+            superExpoFactor: null,//30, // Super Expo Factor
+            loopTime: null,//500,  // Looptime
         },
             
         frameTypes,
