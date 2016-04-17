@@ -200,7 +200,7 @@ GraphConfig.load = function(config) {
             return 5000;
         } else if (fieldName.match(/^servo\[/)) {
             return 5000;
-        } else if (fieldName.match(/^gyroADC\[/)) {
+        } else if (fieldName.match(/^gyroADC.*\[/)) {
             return 3000;
         } else if (fieldName.match(/^accSmooth\[/)) {
             return 3000;
@@ -243,27 +243,15 @@ GraphConfig.load = function(config) {
                 inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
                 outputRange: 1.0
             };
-        } else if (fieldName.match(/^axisError\[/)) { // Custom PID error field
+        } else if (fieldName.match(/^axisError\[/)  ||     // Custom Gyro, rcCommand and axisError Scaling
+                   fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
+                   fieldName.match(/^gyroADCs\[/)      ) { // same range.
             return {
                 offset: 0,
                 power: 0.25, /* Make this 1.0 to scale linearly */
-                inputRange: 1200, // Maximum error is hard coded to 1200 deg/s
+                inputRange: flightLog.gyroRawToDegreesPerSecond(2.0e-5 / sysConfig.gyroScale),
                 outputRange: 1.0
             };
-        } else if (fieldName.match(/^rcCommands\[/)) { // Custom scaled rcCommand scaling
-            return {
-                offset: 0,
-                power: 0.25,
-                inputRange: 1200,
-                outputRange: 1.0
-            };            
-        } else if (fieldName.match(/^gyroADCs\[/)) { // Custom gyroADC scaling
-            return {
-                offset: 0,
-                power: 0.25,
-                inputRange: 1200,
-                outputRange: 1.0
-            };             
         } else if (fieldName.match(/^axis.+\[/)) {
             return {
                 offset: 0,
