@@ -29,6 +29,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             elem = $(
                 '<li class="config-graph-field">'
                     + '<select class="form-control"><option value="">(choose a field)</option></select>'
+                    + '<input name="smoothing" class="form-control" type="text"></input>'
+                    + '<input name="power" class="form-control" type="text"></input>'
+                    + '<input name="scale" class="form-control" type="text"></input>'
                     + '<button type="button" class="btn btn-default btn-sm">Remove</button>'
                 + '</li>'
             ),
@@ -40,6 +43,17 @@ function GraphConfigurationDialog(dialog, onSave) {
             select.append(renderFieldOption(offeredFieldNames[i], selectedFieldName));
         }
         
+        // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
+        $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100)+'%':'30%');
+        if(field.curve!=null) {
+            $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100)+'%':'100%');
+            $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100)+'%':'100%');
+        } else
+        {
+            $('input[name=power]',elem).val('100%');
+            $('input[name=scale]',elem).val('100%');
+        }
+
         return elem;
     }
     
@@ -55,6 +69,18 @@ function GraphConfigurationDialog(dialog, onSave) {
                                     + '<label class="col-sm-2 control-label">Axis label</label>'
                                     + '<div class="col-sm-10">'
                                         + '<input class="form-control" type="text" placeholder="Axis label">'
+                                    + '</div>'
+                                + '</div>'
+                                + '<div class="form-group form-group-sm">'
+                                    + '<div class="col-sm-10">'
+                                        + '<table>'
+                                            + '<tr>'
+                                                + '<th name="field"></th>'
+                                                + '<th name="smoothing">Smooth</th>'
+                                                + '<th name="expo">Expo</th>'
+                                                + '<th name="zoom">Zoom</th>'
+                                            + '</tr>'
+                                        + '</table>'
                                     + '</div>'
                                 + '</div>'
                                 + '<div class="form-group form-group-sm">'
@@ -162,8 +188,13 @@ function GraphConfigurationDialog(dialog, onSave) {
             
             $(".config-graph-field", this).each(function() {
                 field = {
-                    name: $("select", this).val()
-                };
+                    name: $("select", this).val(),
+                    smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
+                    curve: {
+                        power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exagerate center values - expo)
+                        outputRange: parseInt($("input[name=scale]", this).val())/100.0     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
+                    }
+                }
                 
                 if (field.name.length > 0) {
                     graph.fields.push(field);
