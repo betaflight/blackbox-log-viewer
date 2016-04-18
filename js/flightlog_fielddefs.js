@@ -21,6 +21,7 @@ var
         LOGGING_RESUME: 14,
         
         GTUNE_CYCLE_RESULT: 20,
+        FLIGHT_MODE: 30, // New Event type
         
         LOG_END: 255
     }),

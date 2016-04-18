@@ -188,6 +188,20 @@ var FlightLogParser = function(logData) {
             currentMeterScale: 400,
             deviceUID: null
         },
+
+        // One day, maybe these will be part of the blackbox log; they certainly would be helpfull!
+        // If so, then they can be moved intor the defaultSysConfig definition above.
+        // At the moment they are entered on a dialog box.
+        
+        defaultSysConfigExtension = {
+            rcExpo:null,//70,           // RC Expo
+            rRate:null,//0,             // Roll Rate
+            pRate:null,//0,             // Pitch Rate
+            yRate:null,//45,            // Yaw Rate
+            rcYawExpo: null,//20,         // Yaw Expo
+            superExpoFactor: null,//30, // Super Expo Factor
+            loopTime: null,//500,  // Looptime
+        },
             
         frameTypes,
         
@@ -220,7 +234,7 @@ var FlightLogParser = function(logData) {
         
         //The actual log data stream we're reading:
         stream;
-
+        
     //Public fields:
 
     /* Information about the frame types the log contains, along with details on their fields.
@@ -228,8 +242,10 @@ var FlightLogParser = function(logData) {
      */
     this.frameDefs = {};
     
-    this.sysConfig = Object.create(defaultSysConfig);
-    
+    // Lets add the custom extensions
+    var completeSysConfig = $.extend({}, defaultSysConfig, defaultSysConfigExtension);
+    this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
+
     /* 
      * Event handler of the signature (frameValid, frame, frameType, frameOffset, frameSize)
      * called when a frame has been decoded.
@@ -331,6 +347,28 @@ var FlightLogParser = function(logData) {
             case "rcRate":
                 that.sysConfig.rcRate = parseInt(fieldValue, 10);
             break;
+           
+            // In future these fields may exist int the blackbox log
+            case "rcExpo":
+                that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+            break;
+            case "rates":
+                var ratesParams = parseCommaSeparatedIntegers(fieldValue);
+                that.sysConfig.rRate = ratesParams[0];
+                that.sysConfig.pRate = ratesParams[1];
+                that.sysConfig.yRate = ratesParams[2];
+            break;
+            case "rcYawExpo":
+                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
+            break;
+            case "superExpoFactor":
+                that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
+            break;
+            case "looptime":
+                that.sysConfig.loopTime = parseInt(fieldValue, 10);
+            break;
+            /****************************/
+            
             case "vbatscale":
                 that.sysConfig.vbatscale = parseInt(fieldValue, 10);
             break;
@@ -868,6 +906,10 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.time = stream.readUnsignedVB();
                 lastEvent.time = lastEvent.data.time;
             break;
+            case FlightLogEvent.FLIGHT_MODE: // get the flag status change
+                lastEvent.data.newFlags = stream.readUnsignedVB();
+                lastEvent.data.lastFlags = stream.readUnsignedVB();
+            break;
             case FlightLogEvent.AUTOTUNE_CYCLE_START:
                 lastEvent.data.phase = stream.readByte();
                 
@@ -963,7 +1005,9 @@ var FlightLogParser = function(logData) {
         this.resetStats();
         
         //Reset system configuration to MW's defaults
-        this.sysConfig = Object.create(defaultSysConfig);
+        // Lets add the custom extensions
+        var completeSysConfig = $.extend({}, defaultSysConfig, defaultSysConfigExtension);
+        this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
         
         this.frameDefs = {};
         

@@ -42,6 +42,40 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             "#ccebc5",
             "#ffed6f"
         ],
+
+        EventStates = [
+            'ARM',
+            'ANGLE',
+            'HORIZON',
+            'BARO',
+            'MAG',
+            'HEADFREE',
+            'HEADADJ',
+            'CAMSTAB',
+            'CAMTRIG',
+            'GPSHOME',
+            'GPSHOLD',
+            'PASSTHRU',
+            'BEEPER',
+            'LEDMAX',
+            'LEDLOW',
+            'LLIGHTS',
+            'CALIB',
+            'GOV',
+            'OSD',
+            'TELEMETRY',
+            'GTUNE',
+            'SONAR',
+            'SERVO1',
+            'SERVO2',
+            'SERVO3',
+            'BLACKBOX',
+            'FAILSAFE',
+            'AIRMODE',
+            'SUPEREXPO',
+            '3DDISABLESWITCH',
+            'CHECKBOX_ITEM_COUNT'
+            ],
         
         WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
 
@@ -53,6 +87,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         defaultOptions = {
             gapless:false,
             drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
+            drawAnalyser:true,              // add an analyser option
+            analyserSampleRate:2000/*Hz*/,  // the loop time for the log
             eraseBackground: true // Set to false if you want the graph to draw on top of an existing canvas image
         },
         
@@ -71,6 +107,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         
         craft3D = null, craft2D = null,
         
+    	analyser = null, /* define a new spectrum analyser */
+
         that = this;
     
     this.onSeek = null;
@@ -485,6 +523,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
     function drawAxisLine() {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
         canvasContext.lineWidth = 1;
+		canvasContext.setLineDash([5]); // Make the center line a dash        
+        canvasContext.beginPath();
+        canvasContext.moveTo(0, 0);
+        canvasContext.lineTo(canvas.width, 0);
+        
+        canvasContext.stroke();
+		canvasContext.setLineDash([]);        
+    }
+
+    //Draw an background for the line for a graph (at the origin and spanning the window)
+    function drawAxisBackground(plotHeight) {
+        canvasContext.strokeStyle = "rgba(255,255,255,0.1)";
+        canvasContext.lineWidth = plotHeight;
         
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
@@ -540,6 +591,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
     function timeToCanvasX(time) {
         return canvas.width / windowWidthMicros * (time - windowStartTime);
     }
+
+    function eventToFriendly(flags, lastFlags) {
+        var eventState = '';
+        var found = false;        
+        for(var i=0; i<=31; i++) {
+           if((1<<i) & (flags ^ lastFlags)) { // State Changed
+               eventState += ' | ' + EventStates[i] + ' ' + (((1<<i) & flags)?'ON':'OFF')
+               found = true;
+           } 
+        }
+        if(!found) {eventState += ' | ACRO';} // Catch the state when all flags are off, which is ACRO of course
+        return eventState;
+    }
     
     function drawEvent(event, sequenceNum) {
         var 
@@ -566,6 +630,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             break;
             case FlightLogEvent.INFLIGHT_ADJUSTMENT:
                 drawEventLine(x, labelY, event.data.name + " = " + event.data.value, "rgba(0,255,255,0.5)", 2);
+            break;
+            case FlightLogEvent.FLIGHT_MODE:
+                drawEventLine(x, labelY, "Flight Mode Change" + eventToFriendly(event.data.newFlags, event.data.lastFlags), "rgba(0,0,255,0.75)", 3);
             break;
             default:
                 drawEventLine(x);
@@ -731,6 +798,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     canvasContext.translate(0, canvas.height * graph.y);
                     
                     drawAxisLine();
+                    if(graphs.length > 1) // only draw the background if more than one graph set.
+                        drawAxisBackground(canvas.height * graph.height);
                     
                     for (j = 0; j < graph.fields.length; j++) {
                         var field = graph.fields[j];
@@ -794,6 +863,15 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     
                     canvasContext.restore();
                 }
+            }
+            
+            // Draw Analyser
+            if (options.drawAnalyser && graphConfig.selectedFieldName) {
+                try{ // If we do not select a graph/field, then the analyser is hidden
+                var graph = graphs[graphConfig.selectedGraphIndex]; 		
+				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
+                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName, windowEndTime);
+                } catch(err) {console.log('Cannot plot analyser');}            
             }
         }
         
@@ -909,6 +987,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
     identifyFields();
 
     initializeCraftModel();
+    
+    /* Create the FlightLogAnalyser object */
+	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options);
 
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);

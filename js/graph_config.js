@@ -12,6 +12,10 @@ function GraphConfig(graphConfig) {
         }
     }
     
+    this.selectedFieldName  = null;
+    this.selectedGraphIndex = 0;
+    this.selectedFieldIndex = 0;
+
     this.getGraphs = function() {
         return graphs;
     };
@@ -34,7 +38,7 @@ function GraphConfig(graphConfig) {
             
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
-        
+                    
         for (var i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
@@ -161,10 +165,18 @@ GraphConfig.load = function(config) {
                 label: "Gyros",
                 fields: ["gyroADC[all]"]
             },
+            {	/* Add custom graph configurations to the main menu ! */
+                label: "RC Command",
+                fields: ["rcCommand[all]"]
+            },
             {
                 label: "PIDs",
                 fields: ["axisSum[all]"]
             },
+            {
+                label: "PID Error",
+                fields: ["axisError[all]"]
+            },             
             {
                 label: "Gyro + PID roll",
                 fields: ["axisP[0]", "axisI[0]", "axisD[0]", "gyroADC[0]"]
@@ -188,7 +200,7 @@ GraphConfig.load = function(config) {
             return 5000;
         } else if (fieldName.match(/^servo\[/)) {
             return 5000;
-        } else if (fieldName.match(/^gyroADC\[/)) {
+        } else if (fieldName.match(/^gyroADC.*\[/)) {
             return 3000;
         } else if (fieldName.match(/^accSmooth\[/)) {
             return 3000;
@@ -220,7 +232,7 @@ GraphConfig.load = function(config) {
         } else if (fieldName.match(/^gyroADC\[/)) {
             return {
                 offset: 0,
-                power: 0.25,
+                power: 0.25, /* Make this 1.0 to scale linearly */
                 inputRange: 2.0e-5 / sysConfig.gyroScale,
                 outputRange: 1.0
             };
@@ -229,6 +241,15 @@ GraphConfig.load = function(config) {
                 offset: 0,
                 power: 0.5,
                 inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
+                outputRange: 1.0
+            };
+        } else if (fieldName.match(/^axisError\[/)  ||     // Custom Gyro, rcCommand and axisError Scaling
+                   fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
+                   fieldName.match(/^gyroADCs\[/)      ) { // same range.
+            return {
+                offset: 0,
+                power: 0.25, /* Make this 1.0 to scale linearly */
+                inputRange: flightLog.gyroRawToDegreesPerSecond(2.0e-5 / sysConfig.gyroScale),
                 outputRange: 1.0
             };
         } else if (fieldName.match(/^axis.+\[/)) {
@@ -258,7 +279,7 @@ GraphConfig.load = function(config) {
                 power: 0.8,
                 inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
                 outputRange: 1.0
-            };
+            };           
         } else if (fieldName == "heading[2]") {
             return {
                 offset: -Math.PI,

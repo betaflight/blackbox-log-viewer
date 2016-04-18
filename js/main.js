@@ -38,6 +38,55 @@ function BlackboxLogViewer() {
         // JSON graph configuration:
         graphConfig = {},
         
+        // JSON flightlog configuration
+        flightLogSettings = {},
+
+        flightLogDefaultSettings = [ // FlightLog Default Settings
+                { label: "Rates",
+                  parameters:
+                   [ 
+                    { // Index 0
+                      label: "RC Rate",
+                      value: 100
+                    },
+                    { // Index 1
+                      label: "RC Expo",
+                      value: 70
+                    },
+                    { // Index 2
+                      label: "Roll Rate",
+                      value: 75
+                    },
+                    { // Index 3
+                      label: "Pitch Rate",
+                      value: 75
+                    },
+                    { // Index 4
+                      label: "Yaw Rate",
+                      value: 45
+                    }, 
+                    { // Index 5
+                      label: "Yaw Expo",
+                      value: 20
+                    },
+                    { // Index 6
+                      label: "Super Expo",
+                      value: 30
+                    }                     
+                   ]
+                },
+                { label: "Loop Time",
+                  parameters:
+                   [ 
+                    { // Index 0
+                      label: "Looptime",
+                      value: 500
+                    },
+                   ]
+                },
+            ],
+            
+        
         // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
         activeGraphConfig = new GraphConfig(),
         
@@ -423,11 +472,31 @@ function BlackboxLogViewer() {
             return;
         }
         
+        try {
+        // transfer the parameters from the log file into the settings data structure
+        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }
+        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }
+        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }
+        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }
+        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }
+        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }
+        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }
+        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
+        } catch(e) {
+            console.log('FlightLog Settings archive fault... ignoring');
+        }
         if (graph) {
             graph.destroy();
         }
         
-        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas);
+        var graphOptions = {
+            drawAnalyser:true,              // add an analyser option
+            analyserSampleRate:2000/*Hz*/,  // the loop time for the log
+            };
+
+        if(flightLog.getSysConfig().loopTime        != null)    {graphOptions.analyserSampleRate = 1000000 / flightLog.getSysConfig().loopTime; }
+
+        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, graphOptions);
         
         setVideoInTime(false);
         setVideoOutTime(false);
@@ -470,7 +539,7 @@ function BlackboxLogViewer() {
             flightLogDataArray = new Uint8Array(bytes);
             
             try {
-                flightLog = new FlightLog(flightLogDataArray);
+                flightLog = new FlightLog(flightLogDataArray, flightLogSettings);
             } catch (err) {
                 alert("Sorry, an error occured while trying to open this log:\n\n" + err);
                 return;
@@ -522,6 +591,10 @@ function BlackboxLogViewer() {
         prefs.set('log-legend-hidden', hidden);
         updateCanvasSize();
     }
+
+    function onLegendSelectionChange() {
+        updateCanvasSize();
+    }
     
     prefs.get('videoConfig', function(item) {
         if (item) {
@@ -544,12 +617,21 @@ function BlackboxLogViewer() {
         }
     });
     
+    prefs.get('flightLogSettings', function(item) {
+        if(item) {
+            flightLogSettings = item;
+            } else {
+            flightLogSettings = flightLogDefaultSettings;
+            }
+    });
+    
+    
     activeGraphConfig.addListener(function() {
         invalidateGraph();
     });
     
     $(document).ready(function() {
-        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange);
+        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange);
         
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
@@ -662,6 +744,13 @@ function BlackboxLogViewer() {
                 prefs.set('graphConfig', graphConfig);
             }),
             
+            flightLogSetupDialog = new FlightLogSetupDialog($("#dlgFlightLogSetup"), function(newSettings) {
+                flightLog.settings = newSettings; // Store the settings to the flightlog
+
+                flightLogSettings = newSettings;  // Let's write this information to the local store
+                prefs.set('flightLogSettings', flightLogSettings);
+            }),
+
             exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
                 videoConfig = newConfig;
                 
@@ -675,6 +764,12 @@ function BlackboxLogViewer() {
             graphConfigDialog.show(flightLog, graphConfig);
         });
 
+        $(".open-log-setup-dialog").click(function(e) {
+            e.preventDefault();
+            
+            flightLogSetupDialog.show(flightLog, flightLogSettings);
+        });
+        
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
                 setGraphState(GRAPH_STATE_PAUSED);
