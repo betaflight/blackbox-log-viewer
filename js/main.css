@@ -157,53 +157,9 @@ html.has-log .log-graph-config {
 .config-graph-field select {
     margin-right:4px;
 }
-
-.config-graph-field input[name=smoothing] {
-    margin-right:4px;
-    max-width: 75px;
-}
-.config-graph-field input[name=power] {
-    margin-right:4px;
-    max-width: 65px;
-}
-.config-graph-field input[name=scale] {
-    margin-right:4px;
-    max-width: 65px;
-}
-
 .config-graph h4 button {
     margin-left:0.5em;
 }
-
-.config-graph table tr{
-    margin:0.5em 0;
-    width: 100%;    
-    line-height: 10px;
-}
-
-.config-graph th[name=field] {
-    margin-right:4px;
-    width: 265px;    
-}
-
-.config-graph th[name=smoothing] {
-    margin-right:4px;
-    width: 75px;    
-    text-align: center;
-}
-
-.config-graph th[name=expo] {
-    margin-right:4px;
-    width: 65px;    
-    text-align: center;
-}
-
-.config-graph th[name=zoom] {
-    margin-right:4px;
-    width: 65px;    
-    text-align: center;
-}
-
 
 .setup-parameters {
     margin:0.5em 0;
@@ -216,6 +172,7 @@ html.has-log .log-graph-config {
 .setup-parameter {
     margin:0.5em 0;
 }
+
 
 #graphCanvas {
     position:absolute;
