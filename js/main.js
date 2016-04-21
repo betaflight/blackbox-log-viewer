@@ -812,6 +812,26 @@ function BlackboxLogViewer() {
 
         $(window).resize(updateCanvasSize);
         
+        $(document).on("mousewheel", function(e) {
+            var delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
+            if(delta<0) { // scroll down (or left)
+                if (e.altKey || e.shiftKey) {
+                    setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
+                    $(".graph-zoom").val(graphZoom + "%");
+                } else {
+                  logJumpBack();
+                }
+            } else { // scroll up or right
+                if (e.altKey || e.shiftKey) {
+                    setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
+                    $(".graph-zoom").val(graphZoom + "%");
+                } else {
+                    logJumpForward();
+                }
+            }
+            e.preventDefault();
+        });
+
         $(document).keydown(function(e) {
             var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
 
