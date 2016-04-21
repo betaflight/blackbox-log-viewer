@@ -663,8 +663,9 @@ function BlackboxLogViewer() {
                 }
             }
         });
-        
-        $(".log-jump-back").click(function() {
+
+
+        var logJumpBack = function() {
             if (hasVideo) {
                 setVideoTime(video.currentTime - SMALL_JUMP_TIME / 1000000);
             } else {
@@ -672,9 +673,12 @@ function BlackboxLogViewer() {
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-back").click(logJumpBack);
     
-        $(".log-jump-forward").click(function() {
+        
+
+        var logJumpForward = function() {
             if (hasVideo) {
                 setVideoTime(video.currentTime + SMALL_JUMP_TIME / 1000000);
             } else {
@@ -682,49 +686,58 @@ function BlackboxLogViewer() {
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-forward").click(logJumpForward);
         
-        $(".log-jump-start").click(function() {
+        var logJumpStart = function() {
             setCurrentBlackboxTime(flightLog.getMinTime());
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-start").click(logJumpStart);
     
-        $(".log-jump-end").click(function() {
+        var logJumpEnd = function() {
             setCurrentBlackboxTime(flightLog.getMaxTime());
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-end").click(logJumpEnd);
         
-        $(".video-jump-start").click(function() {
+        var videoJumpStart = function() {
             setVideoTime(0);
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".video-jump-start").click(videoJumpStart);
     
-        $(".video-jump-end").click(function() {
+        var videoJumpEnd = function() {
             if (video.duration) {
                 setVideoTime(video.duration);
                 setGraphState(GRAPH_STATE_PAUSED);
             }
-        });
-        
-        $(".log-play-pause").click(function() {
+        };
+        $(".video-jump-end").click(videoJumpEnd);
+
+        var logPlayPause = function() {
             if (graphState == GRAPH_STATE_PAUSED) {
                 setGraphState(GRAPH_STATE_PLAY);
             } else {
                 setGraphState(GRAPH_STATE_PAUSED);
-            }
-        });
+            }            
+        };  
+        $(".log-play-pause").click(logPlayPause);
         
-        $(".log-sync-here").click(function() {
+        var logSyncHere = function() {
             setVideoOffset(video.currentTime);
-        });
+        };
+        $(".log-sync-here").click(logSyncHere);
         
-        $(".log-sync-back").click(function() {
+        var logSyncBack = function() {
             setVideoOffset(videoOffset - 1 / 15);
-        });
+        };
+        $(".log-sync-back").click(logSyncBack);
     
-        $(".log-sync-forward").click(function() {
+        var logSyncForward = function() {
             setVideoOffset(videoOffset + 1 / 15);
-        });
+        };
+        $(".log-sync-forward").click(logSyncForward);
     
         $(".video-offset").change(function() {
             var offset = parseFloat($(".video-offset").val());
@@ -734,6 +747,7 @@ function BlackboxLogViewer() {
                 invalidateGraph();
             }
         });
+
         
         var 
             graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
@@ -799,26 +813,66 @@ function BlackboxLogViewer() {
         $(window).resize(updateCanvasSize);
         
         $(document).keydown(function(e) {
-            if (graph && !(e.altkey || e.shiftKey || e.ctrlKey || e.metaKey) && $(e.target).parents('.modal').length == 0) {
+            var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
+
+            if (graph && $(e.target).parents('.modal').length == 0) {
                 switch (e.which) {
                     case "I".charCodeAt(0):
-                        if (videoExportInTime === currentBlackboxTime) {
-                            setVideoInTime(false)
-                        } else {
-                            setVideoInTime(currentBlackboxTime);
+                        if (!(shifted)) {
+                            if (videoExportInTime === currentBlackboxTime) {
+                                setVideoInTime(false)
+                            } else {
+                                setVideoInTime(currentBlackboxTime);
+                            }
                         }
                         
                         e.preventDefault();
                     break;
                     case "O".charCodeAt(0):
-                        if (videoExportOutTime === currentBlackboxTime) {
-                            setVideoOutTime(false);
-                        } else {
-                            setVideoOutTime(currentBlackboxTime);
-                        }
-                        
+                        if (!(shifted)) {
+                            if (videoExportOutTime === currentBlackboxTime) {
+                                setVideoOutTime(false);
+                            } else {
+                                setVideoOutTime(currentBlackboxTime);
+                            }
+                        }                        
+                        e.preventDefault();
+                    // Add my shortcuts
+                    case " ".charCodeAt(0): // start/stop playback
+                            logPlayPause();
                         e.preventDefault();
                     break;
+                    case 37: // left arrow (normal scroll, shifted zoom out)
+                        if (e.altKey || e.shiftKey) {
+                            setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
+                            $(".graph-zoom").val(graphZoom + "%");
+                        } else {
+                          logJumpBack();
+                        }
+                        e.preventDefault();
+                    break;
+                    case 39: // right arrow (normal scroll, shifted zoom in)
+                        if (e.altKey || e.shiftKey) {
+                            setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
+                            $(".graph-zoom").val(graphZoom + "%");
+                        } else {
+                            logJumpForward();
+                        }
+                        e.preventDefault();
+                    break;
+                    case 33: // pgup arrow - goto start
+                        if (!(shifted)) {
+                          logJumpStart();
+                        } 
+                        e.preventDefault();
+                    break;
+                    case 34: // pgdn arrow - goto end
+                        if (!(shifted)) {
+                            logJumpEnd();
+                        } 
+                        e.preventDefault();
+                    break;
+
                 }
             }
         });
