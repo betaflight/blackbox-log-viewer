@@ -474,14 +474,14 @@ function BlackboxLogViewer() {
         
         try {
         // transfer the parameters from the log file into the settings data structure
-        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }
-        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }
-        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }
-        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }
-        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }
-        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }
-        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }
-        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
+        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }           else {flightLog.getSysConfig().rcRate          = flightLogSettings[0].parameters[0].value; }
+        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }           else {flightLog.getSysConfig().rcExpo          = flightLogSettings[0].parameters[1].value; }
+        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }            else {flightLog.getSysConfig().rRate           = flightLogSettings[0].parameters[2].value; }
+        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }            else {flightLog.getSysConfig().pRate           = flightLogSettings[0].parameters[3].value; }
+        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }            else {flightLog.getSysConfig().yRate           = flightLogSettings[0].parameters[4].value; }
+        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }        else {flightLog.getSysConfig().rcYawExpo       = flightLogSettings[0].parameters[5].value; }
+        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }  else {flightLog.getSysConfig().superExpoFactor = flightLogSettings[0].parameters[6].value; }
+        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }         else {flightLog.getSysConfig().loopTime        = flightLogSettings[1].parameters[0].value; }
         } catch(e) {
             console.log('FlightLog Settings archive fault... ignoring');
         }
@@ -763,6 +763,15 @@ function BlackboxLogViewer() {
 
                 flightLogSettings = newSettings;  // Let's write this information to the local store
                 prefs.set('flightLogSettings', flightLogSettings);
+
+                // Save Current Position
+                var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
+                selectLog(null);
+                if (hasVideo) {
+                    setVideoTime(activePosition);
+                } else {
+                    setCurrentBlackboxTime(activePosition);
+                }
             }),
 
             exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
