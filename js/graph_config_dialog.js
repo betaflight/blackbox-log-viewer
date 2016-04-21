@@ -5,7 +5,8 @@ function GraphConfigurationDialog(dialog, onSave) {
         // Some fields it doesn't make sense to graph
         BLACKLISTED_FIELDS = {time:true, loopIteration:true},
         offeredFieldNames = [],
-        exampleGraphs = [];
+        exampleGraphs = [],
+        activeFlightLog;
     
     function renderFieldOption(fieldName, selectedName) {
         var 
@@ -24,7 +25,7 @@ function GraphConfigurationDialog(dialog, onSave) {
      * Render the element for the "pick a field" dropdown box. Provide "field" from the config in order to set up the
      * initial selection.
      */
-    function renderField(field) {
+    function renderField(flightLog, field) {
         var 
             elem = $(
                 '<li class="config-graph-field">'
@@ -44,20 +45,20 @@ function GraphConfigurationDialog(dialog, onSave) {
         }
         
         // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
-        $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100)+'%':'30%');
+        $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
         if(field.curve!=null) {
-            $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100)+'%':'100%');
-            $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100)+'%':'100%');
+            $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
+            $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
         } else
         {
-            $('input[name=power]',elem).val('100%');
-            $('input[name=scale]',elem).val('100%');
+            $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
+            $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
         }
 
         return elem;
     }
     
-    function renderGraph(index, graph) {
+    function renderGraph(flightLog, index, graph) {
         var 
             graphElem = $(
                 '<li class="config-graph">'
@@ -101,14 +102,14 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         // "Add field" button
         $("button", graphElem).click(function(e) {
-            fieldList.append(renderField({}));
+            fieldList.append(renderField(flightLog, {}));
             e.preventDefault();
         });
         
         for (var i = 0; i < graph.fields.length; i++) {
             var 
                 field = graph.fields[i],
-                fieldElem = renderField(field);
+                fieldElem = renderField(flightLog, field);
             
             fieldList.append(fieldElem);
         }
@@ -130,14 +131,14 @@ function GraphConfigurationDialog(dialog, onSave) {
         return graphElem;
     }
     
-    function renderGraphs(graphs) {
+    function renderGraphs(flightLog, graphs) {
         var
             graphList = $(".config-graphs-list", dialog);
         
         graphList.empty();
         
         for (var i = 0; i < graphs.length; i++) {
-            graphList.append(renderGraph(i, graphs[i]));
+            graphList.append(renderGraph(flightLog, i, graphs[i]));
         }
     }
     
@@ -264,10 +265,12 @@ function GraphConfigurationDialog(dialog, onSave) {
     this.show = function(flightLog, config) {
         dialog.modal('show');
         
+        activeFlightLog = flightLog;
+        
         buildOfferedFieldNamesList(flightLog, config);
 
         populateExampleGraphs(flightLog, exampleGraphsMenu);
-        renderGraphs(config);
+        renderGraphs(flightLog, config);
     };
  
     $(".graph-configuration-dialog-save").click(function(e) {
@@ -283,7 +286,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     exampleGraphsMenu.on("click", "a", function(e) {
         var 
             graph = exampleGraphs[$(this).data("graphIndex")],
-            graphElem = renderGraph($(".config-graph", dialog).length, graph);
+            graphElem = renderGraph(activeFlightLog, $(".config-graph", dialog).length, graph);
         
         $(".config-graphs-list", dialog).append(graphElem);
         
