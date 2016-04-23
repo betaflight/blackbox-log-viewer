@@ -196,133 +196,144 @@ GraphConfig.load = function(config) {
         ];
 
     GraphConfig.getDefaultSmoothingForField = function(flightLog, fieldName) {
-        if (fieldName.match(/^motor\[/)) {
-            return 5000;
-        } else if (fieldName.match(/^servo\[/)) {
-            return 5000;
-        } else if (fieldName.match(/^gyroADC.*\[/)) {
-            return 3000;
-        } else if (fieldName.match(/^accSmooth\[/)) {
-            return 3000;
-        } else if (fieldName.match(/^axis.+\[/)) {
-            return 3000;
-        } else {
-            return 0;
-        }
+        try{
+            if (fieldName.match(/^motor\[/)) {
+                return 5000;
+            } else if (fieldName.match(/^servo\[/)) {
+                return 5000;
+            } else if (fieldName.match(/^gyroADC.*\[/)) {
+                return 3000;
+            } else if (fieldName.match(/^accSmooth\[/)) {
+                return 3000;
+            } else if (fieldName.match(/^axis.+\[/)) {
+                return 3000;
+            } else {
+                return 0;
+            }
+        } catch (e) { return 0;}
     };
     
     GraphConfig.getDefaultCurveForField = function(flightLog, fieldName) {
         var
             sysConfig = flightLog.getSysConfig();
         
-        if (fieldName.match(/^motor\[/)) {
-            return {
-                offset: -(sysConfig.maxthrottle + sysConfig.minthrottle) / 2,
-                power: 1.0,
-                inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^servo\[/)) {
-            return {
-                offset: -1500,
-                power: 1.0,
-                inputRange: 500,
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^gyroADC\[/)) {
-            return {
-                offset: 0,
-                power: 0.25, /* Make this 1.0 to scale linearly */
-                inputRange: 2.0e-5 / sysConfig.gyroScale,
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^accSmooth\[/)) {
-            return {
-                offset: 0,
-                power: 0.5,
-                inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^axisError\[/)  ||     // Custom Gyro, rcCommand and axisError Scaling
-                   fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
-                   fieldName.match(/^gyroADCs\[/)      ) { // same range.
-            return {
-                offset: 0,
-                power: 0.25, /* Make this 1.0 to scale linearly */
-                inputRange: flightLog.gyroRawToDegreesPerSecond(2.0e-5 / sysConfig.gyroScale),
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^axis.+\[/)) {
-            return {
-                offset: 0,
-                power: 0.3,
-                inputRange: 400,
-                outputRange: 1.0
-            };
-        } else if (fieldName == "rcCommand[3]") { // Throttle
-            return {
-                offset: -1500,
-                power: 1.0,
-                inputRange: 500,
-                outputRange: 1.0
-            };
-        } else if (fieldName == "rcCommand[2]") { // Yaw
-            return {
-                offset: 0,
-                power: 0.8,
-                inputRange: 500,
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^rcCommand\[/)) {
-            return {
-                offset: 0,
-                power: 0.8,
-                inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
-                outputRange: 1.0
-            };           
-        } else if (fieldName == "heading[2]") {
-            return {
-                offset: -Math.PI,
-                power: 1.0,
-                inputRange: Math.PI,
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^heading\[/)) {
-            return {
-                offset: 0,
-                power: 1.0,
-                inputRange: Math.PI,
-                outputRange: 1.0
-            };
-        } else if (fieldName.match(/^sonar.*/)) {
-            return {
-                offset: -200,
-                power: 1.0,
-                inputRange: 200,
-                outputRange: 1.0
-            };
-        } else {
-            // Scale and center the field based on the whole-log observed ranges for that field
-            var
-                stats = flightLog.getStats(),
-                fieldIndex = flightLog.getMainFieldIndexByName(fieldName),
-                fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
-            
-            if (fieldStat) {
+        try {
+            if (fieldName.match(/^motor\[/)) {
                 return {
-                    offset: -(fieldStat.max + fieldStat.min) / 2,
+                    offset: -(sysConfig.maxthrottle + sysConfig.minthrottle) / 2,
                     power: 1.0,
-                    inputRange: Math.max((fieldStat.max - fieldStat.min) / 2, 1.0),
+                    inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                     outputRange: 1.0
                 };
-            } else {
+            } else if (fieldName.match(/^servo\[/)) {
                 return {
-                    offset: 0,
+                    offset: -1500,
                     power: 1.0,
                     inputRange: 500,
                     outputRange: 1.0
                 };
+            } else if (fieldName.match(/^gyroADC\[/)) {
+                return {
+                    offset: 0,
+                    power: 0.25, /* Make this 1.0 to scale linearly */
+                    inputRange: 2.0e-5 / sysConfig.gyroScale,
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^accSmooth\[/)) {
+                return {
+                    offset: 0,
+                    power: 0.5,
+                    inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^axisError\[/)  ||     // Custom Gyro, rcCommand and axisError Scaling
+                       fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
+                       fieldName.match(/^gyroADCs\[/)      ) { // same range.
+                return {
+                    offset: 0,
+                    power: 0.25, /* Make this 1.0 to scale linearly */
+                    inputRange: flightLog.gyroRawToDegreesPerSecond(2.0e-5 / sysConfig.gyroScale),
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^axis.+\[/)) {
+                return {
+                    offset: 0,
+                    power: 0.3,
+                    inputRange: 400,
+                    outputRange: 1.0
+                };
+            } else if (fieldName == "rcCommand[3]") { // Throttle
+                return {
+                    offset: -1500,
+                    power: 1.0,
+                    inputRange: 500,
+                    outputRange: 1.0
+                };
+            } else if (fieldName == "rcCommand[2]") { // Yaw
+                return {
+                    offset: 0,
+                    power: 0.8,
+                    inputRange: 500,
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^rcCommand\[/)) {
+                return {
+                    offset: 0,
+                    power: 0.8,
+                    inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
+                    outputRange: 1.0
+                };           
+            } else if (fieldName == "heading[2]") {
+                return {
+                    offset: -Math.PI,
+                    power: 1.0,
+                    inputRange: Math.PI,
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^heading\[/)) {
+                return {
+                    offset: 0,
+                    power: 1.0,
+                    inputRange: Math.PI,
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^sonar.*/)) {
+                return {
+                    offset: -200,
+                    power: 1.0,
+                    inputRange: 200,
+                    outputRange: 1.0
+                };
+            } else {
+                // Scale and center the field based on the whole-log observed ranges for that field
+                var
+                    stats = flightLog.getStats(),
+                    fieldIndex = flightLog.getMainFieldIndexByName(fieldName),
+                    fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+
+                if (fieldStat) {
+                    return {
+                        offset: -(fieldStat.max + fieldStat.min) / 2,
+                        power: 1.0,
+                        inputRange: Math.max((fieldStat.max - fieldStat.min) / 2, 1.0),
+                        outputRange: 1.0
+                    };
+                } else {
+                    return {
+                        offset: 0,
+                        power: 1.0,
+                        inputRange: 500,
+                        outputRange: 1.0
+                    };
+                }
             }
+        } catch(e) {
+            return {
+                offset: 0,
+                power: 1.0,
+                inputRange: 500,
+                outputRange: 1.0
+            };
         }
     };
     
