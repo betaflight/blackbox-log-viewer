@@ -195,7 +195,7 @@ function BlackboxLogViewer() {
             table.append(rows.join(""));
 
             // update time field on toolbar
-            $(".graph-time").val(formatTime(currentBlackboxTime/1000, true));
+            $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
             if(hasMarker) {
                 $(".graph-time-marker").val(formatTime((currentBlackboxTime-markerTime)/1000, true));
             }
@@ -604,11 +604,18 @@ function BlackboxLogViewer() {
         updateCanvasSize();
     }
 
-    function markerSet(state) { // update marker field
+    function setMarker(state) { // update marker field
         hasMarker = state;
         (state)?$("html").addClass("has-marker"):$("html").removeClass("has-marker");       
     }
-        
+
+    this.getMarker = function() { // get marker field
+        return {
+            state:hasMarker,
+            time:markerTime
+            };
+    }
+           
     prefs.get('videoConfig', function(item) {
         if (item) {
             videoConfig = item;
@@ -906,7 +913,8 @@ function BlackboxLogViewer() {
                         if (!(shifted)) {
                             markerTime = currentBlackboxTime;
                             $(".graph-time-marker").val(formatTime(0));
-                            markerSet(!hasMarker);
+                            setMarker(!hasMarker);
+                            invalidateGraph();
                         }                        
                         e.preventDefault();
                     break;

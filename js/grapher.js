@@ -438,12 +438,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
         
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
-        // update time field on toolbar
-//        $(".graph-time").val(formatTime(timeMsec, true));
-//        if(hasMarker) {
-//            $(".graph-time-marker").val(formatTime(timeMsec-markerTime, true));
-//        }
-        
 
     }
     
@@ -641,6 +635,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             case FlightLogEvent.FLIGHT_MODE:
                 drawEventLine(x, labelY, "Flight Mode Change" + eventToFriendly(event.data.newFlags, event.data.lastFlags), "rgba(0,0,255,0.75)", 3);
             break;
+            case FlightLogEvent.CUSTOM: // Virtual Events shown in RED
+                drawEventLine(x, labelY, (event.label)?event.label:'EVENT', "rgba(255,0,0,0.75)", 3);
+            break;
             default:
                 drawEventLine(x);
         }
@@ -676,6 +673,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     drawEvent(events[j], sequenceNum++);
                 }
             }
+        }
+
+        // Add custom markers
+
+        // Draw Marker Event Line
+        var markerEvent = blackboxLogViewer.getMarker();
+        if(markerEvent!=null) {
+            if(markerEvent.state) drawEvent(
+                {
+                event:FlightLogEvent.CUSTOM,
+                time:markerEvent.time,
+                label:'Marker:' +formatTime((markerEvent.time-flightLog.getMinTime())/1000, true) 
+                }, sequenceNum++);
         }
     }
     
@@ -838,7 +848,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             
             // Draw events
             drawEvents(chunks);
-            
+
             // Draw details at the current time
             var
                 centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);

@@ -9,7 +9,7 @@ html, body {
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
     .container.main-pane {
-        width:1280px;
+        width:1320px;
     }
 }
 

@@ -23,9 +23,10 @@ var
         GTUNE_CYCLE_RESULT: 20,
         FLIGHT_MODE: 30, // New Event type
         
+        CUSTOM : 250, // Virtual Event Code - Never part of Log File.
         LOG_END: 255
     }),
-    
+        
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly([
         "ANGLE_MODE",
         "HORIZON_MODE",
