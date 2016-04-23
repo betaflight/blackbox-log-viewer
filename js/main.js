@@ -761,7 +761,7 @@ function BlackboxLogViewer() {
                     newTime += flightLog.getMinTime();
                     setCurrentBlackboxTime(newTime);
                 }
-                invalidateGraph();
+                invalidateGraph();               
             }
         });
        
@@ -861,6 +861,10 @@ function BlackboxLogViewer() {
 
         $(document).keydown(function(e) {
             var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
+            if(e.which === 13 && e.target.type === 'text' && $(e.target).parents('.modal').length == 0) {
+                // pressing return on a text field clears the focus.
+                $(e.target).blur();                
+            }
             // keyboard controls are disabled on modal dialog boxes and text entry fields
             if (graph && e.target.type != 'text' && $(e.target).parents('.modal').length == 0) {
                 switch (e.which) {
