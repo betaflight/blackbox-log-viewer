@@ -168,13 +168,14 @@ function leftPad(string, pad, minLength) {
 }
 
 function formatTime(msec, displayMsec) {
+// modify function to allow negative times.
     var
-        secs, mins, hours;
+        ms, secs, mins, hours;
     
-    msec = Math.round(msec);
+    ms = Math.round(Math.abs(msec));
     
-    secs = Math.floor(msec / 1000);
-    msec %= 1000;
+    secs = Math.floor(ms / 1000);
+    ms %= 1000;
 
     mins = Math.floor(secs / 60);
     secs %= 60;
@@ -182,8 +183,8 @@ function formatTime(msec, displayMsec) {
     hours = Math.floor(mins / 60);  
     mins %= 60;
     
-    return (hours ? leftPad(hours, "0", 2) + ":" : "") + leftPad(mins, "0", 2) + ":" + leftPad(secs, "0", 2)
-        + (displayMsec ? "." + leftPad(msec, "0", 3) : "");
+    return ((msec<0)?'-':'') + (hours ? leftPad(hours, "0", 2) + ":" : "") + leftPad(mins, "0", 2) + ":" + leftPad(secs, "0", 2)
+        + (displayMsec ? "." + leftPad(ms, "0", 3) : "");
 }
 
 function stringTimetoMsec(input) {

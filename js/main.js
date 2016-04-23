@@ -93,7 +93,7 @@ function BlackboxLogViewer() {
         graphLegend = null,
         fieldPresenter = FlightLogFieldPresenter,
         
-        hasVideo = false, hasLog = false,
+        hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         video = $(".log-graph video")[0],
         canvas = $("#graphCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
@@ -102,6 +102,8 @@ function BlackboxLogViewer() {
         
         videoExportInTime = false,
         videoExportOutTime = false,
+
+        markerTime = 0, // New marker time
         
         graphRendersCount = 0,
         
@@ -191,6 +193,12 @@ function BlackboxLogViewer() {
             }
             
             table.append(rows.join(""));
+
+            // update time field on toolbar
+            $(".graph-time").val(formatTime(currentBlackboxTime/1000, true));
+            if(hasMarker) {
+                $(".graph-time-marker").val(formatTime((currentBlackboxTime-markerTime)/1000, true));
+            }
         }
     }
     
@@ -595,7 +603,12 @@ function BlackboxLogViewer() {
     function onLegendSelectionChange() {
         updateCanvasSize();
     }
-    
+
+    function markerSet(state) { // update marker field
+        hasMarker = state;
+        (state)?$("html").addClass("has-marker"):$("html").removeClass("has-marker");       
+    }
+        
     prefs.get('videoConfig', function(item) {
         if (item) {
             videoConfig = item;
@@ -888,6 +901,15 @@ function BlackboxLogViewer() {
                             }
                         }                        
                         e.preventDefault();
+                    break;
+                    case "M".charCodeAt(0):
+                        if (!(shifted)) {
+                            markerTime = currentBlackboxTime;
+                            $(".graph-time-marker").val(formatTime(0));
+                            markerSet(!hasMarker);
+                        }                        
+                        e.preventDefault();
+                    break;
                     // Add my shortcuts
                     case " ".charCodeAt(0): // start/stop playback
                             logPlayPause();

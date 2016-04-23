@@ -439,7 +439,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
         // update time field on toolbar
-        $(".graph-time").val(formatTime(timeMsec, true));
+//        $(".graph-time").val(formatTime(timeMsec, true));
+//        if(hasMarker) {
+//            $(".graph-time-marker").val(formatTime(timeMsec-markerTime, true));
+//        }
+        
+
     }
     
     /**

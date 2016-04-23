@@ -313,6 +313,13 @@ html.has-log .log-seek-bar {
     display:block;
 }
 
+html .graph-time-marker-group > .graph-time-marker {
+    display:none;
+}
+html.has-marker .graph-time-marker-group > .graph-time-marker {
+    display:inline-block;
+}
+
 .log-metadata, .log-field-values {
     display:none;
 }
