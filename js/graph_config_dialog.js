@@ -21,6 +21,22 @@ function GraphConfigurationDialog(dialog, onSave) {
         return option;
     }
     
+    // Set the current smoothing options for a field
+    function renderSmoothingOptions(elem, flightLog, field) {
+        if(elem) {
+            // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
+            $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
+            if(field.curve!=null) {
+                $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
+                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
+            } else
+            {
+                $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
+                $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
+            }
+        }
+    }
+
     /**
      * Render the element for the "pick a field" dropdown box. Provide "field" from the config in order to set up the
      * initial selection.
@@ -44,16 +60,16 @@ function GraphConfigurationDialog(dialog, onSave) {
             select.append(renderFieldOption(offeredFieldNames[i], selectedFieldName));
         }
         
-        // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
-        $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
-        if(field.curve!=null) {
-            $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-            $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
-        } else
-        {
-            $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-            $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
-        }
+        // Set the smoothing values
+        renderSmoothingOptions(elem, flightLog, field);
+
+        // Ade event when selection changed to retreive the current smoothing settings.
+        $('select', elem).change( function(e) {
+            var selectedField = {
+                name: $('select option:selected', elem).val()
+                    };
+            renderSmoothingOptions(elem, activeFlightLog, selectedField);
+        });
 
         return elem;
     }
