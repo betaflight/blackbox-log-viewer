@@ -474,14 +474,14 @@ function BlackboxLogViewer() {
         
         try {
         // transfer the parameters from the log file into the settings data structure
-        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }
-        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }
-        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }
-        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }
-        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }
-        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }
-        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }
-        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }
+        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }           else {flightLog.getSysConfig().rcRate          = flightLogSettings[0].parameters[0].value; }
+        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }           else {flightLog.getSysConfig().rcExpo          = flightLogSettings[0].parameters[1].value; }
+        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }            else {flightLog.getSysConfig().rRate           = flightLogSettings[0].parameters[2].value; }
+        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }            else {flightLog.getSysConfig().pRate           = flightLogSettings[0].parameters[3].value; }
+        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }            else {flightLog.getSysConfig().yRate           = flightLogSettings[0].parameters[4].value; }
+        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }        else {flightLog.getSysConfig().rcYawExpo       = flightLogSettings[0].parameters[5].value; }
+        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }  else {flightLog.getSysConfig().superExpoFactor = flightLogSettings[0].parameters[6].value; }
+        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }         else {flightLog.getSysConfig().loopTime        = flightLogSettings[1].parameters[0].value; }
         } catch(e) {
             console.log('FlightLog Settings archive fault... ignoring');
         }
@@ -663,8 +663,9 @@ function BlackboxLogViewer() {
                 }
             }
         });
-        
-        $(".log-jump-back").click(function() {
+
+
+        var logJumpBack = function() {
             if (hasVideo) {
                 setVideoTime(video.currentTime - SMALL_JUMP_TIME / 1000000);
             } else {
@@ -672,9 +673,12 @@ function BlackboxLogViewer() {
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-back").click(logJumpBack);
     
-        $(".log-jump-forward").click(function() {
+        
+
+        var logJumpForward = function() {
             if (hasVideo) {
                 setVideoTime(video.currentTime + SMALL_JUMP_TIME / 1000000);
             } else {
@@ -682,49 +686,58 @@ function BlackboxLogViewer() {
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-forward").click(logJumpForward);
         
-        $(".log-jump-start").click(function() {
+        var logJumpStart = function() {
             setCurrentBlackboxTime(flightLog.getMinTime());
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-start").click(logJumpStart);
     
-        $(".log-jump-end").click(function() {
+        var logJumpEnd = function() {
             setCurrentBlackboxTime(flightLog.getMaxTime());
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".log-jump-end").click(logJumpEnd);
         
-        $(".video-jump-start").click(function() {
+        var videoJumpStart = function() {
             setVideoTime(0);
             setGraphState(GRAPH_STATE_PAUSED);
-        });
+        };
+        $(".video-jump-start").click(videoJumpStart);
     
-        $(".video-jump-end").click(function() {
+        var videoJumpEnd = function() {
             if (video.duration) {
                 setVideoTime(video.duration);
                 setGraphState(GRAPH_STATE_PAUSED);
             }
-        });
-        
-        $(".log-play-pause").click(function() {
+        };
+        $(".video-jump-end").click(videoJumpEnd);
+
+        var logPlayPause = function() {
             if (graphState == GRAPH_STATE_PAUSED) {
                 setGraphState(GRAPH_STATE_PLAY);
             } else {
                 setGraphState(GRAPH_STATE_PAUSED);
-            }
-        });
+            }            
+        };  
+        $(".log-play-pause").click(logPlayPause);
         
-        $(".log-sync-here").click(function() {
+        var logSyncHere = function() {
             setVideoOffset(video.currentTime);
-        });
+        };
+        $(".log-sync-here").click(logSyncHere);
         
-        $(".log-sync-back").click(function() {
+        var logSyncBack = function() {
             setVideoOffset(videoOffset - 1 / 15);
-        });
+        };
+        $(".log-sync-back").click(logSyncBack);
     
-        $(".log-sync-forward").click(function() {
+        var logSyncForward = function() {
             setVideoOffset(videoOffset + 1 / 15);
-        });
+        };
+        $(".log-sync-forward").click(logSyncForward);
     
         $(".video-offset").change(function() {
             var offset = parseFloat($(".video-offset").val());
@@ -734,6 +747,7 @@ function BlackboxLogViewer() {
                 invalidateGraph();
             }
         });
+
         
         var 
             graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
@@ -749,6 +763,15 @@ function BlackboxLogViewer() {
 
                 flightLogSettings = newSettings;  // Let's write this information to the local store
                 prefs.set('flightLogSettings', flightLogSettings);
+
+                // Save Current Position
+                var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
+                selectLog(null);
+                if (hasVideo) {
+                    setVideoTime(activePosition);
+                } else {
+                    setCurrentBlackboxTime(activePosition);
+                }
             }),
 
             exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
@@ -798,27 +821,89 @@ function BlackboxLogViewer() {
 
         $(window).resize(updateCanvasSize);
         
+        $(document).on("mousewheel", function(e) {
+        if (graph && $(e.target).parents('.modal').length == 0) {
+                var delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
+                if(delta<0) { // scroll down (or left)
+                    if (e.altKey || e.shiftKey) {
+                        setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
+                        $(".graph-zoom").val(graphZoom + "%");
+                    } else {
+                      logJumpBack();
+                    }
+                } else { // scroll up or right
+                    if (e.altKey || e.shiftKey) {
+                        setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
+                        $(".graph-zoom").val(graphZoom + "%");
+                    } else {
+                        logJumpForward();
+                    }
+                }
+                e.preventDefault();
+            }
+        });
+
         $(document).keydown(function(e) {
-            if (graph && !(e.altkey || e.shiftKey || e.ctrlKey || e.metaKey) && $(e.target).parents('.modal').length == 0) {
+            var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
+
+            if (graph && $(e.target).parents('.modal').length == 0) {
                 switch (e.which) {
                     case "I".charCodeAt(0):
-                        if (videoExportInTime === currentBlackboxTime) {
-                            setVideoInTime(false)
-                        } else {
-                            setVideoInTime(currentBlackboxTime);
+                        if (!(shifted)) {
+                            if (videoExportInTime === currentBlackboxTime) {
+                                setVideoInTime(false)
+                            } else {
+                                setVideoInTime(currentBlackboxTime);
+                            }
                         }
                         
                         e.preventDefault();
                     break;
                     case "O".charCodeAt(0):
-                        if (videoExportOutTime === currentBlackboxTime) {
-                            setVideoOutTime(false);
-                        } else {
-                            setVideoOutTime(currentBlackboxTime);
-                        }
-                        
+                        if (!(shifted)) {
+                            if (videoExportOutTime === currentBlackboxTime) {
+                                setVideoOutTime(false);
+                            } else {
+                                setVideoOutTime(currentBlackboxTime);
+                            }
+                        }                        
+                        e.preventDefault();
+                    // Add my shortcuts
+                    case " ".charCodeAt(0): // start/stop playback
+                            logPlayPause();
                         e.preventDefault();
                     break;
+                    case 37: // left arrow (normal scroll, shifted zoom out)
+                        if (e.altKey || e.shiftKey) {
+                            setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
+                            $(".graph-zoom").val(graphZoom + "%");
+                        } else {
+                          logJumpBack();
+                        }
+                        e.preventDefault();
+                    break;
+                    case 39: // right arrow (normal scroll, shifted zoom in)
+                        if (e.altKey || e.shiftKey) {
+                            setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
+                            $(".graph-zoom").val(graphZoom + "%");
+                        } else {
+                            logJumpForward();
+                        }
+                        e.preventDefault();
+                    break;
+                    case 33: // pgup arrow - goto start
+                        if (!(shifted)) {
+                          logJumpStart();
+                        } 
+                        e.preventDefault();
+                    break;
+                    case 34: // pgdn arrow - goto end
+                        if (!(shifted)) {
+                            logJumpEnd();
+                        } 
+                        e.preventDefault();
+                    break;
+
                 }
             }
         });
