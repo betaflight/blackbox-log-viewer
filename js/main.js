@@ -748,7 +748,23 @@ function BlackboxLogViewer() {
             }
         });
 
-        
+        // Add user configurable start time
+        $(".graph-time").change(function() {
+
+            // the log is offset by the minTime
+            var newTime = stringTimetoMsec($(".graph-time").val());
+                   
+            if (!isNaN(newTime)) {
+                if (hasVideo) {
+                    setVideoTime(newTime / 1000000 + videoOffset);
+                } else {
+                    newTime += flightLog.getMinTime();
+                    setCurrentBlackboxTime(newTime);
+                }
+                invalidateGraph();               
+            }
+        });
+       
         var 
             graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
                 graphConfig = newConfig;
@@ -845,8 +861,12 @@ function BlackboxLogViewer() {
 
         $(document).keydown(function(e) {
             var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
-
-            if (graph && $(e.target).parents('.modal').length == 0) {
+            if(e.which === 13 && e.target.type === 'text' && $(e.target).parents('.modal').length == 0) {
+                // pressing return on a text field clears the focus.
+                $(e.target).blur();                
+            }
+            // keyboard controls are disabled on modal dialog boxes and text entry fields
+            if (graph && e.target.type != 'text' && $(e.target).parents('.modal').length == 0) {
                 switch (e.which) {
                     case "I".charCodeAt(0):
                         if (!(shifted)) {
