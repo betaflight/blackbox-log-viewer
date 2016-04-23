@@ -438,6 +438,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
         
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
+        // update time field on toolbar
+        $(".graph-time").val(formatTime(timeMsec, true));
     }
     
     /**
