@@ -37,6 +37,10 @@ function BlackboxLogViewer() {
         
         // JSON graph configuration:
         graphConfig = {},
+
+        // JSON array of graph configurations for New Workspaces feature
+        lastGraphConfig = null,     // Undo feature - go back to last configuration.
+        workspaceGraphConfigs = {}, // Workspaces
         
         // JSON flightlog configuration
         flightLogSettings = {},
@@ -636,6 +640,17 @@ function BlackboxLogViewer() {
             graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
         }
     });
+
+    // New workspaces feature; local storage of user configurations
+    prefs.get('workspaceGraphConfigs', function(item) {
+        if(item) {
+            workspaceGraphConfigs = item;
+            } else {
+            workspaceGraphConfigs = {graphConfig : [
+                                    null,null,null,null,null,null,null,null,null,null
+                                    ]};
+            }
+    });
     
     prefs.get('flightLogSettings', function(item) {
         if(item) {
@@ -785,13 +800,18 @@ function BlackboxLogViewer() {
             }
         });
        
-        var 
-            graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
+        var newGraphConfig = function(newConfig) {
+                lastGraphConfig = graphConfig; // Remember the last configuration.
                 graphConfig = newConfig;
                 
                 activeGraphConfig.adaptGraphs(flightLog, graphConfig);
                 
-                prefs.set('graphConfig', graphConfig);
+                prefs.set('graphConfig', graphConfig);            
+        }
+        
+        var 
+            graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
+                newGraphConfig(newConfig);   
             }),
             
             flightLogSetupDialog = new FlightLogSetupDialog($("#dlgFlightLogSetup"), function(newSettings) {
@@ -924,7 +944,47 @@ function BlackboxLogViewer() {
                         invalidateGraph();
                         e.preventDefault();
                     break;
-                    // Add my shortcuts
+
+                    // Workspace shortcuts
+                    case "0".charCodeAt(0):
+                    case "1".charCodeAt(0):
+                    case "2".charCodeAt(0):
+                    case "3".charCodeAt(0):
+                    case "4".charCodeAt(0):
+                    case "5".charCodeAt(0):
+                    case "6".charCodeAt(0):
+                    case "7".charCodeAt(0):
+                    case "8".charCodeAt(0):
+                    case "9".charCodeAt(0):
+                        try {
+                        if (!e.shiftKey) { // retreive graph configuration from workspace
+                            if (workspaceGraphConfigs.graphConfig[e.which-48] != null) {
+                                newGraphConfig(workspaceGraphConfigs.graphConfig[e.which-48]);
+                            }
+                        } else // store configuration to workspace
+                        {
+                            workspaceGraphConfigs.graphConfig[e.which-48] = graphConfig; // Save current config
+                            prefs.set('workspaceGraphConfigs', workspaceGraphConfigs);      // Store to local cache
+                        }
+                        } catch(e) {
+                            console.log('Workspace feature not functioning');
+                        }
+                        e.preventDefault();
+                    break;
+                    case "Z".charCodeAt(0): // Ctrl-Z key to toggle between last graph config and current one - undo
+                        try {
+                            if(e.ctrlKey) {
+                                if (lastGraphConfig != null) {
+                                    newGraphConfig(lastGraphConfig);
+                                }
+                            }
+                        } catch(e) {
+                            console.log('Workspace toggle feature not functioning');
+                        }
+                        e.preventDefault();
+                    break;
+                    
+                    // Toolbar shortcuts
                     case " ".charCodeAt(0): // start/stop playback
                             logPlayPause();
                         e.preventDefault();
