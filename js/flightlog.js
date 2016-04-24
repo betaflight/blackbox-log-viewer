@@ -913,20 +913,16 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis) {
     // Axis 0,1 refers to Roll and Pitch
     // Axis 2 refers to Yaw.
 
-    // ReWrite or LUXFloat only
-
-
-//        if(axis==2 /*YAW*/) {
-//            return ((this.settings[0].parameters[axis].value + 47) * value ) >> 7;
-//        } else { /*ROLL or PITCH */
-//            return ((this.settings[0].parameters[axis].value + 27) * value ) >> 6;
-//        }
-
         if(axis==2 /*YAW*/) {
             return ((this.getSysConfig().yRate + 47) * value ) >> 7;
         } else { /*ROLL or PITCH */
             return ((((axis==0)?this.getSysConfig().rRate:this.getSysConfig().pRate) + 27) * value ) >> 6;
         }
+};
+
+FlightLog.prototype.rcCommandRawToThrottle = function(value) {
+    // Throttle displayed as percentage
+    return ((value - this.getSysConfig().minthrottle) / (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) * 100.0;
 };
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {

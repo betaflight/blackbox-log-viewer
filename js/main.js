@@ -98,6 +98,10 @@ function BlackboxLogViewer() {
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
+        hasTable = true, hasCraft = true, hasSticks = true,
+
+        isFullscreen = false, // New fullscreen feature (to hide table)
+
         video = $(".log-graph video")[0],
         canvas = $("#graphCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
@@ -168,41 +172,48 @@ function BlackboxLogViewer() {
             fieldNames = flightLog.getMainFieldNames();
         
         $("tr:not(:first)", table).remove();
-        
+
         if (frame) {
-            var 
-                rows = [],
-                rowCount = Math.ceil(fieldNames.length / 2);
-            
-            for (i = 0; i < rowCount; i++) {
+
+            if(hasTable) { // Only redraw the table if it is enabled
+
                 var 
-                    row = 
-                        "<tr>" +
-                        '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[i]) + '</td>' +
-                        '<td class="raw-value">' + atMost2DecPlaces(frame[i]) + '</td>' +
-                        '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i]) + "</td>",
-                        
-                    secondColumn = i + rowCount;
-                
-                if (secondColumn < fieldNames.length) {
-                    row += 
-                        '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn]) + '</td>' +
-                        '<td>' + atMost2DecPlaces(frame[secondColumn]) + '</td>' +
-                        '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn]) + '</td>';
+                    rows = [],
+                    rowCount = Math.ceil(fieldNames.length / 2);
+
+                for (i = 0; i < rowCount; i++) {
+                    var 
+                        row = 
+                            "<tr>" +
+                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[i]) + '</td>' +
+                            '<td class="raw-value">' + atMost2DecPlaces(frame[i]) + '</td>' +
+                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i]) + "</td>",
+
+                        secondColumn = i + rowCount;
+
+                    if (secondColumn < fieldNames.length) {
+                        row += 
+                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn]) + '</td>' +
+                            '<td>' + atMost2DecPlaces(frame[secondColumn]) + '</td>' +
+                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn]) + '</td>';
+                    }
+
+                    row += "</tr>";
+
+                    rows.push(row);
                 }
-                
-                row += "</tr>";
-                
-                rows.push(row);
+
+                table.append(rows.join(""));
             }
             
-            table.append(rows.join(""));
-
             // update time field on toolbar
             $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
             if(hasMarker) {
                 $(".graph-time-marker").val(formatTime((currentBlackboxTime-markerTime)/1000, true));
             }
+
+            // Update the Legend Values
+            if(graphLegend) graphLegend.updateValues(flightLog, frame);
         }
     }
     
@@ -561,6 +572,8 @@ function BlackboxLogViewer() {
             
             hasLog = true;
             $("html").addClass("has-log");
+            (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");
+            (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
             
             selectLog(null);
         };
@@ -613,6 +626,11 @@ function BlackboxLogViewer() {
         (state)?$("html").addClass("has-marker"):$("html").removeClass("has-marker");       
     }
 
+    function setFullscreen(state) { // update fullscreen status
+        isFullscreen = state;
+        (state)?$("html").addClass("is-fullscreen"):$("html").removeClass("is-fullscreen");       
+    }
+    
     this.getMarker = function() { // get marker field
         return {
             state:hasMarker,
@@ -673,7 +691,27 @@ function BlackboxLogViewer() {
                 graphLegend.hide();
             }
         });
-        
+
+        prefs.get('hasCraft', function(item) {
+           if (item) {
+               hasCraft = item;
+               (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");       
+           } 
+        });
+
+        prefs.get('hasSticks', function(item) {
+           if (item) {
+               hasSticks = item;
+           } 
+        });
+
+        prefs.get('hasTable', function(item) {
+           if (item) {
+            hasTable = item;
+            (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
+           } 
+        });
+
         $(".file-open").change(function(e) {
             var 
                 files = e.target.files,
@@ -699,6 +737,25 @@ function BlackboxLogViewer() {
             }
         });
 
+        // New View Controls
+        $(".view-craft").click(function() {
+            hasCraft = !hasCraft;
+            (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");       
+            prefs.set('hasCraft', hasCraft);
+        });
+
+        $(".view-sticks").click(function() {
+            hasSticks = !hasSticks;
+            graph.setDrawSticks(hasSticks);            
+            prefs.set('hasSticks', hasSticks);
+            invalidateGraph();
+        });
+        
+        $(".view-table").click(function() {
+            hasTable = !hasTable;
+            (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
+            prefs.set('hasTable', hasTable);
+        });
 
         var logJumpBack = function() {
             if (hasVideo) {

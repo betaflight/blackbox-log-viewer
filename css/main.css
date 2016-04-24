@@ -9,7 +9,7 @@ html, body {
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
     .container.main-pane {
-        width:1320px;
+        width:90%;
     }
 }
 
@@ -231,6 +231,11 @@ html.has-log .log-graph-config {
     top:0;
     left:0;
     pointer-events:none; /* Allow the user to drag the graph lines instead of hitting the craft */
+    display:none;
+}
+
+html.has-craft #craftCanvas {
+    display:block;
 }
 
 .log-graph video {
@@ -259,6 +264,11 @@ html.has-log .log-graph-config {
     padding-bottom:0.1em;
     margin-bottom:0.3em;
     cursor:pointer;
+    text-align: right;
+}
+
+.graph-legend-field > span {
+    margin-left: 0.7em;
 }
 
 html.has-video .graph-row,
@@ -323,8 +333,8 @@ html.has-marker .graph-time-marker-group > .graph-time-marker {
 .log-metadata, .log-field-values {
     display:none;
 }
-html.has-log .log-metadata,
-html.has-log .log-field-values {
+html.has-log:not(.is-fullscreen) .log-metadata,
+html.has-log:not(.is-fullscreen).has-table .log-field-values {
     display:block;
 }
 

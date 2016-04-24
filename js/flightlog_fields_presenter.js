@@ -138,6 +138,11 @@ function FlightLogFieldPresenter() {
             case 'gyroADC[2]':
                 return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
                 
+            case 'gyroADCs[0]':
+            case 'gyroADCs[1]':
+            case 'gyroADCs[2]':
+                return value.toFixed(0) + " deg/s";
+
             case 'axisError[0]':
             case 'axisError[1]':
             case 'axisError[2]':
@@ -150,6 +155,14 @@ function FlightLogFieldPresenter() {
             case 'rcCommand[2]':
                 return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2)) + " deg/s";
 
+            case 'rcCommand[3]':
+                return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
+
+            case 'rcCommands[0]':
+            case 'rcCommands[1]':
+            case 'rcCommands[2]':
+                return value.toFixed(0) + " deg/s";
+               
             case 'accSmooth[0]':
             case 'accSmooth[1]':
             case 'accSmooth[2]':
