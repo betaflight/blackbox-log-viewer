@@ -130,16 +130,16 @@ function BlackboxLogViewer() {
         }
     }
     
-    function setVideoOffset(offset) {
+    function setVideoOffset(offset, withoutRefresh) { // optionally prevent the graph refresh until later
         videoOffset = offset;
         
         /* 
          * Round to 2 dec places for display and put a plus at the start for positive values to emphasize the fact it's
          * an offset
          */
-        $(".video-offset").val((videoOffset >= 0 ? "+" : "") + (videoOffset.toFixed(2) != videoOffset ? videoOffset.toFixed(2) : videoOffset));
+        $(".video-offset").val((videoOffset >= 0 ? "+" : "") + (videoOffset.toFixed(3) != videoOffset ? videoOffset.toFixed(3) : videoOffset));
         
-        invalidateGraph();
+        if (wihtoutRefresh) invalidateGraph();
     }
     
     function isInteger(value) {
@@ -909,13 +909,19 @@ function BlackboxLogViewer() {
                         }                        
                         e.preventDefault();
                     break;
-                    case "M".charCodeAt(0):
-                        if (!(shifted)) {
+                    case "M".charCodeAt(0): 
+                        if (e.altKey && hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
+                          try{
+                            setVideoOffset(videoOffset + (stringTimetoMsec($(".graph-time-marker").val()) / 1000000), true);  
+                          } catch(e) {
+                             console.log('Failed to set video offset');
+                          }
+                        } else { // Add a marker to graph window
                             markerTime = currentBlackboxTime;
                             $(".graph-time-marker").val(formatTime(0));
-                            setMarker(!hasMarker);
-                            invalidateGraph();
                         }                        
+                        setMarker(!hasMarker);
+                        invalidateGraph();
                         e.preventDefault();
                     break;
                     // Add my shortcuts
@@ -941,16 +947,12 @@ function BlackboxLogViewer() {
                         }
                         e.preventDefault();
                     break;
-                    case 33: // pgup arrow - goto start
-                        if (!(shifted)) {
-                          logJumpStart();
-                        } 
+                    case 36: // home - goto start of log
+                        logJumpStart();
                         e.preventDefault();
                     break;
-                    case 34: // pgdn arrow - goto end
-                        if (!(shifted)) {
-                            logJumpEnd();
-                        } 
+                    case 35: // end - goto end of log
+                        logJumpEnd();
                         e.preventDefault();
                     break;
 

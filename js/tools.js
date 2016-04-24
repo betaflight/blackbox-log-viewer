@@ -189,7 +189,7 @@ function formatTime(msec, displayMsec) {
 
 function stringTimetoMsec(input) {
     try {
-            var matches = input.match(/([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
+            var matches = input.match(/([+-]?[0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
 
             if(matches.length>2) { // there is a placeholder - either : or .
                 if(matches[2] == ':'){ // time has been entered MM:SS.SSS
