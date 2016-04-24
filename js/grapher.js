@@ -998,6 +998,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         }
     };
 
+    // Add option toggling
+    this.setDrawSticks = function(state) {
+      options.drawSticks = state;  
+    };
+
     // Use defaults for any options not provided
     options = extend(defaultOptions, options || {});
     

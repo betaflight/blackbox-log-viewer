@@ -20,14 +20,13 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
             
             graphTitle.text(graph.label);
             
-            for (j = 0; j < graph.fields.length; j++) {
+            for (j = 0; j < graph.fields.length; j++) { 
                 var 
                     field = graph.fields[j],
-                    li = $('<li class="graph-legend-field" graph="' + i + '" field="' + j +'"></li>');
+                    li = $('<li class="graph-legend-field" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>');
                 
                 li.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
                 li.css('border-bottom', "2px solid " + field.color);
-                
                 fieldList.append(li);
             }
             
@@ -65,6 +64,19 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         // on first show, hide the analyser button
         if(!config.selectedFieldName) $('.hide-analyser-window').hide();
     }
+
+    this.updateValues = function(flightLog, frame) {
+      try {  
+          // New function to show values on legend.
+              $(".graph-legend-field").each(function(index, value) {
+                 var value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, $(this).attr('name'), frame[flightLog.getMainFieldIndexByName($(this).attr('name'))]);
+                 $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name')) + ((value)?' (' + value + ')':' ') );
+                 $(this).append('<span class="glyphicon glyphicon-equalizer"></span>');
+              });
+          } catch(e) {
+              console.log('Cannot update legend with values');
+          }
+    };
     
     this.show = function() {
         $('.log-graph-config').show();
