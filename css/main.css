@@ -152,8 +152,14 @@ html.has-log .log-graph-config {
     margin-top:0.5em;
 }
 .config-graph-field {
-    margin:0.5em 0;
+    margin-bottom: 0.5em;
+    margin-top: 0.2em;
 }
+
+.config-graph-field-header {
+    margin-bottom: 0px;
+}
+
 .config-graph-field select {
     margin-right:4px;
 }
@@ -183,7 +189,7 @@ html.has-log .log-graph-config {
 
 .config-graph th[name=field] {
     margin-right:4px;
-    width: 265px;    
+    width: 243px;
 }
 
 .config-graph th[name=smoothing] {
@@ -194,7 +200,7 @@ html.has-log .log-graph-config {
 
 .config-graph th[name=expo] {
     margin-right:4px;
-    width: 65px;    
+    width: 73px;
     text-align: center;
 }
 

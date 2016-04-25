@@ -179,7 +179,8 @@ function BlackboxLogViewer() {
 
                 var 
                     rows = [],
-                    rowCount = Math.ceil(fieldNames.length / 2);
+                    rowCount = Math.ceil(fieldNames.length / 2),
+                    currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
 
                 for (i = 0; i < rowCount; i++) {
                     var 
@@ -187,7 +188,7 @@ function BlackboxLogViewer() {
                             "<tr>" +
                             '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[i]) + '</td>' +
                             '<td class="raw-value">' + atMost2DecPlaces(frame[i]) + '</td>' +
-                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i]) + "</td>",
+                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode) + "</td>",
 
                         secondColumn = i + rowCount;
 
@@ -195,7 +196,7 @@ function BlackboxLogViewer() {
                         row += 
                             '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn]) + '</td>' +
                             '<td>' + atMost2DecPlaces(frame[secondColumn]) + '</td>' +
-                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn]) + '</td>';
+                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn], currentFlightMode) + '</td>';
                     }
 
                     row += "</tr>";
@@ -497,14 +498,14 @@ function BlackboxLogViewer() {
         
         try {
         // transfer the parameters from the log file into the settings data structure
-        if(flightLog.getSysConfig().rcRate          != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }           else {flightLog.getSysConfig().rcRate          = flightLogSettings[0].parameters[0].value; }
-        if(flightLog.getSysConfig().rcExpo          != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }           else {flightLog.getSysConfig().rcExpo          = flightLogSettings[0].parameters[1].value; }
-        if(flightLog.getSysConfig().rRate           != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rRate; }            else {flightLog.getSysConfig().rRate           = flightLogSettings[0].parameters[2].value; }
-        if(flightLog.getSysConfig().pRate           != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().pRate; }            else {flightLog.getSysConfig().pRate           = flightLogSettings[0].parameters[3].value; }
-        if(flightLog.getSysConfig().yRate           != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().yRate; }            else {flightLog.getSysConfig().yRate           = flightLogSettings[0].parameters[4].value; }
-        if(flightLog.getSysConfig().rcYawExpo       != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }        else {flightLog.getSysConfig().rcYawExpo       = flightLogSettings[0].parameters[5].value; }
-        if(flightLog.getSysConfig().superExpoFactor != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }  else {flightLog.getSysConfig().superExpoFactor = flightLogSettings[0].parameters[6].value; }
-        if(flightLog.getSysConfig().loopTime        != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }         else {flightLog.getSysConfig().loopTime        = flightLogSettings[1].parameters[0].value; }
+        if(flightLog.getSysConfig().rcRate            != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }            else {flightLog.getSysConfig().rcRate             = flightLogSettings[0].parameters[0].value; }
+        if(flightLog.getSysConfig().rcExpo            != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }            else {flightLog.getSysConfig().rcExpo             = flightLogSettings[0].parameters[1].value; }
+        if(flightLog.getSysConfig().rates[AXIS.ROLL]  != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rates[AXIS.ROLL]; }  else {flightLog.getSysConfig().rates[AXIS.ROLL]   = flightLogSettings[0].parameters[2].value; }
+        if(flightLog.getSysConfig().rates[AXIS.PITCH] != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().rates[AXIS.PITCH]; } else {flightLog.getSysConfig().rates[AXIS.PITCH]  = flightLogSettings[0].parameters[3].value; }
+        if(flightLog.getSysConfig().rates[AXIS.YAW]   != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().rates[AXIS.YAW]; }   else {flightLog.getSysConfig().rates[AXIS.YAW]    = flightLogSettings[0].parameters[4].value; }
+        if(flightLog.getSysConfig().rcYawExpo         != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }         else {flightLog.getSysConfig().rcYawExpo          = flightLogSettings[0].parameters[5].value; }
+        if(flightLog.getSysConfig().superExpoFactor   != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }   else {flightLog.getSysConfig().superExpoFactor    = flightLogSettings[0].parameters[6].value; }
+        if(flightLog.getSysConfig().loopTime          != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }          else {flightLog.getSysConfig().loopTime           = flightLogSettings[1].parameters[0].value; }
         } catch(e) {
             console.log('FlightLog Settings archive fault... ignoring');
         }

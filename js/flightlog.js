@@ -477,6 +477,8 @@ function FlightLog(logData, newSettings) {
             magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
             rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"]],
 
+            flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"], // This points to the flightmode data
+
             sourceChunkIndex, destChunkIndex,
             
             sysConfig,
@@ -542,16 +544,19 @@ function FlightLog(logData, newSettings) {
                             (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0);
                     }
 
+                    // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
+                    var currentFlightMode = srcFrame[flightModeFlagsIndex];
+
                     // Calculate the PID Error
                     for (var axis = 0; axis < 3; axis++) {
                         destFrame[fieldIndex++] =  
                             (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0) - 
-                            (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis) : 0);
+                            (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
                         }
                     // Calculate the Scaled rcCommand (in deg/s)
                     for (var axis = 0; axis < 3; axis++) {
                         destFrame[fieldIndex++] = 
-                            (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis) : 0);
+                            (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
                         }
 
                     // Calculate the scaled Gyro ADC
@@ -908,15 +913,18 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
 };
 
 // Convert rcCommand to degrees per second
-FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis) {
+FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, currentFlightMode) {
 
-    // Axis 0,1 refers to Roll and Pitch
-    // Axis 2 refers to Yaw.
-
-        if(axis==2 /*YAW*/) {
-            return ((this.getSysConfig().yRate + 47) * value ) >> 7;
+        if(axis===AXIS.YAW /*YAW*/) {
+            return ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
         } else { /*ROLL or PITCH */
-            return ((((axis==0)?this.getSysConfig().rRate:this.getSysConfig().pRate) + 27) * value ) >> 6;
+                var superExpoFactor = 1; // is SuperExpo enabled no (default), then no adjustment?
+                if(currentFlightMode!=null) { 
+                    if(this.getFlightMode(currentFlightMode).SuperExpo) { // is SuperExpo enabled yes, then compute value
+                        superExpoFactor = 1/(1 - (this.getSysConfig().superExpoFactor / 100 * Math.abs(value)/500));
+                    }
+                }
+            return superExpoFactor * ((((axis===AXIS.ROLL)?this.getSysConfig().rates[AXIS.ROLL]:this.getSysConfig().rates[AXIS.PITCH]) + 27) * value ) >> 6;
         }
 };
 
@@ -945,4 +953,41 @@ FlightLog.prototype.amperageADCToMillivolts = function(amperageADC) {
     millivolts -= this.getSysConfig().currentMeterOffset;
 
     return millivolts * 10000 / this.getSysConfig().currentMeterScale;
+};
+
+
+FlightLog.prototype.getFlightMode = function(currentFlightMode) {
+        return {
+            Arm:                   (currentFlightMode & (1<<0))!=0,
+            Angle:                 (currentFlightMode & (1<<1))!=0,
+            Horizon:               (currentFlightMode & (1<<2))!=0,
+            Baro:                  (currentFlightMode & (1<<3))!=0,
+            Mag:                   (currentFlightMode & (1<<4))!=0,
+            Headfree:              (currentFlightMode & (1<<5))!=0,
+            HeadAdj:               (currentFlightMode & (1<<6))!=0,
+            CamStab:               (currentFlightMode & (1<<7))!=0,
+            CamTrig:               (currentFlightMode & (1<<8))!=0,
+            GPSHome:               (currentFlightMode & (1<<9))!=0,
+            GPSHold:               (currentFlightMode & (1<<10))!=0,
+            Passthrough:           (currentFlightMode & (1<<11))!=0,
+            Beeper:                (currentFlightMode & (1<<12))!=0,
+            LEDMax:                (currentFlightMode & (1<<13))!=0,
+            LEDLow:                (currentFlightMode & (1<<14))!=0,
+            LLights:               (currentFlightMode & (1<<15))!=0,
+            Calib:                 (currentFlightMode & (1<<16))!=0,
+            GOV:                   (currentFlightMode & (1<<17))!=0,
+            OSD:                   (currentFlightMode & (1<<18))!=0,
+            Telemetry:             (currentFlightMode & (1<<19))!=0,
+            GTune:                 (currentFlightMode & (1<<20))!=0,
+            Sonar:                 (currentFlightMode & (1<<21))!=0,
+            Servo1:                (currentFlightMode & (1<<22))!=0,
+            Servo2:                (currentFlightMode & (1<<23))!=0,
+            Servo3:                (currentFlightMode & (1<<24))!=0,
+            Blackbox:              (currentFlightMode & (1<<25))!=0,
+            Failsafe:              (currentFlightMode & (1<<26))!=0,
+            Airmode:               (currentFlightMode & (1<<27))!=0,
+            SuperExpo:             (currentFlightMode & (1<<28))!=0,
+            _3DDisableSwitch:      (currentFlightMode & (1<<29))!=0,
+            CheckboxItemCount:     (currentFlightMode & (1<<30))!=0,            
+        };
 };

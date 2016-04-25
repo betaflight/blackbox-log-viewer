@@ -26,18 +26,47 @@ var
         CUSTOM : 250, // Virtual Event Code - Never part of Log File.
         LOG_END: 255
     }),
+
+    // Add a general axis index.
+    AXIS = makeReadOnly({
+            ROLL:  0,
+            PITCH: 1,
+            YAW:   2
+    }),
+
         
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly([
-        "ANGLE_MODE",
-        "HORIZON_MODE",
-        "MAG",
-        "BARO",
-        "GPS_HOME",
-        "GPS_HOLD",
-        "HEADFREE",
-        "AUTOTUNE",
-        "PASSTHRU",
-        "SONAR"
+            'ARM',
+            'ANGLE',
+            'HORIZON',
+            'BARO',
+            'MAG',
+            'HEADFREE',
+            'HEADADJ',
+            'CAMSTAB',
+            'CAMTRIG',
+            'GPSHOME',
+            'GPSHOLD',
+            'PASSTHRU',
+            'BEEPER',
+            'LEDMAX',
+            'LEDLOW',
+            'LLIGHTS',
+            'CALIB',
+            'GOV',
+            'OSD',
+            'TELEMETRY',
+            'GTUNE',
+            'SONAR',
+            'SERVO1',
+            'SERVO2',
+            'SERVO3',
+            'BLACKBOX',
+            'FAILSAFE',
+            'AIRMODE',
+            'SUPEREXPO',
+            '3DDISABLESWITCH',
+            'CHECKBOX_ITEM_COUNT'
     ]),
 
     FLIGHT_LOG_FLIGHT_STATE_NAME = makeReadOnly([

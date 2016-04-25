@@ -110,6 +110,20 @@ function FlightLogFieldPresenter() {
             return "0"; //No flags set
         }
     }
+
+    // Only list events that have changed, flag with eirer go ON or OFF.
+    FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(flags, lastFlags, flagNames) {
+        var eventState = '';
+        var found = false;        
+        for(var i=0; i<=31; i++) {
+           if((1<<i) & (flags ^ lastFlags)) { // State Changed
+               eventState += '|' + flagNames[i] + ' ' + (((1<<i) & flags)?'ON':'OFF')
+               found = true;
+           } 
+        }
+        if(!found) {eventState += ' | ACRO';} // Catch the state when all flags are off, which is ACRO of course
+        return eventState;
+    }
     
     function presentEnum(value, enumNames) {
         if (enumNames[value] === undefined)
@@ -125,7 +139,7 @@ function FlightLogFieldPresenter() {
      * @param fieldName Name of the field
      * @param value Value of the field
      */
-    FlightLogFieldPresenter.decodeFieldToFriendly = function(flightLog, fieldName, value) {
+    FlightLogFieldPresenter.decodeFieldToFriendly = function(flightLog, fieldName, value, currentFlightMode) {
         if (value === undefined)
             return "";
         
@@ -149,11 +163,11 @@ function FlightLogFieldPresenter() {
                 return Math.round(value) + " deg/s";
 
             case 'rcCommand[0]':
-                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,0)) + " deg/s";
+                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,0), currentFlightMode) + " deg/s";
             case 'rcCommand[1]':
-                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,1)) + " deg/s";
+                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,1), currentFlightMode) + " deg/s";
             case 'rcCommand[2]':
-                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2)) + " deg/s";
+                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2), currentFlightMode) + " deg/s";
 
             case 'rcCommand[3]':
                 return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";

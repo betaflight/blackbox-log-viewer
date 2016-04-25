@@ -189,18 +189,51 @@ var FlightLogParser = function(logData) {
             deviceUID: null
         },
 
-        // One day, maybe these will be part of the blackbox log; they certainly would be helpfull!
-        // If so, then they can be moved intor the defaultSysConfig definition above.
-        // At the moment they are entered on a dialog box.
+        // These are now part of the blackbox log header, but they are in addition to the
+        // standard logger.
         
         defaultSysConfigExtension = {
-            rcExpo:null,//70,           // RC Expo
-            rRate:null,//0,             // Roll Rate
-            pRate:null,//0,             // Pitch Rate
-            yRate:null,//45,            // Yaw Rate
-            rcYawExpo: null,//20,         // Yaw Expo
-            superExpoFactor: null,//30, // Super Expo Factor
-            loopTime: null,//500,  // Looptime
+            rcExpo:null,              	    // RC Expo
+            rcYawExpo:null,                 // Yaw Expo
+            thrMid:null,              	    // Throttle Mid Position
+            thrExpo:null,              	    // Throttle Expo
+            dynThrPID:null,                 // TPA 
+            tpa_breakpoint:null,            // TPA Breakpoint
+            superExpoFactor:null,           // Super Expo Factor
+            rates:[null, null, null],	    // Rates [ROLL, PITCH, YAW]
+            looptime:null,                  // Looptime
+            pidController:null,             // Active PID Controller
+            rollPID:[null, null, null],	    // Roll [P, I, D]
+            pitchPID:[null, null, null],	// Pitch[P, I, D]
+            yawPID:[null, null, null],	    // Yaw  [P, I, D]
+            altPID:[null, null, null],	    // Altitude Hold [P, I, D]
+            posPID:[null, null, null],	    // Position Hold [P, I, D]
+            posrPID:[null, null, null],	    // Position Rate [P, I, D]
+            navrPID:[null, null, null],	    // Nav Rate      [P, I, D]
+            levelPID:[null, null, null],	// Level Mode    [P, I, D]
+            magPID:null,              	    // Magnetometer   P
+            velPID:[null, null, null],	    // Velocity      [P, I, D]      
+            yaw_p_limit:null,               // Yaw P Limit
+            yaw_lpf_hz:null,                // Yaw LowPass Filter Hz
+            dterm_average_count:null,       // DTerm Average Count
+            dynamic_dterm_threshold:null,   // DTerm Dynamic Threshold
+            rollPitchItermResetRate:null,   // ITerm Reset rate for Roll and Pitch
+            yawItermResetRate:null,         // ITerm Reset Rate for Yaw
+            dterm_lpf_hz:null,              // DTerm Lowpass Filter Hz
+            deltaMethod:null,              	// DTerm Error Method
+            H_sensitivity:null,             // Horizon Sensitivity
+            deadband:null,                  // Roll, Pitch Deadband
+            yaw_deadband:null,              // Yaw Deadband  
+            gyro_lpf:null,                  // Gyro lpf setting.
+            gyro_lowpass_hz:null,           // Gyro Soft Lowpass Filter Hz 
+            acc_lpf_hz:null,                // Accelerometer Lowpass filter Hz
+            acc_hardware:null,              // Accelerometer Hardware type
+            baro_hardware:null,             // Barometer Hardware type
+            mag_hardware:null,              // Magnetometer Hardware type
+            gyro_cal_on_first_arm:null,     // Gyro Calibrate on first arm
+            vbat_pid_compensation:null,     // VBAT PID compensation
+            rc_smoothing:null,              // RC Control Smoothing 
+            features:null                   // Activated features (e.g. MOTORSTOP etc) 
         },
             
         frameTypes,
@@ -348,24 +381,129 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.rcRate = parseInt(fieldValue, 10);
             break;
            
-            // In future these fields may exist int the blackbox log
+            // Extended Fields in the header
             case "rcExpo":
                 that.sysConfig.rcExpo = parseInt(fieldValue, 10);
-            break;
-            case "rates":
-                var ratesParams = parseCommaSeparatedIntegers(fieldValue);
-                that.sysConfig.rRate = ratesParams[0];
-                that.sysConfig.pRate = ratesParams[1];
-                that.sysConfig.yRate = ratesParams[2];
             break;
             case "rcYawExpo":
                 that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
             break;
+            case "thrMid":
+                that.sysConfig.thrMid = parseInt(fieldValue, 10);
+            break;
+            case "thrExpo":
+                that.sysConfig.thrExpo = parseInt(fieldValue, 10);
+            break;
+            case "dynThrPID":
+                that.sysConfig.dynThrPID = parseInt(fieldValue, 10);
+            break;
+            case "tpa_breakpoint":
+                that.sysConfig.tpa_breakpoint = parseInt(fieldValue, 10);
+            break;
             case "superExpoFactor":
                 that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
             break;
+            case "rates":
+                that.sysConfig.rates = parseCommaSeparatedIntegers(fieldValue);
+            break;
             case "looptime":
                 that.sysConfig.loopTime = parseInt(fieldValue, 10);
+            break;
+            case "pidController":
+                that.sysConfig.pidController = parseInt(fieldValue, 10);
+            break;
+            case "rollPID":
+                that.sysConfig.rollPID = parseCommaSeparatedIntegers(fieldValue);
+            break;
+            case "pitchPID":
+                that.sysConfig.pitchPID = parseCommaSeparatedIntegers(fieldValue);
+            break;
+            case "yawPID":
+                that.sysConfig.yawPID = parseCommaSeparatedIntegers(fieldValue);
+            break;
+            case "altPID":
+                that.sysConfig.altPID = parseCommaSeparatedIntegers(fieldValue);
+            break;
+            case "posPID":
+                that.sysConfig.posPID = parseCommaSeparatedIntegers(fieldValue);
+            break;            
+            case "posrPID":
+                that.sysConfig.posrPID = parseCommaSeparatedIntegers(fieldValue);
+            break; 
+            case "navrPID":
+                that.sysConfig.navrPID = parseCommaSeparatedIntegers(fieldValue);
+            break; 
+            case "levelPID":
+                that.sysConfig.levelPID = parseCommaSeparatedIntegers(fieldValue);
+            break;
+            case "magPID":
+                that.sysConfig.magPID = parseInt(fieldValue, 10);
+            break;
+            case "velPID":
+                that.sysConfig.velPID = parseCommaSeparatedIntegers(fieldValue);
+            break;
+            case "yaw_p_limit":
+                that.sysConfig.yaw_p_limit = parseInt(fieldValue, 10);
+            break;                                                           
+            case "yaw_lpf_hz":
+                that.sysConfig.yaw_lpf_hz = parseInt(fieldValue, 10) / 100.0;
+            break; 
+            case "dterm_average_count":
+                that.sysConfig.dterm_average_count = parseInt(fieldValue, 10);
+            break;
+            case "dynamic_dterm_threshold":
+                that.sysConfig.dynamic_dterm_threshold = parseInt(fieldValue, 10);
+            break;
+            case "rollPitchItermResetRate":
+                that.sysConfig.rollPitchItermResetRate = parseInt(fieldValue, 10);
+            break;
+            case "yawItermResetRate":
+                that.sysConfig.yawItermResetRate = parseInt(fieldValue, 10);
+            break;
+            case "dterm_lpf_hz":
+                that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10) / 100.0;
+            break;
+            case "deltaMethod":
+                that.sysConfig.deltaMethod = parseInt(fieldValue, 10);
+            break;
+            case "H_sensitivity":
+                that.sysConfig.H_sensitivity = parseInt(fieldValue, 10);
+            break;
+            case "deadband": 
+                that.sysConfig.deadband = parseInt(fieldValue, 10);
+            break;
+            case "yaw_deadband":
+                that.sysConfig.yaw_deadband = parseInt(fieldValue, 10);
+            break;
+            case "gyro_lpf": 
+                that.sysConfig.gyro_lpf = parseInt(fieldValue, 10);
+            break;
+            case "gyro_lowpass_hz": 
+                that.sysConfig.gyro_lowpass_hz = parseInt(fieldValue, 10) / 100.0;
+            break;
+            case "acc_lpf_hz": 
+                that.sysConfig.acc_lpf_hz = parseInt(fieldValue, 10) / 100.0;
+            break;
+            case "acc_hardware": 
+                that.sysConfig.acc_hardware = parseInt(fieldValue, 10);
+            break;
+            case "baro_hardware": 
+                that.sysConfig.baro_hardware = parseInt(fieldValue, 10);
+            break;
+            case "mag_hardware": 
+                that.sysConfig.mag_hardware = parseInt(fieldValue, 10);
+            break;
+            case "gyro_cal_on_first_arm":
+                that.sysConfig.gyro_cal_on_first_arm = parseInt(fieldValue, 10);
+            break;
+            case "vbat_pid_compensation":
+                that.sysConfig.vbat_pid_compensation = parseInt(fieldValue, 10);
+            break;
+            case "rc_smoothing": 
+                that.sysConfig.rc_smoothing = parseInt(fieldValue, 10);
+            break;
+            case "features":  
+                that.sysConfig.features = parseInt(fieldValue, 10);
             break;
             /****************************/
             
