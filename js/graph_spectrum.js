@@ -30,36 +30,54 @@ try {
 		spectrumAnalyser.minDecibels = -120;
 		spectrumAnalyser.maxDecibels = -20;    
 
-	var bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, bufferWindowEndTime;
+	var dataBuffer = {
+			chunks: 0, 
+			startFrameIndex: 0, 
+			fieldIndex: 0, 
+			curve: 0,
+			windowCenterTime: 0, 
+			windowEndTime: 0
+		};
+
 	var initialised = false;
-	var analyserFieldName; // Name of the field being analysed
+	var analyserFieldName;   // Name of the field being analysed
+	var analyserSampleRange; // Start and Endtime of sampling as string
 
 	// Setup the audio path
 	source.connect(spectrumAnalyser);
 
 	var audioIterations = 0; // variable to monitor spectrum processing
 
-	function dataLoad(chunks, startFrameIndex, fieldIndex, curve, buffer, windowEndTime) {
+	function dataLoad(dataBuffer, audioBuffer) {
 
 			var chunkIndex, frameIndex;
 			var i = 0;            
 
-			var bufferData = buffer.getChannelData(0); // link to the first channel
+			var startTime = null; // Debugging variables
+			var endTime   = null;
+
+			var audioBufferData = audioBuffer.getChannelData(0); // link to the first channel
 
 			//We may start partway through the first chunk:
-			frameIndex = startFrameIndex;
+			frameIndex = dataBuffer.startFrameIndex;
 
 			dataCollectionLoop:
-			for (chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-				var chunk = chunks[chunkIndex];
+			for (chunkIndex = 0; chunkIndex < dataBuffer.chunks.length; chunkIndex++) {
+				var chunk = dataBuffer.chunks[chunkIndex];
 				for (; frameIndex < chunk.frames.length; frameIndex++) {
-					var fieldValue = chunk.frames[frameIndex][fieldIndex];
+					var fieldValue = chunk.frames[frameIndex][dataBuffer.fieldIndex];
 					var frameTime  = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]
-					bufferData[i++] = (curve.lookupRaw(fieldValue));
+					if(frameTime >= dataBuffer.windowCenterTime) {
+						if(startTime === null) startTime = formatTime((frameTime - flightLog.getMinTime())/1000, true);
+						
+						audioBufferData[i++] = (dataBuffer.curve.lookupRaw(fieldValue));
 
-					if (i >= buffer.length || frameTime >= windowEndTime) {
-						// console.log("Samples : " + i);
-						break dataCollectionLoop;
+						if (i >= audioBuffer.length || frameTime >= dataBuffer.windowEndTime) {
+							endTime = formatTime((frameTime - flightLog.getMinTime())/1000, true);
+							analyserSampleRange = '(' + startTime + ' to ' + endTime + ')';
+							//console.log("Samples : " + i + analyserSampleRange);
+							break dataCollectionLoop;
+							}
 						}
 				}
 				frameIndex = 0;
@@ -108,7 +126,7 @@ try {
 			x += barWidth + 1;
 		  }
 		  drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT);
-		  drawAxisLabel(analyserFieldName, WIDTH - 8, HEIGHT - 10, 'right');
+		  drawAxisLabel(analyserFieldName + ' ' + analyserSampleRange, WIDTH - 8, HEIGHT - 10, 'right');
 		  canvasCtx.restore();
 		}
 
@@ -150,18 +168,21 @@ try {
 	   It is only used to record the current curve positions, collect the data and draw the 
 	   analyser on screen*/
 
-	this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve, fieldName, windowEndTime) {
+	this.plotSpectrum =	function (chunks, startFrameIndex, fieldIndex, curve, fieldName, windowCenterTime, windowEndTime) {
 			// Store the data pointers
-			bufferChunks = chunks;
-			bufferStartFrameIndex = startFrameIndex;
-			bufferFieldIndex = fieldIndex;
-			bufferCurve = curve;
-			bufferWindowEndTime = windowEndTime;
+			dataBuffer = {
+				chunks: chunks,
+				startFrameIndex: startFrameIndex,
+				fieldIndex: fieldIndex,
+				curve: curve,
+				windowCenterTime: windowCenterTime,
+				windowEndTime: windowEndTime
+			};
 
 			analyserFieldName = fieldName;
 
 			if (audioBuffer) {
-				dataLoad(bufferChunks, bufferStartFrameIndex, bufferFieldIndex, bufferCurve, audioBuffer, bufferWindowEndTime);
+				dataLoad(dataBuffer, audioBuffer);
 			}
 			draw(); // draw the analyser on the canvas....
 	}

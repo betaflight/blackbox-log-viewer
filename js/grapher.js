@@ -416,6 +416,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             GAP_WARNING_BOX_RADIUS = 3,
             chunkIndex, frameIndex,
             drawingLine = false,
+            notInBounds = -5, // when <0, then line is always drawn, (this allows us to paritially dash the line when the bounds is exceeded)
             inGap = false,
             lastX, lastY,
             yScale = -plotHeight,
@@ -442,10 +443,24 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                     frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
                     nextX, nextY;
     
+
                 nextY = curve.lookup(fieldValue) * yScale;
                 nextX = (frameTime - windowStartTime) * xScale;
-    
-                if (drawingLine) {
+
+                // clamp the Y to the range of the graph to prevent bleed into next graph if zoomed in (for example)
+
+                if(nextY>plotHeight) {
+                    nextY = plotHeight;
+                    notInBounds++;
+                } else
+                if(nextY<(-1)*plotHeight) {
+                    nextY = (-1)*plotHeight;
+                    notInBounds++;
+                } else notInBounds = -5;
+                
+                if(notInBounds>5) notInBounds = -5; // reset it every 5th line draw (to simulate dashing)  
+
+                if (drawingLine && (notInBounds<=0)) {
                     canvasContext.lineTo(nextX, nextY);
 
                     if (!options.gapless && chunk.gapStartsHere[frameIndex]) {
@@ -840,7 +855,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                 try{ // If we do not select a graph/field, then the analyser is hidden
                 var graph = graphs[graphConfig.selectedGraphIndex]; 		
 				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
-                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName, windowEndTime);
+                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName, windowCenterTime, windowEndTime);
                 } catch(err) {console.log('Cannot plot analyser');}            
             }
         }
