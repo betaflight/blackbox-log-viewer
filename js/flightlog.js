@@ -991,3 +991,30 @@ FlightLog.prototype.getFlightMode = function(currentFlightMode) {
             CheckboxItemCount:     (currentFlightMode & (1<<30))!=0,            
         };
 };
+
+FlightLog.prototype.getFeatures = function(enabledFeatures) {
+        return {
+            RX_PPM              : (enabledFeatures & (1 << 0))!=0,
+            VBAT                : (enabledFeatures & (1 << 1))!=0,
+            INFLIGHT_ACC_CAL    : (enabledFeatures & (1 << 2))!=0,
+            RX_SERIAL           : (enabledFeatures & (1 << 3))!=0,
+            MOTOR_STOP          : (enabledFeatures & (1 << 4))!=0,
+            SERVO_TILT          : (enabledFeatures & (1 << 5))!=0,
+            SOFTSERIAL          : (enabledFeatures & (1 << 6))!=0,
+            GPS                 : (enabledFeatures & (1 << 7))!=0,
+            FAILSAFE            : (enabledFeatures & (1 << 8))!=0,
+            SONAR               : (enabledFeatures & (1 << 9))!=0,
+            TELEMETRY           : (enabledFeatures & (1 << 10))!=0,
+            CURRENT_METER       : (enabledFeatures & (1 << 11))!=0,
+            _3D                 : (enabledFeatures & (1 << 12))!=0,
+            RX_PARALLEL_PWM     : (enabledFeatures & (1 << 13))!=0,
+            RX_MSP              : (enabledFeatures & (1 << 14))!=0,
+            RSSI_ADC            : (enabledFeatures & (1 << 15))!=0,
+            LED_STRIP           : (enabledFeatures & (1 << 16))!=0,
+            DISPLAY             : (enabledFeatures & (1 << 17))!=0,
+            ONESHOT125          : (enabledFeatures & (1 << 18))!=0,
+            BLACKBOX            : (enabledFeatures & (1 << 19))!=0,
+            CHANNEL_FORWARDING  : (enabledFeatures & (1 << 20))!=0,
+            TRANSPONDER         : (enabledFeatures & (1 << 21))!=0,
+        };
+};

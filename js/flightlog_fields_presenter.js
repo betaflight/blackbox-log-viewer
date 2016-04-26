@@ -205,6 +205,8 @@ function FlightLogFieldPresenter() {
             case 'failsafePhase':
                 return presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
                 
+            case 'features':
+                return presentEnum(value, FLIGHT_LOG_FEATURES);                
             default:
                 return "";
         }

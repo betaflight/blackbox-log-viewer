@@ -35,22 +35,12 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
 
         // Add a trigger on legend; select the analyser graph/field to plot
         $('.graph-legend-field').on('click', function() {
-               config.selectedFieldName     = this.innerText;
+               config.selectedFieldName     = FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'));
                config.selectedGraphIndex    = $(this).attr('graph');
                config.selectedFieldIndex    = $(this).attr('field');
-               $('.hide-analyser-window').show();
                if (onNewSelectionChange) {
                    onNewSelectionChange();
                }
-        });
-
-        // Add a button to remove the analyser display
-        $('.hide-analyser-window').on('click', function() {
-            config.selectedFieldName = null;
-            $(this).hide();
-            if (onNewSelectionChange) {
-               onNewSelectionChange();
-               }            
         });
 
         $('.log-close-legend-dialog').on('click', function() {

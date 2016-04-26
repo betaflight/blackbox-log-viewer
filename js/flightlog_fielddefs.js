@@ -69,6 +69,87 @@ var
             'CHECKBOX_ITEM_COUNT'
     ]),
 
+    FLIGHT_LOG_FEATURES = makeReadOnly([
+            'RX_PPM',
+            'VBAT',
+            'INFLIGHT_ACC_CAL',
+            'RX_SERIAL',
+            'MOTOR_STOP',
+            'SERVO_TILT',
+            'SOFTSERIAL',
+            'GPS',
+            'FAILSAFE',
+            'SONAR',
+            'TELEMETRY',
+            'CURRENT_METER',
+            '3D',
+            'RX_PARALLEL_PWM',
+            'RX_MSP',
+            'RSSI_ADC',
+            'LED_STRIP',
+            'DISPLAY',
+            'ONESHOT125',
+            'BLACKBOX',
+            'CHANNEL_FORWARDING',
+            'TRANSPONDER'
+    ]),
+
+    PID_CONTROLLER_TYPE = makeReadOnly([
+            'UNUSED',
+            'MWREWRITE',
+            'LUXFLOAT'
+    ]),
+
+    PID_DELTA_TYPE = makeReadOnly([
+            'ERROR',
+            'MEASUREMENT'
+    ]),
+
+    OFF_ON = makeReadOnly([
+            "OFF",
+            "ON"
+    ]),
+
+    GYRO_LPF = makeReadOnly([
+            "OFF",
+            "188HZ",
+            "98HZ",
+            "42HZ",
+            "20HZ",
+            "10HZ",
+            "5HZ",
+            "EXPERIMENTAL"
+    ]),
+
+    ACC_HARDWARE = makeReadOnly([
+	        "AUTO",
+	        "NONE",
+	        "ADXL345",
+	        "MPU6050",
+	        "MMA8452",
+	        "BMA280",
+	        "LSM303DLHC",
+	        "MPU6000",
+	        "MPU6500",
+	        "FAKE"
+    ]),
+
+    BARO_HARDWARE = makeReadOnly([
+            "AUTO",
+            "NONE",
+            "BMP085",
+            "MS5611",
+            "BMP280"
+    ]),
+
+    MAG_HARDWARE = makeReadOnly([
+            "AUTO",
+            "NONE",
+            "HMC5883",
+            "AK8975",
+            "AK8963"
+    ]),
+
     FLIGHT_LOG_FLIGHT_STATE_NAME = makeReadOnly([
         "GPS_FIX_HOME",
         "GPS_FIX",

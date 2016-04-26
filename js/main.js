@@ -14,6 +14,7 @@ function BlackboxLogViewer() {
         GRAPH_STATE_PLAY = 1,
         
         SMALL_JUMP_TIME = 100 * 1000,
+        LARGE_JUMP_TIME = 1000 * 1000,
         PLAYBACK_MIN_RATE = 5,
         PLAYBACK_MAX_RATE = 300,
         PLAYBACK_DEFAULT_RATE = 100,
@@ -98,7 +99,7 @@ function BlackboxLogViewer() {
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
-        hasTable = true, hasCraft = true, hasSticks = true,
+        hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
@@ -619,7 +620,11 @@ function BlackboxLogViewer() {
     }
 
     function onLegendSelectionChange() {
-        updateCanvasSize();
+            hasAnalyser = true;
+            graph.setDrawAnalyser(hasAnalyser);            
+            (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
+            prefs.set('hasAnalyser', hasAnalyser);
+            invalidateGraph();
     }
 
     function setMarker(state) { // update marker field
@@ -703,15 +708,25 @@ function BlackboxLogViewer() {
         prefs.get('hasSticks', function(item) {
            if (item) {
                hasSticks = item;
+               (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");  
            } 
         });
 
+
         prefs.get('hasTable', function(item) {
            if (item) {
-            hasTable = item;
-            (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
+               hasTable = item;
+               (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
            } 
         });
+        
+        prefs.get('hasAnalyser', function(item) {
+           if (item) {
+               hasAnalyser = item;
+               (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
+           } 
+        });
+
 
         $(".file-open").change(function(e) {
             var 
@@ -748,6 +763,7 @@ function BlackboxLogViewer() {
         $(".view-sticks").click(function() {
             hasSticks = !hasSticks;
             graph.setDrawSticks(hasSticks);            
+            (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");  
             prefs.set('hasSticks', hasSticks);
             invalidateGraph();
         });
@@ -757,30 +773,42 @@ function BlackboxLogViewer() {
             (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
             prefs.set('hasTable', hasTable);
         });
+       
+        $(".view-analyser").click(function() {
+            if(activeGraphConfig.selectedFieldName != null) {
+                hasAnalyser = !hasAnalyser; 
+            } else hasAnalyser = false;
+            graph.setDrawAnalyser(hasAnalyser);            
+            (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
+            prefs.set('hasAnalyser', hasAnalyser);
+            invalidateGraph();
+        });
 
-        var logJumpBack = function() {
+        var logJumpBack = function(fast) {
+            var scrollTime = SMALL_JUMP_TIME;
+            if(fast!=null) scrollTime = (fast)?(graph.getWindowWidthTime() * 0.5 /*50%*/):SMALL_JUMP_TIME;
             if (hasVideo) {
-                setVideoTime(video.currentTime - SMALL_JUMP_TIME / 1000000);
+                setVideoTime(video.currentTime - scrollTime / 1000000);
             } else {
-                setCurrentBlackboxTime(currentBlackboxTime - SMALL_JUMP_TIME);
+                setCurrentBlackboxTime(currentBlackboxTime - scrollTime);
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
         };
-        $(".log-jump-back").click(logJumpBack);
-    
-        
+        $(".log-jump-back").click(function() {logJumpBack(false);});
 
-        var logJumpForward = function() {
+        var logJumpForward = function(fast) {
+            var scrollTime = SMALL_JUMP_TIME;
+            if(fast!=null) scrollTime = (fast)?(graph.getWindowWidthTime() * 0.5 /*50%*/):SMALL_JUMP_TIME;
             if (hasVideo) {
-                setVideoTime(video.currentTime + SMALL_JUMP_TIME / 1000000);
+                setVideoTime(video.currentTime + scrollTime / 1000000);
             } else {
-                setCurrentBlackboxTime(currentBlackboxTime + SMALL_JUMP_TIME);
+                setCurrentBlackboxTime(currentBlackboxTime + scrollTime);
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
         };
-        $(".log-jump-forward").click(logJumpForward);
+        $(".log-jump-forward").click(function() {logJumpForward(false);});
         
         var logJumpStart = function() {
             setCurrentBlackboxTime(flightLog.getMinTime());
@@ -1063,6 +1091,14 @@ function BlackboxLogViewer() {
                         } else {
                             logJumpForward();
                         }
+                        e.preventDefault();
+                    break;
+                    case 33: // pgup - Scroll fast
+                        logJumpBack(true);
+                        e.preventDefault();
+                    break;
+                    case 34: // pgdn - Scroll fast
+                        logJumpForward(true);
                         e.preventDefault();
                     break;
                     case 36: // home - goto start of log

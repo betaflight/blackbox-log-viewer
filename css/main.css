@@ -294,6 +294,26 @@ html.has-video #graphCanvas {
     background-color:rgba(0,0,0,0.25);
 }
 
+html .view-craft,
+html .view-sticks,
+html .view-table,
+html .view-analyser {
+     color:black;
+}
+
+html.has-craft .view-craft {
+     color:green;
+}
+html.has-sticks .view-sticks {
+     color:green;
+}
+html.has-table .view-table {
+     color:green;
+}
+html.has-analyser .view-analyser {
+     color:green;
+}
+
 .video-top-controls > li {
     display:inline-block;
     margin-right: 17px;

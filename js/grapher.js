@@ -951,11 +951,21 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
         }
     };
 
+    // New function to return the current window scale.
+    this.getWindowWidthTime = function() {
+        return windowWidthMicros;
+    }
+
     // Add option toggling
     this.setDrawSticks = function(state) {
       options.drawSticks = state;  
     };
 
+    // Add option toggling
+    this.setDrawAnalyser= function(state) {
+      options.drawAnalyser = state;  
+    };
+    
     // Use defaults for any options not provided
     options = extend(defaultOptions, options || {});
     
