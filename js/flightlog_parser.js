@@ -446,7 +446,7 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.yaw_p_limit = parseInt(fieldValue, 10);
             break;                                                           
             case "yaw_lpf_hz":
-                that.sysConfig.yaw_lpf_hz = parseInt(fieldValue, 10) / 100.0;
+                that.sysConfig.yaw_lpf_hz = parseInt(fieldValue, 10);
             break; 
             case "dterm_average_count":
                 that.sysConfig.dterm_average_count = parseInt(fieldValue, 10);
@@ -461,7 +461,7 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.yawItermResetRate = parseInt(fieldValue, 10);
             break;
             case "dterm_lpf_hz":
-                that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10) / 100.0;
+                that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10);
             break;
             case "deltaMethod":
                 that.sysConfig.deltaMethod = parseInt(fieldValue, 10);
@@ -479,10 +479,10 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.gyro_lpf = parseInt(fieldValue, 10);
             break;
             case "gyro_lowpass_hz": 
-                that.sysConfig.gyro_lowpass_hz = parseInt(fieldValue, 10) / 100.0;
+                that.sysConfig.gyro_lowpass_hz = parseInt(fieldValue, 10);
             break;
             case "acc_lpf_hz": 
-                that.sysConfig.acc_lpf_hz = parseInt(fieldValue, 10) / 100.0;
+                that.sysConfig.acc_lpf_hz = parseInt(fieldValue, 10);
             break;
             case "acc_hardware": 
                 that.sysConfig.acc_hardware = parseInt(fieldValue, 10);

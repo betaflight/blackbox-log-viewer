@@ -916,6 +916,10 @@ function BlackboxLogViewer() {
                 }
             }),
 
+            headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function(newSettings) {
+                console.log(newSettings);
+            }),
+
             exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
                 videoConfig = newConfig;
                 
@@ -933,6 +937,13 @@ function BlackboxLogViewer() {
             e.preventDefault();
             
             flightLogSetupDialog.show(flightLog, flightLogSettings);
+        });
+        
+        
+        $(".open-header-dialog").click(function(e) {
+            e.preventDefault();
+            
+            headerDialog.show(flightLog.getSysConfig());
         });
         
         if (FlightLogVideoRenderer.isSupported()) {

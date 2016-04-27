@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="css/bootstrap-theme.min.css">
 <link rel="stylesheet" href="css/jquery.nouislider.min.css">
 <link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/header_main.css">
+<link rel="stylesheet" href="css/header_dialog.css">
 
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
@@ -265,6 +267,7 @@
                 <div class="log-graph-legend">
                 </div>
                 <button type="button" class="btn btn-default btn-block hide-analyser-window">Hide Analyser</button>
+                <button type="button" class="btn btn-default btn-block open-header-dialog">Log Header</button>
                 <button type="button" class="btn btn-default btn-block open-log-setup-dialog">Log Setup</button>
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
             </div>
@@ -342,6 +345,484 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade header-dialog" id="dlgHeaderDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Log Header Information</h4>
+                </div>
+                <div class="modal-body">
+					<div class="clear-both"></div>
+					<form name="pid-tuning" id="pid-tuning">
+						<div class="cf_column half left">
+							<div class="gui_box grey PID-settings">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">PID Settings</div>
+								</div>
+								<div class="spacer_box">
+									<table class="controller parameter cf">
+										<thead>
+											<tr>
+												<th>Controller</th>
+											</tr>
+										</thead>
+											<tr>
+												<td>
+													<select name="controller">
+														<!-- list generated here -->
+													</select>
+												</td>
+											</tr>
+									</table>							
+									<table class="topspacer pid_titlebar">
+										<tr>
+											<th class="name" i18n="pidTuningName"">Name</th>
+											<th class="proportional" i18n="pidTuningProportional">Proportional</th>
+											<th class="integral" i18n="pidTuningIntegral">Integral</th>
+											<th class="derivative" i18n="pidTuningDerivative">Derivative</th>
+										</tr>
+									</table>
+									<table id="pid_main" class="pid_tuning">
+										<tr>
+											<th colspan="4">
+												<div class="pid_mode" i18n="pidTuningBasic">Basic/Acro</div>
+											</th>
+										</tr>
+										<tr class="ROLL">
+											<!-- 0 -->
+											<td>ROLL</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
+											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
+										</tr>
+										<tr class="PITCH">
+											<!-- 1 -->
+											<td>PITCH</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
+											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
+										</tr>
+										<tr class="YAW">
+											<!-- 2 -->
+											<td>YAW</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
+											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
+										</tr>
+									</table>
+									<table id="pid_baro" class="pid_tuning">
+										<tr>
+											<th colspan="4">
+												<div class="pid_mode" i18n="pidTuningAltitude">Barometer & Sonar/Altitude</div>
+											</th>
+										</tr>
+										<tr class="ALT">
+											<!-- 3 -->
+											<td>ALT</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
+											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
+										</tr>
+										<tr class="Vario">
+											<!-- 9 -->
+											<td>VEL</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
+											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
+										</tr>
+									</table>
+									<table id="pid_mag" class="pid_tuning">
+										<tr>
+											<th colspan="4">
+												<div class="pid_mode" i18n="pidTuningMag">Heading</div>
+											</th>
+										</tr>
+										<tr class="MAG">
+											<!-- 8 -->
+											<td>MAG</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</table>
+									<table id="pid_gps" class="pid_tuning">
+										<tr>
+											<th colspan="4">
+												<div class="pid_mode" i18n="pidTuningGps">GPS</div>
+											</th>
+										</tr>
+										<tr class="Pos">
+											<!-- 4 -->
+											<td>POS</td>
+											<td><input type="number" name="p" step="0.01" min="0" max="2.55" /></td>
+											<td><input type="number" name="i" step="0.01" min="0" max="2.55" /></td>
+											<td></td>
+										</tr>
+										<tr class="PosR">
+											<!-- 5 -->
+											<td>POSR</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.01" min="0" max="2.55" /></td>
+											<td><input type="number" name="d" step="0.001" min="0" max="0.255" /></td>
+										</tr>
+										<tr class="NavR">
+											<!-- 6 -->
+											<td>NAVR</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.01" min="0" max="2.55" /></td>
+											<td><input type="number" name="d" step="0.001" min="0" max="0.255" /></td>
+										</tr>
+									</table>
+									<table id="pid_accel" class="pid_tuning topspacer">
+										<tr>
+											<th colspan="4">
+												<div class="pid_mode borderleft">
+													<div class="textleft">
+														<div class="pidTuningLevel">Angle/Horizon</div>
+													</div>
+													<div class="pids">Strength (Angle)</div>
+													<div class="pids">Strength (Horizon)</div>
+													<div class="pids">Transition (Horizon)</div>
+												</div>
+											</th>
+										</tr>
+										<tr class="LEVEL">
+											<!-- 7 -->
+											<td>LEVEL</td>
+											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
+											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
+											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
+										</tr>
+										<tr>
+											<td colspan="2">Sensitivity</td>
+											<td colspan="2" class="parameter"><input type="number" name="H_sensitivity" data-tip="H_sensitivity" step="1" min="0" max="999" /></td>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<div class="gui_box grey topspacer PID-extra">
+									<div class="gui_box_titlebar">
+										<div class="spacer_box_title">PID Other</div>
+									</div>
+									<div class="spacer_box">
+									<table class="parameter cf">
+										<thead>
+											<tr>
+												<th colspan="1">P-Term</th>
+												<th colspan="2">I-Term</th>
+											</tr>
+											<tr>
+												<th>Yaw Limit</th>
+												<th>Roll/Pitch Reset</th>
+												<th>Yaw Reset</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><input type="number" name="yaw_p_limit" step="1" min="0" max="999" /></td>
+												<td><input type="number" name="rollPitchItermResetRate" step="1" min="0" max="999" /></td>
+												<td><input type="number" name="yawItermResetRate" step="1" min="0" max="999" /></td>
+											</tr>
+										</tbody>
+									</table>
+									<table class="parameter cf">
+										<thead>
+											<tr>
+												<th colspan="5">D-Term</th>
+											</tr>
+											<tr>
+												<th>Calculation</th>
+												<th>Filter (Hz)</th>
+												<th>Dynamic Threshold</th>
+												<th>Average Count</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><select name='deltaMethod' title="deltaMethod"><!-- list generated here --></select></td>
+												<td><input type="number" name="dterm_lpf_hz" title="dterm_lpf_hz" step="0.01" min="0" max="999.00" /></td>
+												<td><input type="number" name="dynamic_dterm_threshold" title="dynamic_dterm_threshold" step="0.01" min="0" max="100.00" /></td>
+												<td><input type="number" name="dterm_average_count" title="dterm_average_count" step="1" min="0" max="12" /></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="gui_box grey topspacer filters">
+									<div class="gui_box_titlebar">
+										<div class="spacer_box_title">Filters</div>
+									</div>
+									<div class="spacer_box">
+									<table class="parameter cf">
+										<thead>
+											<tr>
+												<th>Gyro Hardware</th>
+												<th>Gyro Soft (Hz)</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><select name='gyro_lpf'><!-- list generated here --></select></td>
+												<td><input type="number" name="gyro_lowpass_hz" step="0.01" min="0" max="999.00" /></td>
+											</tr>
+										</tbody>
+										<thead>
+											<tr>
+												<th>Yaw (Hz)</th>
+												<th>Acc (Hz)</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><input type="number" name="yaw_lpf_hz" step="0.01" min="0" max="999.00" /></td>
+												<td><input type="number" name="acc_lpf_hz" step="0.01" min="0" max="999.00" /></td>
+											</tr>
+										</tbody>
+									</table>
+									<table class = "parameter cf" cellpadding="0" cellspacing="0">
+										<tbody class="static-features noline"> 
+											<tr>
+												<td><input class="feature toggle" name="gyro_cal_on_first_arm" title="gyro_cal_on_first_arm" type="checkbox"/></td>
+												<td><label>GYRO_CAL_ON_FIRST_ARM</label></td>
+												<td><span>Calibrate Gyro on first arm</span></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="gui_box grey topspacer rxMode">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Receiver Mode</div>
+								</div>
+								<div class="spacer_box">
+									<table cellpadding="0" cellspacing="0">
+										<thead class="features rxMode noline">
+											<tr>
+												<th class="checkbox"></th>
+												<th class="item"></th>
+												<th class="description"></th>
+											</tr>
+										</thead>
+										<tbody class="features rxMode noline">
+											<!-- table generated here -->
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="gui_box grey topspacer hardware">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Hardware Options</div>
+								</div>
+								<div class="spacer_box">
+									<table class="parameter cf">
+										<thead>
+											<tr>
+												<th>Looptime</th>
+											</tr>
+										</thead>
+											<tr>
+												<td><input type="number" name="loopTime" step="25" min="0" max="3000"/></td>
+											</tr>
+										<thead class="topspacer">
+											<tr>
+												<th>Accelerometer</th>
+												<th>Magnatometer</th>
+												<th>Barometer</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><select name='acc_hardware'><!-- list generated here --></select></td>
+												<td><select name='mag_hardware'><!-- list generated here --></select></td>
+												<td><select name='baro_hardware'><!-- list generated here --></select></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+					</div>
+						<div class="cf_column half right">
+							<div class="spacer_left">
+								<div class="gui_box grey topspacer rates">
+									<div class="gui_box_titlebar">
+										<div class="spacer_box_title">Rates and Expo</div>
+									</div>
+									<div class="spacer_box">
+										<table class="parameter cf">
+											<thead>
+												<tr>
+													<th>RC Rate</th>
+													<th>RC Expo</th>
+													<th>SuperExpo</th>
+													<th>Deadband</th>
+												</tr>
+											</thead>
+												<tr>
+													<td><input type="number" name="rcRate" step="0.01" min="0" max="1.00"/></td>
+													<td><input type="number" name="rcExpo" step="0.01" min="0" max="1.00"/></td>
+													<td><input type="number" name="superExpoFactor" step="0.01" min="0" max="1.00"/></td>
+													<td><input type="number" name="deadband" step="1" min="0" max="32"/></td>
+												</tr>
+											<thead>
+												<tr>
+													<th colspan="2">ROLL Rate</th>
+													<th colspan="2">PITCH Rate</th>
+												</tr>
+											</thead>
+												<tr>
+													<td colspan="2"><input type="number" name="rates_0" step="0.01" min="0" max="1.00" /></td>
+													<td colspan="2"><input type="number" name="rates_1" step="0.01" min="0" max="1.00" /></td>
+												</tr>
+										</table>
+										<table class="parameter cf">
+											<thead>
+												<tr>
+													<th>YAW Rate</th>
+													<th>YAW Expo</th>
+													<th>YAW Deadband</th>
+												</tr>
+											</thead>
+												<tr>
+													<td><input type="number" name="rates_2" step="0.01" min="0" max="2.55" /></td>
+													<td><input type="number" name="rcYawExpo" step="0.01" min="0" max="1.00"/></td>
+													<td><input type="number" name="yaw_deadband" step="1" min="0" max="100"/></td>
+												</tr>
+										</table>
+										<table class="parameter cf noline" cellpadding="0" cellspacing="0">
+											<tbody class="static-features misc noline"> 
+												<tr>
+													<td><input class="feature toggle" name="rc_smoothing" title="rc_smoothing" type="checkbox"/></td>
+													<td><label>RC_SMOOTHING</label></td>
+													<td><span>RC Smoothing Enabled</span></td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<div class="gui_box grey topspacer throttle">
+									<div class="gui_box_titlebar">
+										<div class="spacer_box_title">Throttle</div>
+									</div>
+									<div class="spacer_box">
+										<table class="parameter cf">
+											<thead>
+												<tr>
+													<th>Throttle Mid</th>
+													<th>Throttle Expo</th>
+													<th>Min Throttle</th>
+													<th>Max Throttle</th>
+												</tr>
+											</thead>
+											<tr>
+												<td><input type="number" name="thrMid" step="0.01" min="0" max="1" /></td>
+												<td><input type="number" name="thrExpo" step="0.01" min="0" max="1" /></td>
+												<td><input type="number" name="minthrottle" step="10" min="1000" max="2000" /></td>
+												<td><input type="number" name="maxthrottle" step="10" min="1000" max="2000" /></td>
+											</tr>
+											<thead>
+												<tr>
+													<th colspan="2">TPA</th>
+													<th colspan="2">TPA Breakpoint</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td colspan="2"><input type="number" name="dynThrPID" step="0.01" min="0" max="1.00" /></td>
+													<td colspan="2"><input type="number" name="tpa-breakpoint" step="10" min="1000" max="2000" /></td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<div class="gui_box grey topspacer voltagecurrent">
+									<div class="gui_box_titlebar">
+										<div class="spacer_box_title">Voltage and Current</div>
+									</div>
+									<div class="spacer_box">
+									<table class="parameter cf">
+										<thead>
+											<tr>
+												<th>Current Scale</th>
+												<th>Current Offset</th>
+											</tr>
+										</thead>
+											<tr>
+												<td><input type="number" name="currentMeterScale" step="1" min="0" max="500" /></td>
+												<td><input type="number" name="currentMeterOffset" step="1" min="0" max="500" /></td>
+											</tr>
+										<thead>
+											<tr>
+												<th>VBat Scale</th>
+												<th>VBat Ref</th>
+											</tr>
+										</thead>
+											<tr>
+												<td><input type="number" name="vbatscale" step="1" min="0" max="500" /></td>
+												<td><input type="number" name="vbatref" step="1" min="0" max="500" /></td>
+											</tr>
+										<thead>
+											<tr>
+												<th>Min Cell Voltage</th>
+												<th>Max Cell Voltage</th>
+												<th>Warning Voltage</th>
+											</tr>
+										</thead>
+											<tr>
+												<td><input type="number" name="vbatmincellvoltage" step="0.01" min="0" max="1.00"/></td>
+												<td><input type="number" name="vbatmaxcellvoltage" step="0.01" min="0" max="1.00"/></td>
+												<td><input type="number" name="vbatwarningcellvoltage" step="0.01" min="0" max="2.55" /></td>
+											</tr>
+										</table>
+									<table class="parameter cf noline" cellpadding="0" cellspacing="0">
+										<tbody class="static-features misc noline"> 
+											<tr>
+												<td><input class="feature toggle" name="vbat_pid_compensation" title="vbat_pid_compensation" type="checkbox"/></td>
+												<td><label>VBAT_PID_COMPENSATION</label></td>
+												<td><span>Scale PID parameters based upon current batter voltage</span></td>
+											</tr>
+										</tbody>
+										<tbody class="features battery noline">
+											<!-- table generated here -->
+										</tbody>
+									</table>
+									</div>
+								</div>
+								<div class="gui_box grey topspacer other">
+									<div class="gui_box_titlebar">
+										<div class="spacer_box_title">Other Features</div>
+									</div>
+									<div class="spacer_box">
+										<table cellpadding="0" cellspacing="0">
+											<thead class="features other noline">
+												<tr>
+													<th class="checkbox"></th>
+													<th class="item"></th>
+													<th class="description"></th>
+												</tr>
+											</thead>
+											<tbody class="features other noline">
+												<!-- table generated here -->
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="clear-both"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary header-dialog-save" data-dismiss="modal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="modal fade" id="dlgVideoExport">
         <div class="modal-dialog">
@@ -483,6 +964,7 @@
     <script src="js/graph_legend.js"></script>
     <script src="js/graph_config_dialog.js"></script>
     <script src="js/graph_spectrum.js"></script>
+    <script src="js/header_dialog.js"></script>
     <script src="js/seekbar.js"></script>
     <script src="js/video_export_dialog.js"></script>
     <script src="js/flightlog_video_renderer.js"></script>
