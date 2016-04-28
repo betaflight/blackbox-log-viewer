@@ -137,6 +137,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog .modal-dialog {
     width:75%;
+    min-width:954px;
 }
 
 .header-dialog .cf tr {
@@ -344,7 +345,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog .parameter {
     float: right;
-    /* width: calc(100% - 2px); */
+    width: calc(100% - 2px);
     margin-bottom: 10px;
 }
 
@@ -466,59 +467,6 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog .noline td {
     border: 0px solid #ccc;
-}
-
-/* SLIDE ONE */
-.slideOne {
-    width: 50px;
-    height: 10px;
-    background: #333;
-    margin: 20px auto;
-
-    -webkit-border-radius: 50px;
-    -moz-border-radius: 50px;
-    border-radius: 50px;
-    position: relative;
-
-    -webkit-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
-    -moz-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
-    box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
-}
-
-.slideOne label {
-    display: block;
-    width: 16px;
-    height: 16px;
-
-    -webkit-border-radius: 50px;
-    -moz-border-radius: 50px;
-    border-radius: 50px;
-
-    -webkit-transition: all .4s ease;
-    -moz-transition: all .4s ease;
-    -o-transition: all .4s ease;
-    -ms-transition: all .4s ease;
-    transition: all .4s ease;
-    cursor: pointer;
-    position: absolute;
-    top: -3px;
-    left: -3px;
-
-    -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
-    -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
-    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
-    background: #fcfff4;
-
-    background: -webkit-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
-    background: -moz-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
-    background: -o-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
-    background: -ms-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
-    background: linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#b3bead',GradientType=0 );
-}
-
-.slideOne input[type=checkbox]:checked + label {
-    left: 37px;
 }
 
 .header-dialog .features input[type=checkbox],

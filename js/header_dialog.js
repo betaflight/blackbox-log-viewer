@@ -28,6 +28,7 @@ function HeaderDialog(dialog, onSave) {
 			for(var i=0; i<list.length; i++) {
 				selectElem.append(renderOptions(selected, i, list));
 			}
+			selectElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
 			selectElem.removeClass('missing');
 		} else {
 			selectElem.addClass('missing');
@@ -40,6 +41,7 @@ function HeaderDialog(dialog, onSave) {
 		if(data!=null) {
 			nameElem.val((data/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces));
 			nameElem.attr('decPl', decimalPlaces);
+			nameElem.attr('title', 'set '+name+'='+data);
 			nameElem.removeClass('missing');
 		} else {
 			nameElem.addClass('missing');
@@ -51,6 +53,7 @@ function HeaderDialog(dialog, onSave) {
 		if(data!=null) {
 			var state = (data == 1);
 			nameElem.prop('checked', state);
+			nameElem.attr('title', 'set '+name+'='+data);
 			nameElem.closest('tr').removeClass('missing');
 		} else {
 			nameElem.closest('tr').addClass('missing');
@@ -58,43 +61,46 @@ function HeaderDialog(dialog, onSave) {
 	}    
 
 	function populatePID(name, data) {
-        var i = 0;
+		var i = 0;
         var nameElem = $('.pid_tuning .' + name + ' input');
         nameElem.each(function () {
-        		$(this).attr('name', name + '[' + i + ']');
-                switch (i) {
-                    case 0:
-                    	if(data[i]!=null) {
+			$(this).attr('name', name + '[' + i + ']');
+			if(data!=null) {
+				$(this).closest('tr').removeClass('missing');
+				switch (i) {
+					case 0:
+						if(data[i]!=null) {
 								$(this).val((data[i]/10.0).toFixed(1));
 								$(this).attr('decPl', 1);
 								$(this).removeClass('missing');
-                    		} else {
+							} else {
 								$(this).addClass('missing');
-                    		}
-                    	i++;
-                        break;
-                    case 1:
-                        if(data[i]!=null) {
+							}
+						i++;
+						break;
+					case 1:
+						if(data[i]!=null) {
 								$(this).val((data[i]/1000.0).toFixed(3));
 								$(this).attr('decPl', 3);
 								$(this).removeClass('missing');
-                    		} else {
+							} else {
 								$(this).addClass('missing');
-                    		}
-                        i++;
-                        break;
-                    case 2:
-                        if(data[i]!=null) {
+							}
+						i++;
+						break;
+					case 2:
+						if(data[i]!=null) {
 								$(this).val(data[i].toFixed(0));
 								$(this).attr('decPl', 0);
 								$(this).removeClass('missing');
-                    		} else {
+							} else {
 								$(this).addClass('missing');
-                    		}
-                        i++;
-                        break;
-                    }
-                })
+							}
+						i++;
+						break;
+					}
+				} else $(this).closest('tr').addClass('missing');
+            })
 	}
 
 	function isFeatureEnabled(name, list, value) {
@@ -148,11 +154,11 @@ function HeaderDialog(dialog, onSave) {
                         + i
                         + '" value="'
                         + features[i].bit
-                        + '" title="'
+                        + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
                         + features[i].name
                         + '" type="radio" name="'
                         + features[i].group
-                        + '" /></td><td><label for="feature-'
+                        + '" bit="' + i + '" /></td><td><label for="feature-'
                         + i
                         + '">'
                         + features[i].name
@@ -164,9 +170,9 @@ function HeaderDialog(dialog, onSave) {
                         + i
                         + '" name="'
                         + features[i].name
-                        + '" title="'
+                        + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
                         + features[i].name
-                        + '" type="checkbox"/></td><td><label for="feature-'
+                        + '" type="checkbox" bit="'+ i +'" /></td><td><label for="feature-'
                         + i
                         + '">'
                         + features[i].name
@@ -206,7 +212,12 @@ function HeaderDialog(dialog, onSave) {
 
     function renderSysConfig(sysConfig) { 
     
-    	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
+    	// Update the log header
+
+    	$('h5.modal-title-revision').text( ((sysConfig['Firmware revision']!=null)?(' Rev : '  + sysConfig['Firmware revision']):''));
+    	$('h5.modal-title-date').text(     ((sysConfig['Firmware date']!=null)    ?(' Date : ' + sysConfig['Firmware date']    ):''));
+    
+    	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE); 
 
         // Populate the ROLL Pid Faceplate
         populatePID('rollPID'					, sysConfig.rollPID);
@@ -216,7 +227,7 @@ function HeaderDialog(dialog, onSave) {
         populatePID('altPID'					, sysConfig.altPID);
         populatePID('velPID'					, sysConfig.velPID);
  
-        setParameter('magPID'					, sysConfig.magPID, 1); // this is not an array
+        populatePID('magPID'					, sysConfig.magPID); // this is not an array
         
         populatePID('posPID'					, sysConfig.posPID);
         populatePID('posrPID'					, sysConfig.posrPID);
@@ -242,9 +253,9 @@ function HeaderDialog(dialog, onSave) {
         setParameter('dynThrPID'				,sysConfig.dynThrPID,2);
         setParameter('tpa-breakpoint'			,sysConfig.tpa_breakpoint,0);
         setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
-        setParameter('rates_0'					,sysConfig.rates[0],2);
-        setParameter('rates_1'					,sysConfig.rates[1],2);
-        setParameter('rates_2'					,sysConfig.rates[2],2);
+        setParameter('rates[0]'					,sysConfig.rates[0],2);
+        setParameter('rates[1]'					,sysConfig.rates[1],2);
+        setParameter('rates[2]'					,sysConfig.rates[2],2);
         setParameter('loopTime'					,sysConfig.loopTime,0);
         setParameter('yaw_p_limit'				,sysConfig.yaw_p_limit,0);
         setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,2);
@@ -278,20 +289,66 @@ function HeaderDialog(dialog, onSave) {
         
     function convertUIToSysConfig() {
     	console.log('Saving....');
-    	var newSysConfig = {}; 
-		$(".parameter td input").each(function() { 
-			// console.log($(this).attr('name') + ',' + $(this).val());
+    	var newSysConfig = {};
+
+    	// Scan all the parameters 
+		$(".parameter input").each(function() { 
+			if($(this).val()!=null) {
+				var matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
+				if(matches!=null) { // this is a variable in an array
+					if(newSysConfig[matches[1]]==null) { // array doesn't exist, create it
+						newSysConfig[matches[1]] = [];
+						}
+					var newArray = newSysConfig[matches[1]];
+					if($(this).attr('decPl')!=null) {
+						newArray[matches[2]] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
+					} else {
+						newArray[matches[2]] = (($(this).val()=='on')?1:0);
+					}				
+				} else { // this is just a straight field variable
+					if($(this).attr('decPl')!=null) {
+						newSysConfig[$(this).attr('name')] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
+					} else {
+						newSysConfig[$(this).attr('name')] = (($(this).val()=='on')?1:0);
+					}
+				}
+			}			
+			});
+
+    	// Scan all the drop-down lists 
+		$(".parameter select").each(function() { 
+			if($(this).val()!=null) {
+					newSysConfig[$(this).attr('name')] = parseInt($(this).val());
+			}			
+			});
+		
+
+		// Scan the pid_tuning table
+		$(".pid_tuning input").each(function() { 
 			if($(this).val()!=null) {
 				if($(this).attr('decPl')!=null) {
-					newSysConfig[$(this).attr('name')] = $(this).val() * Math.pow(10, $(this).attr('decPl'));
+					var matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
+					if(matches!=null) {
+						if(newSysConfig[matches[1]]==null) newSysConfig[matches[1]] = [null, null, null];
+						var newArray = newSysConfig[matches[1]];
+						newArray[matches[2]] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
+					} else (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
 				} else {
 					newSysConfig[$(this).attr('name')] = $(this).val();
 				}
 			}			
 			});
-		// TODO : parsing of the form is incomplete	
-		console.log(newSysConfig);
-		return null;			
+
+		//Build the features value
+		var newFeatureValue = 0;
+		$(".features td input").each(function() {
+				if ($(this).prop('checked')) {
+					newFeatureValue |= (1<<parseInt($(this).attr('bit')));
+				}
+			});
+		newSysConfig['features'] = newFeatureValue;
+
+		return newSysConfig;			
     }
 
 	// Public variables

@@ -514,6 +514,7 @@ function BlackboxLogViewer() {
             $("html").addClass("has-log");
             (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");
             (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
+            (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");
             
             selectLog(null);
         };

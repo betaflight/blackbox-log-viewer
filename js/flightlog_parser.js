@@ -436,7 +436,7 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.levelPID = parseCommaSeparatedIntegers(fieldValue);
             break;
             case "magPID":
-                that.sysConfig.magPID = parseInt(fieldValue, 10);
+                that.sysConfig.magPID = [parseInt(fieldValue, 10), null, null];
             break;
             case "velPID":
                 that.sysConfig.velPID = parseCommaSeparatedIntegers(fieldValue);
@@ -540,6 +540,8 @@ var FlightLogParser = function(logData) {
             case "Firmware revision":
             case "Firmware date":
                 // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
+                // Just Add them anyway
+                that.sysConfig[fieldName] = fieldValue;
             break;
             case "Device UID":
                 that.sysConfig.deviceUID = fieldValue;

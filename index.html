@@ -327,6 +327,8 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">Log Header Information</h4>
+                    <h5 class="modal-title-revision"></h5>
+                    <h5 class="modal-title-date"></h5>
                 </div>
                 <div class="modal-body">
 					<form name="header-information" id="pid-tuning">
@@ -468,8 +470,8 @@
 											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
 										</tr>
 										<tr>
-											<td colspan="2">Sensitivity</td>
-											<td colspan="2" class="parameter"><input type="number" name="H_sensitivity" data-tip="H_sensitivity" step="1" min="0" max="999" /></td>
+											<td colspan="2">Horizon Sensitivity</td>
+											<td class="parameter"><input type="number" name="H_sensitivity" title="H_sensitivity" step="1" min="0" max="999" /></td>
 										</tr>
 									</table>
 								</div>
@@ -551,14 +553,7 @@
 											</tr>
 										</tbody>
 									</table>
-									<table cellpadding="0" cellspacing="0">
-										<thead class="rxMode noline">
-											<tr>
-												<th class="cbox"></th>
-												<th class="item"></th>
-												<th class="description"></th>
-											</tr>
-										</thead>
+									<table class="parameter" cellpadding="0" cellspacing="0">
 										<tbody class="static-features noline"> 
 											<tr>
 												<td><input class="feature toggle" name="gyro_cal_on_first_arm" title="gyro_cal_on_first_arm" type="checkbox"/></td>
@@ -649,8 +644,8 @@
 												</tr>
 											</thead>
 												<tr>
-													<td colspan="2"><input type="number" name="rates_0" step="0.01" min="0" max="1.00" /></td>
-													<td colspan="2"><input type="number" name="rates_1" step="0.01" min="0" max="1.00" /></td>
+													<td colspan="2"><input type="number" name="rates[0]" step="0.01" min="0" max="1.00" /></td>
+													<td colspan="2"><input type="number" name="rates[1]" step="0.01" min="0" max="1.00" /></td>
 												</tr>
 										</table>
 										<table class="parameter cf">
@@ -662,7 +657,7 @@
 												</tr>
 											</thead>
 												<tr>
-													<td><input type="number" name="rates_2" step="0.01" min="0" max="2.55" /></td>
+													<td><input type="number" name="rates[2]" step="0.01" min="0" max="2.55" /></td>
 													<td><input type="number" name="rcYawExpo" step="0.01" min="0" max="1.00"/></td>
 													<td><input type="number" name="yaw_deadband" step="1" min="0" max="100"/></td>
 												</tr>
@@ -760,6 +755,8 @@
 												<td><span>Scale PID parameters based upon current battery voltage</span></td>
 											</tr>
 										</tbody>
+									</table>
+									<table cellpadding="0" cellspacing="0">
 										<tbody class="features battery noline">
 											<!-- table generated here -->
 										</tbody>
