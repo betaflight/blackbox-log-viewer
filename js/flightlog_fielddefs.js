@@ -110,6 +110,11 @@ var
             "ON"
     ]),
 
+    DTERM_DIFFERENTIATOR = makeReadOnly([
+            "STANDARD",
+            "ENHANCED"
+    ]),
+
     GYRO_LPF = makeReadOnly([
             "OFF",
             "188HZ",

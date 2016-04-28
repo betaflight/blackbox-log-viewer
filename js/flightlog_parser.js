@@ -216,11 +216,10 @@ var FlightLogParser = function(logData) {
             yaw_p_limit:null,               // Yaw P Limit
             yaw_lpf_hz:null,                // Yaw LowPass Filter Hz
             dterm_average_count:null,       // DTerm Average Count
-            dynamic_dterm_threshold:null,   // DTerm Dynamic Threshold
             rollPitchItermResetRate:null,   // ITerm Reset rate for Roll and Pitch
             yawItermResetRate:null,         // ITerm Reset Rate for Yaw
             dterm_lpf_hz:null,              // DTerm Lowpass Filter Hz
-            deltaMethod:null,              	// DTerm Error Method
+            dterm_differentiator:null,      // DTerm Differentiator
             H_sensitivity:null,             // Horizon Sensitivity
             deadband:null,                  // Roll, Pitch Deadband
             yaw_deadband:null,              // Yaw Deadband  
@@ -451,9 +450,6 @@ var FlightLogParser = function(logData) {
             case "dterm_average_count":
                 that.sysConfig.dterm_average_count = parseInt(fieldValue, 10);
             break;
-            case "dynamic_dterm_threshold":
-                that.sysConfig.dynamic_dterm_threshold = parseInt(fieldValue, 10);
-            break;
             case "rollPitchItermResetRate":
                 that.sysConfig.rollPitchItermResetRate = parseInt(fieldValue, 10);
             break;
@@ -463,8 +459,8 @@ var FlightLogParser = function(logData) {
             case "dterm_lpf_hz":
                 that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10);
             break;
-            case "deltaMethod":
-                that.sysConfig.deltaMethod = parseInt(fieldValue, 10);
+            case "dterm_differentiator":
+                that.sysConfig.dterm_differentiator = parseInt(fieldValue, 10);
             break;
             case "H_sensitivity":
                 that.sysConfig.H_sensitivity = parseInt(fieldValue, 10);

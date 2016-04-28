@@ -1,3 +1,130 @@
+/* Colums  START> */
+.cf_column {
+    min-height: 20px;
+    margin-bottom: 0px;
+}
+
+.full {
+    float: left;
+    width: 100%;
+}
+
+.half {
+    float: left;
+    width: 50%;
+}
+
+.third_left {
+    float: left;
+    width: 33%;
+}
+
+.third_center {
+    display: inline-block;
+    width: 34%;
+}
+
+.third_right {
+    float: right;
+    width: 33%;
+}
+
+.fourth {
+    float: left;
+    width: 25%;
+}
+
+.threefourth_right {
+    float: right;
+    width: 75%;
+}
+
+.threefourth_left {
+    float: left;
+    width: 75%;
+}
+
+.twothird {
+    float: left;
+    width: 67%;
+}
+
+/* Columns  END> */
+
+/* Default Parameter Entry Field */
+input[type="number"]::-webkit-inner-spin-button {
+    opacity: 1; /* required for chromium 33+ beta */
+    margin-left: 5px;
+}
+
+.clear-both {
+    clear: both;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+/* Standard GUI BOX */
+.gui_box {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    float: left;
+    width: calc(100% - 2px);
+    margin-bottom: 10px;
+    font-family: 'open_sansregular', Arial;
+}
+
+.gui_box_titlebar {
+    background-color: #e4e4e4;
+    border-radius: 3px 3px 0px 0px;
+    font-size: 13px;
+    width: 100%;
+    height: 27px;
+    padding-bottom: 0px;
+    float: left;
+    margin-bottom: 7px;
+    font-family: 'open_sanssemibold', Arial;
+}
+
+/* Spacers */
+.spacer {
+    padding-left: 7px;
+    padding-right: 7px;
+    width: calc(100% - 14px);
+    float: left;
+}
+
+.spacer_box {
+    padding: 10px;
+    margin-bottom: 3px;
+}
+
+.spacer_box_title {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 4px;
+    margin-bottom: 0px;
+    float: left;
+}
+
+.spacer_left {
+    padding-left: 15px;
+    float: left;
+    width: calc(100% - 15px);
+}
+
+.spacer_right {
+    padding-right: 15px;
+    width: calc(100% - 15px);
+    float: left;
+}
+
 .header-dialog .parameter th {
     background-color: #828885;
     padding: 4px;
@@ -8,12 +135,12 @@
     text-align: left;
 }
 
-.header-dialog .cf tr {
-    background-color: #DEDEDE;
+.header-dialog .modal-dialog {
+    width:75%;
 }
 
-.header-dialog .modal-dialog {
-    width:60%;
+.header-dialog .cf tr {
+    background-color: #DEDEDE;
 }
 
 .header-dialog .cf th {
@@ -72,7 +199,7 @@
     float: left;
     margin: 0px;
     border-collapse: collapse;
-    width: calc(100% - -1px);
+    width: calc(100% - 1px);
 }
 
 .header-dialog .gui_box {
@@ -135,32 +262,27 @@
     border-radius: 0px;
 }
 
+.header-dialog .missing {
+	display:none;
+	background:rgba(255,0,0,0.2);
+}
+
+.header-dialog .static-features table td {
+    padding: 1px;
+    border-right: 1px solid #ccc;
+}
+
 .header-dialog .controller {
     float: left;
-    width: calc(35% - 2px);
+    width: calc(100% - 10px);
     margin-left: 0px;
     margin-bottom: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
 }
 
-.header-dialog .controller .head {
-    display: block;
-    text-align: left;
-    line-height: 20px;
-    border-bottom: 1px solid #ccc;
-    background-color: #828885;
-    color: white;
-    /* height: 20px; */
-    font-weight: normal;
-    padding: 2px;
-    padding-left: 6px;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-}
-
 .header-dialog .controller select {
-    width: calc(100% - 2px);
+    width: calc(100% - 10px);
     height: 20px;
     line-height: 20px;
 }
@@ -209,10 +331,22 @@
     width: 25%;
 }
 
+.header-dialog .cbox {
+    width: 5%;
+}
+
+.header-dialog .cbox-label {
+    width: 20%;
+}
+
+.header-dialog .cbox-description {
+    width: 80%;
+}
+
 .header-dialog .parameter {
     float: right;
-    width: calc(100% - 2px);
-    margin-bottom: 10p;
+    /* width: calc(100% - 2px); */
+    margin-bottom: 10px;
 }
 
 .header-dialog .top-buttons {
@@ -335,8 +469,61 @@
     border: 0px solid #ccc;
 }
 
-.header-dialog .features input,
-.header-dialog .static-features input {
+/* SLIDE ONE */
+.slideOne {
+    width: 50px;
+    height: 10px;
+    background: #333;
+    margin: 20px auto;
+
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+    position: relative;
+
+    -webkit-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
+    -moz-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
+    box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
+}
+
+.slideOne label {
+    display: block;
+    width: 16px;
+    height: 16px;
+
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+
+    -webkit-transition: all .4s ease;
+    -moz-transition: all .4s ease;
+    -o-transition: all .4s ease;
+    -ms-transition: all .4s ease;
+    transition: all .4s ease;
+    cursor: pointer;
+    position: absolute;
+    top: -3px;
+    left: -3px;
+
+    -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
+    background: #fcfff4;
+
+    background: -webkit-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+    background: -moz-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+    background: -o-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+    background: -ms-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+    background: linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#b3bead',GradientType=0 );
+}
+
+.slideOne input[type=checkbox]:checked + label {
+    left: 37px;
+}
+
+.header-dialog .features input[type=checkbox],
+.header-dialog .static-features input[type=checkbox] {
     width: 50px;
     padding-left: 3px;
     height: 20px;
@@ -350,7 +537,7 @@
 
 .header-dialog .features label,
 .header-dialog .static-features label{
-    width: 70px;
+    /* width: 70px; */
     padding-left: 3px;
     height: 20px;
     line-height: 20px;

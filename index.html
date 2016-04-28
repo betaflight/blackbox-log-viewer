@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="css/bootstrap-theme.min.css">
 <link rel="stylesheet" href="css/jquery.nouislider.min.css">
 <link rel="stylesheet" href="css/main.css">
-<link rel="stylesheet" href="css/header_main.css">
 <link rel="stylesheet" href="css/header_dialog.css">
 
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
@@ -356,40 +355,37 @@
                     <h4 class="modal-title">Log Header Information</h4>
                 </div>
                 <div class="modal-body">
-					<div class="clear-both"></div>
-					<form name="pid-tuning" id="pid-tuning">
+					<form name="header-information" id="pid-tuning">
 						<div class="cf_column half left">
 							<div class="gui_box grey PID-settings">
 								<div class="gui_box_titlebar">
 									<div class="spacer_box_title">PID Settings</div>
 								</div>
 								<div class="spacer_box">
-									<table class="controller parameter cf">
+									<table class="parameter cf">
 										<thead>
 											<tr>
 												<th>Controller</th>
 											</tr>
 										</thead>
+										<tbody>
 											<tr>
-												<td>
-													<select name="controller">
-														<!-- list generated here -->
-													</select>
-												</td>
+												<td><select name='pidController'><!-- list generated here --></select></td>
 											</tr>
-									</table>							
+										</tbody>
+									</table>
 									<table class="topspacer pid_titlebar">
 										<tr>
-											<th class="name" i18n="pidTuningName"">Name</th>
-											<th class="proportional" i18n="pidTuningProportional">Proportional</th>
-											<th class="integral" i18n="pidTuningIntegral">Integral</th>
-											<th class="derivative" i18n="pidTuningDerivative">Derivative</th>
+											<th class="name">Name</th>
+											<th class="proportional">Proportional</th>
+											<th class="integral">Integral</th>
+											<th class="derivative">Derivative</th>
 										</tr>
 									</table>
 									<table id="pid_main" class="pid_tuning">
 										<tr>
 											<th colspan="4">
-												<div class="pid_mode" i18n="pidTuningBasic">Basic/Acro</div>
+												<div class="pid_mode">Basic/Acro</div>
 											</th>
 										</tr>
 										<tr class="ROLL">
@@ -417,7 +413,7 @@
 									<table id="pid_baro" class="pid_tuning">
 										<tr>
 											<th colspan="4">
-												<div class="pid_mode" i18n="pidTuningAltitude">Barometer & Sonar/Altitude</div>
+												<div class="pid_mode">Barometer & Sonar/Altitude</div>
 											</th>
 										</tr>
 										<tr class="ALT">
@@ -438,7 +434,7 @@
 									<table id="pid_mag" class="pid_tuning">
 										<tr>
 											<th colspan="4">
-												<div class="pid_mode" i18n="pidTuningMag">Heading</div>
+												<div class="pid_mode">Heading</div>
 											</th>
 										</tr>
 										<tr class="MAG">
@@ -452,7 +448,7 @@
 									<table id="pid_gps" class="pid_tuning">
 										<tr>
 											<th colspan="4">
-												<div class="pid_mode" i18n="pidTuningGps">GPS</div>
+												<div class="pid_mode">GPS</div>
 											</th>
 										</tr>
 										<tr class="Pos">
@@ -535,17 +531,15 @@
 												<th colspan="5">D-Term</th>
 											</tr>
 											<tr>
-												<th>Calculation</th>
+												<th>Differentiator</th>
 												<th>Filter (Hz)</th>
-												<th>Dynamic Threshold</th>
 												<th>Average Count</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr>
-												<td><select name='deltaMethod' title="deltaMethod"><!-- list generated here --></select></td>
+												<td><select name='dterm_differentiator' title="dterm_differentiator"><!-- list generated here --></select></td>
 												<td><input type="number" name="dterm_lpf_hz" title="dterm_lpf_hz" step="0.01" min="0" max="999.00" /></td>
-												<td><input type="number" name="dynamic_dterm_threshold" title="dynamic_dterm_threshold" step="0.01" min="0" max="100.00" /></td>
 												<td><input type="number" name="dterm_average_count" title="dterm_average_count" step="1" min="0" max="12" /></td>
 											</tr>
 										</tbody>
@@ -583,7 +577,14 @@
 											</tr>
 										</tbody>
 									</table>
-									<table class = "parameter cf" cellpadding="0" cellspacing="0">
+									<table cellpadding="0" cellspacing="0">
+										<thead class="rxMode noline">
+											<tr>
+												<th class="cbox"></th>
+												<th class="item"></th>
+												<th class="description"></th>
+											</tr>
+										</thead>
 										<tbody class="static-features noline"> 
 											<tr>
 												<td><input class="feature toggle" name="gyro_cal_on_first_arm" title="gyro_cal_on_first_arm" type="checkbox"/></td>
@@ -600,9 +601,9 @@
 								</div>
 								<div class="spacer_box">
 									<table cellpadding="0" cellspacing="0">
-										<thead class="features rxMode noline">
+										<thead class="rxMode noline">
 											<tr>
-												<th class="checkbox"></th>
+												<th class="cbox"></th>
 												<th class="item"></th>
 												<th class="description"></th>
 											</tr>
@@ -630,7 +631,7 @@
 										<thead class="topspacer">
 											<tr>
 												<th>Accelerometer</th>
-												<th>Magnatometer</th>
+												<th>Magnetometer</th>
 												<th>Barometer</th>
 											</tr>
 										</thead>
@@ -644,7 +645,7 @@
 									</table>
 								</div>
 							</div>
-					</div>
+						</div>
 						<div class="cf_column half right">
 							<div class="spacer_left">
 								<div class="gui_box grey topspacer rates">
@@ -692,7 +693,7 @@
 													<td><input type="number" name="yaw_deadband" step="1" min="0" max="100"/></td>
 												</tr>
 										</table>
-										<table class="parameter cf noline" cellpadding="0" cellspacing="0">
+										<table class="parameter noline" cellpadding="0" cellspacing="0">
 											<tbody class="static-features misc noline"> 
 												<tr>
 													<td><input class="feature toggle" name="rc_smoothing" title="rc_smoothing" type="checkbox"/></td>
@@ -777,12 +778,12 @@
 												<td><input type="number" name="vbatwarningcellvoltage" step="0.01" min="0" max="2.55" /></td>
 											</tr>
 										</table>
-									<table class="parameter cf noline" cellpadding="0" cellspacing="0">
+									<table class="parameter noline" cellpadding="0" cellspacing="0">
 										<tbody class="static-features misc noline"> 
 											<tr>
 												<td><input class="feature toggle" name="vbat_pid_compensation" title="vbat_pid_compensation" type="checkbox"/></td>
 												<td><label>VBAT_PID_COMPENSATION</label></td>
-												<td><span>Scale PID parameters based upon current batter voltage</span></td>
+												<td><span>Scale PID parameters based upon current battery voltage</span></td>
 											</tr>
 										</tbody>
 										<tbody class="features battery noline">
@@ -813,7 +814,7 @@
 							</div>
 						</div>
 					</form>
-					<div class="clear-both"></div>
+                	<div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal">Cancel</button>
@@ -822,8 +823,7 @@
             </div>
         </div>
     </div>
-
-
+    
     <div class="modal fade" id="dlgVideoExport">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -969,6 +969,6 @@
     <script src="js/video_export_dialog.js"></script>
     <script src="js/flightlog_video_renderer.js"></script>
     <script src="js/graph_config.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js"></script>    
 </body>
 </html>

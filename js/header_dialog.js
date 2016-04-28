@@ -20,40 +20,72 @@ function HeaderDialog(dialog, onSave) {
     
     function renderSelect(name, selected, list) {
     	// Populate a select drop-down box
-    	var select = $(name);
+    	var selectElem = $('.parameter select[name="' + name + '"]');
+		if(selected!=null) {
 
-    	select.children().remove(); // clear list
+			selectElem.children().remove(); // clear list
 
-    	for(var i=0; i<list.length; i++) {
-			select.append(renderOptions(selected, i, list));
-    	}    	
+			for(var i=0; i<list.length; i++) {
+				selectElem.append(renderOptions(selected, i, list));
+			}
+			selectElem.removeClass("missing");
+		} else {
+			selectElem.addClass("missing");
+		}   	
+
     }
     
     function setParameter(name, data, decimalPlaces) {
-		if(data!=null) $(name).val((data/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces));
+		var nameElem = $('.parameter input[name="' + name + '"]');
+		if(data!=null) {
+			nameElem.val((data/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces));
+			nameElem.removeClass("missing");
+		} else {
+			nameElem.addClass("missing");
+		}
 	}
 
 	function setCheckbox(name, data) {
+		var nameElem = $('.parameter input[name="' + name + '"]');
 		if(data!=null) {
 			var state = (data == 1);
-			$(name).prop('checked', state);
+			nameElem.prop('checked', state);
+			nameElem.closest('tr').removeClass("missing");
+		} else {
+			nameElem.closest('tr').addClass("missing");
 		}
 	}    
 
 	function populatePID(name, data) {
         var i = 0;
-        $(name).each(function () {
+        var nameElem = $('.pid_tuning .' + name + ' input');
+        nameElem.each(function () {
                 switch (i) {
                     case 0:
-                    	if(data[i]!=null) $(this).val((data[i]/10.0).toFixed(1));
+                    	if(data[i]!=null) {
+								$(this).val((data[i]/10.0).toFixed(1));
+								$(this).removeClass("missing");
+                    		} else {
+								$(this).addClass("missing");
+                    		}
                     	i++;
                         break;
                     case 1:
-                        if(data[i]!=null) $(this).val((data[i]/1000.0).toFixed(3));
+                        if(data[i]!=null) {
+								$(this).val((data[i]/1000.0).toFixed(3));
+								$(this).removeClass("missing");
+                    		} else {
+								$(this).addClass("missing");
+                    		}
                         i++;
                         break;
                     case 2:
-                        if(data[i]!=null) $(this).val(data[i].toFixed(0));
+                        if(data[i]!=null) {
+								$(this).val(data[i].toFixed(0));
+								$(this).removeClass("missing");
+                    		} else {
+								$(this).addClass("missing");
+                    		}
                         i++;
                         break;
                     }
@@ -149,75 +181,79 @@ function HeaderDialog(dialog, onSave) {
 			});
 		}
 
-  			for (var i = 0; i < radioGroups.length; i++) {
-				var group = radioGroups[i];
-				var controls_e = $('input[name="' + group + '"].feature');
+		for (var i = 0; i < radioGroups.length; i++) {
+			var group = radioGroups[i];
+			var controls_e = $('input[name="' + group + '"].feature');
 
-				controls_e.each(function() {
-					var bit = parseInt($(this).attr('value'));
-					var state = (value & 1<<bit);
-	
-					$(this).prop('checked', state);
-				});
-        	}
+			controls_e.each(function() {
+				var bit = parseInt($(this).attr('value'));
+				var state = (value & 1<<bit);
+
+				$(this).prop('checked', state);
+			});
+		}
+
+		// Finally, if the features value is not part of the log, then invalidate all the check/radio boxes
+		(value!=null)?$(".feature").closest('tr').removeClass("missing"):
+					  $(".feature").closest('tr').addClass("missing");
+        	
 	}
 
     function renderSysConfig(sysConfig) { 
     
-    	renderSelect(".controller select", sysConfig.pidController, PID_CONTROLLER_TYPE);
+    	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
 
         // Populate the ROLL Pid Faceplate
-        populatePID('.pid_tuning .ROLL input',  sysConfig.rollPID);
-        populatePID('.pid_tuning .PITCH input', sysConfig.pitchPID);
-        populatePID('.pid_tuning .YAW input',   sysConfig.yawPID);
+        populatePID('ROLL'						,  sysConfig.rollPID);
+        populatePID('PITCH'						, sysConfig.pitchPID);
+        populatePID('YAW'						,   sysConfig.yawPID);
 
-        populatePID('.pid_tuning .ALT input',   sysConfig.altPID);
-        populatePID('.pid_tuning .Vario input', sysConfig.velPID);
+        populatePID('ALT'						,   sysConfig.altPID);
+        populatePID('Vario'						, sysConfig.velPID);
  
-        setParameter('.pid_tuning .MAG input',	sysConfig.magPID, 1); // this is not an array
+        setParameter('MAG'						,	sysConfig.magPID, 1); // this is not an array
         
-        populatePID('.pid_tuning .Pos input',   sysConfig.posPID);
-        populatePID('.pid_tuning .PosR input',  sysConfig.posrPID);
-        populatePID('.pid_tuning .NavR input',  sysConfig.navrPID);
+        populatePID('Pos'						,   sysConfig.posPID);
+        populatePID('PosR'						,  sysConfig.posrPID);
+        populatePID('NavR'						,  sysConfig.navrPID);
 
-        populatePID('.pid_tuning .LEVEL input', sysConfig.levelPID);
+        populatePID('LEVEL'						, sysConfig.levelPID);
 
         // Fill in data from for the rates object
-        setParameter('.parameter input[name="rcRate"]'					,sysConfig.rcRate,2);
-        setParameter('.parameter input[name="vbatscale"]'				,sysConfig.vbatscale,0);
-        setParameter('.parameter input[name="vbatref"]'					,sysConfig.vbatref,0);
-        setParameter('.parameter input[name="vbatmincellvoltage"]'		,sysConfig.vbatmincellvoltage,1);
-        setParameter('.parameter input[name="vbatmaxcellvoltage"]'		,sysConfig.vbatmaxcellvoltage,1);
-        setParameter('.parameter input[name="vbatwarningcellvoltage"]'	,sysConfig.vbatwarningcellvoltage,1);
-        setParameter('.parameter input[name="minthrottle"]'				,sysConfig.minthrottle,0);
-        setParameter('.parameter input[name="maxthrottle"]'				,sysConfig.maxthrottle,0);
-        setParameter('.parameter input[name="currentMeterOffset"]'		,sysConfig.currentMeterOffset,0);
-        setParameter('.parameter input[name="currentMeterScale"]'		,sysConfig.currentMeterScale,0);
-        setParameter('.parameter input[name="rcExpo"]'					,sysConfig.rcExpo,2);
-        setParameter('.parameter input[name="rcYawExpo"]'				,sysConfig.rcYawExpo,2);
-        setParameter('.parameter input[name="thrMid"]'					,sysConfig.thrMid,2);
-        setParameter('.parameter input[name="thrExpo"]'					,sysConfig.thrExpo,2);
-        setParameter('.parameter input[name="dynThrPID"]'				,sysConfig.dynThrPID,2);
-        setParameter('.parameter input[name="tpa-breakpoint"]'			,sysConfig.tpa_breakpoint,0);
-        setParameter('.parameter input[name="superExpoFactor"]'			,sysConfig.superExpoFactor,2);
-        setParameter('.parameter input[name="rates_0"]'					,sysConfig.rates[0],2);
-        setParameter('.parameter input[name="rates_1"]'					,sysConfig.rates[1],2);
-        setParameter('.parameter input[name="rates_2"]'					,sysConfig.rates[2],2);
-        setParameter('.parameter input[name="loopTime"]'				,sysConfig.loopTime,0);
-        setParameter('.parameter input[name="yaw_p_limit"]'				,sysConfig.yaw_p_limit,0);
-        setParameter('.parameter input[name="yaw_lpf_hz"]'				,sysConfig.yaw_lpf_hz,2);
-        setParameter('.parameter input[name="dterm_average_count"]'		,sysConfig.dterm_average_count,0);
-        setParameter('.parameter input[name="dynamic_dterm_threshold"]'	,sysConfig.dynamic_dterm_threshold,2);
-        setParameter('.parameter input[name="rollPitchItermResetRate"]'	,sysConfig.rollPitchItermResetRate,0);
-        setParameter('.parameter input[name="yawItermResetRate"]'		,sysConfig.yawItermResetRate,0);
-        setParameter('.parameter input[name="dterm_lpf_hz"]'			,sysConfig.dterm_lpf_hz,2);
-    	renderSelect(".parameter select[name='deltaMethod']"		    ,sysConfig.deltaMethod, PID_DELTA_TYPE);
-        setParameter('.parameter input[name="H_sensitivity"]'			,sysConfig.H_sensitivity,2);
-        setParameter('.parameter input[name="deadband"]'				,sysConfig.deadband,0);
-        setParameter('.parameter input[name="yaw_deadband"]'			,sysConfig.yaw_deadband,0);
-    	renderSelect(".parameter select[name='gyro_lpf']"			    ,sysConfig.gyro_lpf, GYRO_LPF);
-        setParameter('.parameter input[name="gyro_lowpass_hz"]'			,sysConfig.gyro_lowpass_hz,2);
-        setParameter('.parameter input[name="acc_lpf_hz"]'				,sysConfig.acc_lpf_hz,2);
+        setParameter('rcRate'					,sysConfig.rcRate,2);
+        setParameter('vbatscale'				,sysConfig.vbatscale,0);
+        setParameter('vbatref'					,sysConfig.vbatref,0);
+        setParameter('vbatmincellvoltage'		,sysConfig.vbatmincellvoltage,1);
+        setParameter('vbatmaxcellvoltage'		,sysConfig.vbatmaxcellvoltage,1);
+        setParameter('vbatwarningcellvoltage'	,sysConfig.vbatwarningcellvoltage,1);
+        setParameter('minthrottle'				,sysConfig.minthrottle,0);
+        setParameter('maxthrottle'				,sysConfig.maxthrottle,0);
+        setParameter('currentMeterOffset'		,sysConfig.currentMeterOffset,0);
+        setParameter('currentMeterScale'		,sysConfig.currentMeterScale,0);
+        setParameter('rcExpo'					,sysConfig.rcExpo,2);
+        setParameter('rcYawExpo'				,sysConfig.rcYawExpo,2);
+        setParameter('thrMid'					,sysConfig.thrMid,2);
+        setParameter('thrExpo'					,sysConfig.thrExpo,2);
+        setParameter('dynThrPID'				,sysConfig.dynThrPID,2);
+        setParameter('tpa-breakpoint'			,sysConfig.tpa_breakpoint,0);
+        setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
+        setParameter('rates_0'					,sysConfig.rates[0],2);
+        setParameter('rates_1'					,sysConfig.rates[1],2);
+        setParameter('rates_2'					,sysConfig.rates[2],2);
+        setParameter('loopTime'					,sysConfig.loopTime,0);
+        setParameter('yaw_p_limit'				,sysConfig.yaw_p_limit,0);
+        setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,2);
+        setParameter('dterm_average_count'		,sysConfig.dterm_average_count,0);
+        setParameter('rollPitchItermResetRate'	,sysConfig.rollPitchItermResetRate,0);
+        setParameter('yawItermResetRate'		,sysConfig.yawItermResetRate,0);
+        setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,2);
+    	renderSelect('dterm_differentiator'		,sysConfig.dterm_differentiator, DTERM_DIFFERENTIATOR);
+        setParameter('H_sensitivity'			,sysConfig.H_sensitivity,2);
+        setParameter('deadband'					,sysConfig.deadband,0);
+        setParameter('yaw_deadband'				,sysConfig.yaw_deadband,0);
+    	renderSelect('gyro_lpf'			    	,sysConfig.gyro_lpf, GYRO_LPF);
+        setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,2);
+        setParameter('acc_lpf_hz'				,sysConfig.acc_lpf_hz,2);
         
 /* Packed Flags */
 
@@ -225,14 +261,14 @@ function HeaderDialog(dialog, onSave) {
 
 /* Hardware selections */
         
-    	renderSelect(".parameter select[name='acc_hardware']"		    ,sysConfig.acc_hardware, ACC_HARDWARE);
-    	renderSelect(".parameter select[name='baro_hardware']"		    ,sysConfig.baro_hardware, BARO_HARDWARE);
-    	renderSelect(".parameter select[name='mag_hardware']"		    ,sysConfig.mag_hardware, MAG_HARDWARE);
+    	renderSelect('acc_hardware'		    	,sysConfig.acc_hardware, ACC_HARDWARE);
+    	renderSelect('baro_hardware'		    ,sysConfig.baro_hardware, BARO_HARDWARE);
+    	renderSelect('mag_hardware'		    	,sysConfig.mag_hardware, MAG_HARDWARE);
 
 /* Booleans */
-        setCheckbox('.parameter input[name="gyro_cal_on_first_arm"]',	sysConfig.gyro_cal_on_first_arm);
-        setCheckbox('.parameter input[name="vbat_pid_compensation"]',	sysConfig.vbat_pid_compensation);
-        setCheckbox('.parameter input[name="rc_smoothing"]',			sysConfig.rc_smoothing);
+        setCheckbox('gyro_cal_on_first_arm'		,sysConfig.gyro_cal_on_first_arm);
+        setCheckbox('vbat_pid_compensation'		,sysConfig.vbat_pid_compensation);
+        setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
     }
         
     function convertUIToSysConfig() { }
