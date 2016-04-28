@@ -43,55 +43,6 @@ function BlackboxLogViewer() {
         lastGraphConfig = null,     // Undo feature - go back to last configuration.
         workspaceGraphConfigs = {}, // Workspaces
         
-        // JSON flightlog configuration
-        flightLogSettings = {},
-
-        flightLogDefaultSettings = [ // FlightLog Default Settings
-                { label: "Rates",
-                  parameters:
-                   [ 
-                    { // Index 0
-                      label: "RC Rate",
-                      value: 100
-                    },
-                    { // Index 1
-                      label: "RC Expo",
-                      value: 70
-                    },
-                    { // Index 2
-                      label: "Roll Rate",
-                      value: 75
-                    },
-                    { // Index 3
-                      label: "Pitch Rate",
-                      value: 75
-                    },
-                    { // Index 4
-                      label: "Yaw Rate",
-                      value: 45
-                    }, 
-                    { // Index 5
-                      label: "Yaw Expo",
-                      value: 20
-                    },
-                    { // Index 6
-                      label: "Super Expo",
-                      value: 30
-                    }                     
-                   ]
-                },
-                { label: "Loop Time",
-                  parameters:
-                   [ 
-                    { // Index 0
-                      label: "Looptime",
-                      value: 500
-                    },
-                   ]
-                },
-            ],
-            
-        
         // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
         activeGraphConfig = new GraphConfig(),
         
@@ -497,19 +448,6 @@ function BlackboxLogViewer() {
             return;
         }
         
-        try {
-        // transfer the parameters from the log file into the settings data structure
-        if(flightLog.getSysConfig().rcRate            != null)    {flightLogSettings[0].parameters[0].value = flightLog.getSysConfig().rcRate; }            else {flightLog.getSysConfig().rcRate             = flightLogSettings[0].parameters[0].value; }
-        if(flightLog.getSysConfig().rcExpo            != null)    {flightLogSettings[0].parameters[1].value = flightLog.getSysConfig().rcExpo; }            else {flightLog.getSysConfig().rcExpo             = flightLogSettings[0].parameters[1].value; }
-        if(flightLog.getSysConfig().rates[AXIS.ROLL]  != null)    {flightLogSettings[0].parameters[2].value = flightLog.getSysConfig().rates[AXIS.ROLL]; }  else {flightLog.getSysConfig().rates[AXIS.ROLL]   = flightLogSettings[0].parameters[2].value; }
-        if(flightLog.getSysConfig().rates[AXIS.PITCH] != null)    {flightLogSettings[0].parameters[3].value = flightLog.getSysConfig().rates[AXIS.PITCH]; } else {flightLog.getSysConfig().rates[AXIS.PITCH]  = flightLogSettings[0].parameters[3].value; }
-        if(flightLog.getSysConfig().rates[AXIS.YAW]   != null)    {flightLogSettings[0].parameters[4].value = flightLog.getSysConfig().rates[AXIS.YAW]; }   else {flightLog.getSysConfig().rates[AXIS.YAW]    = flightLogSettings[0].parameters[4].value; }
-        if(flightLog.getSysConfig().rcYawExpo         != null)    {flightLogSettings[0].parameters[5].value = flightLog.getSysConfig().rcYawExpo; }         else {flightLog.getSysConfig().rcYawExpo          = flightLogSettings[0].parameters[5].value; }
-        if(flightLog.getSysConfig().superExpoFactor   != null)    {flightLogSettings[0].parameters[6].value = flightLog.getSysConfig().superExpoFactor; }   else {flightLog.getSysConfig().superExpoFactor    = flightLogSettings[0].parameters[6].value; }
-        if(flightLog.getSysConfig().loopTime          != null)    {flightLogSettings[1].parameters[0].value = flightLog.getSysConfig().loopTime; }          else {flightLog.getSysConfig().loopTime           = flightLogSettings[1].parameters[0].value; }
-        } catch(e) {
-            console.log('FlightLog Settings archive fault... ignoring');
-        }
         if (graph) {
             graph.destroy();
         }
@@ -564,7 +502,7 @@ function BlackboxLogViewer() {
             flightLogDataArray = new Uint8Array(bytes);
             
             try {
-                flightLog = new FlightLog(flightLogDataArray, flightLogSettings);
+                flightLog = new FlightLog(flightLogDataArray);
             } catch (err) {
                 alert("Sorry, an error occured while trying to open this log:\n\n" + err);
                 return;
@@ -675,15 +613,6 @@ function BlackboxLogViewer() {
                                     ]};
             }
     });
-    
-    prefs.get('flightLogSettings', function(item) {
-        if(item) {
-            flightLogSettings = item;
-            } else {
-            flightLogSettings = flightLogDefaultSettings;
-            }
-    });
-    
     
     activeGraphConfig.addListener(function() {
         invalidateGraph();
@@ -900,24 +829,19 @@ function BlackboxLogViewer() {
                 newGraphConfig(newConfig);   
             }),
             
-            flightLogSetupDialog = new FlightLogSetupDialog($("#dlgFlightLogSetup"), function(newSettings) {
-                flightLog.settings = newSettings; // Store the settings to the flightlog
-
-                flightLogSettings = newSettings;  // Let's write this information to the local store
-                prefs.set('flightLogSettings', flightLogSettings);
-
-                // Save Current Position
-                var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
-                selectLog(null);
-                if (hasVideo) {
-                    setVideoTime(activePosition);
-                } else {
-                    setCurrentBlackboxTime(activePosition);
-                }
-            }),
-
             headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function(newSettings) {
-                console.log(newSettings);
+                if(newSettings!=null) {
+                    prefs.set('lastHeaderData', newSettings);
+
+                    // Save Current Position then re-calculate all the log information
+                    var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
+                    selectLog(null);
+                    if (hasVideo) {
+                        setVideoTime(activePosition);
+                    } else {
+                        setCurrentBlackboxTime(activePosition);
+                    }
+                }
             }),
 
             exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
@@ -933,13 +857,6 @@ function BlackboxLogViewer() {
             graphConfigDialog.show(flightLog, graphConfig);
         });
 
-        $(".open-log-setup-dialog").click(function(e) {
-            e.preventDefault();
-            
-            flightLogSetupDialog.show(flightLog, flightLogSettings);
-        });
-        
-        
         $(".open-header-dialog").click(function(e) {
             e.preventDefault();
             

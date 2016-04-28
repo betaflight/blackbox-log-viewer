@@ -263,7 +263,6 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .header-dialog .missing {
-	display:none;
 	background:rgba(255,0,0,0.2);
 }
 

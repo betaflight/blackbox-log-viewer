@@ -9,7 +9,7 @@
  * Additional computed fields are derived from the original data set and added as new fields in the resulting data.
  * Window based smoothing of fields is offered.
  */
-function FlightLog(logData, newSettings) {
+function FlightLog(logData) {
     var
         ADDITIONAL_COMPUTED_FIELD_COUNT = 15, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GYROADC_SCALED **/
     
@@ -38,8 +38,6 @@ function FlightLog(logData, newSettings) {
     //Public fields:
     this.parser = parser;
     
-    this.settings = newSettings;
-
     this.getMainFieldCount = function() {
         return fieldNames.length;
     };

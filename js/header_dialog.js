@@ -28,9 +28,9 @@ function HeaderDialog(dialog, onSave) {
 			for(var i=0; i<list.length; i++) {
 				selectElem.append(renderOptions(selected, i, list));
 			}
-			selectElem.removeClass("missing");
+			selectElem.removeClass('missing');
 		} else {
-			selectElem.addClass("missing");
+			selectElem.addClass('missing');
 		}   	
 
     }
@@ -39,9 +39,10 @@ function HeaderDialog(dialog, onSave) {
 		var nameElem = $('.parameter input[name="' + name + '"]');
 		if(data!=null) {
 			nameElem.val((data/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces));
-			nameElem.removeClass("missing");
+			nameElem.attr('decPl', decimalPlaces);
+			nameElem.removeClass('missing');
 		} else {
-			nameElem.addClass("missing");
+			nameElem.addClass('missing');
 		}
 	}
 
@@ -50,9 +51,9 @@ function HeaderDialog(dialog, onSave) {
 		if(data!=null) {
 			var state = (data == 1);
 			nameElem.prop('checked', state);
-			nameElem.closest('tr').removeClass("missing");
+			nameElem.closest('tr').removeClass('missing');
 		} else {
-			nameElem.closest('tr').addClass("missing");
+			nameElem.closest('tr').addClass('missing');
 		}
 	}    
 
@@ -60,31 +61,35 @@ function HeaderDialog(dialog, onSave) {
         var i = 0;
         var nameElem = $('.pid_tuning .' + name + ' input');
         nameElem.each(function () {
+        		$(this).attr('name', name + '[' + i + ']');
                 switch (i) {
                     case 0:
                     	if(data[i]!=null) {
 								$(this).val((data[i]/10.0).toFixed(1));
-								$(this).removeClass("missing");
+								$(this).attr('decPl', 1);
+								$(this).removeClass('missing');
                     		} else {
-								$(this).addClass("missing");
+								$(this).addClass('missing');
                     		}
                     	i++;
                         break;
                     case 1:
                         if(data[i]!=null) {
 								$(this).val((data[i]/1000.0).toFixed(3));
-								$(this).removeClass("missing");
+								$(this).attr('decPl', 3);
+								$(this).removeClass('missing');
                     		} else {
-								$(this).addClass("missing");
+								$(this).addClass('missing');
                     		}
                         i++;
                         break;
                     case 2:
                         if(data[i]!=null) {
 								$(this).val(data[i].toFixed(0));
-								$(this).removeClass("missing");
+								$(this).attr('decPl', 0);
+								$(this).removeClass('missing');
                     		} else {
-								$(this).addClass("missing");
+								$(this).addClass('missing');
                     		}
                         i++;
                         break;
@@ -194,8 +199,8 @@ function HeaderDialog(dialog, onSave) {
 		}
 
 		// Finally, if the features value is not part of the log, then invalidate all the check/radio boxes
-		(value!=null)?$(".feature").closest('tr').removeClass("missing"):
-					  $(".feature").closest('tr').addClass("missing");
+		(value!=null)?$(".feature").closest('tr').removeClass('missing'):
+					  $(".feature").closest('tr').addClass('missing');
         	
 	}
 
@@ -204,20 +209,20 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
 
         // Populate the ROLL Pid Faceplate
-        populatePID('ROLL'						,  sysConfig.rollPID);
-        populatePID('PITCH'						, sysConfig.pitchPID);
-        populatePID('YAW'						,   sysConfig.yawPID);
+        populatePID('rollPID'					, sysConfig.rollPID);
+        populatePID('pitchPID'					, sysConfig.pitchPID);
+        populatePID('yawPID'					, sysConfig.yawPID);
 
-        populatePID('ALT'						,   sysConfig.altPID);
-        populatePID('Vario'						, sysConfig.velPID);
+        populatePID('altPID'					, sysConfig.altPID);
+        populatePID('velPID'					, sysConfig.velPID);
  
-        setParameter('MAG'						,	sysConfig.magPID, 1); // this is not an array
+        setParameter('magPID'					, sysConfig.magPID, 1); // this is not an array
         
-        populatePID('Pos'						,   sysConfig.posPID);
-        populatePID('PosR'						,  sysConfig.posrPID);
-        populatePID('NavR'						,  sysConfig.navrPID);
+        populatePID('posPID'					, sysConfig.posPID);
+        populatePID('posrPID'					, sysConfig.posrPID);
+        populatePID('navrPID'					, sysConfig.navrPID);
 
-        populatePID('LEVEL'						, sysConfig.levelPID);
+        populatePID('levelPID'					, sysConfig.levelPID);
 
         // Fill in data from for the rates object
         setParameter('rcRate'					,sysConfig.rcRate,2);
@@ -271,7 +276,23 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
     }
         
-    function convertUIToSysConfig() { }
+    function convertUIToSysConfig() {
+    	console.log('Saving....');
+    	var newSysConfig = {}; 
+		$(".parameter td input").each(function() { 
+			// console.log($(this).attr('name') + ',' + $(this).val());
+			if($(this).val()!=null) {
+				if($(this).attr('decPl')!=null) {
+					newSysConfig[$(this).attr('name')] = $(this).val() * Math.pow(10, $(this).attr('decPl'));
+				} else {
+					newSysConfig[$(this).attr('name')] = $(this).val();
+				}
+			}			
+			});
+		// TODO : parsing of the form is incomplete	
+		console.log(newSysConfig);
+		return null;			
+    }
 
 	// Public variables
     
@@ -282,7 +303,7 @@ function HeaderDialog(dialog, onSave) {
  
  	// Buttons
  
-    $(".header-view-dialog-save").click(function(e) {
+    $(".header-dialog-save").click(function(e) {
         onSave(convertUIToSysConfig());
     });
 }
