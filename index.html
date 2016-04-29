@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/jquery.nouislider.min.css">
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/header_dialog.css">
+<link rel="stylesheet" href="css/keys_dialog.css">
 
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
@@ -266,6 +267,7 @@
                 <div class="log-graph-legend">
                 </div>
                 <button type="button" class="btn btn-default btn-block hide-analyser-window">Hide Analyser</button>
+                <button type="button" class="btn btn-default btn-block open-keys-dialog">Keyboard Shortcuts</button>
                 <button type="button" class="btn btn-default btn-block open-header-dialog">Log Header</button>
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
             </div>
@@ -795,6 +797,81 @@
         </div>
     </div>
     
+    <div class="modal fade keys-dialog" id="dlgKeysDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Shortcut Keys</h4>
+                </div>
+                <div class="modal-body">
+                	<div class="clear-both"></div>
+                		<div class="gui_box grey">
+							<div class="gui_box_titlebar">
+								<div class="spacer_box_title">Scrolling, Zooming, Play and Pause</div>
+							</div>
+		                	<div class="clear-both"></div>
+							<div class="spacer_box">
+								<ul>
+									<li><span class=keys"><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
+												<div class="description">Moves through log backwards and forwards by exactly 100ms.</div></li>
+									<li><span class=keys"><div class="key">PgUp</div><div class="normal">and</div><div class="key">PgDn</div></span>
+												<div class="description">Moves through log backwards and forwards fast.</div></li>
+								</ul>
+								<ul>
+									<li><span class=keys"><div class="key">Shift</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
+												<div class="description">Zoom Log Out and In.</div></li>
+									<li><span class=keys"><div class="key">Alt</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
+												<div class="description">Zoom Log Out and In but faster.</div></li>
+								</ul>
+								<ul>
+									<li><span class=keys"><div class="key">Spacebar</div></span><div class="description">Starts / Pauses Log and/or Video</div></li>
+								</ul>
+							</div>
+						</div>
+                		<div class="gui_box grey topspacer">
+							<div class="gui_box_titlebar">
+								<div class="spacer_box_title">Marking and Smart Sync</div>
+							</div>
+		                	<div class="clear-both"></div>
+							<div class="spacer_box">
+								<ul>
+									<li><span class=keys"><div class="key">M</div></span>
+												<div class="description">Toggles a Marker on the log at the current time. As you scroll, time from marker (offset) is displayed on the toolbar. (Useful for measuring times between events.)</div></li>
+									<li><span class=keys"><div class="key">Alt</div><div class="key">M</div></span>
+												<div class="description">Smart Sync. With both a log AND a video loaded, Press 'M' to place a marker on the log where an event occurs (such as the exact start of a roll). Then scroll backwards and forwards until your video shows the exaxt same start of event. Now press 'Alt M' to sync the log and video at this point.</div></li>
+								</ul>
+							</div>
+						</div>
+                		<div class="gui_box grey topspacer">
+							<div class="gui_box_titlebar">
+								<div class="spacer_box_title">Workspaces / Favourites</div>
+							</div>
+		                	<div class="clear-both"></div>
+							<div class="spacer_box">
+								<ul>
+									<li><span class=keys"><div class="key">Shift</div><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
+												<div class="description">Save the current displayed graph configuration to workspace/favourite key 0 through 9 (this includes all graph smoothing and expo etc.).</div></li>
+									<li><span class=keys"><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
+												<div class="description">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration swapping useful for comparing traces.</div></li>
+								</ul>
+								<ul>
+									<li><span class=keys"><div class="key">Ctrl</div><div class="key">Z</div></span>
+												<div class="description">Swap back to your last graph configuration. Repeatedly pressing Ctrl-Z will toggle the last two graph configurations.</div></li>
+								</ul>
+							</div>
+						</div>
+                	<div class="clear-both"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default keys-dialog-cancel" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="modal fade" id="dlgVideoExport">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -935,6 +1012,7 @@
     <script src="js/graph_config_dialog.js"></script>
     <script src="js/graph_spectrum.js"></script>
     <script src="js/header_dialog.js"></script>
+    <script src="js/keys_dialog.js"></script>
     <script src="js/seekbar.js"></script>
     <script src="js/video_export_dialog.js"></script>
     <script src="js/flightlog_video_renderer.js"></script>
