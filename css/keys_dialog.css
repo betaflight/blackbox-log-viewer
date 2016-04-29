@@ -240,7 +240,7 @@ dialog .spacer_box {
     color: #7d7d7d;
     font-size: 11px;
     text-align: left;
-    width: 165px;
+    min-width: 165px;
 }
 
 .noline {
