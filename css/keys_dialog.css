@@ -1,0 +1,271 @@
+/* Colums  START> */
+.cf_column {
+    min-height: 20px;
+    margin-bottom: 0px;
+}
+
+.full {
+    float: left;
+    width: 100%;
+}
+
+.half {
+    float: left;
+    width: 50%;
+}
+
+.third_left {
+    float: left;
+    width: 33%;
+}
+
+.third_center {
+    display: inline-block;
+    width: 34%;
+}
+
+.third_right {
+    float: right;
+    width: 33%;
+}
+
+.fourth {
+    float: left;
+    width: 25%;
+}
+
+.threefourth_right {
+    float: right;
+    width: 75%;
+}
+
+.threefourth_left {
+    float: left;
+    width: 75%;
+}
+
+.twothird {
+    float: left;
+    width: 67%;
+}
+
+/* Columns  END> */
+
+/* Default Parameter Entry Field */
+input[type="number"]::-webkit-inner-spin-button {
+    opacity: 1; /* required for chromium 33+ beta */
+    margin-left: 5px;
+}
+
+.clear-both {
+    clear: both;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+/* Standard GUI BOX */
+.gui_box {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    float: left;
+    width: calc(100% - 2px);
+    margin-bottom: 10px;
+    font-family: 'open_sansregular', Arial;
+}
+
+.gui_box_titlebar {
+    background-color: #e4e4e4;
+    border-radius: 3px 3px 0px 0px;
+    font-size: 13px;
+    width: 100%;
+    height: 27px;
+    padding-bottom: 0px;
+    float: left;
+    margin-bottom: 7px;
+    font-family: 'open_sanssemibold', Arial;
+}
+
+/* Spacers */
+.spacer {
+    padding-left: 7px;
+    padding-right: 7px;
+    width: calc(100% - 14px);
+    float: left;
+}
+
+.spacer_box {
+    padding: 5px;
+    margin-bottom: 3px;
+}
+
+.spacer_box_title {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 4px;
+    margin-bottom: 0px;
+    float: left;
+}
+
+.spacer_left {
+    padding-left: 15px;
+    float: left;
+    width: calc(100% - 15px);
+}
+
+.spacer_right {
+    padding-right: 15px;
+    width: calc(100% - 15px);
+    float: left;
+}
+
+.keys-dialog .parameter th {
+    background-color: #828885;
+    padding: 4px;
+    border-left: 0px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+    color: white;
+    text-align: left;
+}
+
+.keys-dialog .modal-dialog {
+    width:50%;
+    min-width:600px;
+}
+
+.keys-dialog .gui_box {
+    margin-bottom: 0px;
+}
+
+dialog .spacer_box {
+    padding-bottom: 10px;
+    float: left;
+    width: calc(100% - 5px);
+}
+
+.show {
+    width:110px; 
+    float:right; 
+    margin-right:3px;
+}
+    
+.show a {
+    margin-left: 10px;
+    width: calc(100% - 10px);
+}
+
+.keys-dialog .helpicon {
+    margin-top: -1px;
+}
+
+
+
+.keys-dialog li{
+    height: 3em;
+    text-align: left;
+    max-width: none;
+    display: flex;
+    height: 38px;
+}
+
+.keys-dialog ul{
+    list-style-type: none;
+    padding: initial;
+    float: left;
+    width: calc(100% - 4px);
+}
+
+.keys-dialog .keys {
+    text-align: left;
+}
+
+.keys-dialog .key {
+    margin: 3px;
+    padding: 5px;
+    background-color: beige;
+    display: inline-block;
+    border-radius: 8px;
+    border-style: groove;
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: middle;
+}
+
+.keys-dialog .normal {
+    margin: 3px;
+    padding: 8px;
+    background-color: none;
+    display: inline-block;
+    border-radius: 8px;
+    border-style: none;
+    padding-left: 0px;
+    padding-right: 0px;
+    vertical-align: middle;
+}
+
+.keys-dialog .description {
+    flex: 1;
+    padding-left: 10px;
+    margin-top: 6px;
+    font-style: normal;
+    font-family: 'open_sansregular', Arial;
+    line-height: 1.3em;
+    color: #7d7d7d;
+    font-size: 11px;
+    text-align: left;
+}
+
+
+
+.keys-dialog .gui_box_titlebar .helpicon {
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+.keys-dialog .noline td {
+    border: 0px solid #ccc;
+}
+
+.keys-dialog .gui_box span {
+    font-style: normal;
+    font-family: 'open_sansregular', Arial;
+    line-height: 19px;
+    color: #7d7d7d;
+    font-size: 11px;
+    text-align: left;
+    width: 165px;
+}
+
+.noline {
+	border:0px;
+}
+
+.keys-dialog .right {
+    float: right;
+}
+
+.keys-dialog .leftzero {
+    padding-left: 0px;
+}
+
+.keys-dialog .borderleft {
+    border-top-left-radius: 3px; 
+    border-top-right-radius: 3px;
+}
+
+.keys-dialog .textleft {
+    width: 25%; 
+    float: left; 
+    text-align: left;
+}
+
+.keys-dialog .topspacer {
+    margin-top:15px;
+}

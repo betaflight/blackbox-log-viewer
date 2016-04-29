@@ -845,12 +845,7 @@ function BlackboxLogViewer() {
                 }
             }),
 
-            exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
-                videoConfig = newConfig;
-                
-                prefs.set('videoConfig', newConfig);
-            });
-
+            keysDialog = new KeysDialog($("#dlgKeysDialog"));
         
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();
@@ -863,7 +858,13 @@ function BlackboxLogViewer() {
             
             headerDialog.show(flightLog.getSysConfig());
         });
-        
+
+        $(".open-keys-dialog").click(function(e) {
+            e.preventDefault();
+            
+            keysDialog.show();
+        });
+                
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
                 setGraphState(GRAPH_STATE_PAUSED);
