@@ -910,18 +910,36 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
     return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
 };
 
+FlightLog.prototype.calculateExpoPlus = function(value, axis) {
+    var propFactor;
+    var superExpoFactor;
+
+    if (axis == AXIS.YAW && !this.getSysConfig().superExpoYawMode) {
+        propFactor = 1.0;
+    } else {
+        superExpoFactor = (axis == AXIS.YAW) ? this.getSysConfig().superExpoFactorYaw : this.getSysConfig().superExpoFactor;
+        propFactor = 1.0 - ((superExpoFactor / 100.0) * (Math.abs(value) / 500.0));
+    }
+
+    return propFactor;
+}
+
 // Convert rcCommand to degrees per second
 FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, currentFlightMode) {
 
+        var superExpoFactor = 1.0/this.calculateExpoPlus(value, axis);
+
+
         if(axis===AXIS.YAW /*YAW*/) {
-            return ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
+            if(this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ON && currentFlightMode==null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
+            if((this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ALWAYS)||(this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ON && this.getFlightMode(currentFlightMode).SuperExpo)) {
+                return superExpoFactor * ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
+            } else {
+                return ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
+            }
+
         } else { /*ROLL or PITCH */
-                var superExpoFactor = 1; // is SuperExpo enabled no (default), then no adjustment?
-                if(currentFlightMode!=null) { 
-                    if(this.getFlightMode(currentFlightMode).SuperExpo) { // is SuperExpo enabled yes, then compute value
-                        superExpoFactor = 1/(1 - (this.getSysConfig().superExpoFactor / 100 * Math.abs(value)/500));
-                    }
-                }
+            if(currentFlightMode==null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
             return superExpoFactor * ((((axis===AXIS.ROLL)?this.getSysConfig().rates[AXIS.ROLL]:this.getSysConfig().rates[AXIS.PITCH]) + 27) * value ) >> 6;
         }
 };

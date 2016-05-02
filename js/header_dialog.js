@@ -217,6 +217,42 @@ function HeaderDialog(dialog, onSave) {
     	$('h5.modal-title-revision').text( ((sysConfig['Firmware revision']!=null)?(' Rev : '  + sysConfig['Firmware revision']):''));
     	$('h5.modal-title-date').text(     ((sysConfig['Firmware date']!=null)    ?(' Date : ' + sysConfig['Firmware date']    ):''));
     
+		// check if this is betaflight or cleanflight
+		if(sysConfig['Firmware revision']!=null) {
+			var matches=sysConfig['Firmware revision'].match(/.*(Cleanflight|Betaflight).*/);
+			if(matches!=null) { // This is either Cleanflight or Betaflight
+				$('.header-dialog-toggle').hide();			
+				// The firmware is present is it betaflight ?
+				matches=sysConfig['Firmware revision'].match(/.*(Betaflight).*/);
+				if(matches!=null) { // Found, its Betaflight
+					$('html').addClass('isBF');
+					$('html').removeClass('isCF');
+				} else { // Assume it really is Cleanflight
+					$('html').removeClass('isBF');
+					$('html').addClass('isCF');							
+				}
+			} else { // Firmware type unknown, default to cleanflight
+					 // but give the user a button to change it
+				$('html').removeClass('isBF');
+				$('html').addClass('isCF');							
+				$('.header-dialog-toggle').text('Cleanflight');
+
+				// Toggle Button
+				$('.header-dialog-toggle').show();
+				$('.header-dialog-toggle').click( function() {
+					if($('html').hasClass('isCF')) {
+						$('html').addClass('isBF');
+						$('html').removeClass('isCF');
+						$('.header-dialog-toggle').text('Betaflight');
+					} else {
+						$('html').removeClass('isBF');
+						$('html').addClass('isCF');							
+						$('.header-dialog-toggle').text('Cleanflight');
+					}
+				});
+			}
+		}
+		
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE); 
 
         // Populate the ROLL Pid Faceplate
@@ -252,7 +288,8 @@ function HeaderDialog(dialog, onSave) {
         setParameter('thrExpo'					,sysConfig.thrExpo,2);
         setParameter('dynThrPID'				,sysConfig.dynThrPID,2);
         setParameter('tpa-breakpoint'			,sysConfig.tpa_breakpoint,0);
-        setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
+		setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
+		setParameter('superExpoFactorYaw'		,sysConfig.superExpoFactorYaw,2);
         setParameter('rates[0]'					,sysConfig.rates[0],2);
         setParameter('rates[1]'					,sysConfig.rates[1],2);
         setParameter('rates[2]'					,sysConfig.rates[2],2);
@@ -263,6 +300,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('rollPitchItermResetRate'	,sysConfig.rollPitchItermResetRate,0);
         setParameter('yawItermResetRate'		,sysConfig.yawItermResetRate,0);
         setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,2);
+        setParameter('dterm_cut_hz'				,sysConfig.dterm_cut_hz,2);
     	renderSelect('dterm_differentiator'		,sysConfig.dterm_differentiator, DTERM_DIFFERENTIATOR);
         setParameter('H_sensitivity'			,sysConfig.H_sensitivity,2);
         setParameter('deadband'					,sysConfig.deadband,0);
@@ -270,6 +308,8 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('gyro_lpf'			    	,sysConfig.gyro_lpf, GYRO_LPF);
         setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,2);
         setParameter('acc_lpf_hz'				,sysConfig.acc_lpf_hz,2);
+        setParameter('acc_cut_hz'				,sysConfig.acc_cut_hz,2);
+	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
         
 /* Packed Flags */
 

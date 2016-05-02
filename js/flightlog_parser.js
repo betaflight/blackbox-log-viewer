@@ -400,7 +400,14 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.tpa_breakpoint = parseInt(fieldValue, 10);
             break;
             case "superExpoFactor":
-                that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
+                if(fieldValue.match(/.*,.*/)!=null) {
+                    var expoParams = parseCommaSeparatedIntegers(fieldValue);
+                    that.sysConfig.superExpoFactor    = expoParams[0];
+                    that.sysConfig.superExpoFactorYaw = expoParams[1];
+
+                } else {
+                    that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
+                }
             break;
             case "rates":
                 that.sysConfig.rates = parseCommaSeparatedIntegers(fieldValue);
@@ -444,25 +451,28 @@ var FlightLogParser = function(logData) {
             case "yaw_p_limit":
                 that.sysConfig.yaw_p_limit = parseInt(fieldValue, 10);
             break;                                                           
-            case "yaw_lpf_hz":
+            case "yaw_lpf_hz": // Betaflight Only
                 that.sysConfig.yaw_lpf_hz = parseInt(fieldValue, 10);
             break; 
-            case "dterm_average_count":
+            case "dterm_average_count": // Betaflight Only
                 that.sysConfig.dterm_average_count = parseInt(fieldValue, 10);
             break;
-            case "rollPitchItermResetRate":
+            case "rollPitchItermResetRate": // Betaflight Only
                 that.sysConfig.rollPitchItermResetRate = parseInt(fieldValue, 10);
             break;
-            case "yawItermResetRate":
+            case "yawItermResetRate": // Betaflight Only
                 that.sysConfig.yawItermResetRate = parseInt(fieldValue, 10);
             break;
-            case "dterm_lpf_hz":
+            case "dterm_lpf_hz": // Betaflight Only
                 that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10);
             break;
-            case "dterm_differentiator":
+            case "dterm_cut_hz": // Cleanflight Only
+                that.sysConfig.dterm_cut_hz = parseInt(fieldValue, 10);
+            break;
+            case "dterm_differentiator": // Betaflight Only
                 that.sysConfig.dterm_differentiator = parseInt(fieldValue, 10);
             break;
-            case "H_sensitivity":
+            case "H_sensitivity": // Betaflight Only
                 that.sysConfig.H_sensitivity = parseInt(fieldValue, 10);
             break;
             case "deadband": 
@@ -474,11 +484,14 @@ var FlightLogParser = function(logData) {
             case "gyro_lpf": 
                 that.sysConfig.gyro_lpf = parseInt(fieldValue, 10);
             break;
-            case "gyro_lowpass_hz": 
+            case "gyro_lowpass_hz": // Betaflight Only 
                 that.sysConfig.gyro_lowpass_hz = parseInt(fieldValue, 10);
             break;
-            case "acc_lpf_hz": 
+            case "acc_lpf_hz": // Betaflight Only
                 that.sysConfig.acc_lpf_hz = parseInt(fieldValue, 10);
+            break;
+            case "acc_cut_hz":  // Cleanflight Only
+                that.sysConfig.acc_cut_hz = parseInt(fieldValue, 10);
             break;
             case "acc_hardware": 
                 that.sysConfig.acc_hardware = parseInt(fieldValue, 10);
@@ -489,14 +502,17 @@ var FlightLogParser = function(logData) {
             case "mag_hardware": 
                 that.sysConfig.mag_hardware = parseInt(fieldValue, 10);
             break;
-            case "gyro_cal_on_first_arm":
+            case "gyro_cal_on_first_arm": // Betaflight Only
                 that.sysConfig.gyro_cal_on_first_arm = parseInt(fieldValue, 10);
             break;
-            case "vbat_pid_compensation":
+            case "vbat_pid_compensation": // Betaflight Only
                 that.sysConfig.vbat_pid_compensation = parseInt(fieldValue, 10);
             break;
             case "rc_smoothing": 
                 that.sysConfig.rc_smoothing = parseInt(fieldValue, 10);
+            break;
+            case "superExpoYawMode": 
+                that.sysConfig.superExpoYawMode = parseInt(fieldValue, 10);
             break;
             case "features":  
                 that.sysConfig.features = parseInt(fieldValue, 10);

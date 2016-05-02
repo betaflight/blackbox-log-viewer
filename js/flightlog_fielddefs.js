@@ -110,6 +110,12 @@ var
             "ON"
     ]),
 
+    SUPER_EXPO_YAW = makeReadOnly([
+            "OFF",
+            "ON",
+            "ALWAYS"
+    ]),
+
     DTERM_DIFFERENTIATOR = makeReadOnly([
             "STANDARD",
             "ENHANCED"

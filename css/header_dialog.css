@@ -349,6 +349,14 @@ input[type="number"]::-webkit-inner-spin-button {
     margin-bottom: 10px;
 }
 
+html:not(.isCF) .cf-only,
+html:not(.isBF) .bf-only {
+    /*display:none;*/
+    /*visibility:hidden;*/
+    opacity:0.25;
+}
+
+
 .header-dialog .top-buttons {
     float: right;
 }

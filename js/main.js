@@ -716,7 +716,7 @@ function BlackboxLogViewer() {
 
         var logJumpBack = function(fast) {
             var scrollTime = SMALL_JUMP_TIME;
-            if(fast!=null) scrollTime = (fast)?(graph.getWindowWidthTime() * 0.5 /*50%*/):SMALL_JUMP_TIME;
+            if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):SMALL_JUMP_TIME;
             if (hasVideo) {
                 setVideoTime(video.currentTime - scrollTime / 1000000);
             } else {
@@ -729,7 +729,7 @@ function BlackboxLogViewer() {
 
         var logJumpForward = function(fast) {
             var scrollTime = SMALL_JUMP_TIME;
-            if(fast!=null) scrollTime = (fast)?(graph.getWindowWidthTime() * 0.5 /*50%*/):SMALL_JUMP_TIME;
+            if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):SMALL_JUMP_TIME;
             if (hasVideo) {
                 setVideoTime(video.currentTime + scrollTime / 1000000);
             } else {
@@ -901,14 +901,14 @@ function BlackboxLogViewer() {
                         setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
                         $(".graph-zoom").val(graphZoom + "%");
                     } else {
-                      logJumpBack();
+                      logJumpBack(0.1 /*10%*/);
                     }
                 } else { // scroll up or right
                     if (e.altKey || e.shiftKey) {
                         setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
                         $(".graph-zoom").val(graphZoom + "%");
                     } else {
-                        logJumpForward();
+                        logJumpForward(0.1 /*10%*/);
                     }
                 }
                 e.preventDefault();
@@ -1024,11 +1024,11 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
                     case 33: // pgup - Scroll fast
-                        logJumpBack(true);
+                        logJumpBack(0.25 /* 25% */);
                         e.preventDefault();
                     break;
                     case 34: // pgdn - Scroll fast
-                        logJumpForward(true);
+                        logJumpForward(0.25 /* 25% */);
                         e.preventDefault();
                     break;
                     case 36: // home - goto start of log
