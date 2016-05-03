@@ -259,7 +259,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.3,
-                    inputRange: 400,
+                    inputRange: 1000, // Was 400 ?
                     outputRange: 1.0
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle

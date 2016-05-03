@@ -170,13 +170,35 @@ function FlightLogFieldPresenter() {
                 return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2), currentFlightMode) + " deg/s";
 
             case 'rcCommand[3]':
+            case 'motor[0]':            
+            case 'motor[1]':            
+            case 'motor[2]':            
+            case 'motor[3]':            
+            case 'motor[4]':            
+            case 'motor[5]':            
+            case 'motor[6]':            
+            case 'motor[7]':            
                 return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
 
             case 'rcCommands[0]':
             case 'rcCommands[1]':
             case 'rcCommands[2]':
                 return value.toFixed(0) + " deg/s";
-               
+                
+            case 'axisSum[0]':
+            case 'axisSum[1]':
+            case 'axisSum[2]':
+            case 'axisP[0]':
+            case 'axisP[1]':
+            case 'axisP[2]':
+            case 'axisI[0]':
+            case 'axisI[1]':
+            case 'axisI[2]':
+            case 'axisD[0]':
+            case 'axisD[1]':
+            case 'axisD[2]':
+                return flightLog.getPIDPercentage(value).toFixed(1) + "%";
+
             case 'accSmooth[0]':
             case 'accSmooth[1]':
             case 'accSmooth[2]':

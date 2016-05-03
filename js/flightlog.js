@@ -946,8 +946,14 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 
 FlightLog.prototype.rcCommandRawToThrottle = function(value) {
     // Throttle displayed as percentage
-    return ((value - this.getSysConfig().minthrottle) / (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) * 100.0;
+    return Math.min(Math.max(((value - this.getSysConfig().minthrottle) / (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) * 100.0, 0.0),100.0);
 };
+
+FlightLog.prototype.getPIDPercentage = function(value) {
+    // PID components and outputs are displayed as percentage (raw value is 0-1000)
+    return (value / 10.0);
+};
+
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
     return this.vbatADCToMillivolts(this.getSysConfig().vbatref);
