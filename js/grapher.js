@@ -992,7 +992,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
 	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options);
 
     //Handle dragging events
-    $(canvas).on("mousedown", onMouseDown);
+    $(canvas).on("mousedown",onMouseDown);
     
     graphConfig.addListener(refreshGraphConfig);
     refreshGraphConfig();

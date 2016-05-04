@@ -53,7 +53,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 + '</li>'
             ),
             select = $('select', elem),
-            selectedFieldName = field ? field.name : false,
+            selectedFieldName = field ?field.name : false,
             i;
         
         for (i = 0; i < offeredFieldNames.length; i++) {

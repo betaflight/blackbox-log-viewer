@@ -188,10 +188,6 @@ input[type="number"]::-webkit-inner-spin-button {
     border-top-right-radius: 3px;
 }
 
-.header-dialog .parameter {
-    margin-bottom: 10px;
-}
-
 .header-dialog input[type="number"]::-webkit-inner-spin-button {
     border: 0;
 }
@@ -255,7 +251,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog table input {
     display: block;
-    width: calc(100% - 0px);
+    width: calc(100% - 4px);
     height: 20px;
     line-height: 20px;
     text-align: right;
@@ -346,7 +342,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .header-dialog .parameter {
     float: right;
     width: calc(100% - 2px);
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 html:not(.isCF) .cf-only,
@@ -477,23 +473,10 @@ html:not(.isBF) .bf-only {
     border: 0px solid #ccc;
 }
 
-.header-dialog .features input[type=checkbox],
-.header-dialog .static-features input[type=checkbox] {
-    width: 50px;
-    padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
-    border: 0px solid silver;
-    border-radius: 3px;
-    margin-right: 11px;
-    font-weight: normal;
-}
-
 .header-dialog .features label,
 .header-dialog .static-features label{
     /* width: 70px; */
-    padding-left: 3px;
+    /* padding-left: 3px; */
     height: 20px;
     line-height: 20px;
     text-align: left;

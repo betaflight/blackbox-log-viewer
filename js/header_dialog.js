@@ -150,7 +150,7 @@ function HeaderDialog(dialog, onSave) {
             var feature_tip_html = '';
             
             if (features[i].mode === 'group') {
-                row_e = $('<tr><td style="width: 15px;"><input style="width: 13px;" class="feature" id="feature-'
+                row_e = $('<tr><td><input class="feature" id="feature-'
                         + i
                         + '" value="'
                         + features[i].bit
@@ -208,6 +208,29 @@ function HeaderDialog(dialog, onSave) {
 		(value!=null)?$(".feature").closest('tr').removeClass('missing'):
 					  $(".feature").closest('tr').addClass('missing');
         	
+	}
+
+	function renderUnknownHeaders(unknownHeaders) {
+		// Build a table of unknown header entries
+		try {
+			if(unknownHeaders!=0) {
+				var table = $('.unknown table');
+				var elem = '';
+				$("tr:not(:first)", table).remove(); // clear the entries (not the first row which has the title bar)
+
+				for(var i=0; i<unknownHeaders.length; i++) {
+					elem += '<tr><td>' + unknownHeaders[i].name + '</td>' +
+								'<td>' + unknownHeaders[i].value + '</td></tr>';						
+				}
+
+				table.append(elem);						
+				$('.unknown').show();
+			} else {
+				$('.unknown').hide();
+			}
+		} catch(e) {
+			$('.unknown').hide();
+		}
 	}
 
     function renderSysConfig(sysConfig) { 
@@ -311,20 +334,24 @@ function HeaderDialog(dialog, onSave) {
         setParameter('acc_cut_hz'				,sysConfig.acc_cut_hz,2);
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
         
-/* Packed Flags */
+		/* Packed Flags */
 
         builtFeaturesList(sysConfig.features);
 
-/* Hardware selections */
+		/* Hardware selections */
         
     	renderSelect('acc_hardware'		    	,sysConfig.acc_hardware, ACC_HARDWARE);
     	renderSelect('baro_hardware'		    ,sysConfig.baro_hardware, BARO_HARDWARE);
     	renderSelect('mag_hardware'		    	,sysConfig.mag_hardware, MAG_HARDWARE);
 
-/* Booleans */
+		/* Booleans */
         setCheckbox('gyro_cal_on_first_arm'		,sysConfig.gyro_cal_on_first_arm);
         setCheckbox('vbat_pid_compensation'		,sysConfig.vbat_pid_compensation);
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
+
+        /* Show Unknown Fields */
+        renderUnknownHeaders(sysConfig.unknownHeaders);
+
     }
         
     function convertUIToSysConfig() {
@@ -396,6 +423,7 @@ function HeaderDialog(dialog, onSave) {
     this.show = function(sysConfig) { 
             dialog.modal('show');
             renderSysConfig(sysConfig);
+
     }
  
  	// Buttons

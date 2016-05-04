@@ -232,7 +232,8 @@ var FlightLogParser = function(logData) {
             gyro_cal_on_first_arm:null,     // Gyro Calibrate on first arm
             vbat_pid_compensation:null,     // VBAT PID compensation
             rc_smoothing:null,              // RC Control Smoothing 
-            features:null                   // Activated features (e.g. MOTORSTOP etc) 
+            features:null,                  // Activated features (e.g. MOTORSTOP etc)
+            unknownHeaders : []             // Unknown Extra Headers
         },
             
         frameTypes,
@@ -609,6 +610,8 @@ var FlightLogParser = function(logData) {
                     }
                 } else {
                     console.log("Ignoring unsupported header \"" + fieldName + "\"");
+                    if(that.sysConfig.unknownHeaders==null) that.sysConfig.unknownHeaders = new Array();
+                    that.sysConfig.unknownHeaders.push({ name: fieldName, value: fieldValue });// Save the unknown headers
                 }
             break;
         }

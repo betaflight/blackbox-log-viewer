@@ -115,7 +115,12 @@ function FlightLog(logData) {
     this.getSysConfig = function() {
         return parser.sysConfig;
     };
-    
+
+    this.setSysConfig = function(newSysConfig) {
+        parser.sysConfig = newSysConfig;
+    };
+
+
     /**
      * Get the index of the currently selected log.
      */

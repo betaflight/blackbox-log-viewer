@@ -830,9 +830,10 @@ function BlackboxLogViewer() {
                 newGraphConfig(newConfig);   
             }),
             
-            headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function(newSettings) {
-                if(newSettings!=null) {
-                    prefs.set('lastHeaderData', newSettings);
+            headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function(newSysConfig) {
+                if(newSysConfig!=null) {
+                    prefs.set('lastHeaderData', newSysConfig);
+                    //flightLog.setSysConfig(newSysConfig);
 
                     // Save Current Position then re-calculate all the log information
                     var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
@@ -894,7 +895,7 @@ function BlackboxLogViewer() {
         $(window).resize(updateCanvasSize);
         
         $(document).on("mousewheel", function(e) {
-        if (graph && $(e.target).parents('.modal').length == 0) {
+        if (graph && $(e.target).parents('.modal').length == 0 && $(e.target).attr('id') == 'graphCanvas') {
                 var delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
                 if(delta<0) { // scroll down (or left)
                     if (e.altKey || e.shiftKey) {
