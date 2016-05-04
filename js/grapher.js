@@ -655,6 +655,22 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
                 label:'Marker:' +formatTime((markerEvent.time-flightLog.getMinTime())/1000, true) 
                 }, sequenceNum++);
         }
+
+        // Draw Bookmarks Event Line
+        var bookmarkEvents = blackboxLogViewer.getBookmarks();
+        if(bookmarkEvents!=null) {
+        	for(var i=0; i<=9; i++) {
+        		if(bookmarkEvents[i]!=null) {
+		            if(bookmarkEvents[i].state) drawEvent(
+		                {
+		                event:FlightLogEvent.CUSTOM,
+		                time:bookmarkEvents[i].time,
+		                label: i 
+		                }, sequenceNum++);
+		        	}
+        	}
+        }
+    
     }
     
     /**

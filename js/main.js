@@ -42,6 +42,7 @@ function BlackboxLogViewer() {
         // JSON array of graph configurations for New Workspaces feature
         lastGraphConfig = null,     // Undo feature - go back to last configuration.
         workspaceGraphConfigs = {}, // Workspaces
+        bookmarkTimes	= [],		// Empty array for bookmarks (times)
         
         // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
         activeGraphConfig = new GraphConfig(),
@@ -582,6 +583,25 @@ function BlackboxLogViewer() {
             time:markerTime
             };
     }
+    
+    this.getBookmarks = function() { // get bookmark events
+    	var bookmarks = [];
+    	try {
+    		if(bookmarkTimes!=null) {
+		    	for(var i=0; i<=9; i++) {
+		    		if(bookmarkTimes[i]!=null) {
+			    		bookmarks[i] = {
+			    			state: (bookmarkTimes[i]!=0),
+			    			time:  bookmarkTimes[i]
+			    			};
+			    		} else bookmarks[i] = null;
+		    	}
+    		}
+	    	return bookmarks;	    		
+    	} catch(e) {
+    		return null;
+    	}
+    }
            
     prefs.get('videoConfig', function(item) {
         if (item) {
@@ -974,15 +994,38 @@ function BlackboxLogViewer() {
                     case "8".charCodeAt(0):
                     case "9".charCodeAt(0):
                         try {
-                        if (!e.shiftKey) { // retreive graph configuration from workspace
-                            if (workspaceGraphConfigs.graphConfig[e.which-48] != null) {
-                                newGraphConfig(workspaceGraphConfigs.graphConfig[e.which-48]);
-                            }
-                        } else // store configuration to workspace
-                        {
-                            workspaceGraphConfigs.graphConfig[e.which-48] = graphConfig; // Save current config
-                            prefs.set('workspaceGraphConfigs', workspaceGraphConfigs);      // Store to local cache
-                        }
+                        	if(!e.altKey) { // Workspaces feature
+                        		if (!e.shiftKey) { // retreive graph configuration from workspace
+		                            if (workspaceGraphConfigs.graphConfig[e.which-48] != null) {
+		                                newGraphConfig(workspaceGraphConfigs.graphConfig[e.which-48]);
+		                            }
+		                        } else // store configuration to workspace
+		                        {
+		                            workspaceGraphConfigs.graphConfig[e.which-48] = graphConfig; // Save current config
+		                            prefs.set('workspaceGraphConfigs', workspaceGraphConfigs);      // Store to local cache
+		                        }
+                        	} else { // Bookmark Feature
+                        		if (!e.shiftKey) { // retrieve time from bookmark
+		                            if (bookmarkTimes[e.which-48] != null) {
+		                                setCurrentBlackboxTime(bookmarkTimes[e.which-48]);
+		                                invalidateGraph(); 
+		                            }
+
+		                        } else {// store time to bookmark
+		                            // Special Case : Shift Alt 0 clears all bookmarks
+		                            if(e.which==48) {
+		                                bookmarkTimes = null;
+		                            } else {
+		                                if(bookmarkTimes==null) bookmarkTimes = new Array();
+                                        if (bookmarkTimes[e.which-48] == null) {
+                                             bookmarkTimes[e.which-48] = currentBlackboxTime; 		// Save current time to bookmark
+                                        } else {
+                                             bookmarkTimes[e.which-48] = null; 			            // clear the bookmark
+                                        }
+		                            }
+		                            invalidateGraph();
+		                        }
+                        	}
                         } catch(e) {
                             console.log('Workspace feature not functioning');
                         }

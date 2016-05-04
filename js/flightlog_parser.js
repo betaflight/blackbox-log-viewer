@@ -473,6 +473,12 @@ var FlightLogParser = function(logData) {
             case "dterm_differentiator": // Betaflight Only
                 that.sysConfig.dterm_differentiator = parseInt(fieldValue, 10);
             break;
+            case "deltaMethod": // Betaflight Only
+                that.sysConfig.deltaMethod = parseInt(fieldValue, 10);
+            break;
+            case "dynamic_dterm_threshold": // Betaflight Only
+                that.sysConfig.dynamic_dterm_threshold = parseInt(fieldValue, 10);
+            break;
             case "H_sensitivity": // Betaflight Only
                 that.sysConfig.H_sensitivity = parseInt(fieldValue, 10);
             break;

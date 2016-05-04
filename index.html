@@ -509,6 +509,8 @@
 												<th colspan="5">D-Term</th>
 											</tr>
 											<tr>
+												<th class="bf-only">Calculation</th>
+												<th class="bf-only">Dynamic Threshold</th>
 												<th class="bf-only">Differentiator</th>
 												<th>Filter (Hz)</th>
 												<th class="bf-only">Average Count</th>
@@ -516,6 +518,8 @@
 										</thead>
 										<tbody>
 											<tr>
+												<td class="bf-only"><select name='deltaMethod' title="deltaMethod"><!-- list generated here --></select></td>
+												<td class="bf-only"><input type="number" name="dynamic_dterm_threshold" title="dynamic_dterm_threshold" step="0.01" min="0" max="999.00" /></td>
 												<td class="bf-only"><select name='dterm_differentiator' title="dterm_differentiator"><!-- list generated here --></select></td>
 												<td><input type="number" name="dterm_lpf_hz" title="dterm_lpf_hz" step="0.01" min="0" max="999.00" /></td>
 												<td class="bf-only"><input type="number" name="dterm_average_count" title="dterm_average_count" step="1" min="0" max="12" /></td>
@@ -890,6 +894,14 @@
 								<ul>
 									<li><span class=keys"><div class="key">Ctrl</div><div class="key">Z</div></span>
 												<div class="description">Swap back to your last graph configuration. Repeatedly pressing Ctrl-Z will toggle the last two graph configurations.</div></li>
+								</ul>
+								<ul>
+									<li><span class=keys"><div class="key">Alt</div><div class="key">Shift</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
+												<div class="description">Save the current time to Bookmark hotkeys 1 through 9</div></li>
+									<li><span class=keys"><div class="key">Alt</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
+												<div class="description">Recall Bookmark 1 though 9 to jump to specific time quickly.</div></li>
+									<li><span class=keys"><div class="key">Alt</div><div class="key">0</div></span>
+												<div class="description">Special Case, clear all bookmarks</div></li>
 								</ul>
 							</div>
 						</div>
