@@ -479,6 +479,9 @@ var FlightLogParser = function(logData) {
             case "dynamic_dterm_threshold": // Betaflight Only
                 that.sysConfig.dynamic_dterm_threshold = parseInt(fieldValue, 10);
             break;
+            case "dynamic_pterm": // Betaflight Only
+                that.sysConfig.dynamic_pterm = parseInt(fieldValue, 10);
+            break;
             case "H_sensitivity": // Betaflight Only
                 that.sysConfig.H_sensitivity = parseInt(fieldValue, 10);
             break;

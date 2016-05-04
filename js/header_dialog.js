@@ -21,14 +21,13 @@ function HeaderDialog(dialog, onSave) {
     function renderSelect(name, selected, list) {
     	// Populate a select drop-down box
     	var selectElem = $('.parameter select[name="' + name + '"]');
-		if(selected!=null) {
-
 			selectElem.children().remove(); // clear list
-
 			for(var i=0; i<list.length; i++) {
 				selectElem.append(renderOptions(selected, i, list));
 			}
 			selectElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
+
+			if(selected!=null) {
 			selectElem.removeClass('missing');
 		} else {
 			selectElem.addClass('missing');
@@ -326,6 +325,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('dterm_cut_hz'				,sysConfig.dterm_cut_hz,2);
     	renderSelect('dterm_differentiator'		,sysConfig.dterm_differentiator, DTERM_DIFFERENTIATOR);
     	renderSelect('deltaMethod'				,sysConfig.deltaMethod, PID_DELTA_TYPE);
+    	renderSelect('dynamic_pterm'			,sysConfig.dynamic_pterm, OFF_ON);
         setParameter('dynamic_dterm_threshold'	,sysConfig.dynamic_dterm_threshold,2);
         setParameter('H_sensitivity'			,sysConfig.H_sensitivity,2);
         setParameter('deadband'					,sysConfig.deadband,0);

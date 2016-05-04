@@ -486,10 +486,11 @@
 									<table class="parameter cf">
 										<thead>
 											<tr>
-												<th colspan="1">P-Term</th>
+												<th colspan="2">P-Term</th>
 												<th class="bf-only" colspan="2">I-Term</th>
 											</tr>
 											<tr>
+												<th>Dynamic P</th>
 												<th>Yaw Limit</th>
 												<th class="bf-only">Roll/Pitch Reset</th>
 												<th class="bf-only">Yaw Reset</th>
@@ -497,9 +498,21 @@
 										</thead>
 										<tbody>
 											<tr>
+											    <td class="bf-only"><select name='dynamic_pterm' title="dynamic_pterm"><!-- list generated here --></select></td>											
 												<td><input type="number" name="yaw_p_limit" step="1" min="0" max="999" /></td>
 												<td class="bf-only"><input type="number" name="rollPitchItermResetRate" step="1" min="0" max="999" /></td>
 												<td class="bf-only"><input type="number" name="yawItermResetRate" step="1" min="0" max="999" /></td>
+											</tr>
+										</tbody>
+										<thead>
+												<th></th>
+												<th class="bf-only">Yaw (Hz)</th>
+										</thead>
+										<tbody>
+											<tr>
+												<td></td>
+												<td class="bf-only"><input type="number" name="yaw_lpf_hz" step="0.01" min="0" max="999.00" /></td>
+
 											</tr>
 										</tbody>
 									</table>
@@ -548,13 +561,11 @@
 										</tbody>
 										<thead>
 											<tr>
-												<th class="bf-only">Yaw (Hz)</th>
 												<th>Acc (Hz)</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr>
-												<td class="bf-only"><input type="number" name="yaw_lpf_hz" step="0.01" min="0" max="999.00" /></td>
 												<td><input type="number" name="acc_lpf_hz" step="0.01" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
