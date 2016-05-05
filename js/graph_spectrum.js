@@ -36,10 +36,10 @@ try {
 		source.start();
 
 	var spectrumAnalyser = audioCtx.createAnalyser();	  
-		spectrumAnalyser.fftSize = 256;
+		spectrumAnalyser.fftSize = 512;
 		spectrumAnalyser.smoothingTimeConstant = 0.8;
-		spectrumAnalyser.minDecibels = -120;
-		spectrumAnalyser.maxDecibels = -20;    
+		spectrumAnalyser.minDecibels = -100;
+		spectrumAnalyser.maxDecibels = -30;    
 
 	var dataBuffer = {
 			chunks: 0, 
@@ -162,23 +162,32 @@ try {
 
 		  /* only plot the lower half of the FFT, as the top half
 		  never seems to have any values in it - too high frequency perhaps. */
-		  var PLOTTED_BUFFER_LENGTH = bufferLength; // / 2;
+		  var PLOTTED_BUFFER_LENGTH = bufferLength / 2;
 
 		  canvasCtx.translate(LEFT, TOP);
 
 		  spectrumAnalyser.getByteFrequencyData(dataArray);
 
-		  canvasCtx.fillStyle = 'rgba(255, 255, 255, .25)'; /* white */
+		  var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+    		  gradient.addColorStop(1,   'rgba(255,255,255,0.25)');
+			  gradient.addColorStop(0,   'rgba(255,255,255,0)');
+		  canvasCtx.fillStyle = gradient; //'rgba(255, 255, 255, .25)'; /* white */
 		  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
 		  var barWidth = (WIDTH / PLOTTED_BUFFER_LENGTH) - 1;// * 2.5;
 		  var barHeight;
 		  var x = 0;
 
-		  for(var i = 0; i < (PLOTTED_BUFFER_LENGTH); i++) {
-			barHeight = (dataArray[i]/255 * (HEIGHT));
+		  var gradient = canvasCtx.createLinearGradient(0,HEIGHT,0,0);
+    		  gradient.addColorStop(0,   'rgba(0,255,0,0.2)');
+    		  gradient.addColorStop(0.15, 'rgba(128,255,0,0.2)');
+			  gradient.addColorStop(0.45, 'rgba(255,0,0,0.5)');
+			  gradient.addColorStop(1,   'rgba(255,128,128,1.0)');
 
-			canvasCtx.fillStyle = 'rgba(0,255,0,0.3)'; /* green */
+		  for(var i = 0; i < (PLOTTED_BUFFER_LENGTH); i++) {
+		  barHeight = (dataArray[i]/255 * (HEIGHT));
+
+			canvasCtx.fillStyle = gradient; //'rgba(0,255,0,0.3)'; /* green */
 			canvasCtx.fillRect(x,(HEIGHT)-barHeight,barWidth,barHeight);
 
 			x += barWidth + 1;
@@ -248,5 +257,7 @@ try {
 	} catch (e) {
 		console.log('Failed to create analyser');
 	};
+
+	// execute the resize function once so that the canvas gets a valid setup
 
 }
