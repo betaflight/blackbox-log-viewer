@@ -1,8 +1,19 @@
 "use strict";
 
-function FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options) {
+function FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options) {
 
-var canvasCtx = canvas.getContext("2d");
+var
+        ANALYSER_LEFT_PROPORTION    = 0.05, // 5% from left
+        ANALYSER_TOP_PROPORTION     = 0.55, // 55% from top
+        ANALYSER_HEIGHT_PROPORTION  = 0.40, // 40% high
+        ANALYSER_WIDTH_PROPORTION   = 0.40, // 40% wide
+
+        ANALYSER_LARGE_LEFT_PROPORTION    = 0.05, // 5% from left
+        ANALYSER_LARGE_TOP_PROPORTION     = 0.05, // 55% from top
+        ANALYSER_LARGE_HEIGHT_PROPORTION  = 0.90, // 40% high
+        ANALYSER_LARGE_WIDTH_PROPORTION   = 0.90; // 40% wide
+
+var canvasCtx = analyserCanvas.getContext("2d");
 
 var // inefficient; copied from grapher.js
 
@@ -47,6 +58,46 @@ try {
 	source.connect(spectrumAnalyser);
 
 	var audioIterations = 0; // variable to monitor spectrum processing
+
+	var isFullscreen = false;
+
+	this.setFullscreen = function(size) {
+		isFullscreen = (size==true);
+		that.resize();
+	}
+
+	function getSize() {
+		if (isFullscreen){
+				return {
+					height: ANALYSER_LARGE_HEIGHT_PROPORTION,
+					width: ANALYSER_LARGE_WIDTH_PROPORTION,
+					left: ANALYSER_LARGE_LEFT_PROPORTION,
+					top: ANALYSER_LARGE_TOP_PROPORTION,
+					}
+			} else {
+				return {
+					height: ANALYSER_HEIGHT_PROPORTION,
+					width: ANALYSER_WIDTH_PROPORTION,
+					left: ANALYSER_LEFT_PROPORTION,
+					top: ANALYSER_TOP_PROPORTION,
+				}
+			}
+			
+	}
+
+   	this.resize = function() {
+
+        // Determine the analyserCanvas location
+        canvasCtx.canvas.height    = (canvas.height * getSize().height);
+        canvasCtx.canvas.width     = (canvas.width  * getSize().width);
+
+		// Recenter the analyser canvas in the bottom left corner
+		$(analyserCanvas).css({
+			left: (canvas.width  * getSize().left) + "px",
+			top:  (canvas.height * getSize().top ) + "px",
+		});
+
+	}
 
 	function dataLoad(dataBuffer, audioBuffer) {
 
@@ -94,17 +145,24 @@ try {
 
 		  canvasCtx.save();
 
+		  canvasCtx.lineWidth = 1;
+		  
 		  var bufferLength = spectrumAnalyser.frequencyBinCount;
 		  var dataArray = new Uint8Array(bufferLength);
 
-		  var HEIGHT = canvasCtx.canvas.height * 0.4; /* trial and error values to put box in right place */
-		  var WIDTH  = canvasCtx.canvas.width  * 0.4;
-		  var LEFT   = canvasCtx.canvas.width * 0.05;
-		  var TOP    = canvasCtx.canvas.height * 0.55;
+
+
+		  canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
+
+		  var MARGIN = 10; // pixels
+		  var HEIGHT = canvasCtx.canvas.height - MARGIN;
+		  var WIDTH  = canvasCtx.canvas.width;
+		  var LEFT   = canvasCtx.canvas.left;
+		  var TOP    = canvasCtx.canvas.top;
 
 		  /* only plot the lower half of the FFT, as the top half
 		  never seems to have any values in it - too high frequency perhaps. */
-		  var PLOTTED_BUFFER_LENGTH = bufferLength / 2;
+		  var PLOTTED_BUFFER_LENGTH = bufferLength; // / 2;
 
 		  canvasCtx.translate(LEFT, TOP);
 
@@ -118,19 +176,19 @@ try {
 		  var x = 0;
 
 		  for(var i = 0; i < (PLOTTED_BUFFER_LENGTH); i++) {
-			barHeight = (dataArray[i]/255 * HEIGHT);
+			barHeight = (dataArray[i]/255 * (HEIGHT));
 
 			canvasCtx.fillStyle = 'rgba(0,255,0,0.3)'; /* green */
-			canvasCtx.fillRect(x,HEIGHT-barHeight,barWidth,barHeight);
+			canvasCtx.fillRect(x,(HEIGHT)-barHeight,barWidth,barHeight);
 
 			x += barWidth + 1;
 		  }
-		  drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT);
-		  drawAxisLabel(analyserFieldName + ' ' + analyserSampleRange, WIDTH - 8, HEIGHT - 10, 'right');
+		  drawAxisLabel(analyserFieldName + ' ' + analyserSampleRange, WIDTH - 4, HEIGHT - 6, 'right');
+		  drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
 		  canvasCtx.restore();
 		}
 
-	function drawGridLines(sampleRate, LEFT, TOP, WIDTH, HEIGHT) {
+	function drawGridLines(sampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN) {
 
 		var ticks = 5;
 		var frequencyInterval = (sampleRate / ticks) / 4;
@@ -145,7 +203,8 @@ try {
 				canvasCtx.lineTo(i * (WIDTH / ticks), HEIGHT);
 
 				canvasCtx.stroke();
-				drawAxisLabel((frequency)+"Hz", i * (WIDTH / ticks), HEIGHT * 1.05, 'center');
+				var textAlign = (i==0)?'left':((i==ticks)?'right':'center');
+				drawAxisLabel((frequency)+"Hz", i * (WIDTH / ticks), HEIGHT + MARGIN, textAlign);
 				frequency += frequencyInterval;
 		}	
 	}
@@ -186,8 +245,8 @@ try {
 			}
 			draw(); // draw the analyser on the canvas....
 	}
-} catch (e) {
-	console.log('Failed to create analyser');
-};
+	} catch (e) {
+		console.log('Failed to create analyser');
+	};
 
 }

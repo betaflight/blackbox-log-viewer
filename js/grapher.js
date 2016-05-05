@@ -1,6 +1,6 @@
 "use strict";
 
-function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) {
+function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserCanvas, options) {
     var
         PID_P = 0,
         PID_I = 1,
@@ -760,6 +760,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
             });
         }
         
+        if(analyser!=null) analyser.resize();
+
         computeDrawingParameters();
     };
     
@@ -997,6 +999,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
       options.drawAnalyser = state;  
     };
     
+    // Add analyser zoom toggling
+    this.setAnalyser= function(state) {
+      analyser.setFullscreen( state );  
+    };
+    
     // Use defaults for any options not provided
     options = extend(defaultOptions, options || {});
     
@@ -1005,7 +1012,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, options) 
     initializeCraftModel();
     
     /* Create the FlightLogAnalyser object */
-	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, craftCanvas, options);
+	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options);
 
     //Handle dragging events
     $(canvas).on("mousedown",onMouseDown);

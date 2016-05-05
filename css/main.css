@@ -240,7 +240,16 @@ html.has-log .log-graph-config {
     display:none;
 }
 
-html.has-craft #craftCanvas {
+#analyserCanvas {
+    position:absolute;
+    top:0;
+    left:0;
+    pointer-events:none; /* Allow the user to drag the graph lines instead of hitting the craft */
+    display:none;
+}
+
+html.has-craft #craftCanvas,
+html.has-analyser #analyserCanvas {
     display:block;
 }
 
@@ -297,7 +306,8 @@ html.has-video #graphCanvas {
 html .view-craft,
 html .view-sticks,
 html .view-table,
-html .view-analyser {
+html .view-analyser,
+html .view-analyser-fullscreen {
      color:black;
 }
 
@@ -312,6 +322,22 @@ html.has-table .view-table {
 }
 html.has-analyser .view-analyser {
      color:green;
+}
+
+html:not(.has-analyser-fullscreen) .glyphicon-resize-small {
+     display:none;
+}
+
+html.has-analyser-fullscreen .glyphicon-resize-full {
+     display:none;
+}
+
+html.has-analyser .view-analyser-fullscreen {
+     visibility:inherit;
+}
+
+html:not(has-analyser) .view-analyser-fullscreen {
+     visibility:hidden;
 }
 
 .video-top-controls > li {

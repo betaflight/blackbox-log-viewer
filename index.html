@@ -172,6 +172,9 @@
                         <button type="button" class="btn btn-default view-analyser" title="View/hide analyser display">
                             <span class="glyphicon glyphicon-equalizer"></span>
                         </button>
+                        <button type="button" class="btn btn-default view-analyser-fullscreen" title="Zoom Analyser Window">
+                            <span class="glyphicon glyphicon-resize-full"></span><span class="glyphicon glyphicon-resize-small"></span>
+                        </button>
                    </div>
                 </div>
             </li>
@@ -251,15 +254,14 @@
             </li>
         </ul>
 
-        <div class="craft">
-
-        </div>
+        <div class="craft"></div>
 
         <div class="graph-row">
             <div class="log-graph">
                 <video></video>
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
+                <canvas width="0" height="0" id="analyserCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog"></span>
             </div>
             <div class="log-graph-config">

@@ -54,12 +54,13 @@ function BlackboxLogViewer() {
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
-        hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser,
+        hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
         video = $(".log-graph video")[0],
         canvas = $("#graphCanvas")[0],
+        analyserCanvas = $("#analyserCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
         videoURL = false,
         videoOffset = 0.0,
@@ -466,7 +467,7 @@ function BlackboxLogViewer() {
 
         if(flightLog.getSysConfig().loopTime        != null)    {graphOptions.analyserSampleRate = 1000000 / flightLog.getSysConfig().loopTime; }
 
-        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, graphOptions);
+        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, graphOptions);
         
         setVideoInTime(false);
         setVideoOutTime(false);
@@ -761,6 +762,15 @@ function BlackboxLogViewer() {
             invalidateGraph();
         });
 
+        $(".view-analyser-fullscreen").click(function() {
+            if(hasAnalyser) {
+                hasAnalyserFullscreen = !hasAnalyserFullscreen; 
+            } else hasAnalyserFullscreen = false;
+            (hasAnalyserFullscreen)?$("html").addClass("has-analyser-fullscreen"):$("html").removeClass("has-analyser-fullscreen");       
+            graph.setAnalyser(hasAnalyserFullscreen);
+            invalidateGraph();
+        });
+
         var logJumpBack = function(fast) {
             var scrollTime = SMALL_JUMP_TIME;
             if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):SMALL_JUMP_TIME;
@@ -901,7 +911,14 @@ function BlackboxLogViewer() {
                 }
             }),
 
-            keysDialog = new KeysDialog($("#dlgKeysDialog"));
+            keysDialog = new KeysDialog($("#dlgKeysDialog")),
+
+	        exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
+	            videoConfig = newConfig;
+	            
+	            prefs.set('videoConfig', newConfig);
+	        });
+        
         
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();
