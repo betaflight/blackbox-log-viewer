@@ -39,6 +39,9 @@ function BlackboxLogViewer() {
         // JSON graph configuration:
         graphConfig = {},
 
+        offsetCache = [], // Storage for the offset cache (last 20 files)
+        currentOffsetCache = {log:null, index:null, video:null, offset:null},
+
         // JSON array of graph configurations for New Workspaces feature
         lastGraphConfig = null,     // Undo feature - go back to last configuration.
         workspaceGraphConfigs = {}, // Workspaces
@@ -100,7 +103,7 @@ function BlackboxLogViewer() {
          */
         $(".video-offset").val((videoOffset >= 0 ? "+" : "") + (videoOffset.toFixed(3) != videoOffset ? videoOffset.toFixed(3) : videoOffset));
         
-        if (wihtoutRefresh) invalidateGraph();
+        if (withoutRefresh) invalidateGraph();
     }
     
     function isInteger(value) {
@@ -434,6 +437,7 @@ function BlackboxLogViewer() {
                 for (var i = 0; i < flightLog.getLogCount(); i++) {
                     if (flightLog.openLog(i)) {
                         success = true;
+                        currentOffsetCache.index = i;
                         break;
                     }
                 }
@@ -443,9 +447,11 @@ function BlackboxLogViewer() {
                 }
             } else {
                 flightLog.openLog(logIndex);
+                currentOffsetCache.index = logIndex;
             }
         } catch (e) {
             alert("Error opening log: " + e);
+            currentOffsetCache.index = null;
             return;
         }
         
@@ -510,6 +516,8 @@ function BlackboxLogViewer() {
             }
             
             renderLogFileInfo(file);
+            currentOffsetCache.log      = file.name; // store the name of the loaded log file
+            currentOffsetCache.index    = null;      // and clear the index
             
             hasLog = true;
             $("html").addClass("has-log");
@@ -524,6 +532,7 @@ function BlackboxLogViewer() {
     }
     
     function loadVideo(file) {
+        currentOffsetCache.video = file.name; // store the name of the loaded video
         if (videoURL) {
             URL.revokeObjectURL(videoURL);
             videoURL = false;
@@ -531,6 +540,7 @@ function BlackboxLogViewer() {
         
         if (!URL.createObjectURL) {
             alert("Sorry, your web browser doesn't support showing videos from your local computer. Try Google Chrome instead.");
+            currentOffsetCache.video = null; // clear the associated video name
             return;
         }
             
@@ -634,6 +644,13 @@ function BlackboxLogViewer() {
                                     ]};
             }
     });
+
+    // Get the offsetCache buffer
+    prefs.get('offsetCache', function(item) {
+        if(item) {
+            offsetCache = item;
+        }
+    })
     
     activeGraphConfig.addListener(function() {
         invalidateGraph();
@@ -677,12 +694,11 @@ function BlackboxLogViewer() {
            } 
         });
 
-
         $(".file-open").change(function(e) {
             var 
                 files = e.target.files,
                 i;
-            
+
             for (i = 0; i < files.length; i++) {
                 var
                     isLog = files[i].name.match(/\.(TXT|CFL|LOG)$/i),
@@ -701,8 +717,19 @@ function BlackboxLogViewer() {
                     loadVideo(files[i]);
                 }
             }
-        });
 
+            // finally, see if there is an offsetCache value already, and auto set the offset
+            for(i=0; i<offsetCache.length; i++) {
+                if(
+                    (currentOffsetCache.log   == offsetCache[i].log)   &&
+                    (currentOffsetCache.index == offsetCache[i].index) &&
+                    (currentOffsetCache.video == offsetCache[i].video)    ) {
+                        setVideoOffset(offsetCache[i].offset, true);
+                    }
+
+            }
+        });
+        
         // New View Controls
         $(".view-craft").click(function() {
             hasCraft = !hasCraft;
@@ -814,7 +841,14 @@ function BlackboxLogViewer() {
             var offset = parseFloat($(".video-offset").val());
             
             if (!isNaN(offset)) {
-                videoOffset = offset;
+                videoOffset = offset;                
+                // Store the video offset to the local cache
+                currentOffsetCache.offset = offset;
+                if(hasLog && hasVideo) {
+                    if(offsetCache.length > 20) offsetCache.shift();
+                    offsetCache.push(currentOffsetCache);
+                    prefs.set('offsetCache', offsetCache);
+                }
                 invalidateGraph();
             }
         });
@@ -853,10 +887,11 @@ function BlackboxLogViewer() {
             headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function(newSysConfig) {
                 if(newSysConfig!=null) {
                     prefs.set('lastHeaderData', newSysConfig);
-                    //flightLog.setSysConfig(newSysConfig);
+                    flightLog.setSysConfig(newSysConfig);
 
                     // Save Current Position then re-calculate all the log information
                     var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
+                    
                     selectLog(null);
                     if (hasVideo) {
                         setVideoTime(activePosition);
