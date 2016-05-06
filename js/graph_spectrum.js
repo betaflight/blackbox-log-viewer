@@ -36,7 +36,7 @@ try {
 		source.start();
 
 	var spectrumAnalyser = audioCtx.createAnalyser();	  
-		spectrumAnalyser.fftSize = 512;
+		spectrumAnalyser.fftSize = 256;
 		spectrumAnalyser.smoothingTimeConstant = 0.8;
 		spectrumAnalyser.minDecibels = -100;
 		spectrumAnalyser.maxDecibels = -30;    
@@ -162,7 +162,7 @@ try {
 
 		  /* only plot the lower half of the FFT, as the top half
 		  never seems to have any values in it - too high frequency perhaps. */
-		  var PLOTTED_BUFFER_LENGTH = bufferLength / 2;
+		  var PLOTTED_BUFFER_LENGTH = bufferLength; // / 2;
 
 		  canvasCtx.translate(LEFT, TOP);
 
@@ -200,7 +200,7 @@ try {
 	function drawGridLines(sampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN) {
 
 		var ticks = 5;
-		var frequencyInterval = (sampleRate / ticks) / 4;
+		var frequencyInterval = (sampleRate / ticks) / 2;
 		var frequency = 0;
 
 		for(var i=0; i<=ticks; i++) {
@@ -213,7 +213,7 @@ try {
 
 				canvasCtx.stroke();
 				var textAlign = (i==0)?'left':((i==ticks)?'right':'center');
-				drawAxisLabel((frequency)+"Hz", i * (WIDTH / ticks), HEIGHT + MARGIN, textAlign);
+				drawAxisLabel((frequency.toFixed(0))+"Hz", i * (WIDTH / ticks), HEIGHT + MARGIN, textAlign);
 				frequency += frequencyInterval;
 		}	
 	}

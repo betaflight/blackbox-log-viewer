@@ -465,7 +465,11 @@ function BlackboxLogViewer() {
             analyserSampleRate:2000/*Hz*/,  // the loop time for the log
             };
 
-        if(flightLog.getSysConfig().loopTime        != null)    {graphOptions.analyserSampleRate = 1000000 / flightLog.getSysConfig().loopTime; }
+        if((flightLog.getSysConfig().loopTime             != null) &&
+            (flightLog.getSysConfig().frameIntervalPNum   != null) &&
+            (flightLog.getSysConfig().frameIntervalPDenom != null) ) {
+                graphOptions.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
+                }
 
         graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, graphOptions);
         
