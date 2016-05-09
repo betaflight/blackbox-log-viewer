@@ -189,15 +189,15 @@ function formatTime(msec, displayMsec) {
 
 function stringTimetoMsec(input) {
     try {
-            var matches = input.match(/([+-]?[0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
+            var matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
 
             if(matches.length>2) { // there is a placeholder - either : or .
-                if(matches[2] == ':'){ // time has been entered MM:SS.SSS
-                   return matches[1] * 60 * 1000000 + ((matches[3])?matches[3]:0) * 1000000 + ((matches[4])?(matches[4] + "00").slice(0,3):0) * 1000 
+                if(matches[3] == ':'){ // time has been entered MM:SS.SSS
+                   return ((matches[1])?-1:1) * (matches[2] * 60 * 1000000 + ((matches[4])?matches[4]:0) * 1000000 + ((matches[5])?(matches[5] + "00").slice(0,3):0) * 1000); 
                 } else {
-                   return matches[1] * 1000000 + ((matches[3])?(matches[3] + "00").slice(0,3):0) * 1000;
+                   return ((matches[1])?-1:1) * (matches[2] * 1000000 + ((matches[4])?(matches[4] + "00").slice(0,3):0) * 1000);
                 }
-            } else return matches[1] * 1000000;
+            } else return ((matches[1])?-1:1) * (matches[2] * 1000000);
         } catch(e) {
             return 0;
         }
