@@ -55,12 +55,14 @@ function BlackboxLogViewer() {
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
+        hasAnalyserSticks = false,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
         video = $(".log-graph video")[0],
         canvas = $("#graphCanvas")[0],
         analyserCanvas = $("#analyserCanvas")[0],
+        analyserStickCanvas = $("#analyserStickCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
         videoURL = false,
         videoOffset = 0.0,
@@ -756,6 +758,12 @@ function BlackboxLogViewer() {
             prefs.set('hasTable', hasTable);
         });
        
+        $(".view-analyser-sticks").click(function() {
+            hasAnalyserSticks = !hasAnalyserSticks;
+            (hasAnalyserSticks)?$("html").addClass("has-analyser-sticks"):$("html").removeClass("has-analyser-sticks");       
+            prefs.set('hasAnalyserSticks', hasAnalyserSticks);
+        });
+
         $(".view-analyser").click(function() {
             if(activeGraphConfig.selectedFieldName != null) {
                 hasAnalyser = !hasAnalyser; 

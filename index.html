@@ -160,6 +160,12 @@
                 <h4>View</h4>
                 <div>
                     <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default open-keys-dialog" title="View/hide keyboard shortcuts">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </button>
+                        <button type="button" class="btn btn-default open-header-dialog" title="View/hide header">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                        </button>
                         <button type="button" class="btn btn-default view-craft" title="View/hide craft display">
                             <span class="glyphicon glyphicon-plane"></span>
                         </button>
@@ -168,6 +174,9 @@
                         </button>
                         <button type="button" class="btn btn-default view-table" title="View/hide statistics display">
                             <span class="glyphicon glyphicon-list-alt"></span>
+                        </button>
+                        <button type="button" class="btn btn-default view-analyser-sticks" style="display:none" title="View/hide stick analyser">
+                            <span class="glyphicon glyphicon-screenshot"></span>
                         </button>
                         <button type="button" class="btn btn-default view-analyser" title="View/hide analyser display">
                             <span class="glyphicon glyphicon-equalizer"></span>
@@ -262,15 +271,13 @@
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <canvas width="0" height="0" id="analyserCanvas"></canvas>
+                <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog"></span>
             </div>
             <div class="log-graph-config">
                 <h2>Legend <span class="log-close-legend-dialog glyphicon glyphicon-remove"></span></h2>
                 <div class="log-graph-legend">
                 </div>
-                <button type="button" class="btn btn-default btn-block hide-analyser-window">Hide Analyser</button>
-                <button type="button" class="btn btn-default btn-block open-keys-dialog">Keyboard Shortcuts</button>
-                <button type="button" class="btn btn-default btn-block open-header-dialog">Log Header</button>
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
             </div>
         </div>

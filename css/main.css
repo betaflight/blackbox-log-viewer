@@ -307,20 +307,16 @@ html .view-craft,
 html .view-sticks,
 html .view-table,
 html .view-analyser,
+html .view-analyser-sticks,
 html .view-analyser-fullscreen {
      color:black;
 }
 
+html.has-analyser-sticks .view-analyser-sticks,
+html.has-analyser .view-analyser,
+html.has-table .view-table,
+html.has-sticks .view-sticks,
 html.has-craft .view-craft {
-     color:green;
-}
-html.has-sticks .view-sticks {
-     color:green;
-}
-html.has-table .view-table {
-     color:green;
-}
-html.has-analyser .view-analyser {
      color:green;
 }
 
