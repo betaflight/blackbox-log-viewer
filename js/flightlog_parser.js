@@ -221,6 +221,7 @@ var FlightLogParser = function(logData) {
             dterm_lpf_hz:null,              // DTerm Lowpass Filter Hz
             dterm_differentiator:null,      // DTerm Differentiator
             H_sensitivity:null,             // Horizon Sensitivity
+            iterm_reset_offset:null,        // I-Term reset offset
             deadband:null,                  // Roll, Pitch Deadband
             yaw_deadband:null,              // Yaw Deadband  
             gyro_lpf:null,                  // Gyro lpf setting.
@@ -482,8 +483,8 @@ var FlightLogParser = function(logData) {
             case "dynamic_pterm": // Betaflight Only
                 that.sysConfig.dynamic_pterm = parseInt(fieldValue, 10);
             break;
-            case "H_sensitivity": // Betaflight Only
-                that.sysConfig.H_sensitivity = parseInt(fieldValue, 10);
+            case "iterm_reset_offset": // Betaflight Only
+                that.sysConfig.iterm_reset_offset = parseInt(fieldValue, 10);
             break;
             case "deadband": 
                 that.sysConfig.deadband = parseInt(fieldValue, 10);

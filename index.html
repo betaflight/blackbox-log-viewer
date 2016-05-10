@@ -480,10 +480,6 @@
 											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
 											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
 										</tr>
-										<tr class="bf-only">
-											<td colspan="2">Horizon Sensitivity</td>
-											<td class="parameter"><input type="number" name="H_sensitivity" title="H_sensitivity" step="1" min="0" max="999" /></td>
-										</tr>
 									</table>
 								</div>
 							</div>
@@ -516,12 +512,13 @@
 										<thead>
 												<th></th>
 												<th class="bf-only">Yaw (Hz)</th>
+												<th class="bf-only">Reset Offset</th>
 										</thead>
 										<tbody>
 											<tr>
 												<td></td>
 												<td class="bf-only"><input type="number" name="yaw_lpf_hz" step="0.01" min="0" max="999.00" /></td>
-
+												<td class="bf-only"><input type="number" name="iterm_reset_offset" step="1" min="0" max="999" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -531,18 +528,12 @@
 												<th colspan="5">D-Term</th>
 											</tr>
 											<tr>
-												<th class="bf-only">Calculation</th>
-												<th class="bf-only">Dynamic Threshold</th>
-												<th class="bf-only">Differentiator</th>
 												<th>Filter (Hz)</th>
 												<th class="bf-only">Average Count</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr>
-												<td class="bf-only"><select name='deltaMethod' title="deltaMethod"><!-- list generated here --></select></td>
-												<td class="bf-only"><input type="number" name="dynamic_dterm_threshold" title="dynamic_dterm_threshold" step="0.01" min="0" max="999.00" /></td>
-												<td class="bf-only"><select name='dterm_differentiator' title="dterm_differentiator"><!-- list generated here --></select></td>
 												<td><input type="number" name="dterm_lpf_hz" title="dterm_lpf_hz" step="0.01" min="0" max="999.00" /></td>
 												<td class="bf-only"><input type="number" name="dterm_average_count" title="dterm_average_count" step="1" min="0" max="12" /></td>
 											</tr>

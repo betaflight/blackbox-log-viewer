@@ -319,15 +319,12 @@ function HeaderDialog(dialog, onSave) {
         setParameter('yaw_p_limit'				,sysConfig.yaw_p_limit,0);
         setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,2);
         setParameter('dterm_average_count'		,sysConfig.dterm_average_count,0);
+    	renderSelect('dynamic_pterm'			,sysConfig.dynamic_pterm, OFF_ON);
         setParameter('rollPitchItermResetRate'	,sysConfig.rollPitchItermResetRate,0);
         setParameter('yawItermResetRate'		,sysConfig.yawItermResetRate,0);
         setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,2);
         setParameter('dterm_cut_hz'				,sysConfig.dterm_cut_hz,2);
-    	renderSelect('dterm_differentiator'		,sysConfig.dterm_differentiator, DTERM_DIFFERENTIATOR);
-    	renderSelect('deltaMethod'				,sysConfig.deltaMethod, PID_DELTA_TYPE);
-    	renderSelect('dynamic_pterm'			,sysConfig.dynamic_pterm, OFF_ON);
-        setParameter('dynamic_dterm_threshold'	,sysConfig.dynamic_dterm_threshold,2);
-        setParameter('H_sensitivity'			,sysConfig.H_sensitivity,2);
+        setParameter('iterm_reset_offset'		,sysConfig.iterm_reset_offset,0);
         setParameter('deadband'					,sysConfig.deadband,0);
         setParameter('yaw_deadband'				,sysConfig.yaw_deadband,0);
     	renderSelect('gyro_lpf'			    	,sysConfig.gyro_lpf, GYRO_LPF);
