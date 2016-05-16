@@ -194,8 +194,30 @@ try {
 		  }
 		  drawAxisLabel(analyserFieldName + ' ' + analyserSampleRange, WIDTH - 4, HEIGHT - 6, 'right');
 		  drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
+		  
+		  var offset = 0;
+		  if(flightLog.getSysConfig().gyro_lowpass_hz!=null) drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  options.analyserSampleRate, 'GYRO Filter ', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		  if(flightLog.getSysConfig().dterm_lpf_hz!=null)    drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  options.analyserSampleRate, 'D-TERM Filter', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		  if(flightLog.getSysConfig().yaw_lpf_hz!=null)      drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  options.analyserSampleRate, 'YAW Filter', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		  
 		  canvasCtx.restore();
 		}
+	
+	function drawMarkerLine(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET){
+		var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequncy lies
+
+		canvasCtx.beginPath();
+		canvasCtx.lineWidth = 1;
+		canvasCtx.strokeStyle = "rgba(128,128,255,0.50)";
+
+		canvasCtx.moveTo(x, 0);
+		canvasCtx.lineTo(x, HEIGHT);
+
+		canvasCtx.stroke();
+		
+		drawAxisLabel(label + ' ' + (frequency.toFixed(0))+"Hz", (x + 2), OFFSET, 'left');
+		
+	}
 
 	function drawGridLines(sampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN) {
 
