@@ -134,12 +134,13 @@ function BlackboxLogViewer() {
 
         if (frame) {
 
+            var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+
             if(hasTable) { // Only redraw the table if it is enabled
 
                 var 
                     rows = [],
-                    rowCount = Math.ceil(fieldNames.length / 2),
-                    currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+                    rowCount = Math.ceil(fieldNames.length / 2);
 
                 for (i = 0; i < rowCount; i++) {
                     var 
@@ -164,14 +165,21 @@ function BlackboxLogViewer() {
                 }
 
                 table.append(rows.join(""));
-            }
-            
-            // update time field on toolbar
-            $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
-            if(hasMarker) {
-                $(".graph-time-marker").val(formatTime((currentBlackboxTime-markerTime)/1000, true));
+                
             }
 
+            // Update flight mode flags on status bar
+            $("#status-bar .flight-mode").text(
+            		fieldPresenter.decodeFieldToFriendly(null, 'flightModeFlags', currentFlightMode, null)	
+            	);
+
+            // update time field on status bar
+            $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
+            if(hasMarker) {
+                $("#status-bar .marker-offset").text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms');
+            }
+
+            
             // Update the Legend Values
             if(graphLegend) graphLegend.updateValues(flightLog, frame);
         }
@@ -313,7 +321,7 @@ function BlackboxLogViewer() {
      */
     function renderSelectedLogInfo() {
         $(".log-index").val(flightLog.getLogIndex());
-        
+                
         if (flightLog.getNumCellsEstimate()) {
             $(".log-cells").text(flightLog.getNumCellsEstimate() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
             $(".log-cells-header,.log-cells").css('display', 'block');
@@ -328,6 +336,12 @@ function BlackboxLogViewer() {
            $(".log-device-uid-header,.log-device-uid").css('display', 'none');
         }
         
+        // Add log version information to status bar
+        var sysConfig = flightLog.getSysConfig();
+        $('#status-bar .version').text( ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
+        $('#status-bar .looptime').text( ((sysConfig['loopTime']!=null)?(sysConfig['loopTime'] +'us (' + (1000000/sysConfig['loopTime']).toFixed(0) + 'Hz)'):''));
+        $('#status-bar .lograte').text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Logging Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
+
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
         seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
         
@@ -954,6 +968,65 @@ function BlackboxLogViewer() {
             
             keysDialog.show();
         });
+
+        $("#status-bar .marker-offset").click(function(e) {
+	        setCurrentBlackboxTime(markerTime);
+	        invalidateGraph(); 
+        });
+        
+        $('#status-bar .bookmark-1').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[1]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-2').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[2]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-3').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[3]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-4').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[4]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-5').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[5]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-6').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[6]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-7').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[7]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-8').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[8]);
+	        invalidateGraph(); 
+        });
+                
+        $('#status-bar .bookmark-9').click(function(e) {
+	        setCurrentBlackboxTime(bookmarkTimes[9]);
+	        invalidateGraph(); 
+        });
+
+        $('#status-bar .bookmark-clear').click(function(e) {
+            bookmarkTimes = null;
+            for(var i=1; i<=9; i++) {
+                $('#status-bar .bookmark-'+ i).css('visibility', 'hidden' );
+            }
+            $('#status-bar .bookmark-clear').css('visibility', 'hidden' );
+	        invalidateGraph(); 
+        });
                 
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
@@ -1038,15 +1111,17 @@ function BlackboxLogViewer() {
                     case "M".charCodeAt(0): 
                         if (e.altKey && hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
                           try{
-                            setVideoOffset(videoOffset + (stringTimetoMsec($(".graph-time-marker").val()) / 1000000), true);  
+                            setVideoOffset(videoOffset + (stringTimetoMsec($("#status-bar .marker-offset").text()) / 1000000), true);  
                           } catch(e) {
                              console.log('Failed to set video offset');
                           }
                         } else { // Add a marker to graph window
                             markerTime = currentBlackboxTime;
-                            $(".graph-time-marker").val(formatTime(0));
+                            $("#status-bar .marker-offset").text('Marker Offset ' + formatTime(0) + 'ms');
+                            
                         }                        
                         setMarker(!hasMarker);
+                        $("#status-bar .marker-offset").css('visibility', (hasMarker)?'visible':'hidden');
                         invalidateGraph();
                         e.preventDefault();
                     break;
@@ -1084,6 +1159,10 @@ function BlackboxLogViewer() {
 		                            // Special Case : Shift Alt 0 clears all bookmarks
 		                            if(e.which==48) {
 		                                bookmarkTimes = null;
+		                                for(var i=1; i<=9; i++) {
+	                                        $('#status-bar .bookmark-'+ i).css('visibility', 'hidden' );
+		                                }
+                                        $('#status-bar .bookmark-clear').css('visibility', 'hidden' );
 		                            } else {
 		                                if(bookmarkTimes==null) bookmarkTimes = new Array();
                                         if (bookmarkTimes[e.which-48] == null) {
@@ -1091,6 +1170,13 @@ function BlackboxLogViewer() {
                                         } else {
                                              bookmarkTimes[e.which-48] = null; 			            // clear the bookmark
                                         }
+                                        $('#status-bar .bookmark-'+(e.which-48)).css('visibility', ((bookmarkTimes[e.which-48]!=null)?('visible'):('hidden')) );
+                                        var countBookmarks = 0;
+                                        for(var i=0; i<=9; i++) {
+                                        	countBookmarks += (bookmarkTimes[i]!=null)?1:0;
+                                        }
+                                        $('#status-bar .bookmark-clear').css('visibility', ((countBookmarks>0)?('visible'):('hidden')) );
+
 		                            }
 		                            invalidateGraph();
 		                        }

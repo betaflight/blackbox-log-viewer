@@ -470,3 +470,67 @@ progress {
 .navbar-inverse .navbar-brand {
     color: #EAEAEA;
 }
+
+#status-bar {
+    position: fixed;
+    bottom: 0px;
+    width: 88%;
+    height: 20px;
+    line-height: 20px;
+    padding: 0 10px 0 10px;
+    border-top: 1px solid #7d7d79;
+    background-color: #bfbeb5;
+}
+
+#status-bar div {
+    float: left;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #7d7d79;
+}
+
+#status-bar .version {
+    float: right;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#status-bar .bookmark-1,
+#status-bar .bookmark-2,
+#status-bar .bookmark-3,
+#status-bar .bookmark-4,
+#status-bar .bookmark-5,
+#status-bar .bookmark-6,
+#status-bar .bookmark-7,
+#status-bar .bookmark-8,
+#status-bar .bookmark-9 {
+    background-color: red;
+    color : white;
+    padding-left: 0;
+    padding-right: 0;
+    width: 30px;
+    margin-right: 0px;
+    margin-left: 0px;
+    text-align: center;
+    visibility: hidden;
+    cursor: pointer;
+}
+
+#status-bar .marker-offset {
+    visibility: hidden;
+    cursor: pointer;
+}
+
+#status-bar .bookmark-clear {
+    background-color: blue;
+    color : white;
+    padding-left: 0;
+    padding-right: 0;
+    width: 60px;
+    margin-right: 0px;
+    margin-left: 0px;
+    text-align: center;
+    visibility: hidden;
+    cursor: pointer;
+}
