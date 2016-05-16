@@ -81,7 +81,10 @@ html, body {
     height:100%;
 }
 
-.log-close-legend-dialog {
+
+
+.log-close-legend-dialog,
+.open-keys-dialog {
     float: right;
     font-size: 14px;
     color: #bbb;
