@@ -55,7 +55,7 @@ function BlackboxLogViewer() {
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
-        hasAnalyserSticks = false,
+        hasAnalyserSticks = false, viewVideo = true,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
@@ -738,6 +738,11 @@ function BlackboxLogViewer() {
         });
         
         // New View Controls
+        $(".view-video").click(function() {
+            viewVideo = !viewVideo;
+            (!viewVideo)?$("html").addClass("video-hidden"):$("html").removeClass("video-hidden");       
+        });
+
         $(".view-craft").click(function() {
             hasCraft = !hasCraft;
             (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");       

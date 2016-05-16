@@ -303,6 +303,7 @@ html.has-video #graphCanvas {
     background-color:rgba(0,0,0,0.25);
 }
 
+html .view-video,
 html .view-craft,
 html .view-sticks,
 html .view-table,
@@ -316,7 +317,8 @@ html.has-analyser-sticks .view-analyser-sticks,
 html.has-analyser .view-analyser,
 html.has-table .view-table,
 html.has-sticks .view-sticks,
-html.has-craft .view-craft {
+html.has-craft .view-craft,
+html:not(.video-hidden) .view-video {
      color:green;
 }
 
@@ -410,6 +412,14 @@ html.has-log .log-graph {
 
 .main-pane {
     display:none;
+}
+
+html.video-hidden video {
+	display:none;
+}
+
+html:not(.has-video) .view-video {
+	visibility:hidden
 }
 
 html.has-log .main-pane,
