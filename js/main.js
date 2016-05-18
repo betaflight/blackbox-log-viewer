@@ -55,7 +55,7 @@ function BlackboxLogViewer() {
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
-        hasAnalyserSticks = false, viewVideo = true,
+        hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
@@ -1126,6 +1126,16 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
 
+                    case "T".charCodeAt(0): 
+                        hasTableOverlay = !hasTableOverlay;
+                    	(hasTableOverlay)?$("html").addClass("has-table-overlay"):$("html").removeClass("has-table-overlay");
+                    	if (hasTableOverlay && !hasTable) { 
+                    		hasTable = true; // force display the table if it is off when we quickshow.
+                    		(hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
+                    		}
+                        e.preventDefault();
+                    break;
+                    
                     // Workspace shortcuts
                     case "0".charCodeAt(0):
                     case "1".charCodeAt(0):

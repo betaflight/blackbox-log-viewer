@@ -270,12 +270,37 @@ html.has-analyser #analyserCanvas {
 .log-field-values td {
     width:15%;
 }
+
 .log-field-values td {
     font-family: monospace;
 }
 
 .log-field-values .raw-value {
     max-width:5em;
+}
+
+.log-field-values table,
+.log-field-values h4 {
+    background-color: #FFFFFF;
+}
+
+.log-field-values tr:nth-child(even) {
+    background-color: #EBF3F7;
+}
+
+html.has-table-overlay .log-field-values {
+    position:absolute;
+    top: 21%;
+    left: 10%;
+    width: 78.5%;
+    display:block;
+    padding-left:0px;
+    padding-right:0px;
+    font-size:xx-small;
+    background-color: white;
+    border: #337ab7;
+    border-style: groove;
+    z-index: 10;
 }
 
 .graph-legend-field {
