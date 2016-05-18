@@ -157,6 +157,7 @@ html:not(.has-log):not(.has-video) .header-pane {
     font-size:125%;
     margin-top: 1em;
     margin-bottom: 0.5em;
+    cursor: pointer;
 }
 html.has-log .log-graph-config {
     display:-webkit-flex;
@@ -226,6 +227,11 @@ html.has-log .log-graph-config {
     margin-right:4px;
     width: 65px;    
     text-align: center;
+}
+
+.color-picker {
+    height:30px;
+    max-width: 30px;
 }
 
 

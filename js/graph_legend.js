@@ -1,6 +1,6 @@
 "use strict";
 
-function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange) {
+function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onExpandGraph) {
     var
         that = this;
 
@@ -14,7 +14,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         for (i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend"><h3></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
+                graphDiv = $('<div class="graph-legend"><h3 graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
             
@@ -40,6 +40,14 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                config.selectedFieldIndex    = $(this).attr('field');
                if (onNewSelectionChange) {
                    onNewSelectionChange();
+               }
+        });
+
+        // Add a trigger on legend list title; select the graph to expland
+        $('.graph-legend h3').on('click', function() {
+               var selectedGraph = $(this).attr('graph');
+               if (onExpandGraph) {
+                   onExpandGraph(selectedGraph);
                }
         });
 

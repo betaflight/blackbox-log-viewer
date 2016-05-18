@@ -678,7 +678,7 @@ function BlackboxLogViewer() {
     });
     
     $(document).ready(function() {
-        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange);
+        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, zoomGraphConfig);
         
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
@@ -919,6 +919,47 @@ function BlackboxLogViewer() {
                 
                 prefs.set('graphConfig', graphConfig);            
         }
+
+        function expandGraphConfig(index) { // Put each of the fields into a seperate graph
+
+            var expandedGraphConfig = [];
+
+
+            for(var i=0; i< graphConfig[index].fields.length; i++) {                    // Loop through each of the fields
+            var singleGraph = {fields: [], label:'', height: 1 };
+                singleGraph.fields.push(graphConfig[index].fields[i]);
+                singleGraph.label = graphConfig[index].fields[i].name;
+                expandedGraphConfig.push(singleGraph);
+            }
+            
+            newGraphConfig(expandedGraphConfig);
+            invalidateGraph();
+
+        }
+
+        function zoomGraphConfig(index) { // Put each of the fields onto one graph and clear the others
+
+            if(graphConfig.length == 1) { // if there is only one graph, then return to previous configuration
+                if (lastGraphConfig != null) {
+                    newGraphConfig(lastGraphConfig);
+                }
+            } else {
+
+                var expandedGraphConfig = [];
+                var singleGraph = {fields: [], label:'', height: 1 };
+
+
+                for(var i=0; i< graphConfig[index].fields.length; i++) {                    // Loop through each of the fields
+                    singleGraph.fields.push(graphConfig[index].fields[i]);
+                    singleGraph.label = graphConfig[index].label;
+                }
+                expandedGraphConfig.push(singleGraph);
+
+                newGraphConfig(expandedGraphConfig);
+            }
+            invalidateGraph();
+
+        }
         
         var 
             graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
@@ -1135,7 +1176,7 @@ function BlackboxLogViewer() {
                     		}
                         e.preventDefault();
                     break;
-                    
+
                     // Workspace shortcuts
                     case "0".charCodeAt(0):
                     case "1".charCodeAt(0):

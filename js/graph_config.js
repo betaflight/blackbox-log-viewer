@@ -76,7 +76,7 @@ function GraphConfig(graphConfig) {
                     }
                     
                     if (field.color === undefined) {
-                        field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length];
+                        field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
                         colorIndex++;
                     }
                     
@@ -117,19 +117,20 @@ function GraphConfig(graphConfig) {
 }
 
 GraphConfig.PALETTE = [
-    "#fb8072", // Red
-    "#8dd3c7", // Cyan
-    "#ffffb3", // Yellow
-    "#bebada", // Purple
-    "#80b1d3",
-    "#fdb462",
-    "#b3de69",
-    "#fccde5",
-    "#d9d9d9",
-    "#bc80bd",
-    "#ccebc5",
-    "#ffed6f"
+    {color: "#fb8072", name: "Red" },
+    {color: "#8dd3c7", name: "Cyan" },
+    {color: "#ffffb3", name: "Yellow" },
+    {color: "#bebada", name: "Purple" },
+    {color: "#80b1d3", name: "Blue" },
+    {color: "#fdb462", name: "Orange" },
+    {color: "#b3de69", name: "Green" },
+    {color: "#fccde5", name: "Pink" },
+    {color: "#d9d9d9", name: "Grey" },
+    {color: "#bc80bd", name: "Dark Purple" },
+    {color: "#ccebc5", name: "Light Green" },
+    {color: "#ffed6f", name: "Dark Yellow" },
 ];
+
 
 GraphConfig.load = function(config) {
     // Upgrade legacy configs to suit the newer standard by translating field names

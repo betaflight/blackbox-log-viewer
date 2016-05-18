@@ -8,6 +8,25 @@ function GraphConfigurationDialog(dialog, onSave) {
         exampleGraphs = [],
         activeFlightLog;
     
+
+    function chooseColor(currentSelection) {
+    	var selectColor = $('<select class="color-picker"></select>');
+    		for(var i=0; i<GraphConfig.PALETTE.length; i++) {
+    			var option = $('<option></option>')
+    				.text(GraphConfig.PALETTE[i].name)
+    				.attr('value', GraphConfig.PALETTE[i].color)
+    				.css('color', GraphConfig.PALETTE[i].color);
+    			if(currentSelection == GraphConfig.PALETTE[i].color) {
+    				option.attr('selected', 'selected');
+    				selectColor.css('background', GraphConfig.PALETTE[i].color)
+    				           .css('color', GraphConfig.PALETTE[i].color);
+    			}
+    			selectColor.append(option);
+    		}
+
+    	return selectColor;
+    }
+    
     function renderFieldOption(fieldName, selectedName) {
         var 
             option = $("<option></option>")
@@ -41,7 +60,7 @@ function GraphConfigurationDialog(dialog, onSave) {
      * Render the element for the "pick a field" dropdown box. Provide "field" from the config in order to set up the
      * initial selection.
      */
-    function renderField(flightLog, field) {
+    function renderField(flightLog, field, color) {
         var 
             elem = $(
                 '<li class="config-graph-field">'
@@ -49,10 +68,11 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<input name="smoothing" class="form-control" type="text"></input>'
                     + '<input name="power" class="form-control" type="text"></input>'
                     + '<input name="scale" class="form-control" type="text"></input>'
+                    + '<select class="color-picker"></select>'
                     + '<button type="button" class="btn btn-default btn-sm">Remove</button>'
                 + '</li>'
             ),
-            select = $('select', elem),
+            select = $('select.form-control', elem),
             selectedFieldName = field ?field.name : false,
             i;
         
@@ -63,13 +83,24 @@ function GraphConfigurationDialog(dialog, onSave) {
         // Set the smoothing values
         renderSmoothingOptions(elem, flightLog, field);
 
+        //Populate the Color Picker
+        $('select.color-picker', elem).replaceWith(chooseColor(color));
+        
+
         // Ade event when selection changed to retreive the current smoothing settings.
-        $('select', elem).change( function(e) {
+        $('select.form-control', elem).change( function(e) {
             var selectedField = {
-                name: $('select option:selected', elem).val()
+                name: $('select.form-control option:selected', elem).val()
                     };
             renderSmoothingOptions(elem, activeFlightLog, selectedField);
         });
+
+        // Add event when color picker is changed to change the dropdown coloe
+        $('select.color-picker', elem).change( function(e) {
+            $(this).css('background', $('select.color-picker option:selected', elem).val())
+                   .css('color', $('select.color-picker option:selected', elem).val());
+        });
+        
 
         return elem;
     }
@@ -116,16 +147,18 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         $("input", graphElem).val(graph.label);
         
+        var fieldCount = graph.fields.length;
+
         // "Add field" button
         $("button", graphElem).click(function(e) {
-            fieldList.append(renderField(flightLog, {}));
+            fieldList.append(renderField(flightLog, {}, GraphConfig.PALETTE[fieldCount++].color));
             e.preventDefault();
         });
         
         for (var i = 0; i < graph.fields.length; i++) {
             var 
                 field = graph.fields[i],
-                fieldElem = renderField(flightLog, field);
+                fieldElem = renderField(flightLog, field, field.color?(field.color):(GraphConfig.PALETTE[i].color));
             
             fieldList.append(fieldElem);
         }
@@ -210,7 +243,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                     curve: {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exagerate center values - expo)
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
-                    }
+                    },
+                    color: $('select.color-picker option:selected', this).val()
                 }
                 
                 if (field.name.length > 0) {
