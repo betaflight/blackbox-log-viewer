@@ -19,6 +19,15 @@ html, body {
     }
 }
 
+.welcome-pane, .main-pane {
+    position:relative;
+    top:60px;
+}
+
+html:not(.has-log):not(.has-video) .header-pane {
+    visibility:hidden;
+}
+
 .log-info {
     max-width: 30em;
 }
@@ -290,7 +299,7 @@ html.has-analyser #analyserCanvas {
 
 html.has-table-overlay .log-field-values {
     position:absolute;
-    top: 21%;
+    top: 10%;
     left: 10%;
     width: 78.5%;
     display:block;
@@ -499,12 +508,21 @@ progress {
 #status-bar {
     position: fixed;
     bottom: 0px;
-    width: 88%;
+    width: 100%;
     height: 20px;
     line-height: 20px;
     padding: 0 10px 0 10px;
     border-top: 1px solid #7d7d79;
     background-color: #bfbeb5;
+}
+
+html:not(.has-log) #status-bar {
+    display: none;
+}
+
+.navbar-static-top {
+    position: fixed;
+       width: 100%;
 }
 
 #status-bar div {

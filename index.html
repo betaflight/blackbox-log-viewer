@@ -18,12 +18,12 @@
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-        <div class="container main-pane">
+        <div class="container header-pane">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Cleanflight Blackbox Explorer</a>
+                <a class="navbar-brand log-filename" href="#">Cleanflight Blackbox Explorer</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <div class="navbar-form navbar-right" role="form">
@@ -133,7 +133,6 @@
 
     <div class="container main-pane">
         <div class="log-metadata">
-            <h3 class="log-filename"></h3>
             <div class="log-info form-horizontal">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Log</label>
@@ -291,59 +290,61 @@
             </table>
         </div>
         
-        <div id="status-bar">
-            <div>
-				<span class="version">-</span>
-            </div>
-            <div>
-                <span class="log-cells">-</span>
-            </div>
-            <div>
-                <span class="looptime">-</span>
-            </div>
-            <div>
-                <span class="lograte">-</span>
-            </div>
-            <div>
-				<span class="flight-mode">-</span>
-            </div>
-            <div>
-				<span class="marker-offset">00:00.000</span>
-            </div>
-            <div class="bookmark-1">
-				<span>1</span>
-            </div>
-            <div class="bookmark-2">
-				<span>2</span>
-            </div>
-            <div class="bookmark-3">
-				<span>3</span>
-            </div>
-            <div class="bookmark-4">
-				<span>4</span>
-            </div>
-            <div class="bookmark-5">
-				<span>5</span>
-            </div>
-            <div class="bookmark-6">
-				<span>6</span>
-            </div>
-            <div class="bookmark-7">
-				<span>7</span>
-            </div>
-            <div class="bookmark-8">
-				<span>8</span>
-            </div>
-            <div class="bookmark-9">
-				<span>9</span>
-            </div>
-            <div class="bookmark-clear">
-				<span>Clear All</span>
-            </div>
-        </div>
+
         
     </div>
     <!-- /container -->
+    
+    <div id="status-bar">
+        <div>
+			<span class="version">-</span>
+        </div>
+        <div>
+            <span class="log-cells">-</span>
+        </div>
+        <div>
+            <span class="looptime">-</span>
+        </div>
+        <div>
+             <span class="lograte">-</span>
+        </div>
+        <div>
+			<span class="flight-mode">-</span>
+        </div>
+        <div>
+			<span class="marker-offset">00:00.000</span>
+        </div>
+        <div class="bookmark-1">
+			<span>1</span>
+        </div>
+        <div class="bookmark-2">
+			<span>2</span>
+        </div>
+        <div class="bookmark-3">
+			<span>3</span>
+        </div>
+        <div class="bookmark-4">
+			<span>4</span>
+        </div>
+        <div class="bookmark-5">
+			<span>5</span>
+        </div>
+       	<div class="bookmark-6">
+			<span>6</span>
+        </div>
+        <div class="bookmark-7">
+			<span>7</span>
+        </div>
+        <div class="bookmark-8">
+			<span>8</span>
+        </div>
+        <div class="bookmark-9">
+			<span>9</span>
+        </div>
+        <div class="bookmark-clear">
+			<span>Clear All</span>
+        </div>
+      </div>
 
     <div class="modal fade" id="dlgGraphConfiguration">
         <div class="modal-dialog">
