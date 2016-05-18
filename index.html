@@ -25,12 +25,12 @@
                 </button>
                 <a class="navbar-brand log-filename" href="#">Cleanflight Blackbox Explorer</a>
             </div>
-            <div id="navbar" class="navbar-collapse collapse">
+            <!-- <div id="navbar" class="navbar-collapse collapse"> -->
                 <div class="navbar-form navbar-right" role="form">
                     <a class="btn btn-default btn-video-export"> Export video...</a>
                     <span class="btn btn-primary btn-file"> Open log file/video <input type="file" class="file-open" multiple></span>
                 </div>
-            </div>
+            <!--</div>-->
         </div>
     </nav>
 
@@ -276,8 +276,8 @@
             <canvas width="200" height="100"></canvas>
         </div>
 
-        <div class="log-field-values">
-            <h4>Field values</h4>
+        <div class="log-field-values" id="log-field-values">
+            <a href="#log-field-values"><h4>Field values</h4></a>
             <table class="table table-condensed">
                 <tr>
                     <th>&nbsp;</th>

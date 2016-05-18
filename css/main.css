@@ -24,6 +24,12 @@ html, body {
     top:60px;
 }
 
+.header-pane {
+    margin-left:5%;
+    margin-right: 5%;
+    width: 90%;
+}
+
 html:not(.has-log):not(.has-video) .header-pane {
     visibility:hidden;
 }
@@ -505,6 +511,16 @@ progress {
     color: #EAEAEA;
 }
 
+.navbar {
+    margin-bottom:5px;
+}
+
+
+.navbar-static-top {
+    position: fixed;
+       width: 100%;
+}
+
 #status-bar {
     position: fixed;
     bottom: 0px;
@@ -518,11 +534,6 @@ progress {
 
 html:not(.has-log) #status-bar {
     display: none;
-}
-
-.navbar-static-top {
-    position: fixed;
-       width: 100%;
 }
 
 #status-bar div {
