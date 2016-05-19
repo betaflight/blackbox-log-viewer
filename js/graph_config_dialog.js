@@ -27,6 +27,23 @@ function GraphConfigurationDialog(dialog, onSave) {
     	return selectColor;
     }
     
+    function chooseHeight(currentSelection) {
+        var MAX_HEIGHT = 5;
+
+    	var selectHeight = $('<select class="form-control graph-height"></select>');
+    		for(var i=1; i<=MAX_HEIGHT; i++) {
+    			var option = $('<option></option>')
+    				.text(i)
+    				.attr('value', i)
+    			if(currentSelection == i || (currentSelection==null && i==1)) {
+    				option.attr('selected', 'selected');
+    			}
+    			selectHeight.append(option);
+    		}
+
+    	return selectHeight;
+    }
+
     function renderFieldOption(fieldName, selectedName) {
         var 
             option = $("<option></option>")
@@ -116,7 +133,12 @@ function GraphConfigurationDialog(dialog, onSave) {
                                 + '<div class="form-group">'
                                     + '<label class="col-sm-2 control-label">Axis label</label>'
                                     + '<div class="col-sm-10">'
-                                        + '<input class="form-control" type="text" placeholder="Axis label">'
+                                        + '<ul class="config-graph-header form-inline list-unstyled">'
+                                            + '<li class="config-graph-header">'
+                                                + '<input class="form-control" type="text" placeholder="Axis label" style="width:92%;">'
+                                                + '<select class="form-control graph-height"></select>'
+                                            + '</li>'
+                                        + '</ul>'
                                     + '</div>'
                                 + '</div>'
                                 + '<div class="form-group form-group-sm config-graph-field-header">'
@@ -155,6 +177,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             e.preventDefault();
         });
         
+        //Populate the Height seletor
+        $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));        
+
+        // Add Field List
         for (var i = 0; i < graph.fields.length; i++) {
             var 
                 field = graph.fields[i],
@@ -235,6 +261,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             };
             
             graph.label = $("input[type='text']", this).val();
+            graph.height = parseInt($('select.graph-height option:selected', this).val());
             
             $(".config-graph-field", this).each(function() {
                 field = {

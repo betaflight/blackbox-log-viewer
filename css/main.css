@@ -167,9 +167,17 @@ html.has-log .log-graph-config {
 .config-graph {
     margin:0.5em 0;
 }
+
 .config-graph dd {
     margin-top:0.5em;
 }
+
+.config-graph-header {
+    margin-bottom: 0px;
+    margin-right: 0px;
+    width: 100%;
+}
+
 .config-graph-field {
     margin-bottom: 0.5em;
     margin-top: 0.2em;

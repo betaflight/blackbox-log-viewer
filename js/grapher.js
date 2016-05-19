@@ -925,7 +925,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         for (i = 0; i < graphs.length; i++) {
             graph = graphs[i];
 
-            graph.height = graph.height / heightSum * 0.95;
+            graph.height = graph.height / heightSum * 0.975;
         }
     
         flightLog.setFieldSmoothing(smoothing);
