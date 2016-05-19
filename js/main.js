@@ -660,6 +660,44 @@ function BlackboxLogViewer() {
         }
     });
 
+    // Workspace save/restore to/from file.
+    function saveWorkspaces(file) {
+
+        var data; // Data to save
+
+        if(!workspaceGraphConfigs) return null;     // No workspaces to save
+        if(!file) file = 'workspaces.json'; // No filename to save to, make one up
+
+        if(typeof workspaceGraphConfigs === "object"){
+            data = JSON.stringify(workspaceGraphConfigs, undefined, 4);
+        }
+
+        var blob = new Blob([data], {type: 'text/json'}),
+            e    = document.createEvent('MouseEvents'),
+            a    = document.createElement('a');
+
+        a.download = file;
+        a.href = window.URL.createObjectURL(blob);
+        a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+        e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dispatchEvent(e);
+
+    }
+
+    function loadWorkspaces(file) {
+
+        var reader = new FileReader();
+    
+        reader.onload = function(e) {
+
+            var data = e.target.result;
+            workspaceGraphConfigs = JSON.parse(data); 
+            window.alert('Workspaces Loaded')                       
+        };
+     
+        reader.readAsText(file);
+    }
+
     // New workspaces feature; local storage of user configurations
     prefs.get('workspaceGraphConfigs', function(item) {
         if(item) {
@@ -728,9 +766,10 @@ function BlackboxLogViewer() {
             for (i = 0; i < files.length; i++) {
                 var
                     isLog = files[i].name.match(/\.(TXT|CFL|LOG)$/i),
-                    isVideo = files[i].name.match(/\.(AVI|MOV|MP4|MPEG)$/i);
+                    isVideo = files[i].name.match(/\.(AVI|MOV|MP4|MPEG)$/i),
+                    isWorkspaces = files[i].name.match(/\.(JSON)$/i);
                 
-                if (!isLog && !isVideo) {
+                if (!isLog && !isVideo && !isWorkspaces) {
                     if (files[i].size < 10 * 1024 * 1024)
                         isLog = true; //Assume small files are logs rather than videos
                     else
@@ -741,6 +780,8 @@ function BlackboxLogViewer() {
                     loadLogFile(files[i]);
                 } else if (isVideo) {
                     loadVideo(files[i]);
+                } else if (isWorkspaces) {
+                    loadWorkspaces(files[i])
                 }
             }
 
@@ -1072,6 +1113,13 @@ function BlackboxLogViewer() {
             $('#status-bar .bookmark-clear').css('visibility', 'hidden' );
 	        invalidateGraph(); 
         });
+        
+        $(".btn-workspaces-export").click(function(e) {
+            setGraphState(GRAPH_STATE_PAUSED);
+            saveWorkspaces();
+            e.preventDefault();
+        });
+        
                 
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
@@ -1168,6 +1216,11 @@ function BlackboxLogViewer() {
                         setMarker(!hasMarker);
                         $("#status-bar .marker-offset").css('visibility', (hasMarker)?'visible':'hidden');
                         invalidateGraph();
+                        e.preventDefault();
+                    break;
+
+                    case "S".charCodeAt(0): 
+                        saveWorkspaces();
                         e.preventDefault();
                     break;
 
