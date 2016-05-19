@@ -85,7 +85,8 @@ function BlackboxLogViewer() {
         
         playbackRate = PLAYBACK_DEFAULT_RATE,
         
-        graphZoom = GRAPH_DEFAULT_ZOOM;
+        graphZoom = GRAPH_DEFAULT_ZOOM,
+        lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
     
     function blackboxTimeFromVideoTime() {
         return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
@@ -431,7 +432,11 @@ function BlackboxLogViewer() {
     }
     
     function setGraphZoom(zoom) {
+        if (zoom == null) { // go back to last zoom value
+            zoom = lastGraphZoom;
+        }
         if (zoom >= GRAPH_MIN_ZOOM && zoom <= GRAPH_MAX_ZOOM) {
+            lastGraphZoom = graphZoom;
             graphZoom = zoom;
             
             if (graph) {
@@ -1243,6 +1248,9 @@ function BlackboxLogViewer() {
                                 if (lastGraphConfig != null) {
                                     newGraphConfig(lastGraphConfig);
                                 }
+                            } else {
+                                    (graphZoom==GRAPH_MIN_ZOOM)?setGraphZoom(null):setGraphZoom(GRAPH_MIN_ZOOM);
+                                    $(".graph-zoom").val(graphZoom + "%");
                             }
                         } catch(e) {
                             console.log('Workspace toggle feature not functioning');
