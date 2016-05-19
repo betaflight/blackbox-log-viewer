@@ -683,7 +683,7 @@ function BlackboxLogViewer() {
     });
     
     $(document).ready(function() {
-        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, zoomGraphConfig);
+        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, zoomGraphConfig, expandGraphConfig);
         
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
@@ -928,7 +928,6 @@ function BlackboxLogViewer() {
         function expandGraphConfig(index) { // Put each of the fields into a seperate graph
 
             var expandedGraphConfig = [];
-
 
             for(var i=0; i< graphConfig[index].fields.length; i++) {                    // Loop through each of the fields
             var singleGraph = {fields: [], label:'', height: 1 };

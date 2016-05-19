@@ -1,6 +1,6 @@
 "use strict";
 
-function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onExpandGraph) {
+function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onZoomGraph, onExpandGraph) {
     var
         that = this;
 
@@ -44,10 +44,16 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         });
 
         // Add a trigger on legend list title; select the graph to expland
-        $('.graph-legend h3').on('click', function() {
+        $('.graph-legend h3').on('click', function(e) {
                var selectedGraph = $(this).attr('graph');
-               if (onExpandGraph) {
-                   onExpandGraph(selectedGraph);
+               if(!e.altKey) {
+                   if (onZoomGraph) {                   
+                       onZoomGraph(selectedGraph);
+                   }
+               } else {
+                   if (onExpandGraph) {                   
+                       onExpandGraph(selectedGraph);
+                   }
                }
         });
 
