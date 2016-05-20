@@ -242,7 +242,6 @@ html.has-log .log-graph-config {
     max-width: 30px;
 }
 
-
 .setup-parameters {
     margin:0.5em 0;
 }
@@ -331,6 +330,33 @@ html.has-table-overlay .log-field-values {
     border-style: groove;
     z-index: 10;
 }
+
+html:not(.has-config-overlay) .configuration-file,
+html:not(.has-marker) .marker-offset {
+    display:none;
+}
+
+.configuration-file h3 {
+    background-color: #d9edf7;
+    margin-top: 2px;
+    padding: 5px;
+}
+
+html.has-config .configuration-file {
+    position:absolute;
+    top: 10%;
+    left: 10%;
+    width: 78.5%;
+    padding:10px;
+    height:580px;
+    overflow:hidden;
+    overflow-y:scroll;
+    background-color: white;
+    border: #337ab7;
+    border-style: groove;
+    z-index: 11;
+}
+
 
 .graph-legend-field {
     padding-bottom:0.1em;
@@ -602,3 +628,13 @@ html:not(.has-log) #status-bar {
     visibility: hidden;
     cursor: pointer;
 }
+
+#status-bar .configuration-file-name {
+    cursor: pointer;
+}
+
+html:not(.has-config) #status-bar .configuration-file-name {
+    display: none;    
+}
+
+

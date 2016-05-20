@@ -29,7 +29,8 @@ function BlackboxLogViewer() {
         currentBlackboxTime = 0,
         lastRenderTime = false,
         flightLog, flightLogDataArray,
-        graph = null, 
+        graph = null,
+        configuration = null, // is their an associated dump file ?
         
         prefs = new PrefStorage(),
         
@@ -56,6 +57,7 @@ function BlackboxLogViewer() {
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
         hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false,
+        hasConfig = false, hasConfigOverlay = false,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
@@ -532,6 +534,20 @@ function BlackboxLogViewer() {
         reader.onload = function(e) {
             var bytes = e.target.result;
             
+            var fileContents = String.fromCharCode.apply(null, new Uint8Array(bytes, 0,100));
+
+            if(fileContents.match(/# dump/i)) { // this is actually a configuration file
+                try{
+                   configuration = new Configuration(file); // the configuration class will actually re-open the file as a text object.
+                   hasConfig = true;
+                   (hasConfig)?$("html").addClass("has-config"):$("html").removeClass("has-config");
+                   } catch(e) {
+                       configuration = null;
+                       hasConfig = false;
+                   }
+               return;            
+            }
+
             flightLogDataArray = new Uint8Array(bytes);
             
             try {
@@ -691,7 +707,9 @@ function BlackboxLogViewer() {
         reader.onload = function(e) {
 
             var data = e.target.result;
-            workspaceGraphConfigs = JSON.parse(data); 
+            workspaceGraphConfigs = JSON.parse(data);
+            prefs.set('workspaceGraphConfigs', workspaceGraphConfigs);      // Store to local cache
+ 
             window.alert('Workspaces Loaded')                       
         };
      
@@ -1113,6 +1131,14 @@ function BlackboxLogViewer() {
             $('#status-bar .bookmark-clear').css('visibility', 'hidden' );
 	        invalidateGraph(); 
         });
+
+        $('#status-bar .configuration-file-name').click(function(e) {
+            if(hasConfig) {
+                hasConfigOverlay = !hasConfigOverlay;
+                (hasConfigOverlay)?$("html").addClass("has-config-overlay"):$("html").removeClass("has-config-overlay");
+            }
+            e.preventDefault();
+        });
         
         $(".btn-workspaces-export").click(function(e) {
             setGraphState(GRAPH_STATE_PAUSED);
@@ -1219,8 +1245,11 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
 
-                    case "S".charCodeAt(0): 
-                        saveWorkspaces();
+                    case "C".charCodeAt(0): 
+                        if(hasConfig) {
+                            hasConfigOverlay = !hasConfigOverlay;
+                            (hasConfigOverlay)?$("html").addClass("has-config-overlay"):$("html").removeClass("has-config-overlay");
+                        }
                         e.preventDefault();
                     break;
 
