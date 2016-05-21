@@ -26,11 +26,15 @@ function Configuration(file, showConfigFile) {
 				li = $('<li class="configuration-row">' + fileLinesArray[i] + '</li>');
 				configurationList.append(li);	
 			} else {
+				try {
 				var regFilter = new RegExp('(.*)(' + filter + ')(.*)','i');
 				var highLight = fileLinesArray[i].match(regFilter);
 				if(highLight!=null) { // dont include blank lines
 					li = $('<li class="configuration-row">' + highLight[1] + '<b>' + highLight[2] + '</b>' + highLight[3] + '</li>');
-					configurationList.append(li);	
+					configurationList.append(li);
+					} 
+				} catch(e) {
+					continue;
 				}
 			}
 		}
