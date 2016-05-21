@@ -342,21 +342,29 @@ html:not(.has-marker) .marker-offset {
     padding: 5px;
 }
 
+.configuration-close {
+    float: right;
+    color: #bbb;
+    cursor: pointer;
+}
+
 html.has-config .configuration-file {
     position:absolute;
     top: 10%;
     left: 10%;
     width: 78.5%;
     padding:10px;
-    height:580px;
-    overflow:hidden;
-    overflow-y:scroll;
     background-color: white;
     border: #337ab7;
     border-style: groove;
     z-index: 11;
 }
 
+html.has-config .configuration-list {
+    height:580px;
+    overflow:hidden;
+    overflow-y:scroll;
+}
 
 .graph-legend-field {
     padding-bottom:0.1em;

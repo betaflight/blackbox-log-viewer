@@ -448,6 +448,17 @@ function BlackboxLogViewer() {
         }
     }
     
+    function showConfigFile(state) {
+            if(hasConfig) {
+                if(state == null) { // no state specified, just toggle
+                    hasConfigOverlay = !hasConfigOverlay;
+                } else { //state defined, just set item
+                    hasConfigOverlay = (state)?true:false;
+                }
+                (hasConfigOverlay)?$("html").addClass("has-config-overlay"):$("html").removeClass("has-config-overlay");
+            }
+        }
+
     /**
      * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
      * available log.
@@ -538,9 +549,10 @@ function BlackboxLogViewer() {
 
             if(fileContents.match(/# dump/i)) { // this is actually a configuration file
                 try{
-                   configuration = new Configuration(file); // the configuration class will actually re-open the file as a text object.
+                   configuration = new Configuration(file, showConfigFile); // the configuration class will actually re-open the file as a text object.
                    hasConfig = true;
                    (hasConfig)?$("html").addClass("has-config"):$("html").removeClass("has-config");
+
                    } catch(e) {
                        configuration = null;
                        hasConfig = false;
@@ -1133,13 +1145,10 @@ function BlackboxLogViewer() {
         });
 
         $('#status-bar .configuration-file-name').click(function(e) {
-            if(hasConfig) {
-                hasConfigOverlay = !hasConfigOverlay;
-                (hasConfigOverlay)?$("html").addClass("has-config-overlay"):$("html").removeClass("has-config-overlay");
-            }
+            showConfigFile(true); // show the config file
             e.preventDefault();
         });
-        
+
         $(".btn-workspaces-export").click(function(e) {
             setGraphState(GRAPH_STATE_PAUSED);
             saveWorkspaces();
@@ -1246,10 +1255,7 @@ function BlackboxLogViewer() {
                     break;
 
                     case "C".charCodeAt(0): 
-                        if(hasConfig) {
-                            hasConfigOverlay = !hasConfigOverlay;
-                            (hasConfigOverlay)?$("html").addClass("has-config-overlay"):$("html").removeClass("has-config-overlay");
-                        }
+                        showConfigFile(); // toggle the config file popup
                         e.preventDefault();
                     break;
 
