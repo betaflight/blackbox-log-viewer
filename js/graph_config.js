@@ -62,9 +62,10 @@ function GraphConfig(graphConfig) {
                     matches,
                     defaultCurve;
                 
-                var adaptField = function(field) {
+                var adaptField = function(field, colorIndexOffset) {
                     defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
                     
+
                     if (field.curve === undefined) {
                         field.curve = defaultCurve;
                     } else {
@@ -75,6 +76,15 @@ function GraphConfig(graphConfig) {
                         field.curve.inputRange = defaultCurve.inputRange;
                     }
                     
+                    if(colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
+                        var index;
+                        for(index=0; index < GraphConfig.PALETTE.length; index++)
+                            {
+                                if(GraphConfig.PALETTE[index].color == field.color) break;
+                            }
+                        field.color = GraphConfig.PALETTE[(index + colorIndexOffset) % GraphConfig.PALETTE.length].color
+                    }
+
                     if (field.color === undefined) {
                         field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
                         colorIndex++;
@@ -90,11 +100,13 @@ function GraphConfig(graphConfig) {
                 if ((matches = field.name.match(/^(.+)\[all\]$/))) {
                     var 
                         nameRoot = matches[1],
-                        nameRegex = new RegExp("^" + nameRoot + "\[[0-9]+\]$");
+                        nameRegex = new RegExp("^" + nameRoot + "\[[0-9]+\]$"),
+                        colorIndexOffset = 0;
                     
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
-                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]})));
+                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset));
+                            colorIndexOffset++;
                         }
                     }
                 } else {
