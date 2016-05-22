@@ -31,7 +31,10 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
         
         canvas = document.createElement('canvas'),
         craftCanvas = document.createElement('canvas'),
-        craftCanvasLeft, craftCanvasTop,
+        analyserCanvas = document.createElement('canvas'),
+        craftCanvasLeft, craftCanvasTop, hasCraft,
+        analyserCanvasLeft, analyserCanvasTop, hasAnalyser,
+        
         
         canvasContext = canvas.getContext("2d"),
         
@@ -177,7 +180,8 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
             renderFrame = function() {
                 graph.render(frameTime);
                 
-                canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
+                if(logParameters.hasCraft) canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
+                if(logParameters.hasAnalyser) canvasContext.drawImage(analyserCanvas, analyserCanvasLeft, analyserCanvasTop);
                 
                 videoWriter.addFrame(canvas);
                 
@@ -284,13 +288,17 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
         delete logParameters.flightVideo;
     }
     
-    graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, craftCanvas, {
-        eraseBackground : !logParameters.flightVideo
+    graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, craftCanvas, analyserCanvas, {
+        eraseBackground : !logParameters.flightVideo,
+        drawSticks: logParameters.hasSticks
     });
     
     craftCanvasLeft = parseInt($(craftCanvas).css('left'), 10);
     craftCanvasTop = parseInt($(craftCanvas).css('top'), 10);
     
+    analyserCanvasLeft = parseInt($(analyserCanvas).css('left'), 10);
+    analyserCanvasTop = parseInt($(analyserCanvas).css('top'), 10);
+
     if (!("inTime" in logParameters) || logParameters.inTime === false) {
         logParameters.inTime = flightLog.getMinTime();
     }

@@ -1164,8 +1164,11 @@ function BlackboxLogViewer() {
                     graphConfig: activeGraphConfig,
                     inTime: videoExportInTime,
                     outTime: videoExportOutTime,
-                    flightVideo: hasVideo ? video.cloneNode() : false,
-                    flightVideoOffset: videoOffset
+                    flightVideo: (hasVideo && viewVideo) ? video.cloneNode() : false,
+                    flightVideoOffset: videoOffset,
+                    hasCraft: hasCraft,
+                    hasAnalyser: hasAnalyser,
+                    hasSticks: hasSticks
                 }, videoConfig);
                 
                 e.preventDefault();
