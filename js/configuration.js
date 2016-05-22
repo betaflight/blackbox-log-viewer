@@ -8,7 +8,7 @@
  */
 
 
-function Configuration(file, showConfigFile) {
+function Configuration(file, configurationDefaults, showConfigFile) {
 
 	// Private Variables
 	var that = this; 	  // generic pointer back to this function
@@ -23,14 +23,14 @@ function Configuration(file, showConfigFile) {
 
 		for(var i=0; i<fileLinesArray.length; i++) {
 			if(!filter || filter.length<1) { //Everything
-				li = $('<li class="configuration-row">' + fileLinesArray[i] + '</li>');
+				li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + fileLinesArray[i] + '</li>');
 				configurationList.append(li);	
 			} else {
 				try {
 				var regFilter = new RegExp('(.*)(' + filter + ')(.*)','i');
 				var highLight = fileLinesArray[i].match(regFilter);
 				if(highLight!=null) { // dont include blank lines
-					li = $('<li class="configuration-row">' + highLight[1] + '<b>' + highLight[2] + '</b>' + highLight[3] + '</li>');
+					li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + highLight[1] + '<b>' + highLight[2] + '</b>' + highLight[3] + '</li>');
 					configurationList.append(li);
 					} 
 				} catch(e) {
@@ -114,5 +114,73 @@ function Configuration(file, showConfigFile) {
     loadFile(file); // configuration file loaded
 	
     // Add filter 
+    
+}
+
+function ConfigurationDefaults(prefs) {
+	
+	// Special configuration file that handles default values only
+
+	// Private Variables
+	var that = this; 	  		  // generic pointer back to this function
+	var fileData; 		  		  // configuration file information
+	var fileLinesArray = null;	  // Store the contents of the file globally	
+	
+	function loadFileFromCache() {
+		
+		// Get the file from the cache if it exists
+        prefs.get('configurationDefaults', function(item) {
+            if (item) {
+            	fileLinesArray = item;
+            } else {
+            	fileLinesArray = null;
+            }
+         });
+	}
+	
+	this.loadFile = function(file) {
+
+        var reader = new FileReader();
+    	fileData = file; 				// Store the data locally;
+
+    	reader.onload = function(e) {
+        	
+        	var data = e.target.result;	  			// all the data
+	    	fileLinesArray = data.split('\n'); 		// separated into lines
+	    	
+	    	prefs.set('configurationDefaults', fileLinesArray); // and store it to the cache
+
+        };
+     
+        reader.readAsText(file);
+    }
+
+    // Public variables and functions
+	this.getFile = function() {
+		return fileData;
+		};
+
+	this.getLines = function() {
+		return fileLinesArray;
+	}
+	
+	this.hasDefaults = function() {
+		return (fileLinesArray!=null); // is there a default file array
+	}
+	
+	this.isDefault = function(line) {		
+		// Returns the default line equivalent
+
+		if(!fileLinesArray) return true; // by default, lines are the same if there is no default file loaded
+		
+		for(var i=0; i<fileLinesArray.length; i++) {
+			if(line!=fileLinesArray[i]) continue; // not the same line, keep looking
+			return true; // line is same as default
+		}
+		return false; // line not the same as default or not found
+	}
+
+	
+    loadFileFromCache(); // configuration file loaded
     
 }

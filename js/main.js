@@ -30,10 +30,12 @@ function BlackboxLogViewer() {
         lastRenderTime = false,
         flightLog, flightLogDataArray,
         graph = null,
-        configuration = null, // is their an associated dump file ?
         
         prefs = new PrefStorage(),
         
+        configuration = null,           					       // is their an associated dump file ?
+        configurationDefaults = new ConfigurationDefaults(prefs),  // configuration defaults
+
         // User's video render config:
         videoConfig = {},
         
@@ -549,10 +551,19 @@ function BlackboxLogViewer() {
 
             if(fileContents.match(/# dump/i)) { // this is actually a configuration file
                 try{
-                   configuration = new Configuration(file, showConfigFile); // the configuration class will actually re-open the file as a text object.
-                   hasConfig = true;
-                   (hasConfig)?$("html").addClass("has-config"):$("html").removeClass("has-config");
 
+                   // Firstly, is this a configuration defaults file
+                   // (the filename contains the word 'default')
+
+                   if( (file.name).match(/default/i) ) {
+                        configurationDefaults.loadFile(file);
+                   } else {
+
+                       configuration = new Configuration(file, configurationDefaults, showConfigFile); // the configuration class will actually re-open the file as a text object.
+                       hasConfig = true;
+                       (hasConfig)?$("html").addClass("has-config"):$("html").removeClass("has-config");
+                   }
+                   
                    } catch(e) {
                        configuration = null;
                        hasConfig = false;

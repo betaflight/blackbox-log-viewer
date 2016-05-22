@@ -317,8 +317,8 @@ html.has-analyser #analyserCanvas {
 }
 
 html.has-table-overlay .log-field-values {
-    position:absolute;
-    top: 10%;
+    position: fixed;
+    top: 7%;
     left: 10%;
     width: 78.5%;
     display:block;
@@ -336,6 +336,10 @@ html:not(.has-marker) .marker-offset {
     display:none;
 }
 
+.configuration-changed {
+    background-color: #f2dede;
+}
+
 .configuration-file h3 {
     background-color: #d9edf7;
     margin-top: 2px;
@@ -349,8 +353,8 @@ html:not(.has-marker) .marker-offset {
 }
 
 html.has-config .configuration-file {
-    position:absolute;
-    top: 10%;
+    position: fixed;
+    top: 7%;
     left: 10%;
     width: 78.5%;
     padding:10px;
