@@ -56,7 +56,7 @@ function BlackboxLogViewer() {
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
-        hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false,
+        hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false, hadTable,
         hasConfig = false, hasConfigOverlay = false,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
@@ -1259,13 +1259,20 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
 
-                    case "T".charCodeAt(0): 
+                    case "T".charCodeAt(0):
                         hasTableOverlay = !hasTableOverlay;
                     	(hasTableOverlay)?$("html").addClass("has-table-overlay"):$("html").removeClass("has-table-overlay");
+
+                        if (hasTableOverlay) hadTable = hasTable; // Store the state of the table view when quickshow selected
+
                     	if (hasTableOverlay && !hasTable) { 
                     		hasTable = true; // force display the table if it is off when we quickshow.
-                    		(hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
                     		}
+                		if (!hasTableOverlay && !hadTable) {
+                    		hasTable = false; // return table state when we remove quickshow.
+                    		}
+
+                    	(hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
                         e.preventDefault();
                     break;
 
