@@ -1273,6 +1273,7 @@ function BlackboxLogViewer() {
                     		}
 
                     	(hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
+                    	invalidateGraph();
                         e.preventDefault();
                     break;
 
