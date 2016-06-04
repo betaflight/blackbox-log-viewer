@@ -28,10 +28,11 @@ function HeaderDialog(dialog, onSave) {
 			selectElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
 
 			if(selected!=null) {
-			selectElem.removeClass('missing');
-		} else {
-			selectElem.addClass('missing');
-		}   	
+				selectElem.removeClass('missing');
+			} else {
+				$(selectElem).css('display', 'none');
+				selectElem.addClass('missing');
+			}   	
 
     }
     
@@ -111,7 +112,10 @@ function HeaderDialog(dialog, onSave) {
 		return false;
 	}
 
-	function builtFeaturesList(value) {
+	function builtFeaturesList(sysConfig) {
+
+		var value = sysConfig.features;
+
         // generate features
         var features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM', description: 'PPM Receiver Selected'},
@@ -137,7 +141,16 @@ function HeaderDialog(dialog, onSave) {
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
             {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Transponder enabled'}
         ];
-        
+
+
+        // Add specific features for betaflight v2.8 onwards....
+        if (sysConfig.firmware >=2.8) {
+        	features.push(
+        	            {bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'},
+            			{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
+						);
+        }
+
         var radioGroups = [];
         
         var features_e = $('.features');
@@ -335,7 +348,7 @@ function HeaderDialog(dialog, onSave) {
         
 		/* Packed Flags */
 
-        builtFeaturesList(sysConfig.features);
+        builtFeaturesList(sysConfig);
 
 		/* Hardware selections */
         
