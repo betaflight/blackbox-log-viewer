@@ -389,6 +389,9 @@ var FlightLogParser = function(logData) {
             case "rcYawExpo":
                 that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
             break;
+            case "rcYawRate":
+                that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
+            break;
             case "thrMid":
                 that.sysConfig.thrMid = parseInt(fieldValue, 10);
             break;
@@ -562,9 +565,20 @@ var FlightLogParser = function(logData) {
             case "acc_1G":
                 that.sysConfig.acc_1G = parseInt(fieldValue, 10);
             break;
+            case "Firmware revision":
+                // Extract the firmware revision
+                var matches = fieldValue.match(/.*flight.* (\d+)\.(\d+)(\.(\d+))*/i);
+                if(matches!=null) {
+                    that.sysConfig.firmware      = matches[1] + '.' + matches[2];
+                    that.sysConfig.firmwarePatch = (matches[4] != null)?matches[4]:'';
+                } else {
+                    that.sysConfig.firmware      = '';
+                    that.sysConfig.firmwarePatch = '';
+                }
+                that.sysConfig[fieldName] = fieldValue;
+            break;
             case "Product":
             case "Blackbox version":
-            case "Firmware revision":
             case "Firmware date":
                 // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
                 // Just Add them anyway

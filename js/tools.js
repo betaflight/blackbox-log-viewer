@@ -202,3 +202,11 @@ function stringTimetoMsec(input) {
             return 0;
         }
 }
+
+function constrain(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+}
+
+function validate(value, defaultValue) {
+    return (value!=null)?value:defaultValue;
+}
