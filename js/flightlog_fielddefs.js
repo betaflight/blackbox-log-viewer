@@ -91,7 +91,9 @@ var
             'ONESHOT125',
             'BLACKBOX',
             'CHANNEL_FORWARDING',
-            'TRANSPONDER'
+            'TRANSPONDER',
+            'AIRMODE',
+            'SUPEREXPO_RATES'
     ]),
 
     PID_CONTROLLER_TYPE = makeReadOnly([

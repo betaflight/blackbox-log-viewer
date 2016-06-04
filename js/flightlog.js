@@ -915,38 +915,79 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
     return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
 };
 
-FlightLog.prototype.calculateExpoPlus = function(value, axis) {
-    var propFactor;
-    var superExpoFactor;
 
-    if (axis == AXIS.YAW && !this.getSysConfig().superExpoYawMode) {
-        propFactor = 1.0;
-    } else {
-        superExpoFactor = (axis == AXIS.YAW) ? this.getSysConfig().superExpoFactorYaw : this.getSysConfig().superExpoFactor;
-        propFactor = 1.0 - ((superExpoFactor / 100.0) * (Math.abs(value) / 500.0));
-    }
 
-    return propFactor;
-}
+/***
+
+    The rcCommandToDegreesPerSecond function is betaflight version specific
+    due to the coding improvements from v2.8.0 onwards
+
+**/
 
 // Convert rcCommand to degrees per second
 FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, currentFlightMode) {
 
-        var superExpoFactor = 1.0/this.calculateExpoPlus(value, axis);
+    if(this.getSysConfig().firmware >= 2.8) {
 
+            var that = this;
 
-        if(axis===AXIS.YAW /*YAW*/) {
-            if(this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ON && currentFlightMode==null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
-            if((this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ALWAYS)||(this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ON && this.getFlightMode(currentFlightMode).SuperExpo)) {
-                return superExpoFactor * ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
-            } else {
-                return ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
+            var isSuperExpoActive = function() {
+               var FEATURE_SUPEREXPO_RATES = 1 << 23;
+
+               return (that.getSysConfig().features & FEATURE_SUPEREXPO_RATES);
             }
 
-        } else { /*ROLL or PITCH */
-            if(currentFlightMode==null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
-            return superExpoFactor * ((((axis===AXIS.ROLL)?this.getSysConfig().rates[AXIS.ROLL]:this.getSysConfig().rates[AXIS.PITCH]) + 27) * value ) >> 6;
-        }
+            var calculateRate = function(value, axis) {
+                var angleRate;
+
+                if (isSuperExpoActive()) {
+                    var rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(that.getSysConfig().rcYawRate,100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(that.getSysConfig().rcRate,100) / 100.0)));
+                    rcFactor = 1.0 / (constrain(1.0 - (rcFactor * (validate(that.getSysConfig().rates[axis],100) / 100.0)), 0.01, 1.00));
+
+                    angleRate = rcFactor * ((27 * value) / 16.0);
+                } else {
+                    angleRate = ((validate(that.getSysConfig().rates[axis],100) + 27) * value) / 16.0;
+                }
+
+                return constrain(angleRate, -8190.0, 8190.0); // Rate limit protection
+            };
+
+            return calculateRate(value, axis) >> 2; // the shift by 2 is to counterbalance the divide by 4 that occurs on the gyro to calculate the error       
+
+    } else { // earlier version of betaflight
+
+            var that = this;
+
+            var calculateExpoPlus = function(value, axis) {
+                    var propFactor;
+                    var superExpoFactor;
+
+                    if (axis == AXIS.YAW && !that.getSysConfig().superExpoYawMode) {
+                        propFactor = 1.0;
+                    } else {
+                        superExpoFactor = (axis == AXIS.YAW) ? that.getSysConfig().superExpoFactorYaw : that.getSysConfig().superExpoFactor;
+                        propFactor = 1.0 - ((superExpoFactor / 100.0) * (Math.abs(value) / 500.0));
+                    }
+
+                    return propFactor;
+                }
+
+            var superExpoFactor = 1.0/calculateExpoPlus(value, axis);
+
+
+            if(axis===AXIS.YAW /*YAW*/) {
+                if(this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ON && currentFlightMode==null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
+                if((this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ALWAYS)||(this.getSysConfig().superExpoYawMode==SUPER_EXPO_YAW.ON && this.getFlightMode(currentFlightMode).SuperExpo)) {
+                    return superExpoFactor * ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
+                } else {
+                    return ((this.getSysConfig().rates[AXIS.YAW] + 47) * value ) >> 7;
+                }
+
+            } else { /*ROLL or PITCH */
+                if(currentFlightMode==null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
+                return superExpoFactor * ((((axis===AXIS.ROLL)?this.getSysConfig().rates[AXIS.ROLL]:this.getSysConfig().rates[AXIS.PITCH]) + 27) * value ) >> 6;
+            }
+    }
 };
 
 FlightLog.prototype.rcCommandRawToThrottle = function(value) {
