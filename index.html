@@ -400,14 +400,9 @@
 								</div>
 								<div class="spacer_box">
 									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th>Controller</th>
-											</tr>
-										</thead>
 										<tbody>
 											<tr>
-												<td><select name='pidController'><!-- list generated here --></select></td>
+												<td name='pidController'><label>Controller</label><select ><!-- list generated here --></select></td>
 											</tr>
 										</tbody>
 									</table>
@@ -539,36 +534,32 @@
 									</div>
 									<div class="spacer_box">
 									<table class="parameter cf">
+										<tbody>
+											<tr>
+											    <td name='dynamic_pid' class="bf-only"><label>Dynamic PID</label><select><!-- list generated here --></select></td>											
+											</tr>
+										</tbody>
+									</table>
+									<table class="parameter cf">
 										<thead>
 											<tr>
 												<th colspan="2">P-Term</th>
 												<th class="bf-only" colspan="2">I-Term</th>
 											</tr>
-											<tr>
-												<th>Dynamic P</th>
-												<th>Yaw Limit</th>
-												<th class="bf-only">Roll/Pitch Reset</th>
-												<th class="bf-only">Yaw Reset</th>
-											</tr>
 										</thead>
 										<tbody>
 											<tr>
-											    <td class="bf-only"><select name='dynamic_pterm' title="dynamic_pterm"><!-- list generated here --></select></td>											
-												<td><input type="number" name="yaw_p_limit" step="1" min="0" max="999" /></td>
-												<td class="bf-only"><input type="number" name="rollPitchItermResetRate" step="1" min="0" max="999" /></td>
-												<td class="bf-only"><input type="number" name="yawItermResetRate" step="1" min="0" max="999" /></td>
+											    <td name='dynamic_pterm' class="bf-only"><label>Dynamic P</label><select><!-- list generated here --></select></td>											
+												<td name="yaw_p_limit"><label>Yaw Limit</label><input type="number" step="1" min="0" max="999" /></td>
+												<td name="rollPitchItermResetRate" class="bf-only"><label>Roll/Pitch Reset</label><input type="number" step="1" min="0" max="999" /></td>
+												<td name="yawItermResetRate" class="bf-only"><label>Yaw Reset</label><input type="number" step="1" min="0" max="999" /></td>
 											</tr>
 										</tbody>
-										<thead>
-												<th></th>
-												<th class="bf-only">Yaw (Hz)</th>
-												<th class="bf-only">Reset Offset</th>
-										</thead>
 										<tbody>
 											<tr>
 												<td></td>
-												<td class="bf-only"><input type="number" name="yaw_lpf_hz" step="0.01" min="0" max="999.00" /></td>
-												<td class="bf-only"><input type="number" name="iterm_reset_offset" step="1" min="0" max="999" /></td>
+												<td name="yaw_lpf_hz" class="bf-only"><label>Yaw (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="iterm_reset_offset" class="bf-only"><label>Reset Offset</label><input type="number" step="1" min="0" max="999" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -577,15 +568,11 @@
 											<tr>
 												<th colspan="5">D-Term</th>
 											</tr>
-											<tr>
-												<th>Filter (Hz)</th>
-												<th class="bf-only">Average Count</th>
-											</tr>
 										</thead>
 										<tbody>
 											<tr>
-												<td><input type="number" name="dterm_lpf_hz" title="dterm_lpf_hz" step="0.01" min="0" max="999.00" /></td>
-												<td class="bf-only"><input type="number" name="dterm_average_count" title="dterm_average_count" step="1" min="0" max="12" /></td>
+												<td name="dterm_lpf_hz" ><label>Filter (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -597,33 +584,22 @@
 									</div>
 									<div class="spacer_box">
 									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th>Gyro Hardware</th>
-												<th class="bf-only">Gyro Soft (Hz)</th>
-											</tr>
-										</thead>
 										<tbody>
 											<tr>
-												<td><select name='gyro_lpf'><!-- list generated here --></select></td>
-												<td class="bf-only"><input type="number" name="gyro_lowpass_hz" step="0.01" min="0" max="999.00" /></td>
+												<td name='gyro_lpf'><label>Gyro Hardware</label><select><!-- list generated here --></select></td>
+												<td name="gyro_lowpass_hz" class="bf-only"><label>Gyro Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
-										<thead>
-											<tr>
-												<th>Acc (Hz)</th>
-											</tr>
-										</thead>
 										<tbody>
 											<tr>
-												<td><input type="number" name="acc_lpf_hz" step="0.01" min="0" max="999.00" /></td>
+												<td name="acc_lpf_hz"><label>Acc (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
 									</table>
-									<table class="parameter bf-only" cellpadding="0" cellspacing="0">
+									<table class="bf-only" cellpadding="0" cellspacing="0">
 										<tbody class="static-features noline"> 
 											<tr>
-												<td><input class="feature toggle" name="gyro_cal_on_first_arm" title="gyro_cal_on_first_arm" type="checkbox"/></td>
+												<td name="gyro_cal_on_first_arm"><input class="feature toggle" type="checkbox"/></td>
 												<td><label>GYRO_CAL_ON_FIRST_ARM</label></td>
 												<td><span>Calibrate Gyro on first arm</span></td>
 											</tr>
@@ -656,26 +632,16 @@
 								</div>
 								<div class="spacer_box">
 									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th>Looptime</th>
-											</tr>
-										</thead>
-											<tr>
-												<td><input type="number" name="loopTime" step="25" min="0" max="3000"/></td>
-											</tr>
-										<thead class="topspacer">
-											<tr>
-												<th>Accelerometer</th>
-												<th>Magnetometer</th>
-												<th>Barometer</th>
-											</tr>
-										</thead>
 										<tbody>
 											<tr>
-												<td><select name='acc_hardware'><!-- list generated here --></select></td>
-												<td><select name='mag_hardware'><!-- list generated here --></select></td>
-												<td><select name='baro_hardware'><!-- list generated here --></select></td>
+												<td name="loopTime"><label>Looptime</label><input type="number" step="25" min="0" max="3000"/></td>
+											</tr>
+										</tbody>
+										<tbody>
+											<tr>
+												<td name='acc_hardware'><label>Accelerometer</label><select><!-- list generated here --></select></td>
+												<td name='mag_hardware'><label>Magnetometer</label><select><!-- list generated here --></select></td>
+												<td name='baro_hardware'><label>Barometer</label><select><!-- list generated here --></select></td>
 											</tr>
 										</tbody>
 									</table>
@@ -705,61 +671,56 @@
 										<table class="parameter cf">
 											<thead>
 												<tr>
-													<th colspan="5">Pitch / Roll</th>
+													<th colspan="6">RC Command</th>
 												</tr>
 												<tr>
-													<th title="RC Rate">Rate</th>
-													<th title="RC Expo">Expo</th>
-													<th class="bf-only">SuperExpo</th>
-													<th>Deadband</th>
+													<th colspan="3">ROLL/PITCH</th>
 												</tr>
 											</thead>
+											<tbody>
 												<tr>
-													<td><input type="number" name="rcRate" step="0.01" min="0" max="1.00"/></td>
-													<td><input type="number" name="rcExpo" step="0.01" min="0" max="1.00"/></td>
-													<td class="bf-only"><input type="number" name="superExpoFactor" step="0.01" min="0" max="1.00"/></td>
-													<td><input type="number" name="deadband" step="1" min="0" max="32"/></td>
+													<td name="rcRate" ><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="rcExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="deadband"><label>Deadband</label><input type="number" step="1" min="0" max="32"/></td>
 												</tr>
-											<thead>
 												<tr>
-													<th colspan="2">ROLL Rate</th>
-													<th colspan="2">PITCH Rate</th>
+													<th colspan="3">YAW</th>
 												</tr>
-											</thead>
 												<tr>
-													<td colspan="2"><input type="number" name="rates[0]" step="0.01" min="0" max="1.00" /></td>
-													<td colspan="2"><input type="number" name="rates[1]" step="0.01" min="0" max="1.00" /></td>
+													<td name="rcYawRate" ><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="rcYawExpo" ><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="yaw_deadband" ><label>Deadband</label><input type="number" step="1" min="0" max="100"/></td>
 												</tr>
+											</tbody>
 										</table>
 										<table class="parameter cf">
 											<thead>
 												<tr>
-													<th colspan="5">Yaw</th>
-												</tr>
-												<tr>
-													<th title="YAW Rate">Rate</th>
-													<th title="YAW Expo">Expo</th>
-													<th title="YAW SuperExpo" class="bf-only">SuperExpo</th>
-													<th title="YAW Deadband">Deadband</th>
+													<th colspan="5">Expo Rates</th>
 												</tr>
 											</thead>
+											<tbody>
 												<tr>
-													<td><input type="number" name="rates[2]" step="0.01" min="0" max="2.55" /></td>
-													<td><input type="number" name="rcYawExpo" step="0.01" min="0" max="1.00"/></td>
-													<td class="bf-only"><input type="number" name="superExpoFactorYaw" step="0.01" min="0" max="1.00"/></td>
-													<td><input type="number" name="yaw_deadband" step="1" min="0" max="100"/></td>
+													<td name="rates[0]"><label>ROLL Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
+													<td name="rates[1]"><label>PITCH Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
+													<td name="rates[2]"><label>YAW Rate</label><input type="number" step="0.01" min="0" max="2.55" /></td>
+												</tr>
+												<tr>
+													<td name="superExpoFactor" class="bf-only"><label>ROLL/PITCH SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="superExpoFactorYaw" class="bf-only"><label>YAW SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td></td>
 												</tr>
 												<tr>
 													<td></td>
-													<td></td>
-													<td class="bf-only"><select name='superExpoYawMode' title="superExpoYawMode"><!-- list generated here --></select></td>
+													<td name='superExpoYawMode' class="bf-only"><select><!-- list generated here --></select></td>
 													<td></td>
 												</tr>
+											</tbody>
 										</table>
-										<table class="parameter noline" cellpadding="0" cellspacing="0">
+										<table class="noline" cellpadding="0" cellspacing="0">
 											<tbody class="static-features misc noline"> 
 												<tr>
-													<td><input class="feature toggle" name="rc_smoothing" title="rc_smoothing" type="checkbox"/></td>
+													<td class="feature toggle"><input name="rc_smoothing" title="rc_smoothing" type="checkbox"/></td>
 													<td><label>RC_SMOOTHING</label></td>
 													<td><span>RC Smoothing Enabled</span></td>
 												</tr>
@@ -773,30 +734,19 @@
 									</div>
 									<div class="spacer_box">
 										<table class="parameter cf">
-											<thead>
-												<tr>
-													<th>Throttle Mid</th>
-													<th>Throttle Expo</th>
-													<th>Min Throttle</th>
-													<th>Max Throttle</th>
-												</tr>
-											</thead>
-											<tr>
-												<td><input type="number" name="thrMid" step="0.01" min="0" max="1" /></td>
-												<td><input type="number" name="thrExpo" step="0.01" min="0" max="1" /></td>
-												<td><input type="number" name="minthrottle" step="10" min="1000" max="2000" /></td>
-												<td><input type="number" name="maxthrottle" step="10" min="1000" max="2000" /></td>
-											</tr>
-											<thead>
-												<tr>
-													<th colspan="2">TPA</th>
-													<th colspan="2">TPA Breakpoint</th>
-												</tr>
-											</thead>
 											<tbody>
 												<tr>
-													<td colspan="2"><input type="number" name="dynThrPID" step="0.01" min="0" max="1.00" /></td>
-													<td colspan="2"><input type="number" name="tpa-breakpoint" step="10" min="1000" max="2000" /></td>
+													<td name="thrMid"><label>Throttle Mid</label><input type="number" step="0.01" min="0" max="1" /></td>
+													<td name="thrExpo"><label>Throttle Expo</label><input type="number" step="0.01" min="0" max="1" /></td>
+													<td name="minthrottle"><label>Min Throttle</label><input type="number" step="10" min="1000" max="2000" /></td>
+													<td name="maxthrottle"><label>Max Throttle</label><input type="number" step="10" min="1000" max="2000" /></td>
+												</tr>
+											</tbody>
+											<tbody>
+												<tr>
+													<td name="dynThrPID" colspan="2"><label>TPA</label><input type="number" step="0.01" min="0" max="1.00" /></td>
+													<td name="tpa-breakpoint"><label>TPA Breakpoint</label><input type="number" step="10" min="1000" max="2000" /></td>
+													<td name="airmode_activate_throttle" class="bf-only"><label>Airmode Activate</label><input type="number" step="10" min="1000" max="2000" /></td>
 												</tr>
 											</tbody>
 										</table>
@@ -808,43 +758,30 @@
 									</div>
 									<div class="spacer_box">
 									<table class="parameter cf">
-										<thead>
+										<tbody>
 											<tr>
-												<th>Current Scale</th>
-												<th>Current Offset</th>
+												<td name="currentMeterScale"><label>Current Scale</label><input type="number" step="1" min="0" max="500" /></td>
+												<td name="currentMeterOffset"><label>Current Offset</label><input type="number" step="1" min="0" max="500" /></td>
 											</tr>
-										</thead>
+										</tbody>
+										<tbody>
 											<tr>
-												<td><input type="number" name="currentMeterScale" step="1" min="0" max="500" /></td>
-												<td><input type="number" name="currentMeterOffset" step="1" min="0" max="500" /></td>
+												<td name="vbatscale"><label>>VBat Scale</label><input type="number" step="1" min="0" max="500" /></td>
+												<td name="vbatref"><label>VBat Ref</label><input type="number" step="1" min="0" max="500" /></td>
 											</tr>
-										<thead>
+										</tbody>
+										<tbody>
 											<tr>
-												<th>VBat Scale</th>
-												<th>VBat Ref</th>
+												<td name="vbatmincellvoltage"><label>Min Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+												<td name="vbatmaxcellvoltage"><label>Max Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+												<td name="vbatwarningcellvoltage"><label>Warning Voltage</label><input type="number" step="0.01" min="0" max="2.55" /></td>
 											</tr>
-										</thead>
-											<tr>
-												<td><input type="number" name="vbatscale" step="1" min="0" max="500" /></td>
-												<td><input type="number" name="vbatref" step="1" min="0" max="500" /></td>
-											</tr>
-										<thead>
-											<tr>
-												<th>Min Cell Voltage</th>
-												<th>Max Cell Voltage</th>
-												<th>Warning Voltage</th>
-											</tr>
-										</thead>
-											<tr>
-												<td><input type="number" name="vbatmincellvoltage" step="0.01" min="0" max="1.00"/></td>
-												<td><input type="number" name="vbatmaxcellvoltage" step="0.01" min="0" max="1.00"/></td>
-												<td><input type="number" name="vbatwarningcellvoltage" step="0.01" min="0" max="2.55" /></td>
-											</tr>
+										</tbody>
 										</table>
-									<table class="parameter noline bf-only" cellpadding="0" cellspacing="0">
+									<table class="noline bf-only" cellpadding="0" cellspacing="0">
 										<tbody class="static-features misc noline"> 
 											<tr>
-												<td><input class="feature toggle" name="vbat_pid_compensation" title="vbat_pid_compensation" type="checkbox"/></td>
+												<td name="vbat_pid_compensation"><input class="feature toggle" type="checkbox"/></td>
 												<td><label>VBAT_PID_COMPENSATION</label></td>
 												<td><span>Scale PID parameters based upon current battery voltage</span></td>
 											</tr>

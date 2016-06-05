@@ -1,16 +1,17 @@
 "use strict";
 
-var FlightLogIndex;
+var FlightLogIndex,
+
+    FIRMWARE_TYPE_UNKNOWN = 0,
+    FIRMWARE_TYPE_BASEFLIGHT = 1,
+    FIRMWARE_TYPE_CLEANFLIGHT = 2,
+    FIRMWARE_TYPE_BETAFLIGHT = 3;
 
 var FlightLogParser = function(logData) {
     //Private constants:
     var
         FLIGHT_LOG_MAX_FIELDS = 128,
         FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
-        
-        FIRMWARE_TYPE_UNKNOWN = 0,
-        FIRMWARE_TYPE_BASEFLIGHT = 1,
-        FIRMWARE_TYPE_CLEANFLIGHT = 2,
         
         //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
         MAXIMUM_TIME_JUMP_BETWEEN_FRAMES = (10 * 1000000),
@@ -404,6 +405,9 @@ var FlightLogParser = function(logData) {
             case "tpa_breakpoint":
                 that.sysConfig.tpa_breakpoint = parseInt(fieldValue, 10);
             break;
+            case "airmode_activate_throttle":
+                that.sysConfig.airmode_activate_throttle = parseInt(fieldValue, 10);
+            break;
             case "superExpoFactor":
                 if(fieldValue.match(/.*,.*/)!=null) {
                     var expoParams = parseCommaSeparatedIntegers(fieldValue);
@@ -531,6 +535,9 @@ var FlightLogParser = function(logData) {
             case "features":  
                 that.sysConfig.features = parseInt(fieldValue, 10);
             break;
+            case "dynamic_pid": // Betaflight Only
+                that.sysConfig.dynamic_pid = parseInt(fieldValue, 10);
+            break;
             /****************************/
             
             case "vbatscale":
@@ -558,7 +565,8 @@ var FlightLogParser = function(logData) {
                 /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
                  * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
                  * match Baseflight so we can use Baseflight's IMU for both: */
-                if (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT) {
+                if (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
+                    that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
                     that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
                 }
             break;
@@ -567,13 +575,14 @@ var FlightLogParser = function(logData) {
             break;
             case "Firmware revision":
                 // Extract the firmware revision
-                var matches = fieldValue.match(/.*flight.* (\d+)\.(\d+)(\.(\d+))*/i);
+                var matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
                 if(matches!=null) {
-                    that.sysConfig.firmware      = matches[1] + '.' + matches[2];
-                    that.sysConfig.firmwarePatch = (matches[4] != null)?matches[4]:'';
+                    that.sysConfig.firmwareType  = FIRMWARE_TYPE_BETAFLIGHT;
+                    that.sysConfig.firmware      = parseFloat(matches[2] + '.' + matches[3]);
+                    that.sysConfig.firmwarePatch = (matches[5] != null)?parseInt(matches[5]):'';
                 } else {
-                    that.sysConfig.firmware      = '';
-                    that.sysConfig.firmwarePatch = '';
+                    that.sysConfig.firmware      = 0.0;
+                    that.sysConfig.firmwarePatch = 0;
                 }
                 that.sysConfig[fieldName] = fieldValue;
             break;

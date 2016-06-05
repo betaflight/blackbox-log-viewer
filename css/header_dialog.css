@@ -125,6 +125,25 @@ input[type="number"]::-webkit-inner-spin-button {
     float: left;
 }
 
+.header-dialog .parameter td:first-child label {
+    border-top-left-radius: 3px;
+}
+
+.header-dialog .parameter td:last-child label {
+    border-top-right-radius: 3px;
+}
+
+.header-dialog .parameter label {
+    background-color: #828885;
+    padding: 4px;
+    border-left: 0px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    font-weight: normal;
+    color: white;
+    text-align: left;
+    width:100%;
+}
+
 .header-dialog .parameter th {
     background-color: #828885;
     padding: 4px;
@@ -156,11 +175,13 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog .cf td:first-child {
     border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
 }
 
 .header-dialog .cf td:last-child {
     border-bottom-right-radius: 3px;
     border-right: 0px;
+    border-top-right-radius: 3px;
 }
 
 .header-dialog .cf input {
@@ -203,6 +224,12 @@ input[type="number"]::-webkit-inner-spin-button {
     margin-bottom: 0px;
 }
 
+.header-dialog .parameter td+input {
+    padding: 1px;
+    background-color:red;
+    border-bottom: 0px solid #ccc;
+}
+
 .header-dialog table, .header-dialog table td {
     padding: 1px;
     border-bottom: 0px solid #ccc;
@@ -229,7 +256,7 @@ input[type="number"]::-webkit-inner-spin-button {
     border-right: none;
 }
 
-.header-dialog table tr td:first-child {
+.header-dialog table:not(.parameter) tr td:first-child {
     text-align: left;
     padding-left: 5px;
 }
@@ -343,6 +370,7 @@ input[type="number"]::-webkit-inner-spin-button {
     float: right;
     width: calc(100% - 2px);
     margin-top: 10px;
+    /* padding-left: 0px; */
 }
 
 html:not(.isCF) .cf-only,
@@ -351,7 +379,11 @@ html:not(.isBF) .bf-only {
     /*visibility:hidden;*/
     opacity:0.25;
 }
-
+/*
+html:not(.isBF28) .bf-only {
+    display:none;
+}
+*/
 
 .header-dialog .top-buttons {
     float: right;
@@ -485,6 +517,7 @@ html:not(.isBF) .bf-only {
     margin-right: 11px;
     font-weight: normal;
     font-size: 13px;
+    width:90%
 }
 
 .header-dialog .features span,
