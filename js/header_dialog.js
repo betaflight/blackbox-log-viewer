@@ -3,8 +3,37 @@
 function HeaderDialog(dialog, onSave) {
 
 	// Private Variables
-	var that = this; // generic pointer back to this function
+
+
+	var that = this; 		// generic pointer back to this function
+	var activeSysConfig;	// pointer to the current system configuration
     
+	/** By default, all parameters are shown on the header
+		however, specific firmware version parameters can be hidden
+		by adding them to this variable
+	**/ 
+
+	var parameterVersion = [
+			{name:'rcYawRate'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+			{name:'superExpoFactor'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.6, max:2.7},
+			{name:'superExpoFactorYaw'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+			{name:'dynamic_pterm'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.6, max:2.7},
+			{name:'iterm_reset_offset'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.6, max:2.7},
+			{name:'airmode_activate_throttle'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+			{name:'dynamic_pid'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+			{name:'superExpoYawMode'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+	];
+
+	function isParametervalid(name) {
+
+		for(var i=0; i<parameterVersion.length; i++) {
+			if (parameterVersion[i].name == name && parameterVersion[i].type == activeSysConfig.firmwareType) {
+				return ((activeSysConfig.firmware >= parameterVersion[i].min) && (activeSysConfig.firmware <= parameterVersion[i].max));
+			}
+		}
+		return true; // default is to show parameter
+	}
+
     function renderOptions(selected, index, list) {
         var 
             option = $("<option></option>")
@@ -20,43 +49,51 @@ function HeaderDialog(dialog, onSave) {
     
     function renderSelect(name, selected, list) {
     	// Populate a select drop-down box
-    	var selectElem = $('.parameter select[name="' + name + '"]');
+    	var parameterElem = $('.parameter td[name="' + name + '"]');
+    	var selectElem = $('select', parameterElem);
 			selectElem.children().remove(); // clear list
 			for(var i=0; i<list.length; i++) {
 				selectElem.append(renderOptions(selected, i, list));
 			}
-			selectElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
+			parameterElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
+
+			parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
 
 			if(selected!=null) {
-			selectElem.removeClass('missing');
-		} else {
-			selectElem.addClass('missing');
-		}   	
+				parameterElem.removeClass('missing');
+			} else {
+				parameterElem.addClass('missing');
+			}   	
 
     }
     
     function setParameter(name, data, decimalPlaces) {
-		var nameElem = $('.parameter input[name="' + name + '"]');
+    	var parameterElem = $('.parameter td[name="' + name + '"]');
+		var nameElem = $('input', parameterElem);
 		if(data!=null) {
 			nameElem.val((data/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces));
 			nameElem.attr('decPl', decimalPlaces);
-			nameElem.attr('title', 'set '+name+'='+data);
-			nameElem.removeClass('missing');
+			parameterElem.attr('title', 'set '+name+'='+data);
+			parameterElem.removeClass('missing');
 		} else {
-			nameElem.addClass('missing');
+			parameterElem.addClass('missing');
 		}
+		parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
+
 	}
 
 	function setCheckbox(name, data) {
-		var nameElem = $('.parameter input[name="' + name + '"]');
+    	var parameterElem = $('.parameter td[name="' + name + '"]');
+		var nameElem = $('input', parameterElem);
 		if(data!=null) {
 			var state = (data == 1);
 			nameElem.prop('checked', state);
-			nameElem.attr('title', 'set '+name+'='+data);
+			parameterElem.attr('title', 'set '+name+'='+data);
 			nameElem.closest('tr').removeClass('missing');
 		} else {
 			nameElem.closest('tr').addClass('missing');
 		}
+		parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
 	}    
 
 	function populatePID(name, data) {
@@ -111,7 +148,10 @@ function HeaderDialog(dialog, onSave) {
 		return false;
 	}
 
-	function builtFeaturesList(value) {
+	function builtFeaturesList(sysConfig) {
+
+		var value = sysConfig.features;
+
         // generate features
         var features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM', description: 'PPM Receiver Selected'},
@@ -137,7 +177,16 @@ function HeaderDialog(dialog, onSave) {
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
             {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Transponder enabled'}
         ];
-        
+
+
+        // Add specific features for betaflight v2.8 onwards....
+        if (sysConfig.firmware >=2.8) {
+        	features.push(
+        	            {bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'},
+            			{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
+						);
+        }
+
         var radioGroups = [];
         
         var features_e = $('.features');
@@ -234,33 +283,35 @@ function HeaderDialog(dialog, onSave) {
 
     function renderSysConfig(sysConfig) { 
     
+		activeSysConfig = sysConfig; // Store the current system configuration
+
     	// Update the log header
 
     	$('h5.modal-title-revision').text( ((sysConfig['Firmware revision']!=null)?(' Rev : '  + sysConfig['Firmware revision']):''));
     	$('h5.modal-title-date').text(     ((sysConfig['Firmware date']!=null)    ?(' Date : ' + sysConfig['Firmware date']    ):''));
     
-		// check if this is betaflight or cleanflight
-		if(sysConfig['Firmware revision']!=null) {
-			var matches=sysConfig['Firmware revision'].match(/.*(Cleanflight|Betaflight).*/);
-			if(matches!=null) { // This is either Cleanflight or Betaflight
-				$('.header-dialog-toggle').hide();			
-				// The firmware is present is it betaflight ?
-				matches=sysConfig['Firmware revision'].match(/.*(Betaflight).*/);
-				if(matches!=null) { // Found, its Betaflight
+		switch(sysConfig.firmwareType) {
+			case FIRMWARE_TYPE_BETAFLIGHT:
+					$('.header-dialog-toggle').hide(); // selection button is not required
 					$('html').addClass('isBF');
 					$('html').removeClass('isCF');
-				} else { // Assume it really is Cleanflight
-					$('html').removeClass('isBF');
-					$('html').addClass('isCF');							
-				}
-			} else { // Firmware type unknown, default to cleanflight
-					 // but give the user a button to change it
+					// add the version indicator
+					//(sysConfig.firmware >= 2.8)?$('html').addClass('isBF28'):$('html').removeClass('isBF28');
+					break;
+			case FIRMWARE_TYPE_CLEANFLIGHT:
+					$('.header-dialog-toggle').hide(); // selection button is not required
+					$('html').removeClass('isBF'); 
+					//$('html').removeClass('isBF28');
+					$('html').addClass('isCF');			
+					break;
+			default:
 				$('html').removeClass('isBF');
+				//$('html').removeClass('isBF28');
 				$('html').addClass('isCF');							
 				$('.header-dialog-toggle').text('Cleanflight');
 
 				// Toggle Button
-				$('.header-dialog-toggle').show();
+				$('.header-dialog-toggle').show(); // Selection button is required
 				$('.header-dialog-toggle').click( function() {
 					if($('html').hasClass('isCF')) {
 						$('html').addClass('isBF');
@@ -273,7 +324,6 @@ function HeaderDialog(dialog, onSave) {
 					}
 				});
 			}
-		}
 		
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE); 
 
@@ -305,6 +355,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('currentMeterOffset'		,sysConfig.currentMeterOffset,0);
         setParameter('currentMeterScale'		,sysConfig.currentMeterScale,0);
         setParameter('rcExpo'					,sysConfig.rcExpo,2);
+        setParameter('rcYawRate'				,sysConfig.rcYawRate,2);
         setParameter('rcYawExpo'				,sysConfig.rcYawExpo,2);
         setParameter('thrMid'					,sysConfig.thrMid,2);
         setParameter('thrExpo'					,sysConfig.thrExpo,2);
@@ -331,11 +382,13 @@ function HeaderDialog(dialog, onSave) {
         setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,2);
         setParameter('acc_lpf_hz'				,sysConfig.acc_lpf_hz,2);
         setParameter('acc_cut_hz'				,sysConfig.acc_cut_hz,2);
+	    setParameter('airmode_activate_throttle',sysConfig.airmode_activate_throttle, 0);
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
-        
+    	renderSelect('dynamic_pid'				,sysConfig.dynamic_pid, OFF_ON);
+	            
 		/* Packed Flags */
 
-        builtFeaturesList(sysConfig.features);
+        builtFeaturesList(sysConfig);
 
 		/* Hardware selections */
         
