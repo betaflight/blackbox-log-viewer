@@ -1,5 +1,8 @@
 "use strict";
 
+// The audioContext is global scoped and only created once
+var audioCtx = new AudioContext();
+
 function FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options) {
 
 var
@@ -28,7 +31,7 @@ var that = this;
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 try {
 	var frameCount = 4096;
-	var audioCtx = new AudioContext();
+//	var audioCtx = new AudioContext();
 	var audioBuffer   	= audioCtx.createBuffer(1, frameCount, audioCtx.sampleRate);
 	var source        	= audioCtx.createBufferSource();
 		source.buffer 	= audioBuffer; 
@@ -277,9 +280,16 @@ try {
 			draw(); // draw the analyser on the canvas....
 	}
 	} catch (e) {
-		console.log('Failed to create analyser');
+		console.log('Failed to create analyser... error:' + e);
 	};
 
-	// execute the resize function once so that the canvas gets a valid setup
+	// release the hardware context associated with the analyser
+	this.closeAnalyserHardware = function() {
+		try {
+			if(audioCtx!=null) audioCtx.close();
+		} catch(e) {
+			console.log('Failed to close analyser... error:' + e);
+		}
+	}
 
 }
