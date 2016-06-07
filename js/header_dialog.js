@@ -22,6 +22,11 @@ function HeaderDialog(dialog, onSave) {
 			{name:'airmode_activate_throttle'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
 			{name:'dynamic_pid'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
 			{name:'superExpoYawMode'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+            {name:'rollPitchItermResetRate'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+            {name:'yawItermResetRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+            {name:'rollPitchItermIgnoreRate'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+            {name:'yawItermIgnoreRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+
 	];
 
 	function isParametervalid(name) {
@@ -373,6 +378,8 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('dynamic_pterm'			,sysConfig.dynamic_pterm, OFF_ON);
         setParameter('rollPitchItermResetRate'	,sysConfig.rollPitchItermResetRate,0);
         setParameter('yawItermResetRate'		,sysConfig.yawItermResetRate,0);
+        setParameter('rollPitchItermIgnoreRate'	,sysConfig.rollPitchItermIgnoreRate,0);
+        setParameter('yawItermIgnoreRate'		,sysConfig.yawItermIgnoreRate,0);
         setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,2);
         setParameter('dterm_cut_hz'				,sysConfig.dterm_cut_hz,2);
         setParameter('iterm_reset_offset'		,sysConfig.iterm_reset_offset,0);
