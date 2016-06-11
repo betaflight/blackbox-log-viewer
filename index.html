@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/header_dialog.css">
 <link rel="stylesheet" href="css/keys_dialog.css">
+<link rel="stylesheet" href="css/user_settings_dialog.css">
 
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
@@ -154,6 +155,9 @@
                 <h4>View</h4>
                 <div>
                     <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default open-user-settings-dialog" title="Show User Settings">
+                            <span class="glyphicon glyphicon-cog"></span>
+                        </button>
                         <button type="button" class="btn btn-default open-header-dialog" title="View/hide header">
                             <span class="glyphicon glyphicon-info-sign"></span>
                         </button>
@@ -1031,6 +1035,47 @@
         </div>
     </div>
 
+    <div class="modal fade user-settings-dialog" id="dlgUserSettings">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Advanced User Settings</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="pane-user-settings form-horizontal">
+                        <div class="form-group">
+							<label class="col-sm-3 control-label">Mixer Settings</label>
+								</tr>
+							</table>
+                            <div class="col-sm-9">
+                               <label class="option">Custom<input class="custom_mixes ios-switch green" type="checkbox"/><div><div></div></div></label>
+                            </div>
+                            <div class="custom_mixes_group col-sm-9">
+								<table>
+									<tr>
+										<td><label>Mixer Type</label><select class="mixerList"><!-- list generated here --></select></td>	
+										<td class="mixerPreview"><img src="./images/motor_order/quad_x.svg"/></td>
+									</tr>
+								</table>
+								<table class="motorList">
+									<!-- list generated here -->
+								</table>
+								<p>The custom mixer settings ONLY affect the craft icon that is displayed over the log. Please set the closest craft type (e.g. QuadX)
+								and then identify which motors are connected to which motor outputs. If you deselect the custom setting, then the viewer will function
+								as per the original method (i.e. it will autocalculate the craft model based upon the number of motors found in the log.)
+								</p>
+							</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default user-settings-dialog-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary user-settings-dialog-save" data-dismiss="modal">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/vendor/jquery-1.11.3.min.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
@@ -1059,6 +1104,7 @@
     <script src="js/graph_spectrum.js"></script>
     <script src="js/header_dialog.js"></script>
     <script src="js/keys_dialog.js"></script>
+    <script src="js/user_settings_dialog.js"></script>
     <script src="js/seekbar.js"></script>
     <script src="js/video_export_dialog.js"></script>
     <script src="js/flightlog_video_renderer.js"></script>
