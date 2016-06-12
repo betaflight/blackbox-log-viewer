@@ -290,7 +290,11 @@ input[type="number"]::-webkit-inner-spin-button {
 	background:rgba(255,0,0,0.2);
 }
 
-.header-dialog .static-features table td {
+.header-dialog .static-features span {
+    /* background-color:yellow; */
+}
+
+.header-dialog .static-features table {
     padding: 1px;
     border-right: 1px solid #ccc;
 }
@@ -517,7 +521,7 @@ html:not(.isBF28) .bf-only {
     margin-right: 11px;
     font-weight: normal;
     font-size: 13px;
-    width:90%
+    width:90%;
 }
 
 .header-dialog .features span,

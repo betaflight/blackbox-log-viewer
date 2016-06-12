@@ -897,12 +897,15 @@ function FlightLog(logData) {
         iframeDirectory = logIndexes.getIntraframeDirectory(index);
         
         parser.parseHeader(logIndexes.getLogBeginOffset(index), logIndexes.getLogBeginOffset(index + 1));
+
+        // Hide the header button if we are not using betaflight
+        (this.getSysConfig().firmwareType==FIRMWARE_TYPE_BETAFLIGHT)?$(".open-header-dialog").show():$(".open-header-dialog").hide();
         
         buildFieldNames();
         
         estimateNumMotors();
         estimateNumCells();
-        
+
         return true;
     };
 }

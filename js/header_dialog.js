@@ -88,7 +88,7 @@ function HeaderDialog(dialog, onSave) {
 	}
 
 	function setCheckbox(name, data) {
-    	var parameterElem = $('.parameter td[name="' + name + '"]');
+    	var parameterElem = $('.static-features td[name="' + name + '"]');
 		var nameElem = $('input', parameterElem);
 		if(data!=null) {
 			var state = (data == 1);
@@ -219,13 +219,13 @@ function HeaderDialog(dialog, onSave) {
                         + feature_tip_html + '</td></tr>');
                 radioGroups.push(features[i].group);
             } else {
-                row_e = $('<tr><td><input class="feature toggle"'
+                row_e = $('<tr><td><label class="option"><input class="feature '
                         + i
-                        + '" name="'
+                        + ' ios-switch green" name="'
                         + features[i].name
                         + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
                         + features[i].name
-                        + '" type="checkbox" bit="'+ i +'" /></td><td><label for="feature-'
+                        + '" type="checkbox" bit="'+ i +'" /><div><div></div></div></label></td><td><label for="feature-'
                         + i
                         + '">'
                         + features[i].name
