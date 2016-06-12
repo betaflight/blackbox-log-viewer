@@ -1,5 +1,8 @@
 "use strict";
 
+// Global Level Variables
+var userSettings = {};
+
 function BlackboxLogViewer() {
     function supportsRequiredAPIs() {
         return window.File && window.FileReader && window.FileList && Modernizr.canvas;
@@ -41,6 +44,7 @@ function BlackboxLogViewer() {
         
         // JSON graph configuration:
         graphConfig = {},
+        
 
         offsetCache = [], // Storage for the offset cache (last 20 files)
         currentOffsetCache = {log:null, index:null, video:null, offset:null},
@@ -181,7 +185,7 @@ function BlackboxLogViewer() {
             // update time field on status bar
             $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
             if(hasMarker) {
-                $("#status-bar .marker-offset").text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms');
+                $("#status-bar .marker-offset").text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms ' + (1000000/(currentBlackboxTime-markerTime)).toFixed(0) + "Hz");
             }
 
             
@@ -698,6 +702,16 @@ function BlackboxLogViewer() {
             graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
         }
     });
+    
+    prefs.get('userSettings', function(item) {
+		if(item) {
+	    			userSettings = item;
+				 } else {
+					 userSettings = { // default settings
+							 		customMix: null
+					 	 			};
+				 }
+    	});
 
     // Workspace save/restore to/from file.
     function saveWorkspaces(file) {
@@ -1070,6 +1084,19 @@ function BlackboxLogViewer() {
             }),
 
             keysDialog = new KeysDialog($("#dlgKeysDialog")),
+            
+            userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), function(newSettings) {
+	            userSettings = newSettings;
+
+	            prefs.set('userSettings', newSettings);
+
+	            // refresh the craft model
+	            if(graph!=null) {
+	                graph.initializeCraftModel();
+	                invalidateGraph();
+	            }
+
+	        }),
 
 	        exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
 	            videoConfig = newConfig;
@@ -1094,6 +1121,12 @@ function BlackboxLogViewer() {
             e.preventDefault();
             
             keysDialog.show();
+        });
+
+        $(".open-user-settings-dialog").click(function(e) {
+            e.preventDefault();
+            
+            userSettingsDialog.show(flightLog, userSettings);
         });
 
         $("#status-bar .marker-offset").click(function(e) {
