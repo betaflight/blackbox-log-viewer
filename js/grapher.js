@@ -750,12 +750,20 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                     centerX = canvas.width / 2;
 
                 canvasContext.strokeStyle = 'rgba(255, 64, 64, 0.2)';
-                canvasContext.lineWidth = 10;
+                canvasContext.lineWidth = 11;
 
                 canvasContext.beginPath();
                 canvasContext.moveTo(centerX, 0);
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
+
+                canvasContext.strokeStyle = 'rgba(255, 128, 128, 0.7)';
+                canvasContext.lineWidth = 1;
+                canvasContext.beginPath();
+                canvasContext.moveTo(centerX, 0);
+                canvasContext.lineTo(centerX, canvas.height);
+                canvasContext.stroke();
+		         
             }
             
             // Draw events

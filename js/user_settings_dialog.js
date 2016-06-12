@@ -139,16 +139,20 @@ function UserSettingsDialog(dialog, onSave) {
         mixer_list_e.append('<option value="' + (i + 1) + '">' + mixerList[i].name + '</option>');
     }
 
- 	// Buttons and Selectors
-    
-    $('select.mixerList').change(function () {
-        var val = parseInt($(this).val());
+	function mixerListSelection(val) {
 
+		if(val===null) val=3; // default for invalid values
         mixerConfiguration = val;
 
         $('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
         
         buildMotorList(mixerConfiguration); // rebuild the motor list based upon the current selection
+	}
+
+ 	// Buttons and Selectors
+    
+    $('select.mixerList').change(function () {
+		mixerListSelection(parseInt($(this).val()));
     });
 
     // Handle the mixer custom toggle
@@ -187,7 +191,7 @@ function UserSettingsDialog(dialog, onSave) {
     			$(".custom_mixes_group").show(300);
     		}
 
-    		mixer_list_e.val(mixerConfiguration).change(); // select current mixer configuration
+    		mixerListSelection(mixerConfiguration); // select current mixer configuration
     		
             dialog.modal('show');
 
