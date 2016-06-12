@@ -22,6 +22,11 @@ function HeaderDialog(dialog, onSave) {
 			{name:'airmode_activate_throttle'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
 			{name:'dynamic_pid'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
 			{name:'superExpoYawMode'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+            {name:'rollPitchItermResetRate'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+            {name:'yawItermResetRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
+            {name:'rollPitchItermIgnoreRate'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+            {name:'yawItermIgnoreRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+
 	];
 
 	function isParametervalid(name) {
@@ -83,7 +88,7 @@ function HeaderDialog(dialog, onSave) {
 	}
 
 	function setCheckbox(name, data) {
-    	var parameterElem = $('.parameter td[name="' + name + '"]');
+    	var parameterElem = $('.static-features td[name="' + name + '"]');
 		var nameElem = $('input', parameterElem);
 		if(data!=null) {
 			var state = (data == 1);
@@ -214,13 +219,13 @@ function HeaderDialog(dialog, onSave) {
                         + feature_tip_html + '</td></tr>');
                 radioGroups.push(features[i].group);
             } else {
-                row_e = $('<tr><td><input class="feature toggle"'
+                row_e = $('<tr><td><label class="option"><input class="feature '
                         + i
-                        + '" name="'
+                        + ' ios-switch green" name="'
                         + features[i].name
                         + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
                         + features[i].name
-                        + '" type="checkbox" bit="'+ i +'" /></td><td><label for="feature-'
+                        + '" type="checkbox" bit="'+ i +'" /><div><div></div></div></label></td><td><label for="feature-'
                         + i
                         + '">'
                         + features[i].name
@@ -373,6 +378,8 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('dynamic_pterm'			,sysConfig.dynamic_pterm, OFF_ON);
         setParameter('rollPitchItermResetRate'	,sysConfig.rollPitchItermResetRate,0);
         setParameter('yawItermResetRate'		,sysConfig.yawItermResetRate,0);
+        setParameter('rollPitchItermIgnoreRate'	,sysConfig.rollPitchItermIgnoreRate,0);
+        setParameter('yawItermIgnoreRate'		,sysConfig.yawItermIgnoreRate,0);
         setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,2);
         setParameter('dterm_cut_hz'				,sysConfig.dterm_cut_hz,2);
         setParameter('iterm_reset_offset'		,sysConfig.iterm_reset_offset,0);
