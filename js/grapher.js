@@ -218,77 +218,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         }
     }
     
-    /**
-     * Examine the log metadata to determine the layout of motors for the 2D craft model. Returns the craft parameters
-     * object.
-     */
-    function decide2DCraftParameters() {
-        var
-            craftParameters = {};
-        
-        switch (idents.motorFields.length) {
-            case 3:
-                craftParameters.motors = [
-                    {
-                        x: 0,
-                        y: 1,
-                        direction: -1,
-                        color: idents.motorColors[0]
-                    }, {
-                        x: 0.71,
-                        y: -0.71,
-                        direction: -1,
-                        color: idents.motorColors[1]
-                    }, {
-                        x: -0.71,
-                        y: -0.71,
-                        direction: -1,
-                        color: idents.motorColors[2]
-                    }
-                ];
-            break;
-            case 4:
-                craftParameters.motors = [
-                    {
-                        x: 0.71,
-                        y: 0.71,
-                        direction: 1,
-                        color: idents.motorColors[0]
-                    }, {
-                        x: 0.71,
-                        y: -0.71,
-                        direction: -1,
-                        color: idents.motorColors[1]
-                    }, {
-                        x: -0.71,
-                        y: 0.71,
-                        direction: -1,
-                        color: idents.motorColors[2]
-                    }, {
-                        x: -0.71,
-                        y: -0.71,
-                        direction: 1,
-                        color: idents.motorColors[3]
-                    }
-                ];
-            break;
-            default:
-                craftParameters.motors = [];
-            
-                for (var i = 0; i < idents.motorFields.length; i++) {
-                    craftParameters.motors.push({
-                        x: Math.cos(i / idents.motorFields.length * Math.PI * 2),
-                        y: Math.sin(i / idents.motorFields.length * Math.PI * 2),
-                        direction: Math.pow(-1, i),
-                        color: idents.motorColors[i]
-                    });
-                }
-            break;
-        }
-        
-        return craftParameters;
-    }
-    
     function drawCommandSticks(frame) {
         var
             // The total width available to draw both sticks in:
@@ -742,23 +671,20 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     this.resize = function(width, height) {
         canvas.width = width;
         canvas.height = height;
-        
+            
+        var craftSize = Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION * 2, canvas.width / 2.5);
+
         if (craft2D) {
-            craft2D.resize(canvas.height / 4);
-        } else if (craft3D) {
-            var
-                craftSize;
-            
-            craftSize = Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION * 2, canvas.width / 2.5);
-            
+            craft2D.resize(craftSize, craftSize);
+        } else {
             craft3D.resize(craftSize, craftSize);
-            
-            // Recenter the craft canvas in the top left corner
-            $(craftCanvas).css({
-                left: Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2, canvas.width / 4 - craftSize / 2) + "px",
-                top: (canvas.height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2) + "px",
-            });
         }
+
+        // Recenter the craft canvas in the top left corner
+        $(craftCanvas).css({
+            left: Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2, canvas.width / 4 - craftSize / 2) + "px",
+            top: (canvas.height * CRAFT_POSITION_Y_PROPORTION - craftSize / 2) + "px",
+        });
         
         if(analyser!=null) analyser.resize();
 
@@ -857,14 +783,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 if (options.drawCraft == '3D') {
                     craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
                 } else if (options.drawCraft == '2D') {
-                    canvasContext.save();
-                
-                    canvasContext.translate(0.25 * canvas.width, 0.20 * canvas.height);
-                    canvasContext.font = drawingParams.fontSizeCurrentValueLabel + "pt " + DEFAULT_FONT_FACE;
+//                   canvasContext.font = drawingParams.fontSizeCurrentValueLabel + "pt " + DEFAULT_FONT_FACE;
 
-                    craft2D.render(canvasContext, centerFrame, flightLog.getMainFieldIndexes());
+                    craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
                     
-                    canvasContext.restore();
                 }
             }
             
@@ -931,7 +853,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         flightLog.setFieldSmoothing(smoothing);
     }
     
-    function initializeCraftModel() {
+    this.initializeCraftModel = function() {
         // Ensure drawCraft is a valid value
         if (["2D", "3D"].indexOf(options.drawCraft) == -1) {
             options.drawCraft = false;
@@ -952,11 +874,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         }
         
         if (options.drawCraft == '2D') {
-            if (craftCanvas) {
-                craftCanvas.width = 0;
-                craftCanvas.height = 0;
-            }
-            craft2D = new Craft2D(flightLog, canvas, idents.motorColors, decide2DCraftParameters());
+            craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
         }
     }
     
@@ -1009,7 +927,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     identifyFields();
 
-    initializeCraftModel();
+    this.initializeCraftModel();
     
     /* Create the FlightLogAnalyser object */
 	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options);

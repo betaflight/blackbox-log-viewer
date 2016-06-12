@@ -9,9 +9,24 @@ function Craft3D(flightLog, canvas, propColors) {
         HUB_RADIUS = ARM_LENGTH * 0.3,
 
         CRAFT_DEPTH = ARM_LENGTH * 0.08,
-        ARROW_DEPTH = CRAFT_DEPTH * 0.5,
+        ARROW_DEPTH = CRAFT_DEPTH * 0.5;
         
-        numMotors = propColors.length,
+    var customMix;
+        
+        if(userSettings != null) {
+            customMix = userSettings.customMix;
+        } else {
+            customMix = null;            
+        }
+
+    var numMotors; 
+        if(customMix===null) {
+            numMotors = propColors.length;
+        } else {
+            numMotors = customMix.motorOrder.length;
+        }       
+
+    var
         propRadius = numMotors == 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
         
         craftMaterial = new THREE.MeshLambertMaterial({ color : 0xA0A0A0 }),
@@ -192,8 +207,7 @@ function Craft3D(flightLog, canvas, propColors) {
         propShells = new Array(numMotors),
         
         motorOrder,
-        sysInfo = flightLog.getSysConfig(),
-        
+        sysInfo = flightLog.getSysConfig(),        
         yawOffset;
     
     // The craft object will hold the props and craft body
@@ -215,9 +229,12 @@ function Craft3D(flightLog, canvas, propColors) {
 
     camera.position.y = 0;
     camera.position.z = 5;
+
+    for (var i = 0; i < propColors.length; i++) {
+        propMaterials[i] = new THREE.MeshLambertMaterial({color: propColors[i]});
+    }
     
     for (var i = 0; i < numMotors; i++) {
-        propMaterials[i] = new THREE.MeshLambertMaterial({color: propColors[i]});
 
         var propShell = new THREE.Mesh(propGeometry[propGeometry.length - 1], propShellMaterial);
         
@@ -231,29 +248,34 @@ function Craft3D(flightLog, canvas, propColors) {
     }
     
     // Motor numbering in counter-clockwise order starting from the 3 o'clock position
-    switch (numMotors) {
-        case 3:
-            motorOrder = [0, 1, 2]; // Put motor 1 at the right
-            yawOffset = -Math.PI / 2;
-        break;
-        case 4:
-            motorOrder = [1, 3, 2, 0]; // Numbering for quad-plus
-            yawOffset = Math.PI / 4; // Change from "plus" orientation to "X"
-        break;
-        case 6:
-            motorOrder = [4, 1, 3, 5, 2, 0];
-            yawOffset = 0;
-        break;
-        case 8:
-            motorOrder = [5, 1, 4, 0, 7, 3, 6, 2];
-            yawOffset = Math.PI / 8; // Put two motors at the front
-        break;
-        default:
-            motorOrder = new Array(numMotors);
-            for (var i = 0; i < numMotors; i++) {
-                motorOrder[i] = i;
-            }
-            yawOffset = 0;
+    if(customMix===null) {
+        switch (numMotors) {
+            case 3:
+                motorOrder = [0, 1, 2]; // Put motor 1 at the right
+                yawOffset = -Math.PI / 2;
+            break;
+            case 4:
+                motorOrder = [1, 3, 2, 0]; // Numbering for quad-plus
+                yawOffset = Math.PI / 4; // Change from "plus" orientation to "X"
+            break;
+            case 6:
+                motorOrder = [4, 1, 3, 5, 2, 0];
+                yawOffset = 0;
+            break;
+            case 8:
+                motorOrder = [5, 1, 4, 0, 7, 3, 6, 2];
+                yawOffset = Math.PI / 8; // Put two motors at the front
+            break;
+            default:
+                motorOrder = new Array(numMotors);
+                for (var i = 0; i < numMotors; i++) {
+                    motorOrder[i] = i;
+                }
+                yawOffset = 0;
+        }
+    } else {
+        motorOrder = customMix.motorOrder;
+        yawOffset  = customMix.yawOffset;
     }
     
     // Rotate the craft mesh and props to bring the board's direction arrow to the right direction
