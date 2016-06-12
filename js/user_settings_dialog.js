@@ -144,7 +144,9 @@ function UserSettingsDialog(dialog, onSave) {
 		if(val===null) val=3; // default for invalid values
         mixerConfiguration = val;
 
-        $('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
+		if(val>0 && val <= mixerList.length) {
+				$('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
+			}
         
         buildMotorList(mixerConfiguration); // rebuild the motor list based upon the current selection
 	}
