@@ -472,6 +472,12 @@ var FlightLogParser = function(logData) {
             case "yawItermResetRate": // Betaflight Only
                 that.sysConfig.yawItermResetRate = parseInt(fieldValue, 10);
             break;
+            case "rollPitchItermIgnoreRate": // Betaflight Only
+                that.sysConfig.rollPitchItermIgnoreRate = parseInt(fieldValue, 10);
+            break;
+            case "yawItermIgnoreRate": // Betaflight Only
+                that.sysConfig.yawItermIgnoreRate = parseInt(fieldValue, 10);
+            break;
             case "dterm_lpf_hz": // Betaflight Only
                 that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10);
             break;
