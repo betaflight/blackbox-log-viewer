@@ -3,7 +3,6 @@
 function UserSettingsDialog(dialog, onSave) {
 
 	// Private Variables
-	var that = this; // generic pointer back to this function
 	var mixerConfiguration = 3; // mixerConfiguration starts at 1;
 	
     var customMix = null;
@@ -65,7 +64,7 @@ function UserSettingsDialog(dialog, onSave) {
     	return settings;
     }
         
-    var availableMotors; // motors that appear in the log file
+    var availableMotors =[]; // motors that appear in the log file
     function getAvailableMotors(flightLog) {
     	
         var fieldNames = flightLog.getMainFieldNames();
@@ -141,10 +140,13 @@ function UserSettingsDialog(dialog, onSave) {
 
 	function mixerListSelection(val) {
 
-		if(val===null) val=3; // default for invalid values
+		if(val==null) val=3; // default for invalid values
+
         mixerConfiguration = val;
 
-        $('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
+		if(val>0 && val <= mixerList.length) {
+				$('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
+			}
         
         buildMotorList(mixerConfiguration); // rebuild the motor list based upon the current selection
 	}
@@ -195,6 +197,6 @@ function UserSettingsDialog(dialog, onSave) {
     		
             dialog.modal('show');
 
-    }
+    };
 
 }
