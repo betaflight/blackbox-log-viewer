@@ -267,7 +267,7 @@ function BlackboxLogViewer() {
     }
     
     function renderLogFileInfo(file) {
-        $(".log-filename").text("Cleanflight Blackbox Explorer " + file.name);
+        $(".log-filename").text("Blackbox Explorer " + file.name);
         
         var 
             logIndexContainer = $(".log-index"),

@@ -368,9 +368,15 @@ var FlightLogParser = function(logData) {
                 switch (fieldValue) {
                     case "Cleanflight":
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
+                        $('html').removeClass('isBaseF');
+    					$('html').addClass('isCF');
+                        $('html').removeClass('isBF');
                     break;
                     default:
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
+                        $('html').addClass('isBaseF');
+    					$('html').removeClass('isCF');
+                        $('html').removeClass('isBF');
                 }
             break;
             case "minthrottle":
@@ -586,6 +592,9 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.firmwareType  = FIRMWARE_TYPE_BETAFLIGHT;
                     that.sysConfig.firmware      = parseFloat(matches[2] + '.' + matches[3]);
                     that.sysConfig.firmwarePatch = (matches[5] != null)?parseInt(matches[5]):'';
+                        $('html').removeClass('isBaseF');
+    					$('html').removeClass('isCF');
+                        $('html').addClass('isBF');
                 } else {
                     that.sysConfig.firmware      = 0.0;
                     that.sysConfig.firmwarePatch = 0;

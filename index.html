@@ -24,7 +24,9 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand log-filename" href="#">Cleanflight Blackbox Explorer</a>
+                <img src="./images/bf_logo_white.svg" class="isBF navbar-brand"/>
+                <img src="./images/cf_logo_white.svg" class="isCF navbar-brand"/>
+                <a class="navbar-brand log-filename" href="#">Blackbox Explorer</a>
             </div>
             <!-- <div id="navbar" class="navbar-collapse collapse"> -->
                 <div class="navbar-form navbar-right" role="form">
@@ -605,7 +607,7 @@
 									<table class="bf-only" cellpadding="0" cellspacing="0">
 										<tbody class="static-features noline"> 
 											<tr>
-												<td name="gyro_cal_on_first_arm"><label class="option"><input class="ios-switch green" type="checkbox"/><div><div></div></div></label></td>
+												<td name="gyro_cal_on_first_arm"><label class="option"><input class="ios-switch" type="checkbox"/><div><div></div></div></label></td>
 												<td><label>GYRO_CAL_ON_FIRST_ARM</label></td>
 												<td><span>Calibrate Gyro on first arm</span></td>
 											</tr>
@@ -726,7 +728,7 @@
 										<table class="noline" cellpadding="0" cellspacing="0">
 											<tbody class="static-features misc noline"> 
 												<tr>
-													<td name="rc_smoothing"><label class="option"><input class="ios-switch green" type="checkbox"/><div><div></div></div></label></td>
+													<td name="rc_smoothing"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label></td>
 													<td><label>RC_SMOOTHING</label></td>
 													<td><span>RC Smoothing Enabled</span></td>
 												</tr>
@@ -787,7 +789,7 @@
 									<table class="noline bf-only" cellpadding="0" cellspacing="0">
 										<tbody class="static-features misc noline"> 
 											<tr>
-												<td name="vbat_pid_compensation"><label class="option"><input class="ios-switch green" type="checkbox"/><div><div></div></div></label>
+												<td name="vbat_pid_compensation"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label>
 												<td><label>VBAT_PID_COMPENSATION</label></td>
 												<td><span>Scale PID parameters based upon current battery voltage</span></td>
 											</tr>
@@ -1050,7 +1052,7 @@
 								</tr>
 							</table>
                             <div class="col-sm-9">
-                               <label class="option">Custom<input class="custom_mixes ios-switch green" type="checkbox"/><div><div></div></div></label>
+                               <label class="option">Custom<input class="custom_mixes ios-switch orange" type="checkbox"/><div><div></div></div></label>
                             </div>
                             <div class="custom_mixes_group col-sm-9">
 								<table>
