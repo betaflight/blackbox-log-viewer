@@ -217,6 +217,40 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             }
         }
     }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof stroke == 'undefined') {
+        stroke = true;
+      }
+      if (typeof radius === 'undefined') {
+        radius = 5;
+      }
+      if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      } else {
+        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+        for (var side in defaultRadius) {
+          radius[side] = radius[side] || defaultRadius[side];
+        }
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) {
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.stroke();
+      }
+    }
     
     function drawCommandSticks(frame) {
         var
@@ -228,7 +262,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             yawStickMax = 500,
             
             stickColor = "rgba(255,102,102,1.0)",
-            stickAreaColor = "rgba(76,76,76,0.8)",
+            stickAreaColor = "rgba(76,76,76,0.2)",
             crosshairColor = "rgba(191,191,191,0.5)";
         
         var
@@ -267,10 +301,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         //For each stick
         for (var i = 0; i < 2; i++) {
             //Fill in background
-            canvasContext.beginPath();
             canvasContext.fillStyle = stickAreaColor;
-            canvasContext.rect(-stickSurroundRadius, -stickSurroundRadius, stickSurroundRadius * 2, stickSurroundRadius * 2);
-            canvasContext.fill();
+            roundRect(canvasContext, -stickSurroundRadius, -stickSurroundRadius, 
+                                      stickSurroundRadius * 2, stickSurroundRadius * 2, 10, true, false);
 
             //Draw crosshair
             canvasContext.beginPath();
