@@ -221,7 +221,7 @@ function HeaderDialog(dialog, onSave) {
             } else {
                 row_e = $('<tr><td><label class="option"><input class="feature '
                         + i
-                        + ' ios-switch green" name="'
+                        + ' ios-switch" name="'
                         + features[i].name
                         + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
                         + features[i].name
@@ -298,21 +298,13 @@ function HeaderDialog(dialog, onSave) {
 		switch(sysConfig.firmwareType) {
 			case FIRMWARE_TYPE_BETAFLIGHT:
 					$('.header-dialog-toggle').hide(); // selection button is not required
-					$('html').addClass('isBF');
-					$('html').removeClass('isCF');
 					// add the version indicator
 					//(sysConfig.firmware >= 2.8)?$('html').addClass('isBF28'):$('html').removeClass('isBF28');
 					break;
 			case FIRMWARE_TYPE_CLEANFLIGHT:
 					$('.header-dialog-toggle').hide(); // selection button is not required
-					$('html').removeClass('isBF'); 
-					//$('html').removeClass('isBF28');
-					$('html').addClass('isCF');			
 					break;
 			default:
-				$('html').removeClass('isBF');
-				//$('html').removeClass('isBF28');
-				$('html').addClass('isCF');							
 				$('.header-dialog-toggle').text('Cleanflight');
 
 				// Toggle Button
