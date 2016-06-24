@@ -499,6 +499,7 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.destroy();
         }
+
         
         if((flightLog.getSysConfig().loopTime             != null) &&
             (flightLog.getSysConfig().frameIntervalPNum   != null) &&
@@ -697,14 +698,6 @@ function BlackboxLogViewer() {
             graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
         }
     });
-    
-    prefs.get('userSettings', function(item) {
-		if(item) {
-	    			userSettings = item;
-				 } else {
-					 userSettings = null;
-				 }
-    	});
 
     // Workspace save/restore to/from file.
     function saveWorkspaces(file) {
@@ -1078,7 +1071,19 @@ function BlackboxLogViewer() {
 
             keysDialog = new KeysDialog($("#dlgKeysDialog")),
             
-            userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), function(newSettings) {
+            userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), 
+            function(defaultSettings) { // onLoad
+    
+            prefs.get('userSettings', function(item) {
+                if(item) {
+                            userSettings = item;
+                         } else {
+                             userSettings = defaultSettings;
+                         }
+                });                
+            },
+
+            function(newSettings) { // onSave
 	            userSettings = newSettings;
 
 	            prefs.set('userSettings', newSettings);

@@ -1,6 +1,6 @@
 'use strict';
 
-function UserSettingsDialog(dialog, onSave) {
+function UserSettingsDialog(dialog, onLoad, onSave) {
 
 	// Private Variables
     
@@ -36,7 +36,7 @@ function UserSettingsDialog(dialog, onSave) {
 
 	// Setup Defaults....
 
-	var currentSettings = {
+	var defaultSettings = {
 		mixerConfiguration : 3, 				// Default to Quad-X
 		customMix 			: null,				// Default to no mixer configuration
 		stickMode 			: 2,				// Default to Mode 2
@@ -48,7 +48,9 @@ function UserSettingsDialog(dialog, onSave) {
 		drawAnalyser		:true,              // add an analyser option
 		analyserSampleRate	:2000/*Hz*/,  		// the loop time for the log
 		eraseBackground		: true           	// Set to false if you want the graph to draw on top of an existing canvas image
-	}
+	};
+
+	var currentSettings = {};
 
     function saveCustomMix() {
 
@@ -199,11 +201,16 @@ function UserSettingsDialog(dialog, onSave) {
         stickModeSelection(parseInt($(this).val()));
     });
 
+	// Initialise the userSettings
+
+	onLoad(defaultSettings);
+
 	// Public variables
+
     
     this.show = function(flightLog, settings) {
 
- 			currentSettings = $.extend(currentSettings, settings || {});
+ 			currentSettings = $.extend(defaultSettings, currentSettings, settings || {});
 
     		getAvailableMotors(flightLog); // Which motors are in the log file ?
     		
