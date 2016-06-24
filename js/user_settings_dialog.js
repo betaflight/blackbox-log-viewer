@@ -3,9 +3,6 @@
 function UserSettingsDialog(dialog, onSave) {
 
 	// Private Variables
-	var mixerConfiguration = 3; // mixerConfiguration starts at 1;
-	
-    var customMix = null;
     
 	// generate mixer (from Cleanflight Configurator) (note that the mixerConfiguration index starts at 1)
 	var mixerList = [
@@ -37,18 +34,35 @@ function UserSettingsDialog(dialog, onSave) {
 
 	];
 
-    
+	// Setup Defaults....
+
+	var currentSettings = {
+		mixerConfiguration : 3, 				// Default to Quad-X
+		customMix 			: null,				// Default to no mixer configuration
+		stickMode 			: 2,				// Default to Mode 2
+		gapless				:false,
+		drawCraft			:"3D", 
+		drawPidTable		:true, 
+		drawSticks			:true, 
+		drawTime			:true,
+		drawAnalyser		:true,              // add an analyser option
+		analyserSampleRate	:2000/*Hz*/,  		// the loop time for the log
+		eraseBackground		: true           	// Set to false if you want the graph to draw on top of an existing canvas image
+	}
+
     function saveCustomMix() {
+
+		var customMix;
 
 		if($(".custom_mixes").is(":checked")) {
     	
-			var motorOrder = new Array(mixerList[mixerConfiguration-1].defaultMotorOrder.length);
+			var motorOrder = new Array(mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder.length);
 			for(var i=0;i<motorOrder.length; i++) {
-				var select_e = $('select.motor_'+mixerList[mixerConfiguration-1].defaultMotorOrder[i]+'_');
+				var select_e = $('select.motor_'+mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder[i]+'_');
 				motorOrder[i] = select_e.val();
 			}
 			customMix = {  motorOrder: motorOrder,
-							yawOffset: mixerList[mixerConfiguration-1].defaultYawOffset
+							yawOffset: mixerList[currentSettings.mixerConfiguration-1].defaultYawOffset
 				  };       
     	} else {
     		customMix = null;
@@ -57,10 +71,9 @@ function UserSettingsDialog(dialog, onSave) {
     }
     
     function convertUIToSettings() {
-    	var settings = {
-    			customMix: saveCustomMix(),
-    			mixerConfiguration: mixerConfiguration
-    	};
+    	var settings = $.extend({}, currentSettings, {
+    			customMix: saveCustomMix()
+    	});
     	return settings;
     }
         
@@ -115,10 +128,10 @@ function UserSettingsDialog(dialog, onSave) {
 										'<td colspan="2"><label>Motor ' + (i+1) + '</label><select class="motor_' + i + '_"><!-- list generated here --></select></td>' +	
 									'</tr>');
 	        	var select_e = $('select', motors_e);
-	        	if(customMix!=null) {
+	        	if(currentSettings.customMix!=null) {
 	        		for(var j=0; j<mixerList[mixerConfiguration-1].defaultMotorOrder.length; j++) {
 	        			if(mixerList[mixerConfiguration-1].defaultMotorOrder[j] == i) {
-				        	buildAvailableMotors(select_e, 'motor[' + customMix.motorOrder[j] + ']');
+				        	buildAvailableMotors(select_e, 'motor[' + currentSettings.customMix.motorOrder[j] + ']');
 				        	break;
 	        			}
 	        		}
@@ -142,13 +155,24 @@ function UserSettingsDialog(dialog, onSave) {
 
 		if(val==null) val=3; // default for invalid values
 
-        mixerConfiguration = val;
+        currentSettings.mixerConfiguration = val;
 
 		if(val>0 && val <= mixerList.length) {
 				$('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
 			}
         
-        buildMotorList(mixerConfiguration); // rebuild the motor list based upon the current selection
+        buildMotorList(val); // rebuild the motor list based upon the current selection
+	}
+
+	function stickModeSelection(val) {
+
+		if(val==null) val=2; // default for invalid values
+
+        currentSettings.stickMode = val;
+
+		if(val>0 && val <= 5) {
+				$('.modePreview img').attr('src', './images/stick_modes/mode_' + val + '.png');
+			}
 	}
 
  	// Buttons and Selectors
@@ -171,19 +195,19 @@ function UserSettingsDialog(dialog, onSave) {
     	onSave(convertUIToSettings());
     });
 
+    $('input[type=radio][name=stick-mode]').change(function() {
+        stickModeSelection(parseInt($(this).val()));
+    });
 
 	// Public variables
     
     this.show = function(flightLog, settings) {
 
-    		if(settings!=null) {
-    			mixerConfiguration = settings.mixerConfiguration;
-    			customMix = settings.customMix;
-    		}
+ 			currentSettings = $.extend(currentSettings, settings || {});
 
     		getAvailableMotors(flightLog); // Which motors are in the log file ?
     		
-    		if(customMix==null) {
+    		if(currentSettings.customMix==null) {
     			// clear the toggle switch
     			$(".custom_mixes").prop('checked', false);
     			$(".custom_mixes_group").hide(200);
@@ -193,7 +217,12 @@ function UserSettingsDialog(dialog, onSave) {
     			$(".custom_mixes_group").show(300);
     		}
 
-    		mixerListSelection(mixerConfiguration); // select current mixer configuration
+    		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
+    		stickModeSelection(currentSettings.stickMode);
+
+    		// setup the stick mode and dropdowns;
+    		$('select.mixerList').val(currentSettings.mixerConfiguration);
+    		$('input:radio[name="stick-mode"]').filter('[value="' + currentSettings.stickMode + '"]').attr('checked', true);
     		
             dialog.modal('show');
 

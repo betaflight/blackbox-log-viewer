@@ -500,18 +500,13 @@ function BlackboxLogViewer() {
             graph.destroy();
         }
         
-        var graphOptions = {
-            drawAnalyser:true,              // add an analyser option
-            analyserSampleRate:2000/*Hz*/,  // the loop time for the log
-            };
-
         if((flightLog.getSysConfig().loopTime             != null) &&
             (flightLog.getSysConfig().frameIntervalPNum   != null) &&
             (flightLog.getSysConfig().frameIntervalPDenom != null) ) {
-                graphOptions.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
+                userSettings.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
                 }
 
-        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, graphOptions);
+        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, userSettings);
         
         setVideoInTime(false);
         setVideoOutTime(false);
@@ -707,9 +702,7 @@ function BlackboxLogViewer() {
 		if(item) {
 	    			userSettings = item;
 				 } else {
-					 userSettings = { // default settings
-							 		customMix: null
-					 	 			};
+					 userSettings = null;
 				 }
     	});
 
@@ -1092,6 +1085,7 @@ function BlackboxLogViewer() {
 
 	            // refresh the craft model
 	            if(graph!=null) {
+	                graph.refreshOptions(newSettings);
 	                graph.initializeCraftModel();
 	                invalidateGraph();
 	            }

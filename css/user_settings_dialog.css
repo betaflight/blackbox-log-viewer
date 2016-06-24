@@ -1,5 +1,10 @@
-.user-settings-dialog img {
+.user-settings-dialog .custom_mixes_group img {
 	width: 125px;
+	max-height: 125px;
+}
+
+.user-settings-dialog .stick_mode_group img  {
+	width: 200px;
 	max-height: 125px;
 }
 
@@ -10,15 +15,27 @@
 .user-settings-dialog select {
 	width:100px;
 	margin-left:10px;
+	margin-bottom:5px
 }
 
 .user-settings-dialog label.option  {
 	width: 100%;
 }
 
+.user-settings-dialog label + input[type=radio] {
+	margin-left: 6px;	
+	margin-bottom:5px
+}
+
+.user-settings-dialog input[type=radio] {
+	margin-left: 85px;
+	margin-bottom:5px
+}
 
 .user-settings-dialog label {
 	width: 75px;
+	margin-bottom:0px;
+
 }
 
 

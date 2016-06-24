@@ -18,6 +18,7 @@
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
 <body>
+	<!-- Navigation Bar -->
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container header-pane">
             <div class="navbar-header">
@@ -37,7 +38,7 @@
             <!--</div>-->
         </div>
     </nav>
-
+	<!--  Welcome Page -->
     <div class="welcome-pane">
         <div class="container">
             <div class="jumbotron">
@@ -140,8 +141,8 @@
             </div>
         </div>
     </div>
-
-    <div class="container main-pane">
+	<!-- Main Page -->
+    <div class="container-fluid main-pane">
         <div class="log-metadata">
             <div class="log-info form-horizontal">
                 <div class="form-group">
@@ -308,8 +309,7 @@
         </div>
         
     </div>
-    <!-- /container -->
-    
+    <!-- Status Bar -->
     <div id="status-bar">
         <div>
 			<span class="version">-</span>
@@ -363,8 +363,8 @@
 			<span class="configuration-file-name">-</span>
         </div>
       </div>
-
-    <div class="modal fade" id="dlgGraphConfiguration">
+	<!-- Dialog Boxes and Popup Windows -->
+    <div class="modal fade graph-configuration-dialog" id="dlgGraphConfiguration">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -391,7 +391,6 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade header-dialog" id="dlgHeaderDialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -840,7 +839,6 @@
             </div>
         </div>
     </div>
-    
     <div class="modal fade keys-dialog" id="dlgKeysDialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -931,8 +929,7 @@
             </div>
         </div>
     </div>
-    
-    <div class="modal fade" id="dlgVideoExport">
+    <div class="modal fade video-export-dialog" id="dlgVideoExport">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1044,7 +1041,6 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade user-settings-dialog" id="dlgUserSettings">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -1055,8 +1051,6 @@
                     <div class="pane-user-settings form-horizontal">
                         <div class="form-group">
 							<label class="col-sm-3 control-label">Mixer Settings</label>
-								</tr>
-							</table>
                             <div class="col-sm-9">
                                <label class="option">Custom<input class="custom_mixes ios-switch orange" type="checkbox"/><div><div></div></div></label>
                             </div>
@@ -1076,6 +1070,23 @@
 								</p>
 							</div>
                         </div>
+                        <div class="form-group">
+							<label class="col-sm-3 control-label">Stick Settings</label>
+                            <div class="stick_mode_group col-sm-9">
+								<table>
+									<tr>
+										<td>
+												<label>Mode</label>
+											  	<input type="radio" name="stick-mode" value="1">Mode 1</input><br>
+  												<input type="radio" name="stick-mode" value="2">Mode 2</input><br>
+  												<input type="radio" name="stick-mode" value="3">Mode 3</input><br>
+  												<input type="radio" name="stick-mode" value="4">Mode 4</input><br>
+										</td>	
+										<td class="modePreview"><img src="./images/stick_modes/mode_2.png"/></td>
+									</tr>
+								</table>
+							</div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1085,7 +1096,7 @@
             </div>
         </div>
     </div>
-
+	<!-- Scripts -->
     <script src="js/vendor/jquery-1.11.3.min.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
