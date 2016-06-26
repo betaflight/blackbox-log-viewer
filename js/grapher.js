@@ -5,6 +5,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         PID_P = 0,
         PID_I = 1,
         PID_D = 2,
+
+        STICK_MODE_1 = 1,
+        STICK_MODE_2 = 2,
+        STICK_MODE_3 = 3,
+        STICK_MODE_4 = 4,
         
         WHITE = "white",
         
@@ -55,7 +60,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
             drawAnalyser:true,              // add an analyser option
             analyserSampleRate:2000/*Hz*/,  // the loop time for the log
-            eraseBackground: true // Set to false if you want the graph to draw on top of an existing canvas image
+            eraseBackground: true           // Set to false if you want the graph to draw on top of an existing canvas image
         },
         
         windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
@@ -253,6 +258,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     }
     
     function drawCommandSticks(frame) {
+
+            canvasContext.save();
+
         var
             // The total width available to draw both sticks in:
             sticksDisplayWidth = canvas.width * 0.3,
@@ -279,11 +287,35 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             rcCommand[stickIndex] = frame[idents.rcCommandFields[stickIndex]];
         }
 
+
+        // map the stick positions based upon selected stick mode (default is mode 2)
+
         //Compute the position of the sticks in the range [-1..1] (left stick x, left stick y, right stick x, right stick y)
-        stickPositions[0] = -rcCommand[2] / yawStickMax; //Yaw
-        stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
-        stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-        stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
+        switch(options.stickMode) {
+            case STICK_MODE_1:
+                stickPositions[0] = -rcCommand[2] / yawStickMax; //Yaw
+                stickPositions[1] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
+                stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
+                stickPositions[3] = (1500 - rcCommand[3]) / 500; //Throttle
+                break;
+            case STICK_MODE_3:
+                stickPositions[0] = pitchStickCurve.lookup(rcCommand[0]); //Roll
+                stickPositions[1] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
+                stickPositions[2] = -rcCommand[2] / yawStickMax; //Yaw
+                stickPositions[3] = (1500 - rcCommand[3]) / 500; //Throttle
+                break;
+            case STICK_MODE_4:
+                stickPositions[0] = pitchStickCurve.lookup(rcCommand[0]); //Roll
+                stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
+                stickPositions[2] = -rcCommand[2] / yawStickMax; //Yaw
+                stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
+                break;
+            default: // Mode 2
+                stickPositions[0] = -rcCommand[2] / yawStickMax; //Yaw
+                stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
+                stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
+                stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
+        }
 
         for (stickIndex = 0; stickIndex < 4; stickIndex++) {
             //Clamp to [-1..1]
@@ -318,12 +350,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             
             canvasContext.stroke();
 
-            //Draw circle to represent stick position
-            canvasContext.beginPath();
-            canvasContext.fillStyle = stickColor;
-            canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], stickSurroundRadius / 5, 0, 2 * Math.PI);
-            canvasContext.fill();
-
             if (drawingParams.fontSizeCommandStickLabel) {
                 canvasContext.fillStyle = WHITE;
                 
@@ -337,12 +363,37 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 stickLabel = frame[idents.rcCommandFields[(1 - i) * 2 + 1]] + "";
                 
                 canvasContext.textAlign = 'right';
-                canvasContext.fillText(stickLabel, -stickSurroundRadius - drawingParams.commandStickLabelMargin, drawingParams.fontSizeCurrentValueLabel / 2);
+                canvasContext.fillText(stickLabel, -stickSurroundRadius, drawingParams.fontSizeCurrentValueLabel / 2);
+
+            
+                // put the mode label on the throttle stick
+                if(     (i==0 && (options.stickMode==STICK_MODE_2 || options.stickMode==STICK_MODE_4 )) ||
+                        (i==1 && (options.stickMode==STICK_MODE_1 || options.stickMode==STICK_MODE_3 ))
+                 ) {
+                    //Draw stick mode label
+
+                    canvasContext.fillStyle = crosshairColor;
+                    stickLabel = 'Mode ' + options.stickMode;
+
+                    canvasContext.textAlign = 'center';
+                    canvasContext.fillText(stickLabel, 0, stickSurroundRadius - (drawingParams.fontSizeCurrentValueLabel / 2));
+                }
+
             }
+
+            //Draw circle to represent stick position
+            canvasContext.beginPath();
+            canvasContext.fillStyle = stickColor;
+            canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], stickSurroundRadius / 7.5, 0, 2 * Math.PI);
+            canvasContext.fill();
+
             
             //Advance to next stick
             canvasContext.translate(stickSurroundRadius + drawingParams.stickSpacing + stickSurroundRadius, 0);
         }
+
+        canvasContext.restore();
+
     }
     
     var
@@ -963,6 +1014,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
       analyser.setFullscreen( state );  
     };
     
+    // Update user options
+    this.refreshOptions = function(newSettings) {
+        options = $.extend(defaultOptions, newSettings || {});
+    }
+
     // Use defaults for any options not provided
     options = extend(defaultOptions, options || {});
     

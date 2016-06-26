@@ -499,19 +499,15 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.destroy();
         }
-        
-        var graphOptions = {
-            drawAnalyser:true,              // add an analyser option
-            analyserSampleRate:2000/*Hz*/,  // the loop time for the log
-            };
 
+        
         if((flightLog.getSysConfig().loopTime             != null) &&
             (flightLog.getSysConfig().frameIntervalPNum   != null) &&
             (flightLog.getSysConfig().frameIntervalPDenom != null) ) {
-                graphOptions.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
+                userSettings.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
                 }
 
-        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, graphOptions);
+        graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, userSettings);
         
         setVideoInTime(false);
         setVideoOutTime(false);
@@ -702,16 +698,6 @@ function BlackboxLogViewer() {
             graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
         }
     });
-    
-    prefs.get('userSettings', function(item) {
-		if(item) {
-	    			userSettings = item;
-				 } else {
-					 userSettings = { // default settings
-							 		customMix: null
-					 	 			};
-				 }
-    	});
 
     // Workspace save/restore to/from file.
     function saveWorkspaces(file) {
@@ -1085,13 +1071,26 @@ function BlackboxLogViewer() {
 
             keysDialog = new KeysDialog($("#dlgKeysDialog")),
             
-            userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), function(newSettings) {
+            userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), 
+            function(defaultSettings) { // onLoad
+    
+            prefs.get('userSettings', function(item) {
+                if(item) {
+                            userSettings = item;
+                         } else {
+                             userSettings = defaultSettings;
+                         }
+                });                
+            },
+
+            function(newSettings) { // onSave
 	            userSettings = newSettings;
 
 	            prefs.set('userSettings', newSettings);
 
 	            // refresh the craft model
 	            if(graph!=null) {
+	                graph.refreshOptions(newSettings);
 	                graph.initializeCraftModel();
 	                invalidateGraph();
 	            }
