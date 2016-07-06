@@ -6,10 +6,49 @@ html, body {
     overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
 }
 
+
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
     .container.main-pane {
         width:90%;
+    }
+}
+
+@media (max-width: 1140px) {
+    .navbar-header {
+        float: none;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin: 7.5px -15px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .navbar-text {
+        float: none;
+        margin: 15px 0;
+    }
+    /* since 3.1.0 */
+    .navbar-collapse.collapse.in { 
+        display: block!important;
+    }
+    .collapsing {
+        overflow: hidden!important;
     }
 }
 
@@ -495,12 +534,28 @@ html.has-log .log-graph {
     display:block;
 }
 
-.playback-rate-control {
-    width: 100px;
-    margin-right: 13px;
+html.has-video .video-top-controls,
+html.has-log .video-top-controls {
+	top:50px;
+	position:fixed;
+	z-index:10;
+	background-color:white;
+	padding-bottom:10px;
+	width:100%;
+	min-width:1090px;
 }
 
-.graph-zoom-control {
+html.has-video .log-graph,
+html.has-log .log-graph,
+html.has-log .log-graph-config,
+html.has-log .log-seek-bar,
+html.has-log:not(.has-table-overlay) .log-field-values {
+    position:relative;
+    top:60px;
+}
+
+.playback-rate-control,
+.graph-zoom-control  {
     width: 100px;
     margin-right: 13px;
 }
@@ -563,24 +618,47 @@ progress {
     color: #EAEAEA;
 }
 
-img.navbar-brand {
-    height: 35px;
-    padding: 0px;
-    display:none;
+.navbar {
+    margin-bottom:5px;
+}
+
+.navbar-logo {
+	position: absolute;
+	display:block;
+	left: -40px;
+}
+
+html.isCF .navbar-logo {
+    left: 16px;
+}
+
+.navbar-logo img {
+	position:relative;
+	height: 35px;
+	width: 210px;
+	padding: 0px;
+	display:none;
 }
 
 html.isCF img.isCF, html.isBF img.isBF {
 	display: block;
 }
 
-a.navbar-brand {
-    padding: 15px;
+.navbar-logo a {
+    padding: 0px;
+    position: absolute;
+    top: 44%;
+    left: 68%;
+    width: 100%;
 }
 
-.navbar {
-    margin-bottom:5px;
+.navbar-logo span {
+	padding-left: 0px;
+	position: relative;
+	left: -150px;
+	top: 20px;
+	color: antiquewhite;
 }
-
 
 .navbar-static-top {
     position: fixed;

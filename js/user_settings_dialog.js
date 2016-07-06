@@ -40,14 +40,30 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		mixerConfiguration : 3, 				// Default to Quad-X
 		customMix 			: null,				// Default to no mixer configuration
 		stickMode 			: 2,				// Default to Mode 2
-		gapless				:false,
-		drawCraft			:"3D", 
-		drawPidTable		:true, 
-		drawSticks			:true, 
-		drawTime			:true,
-		drawAnalyser		:true,              // add an analyser option
-		analyserSampleRate	:2000/*Hz*/,  		// the loop time for the log
-		eraseBackground		: true           	// Set to false if you want the graph to draw on top of an existing canvas image
+		stickUnits			: false,			// Show units on stick display?
+		gapless				: false,
+		drawCraft			: "3D", 
+		drawPidTable		: true, 
+		drawSticks			: true, 
+		drawTime			: true,
+		drawAnalyser		: true,             // add an analyser option
+		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log
+		eraseBackground		: true,           	// Set to false if you want the graph to draw on top of an existing canvas image
+		craft				: {
+									left  : '15%',	// position from left (as a percentage of width)
+									top   : '25%',  // position from top (as a percentage of height)
+									size  : '40%'   // size (as a percentage of width)
+							  },
+		sticks				: {
+									left  : '75%',	// position from left (as a percentage of width)
+									top   : '20%',  // position from top (as a percentage of height)
+									size  : '30%'   // size (as a percentage of width)
+							  },
+		analyser			: {
+									left  : '5%',	// position from left (as a percentage of width)
+									top   : '60%',  // position from top (as a percentage of height)
+									size  : '35%'   // size (as a percentage of width)
+							  },
 	};
 
 	var currentSettings = {};
@@ -56,7 +72,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 
 		var customMix;
 
-		if($(".custom_mixes").is(":checked")) {
+		if($(".custom-mixes").is(":checked")) {
     	
 			var motorOrder = new Array(mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder.length);
 			for(var i=0;i<motorOrder.length; i++) {
@@ -74,7 +90,16 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     
     function convertUIToSettings() {
     	var settings = $.extend({}, currentSettings, {
-    			customMix: saveCustomMix()
+    			customMix: saveCustomMix(),
+    			sticks:    {top: $('.stick-mode-group input[name="stick-top"]').val() + '%',
+    					   left: $('.stick-mode-group input[name="stick-left"]').val() + '%',
+    					   size: $('.stick-mode-group input[name="stick-size"]').val() + '%', },
+    			craft:     {top: $('.craft-settings input[name="craft-top"]').val() + '%',
+    					   left: $('.craft-settings input[name="craft-left"]').val() + '%',
+    					   size: $('.craft-settings input[name="craft-size"]').val() + '%', },
+    			analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
+    					   left: $('.analyser-settings input[name="analyser-left"]').val() + '%',
+    					   size: $('.analyser-settings input[name="analyser-size"]').val() + '%', },
     	});
     	return settings;
     }
@@ -184,12 +209,12 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     });
 
     // Handle the mixer custom toggle
-    $(".custom_mixes_group").hide();
-    $(".custom_mixes").click(function() {
+    $(".custom-mixes-group").hide();
+    $(".custom-mixes").click(function() {
         if($(this).is(":checked")) {
-            $(".custom_mixes_group").show(300);
+            $(".custom-mixes-group").show(300);
         } else {
-            $(".custom_mixes_group").hide(200);
+            $(".custom-mixes-group").hide(200);
         }
     });
 
@@ -199,6 +224,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 
     $('input[type=radio][name=stick-mode]').change(function() {
         stickModeSelection(parseInt($(this).val()));
+    });
+
+    $(".stick-units").click(function() {
+    	currentSettings.stickUnits = $(this).is(":checked");
     });
 
 	// Initialise the userSettings
@@ -216,13 +245,18 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		
     		if(currentSettings.customMix==null) {
     			// clear the toggle switch
-    			$(".custom_mixes").prop('checked', false);
-    			$(".custom_mixes_group").hide(200);
+    			$(".custom-mixes").prop('checked', false);
+    			$(".custom-mixes-group").hide(200);
     		} else {
     			// set the toggle switch
-    			$(".custom_mixes").prop('checked', true);
-    			$(".custom_mixes_group").show(300);
+    			$(".custom-mixes").prop('checked', true);
+    			$(".custom-mixes-group").show(300);
     		}
+
+    		if(currentSettings.stickUnits!=null) {
+    			// set the toggle switch
+    			$(".stick-units").prop('checked', currentSettings.stickUnits);
+    		} 
 
     		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
     		stickModeSelection(currentSettings.stickMode);
@@ -230,6 +264,16 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		// setup the stick mode and dropdowns;
     		$('select.mixerList').val(currentSettings.mixerConfiguration);
     		$('input:radio[name="stick-mode"]').filter('[value="' + currentSettings.stickMode + '"]').attr('checked', true);
+
+    		$('.stick-mode-group input[name="stick-top"]').val(parseInt(currentSettings.sticks.top));
+    		$('.stick-mode-group input[name="stick-left"]').val(parseInt(currentSettings.sticks.left));
+    		$('.stick-mode-group input[name="stick-size"]').val(parseInt(currentSettings.sticks.size));
+    		$('.craft-settings input[name="craft-top"]').val(parseInt(currentSettings.craft.top));
+    		$('.craft-settings input[name="craft-left"]').val(parseInt(currentSettings.craft.left));
+    		$('.craft-settings input[name="craft-size"]').val(parseInt(currentSettings.craft.size));
+    		$('.analyser-settings input[name="analyser-top"]').val(parseInt(currentSettings.analyser.top));
+    		$('.analyser-settings input[name="analyser-left"]').val(parseInt(currentSettings.analyser.left));
+    		$('.analyser-settings input[name="analyser-size"]').val(parseInt(currentSettings.analyser.size));
     		
             dialog.modal('show');
 
