@@ -815,7 +815,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         canvas.width = width;
         canvas.height = height;
             
-//        var craftSize = Math.min(canvas.height * CRAFT_POSITION_Y_PROPORTION * 2, canvas.width / 2.5);
         var craftSize = canvas.height * (parseInt(userSettings.craft.size) / 100.0);
         
         if (craft2D) {
@@ -826,10 +825,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
 
         // Recenter the craft canvas in the top left corner
         $(craftCanvas).css({
-//            left: Math.min(canvas.height * parseInt(userSettings.craft.top) / 100.0 - craftSize / 2, canvas.width / 4 - craftSize / 2) + "px",
-//            top: (canvas.height * parseInt(userSettings.craft.top) / 100.0 - craftSize / 2) + "px",
-            left:((canvas.width * parseInt(userSettings.craft.left) / 100.0) - (craftSize / 2)) + "px",
-            top: ((canvas.height * parseInt(userSettings.craft.top) / 100.0) - (craftSize / 2)) + "px",
+            left:Math.max(((canvas.width * parseInt(userSettings.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
+            top: Math.max(((canvas.height * parseInt(userSettings.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",
         });
         
         if(analyser!=null) analyser.resize();

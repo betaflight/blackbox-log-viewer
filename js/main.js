@@ -1096,7 +1096,7 @@ function BlackboxLogViewer() {
 	            if(graph!=null) {
 	                graph.refreshOptions(newSettings);
 	                graph.initializeCraftModel();
-	                invalidateGraph();
+	                updateCanvasSize();
 	            }
 
 	        }),
