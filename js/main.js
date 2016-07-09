@@ -893,26 +893,39 @@ function BlackboxLogViewer() {
             invalidateGraph();
         });
 
-        var logJumpBack = function(fast) {
-            var scrollTime = SMALL_JUMP_TIME;
-            if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):SMALL_JUMP_TIME;
+        var logJumpBack = function(fast, slow) {
+            var scrollTime  = SMALL_JUMP_TIME;
+            if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):scrollTime;
             if (hasVideo) {
+                if(slow) { scrollTime = (1/60) * 1000000; } // Assume 60Hz video
                 setVideoTime(video.currentTime - scrollTime / 1000000);
             } else {
-                setCurrentBlackboxTime(currentBlackboxTime - scrollTime);
+                var currentFrame = flightLog.getCurrentFrameAtTime((hasVideo)?video.currentTime:currentBlackboxTime);
+                if (currentFrame && currentFrame.previous && slow) {
+                    setCurrentBlackboxTime(currentFrame.previous[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
+                } else {
+                    setCurrentBlackboxTime(currentBlackboxTime - scrollTime);
+                }
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
         };
         $(".log-jump-back").click(function() {logJumpBack(false);});
 
-        var logJumpForward = function(fast) {
+        var logJumpForward = function(fast, slow) {
+
             var scrollTime = SMALL_JUMP_TIME;
-            if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):SMALL_JUMP_TIME;
+            if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):scrollTime;
             if (hasVideo) {
+                if(slow) { scrollTime = (1/60) * 1000000; } // Assume 60Hz video
                 setVideoTime(video.currentTime + scrollTime / 1000000);
             } else {
-                setCurrentBlackboxTime(currentBlackboxTime + scrollTime);
+                var currentFrame = flightLog.getCurrentFrameAtTime((hasVideo)?video.currentTime:currentBlackboxTime);
+                if (currentFrame && currentFrame.next && slow) {
+                    setCurrentBlackboxTime(currentFrame.next[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
+                } else {
+                    setCurrentBlackboxTime(currentBlackboxTime + scrollTime);
+                }
             }
             
             setGraphState(GRAPH_STATE_PAUSED);
@@ -1411,20 +1424,20 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
                     case 37: // left arrow (normal scroll, shifted zoom out)
-                        if (e.altKey || e.shiftKey) {
+                        if (e.shiftKey) {
                             setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
                             $(".graph-zoom").val(graphZoom + "%");
                         } else {
-                          logJumpBack();
+                          logJumpBack(null, e.altKey);
                         }
                         e.preventDefault();
                     break;
                     case 39: // right arrow (normal scroll, shifted zoom in)
-                        if (e.altKey || e.shiftKey) {
+                        if (e.shiftKey) {
                             setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
                             $(".graph-zoom").val(graphZoom + "%");
                         } else {
-                            logJumpForward();
+                            logJumpForward(null, e.altKey);
                         }
                         e.preventDefault();
                     break;

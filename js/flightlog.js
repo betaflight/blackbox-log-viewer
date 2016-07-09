@@ -187,6 +187,26 @@ function FlightLog(logData) {
         } else
             return false;
     };
+
+    this.getCurrentFrameAtTime = function(startTime) {
+        var
+            chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
+            chunk = chunks[0];
+        
+        if (chunk) {
+            for (var i = 0; i < chunk.frames.length; i++) {
+                if (chunk.frames[i][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] > startTime)
+                    break;
+            }
+            
+            return {    
+                    previous:(i>=2)?chunk.frames[i - 2]:null,
+                    current:(i>=1)?chunk.frames[i - 1]:null,
+                    next:(i>=0)?chunk.frames[i]:null,
+                    };
+        } else
+            return false;
+    };
     
     function buildFieldNames() {
         var 
@@ -1087,5 +1107,7 @@ FlightLog.prototype.getFeatures = function(enabledFeatures) {
             BLACKBOX            : (enabledFeatures & (1 << 19))!=0,
             CHANNEL_FORWARDING  : (enabledFeatures & (1 << 20))!=0,
             TRANSPONDER         : (enabledFeatures & (1 << 21))!=0,
+            AIRMODE             : (enabledFeatures & (1 << 22))!=0,
+            SUPEREXPO_RATES     : (enabledFeatures & (1 << 23))!=0,
         };
 };
