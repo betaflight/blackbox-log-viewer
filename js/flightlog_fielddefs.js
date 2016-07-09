@@ -24,6 +24,7 @@ var
         FLIGHT_MODE: 30, // New Event type
         
         CUSTOM : 250, // Virtual Event Code - Never part of Log File.
+        CUSTOM_BLANK : 251, // Virtual Event Code - Never part of Log File. - No line shown
         LOG_END: 255
     }),
 

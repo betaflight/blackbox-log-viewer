@@ -267,7 +267,7 @@ function BlackboxLogViewer() {
     }
     
     function renderLogFileInfo(file) {
-        $(".log-filename").text("Blackbox Explorer " + file.name);
+        $(".log-filename").text(file.name);
         
         var 
             logIndexContainer = $(".log-index"),
@@ -338,12 +338,16 @@ function BlackboxLogViewer() {
             $(".log-cells-header,.log-cells").css('display', 'none');
         }
         
+        /**
+        Removed as cant see a reason to display this information
+
         if (flightLog.getSysConfig().deviceUID != null) {
             $(".log-device-uid").text(flightLog.getSysConfig().deviceUID);
             $(".log-device-uid-header,.log-device-uid").css('display', 'block');
         } else {
            $(".log-device-uid-header,.log-device-uid").css('display', 'none');
         }
+        **/
         
         // Add log version information to status bar
         var sysConfig = flightLog.getSysConfig();
@@ -1092,7 +1096,7 @@ function BlackboxLogViewer() {
 	            if(graph!=null) {
 	                graph.refreshOptions(newSettings);
 	                graph.initializeCraftModel();
-	                invalidateGraph();
+	                updateCanvasSize();
 	            }
 
 	        }),
@@ -1300,9 +1304,11 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
 
-                    case "C".charCodeAt(0): 
-                        showConfigFile(); // toggle the config file popup
-                        e.preventDefault();
+                    case "C".charCodeAt(0):
+                        if(!(shifted)) { 
+                            showConfigFile(); // toggle the config file popup
+                            e.preventDefault();
+                        }
                     break;
 
                     case "T".charCodeAt(0):

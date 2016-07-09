@@ -6,10 +6,10 @@ var audioCtx = new AudioContext();
 function FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options) {
 
 var
-        ANALYSER_LEFT_PROPORTION    = 0.05, // 5% from left
-        ANALYSER_TOP_PROPORTION     = 0.55, // 55% from top
-        ANALYSER_HEIGHT_PROPORTION  = 0.40, // 40% high
-        ANALYSER_WIDTH_PROPORTION   = 0.40, // 40% wide
+        ANALYSER_LEFT_PROPORTION    = parseInt(userSettings.analyser.left) / 100.0, // 5% from left
+        ANALYSER_TOP_PROPORTION     = parseInt(userSettings.analyser.top) / 100.0, // 55% from top
+        ANALYSER_HEIGHT_PROPORTION  = parseInt(userSettings.analyser.size) / 100.0, // 40% high
+        ANALYSER_WIDTH_PROPORTION   = parseInt(userSettings.analyser.size) / 100.0, // 40% wide
 
         ANALYSER_LARGE_LEFT_PROPORTION    = 0.05, // 5% from left
         ANALYSER_LARGE_TOP_PROPORTION     = 0.05, // 55% from top
@@ -79,10 +79,10 @@ try {
 					}
 			} else {
 				return {
-					height: ANALYSER_HEIGHT_PROPORTION,
-					width: ANALYSER_WIDTH_PROPORTION,
-					left: ANALYSER_LEFT_PROPORTION,
-					top: ANALYSER_TOP_PROPORTION,
+					height: parseInt(userSettings.analyser.size) / 100.0,
+					width: parseInt(userSettings.analyser.size) / 100.0,
+					left: parseInt(userSettings.analyser.left) / 100.0,
+					top: parseInt(userSettings.analyser.top) / 100.0,
 				}
 			}
 			

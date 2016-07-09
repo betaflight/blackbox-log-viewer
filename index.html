@@ -25,17 +25,24 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
-                <img src="./images/bf_logo_white.svg" class="isBF navbar-brand"/>
-                <img src="./images/cf_logo_white.svg" class="isCF navbar-brand"/>
-                <a class="navbar-brand log-filename" href="#">Blackbox Explorer</a>
+                <div class="navbar-logo">
+                	<div>
+						<img src="./images/bf_logo_white.svg" style="width:auto;" class="isBF navbar-brand"/>
+						<img src="./images/cf_logo_white.svg" style="width:160px;" class="isCF navbar-brand"/>
+						<span>Blackbox&nbspExplorer</span>
+					</div>
+	                <a class="navbar-brand log-filename" html="#"></a>
+				</div>
             </div>
-            <!-- <div id="navbar" class="navbar-collapse collapse"> -->
+            <div id="navbar" class="navbar-collapse collapse">
                 <div class="navbar-form navbar-right" role="form">
-                    <a class="btn btn-default btn-workspaces-export"> Export Workspaces...</a>
-                    <a class="btn btn-default btn-video-export"> Export video...</a>
-                    <span class="btn btn-primary btn-file"> Open log file/video <input type="file" class="file-open" multiple></span>
+                	<div class="btn-group">
+						<a class="btn btn-default btn-video-export"> Export video...</a>
+						<a class="btn btn-primary btn-workspaces-export"> Export Workspaces...</a>
+						<span class="btn btn-primary btn-file"> Open log file/video <input type="file" class="file-open" multiple></span>
+	                </div>
                 </div>
-            <!--</div>-->
+            </div>
         </div>
     </nav>
 	<!--  Welcome Page -->
@@ -143,13 +150,9 @@
     </div>
 	<!-- Main Page -->
     <div class="container-fluid main-pane">
+    	<!-- Removed as not necessary to display this information
         <div class="log-metadata">
             <div class="log-info form-horizontal">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Log</label>
-                    <div class="col-sm-9 log-index">
-                    </div>
-                </div>
                 <div class="form-group log-device-uid-header">
                     <label class="col-sm-3 control-label">Device UID</label>
                     <div class="col-sm-9">
@@ -158,7 +161,7 @@
                 </div>
             </div>
         </div>
-
+		-->
         <ul class="video-top-controls list-unstyled">
             <li class="log-view-panel">
                 <h4>View</h4>
@@ -266,9 +269,7 @@
                 </div>
             </li>
         </ul>
-
         <div class="craft"></div>
-
         <div class="graph-row">
             <div class="log-graph">
                 <video></video>
@@ -280,16 +281,15 @@
             </div>
             <div class="log-graph-config">
                 <h2>Legend <span class="log-close-legend-dialog glyphicon glyphicon-remove"></span><span class="open-keys-dialog glyphicon glyphicon-question-sign"></span></h2>
+				<div class="log-index"></div>
                 <div class="log-graph-legend">
                 </div>
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog">Graph setup</button>
             </div>
         </div>
-        
         <div class="log-seek-bar">
             <canvas width="200" height="100"></canvas>
         </div>
-
         <div class="log-field-values" id="log-field-values">
             <a href="#log-field-values"><h4>Field values</h4></a>
             <table class="table table-condensed">
@@ -303,11 +303,9 @@
                 </tr>
             </table>
         </div>
-        
         <div class="configuration-file" id="configuration-file">
 			<!-- auto filled bu configuration function -->
         </div>
-        
     </div>
     <!-- Status Bar -->
     <div id="status-bar">
@@ -849,78 +847,85 @@
                     <h4 class="modal-title">Shortcut Keys</h4>
                 </div>
                 <div class="modal-body">
-                	<div class="clear-both"></div>
-                		<div class="gui_box grey">
-							<div class="gui_box_titlebar">
-								<div class="spacer_box_title">Scrolling, Zooming, Play and Pause</div>
+                    <div class="cf_column half left">
+						<div class="clear-both"></div>
+							<div class="gui_box grey">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Scrolling, Zooming, Play and Pause</div>
+								</div>
+								<div class="clear-both"></div>
+								<div class="spacer_box">
+									<ul>
+										<li><span class=keys"><div class="key">Home</div><div class="normal">and</div><div class="key">End</div></span>
+													<div class="description">Go to the start or end of the current log.</div></li>
+										<li><span class=keys"><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
+													<div class="description">Moves through log backwards and forwards by exactly 100ms.</div></li>
+										<li><span class=keys"><div class="key">PgUp</div><div class="normal">and</div><div class="key">PgDn</div></span>
+													<div class="description">Moves through log backwards and forwards fast.</div></li>
+									</ul>
+									<ul>
+										<li><span class=keys"><div class="key">Shift</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
+													<div class="description">Zoom Log Out and In.</div></li>
+										<li><span class=keys"><div class="key">Alt</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
+													<div class="description">Zoom Log Out and In but faster.</div></li>
+										<li><span class=keys"><div class="key">Z</div></span>
+													<div class="description">Toggle QuickZoom. Quickly Zoom out to Max and back</div></li>
+									</ul>
+									<ul>
+										<li><span class=keys"><div class="key">Spacebar</div></span><div class="description">Starts / Pauses Log and/or Video</div></li>
+									</ul>
+								</div>
 							</div>
-		                	<div class="clear-both"></div>
-							<div class="spacer_box">
-								<ul>
-									<li><span class=keys"><div class="key">Home</div><div class="normal">and</div><div class="key">End</div></span>
-												<div class="description">Go to the start or end of the current log.</div></li>
-									<li><span class=keys"><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-												<div class="description">Moves through log backwards and forwards by exactly 100ms.</div></li>
-									<li><span class=keys"><div class="key">PgUp</div><div class="normal">and</div><div class="key">PgDn</div></span>
-												<div class="description">Moves through log backwards and forwards fast.</div></li>
-								</ul>
-								<ul>
-									<li><span class=keys"><div class="key">Shift</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-												<div class="description">Zoom Log Out and In.</div></li>
-									<li><span class=keys"><div class="key">Alt</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-												<div class="description">Zoom Log Out and In but faster.</div></li>
-									<li><span class=keys"><div class="key">Z</div></span>
-												<div class="description">Toggle QuickZoom. Quickly Zoom out to Max and back</div></li>
-								</ul>
-								<ul>
-									<li><span class=keys"><div class="key">Spacebar</div></span><div class="description">Starts / Pauses Log and/or Video</div></li>
-								</ul>
-							</div>
-						</div>
-                		<div class="gui_box grey topspacer">
-							<div class="gui_box_titlebar">
-								<div class="spacer_box_title">Marking, Smart Sync & Table Quickshow</div>
-							</div>
-		                	<div class="clear-both"></div>
-							<div class="spacer_box">
-								<ul>
-									<li><span class=keys"><div class="key">M</div></span>
-												<div class="description">Toggles a Marker on the log at the current time. As you scroll, time from marker (offset) is displayed on the toolbar. (Useful for measuring times between events.)</div></li>
-									<li><span class=keys"><div class="key">Alt</div><div class="key">M</div></span>
-												<div class="description">Smart Sync. With both a log AND a video loaded, Press 'M' to place a marker on the log where an event occurs (such as the exact start of a roll). Then scroll backwards and forwards until your video shows the exaxt same start of event. Now press 'Alt M' to sync the log and video at this point.</div></li>
-								</ul>
-								<ul>
-									<li><span class=keys"><div class="key">T</div></span>
-												<div class="description">Toggle to quick show the field values table.</div></li>
-								</ul>
-							</div>
-						</div>
-                		<div class="gui_box grey topspacer">
-							<div class="gui_box_titlebar">
-								<div class="spacer_box_title">Workspaces / Favourites</div>
-							</div>
-		                	<div class="clear-both"></div>
-							<div class="spacer_box">
-								<ul>
-									<li><span class=keys"><div class="key">Shift</div><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
-												<div class="description">Save the current displayed graph configuration to workspace/favourite key 0 through 9 (this includes all graph smoothing and expo etc.).</div></li>
-									<li><span class=keys"><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
-												<div class="description">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration swapping useful for comparing traces.</div></li>
-								</ul>
-								<ul>
-									<li><span class=keys"><div class="key">Ctrl</div><div class="key">Z</div></span>
-												<div class="description">Swap back to your last graph configuration. Repeatedly pressing Ctrl-Z will toggle the last two graph configurations.</div></li>
-								</ul>
-								<ul>
-									<li><span class=keys"><div class="key">Alt</div><div class="key">Shift</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
-												<div class="description">Save the current time to Bookmark hotkeys 1 through 9</div></li>
-									<li><span class=keys"><div class="key">Alt</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
-												<div class="description">Recall Bookmark 1 though 9 to jump to specific time quickly.</div></li>
-									<li><span class=keys"><div class="key">Alt</div><div class="key">0</div></span>
-												<div class="description">Special Case, clear all bookmarks</div></li>
-								</ul>
+							<div class="gui_box grey topspacer">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Marking, Smart Sync & Table Quickshow</div>
+								</div>
+								<div class="clear-both"></div>
+								<div class="spacer_box">
+									<ul>
+										<li><span class=keys"><div class="key">M</div></span>
+													<div class="description">Toggles a Marker on the log at the current time. As you scroll, time from marker (offset) is displayed on the toolbar. (Useful for measuring times between events.)</div></li>
+										<li><span class=keys"><div class="key">Alt</div><div class="key">M</div></span>
+													<div class="description">Smart Sync. With both a log AND a video loaded, Press 'M' to place a marker on the log where an event occurs (such as the exact start of a roll). Then scroll backwards and forwards until your video shows the exaxt same start of event. Now press 'Alt M' to sync the log and video at this point.</div></li>
+									</ul>
+									<ul>
+										<li><span class=keys"><div class="key">T</div></span>
+													<div class="description">Toggle to quick show the field values table.</div></li>
+									</ul>
+								</div>
 							</div>
 						</div>
+                    <div class="cf_column half right">
+						<div class="spacer_left">
+                			<div class="clear-both"></div>
+                			<div class="gui_box grey">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Workspaces / Favourites</div>
+								</div>
+								<div class="clear-both"></div>
+								<div class="spacer_box">
+									<ul>
+										<li><span class=keys"><div class="key">Shift</div><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
+													<div class="description">Save the current displayed graph configuration to workspace/favourite key 0 through 9 (this includes all graph smoothing and expo etc.).</div></li>
+										<li><span class=keys"><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
+													<div class="description">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration swapping useful for comparing traces.</div></li>
+									</ul>
+									<ul>
+										<li><span class=keys"><div class="key">Ctrl</div><div class="key">Z</div></span>
+													<div class="description">Swap back to your last graph configuration. Repeatedly pressing Ctrl-Z will toggle the last two graph configurations.</div></li>
+									</ul>
+									<ul>
+										<li><span class=keys"><div class="key">Alt</div><div class="key">Shift</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
+													<div class="description">Save the current time to Bookmark hotkeys 1 through 9</div></li>
+										<li><span class=keys"><div class="key">Alt</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
+													<div class="description">Recall Bookmark 1 though 9 to jump to specific time quickly.</div></li>
+										<li><span class=keys"><div class="key">Alt</div><div class="key">0</div></span>
+													<div class="description">Special Case, clear all bookmarks</div></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
                 	<div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
@@ -1048,46 +1053,126 @@
                     <h4 class="modal-title">Advanced User Settings</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="pane-user-settings form-horizontal">
-                        <div class="form-group">
-							<label class="col-sm-3 control-label">Mixer Settings</label>
-                            <div class="col-sm-9">
-                               <label class="option">Custom<input class="custom_mixes ios-switch orange" type="checkbox"/><div><div></div></div></label>
-                            </div>
-                            <div class="custom_mixes_group col-sm-9">
-								<table>
-									<tr>
-										<td><label>Mixer Type</label><select class="mixerList"><!-- list generated here --></select></td>	
-										<td class="mixerPreview"><img src="./images/motor_order/quad_x.svg"/></td>
-									</tr>
-								</table>
-								<table class="motorList">
-									<!-- list generated here -->
-								</table>
-								<p>The custom mixer settings ONLY affect the craft icon that is displayed over the log. Please set the closest craft type (e.g. QuadX)
-								and then identify which motors are connected to which motor outputs. If you deselect the custom setting, then the viewer will function
-								as per the original method (i.e. it will autocalculate the craft model based upon the number of motors found in the log.)
-								</p>
+                	<div class="cf_column half left">
+	                    <div class="pane-user-settings form-horizontal">
+							<div class="gui_box grey mixer-settings">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Mixer Settings</div>
+								</div>
+								<div class="spacer_box">
+		                            <div>
+		                               <label class="option">Custom<input class="custom-mixes ios-switch" type="checkbox"/><div><div></div></div><span>Select custom craft display.</span></label>                             
+		                            </div>
+		                            <div class="custom-mixes-group">
+										<table>
+											<tr>
+												<td><label>Mixer Type</label><select class="mixerList"><!-- list generated here --></select></td>	
+												<td class="mixerPreview"><img src="./images/motor_order/quad_x.svg"/></td>
+											</tr>
+										</table>
+										<table class="motorList">
+											<!-- list generated here -->
+										</table>
+										<p>The custom mixer settings ONLY affect the craft icon that is displayed over the log. Please set the closest craft type (e.g. QuadX)
+										and then identify which motors are connected to which motor outputs. If you deselect the custom setting, then the viewer will function
+										as per the original method (i.e. it will autocalculate the craft model based upon the number of motors found in the log.)
+										</p>
+									</div>
+								</div>
 							</div>
-                        </div>
-                        <div class="form-group">
-							<label class="col-sm-3 control-label">Stick Settings</label>
-                            <div class="stick_mode_group col-sm-9">
-								<table>
-									<tr>
-										<td>
-												<label>Mode</label>
-											  	<input type="radio" name="stick-mode" value="1">Mode 1</input><br>
-  												<input type="radio" name="stick-mode" value="2">Mode 2</input><br>
-  												<input type="radio" name="stick-mode" value="3">Mode 3</input><br>
-  												<input type="radio" name="stick-mode" value="4">Mode 4</input><br>
-										</td>	
-										<td class="modePreview"><img src="./images/stick_modes/mode_2.png"/></td>
-									</tr>
-								</table>
+							<div class="gui_box grey mixer-settings">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Stick Settings</div>
+								</div>
+								<div class="spacer_box">
+									<div>
+		                               <label class="option">Units<input class="stick-units ios-switch" type="checkbox"/><div><div></div></div><span>Display actual units on stick display.</span></label>                             
+		                            </div>
+		                            <div class="stick-mode-group">
+										<table>
+											<tr>
+												<td>
+														<label>Mode</label>
+													  	<input type="radio" name="stick-mode" value="1">Mode 1</input><br>
+		  												<input type="radio" name="stick-mode" value="2">Mode 2</input><br>
+		  												<input type="radio" name="stick-mode" value="3">Mode 3</input><br>
+		  												<input type="radio" name="stick-mode" value="4">Mode 4</input><br>
+												</td>	
+												<td class="modePreview"><img src="./images/stick_modes/mode_2.png"/></td>
+											</tr>
+										</table>
+										<table>
+											<tr>
+												<td>
+													<label>Position</label>
+												</td>
+												<td class="position">
+													<label>Top</label><input name="stick-top" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+												<td class="position">
+													<label>Left</label><input  name="stick-left" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+												<td class="position">
+													<label>Size</label><input name="stick-size" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+											</tr>
+										</table>
+									</div>
+								</div>
 							</div>
-                        </div>
-                    </div>
+	                    </div>
+					</div>
+                	<div class="cf_column half right">
+						<div class="spacer_left">
+							<div class="gui_box grey craft-settings">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Craft Settings</div>
+								</div>
+								<div class="spacer_box">
+									<table>
+										<tr>
+											<td>
+												<label>Position</label>
+											</td>
+											<td class="position">
+												<label>Top</label><input name="craft-top" type="number" step="1" min="0" max="100"/><p>%</p>
+											</td>
+											<td class="position">
+												<label>Left</label><input name="craft-left" type="number" step="1" min="0" max="100"/><p>%</p>
+											</td>
+											<td class="position">
+												<label>Size</label><input name="craft-size" type="number" step="1" min="0" max="100"/><p>%</p>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<div class="gui_box grey top-spacer analyser-settings">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Analyser Settings</div>
+								</div>
+								<div class="spacer_box">
+									<table>
+										<tr>
+											<td>
+												<label>Position</label>
+											</td>
+											<td class="position">
+												<label>Top</label><input name="analyser-top" type="number" step="1" min="0" max="100"/><p>%</p>
+											</td>
+											<td class="position">
+												<label>Left</label><input name="analyser-left" type="number" step="1" min="0" max="100"/><p>%</p>
+											</td>
+											<td class="position">
+												<label>Size</label><input name="analyser-size" type="number" step="1" min="0" max="100"/><p>%</p>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+                	<div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default user-settings-dialog-cancel" data-dismiss="modal">Cancel</button>
