@@ -718,7 +718,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 var markerFrequency = ((windowCenterTime-markerEvent.time).toFixed(0)!=0)?((1000000/(windowCenterTime-markerEvent.time)).toFixed(0) + "Hz") : '';
                 drawEvent(
                     {
-                    event:FlightLogEvent.CUSTOM_BLANK,
+                    event:FlightLogEvent.CUSTOM_BLANK, // Blank doesnt show a vertical line
                     time:windowCenterTime,
                     label: formatTime((windowCenterTime-markerEvent.time)/1000, true) + 'ms ' + markerFrequency,
                     align:(markerEvent.time<windowCenterTime)?'right':'left', 

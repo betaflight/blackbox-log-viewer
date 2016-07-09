@@ -541,8 +541,8 @@ html.has-log .video-top-controls {
 	z-index:10;
 	background-color:white;
 	padding-bottom:10px;
-	width:100%;
-	min-width:1090px;
+	width: 100%;
+	min-width: 1390px;
 }
 
 html.has-video .log-graph,
