@@ -85,6 +85,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<input name="smoothing" class="form-control" type="text"></input>'
                     + '<input name="power" class="form-control" type="text"></input>'
                     + '<input name="scale" class="form-control" type="text"></input>'
+                    + '<input name="linewidth" class="form-control" type="text"></input>'
                     + '<select class="color-picker"></select>'
                     + '<button type="button" class="btn btn-default btn-sm">Remove</button>'
                 + '</li>'
@@ -99,6 +100,9 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         // Set the smoothing values
         renderSmoothingOptions(elem, flightLog, field);
+
+        // Set the line width values
+        $('input[name=linewidth]',elem).val((field.lineWidth)?field.lineWidth:1);
 
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
@@ -144,11 +148,13 @@ function GraphConfigurationDialog(dialog, onSave) {
                                 + '<div class="form-group form-group-sm config-graph-field-header">'
                                     + '<div class="col-sm-10 control-label">'
                                         + '<table>'
-                                            + '<tr>'
-                                                + '<th name="field"></th>'
+                                            + '<tr name="field-header">'
+                                                + '<th name="field">Name</th>'
                                                 + '<th name="smoothing">Smooth</th>'
                                                 + '<th name="expo">Expo</th>'
                                                 + '<th name="zoom">Zoom</th>'
+                                                + '<th name="line">Line</th>'
+                                                + '<th name="color">Color</th>'
                                             + '</tr>'
                                         + '</table>'
                                     + '</div>'
@@ -271,7 +277,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exagerate center values - expo)
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
                     },
-                    color: $('select.color-picker option:selected', this).val()
+                    color: $('select.color-picker option:selected', this).val(),
+                    lineWidth: parseInt($("input[name=linewidth]", this).val())
                 }
                 
                 if (field.name.length > 0) {

@@ -449,7 +449,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
      * Plot the given field within the specified time period. When the output from the curve applied to a field
      * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
      */
-    function plotField(chunks, startFrameIndex, fieldIndex, curve, plotHeight, color) {
+    function plotField(chunks, startFrameIndex, fieldIndex, curve, plotHeight, color, lineWidth) {
         var
             GAP_WARNING_BOX_RADIUS = 3,
             chunkIndex, frameIndex,
@@ -466,7 +466,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         frameIndex = startFrameIndex;
         
         canvasContext.strokeStyle = color;
-        canvasContext.lineWidth = drawingParams.plotLineWidth;
+        canvasContext.lineWidth = (lineWidth)?lineWidth:drawingParams.plotLineWidth;
         
         canvasContext.beginPath();
         
@@ -877,7 +877,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                         var field = graph.fields[j];
                         
                         plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, 
-                            field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length]);
+                            field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
+                            field.lineWidth ? field.lineWidth : null);
                     }
                     
                     if (graph.label) {
