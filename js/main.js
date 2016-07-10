@@ -1150,50 +1150,12 @@ function BlackboxLogViewer() {
 	        invalidateGraph(); 
         });
         
-        $('#status-bar .bookmark-1').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[1]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-2').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[2]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-3').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[3]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-4').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[4]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-5').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[5]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-6').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[6]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-7').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[7]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-8').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[8]);
-	        invalidateGraph(); 
-        });
-                
-        $('#status-bar .bookmark-9').click(function(e) {
-	        setCurrentBlackboxTime(bookmarkTimes[9]);
-	        invalidateGraph(); 
-        });
+        for(var i=1; i< 9; i++) { // Loop through all the bookmarks.
+            $('#status-bar .bookmark-'+i).click(function(e) {
+    	        setCurrentBlackboxTime(bookmarkTimes[parseInt(this.className.slice(-1))]);
+    	        invalidateGraph(); 
+            });
+        }
 
         $('#status-bar .bookmark-clear').click(function(e) {
             bookmarkTimes = null;
