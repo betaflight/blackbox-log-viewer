@@ -198,6 +198,7 @@ html:not(.has-log):not(.has-video) .header-pane {
     margin-bottom: 0.5em;
     cursor: pointer;
 }
+
 html.has-log .log-graph-config {
     display:-webkit-flex;
     display:flex;
@@ -205,6 +206,7 @@ html.has-log .log-graph-config {
 
 .config-graph {
     margin:0.5em 0;
+    background-color: white;
 }
 
 .config-graph dd {
@@ -902,4 +904,16 @@ html.isCF input[type="checkbox"].ios-switch:checked + div > div {
 input[type="checkbox"].orange.ios-switch:checked + div > div ,
 html.isBF input[type="checkbox"].ios-switch:checked + div > div {
 	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0,1);
+}
+
+
+.config-graph h4 span,
+.log-graph-config h3 span {
+    background-color: rgba(239,187,0,0.5);
+    padding-top: 2px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 5px;
+    margin-right:3px;
 }
