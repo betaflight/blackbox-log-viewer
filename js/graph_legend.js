@@ -10,15 +10,16 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
             i, j;
         
         targetElem.empty();
-        
+
         for (i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend"><h3 graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
+                graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
             
             graphTitle.text(graph.label);
+            graphTitle.prepend('<span class="glyphicon glyphicon-minus"></span>');
             
             for (j = 0; j < graph.fields.length; j++) { 
                 var 
@@ -56,6 +57,23 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                    }
                }
         });
+
+        // Make the legend dragabble
+        $('.log-graph-legend').sortable( 
+            {
+                update: function( event, ui ) { 
+                            var newOrder = $('.log-graph-legend').sortable('toArray');
+                            var newGraphs = [];
+                            var oldGraphs = config.getGraphs();
+                            for(var i=0; i<newOrder.length; i++) {
+                                newGraphs[i] = oldGraphs[newOrder[i]];
+                            }
+                            config.setGraphs(newGraphs);
+                      },
+                cursor: "move",
+            }
+        );
+        $('.log-graph-legend').disableSelection();        
 
         $('.log-close-legend-dialog').on('click', function() {
             that.hide();

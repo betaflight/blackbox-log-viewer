@@ -129,9 +129,9 @@ function GraphConfigurationDialog(dialog, onSave) {
     function renderGraph(flightLog, index, graph) {
         var 
             graphElem = $(
-                '<li class="config-graph">'
+                '<li class="config-graph" id="'+index+'">'
                     + '<dl>'
-                        + '<dt><h4>Graph ' + (index + 1) + '</dt>'
+                        + '<dt><h4><span class="glyphicon glyphicon-minus"></span> Graph ' + (index + 1) + '</dt>'
                         + '<dd>'
                             + '<div class="form-horizontal">'
                                 + '<div class="form-group">'
@@ -285,7 +285,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     graph.fields.push(field);
                 }
             });
-            
+
             graphs.push(graph);
         });
         
@@ -360,6 +360,14 @@ function GraphConfigurationDialog(dialog, onSave) {
     $(".graph-configuration-dialog-save").click(function(e) {
         onSave(convertUIToGraphConfig());
     });
+
+    // Make the graph order dragabble
+    $('.config-graphs-list').sortable( 
+        {
+            cursor: "move",
+        }
+    );
+    $('.config-graphs-list').disableSelection();  
     
     $(".config-graphs-add").dropdown();
     
