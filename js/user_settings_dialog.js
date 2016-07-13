@@ -47,6 +47,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawSticks			: true, 
 		drawTime			: true,
 		drawAnalyser		: true,             // add an analyser option
+		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
+        graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
+        
+
 		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log
 		eraseBackground		: true,           	// Set to false if you want the graph to draw on top of an existing canvas image
 		craft				: {

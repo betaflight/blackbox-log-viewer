@@ -92,7 +92,7 @@ function BlackboxLogViewer() {
         animationFrameIsQueued = false,
         
         playbackRate = PLAYBACK_DEFAULT_RATE,
-        
+
         graphZoom = GRAPH_DEFAULT_ZOOM,
         lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
     
@@ -188,7 +188,6 @@ function BlackboxLogViewer() {
                 $("#status-bar .marker-offset").text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms ' + (1000000/(currentBlackboxTime-markerTime)).toFixed(0) + "Hz");
             }
 
-            
             // Update the Legend Values
             if(graphLegend) graphLegend.updateValues(flightLog, frame);
         }
@@ -1379,7 +1378,42 @@ function BlackboxLogViewer() {
                         }
                         e.preventDefault();
                     break;
-                    
+
+                    case "S".charCodeAt(0): // S key to toggle between last graph smooth and none
+                        try {
+                            if(!(shifted)) { 
+                                userSettings.graphSmoothOverride = !userSettings.graphSmoothOverride; // toggle current setting
+                                graph.refreshGraphConfig();
+                                invalidateGraph();
+                                // Update smoothing status flags on status bar
+                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'');
+                                $("#status-bar .overrides").text(overrideStatus);
+
+                                e.preventDefault();
+                            }
+                        } catch(e) {
+                            console.log('Smoothing override toggle feature not functioning');
+                        }
+                        e.preventDefault();
+                    break;                    
+
+                    case "X".charCodeAt(0): // S key to toggle between last graph smooth and none
+                        try {
+                            if(!(shifted)) { 
+                                userSettings.graphExpoOverride = !userSettings.graphExpoOverride; // toggle current setting
+                                graph.refreshGraphConfig();
+                                invalidateGraph();
+                                // Update smoothing status flags on status bar
+                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'');
+                                $("#status-bar .overrides").text(overrideStatus);
+                                e.preventDefault();
+                            }
+                        } catch(e) {
+                            console.log('Expo override toggle feature not functioning');
+                        }
+                        e.preventDefault();
+                    break;                    
+
                     // Toolbar shortcuts
                     case " ".charCodeAt(0): // start/stop playback
                             logPlayPause();

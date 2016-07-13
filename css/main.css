@@ -713,6 +713,10 @@ html.isCF img.isCF, html.isBF img.isBF {
     background-color: #bfbeb5;
 }
 
+#status-bar .overrides {
+	text-decoration: line-through;
+}
+
 html:not(.has-log) #status-bar {
     display: none;
 }

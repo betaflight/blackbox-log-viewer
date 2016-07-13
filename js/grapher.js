@@ -955,7 +955,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         drawInOutRegion();
     };
     
-    function refreshGraphConfig() {
+    this.refreshGraphConfig = function() {
         var 
             smoothing = {},
             heightSum = 0, allocatedHeight, graphHeight,
@@ -974,11 +974,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 field.index = flightLog.getMainFieldIndexByName(field.name);
                 
                 // Convert the field's curve settings into an actual expo curve object:
-                field.curve = new ExpoCurve(field.curve.offset, field.curve.power, field.curve.inputRange, 
-                    field.curve.outputRange, field.curve.steps); 
+                field.curve = new ExpoCurve(field.curve.offset, 
+                                            ((userSettings.graphExpoOverride)?1.0:field.curve.power), 
+                                            field.curve.inputRange, 
+                                            field.curve.outputRange, 
+                                            field.curve.steps); 
                 
                 if (field.smoothing > 0) {
-                    smoothing[field.index] = field.smoothing;
+                    smoothing[field.index] = (userSettings.graphSmoothOverride)?0:field.smoothing;
                 }
             }
         }
@@ -1092,8 +1095,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     //Handle dragging events
     $(canvas).on("mousedown",onMouseDown);
     
-    graphConfig.addListener(refreshGraphConfig);
-    refreshGraphConfig();
+    graphConfig.addListener(this.refreshGraphConfig);
+    this.refreshGraphConfig();
     
     this.resize(canvas.width, canvas.height);
 }

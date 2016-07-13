@@ -44,6 +44,7 @@
     display: flex;
     position: static;
     margin-bottom: 0.05em;
+    height: 39px;
 }
 
 .keys-dialog ul{
@@ -85,7 +86,7 @@
     flex: 1;
     padding-left: 10px;
     color: #7d7d7d;
-    text-align: left;
+    text-align: justify;
     position: relative;
     vertical-align: middle;
     font-size: 11px;

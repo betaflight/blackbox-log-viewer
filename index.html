@@ -327,6 +327,9 @@
         <div>
 			<span class="marker-offset">00:00.000</span>
         </div>
+        <div>
+			<span class="overrides"></span>
+        </div>
         <div class="bookmark-1">
 			<span>1</span>
         </div>
@@ -870,17 +873,39 @@
 													<div class="description">Zoom Log Out and In.</div></li>
 										<li><span class=keys"><div class="key">Shift</div><div class="key">Alt</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
 													<div class="description">Zoom Log Out and In but faster.</div></li>
-										<li><span class=keys"><div class="key">Z</div></span>
-													<div class="description">Toggle QuickZoom. Quickly Zoom out to Max and back</div></li>
 									</ul>
 									<ul>
 										<li><span class=keys"><div class="key">Spacebar</div></span><div class="description">Starts / Pauses Log and/or Video</div></li>
 									</ul>
 								</div>
 							</div>
-							<div class="gui_box grey topspacer">
+                			<div class="gui_box grey topspacer">
 								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Marking, Smart Sync & Table Quickshow</div>
+									<div class="spacer_box_title">Quick Modes</div>
+								</div>
+								<div class="clear-both"></div>
+								<div class="spacer_box">
+									<ul>
+										<li><span class=keys"><div class="key">Z</div></span>
+													<div class="description">Toggle QuickZoom. Quickly Zoom out to Max and back</div></li>
+										<li><span class=keys"><div class="key">S</div></span>
+													<div class="description">Toggle QuickSmooth, Quickly override graph smoothing and force all graph smoothing to zero.</div></li>
+										<li><span class=keys"><div class="key">X</div></span>
+													<div class="description">Toggle QuickExpo, Quickly override graph expo and force all graph expo to linear.</div></li>
+										<li><span class=keys"><div class="key">T</div></span>
+													<div class="description">Toggle QuickTable, Quickly show the field values table.</div></li>
+										<li><span class=keys"><div class="key">C</div></span>
+													<div class="description">Toggle QuickConfig, Quickly show the configuration dump file (if loaded).</div></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+                    <div class="cf_column half right">
+						<div class="spacer_left">
+                			<div class="clear-both"></div>
+							<div class="gui_box grey">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Marking, Smart Sync</div>
 								</div>
 								<div class="clear-both"></div>
 								<div class="spacer_box">
@@ -891,16 +916,15 @@
 													<div class="description">Smart Sync. With both a log AND a video loaded, Press 'M' to place a marker on the log where an event occurs (such as the exact start of a roll). Then scroll backwards and forwards until your video shows the exaxt same start of event. Now press 'Alt M' to sync the log and video at this point.</div></li>
 									</ul>
 									<ul>
-										<li><span class=keys"><div class="key">T</div></span>
-													<div class="description">Toggle to quick show the field values table.</div></li>
+										<li></li>
+										<li><span class=keys"><div class="key">I</div></span>
+													<div class="description">Mark the start of (IN) video export.</div></li>
+										<li><span class=keys"><div class="key">O</div></span>
+													<div class="description">Mark the end of (OUT) video export.</div></li>
 									</ul>
 								</div>
 							</div>
-						</div>
-                    <div class="cf_column half right">
-						<div class="spacer_left">
-                			<div class="clear-both"></div>
-                			<div class="gui_box grey">
+                			<div class="gui_box grey topspacer">
 								<div class="gui_box_titlebar">
 									<div class="spacer_box_title">Workspaces / Favourites</div>
 								</div>
