@@ -6,7 +6,6 @@ html, body {
     overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
 }
 
-
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
     .container.main-pane {
@@ -491,7 +490,7 @@ html.has-table .view-table,
 html.has-sticks .view-sticks,
 html.has-craft .view-craft,
 html:not(.video-hidden) .view-video {
-     color:green;
+     color: rgba(239,187,0,1.0);
 }
 
 html:not(.has-analyser-fullscreen) .glyphicon-resize-small {
@@ -909,11 +908,12 @@ html.isBF input[type="checkbox"].ios-switch:checked + div > div {
 
 .config-graph h4 span,
 .log-graph-config h3 span {
-    background-color: rgba(239,187,0,0.5);
+    /* background-color: rgba(239,187,0,0.5); */
     padding-top: 2px;
     padding-bottom: 4px;
     padding-left: 4px;
     padding-right: 4px;
     border-radius: 5px;
     margin-right:3px;
+    background-image: linear-gradient(to bottom,#fff8e9 0,#ffbb00 100%);
 }
