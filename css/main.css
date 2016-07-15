@@ -116,6 +116,11 @@ html:not(.has-log):not(.has-video) .header-pane {
     height:300px;
 }
 
+#main-page {
+    position: static;
+    top: 60px;
+}
+
 /* Desktop */
 @media (min-height:580px) {
     .graph-row {
@@ -461,6 +466,7 @@ html.has-video .graph-row,
 html.has-log .graph-row {
     display:-webkit-flex;
     display:flex;
+    position: inherit;
 }
 
 html.has-video .log-graph {
@@ -588,7 +594,7 @@ html.has-log .log-graph-config,
 html.has-log .log-seek-bar,
 html.has-log:not(.has-table-overlay) .log-field-values {
     position:relative;
-    top:60px;
+    top: 60px;
 }
 
 .playback-rate-control,

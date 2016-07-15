@@ -251,7 +251,7 @@ function BlackboxLogViewer() {
             requestAnimationFrame(animationLoop);
         }
     }
-    
+
     function updateCanvasSize() {
         var
             width = $(canvas).width(),
@@ -626,6 +626,7 @@ function BlackboxLogViewer() {
         $("html").addClass("has-video");
         
         setGraphState(GRAPH_STATE_PAUSED);
+        invalidateGraph();
     }
     
     function reportVideoError(e) {
@@ -1206,7 +1207,16 @@ function BlackboxLogViewer() {
                 .tooltip();
         }
 
-        $(window).resize(updateCanvasSize);
+        $(window).resize(function() { updateCanvasSize(); updateHeaderSize() });
+
+        function updateHeaderSize() {
+            var newHeight = $(".video-top-controls").height() - 20; // 23px offset
+            $(".log-graph").css("top", newHeight+"px");
+            $(".log-graph-config").css("top", newHeight+"px");
+            $(".log-seek-bar").css("top", newHeight+"px");
+            $(".log-field-values").css("top", newHeight+"px");
+            invalidateGraph();
+        };
         
         $(document).on("mousewheel", function(e) {
         if (graph && $(e.target).parents('.modal').length == 0 && $(e.target).attr('id') == 'graphCanvas') {
