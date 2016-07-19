@@ -4,6 +4,11 @@
     min-width:954px;
 }
 
+.user-settings-dialog input[type=number] {
+	margin-right:2px;
+	min-width: 48px;
+}
+
 .user-settings-dialog .custom-mixes-group img {
 	width: 125px;
 	max-height: 125px;
@@ -12,6 +17,30 @@
 .user-settings-dialog .stick-mode-group img  {
 	width: 200px;
 	max-height: 125px;
+}
+
+
+.user-settings-dialog .watermark-logo-image {
+    background-image: url('../images/logo-background.png');
+    height: 100px;
+    width: 100px;
+    background-repeat:no-repeat;
+    background-size:100px 100px;
+}
+
+.user-settings-dialog .watermark-group img  {
+ 	width: 100px;
+ 	height: 100px;
+ 	/* background-color:aquamarine; */
+ 	padding: 2px;
+ 	border:1px solid #021a40;
+ 	opacity: 1.0;
+}
+
+
+.user-settings-dialog .watermark-group input[type=file]  {
+	color: #7D7D7D;
+	margin: 2px;
 }
 
 .user-settings-dialog table {
@@ -59,10 +88,14 @@
 	margin-top: 10px;
 }
 
+.user-settings-dialog td.position {
+    text-align-last: right;
+}
+
 .user-settings-dialog td.position label {
 	width: 41px;
 	font-style:oblique;
-	margin-left: 18px;
+	margin-right: 6px;
 	padding-top: 0px;
 }
 

@@ -71,7 +71,8 @@ function BlackboxLogViewer() {
         canvas = $("#graphCanvas")[0],
         analyserCanvas = $("#analyserCanvas")[0],
         analyserStickCanvas = $("#analyserStickCanvas")[0],
-        craftCanvas = $("#craftCanvas")[0],
+        craftCanvas = $("#craftCanvas")[0],        
+
         videoURL = false,
         videoOffset = 0.0,
         
@@ -1108,6 +1109,7 @@ function BlackboxLogViewer() {
 	            // refresh the craft model
 	            if(graph!=null) {
 	                graph.refreshOptions(newSettings);
+	                graph.refreshLogo();
 	                graph.initializeCraftModel();
 	                updateCanvasSize();
 	            }

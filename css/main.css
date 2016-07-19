@@ -344,14 +344,7 @@ html.has-log .log-graph-config {
     background-color: black;
 }
 
-#craftCanvas {
-    position:absolute;
-    top:0;
-    left:0;
-    pointer-events:none; /* Allow the user to drag the graph lines instead of hitting the craft */
-    display:none;
-}
-
+#craftCanvas,
 #analyserCanvas {
     position:absolute;
     top:0;
@@ -362,7 +355,7 @@ html.has-log .log-graph-config {
 
 html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas {
-    display:block;
+	display:block;
 }
 
 .log-graph video {
