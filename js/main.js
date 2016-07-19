@@ -1395,6 +1395,7 @@ function BlackboxLogViewer() {
                         try {
                             if(!(shifted)) { 
                                 userSettings.graphSmoothOverride = !userSettings.graphSmoothOverride; // toggle current setting
+                                graph.refreshOptions(userSettings);
                                 graph.refreshGraphConfig();
                                 invalidateGraph();
                                 // Update smoothing status flags on status bar
@@ -1413,6 +1414,7 @@ function BlackboxLogViewer() {
                         try {
                             if(!(shifted)) { 
                                 userSettings.graphExpoOverride = !userSettings.graphExpoOverride; // toggle current setting
+                                graph.refreshOptions(userSettings);
                                 graph.refreshGraphConfig();
                                 invalidateGraph();
                                 // Update smoothing status flags on status bar
