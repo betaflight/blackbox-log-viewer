@@ -30,8 +30,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         },
         
         // How far the center of the craft and command sticks are from the top of the canvas, as a portion of height
-        COMMAND_STICK_POSITION_Y_PROPORTION =  parseInt(userSettings.sticks.top) / 100.0 || 0.2,
-        // CRAFT_POSITION_Y_PROPORTION         =  parseInt(userSettings.craft.top) / 100.0 ||0.2,
+        COMMAND_STICK_POSITION_Y_PROPORTION =  parseInt(options.sticks.top) / 100.0 || 0.2,
+        // CRAFT_POSITION_Y_PROPORTION         =  parseInt(options.craft.top) / 100.0 ||0.2,
         
         lineColors = [
             "#fb8072", // Red
@@ -80,7 +80,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         
     	analyser = null, /* define a new spectrum analyser */
 
+        watermarkLogo, /* Watermark feature */
+
         that = this;
+
     
     this.onSeek = null;
     
@@ -256,6 +259,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         ctx.stroke();
       }
     }
+
+    function drawWaterMark() {
+
+        canvasContext.save();
+        canvasContext.globalAlpha = parseInt(options.watermark.transparency)/100;
+        canvasContext.drawImage(watermarkLogo, parseInt(options.watermark.left)/100 * canvas.width, 
+                                               parseInt(options.watermark.top)/100 * canvas.height, 
+                                               parseInt(options.watermark.size)/100 * watermarkLogo.width, 
+                                               parseInt(options.watermark.size)/100 * watermarkLogo.height);
+        canvasContext.restore();
+
+    }
+
     
     function drawCommandSticks(frame) {
 
@@ -263,7 +279,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
 
         var
             // The total width available to draw both sticks in:
-            sticksDisplayWidth = canvas.width * parseInt(userSettings.sticks.size) / 100.0,
+            sticksDisplayWidth = canvas.width * parseInt(options.sticks.size) / 100.0,
             
             // Use that plus the inter-stick spacing that has been determined already to decide how big each stick should be:
             stickSurroundRadius = Math.min((sticksDisplayWidth - drawingParams.stickSpacing) / 4, canvas.height / 10), 
@@ -815,7 +831,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         canvas.width = width;
         canvas.height = height;
             
-        var craftSize = canvas.height * (parseInt(userSettings.craft.size) / 100.0);
+        var craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
         
         if (craft2D) {
             craft2D.resize(craftSize, craftSize);
@@ -825,8 +841,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
 
         // Recenter the craft canvas in the top left corner
         $(craftCanvas).css({
-            left:Math.max(((canvas.width * parseInt(userSettings.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
-            top: Math.max(((canvas.height * parseInt(userSettings.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",
+            left:Math.max(((canvas.width * parseInt(options.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
+            top: Math.max(((canvas.height * parseInt(options.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",
         });
         
         if(analyser!=null) analyser.resize();
@@ -921,7 +937,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 if (options.drawSticks) {
                     canvasContext.save();
                     
-                    canvasContext.translate(canvas.width * parseInt(userSettings.sticks.left) / 100.0, canvas.height * parseInt(userSettings.sticks.top) / 100.0);
+                    canvasContext.translate(canvas.width * parseInt(options.sticks.left) / 100.0, canvas.height * parseInt(options.sticks.top) / 100.0);
                     
                     drawCommandSticks(centerFrame);
                     
@@ -950,6 +966,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName, windowCenterTime, windowEndTime);
                 } catch(err) {console.log('Cannot plot analyser');}            
             }
+
+            //Draw Watermark
+            if (options.drawWatermark && watermarkLogo) {
+                drawWaterMark();
+            }
         }
         
         drawInOutRegion();
@@ -975,13 +996,13 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 
                 // Convert the field's curve settings into an actual expo curve object:
                 field.curve = new ExpoCurve(field.curve.offset, 
-                                            ((userSettings.graphExpoOverride)?1.0:field.curve.power), 
+                                            ((options.graphExpoOverride)?1.0:field.curve.power), 
                                             field.curve.inputRange, 
                                             field.curve.outputRange, 
                                             field.curve.steps); 
                 
                 if (field.smoothing > 0) {
-                    smoothing[field.index] = (userSettings.graphSmoothOverride)?0:field.smoothing;
+                    smoothing[field.index] = (options.graphSmoothOverride)?0:field.smoothing;
                 }
             }
         }
@@ -1082,12 +1103,21 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         options = $.extend(defaultOptions, newSettings || {});
     }
 
+    this.refreshLogo = function() {
+        if(options.watermark.logo) {
+            watermarkLogo = new Image();
+            watermarkLogo.src = options.watermark.logo;
+        }
+    }
+
     // Use defaults for any options not provided
     options = extend(defaultOptions, options || {});
     
     identifyFields();
 
     this.initializeCraftModel();
+
+    this.refreshLogo();
     
     /* Create the FlightLogAnalyser object */
 	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options);

@@ -287,11 +287,10 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
     if (videoOptions.videoDim >= 1.0) {
         delete logParameters.flightVideo;
     }
+
+    var options = $.extend({}, userSettings || {}, {eraseBackground : !logParameters.flightVideo});
     
-    graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, craftCanvas, analyserCanvas, {
-        eraseBackground : !logParameters.flightVideo,
-        drawSticks: logParameters.hasSticks
-    });
+    graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, craftCanvas, analyserCanvas, options);
     
     craftCanvasLeft = parseInt($(craftCanvas).css('left'), 10);
     craftCanvasTop = parseInt($(craftCanvas).css('top'), 10);

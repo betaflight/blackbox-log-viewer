@@ -47,6 +47,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawSticks			: true, 
 		drawTime			: true,
 		drawAnalyser		: true,             // add an analyser option
+		drawWatermark		: false,			// Show Watermark on display?
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         
@@ -68,9 +69,17 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 									top   : '60%',  // position from top (as a percentage of height)
 									size  : '35%'   // size (as a percentage of width)
 							  },
+	    watermark			: {
+									left  : '3%',	// position from left (as a percentage of width)
+									top   : '90%',  // position from top (as a percentage of height)
+									size  : '100%',  // size (as a percentage of width)
+									transparency : '100%', //transparency of watermark image
+									logo		 : null,   // No custom logo
+							  },
 	};
 
 	var currentSettings = {};
+	var currentLogo = null;
 
     function saveCustomMix() {
 
@@ -104,6 +113,12 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     			analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
     					   left: $('.analyser-settings input[name="analyser-left"]').val() + '%',
     					   size: $('.analyser-settings input[name="analyser-size"]').val() + '%', },
+    			watermark: {top: $('.watermark-settings input[name="watermark-top"]').val() + '%',
+					   	   left: $('.watermark-settings input[name="watermark-left"]').val() + '%',
+					   	   size: $('.watermark-settings input[name="watermark-size"]').val() + '%', 
+					   	   transparency: $('.watermark-settings input[name="watermark-transparency"]').val() + '%',
+					   	   logo: currentLogo, },
+				drawWatermark: ($(".watermark").is(":checked")),
     	});
     	return settings;
     }
@@ -222,6 +237,14 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
         }
     });
 
+    $(".watermark").click(function() {
+        if($(this).is(":checked")) {
+            $(".watermark-group").show(300);
+        } else {
+            $(".watermark-group").hide(200);
+        }
+    });
+
     $(".user-settings-dialog-save").click(function(e) {
     	onSave(convertUIToSettings());
     });
@@ -232,6 +255,24 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 
     $(".stick-units").click(function() {
     	currentSettings.stickUnits = $(this).is(":checked");
+    });
+
+    // Load Custom Logo
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function (e) {
+                $('#watermark-logo').attr('src', e.target.result);
+                currentLogo = e.target.result;
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    $("#watermark-logo-load").change(function(){
+        readURL(this);
     });
 
 	// Initialise the userSettings
@@ -278,7 +319,25 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		$('.analyser-settings input[name="analyser-top"]').val(parseInt(currentSettings.analyser.top));
     		$('.analyser-settings input[name="analyser-left"]').val(parseInt(currentSettings.analyser.left));
     		$('.analyser-settings input[name="analyser-size"]').val(parseInt(currentSettings.analyser.size));
-    		
+
+    		if(currentSettings.drawWatermark!=null) {
+    			// set the toggle switch
+    			$(".watermark").prop('checked', currentSettings.drawWatermark);
+    			(currentSettings.drawWatermark)?$(".watermark-group").show(200):$(".watermark-group").hide(200);
+    		}
+ 
+    		$('.watermark-settings input[name="watermark-top"]').val(parseInt(currentSettings.watermark.top));
+    		$('.watermark-settings input[name="watermark-left"]').val(parseInt(currentSettings.watermark.left));
+    		$('.watermark-settings input[name="watermark-size"]').val(parseInt(currentSettings.watermark.size));
+    		$('.watermark-settings input[name="watermark-transparency"]').val(parseInt(currentSettings.watermark.transparency));
+			
+			if(currentSettings.watermark.logo!=null) {
+				currentLogo = currentSettings.watermark.logo;
+				$('#watermark-logo').attr('src', currentLogo);
+			} else {
+				currentLogo = $('#watermark-logo').attr('src');
+			}
+
             dialog.modal('show');
 
     };

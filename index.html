@@ -1196,6 +1196,64 @@
 									</table>
 								</div>
 							</div>
+							<div class="gui_box grey top-spacer watermark-settings">
+								<div class="gui_box_titlebar">
+									<div class="spacer_box_title">Watermark Settings</div>
+								</div>
+								<div class="spacer_box">
+									<div>
+		                               <label class="option">Watermark<input class="watermark ios-switch" type="checkbox"/><div><div></div></div><span>Show the watermark.</span></label>                             
+		                            </div>
+		                            <div class="watermark-group">
+										<table>
+											<tr>
+												<td>
+													<label>Logo</label>
+												</td>
+												<td>
+													<div class="watermark-logo-button">
+														<input type='file' id="watermark-logo-load" />
+													</div>
+												</td>
+											</tr>
+											<tr>
+												<td>
+												</td>
+												<td class="watermark-logo-image">
+												    <img id="watermark-logo" src="./images/logo.png" alt="choose your own logo"/>												
+												</td>
+											</tr>
+										</table>
+										<table>
+											<tr>
+												<td>
+													<label>Position</label>
+												</td>
+												<td class="position">
+													<label>Top</label><input name="watermark-top" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+												<td class="position">
+													<label>Left</label><input  name="watermark-left" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+												<td class="position">
+													<label>Size</label><input name="watermark-size" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<label>Transparency</label>
+												</td>
+												<td class="position">
+													<input name="watermark-transparency" type="number" step="1" min="0" max="100"/><p>%</p>
+												</td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>										
+										</table>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
                 	<div class="clear-both"></div>
