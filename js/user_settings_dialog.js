@@ -70,9 +70,9 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 									size  : '35%'   // size (as a percentage of width)
 							  },
 	    watermark			: {
-									left  : '55%',	// position from left (as a percentage of width)
-									top   : '60%',  // position from top (as a percentage of height)
-									size  : '15%',  // size (as a percentage of width)
+									left  : '3%',	// position from left (as a percentage of width)
+									top   : '90%',  // position from top (as a percentage of height)
+									size  : '100%',  // size (as a percentage of width)
 									transparency : '100%', //transparency of watermark image
 									logo		 : null,   // No custom logo
 							  },
@@ -334,6 +334,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 			if(currentSettings.watermark.logo!=null) {
 				currentLogo = currentSettings.watermark.logo;
 				$('#watermark-logo').attr('src', currentLogo);
+			} else {
+				currentLogo = $('#watermark-logo').attr('src');
 			}
 
             dialog.modal('show');
