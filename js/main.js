@@ -71,7 +71,7 @@ function BlackboxLogViewer() {
         canvas = $("#graphCanvas")[0],
         analyserCanvas = $("#analyserCanvas")[0],
         analyserStickCanvas = $("#analyserStickCanvas")[0],
-        craftCanvas = $("#craftCanvas")[0],        
+        craftCanvas = $("#craftCanvas")[0],
 
         videoURL = false,
         videoOffset = 0.0,
@@ -191,6 +191,7 @@ function BlackboxLogViewer() {
 
             // Update the Legend Values
             if(graphLegend) graphLegend.updateValues(flightLog, frame);
+            
         }
     }
     
@@ -682,6 +683,10 @@ function BlackboxLogViewer() {
     		return null;
     	}
     }
+
+    this.getBookmarkTimes = function() {
+        return bookmarkTimes;
+    }
            
     prefs.get('videoConfig', function(item) {
         if (item) {
@@ -1088,7 +1093,7 @@ function BlackboxLogViewer() {
             }),
 
             keysDialog = new KeysDialog($("#dlgKeysDialog")),
-            
+
             userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), 
             function(defaultSettings) { // onLoad
     
@@ -1121,7 +1126,6 @@ function BlackboxLogViewer() {
 	            
 	            prefs.set('videoConfig', newConfig);
 	        });
-        
         
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();

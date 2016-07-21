@@ -81,6 +81,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     	analyser = null, /* define a new spectrum analyser */
 
         watermarkLogo, /* Watermark feature */
+        
+        lapTimer, /* LapTimer feature */
 
         that = this;
 
@@ -226,40 +228,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         }
     }
 
-    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-      if (typeof stroke == 'undefined') {
-        stroke = true;
-      }
-      if (typeof radius === 'undefined') {
-        radius = 5;
-      }
-      if (typeof radius === 'number') {
-        radius = {tl: radius, tr: radius, br: radius, bl: radius};
-      } else {
-        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
-        for (var side in defaultRadius) {
-          radius[side] = radius[side] || defaultRadius[side];
-        }
-      }
-      ctx.beginPath();
-      ctx.moveTo(x + radius.tl, y);
-      ctx.lineTo(x + width - radius.tr, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-      ctx.lineTo(x + width, y + height - radius.br);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-      ctx.lineTo(x + radius.bl, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-      ctx.lineTo(x, y + radius.tl);
-      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
-      ctx.closePath();
-      if (fill) {
-        ctx.fill();
-      }
-      if (stroke) {
-        ctx.stroke();
-      }
-    }
-
     function drawWaterMark() {
 
         canvasContext.save();
@@ -271,7 +239,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         canvasContext.restore();
 
     }
-
+    
+    function drawLapTimer() {
+        // Update the Lap Timer
+        lapTimer.refresh(windowCenterTime, (3600*1000000/*a long time*/), blackboxLogViewer.getBookmarkTimes());
+    	lapTimer.drawCanvas(canvas, options);
+    }
     
     function drawCommandSticks(frame) {
 
@@ -927,7 +900,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             }
             
             // Draw events
-            drawEvents(chunks);
+            if(options.drawEvents) {
+                drawEvents(chunks);
+            }
 
             // Draw details at the current time
             var
@@ -971,6 +946,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             if (options.drawWatermark && watermarkLogo) {
                 drawWaterMark();
             }
+
+            //Draw Lap Timer
+            if (options.drawLapTimer && lapTimer) {
+                drawLapTimer();
+            }
+
         }
         
         drawInOutRegion();
@@ -1121,6 +1102,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     /* Create the FlightLogAnalyser object */
 	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options);
+
+    /* Create the Lap Timer object */
+	lapTimer = new LapTimer();
 
     //Handle dragging events
     $(canvas).on("mousedown",onMouseDown);

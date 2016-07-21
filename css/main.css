@@ -514,6 +514,14 @@ html:not(has-analyser) .view-analyser-fullscreen {
     vertical-align: top;
 }
 
+html.has-log .video-top-controls > li.log-view-panel, html.has-log .video-top-controls > li.log-chart-zoom-panel, html.has-log .video-top-controls > li.log-chart-time-panel {
+    display: inline-block;
+}
+
+.video-top-controls > li.log-view-panel, .video-top-controls > li.log-chart-zoom-panel, .video-top-controls > li.log-chart-time-panel {
+    display: none;
+}
+
 .video-top-controls > .log-sync-panel {
     display:none;
 }
@@ -919,4 +927,37 @@ html.isBF input[type="checkbox"].ios-switch:checked + div > div {
     border-radius: 5px;
     margin-right:3px;
     background-image: linear-gradient(to bottom,#fff8e9 0,#ffbb00 100%);
+}
+
+div#lap-timer {
+    position: absolute;
+    background-color: rgb(34, 34, 34);
+    z-index: 10;
+    top: 5%;
+    left: calc(90% - 233px);
+    border-radius: 5px;
+    padding: 5px;
+    color: #bbb;
+    border-style: solid;
+    border-width: thin;
+}
+
+tr.lap-timer-heading td {
+    font-style: italic;
+    border-bottom-color: white;
+    border-bottom-width: thin;
+    /* text-decoration: underline; */
+    border-bottom-style: solid;
+}
+
+table#lap-timer-laps {
+    display: none;
+}
+
+html.hasLaps table#lap-timer-laps {
+    display: table;
+}
+
+div#lap-timer td:first-child {
+    padding-right: 10px;
 }

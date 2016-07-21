@@ -46,8 +46,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawPidTable		: true, 
 		drawSticks			: true, 
 		drawTime			: true,
+		drawEvents			: true,
 		drawAnalyser		: true,             // add an analyser option
 		drawWatermark		: false,			// Show Watermark on display?
+		drawLapTimer		: false,			// Show Laptimer on display?
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         
@@ -75,6 +77,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 									size  : '100%',  // size (as a percentage of width)
 									transparency : '100%', //transparency of watermark image
 									logo		 : null,   // No custom logo
+							  },
+	    laptimer			: {
+									left  : '5%',			// position from left (as a percentage of width)
+									top   : '50%',  			// position from top (as a percentage of height)
+									transparency : '40%',  // transparency of laptimer
 							  },
 	};
 
@@ -119,6 +126,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 					   	   transparency: $('.watermark-settings input[name="watermark-transparency"]').val() + '%',
 					   	   logo: currentLogo, },
 				drawWatermark: ($(".watermark").is(":checked")),
+    			laptimer: {top: $('.laptimer-settings input[name="laptimer-top"]').val() + '%',
+					   	   left: $('.laptimer-settings input[name="laptimer-left"]').val() + '%',
+					   	   transparency: $('.laptimer-settings input[name="laptimer-transparency"]').val() + '%', },
+				drawLapTimer: ($(".laptimer").is(":checked")),
     	});
     	return settings;
     }
@@ -245,6 +256,14 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
         }
     });
 
+    $(".laptimer").click(function() {
+        if($(this).is(":checked")) {
+            $(".laptimer-group").show(300);
+        } else {
+            $(".laptimer-group").hide(200);
+        }
+    });
+
     $(".user-settings-dialog-save").click(function(e) {
     	onSave(convertUIToSettings());
     });
@@ -281,10 +300,15 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 
 	// Public variables
 
+	this.resetToDefaults = function() {
+		currentSettings = $.extend({}, defaultSettings);
+		onSave(currentSettings);
+	}
+
     
     this.show = function(flightLog, settings) {
 
- 			currentSettings = $.extend(defaultSettings, currentSettings, settings || {});
+ 			currentSettings = $.extend({}, defaultSettings, currentSettings, settings || {});
 
     		getAvailableMotors(flightLog); // Which motors are in the log file ?
     		
@@ -337,6 +361,16 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 			} else {
 				currentLogo = $('#watermark-logo').attr('src');
 			}
+
+    		if(currentSettings.drawLapTimer!=null) {
+    			// set the toggle switch
+    			$(".laptimer").prop('checked', currentSettings.drawLapTimer);
+    			(currentSettings.drawLapTimer)?$(".laptimer-group").show(200):$(".laptimer-group").hide(200);
+    		}
+ 
+    		$('.laptimer-settings input[name="laptimer-top"]').val(parseInt(currentSettings.laptimer.top));
+    		$('.laptimer-settings input[name="laptimer-left"]').val(parseInt(currentSettings.laptimer.left));
+    		$('.laptimer-settings input[name="laptimer-transparency"]').val(parseInt(currentSettings.laptimer.transparency));
 
             dialog.modal('show');
 
