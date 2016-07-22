@@ -553,12 +553,51 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         canvasContext.stroke();
     }
 
-    function drawAxisLabel(axisLabel) {
+    //Draw a grid
+    function drawGrid(curve, plotHeight) {
+        var settings = curve.getCurve(),
+            GRID_LINES = 10,
+            min = -settings.inputRange - settings.offset,
+            max = settings.inputRange - settings.offset,
+            GRID_INTERVAL = 1/GRID_LINES * (max - min),
+            yScale = -plotHeight/2;
+
+        canvasContext.strokeStyle = "rgba(255,255,255,0.5)"; // Grid Color
+		canvasContext.setLineDash([1,10]); // Make the grid line a dash        
+        canvasContext.lineWidth = 1;
+        canvasContext.beginPath();
+
+        // horizontal lines
+        for(var y=1; y<GRID_LINES; y++) {
+            var yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
+            if(yValue!=0) {
+                canvasContext.moveTo(0, yValue );
+                canvasContext.lineTo(canvas.width, yValue);
+            }
+        }
+		// vertical lines
+		for(var i=(windowStartTime / 100000).toFixed(0) * 100000; i<windowEndTime; i+=100000) {
+            var x = timeToCanvasX(i);
+            canvasContext.moveTo(x, yScale);
+            canvasContext.lineTo(x, -yScale);
+		}
+
+        canvasContext.stroke();
+		canvasContext.setLineDash([]); // clear the dash
+
+        // range values,
+        //drawAxisLabel(max.toFixed(0), yScale + 12);
+        //drawAxisLabel(min.toFixed(0), -yScale - 8);
+        
+
+    }
+
+    function drawAxisLabel(axisLabel, y) {
         canvasContext.font = drawingParams.fontSizeAxisLabel + "pt " + DEFAULT_FONT_FACE;
         canvasContext.fillStyle = "rgba(255,255,255,0.9)";
         canvasContext.textAlign = 'right';
         
-        canvasContext.fillText(axisLabel, canvas.width - 8, -8);
+        canvasContext.fillText(axisLabel, canvas.width - 8, (y)?y:-8);
     }
     
     function drawEventLine(x, labelY, label, color, width, labelColor, align) {
@@ -859,6 +898,16 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                     canvasContext.translate(0, canvas.height * graph.y);
                     
                     drawAxisLine();
+
+                    if(!options.graphGridOverride) {
+                        for (j = 0; j < graph.fields.length; j++) {
+                            if(graph.fields[j].grid){
+                                drawGrid(graph.fields[j].curve, canvas.height * graph.height);
+                                break;
+                            };
+                        };
+                    }
+
                     if(graphs.length > 1) // only draw the background if more than one graph set.
                         drawAxisBackground(canvas.height * graph.height);
                     

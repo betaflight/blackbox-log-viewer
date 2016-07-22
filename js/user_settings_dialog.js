@@ -52,6 +52,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawLapTimer		: false,			// Show Laptimer on display?
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
+        graphGridOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         
 
 		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log

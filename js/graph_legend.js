@@ -1,6 +1,6 @@
 "use strict";
 
-function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onZoomGraph, onExpandGraph) {
+function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onZoomGraph, onExpandGraph, onNewGraphConfig) {
     var
         that = this;
 
@@ -35,13 +35,27 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         }
 
         // Add a trigger on legend; select the analyser graph/field to plot
-        $('.graph-legend-field').on('click', function() {
+        $('.graph-legend-field').on('click', function(e) {
+            var
+               selectedGraphIndex    = $(this).attr('graph'),
+               selectedFieldIndex    = $(this).attr('field');
+
+           if(!e.altKey) {
                config.selectedFieldName     = FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'));
-               config.selectedGraphIndex    = $(this).attr('graph');
-               config.selectedFieldIndex    = $(this).attr('field');
+               config.selectedGraphIndex    = selectedGraphIndex;
+               config.selectedFieldIndex    = selectedFieldIndex;
                if (onNewSelectionChange) {
                    onNewSelectionChange();
                }
+           } else { // toggle the grid setting
+               var graphs = config.getGraphs();
+               for(var i=0; i<graphs[selectedGraphIndex].fields.length; i++) {
+                  graphs[selectedGraphIndex].fields[i].grid = ((i==selectedFieldIndex)?(!graphs[selectedGraphIndex].fields[i].grid):false);
+               };
+               if (onNewGraphConfig) {
+                   onNewGraphConfig(graphs);
+               }
+           };
         });
 
         // Add a trigger on legend list title; select the graph to expland
