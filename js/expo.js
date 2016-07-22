@@ -17,6 +17,16 @@ function ExpoCurve(offset, power, inputRange, outputRange, steps) {
         return (input + offset) * rawInputScale;
     }
 
+    this.getCurve = function() {
+        return {
+            offset: offset,
+            power: power,
+            inputRange: inputRange,
+            outputRange: outputRange,
+            steps: steps,
+            };
+    }
+
     /**
      * An approximation of lookupMathPow by precomputing several expo curve points and interpolating between those
      * points using straight line interpolation.

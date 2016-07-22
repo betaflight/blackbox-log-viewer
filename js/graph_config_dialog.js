@@ -88,6 +88,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<input name="linewidth" class="form-control" type="text"></input>'
                     + '<select class="color-picker"></select>'
                     + '<button type="button" class="btn btn-default btn-sm">Remove</button>'
+                    + '<div id="grid" value=""/>'
                 + '</li>'
             ),
             select = $('select.form-control', elem),
@@ -103,6 +104,9 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         // Set the line width values
         $('input[name=linewidth]',elem).val((field.lineWidth)?field.lineWidth:1);
+
+        // Set the grid state
+        $('div#grid',elem).attr("value", (field.grid)?field.grid:false);
 
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
@@ -278,7 +282,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
                     },
                     color: $('select.color-picker option:selected', this).val(),
-                    lineWidth: parseInt($("input[name=linewidth]", this).val())
+                    lineWidth: parseInt($("input[name=linewidth]", this).val()),
+                    grid: (($('div#grid', this).attr("value")==="true")?true:false),
                 }
                 
                 if (field.name.length > 0) {
