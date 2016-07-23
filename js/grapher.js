@@ -948,8 +948,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
 		         
             }
             
-            // Draw events
-            if(options.drawEvents) {
+            // Draw events - if option set or even if option is not set but there are graphs
+            // the option is for video export; if you export the video without any graphs set,
+            // then the events are not shown either (to keep the video clean. but
+            // if you export the video with a graph selected, then the events are also shown.
+            
+            if(options.drawEvents || (!options.drawEvents && graphs.length > 0)) {
                 drawEvents(chunks);
             }
 
