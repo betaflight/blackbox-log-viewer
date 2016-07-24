@@ -54,7 +54,7 @@
                 <span class="btn btn-primary btn-lg btn-file"> Open log file/video <input type="file" class="file-open" multiple></span>
             </div>
         </div>
-        
+
         <div class="container">
             <div class="row">
                 <div class="col-sm-4">
@@ -68,18 +68,18 @@
                                 and is supported on most of CF's flight controllers (Naze32, CC3D, SPRacingF3, etc.).
                             </p>
                             <p>
-                                To get started with Blackbox recording, read 
-                                <a href="https://github.com/cleanflight/cleanflight/blob/master/docs/Blackbox.md">Cleanflight and Betaflight's 
+                                To get started with Blackbox recording, read
+                                <a href="https://github.com/cleanflight/cleanflight/blob/master/docs/Blackbox.md">Cleanflight and Betaflight's
                                 Blackbox feature documentation</a>.
                             </p>
                             <p>
-                                Already have a log recorded? View 
-                                <a href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md">the 
+                                Already have a log recorded? View
+                                <a href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md">the
                                 documentation for this log viewer</a> for details on how to best use this tool.
                             </p>
                             <p>
                                 If you believe you've found a bug in this viewer (e.g. the viewer crashes upon attempting to
-                                open a log file), or you have a suggestion, please add it to 
+                                open a log file), or you have a suggestion, please add it to
                                 <a href="https://github.com/betaflight/blackbox-log-viewer/issues">the viewer's GitHub bug tracker</a>.
                             </p>
                         </div>
@@ -92,7 +92,7 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                The Blackbox can deliver insights on your flight performance that will allow you to tune 
+                                The Blackbox can deliver insights on your flight performance that will allow you to tune
                                 variables such as your PIDs and low-pass filter settings.
                             </p>
                             <p>
@@ -132,12 +132,12 @@
                         <div class="panel-body">
                             <p>
                                 If you want to analyze your logs with your own mathematics package (such as Matlab)
-                                you can use the separate <a href="https://github.com/cleanflight/blackbox-tools">blackbox_decode tool</a> 
+                                you can use the separate <a href="https://github.com/cleanflight/blackbox-tools">blackbox_decode tool</a>
                                 to convert your log file into a CSV file for analysis.
                             </p>
                             <p>
-                                If you want to share your log as a video, you can use the "export video" button at the 
-                                top to render a WebM video, or use the commandline 
+                                If you want to share your log as a video, you can use the "export video" button at the
+                                top to render a WebM video, or use the commandline
                                 <a href="https://github.com/cleanflight/blackbox-tools">blackbox_render tool</a>
                                 tool to turn your log into a series of PNG files, or use a
                                 screen recording tool to record the playback of this log viewer.
@@ -229,7 +229,7 @@
                 <h4>Playback speed</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <div class="playback-rate-control btn-group btn-group-vertical"></div> 
+                        <div class="playback-rate-control btn-group btn-group-vertical"></div>
                         <input type="text" class="form-control playback-rate" value="1.0" size="5">
                     </div>
                 </div>
@@ -238,7 +238,7 @@
                 <h4>Zoom</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <div class="graph-zoom-control btn-group btn-group-vertical"></div> 
+                        <div class="graph-zoom-control btn-group btn-group-vertical"></div>
                         <input type="text" class="form-control graph-zoom" value="-" size="6">
                     </div>
                 </div>
@@ -410,14 +410,14 @@
 									<div class="spacer_box_title">PID Settings</div>
 								</div>
 								<div class="spacer_box">
-									<table class="parameter cf">
+									<table class="no-inav parameter cf">
 										<tbody>
 											<tr>
 												<td name='pidController'><label>Controller</label><select ><!-- list generated here --></select></td>
 											</tr>
 										</tbody>
 									</table>
-									<table class="topspacer pid_titlebar">
+									<table class="pid_titlebar">
 										<tr>
 											<th class="name">Name</th>
 											<th class="proportional">Proportional</th>
@@ -516,7 +516,7 @@
 											<td><input type="number" name="d" step="0.001" min="0" max="0.255" /></td>
 										</tr>
 									</table>
-									<table id="pid_accel" class="pid_tuning topspacer">
+									<table id="pid_accel" class="pid_tuning">
 										<tr>
 											<th colspan="4">
 												<div class="pid_mode borderleft">
@@ -539,15 +539,15 @@
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey topspacer PID-extra">
+							<div class="gui_box grey PID-extra">
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">PID Other</div>
 									</div>
 									<div class="spacer_box">
-									<table class="parameter cf">
+									<table class="no-inav parameter cf">
 										<tbody>
 											<tr>
-											    <td name='dynamic_pid' class="bf-only"><label>Dynamic PID</label><select><!-- list generated here --></select></td>											
+											    <td name='dynamic_pid' class="bf-only"><label>Dynamic PID</label><select><!-- list generated here --></select></td>
 											</tr>
 										</tbody>
 									</table>
@@ -560,7 +560,7 @@
 										</thead>
 										<tbody>
 											<tr>
-											    <td name='dynamic_pterm' class="bf-only"><label>Dynamic P</label><select><!-- list generated here --></select></td>											
+											    <td name='dynamic_pterm' class="bf-only"><label>Dynamic P</label><select><!-- list generated here --></select></td>
 												<td name="yaw_p_limit"><label>Yaw Limit</label><input type="number" step="1" min="0" max="999" /></td>
 												<td name="rollPitchItermResetRate" class="bf-only"><label>Roll/Pitch Reset</label><input type="number" step="1" min="0" max="999" /></td>
 												<td name="rollPitchItermIgnoreRate" class="bf-only"><label>Roll/Pitch Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
@@ -591,7 +591,7 @@
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey topspacer filters">
+							<div class="gui_box grey filters">
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">Filters</div>
 									</div>
@@ -600,7 +600,7 @@
 										<tbody>
 											<tr>
 												<td name='gyro_lpf'><label>Gyro Hardware</label><select><!-- list generated here --></select></td>
-												<td name="gyro_lowpass_hz" class="bf-only"><label>Gyro Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="gyro_lowpass_hz"><label>Gyro Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
 										<tbody>
@@ -610,7 +610,7 @@
 										</tbody>
 									</table>
 									<table class="bf-only" cellpadding="0" cellspacing="0">
-										<tbody class="static-features noline"> 
+										<tbody class="static-features noline">
 											<tr>
 												<td name="gyro_cal_on_first_arm"><label class="option"><input class="ios-switch" type="checkbox"/><div><div></div></div></label></td>
 												<td><label>GYRO_CAL_ON_FIRST_ARM</label></td>
@@ -620,7 +620,7 @@
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey topspacer rxMode">
+							<div class="gui_box grey rxMode">
 								<div class="gui_box_titlebar">
 									<div class="spacer_box_title">Receiver Mode</div>
 								</div>
@@ -639,7 +639,7 @@
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey topspacer hardware">
+							<div class="gui_box grey hardware">
 								<div class="gui_box_titlebar">
 									<div class="spacer_box_title">Hardware Options</div>
 								</div>
@@ -660,7 +660,7 @@
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey topspacer unknown">
+							<div class="gui_box grey unknown">
 								<div class="gui_box_titlebar">
 									<div class="spacer_box_title">Unknown Header Fields</div>
 								</div>
@@ -676,7 +676,7 @@
 						</div>
 						<div class="cf_column half right">
 							<div class="spacer_left">
-								<div class="gui_box grey topspacer rates">
+								<div class="gui_box grey rates">
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">Rates and Expo</div>
 									</div>
@@ -692,7 +692,7 @@
 											</thead>
 											<tbody>
 												<tr>
-													<td name="rcRate" ><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="rcRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 													<td name="rcExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 													<td name="deadband"><label>Deadband</label><input type="number" step="1" min="0" max="32"/></td>
 												</tr>
@@ -700,7 +700,7 @@
 													<th colspan="3">YAW</th>
 												</tr>
 												<tr>
-													<td name="rcYawRate" ><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+													<td name="rcYawRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 													<td name="rcYawExpo" ><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 													<td name="yaw_deadband" ><label>Deadband</label><input type="number" step="1" min="0" max="100"/></td>
 												</tr>
@@ -731,7 +731,7 @@
 											</tbody>
 										</table>
 										<table class="noline" cellpadding="0" cellspacing="0">
-											<tbody class="static-features misc noline"> 
+											<tbody class="static-features misc noline">
 												<tr>
 													<td name="rc_smoothing"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label></td>
 													<td><label>RC_SMOOTHING</label></td>
@@ -741,7 +741,7 @@
 										</table>
 									</div>
 								</div>
-								<div class="gui_box grey topspacer throttle">
+								<div class="gui_box grey throttle">
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">Throttle</div>
 									</div>
@@ -765,7 +765,7 @@
 										</table>
 									</div>
 								</div>
-								<div class="gui_box grey topspacer voltagecurrent">
+								<div class="gui_box grey voltagecurrent">
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">Voltage and Current</div>
 									</div>
@@ -792,7 +792,7 @@
 										</tbody>
 										</table>
 									<table class="noline bf-only" cellpadding="0" cellspacing="0">
-										<tbody class="static-features misc noline"> 
+										<tbody class="static-features misc noline">
 											<tr>
 												<td name="vbat_pid_compensation"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label>
 												<td><label>VBAT_PID_COMPENSATION</label></td>
@@ -807,7 +807,7 @@
 									</table>
 									</div>
 								</div>
-								<div class="gui_box grey topspacer other">
+								<div class="gui_box grey other">
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">Other Features</div>
 									</div>
@@ -1029,7 +1029,7 @@
                             <label class="col-sm-3 control-label">Note</label>
                             <div class="col-sm-9">
                                 <p class="form-control-static">
-                                    If you experience problems with the background flight video being glitchy 
+                                    If you experience problems with the background flight video being glitchy
                                     in the exported video, <a target="_blank" href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md">follow
                                     the instructions here</a> to re-encode your flight video.
                                 </p>
@@ -1088,12 +1088,12 @@
 								</div>
 								<div class="spacer_box">
 		                            <div>
-		                               <label class="option">Custom<input class="custom-mixes ios-switch" type="checkbox"/><div><div></div></div><span>Select custom craft display.</span></label>                             
+		                               <label class="option">Custom<input class="custom-mixes ios-switch" type="checkbox"/><div><div></div></div><span>Select custom craft display.</span></label>
 		                            </div>
 		                            <div class="custom-mixes-group">
 										<table>
 											<tr>
-												<td><label>Mixer Type</label><select class="mixerList"><!-- list generated here --></select></td>	
+												<td><label>Mixer Type</label><select class="mixerList"><!-- list generated here --></select></td>
 												<td class="mixerPreview"><img src="./images/motor_order/quad_x.svg"/></td>
 											</tr>
 										</table>
@@ -1113,7 +1113,7 @@
 								</div>
 								<div class="spacer_box">
 									<div>
-		                               <label class="option">Units<input class="stick-units ios-switch" type="checkbox"/><div><div></div></div><span>Display actual units on stick display.</span></label>                             
+		                               <label class="option">Units<input class="stick-units ios-switch" type="checkbox"/><div><div></div></div><span>Display actual units on stick display.</span></label>
 		                            </div>
 		                            <div class="stick-mode-group">
 										<table>
@@ -1124,7 +1124,7 @@
 		  												<input type="radio" name="stick-mode" value="2">Mode 2</input><br>
 		  												<input type="radio" name="stick-mode" value="3">Mode 3</input><br>
 		  												<input type="radio" name="stick-mode" value="4">Mode 4</input><br>
-												</td>	
+												</td>
 												<td class="modePreview"><img src="./images/stick_modes/mode_2.png"/></td>
 											</tr>
 										</table>
@@ -1203,7 +1203,7 @@
 								</div>
 								<div class="spacer_box">
 									<div>
-		                               <label class="option">Watermark<input class="watermark ios-switch" type="checkbox"/><div><div></div></div><span>Show the watermark.</span></label>                             
+		                               <label class="option">Watermark<input class="watermark ios-switch" type="checkbox"/><div><div></div></div><span>Show the watermark.</span></label>
 		                            </div>
 		                            <div class="watermark-group">
 										<table>
@@ -1221,7 +1221,7 @@
 												<td>
 												</td>
 												<td class="watermark-logo-image">
-												    <img id="watermark-logo" src="./images/logo.png" alt="choose your own logo"/>												
+												    <img id="watermark-logo" src="./images/logo.png" alt="choose your own logo"/>
 												</td>
 											</tr>
 										</table>
@@ -1250,7 +1250,7 @@
 												<td></td>
 												<td></td>
 												<td></td>
-											</tr>										
+											</tr>
 										</table>
 									</div>
 								</div>
@@ -1261,7 +1261,7 @@
 								</div>
 								<div class="spacer_box">
 									<div>
-		                               <label class="option">Lap Timer<input class="laptimer ios-switch" type="checkbox"/><div><div></div></div><span>Show the lap timer.</span></label>                             
+		                               <label class="option">Lap Timer<input class="laptimer ios-switch" type="checkbox"/><div><div></div></div><span>Show the lap timer.</span></label>
 		                            </div>
 		                            <div class="laptimer-group">
 										<table>
@@ -1288,7 +1288,7 @@
 												<td></td>
 												<td></td>
 												<td></td>
-											</tr>										
+											</tr>
 										</table>
 										<p>To use the lap timer feature, you MUST set a "start time" bookmark at the beginning
 										of the log/video (where the race starts for example) plus additional bookmarks to mark the start of each lap.
@@ -1345,6 +1345,6 @@
     <script src="js/graph_config.js"></script>
     <script src="js/configuration.js"></script>
     <script src="js/laptimer.js"></script>
-    <script src="js/main.js"></script>    
+    <script src="js/main.js"></script>
 </body>
 </html>

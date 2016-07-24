@@ -221,7 +221,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .header-dialog .gui_box {
-    margin-bottom: 0px;
+    /*margin-bottom: 0px;*/
 }
 
 .header-dialog .parameter td+input {
@@ -441,11 +441,11 @@ html:not(.isBF28) .bf-only {
 }
 
 .show {
-    width:110px; 
-    float:right; 
+    width:110px;
+    float:right;
     margin-right:3px;
 }
-    
+
 .show a {
     margin-left: 10px;
     width: calc(100% - 10px);
@@ -503,7 +503,7 @@ html:not(.isBF28) .bf-only {
  {
     padding: 1px;
     border: 0px solid #ccc;
-} 
+}
 
 .header-dialog .noline td {
     border: 0px solid #ccc;
@@ -548,7 +548,7 @@ html:not(.isBF28) .bf-only {
 .noline {
 	border:0px;
 }
-   
+
 #content-watermark {
     position: absolute;
     bottom: 40px;
@@ -565,7 +565,7 @@ html:not(.isBF28) .bf-only {
 }
 
 .header-dialog .resetbt {
-    width: 140px; 
+    width: 140px;
     float: right;
 }
 
@@ -595,13 +595,13 @@ html:not(.isBF28) .bf-only {
 }
 
 .header-dialog .borderleft {
-    border-top-left-radius: 3px; 
+    border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
 
 .header-dialog .textleft {
-    width: 25%; 
-    float: left; 
+    width: 25%;
+    float: left;
     text-align: left;
 }
 
