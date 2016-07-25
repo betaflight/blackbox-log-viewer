@@ -7,11 +7,11 @@ function HeaderDialog(dialog, onSave) {
 
 	var that = this; 		// generic pointer back to this function
 	var activeSysConfig;	// pointer to the current system configuration
-    
+
 	/** By default, all parameters are shown on the header
 		however, specific firmware version parameters can be hidden
 		by adding them to this variable
-	**/ 
+	**/
 
 	var parameterVersion = [
 			{name:'rcYawRate'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
@@ -40,18 +40,18 @@ function HeaderDialog(dialog, onSave) {
 	}
 
     function renderOptions(selected, index, list) {
-        var 
+        var
             option = $("<option></option>")
                 .text(list[index])
                 .attr("value", index);
-    
+
         if (index == selected) {
             option.attr("selected", "selected");
         }
-        
+
         return option;
     }
-    
+
     function renderSelect(name, selected, list) {
     	// Populate a select drop-down box
     	var parameterElem = $('.parameter td[name="' + name + '"]');
@@ -68,10 +68,10 @@ function HeaderDialog(dialog, onSave) {
 				parameterElem.removeClass('missing');
 			} else {
 				parameterElem.addClass('missing');
-			}   	
+			}
 
     }
-    
+
     function setParameter(name, data, decimalPlaces) {
     	var parameterElem = $('.parameter td[name="' + name + '"]');
 		var nameElem = $('input', parameterElem);
@@ -99,7 +99,7 @@ function HeaderDialog(dialog, onSave) {
 			nameElem.closest('tr').addClass('missing');
 		}
 		parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
-	}    
+	}
 
 	function populatePID(name, data) {
 		var i = 0;
@@ -193,15 +193,15 @@ function HeaderDialog(dialog, onSave) {
         }
 
         var radioGroups = [];
-        
+
         var features_e = $('.features');
         features_e.children().remove(); // clear list
 
         for (var i = 0; i < features.length; i++) {
             var row_e;
-            
+
             var feature_tip_html = '';
-            
+
             if (features[i].mode === 'group') {
                 row_e = $('<tr><td><input class="feature" id="feature-'
                         + i
@@ -215,7 +215,7 @@ function HeaderDialog(dialog, onSave) {
                         + i
                         + '">'
                         + features[i].name
-                        + '</label></td><td><span>' + features[i].description + '</span>' 
+                        + '</label></td><td><span>' + features[i].description + '</span>'
                         + feature_tip_html + '</td></tr>');
                 radioGroups.push(features[i].group);
             } else {
@@ -229,9 +229,9 @@ function HeaderDialog(dialog, onSave) {
                         + i
                         + '">'
                         + features[i].name
-                        + '</label></td><td><span>' + features[i].description + '</span>' 
+                        + '</label></td><td><span>' + features[i].description + '</span>'
                         + feature_tip_html + '</td></tr>');
-                
+
                 var feature_e = row_e.find('input.feature');
 
                 feature_e.prop('checked', (value & 1<<features[i].bit));
@@ -260,7 +260,7 @@ function HeaderDialog(dialog, onSave) {
 		// Finally, if the features value is not part of the log, then invalidate all the check/radio boxes
 		(value!=null)?$(".feature").closest('tr').removeClass('missing'):
 					  $(".feature").closest('tr').addClass('missing');
-        	
+
 	}
 
 	function renderUnknownHeaders(unknownHeaders) {
@@ -273,10 +273,10 @@ function HeaderDialog(dialog, onSave) {
 
 				for(var i=0; i<unknownHeaders.length; i++) {
 					elem += '<tr><td>' + unknownHeaders[i].name + '</td>' +
-								'<td>' + unknownHeaders[i].value + '</td></tr>';						
+								'<td>' + unknownHeaders[i].value + '</td></tr>';
 				}
 
-				table.append(elem);						
+				table.append(elem);
 				$('.unknown').show();
 			} else {
 				$('.unknown').hide();
@@ -286,23 +286,23 @@ function HeaderDialog(dialog, onSave) {
 		}
 	}
 
-    function renderSysConfig(sysConfig) { 
-    
+    function renderSysConfig(sysConfig) {
+
 		activeSysConfig = sysConfig; // Store the current system configuration
 
     	// Update the log header
 
     	$('h5.modal-title-revision').text( ((sysConfig['Firmware revision']!=null)?(' Rev : '  + sysConfig['Firmware revision']):''));
     	$('h5.modal-title-date').text(     ((sysConfig['Firmware date']!=null)    ?(' Date : ' + sysConfig['Firmware date']    ):''));
-    
+
 		switch(sysConfig.firmwareType) {
 			case FIRMWARE_TYPE_BETAFLIGHT:
-					$('.header-dialog-toggle').hide(); // selection button is not required
-					// add the version indicator
-					//(sysConfig.firmware >= 2.8)?$('html').addClass('isBF28'):$('html').removeClass('isBF28');
-					break;
 			case FIRMWARE_TYPE_CLEANFLIGHT:
-					$('.header-dialog-toggle').hide(); // selection button is not required
+				$('.header-dialog-toggle').hide(); // selection button is not required
+					break;
+			case FIRMWARE_TYPE_INAV:
+				$('[name="rates[0]"] input').attr("step", "10").attr("min", "10").attr("max", "1800");
+				$('.header-dialog-toggle').hide(); // selection button is not required
 					break;
 			default:
 				$('.header-dialog-toggle').text('Cleanflight');
@@ -316,24 +316,21 @@ function HeaderDialog(dialog, onSave) {
 						$('.header-dialog-toggle').text('Betaflight');
 					} else {
 						$('html').removeClass('isBF');
-						$('html').addClass('isCF');							
+						$('html').addClass('isCF');
 						$('.header-dialog-toggle').text('Cleanflight');
 					}
 				});
-			}
-		
-    	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE); 
+		}
+
+    	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
 
         // Populate the ROLL Pid Faceplate
         populatePID('rollPID'					, sysConfig.rollPID);
         populatePID('pitchPID'					, sysConfig.pitchPID);
         populatePID('yawPID'					, sysConfig.yawPID);
-
         populatePID('altPID'					, sysConfig.altPID);
         populatePID('velPID'					, sysConfig.velPID);
- 
         populatePID('magPID'					, sysConfig.magPID); // this is not an array
-        
         populatePID('posPID'					, sysConfig.posPID);
         populatePID('posrPID'					, sysConfig.posrPID);
         populatePID('navrPID'					, sysConfig.navrPID);
@@ -360,9 +357,17 @@ function HeaderDialog(dialog, onSave) {
         setParameter('tpa-breakpoint'			,sysConfig.tpa_breakpoint,0);
 		setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
 		setParameter('superExpoFactorYaw'		,sysConfig.superExpoFactorYaw,2);
-        setParameter('rates[0]'					,sysConfig.rates[0],2);
-        setParameter('rates[1]'					,sysConfig.rates[1],2);
-        setParameter('rates[2]'					,sysConfig.rates[2],2);
+
+		if (sysConfig.firmwareType == FIRMWARE_TYPE_INAV) {
+			setParameter('rates[0]'				,sysConfig.rates[0] * 10,0);
+			setParameter('rates[1]'				,sysConfig.rates[1] * 10,0);
+			setParameter('rates[2]'				,sysConfig.rates[2] * 10,0);
+		} else {
+			setParameter('rates[0]'				,sysConfig.rates[0],2);
+	        setParameter('rates[1]'				,sysConfig.rates[1],2);
+	        setParameter('rates[2]'				,sysConfig.rates[2],2);
+		}
+
         setParameter('loopTime'					,sysConfig.loopTime,0);
         setParameter('yaw_p_limit'				,sysConfig.yaw_p_limit,0);
         setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,2);
@@ -384,13 +389,13 @@ function HeaderDialog(dialog, onSave) {
 	    setParameter('airmode_activate_throttle',sysConfig.airmode_activate_throttle, 0);
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
     	renderSelect('dynamic_pid'				,sysConfig.dynamic_pid, OFF_ON);
-	            
+
 		/* Packed Flags */
 
         builtFeaturesList(sysConfig);
 
 		/* Hardware selections */
-        
+
     	renderSelect('acc_hardware'		    	,sysConfig.acc_hardware, ACC_HARDWARE);
     	renderSelect('baro_hardware'		    ,sysConfig.baro_hardware, BARO_HARDWARE);
     	renderSelect('mag_hardware'		    	,sysConfig.mag_hardware, MAG_HARDWARE);
@@ -403,14 +408,22 @@ function HeaderDialog(dialog, onSave) {
         /* Show Unknown Fields */
         renderUnknownHeaders(sysConfig.unknownHeaders);
 
+		/*
+		 * In case of INAV, hide irrelevant options
+		 */
+		 if (sysConfig.firmwareType == FIRMWARE_TYPE_INAV) {
+			 $(".no-inav").hide();
+			 $(".bf-only").hide();
+		 }
+
     }
-        
+
     function convertUIToSysConfig() {
     	console.log('Saving....');
     	var newSysConfig = {};
 
-    	// Scan all the parameters 
-		$(".parameter input").each(function() { 
+    	// Scan all the parameters
+		$(".parameter input").each(function() {
 			if($(this).val()!=null) {
 				var matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
 				if(matches!=null) { // this is a variable in an array
@@ -422,7 +435,7 @@ function HeaderDialog(dialog, onSave) {
 						newArray[matches[2]] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
 					} else {
 						newArray[matches[2]] = (($(this).val()=='on')?1:0);
-					}				
+					}
 				} else { // this is just a straight field variable
 					if($(this).attr('decPl')!=null) {
 						newSysConfig[$(this).attr('name')] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
@@ -430,19 +443,19 @@ function HeaderDialog(dialog, onSave) {
 						newSysConfig[$(this).attr('name')] = (($(this).val()=='on')?1:0);
 					}
 				}
-			}			
+			}
 			});
 
-    	// Scan all the drop-down lists 
-		$(".parameter select").each(function() { 
+    	// Scan all the drop-down lists
+		$(".parameter select").each(function() {
 			if($(this).val()!=null) {
 					newSysConfig[$(this).attr('name')] = parseInt($(this).val());
-			}			
+			}
 			});
-		
+
 
 		// Scan the pid_tuning table
-		$(".pid_tuning input").each(function() { 
+		$(".pid_tuning input").each(function() {
 			if($(this).val()!=null) {
 				if($(this).attr('decPl')!=null) {
 					var matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
@@ -454,7 +467,7 @@ function HeaderDialog(dialog, onSave) {
 				} else {
 					newSysConfig[$(this).attr('name')] = $(this).val();
 				}
-			}			
+			}
 			});
 
 		//Build the features value
@@ -466,19 +479,19 @@ function HeaderDialog(dialog, onSave) {
 			});
 		newSysConfig['features'] = newFeatureValue;
 
-		return newSysConfig;			
+		return newSysConfig;
     }
 
 	// Public variables
-    
-    this.show = function(sysConfig) { 
+
+    this.show = function(sysConfig) {
             dialog.modal('show');
             renderSysConfig(sysConfig);
 
     }
- 
+
  	// Buttons
- 
+
     $(".header-dialog-save").click(function(e) {
         onSave(convertUIToSysConfig());
     });
