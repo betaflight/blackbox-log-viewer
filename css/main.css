@@ -483,14 +483,33 @@ html .view-analyser-fullscreen {
      color:black;
 }
 
-html.has-analyser-sticks .view-analyser-sticks,
-html.has-analyser .view-analyser,
-html.has-table .view-table,
-html.has-sticks .view-sticks,
-html.has-craft .view-craft,
-html:not(.video-hidden) .view-video {
-     color: rgba(239,187,0,1.0);
+html.has-analyser-sticks.isBF .view-analyser-sticks,
+html.has-analyser.isBF .view-analyser,
+html.has-table.isBF .view-table,
+html.has-sticks.isBF .view-sticks,
+html.has-craft.isBF .view-craft,
+html:not(.video-hidden).isBF .view-video {
+     color: rgba(158, 100, 0,1);
 }
+
+html.has-analyser-sticks.isCF .view-analyser-sticks,
+html.has-analyser.isCF .view-analyser,
+html.has-table.isCF .view-table,
+html.has-sticks.isCF .view-sticks,
+html.has-craft.isCF .view-craft,
+html:not(.video-hidden).isCF .view-video {
+     color: rgba(0, 162, 63,1);
+}
+
+html.has-analyser-sticks.isINAV .view-analyser-sticks,
+html.has-analyser.isINAV .view-analyser,
+html.has-table.isINAV .view-table,
+html.has-sticks.isINAV .view-sticks,
+html.has-craft.isINAV .view-craft,
+html:not(.video-hidden).isINAV .view-video {
+     color: rgba(8, 80, 172,1.0);
+}
+
 
 html:not(.has-analyser-fullscreen) .glyphicon-resize-small {
      display:none;
@@ -676,16 +695,33 @@ html.isCF .navbar-logo {
     left: 16px;
 }
 
+html.isINAV .navbar-logo {
+    left: 34px;
+}
+
+html.isCF .navbar-logo img {
+	content: url(".././images/cf_logo_white.svg");
+	width: 160px;
+}
+
+html.isBF .navbar-logo img {
+	content: url(".././images/bf_logo_white.svg");
+	width: auto;
+}
+
+html.isINAV .navbar-logo img {
+	content: url(".././images/inav_logo_white.png");
+	width: auto;
+	left: -16px;
+	top: 3px;
+}
+
 .navbar-logo img {
 	position:relative;
 	height: 35px;
 	width: 210px;
 	padding: 0px;
-	display:none;
-}
-
-html.isCF img.isCF, html.isBF img.isBF {
-	display: block;
+	display:block;
 }
 
 .navbar-logo a {
@@ -916,6 +952,26 @@ html.isBF input[type="checkbox"].ios-switch:checked + div > div {
 	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0,1);
 }
 
+/* Blue Knob */
+input[type="checkbox"].blue.ios-switch:checked + div > div ,
+html.isINAV input[type="checkbox"].ios-switch:checked + div > div {
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
+}
+
+html.isBF .config-graph h4 span,
+html.isBF .log-graph-config h3 span {
+    background-image: linear-gradient(to bottom,#fff8e9 0,#ffbb00 100%);
+}
+
+html.isCF .config-graph h4 span,
+html.isCF .log-graph-config h3 span {
+    background-image: linear-gradient(to bottom,#fff8e9 0,#00a23f 100%);
+}
+
+html.isINAV .config-graph h4 span,
+html.isINAV .log-graph-config h3 span {
+    background-image: linear-gradient(to bottom,#fff8e9 0,#0850ac 100%);
+}
 
 .config-graph h4 span,
 .log-graph-config h3 span {
