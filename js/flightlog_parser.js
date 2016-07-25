@@ -601,24 +601,23 @@ var FlightLogParser = function(logData) {
 					$('html').removeClass('isCF');
                     $('html').addClass('isBF');
                 } else {
-                    that.sysConfig.firmware      = 0.0;
-                    that.sysConfig.firmwarePatch = 0;
-                }
 
-                /*
-                 * Try to detect INAV
-                 */
-                var matches = fieldValue.match(/(INAV).* (\d+)\.(\d+).(\d+)*/i);
-                if(matches!=null) {
-                    that.sysConfig.firmwareType  = FIRMWARE_TYPE_INAV;
-                    that.sysConfig.firmware      = parseFloat(matches[2] + '.' + matches[3]);
-                    that.sysConfig.firmwarePatch = (matches[5] != null)?parseInt(matches[5]):'';
-                    //since we do not do much changes comparing to CF, do not change html
-                } else {
-                    that.sysConfig.firmware      = 0.0;
-                    that.sysConfig.firmwarePatch = 0;
+                    /*
+                     * Try to detect INAV
+                     */
+                    var matches = fieldValue.match(/(INAV).* (\d+)\.(\d+).(\d+)*/i);
+                    if(matches!=null) {
+                        that.sysConfig.firmwareType  = FIRMWARE_TYPE_INAV;
+                        that.sysConfig.firmware      = parseFloat(matches[2] + '.' + matches[3]);
+                        that.sysConfig.firmwarePatch = (matches[5] != null)?parseInt(matches[5]):'';
+                        //since we do not do much changes comparing to CF, do not change html
+                    } else {
+                        that.sysConfig.firmware      = 0.0;
+                        that.sysConfig.firmwarePatch = 0;
+                    }
                 }
                 that.sysConfig[fieldName] = fieldValue;
+                
             break;
             case "Product":
             case "Blackbox version":
