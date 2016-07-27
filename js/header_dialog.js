@@ -328,6 +328,19 @@ function HeaderDialog(dialog, onSave) {
 				});
 		}
 
+		if(sysConfig.firmware >= 3.0 && sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
+			PID_CONTROLLER_TYPE = ([
+					'LEGACY',
+					'BETAFLIGHT'
+				])
+		} else {
+			PID_CONTROLLER_TYPE = ([
+					'UNUSED',
+					'MWREWRITE',
+					'LUXFLOAT'
+				]) 
+		}
+
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
 
         // Populate the ROLL Pid Faceplate
