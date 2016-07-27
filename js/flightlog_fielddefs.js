@@ -97,7 +97,7 @@ var
             'SUPEREXPO_RATES'
     ]),
 
-    PID_CONTROLLER_TYPE = makeReadOnly([
+    PID_CONTROLLER_TYPE = ([
             'UNUSED',
             'MWREWRITE',
             'LUXFLOAT'
