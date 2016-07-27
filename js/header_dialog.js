@@ -18,14 +18,19 @@ function HeaderDialog(dialog, onSave) {
 			{name:'superExpoFactor'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.6, max:2.7},
 			{name:'superExpoFactorYaw'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
 			{name:'dynamic_pterm'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.6, max:2.7},
+            {name:'dterm_average_count'	    	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:0.0, max:2.6},
 			{name:'iterm_reset_offset'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.6, max:2.7},
 			{name:'airmode_activate_throttle'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
-			{name:'dynamic_pid'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+			{name:'dynamic_pid'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:2.9},
 			{name:'superExpoYawMode'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
             {name:'rollPitchItermResetRate'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
             {name:'yawItermResetRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.7, max:2.7},
             {name:'rollPitchItermIgnoreRate'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
             {name:'yawItermIgnoreRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
+            {name:'gyro_notch_hz'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'gyro_notch_q'			    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'rc_smooth_interval'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'rc_smoothing'			    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:0.0, max:2.8},
 
 	];
 
@@ -98,7 +103,7 @@ function HeaderDialog(dialog, onSave) {
 		} else {
 			nameElem.closest('tr').addClass('missing');
 		}
-		parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
+		parameterElem.parent().css('display', isParametervalid(name)?('table-cell'):('none'));
 	}
 
 	function populatePID(name, data) {
@@ -294,6 +299,7 @@ function HeaderDialog(dialog, onSave) {
 
     	$('h5.modal-title-revision').text( ((sysConfig['Firmware revision']!=null)?(' Rev : '  + sysConfig['Firmware revision']):''));
     	$('h5.modal-title-date').text(     ((sysConfig['Firmware date']!=null)    ?(' Date : ' + sysConfig['Firmware date']    ):''));
+    	$('h5.modal-title-craft').text(    ((sysConfig['Craft name']!=null)       ?(' Name : ' + sysConfig['Craft name']    ):''));
 
 		switch(sysConfig.firmwareType) {
 			case FIRMWARE_TYPE_BETAFLIGHT:
@@ -389,6 +395,9 @@ function HeaderDialog(dialog, onSave) {
 	    setParameter('airmode_activate_throttle',sysConfig.airmode_activate_throttle, 0);
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
     	renderSelect('dynamic_pid'				,sysConfig.dynamic_pid, OFF_ON);
+        setParameter('gyro_notch_hz'			,sysConfig.gyro_notch_hz,2);
+        setParameter('gyro_notch_q'				,sysConfig.gyro_notch_q,1);
+        setParameter('rc_smooth_interval'		,sysConfig.rc_smooth_interval,0);
 
 		/* Packed Flags */
 

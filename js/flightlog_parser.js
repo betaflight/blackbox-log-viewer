@@ -228,6 +228,8 @@ var FlightLogParser = function(logData) {
             yaw_deadband:null,              // Yaw Deadband
             gyro_lpf:null,                  // Gyro lpf setting.
             gyro_lowpass_hz:null,           // Gyro Soft Lowpass Filter Hz
+            gyro_notch_hz:null,             // Gyro Notch Frequency
+            gyro_notch_q:null,              // Gyro Notch Quality
             acc_lpf_hz:null,                // Accelerometer Lowpass filter Hz
             acc_hardware:null,              // Accelerometer Hardware type
             baro_hardware:null,             // Barometer Hardware type
@@ -235,7 +237,9 @@ var FlightLogParser = function(logData) {
             gyro_cal_on_first_arm:null,     // Gyro Calibrate on first arm
             vbat_pid_compensation:null,     // VBAT PID compensation
             rc_smoothing:null,              // RC Control Smoothing
+            rc_smooth_interval:null,        // RC Control Smoothing
             features:null,                  // Activated features (e.g. MOTORSTOP etc)
+            Craft_name:null,                // Craft Name
             unknownHeaders : []             // Unknown Extra Headers
         },
 
@@ -553,6 +557,16 @@ var FlightLogParser = function(logData) {
             case "dynamic_pid": // Betaflight Only
                 that.sysConfig.dynamic_pid = parseInt(fieldValue, 10);
             break;
+            case "gyro_notch_hz": // Betaflight Only
+                that.sysConfig.gyro_notch_hz = parseInt(fieldValue, 10);
+            break;
+            case "gyro_notch_q": // Betaflight Only
+                that.sysConfig.gyro_notch_q = parseInt(fieldValue, 10);
+            break;
+            case "rc_smooth_interval": // Betaflight Only
+                that.sysConfig.rc_smooth_interval = parseInt(fieldValue, 10);
+            break;
+                        
             /****************************/
 
             case "vbatscale":
@@ -630,6 +644,7 @@ var FlightLogParser = function(logData) {
             case "Product":
             case "Blackbox version":
             case "Firmware date":
+            case "Craft name":
                 // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
                 // Just Add them anyway
                 that.sysConfig[fieldName] = fieldValue;
