@@ -400,6 +400,7 @@
                     <h4 class="modal-title">Log Header Information</h4>
                     <h5 class="modal-title-revision"></h5>
                     <h5 class="modal-title-date"></h5>
+                    <h5 class="modal-title-craft"></h5>
                 </div>
                 <div class="modal-body">
 					<form name="header-information" id="pid-tuning">
@@ -600,6 +601,8 @@
 											<tr>
 												<td name='gyro_lpf'><label>Gyro Hardware</label><select><!-- list generated here --></select></td>
 												<td name="gyro_lowpass_hz"><label>Gyro Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name='gyro_notch_hz'><label>Gyro Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="gyro_notch_q"><label>Gyro Notch Q (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
 										<tbody>
@@ -729,6 +732,13 @@
 												</tr>
 											</tbody>
 										</table>
+										<table class="parameter cf">
+											<tbody>
+												<tr>
+													<td name="rc_smooth_interval"><label>RC Smooth Interval (ms)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												</tr>
+											</tbody>
+										</table>									
 										<table class="noline" cellpadding="0" cellspacing="0">
 											<tbody class="static-features misc noline">
 												<tr>

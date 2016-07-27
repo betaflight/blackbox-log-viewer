@@ -352,7 +352,8 @@ function BlackboxLogViewer() {
         
         // Add log version information to status bar
         var sysConfig = flightLog.getSysConfig();
-        $('#status-bar .version').text( ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
+        $('#status-bar .version').text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
+                                        ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
         $('#status-bar .looptime').text( ((sysConfig['loopTime']!=null)?(sysConfig['loopTime'] +'us (' + (1000000/sysConfig['loopTime']).toFixed(0) + 'Hz)'):''));
         $('#status-bar .lograte').text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Logging Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
 
