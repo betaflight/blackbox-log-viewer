@@ -41,6 +41,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		customMix 			: null,				// Default to no mixer configuration
 		stickMode 			: 2,				// Default to Mode 2
 		stickUnits			: false,			// Show units on stick display?
+		stickTrails			: false,			// Show stick trails?
 		gapless				: false,
 		drawCraft			: "3D", 
 		drawPidTable		: true, 
@@ -277,6 +278,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     	currentSettings.stickUnits = $(this).is(":checked");
     });
 
+
+    $(".stick-trails").click(function() {
+    	currentSettings.stickTrails = $(this).is(":checked");
+    });
+    
     // Load Custom Logo
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -326,6 +332,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		if(currentSettings.stickUnits!=null) {
     			// set the toggle switch
     			$(".stick-units").prop('checked', currentSettings.stickUnits);
+    		} 
+    		if(currentSettings.stickTrails!=null) {
+    			// set the toggle switch
+    			$(".stick-trails").prop('checked', currentSettings.stickTrails);
     		} 
 
     		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
