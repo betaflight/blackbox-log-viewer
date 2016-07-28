@@ -773,6 +773,9 @@ function BlackboxLogViewer() {
     });
     
     $(document).ready(function() {
+
+        $('[data-toggle="tooltip"]').tooltip(); // initialise tooltips
+        
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
         
         prefs.get('log-legend-hidden', function(item) {
