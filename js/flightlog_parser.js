@@ -1205,6 +1205,10 @@ var FlightLogParser = function(logData) {
                     lastEvent.data.value = Math.round((lastEvent.data.value * scale) * 10000) / 10000;
                 }
             break;
+            case FlightLogEvent.TWITCH_TEST:
+                lastEvent.data.stage = stream.readU8();
+                lastEvent.data.value = uint32ToFloat(stream.readU32());
+            break;
             case FlightLogEvent.LOGGING_RESUME:
                 lastEvent.data.logIteration = stream.readUnsignedVB();
                 lastEvent.data.currentTime = stream.readUnsignedVB();
