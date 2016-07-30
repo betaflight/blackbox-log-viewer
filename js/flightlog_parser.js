@@ -1206,7 +1206,24 @@ var FlightLogParser = function(logData) {
                 }
             break;
             case FlightLogEvent.TWITCH_TEST:
-                lastEvent.data.stage = stream.readU8();
+                //lastEvent.data.stage = stream.readU8();
+                var tmp = stream.readU8();
+                switch (tmp) {
+                    case(1):
+                        lastEvent.data.name = "Response Time->";
+                        break;
+                    case(2):
+                        lastEvent.data.name = "Half Setpoint Time->";
+                        break;
+                    case(3):
+                        lastEvent.data.name = "Setpoint Time->";
+                        break;
+                    case(4):
+                        lastEvent.data.name = "Negative Setpoint->";
+                        break;
+                    case(5):
+                        lastEvent.data.name = "Initial Setpoint->";
+                }
                 lastEvent.data.value = uint32ToFloat(stream.readU32());
             break;
             case FlightLogEvent.LOGGING_RESUME:
