@@ -53,7 +53,7 @@ html, body {
 
 @media (min-width: 768px) {
     .welcome-pane .panel-body {
-        min-height:320px;
+        min-height: 100px;
     }
 }
 
@@ -1016,4 +1016,9 @@ html.hasLaps table#lap-timer-laps {
 
 div#lap-timer td:first-child {
     padding-right: 10px;
+}
+
+
+.viewer-download {
+    display: none;
 }

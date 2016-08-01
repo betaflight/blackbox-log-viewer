@@ -3,6 +3,8 @@
 // Global Level Variables
 var userSettings = {};
 
+var VIEWER_VERSION = '2.4.11'; // Current version
+
 function BlackboxLogViewer() {
     function supportsRequiredAPIs() {
         return window.File && window.FileReader && window.FileList && Modernizr.canvas;
@@ -33,6 +35,7 @@ function BlackboxLogViewer() {
         lastRenderTime = false,
         flightLog, flightLogDataArray,
         graph = null,
+        latestVersion,
         
         prefs = new PrefStorage(),
         
@@ -776,6 +779,24 @@ function BlackboxLogViewer() {
 
         $('[data-toggle="tooltip"]').tooltip(); // initialise tooltips
         
+        // Get Latest Version Information
+        $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
+        try {
+            $.getJSON('https://api.github.com/repos/GaryKeeble/blackbox-log-viewer/releases/latest',{},function(data){
+                latestVersion = data;
+                if(latestVersion) {
+                    $(".btn-viewer-download").text(latestVersion.tag_name);
+                    $(".viewer-download").show();
+                } else {
+                    $(".viewer-download").hide();
+                }
+                });
+        } catch (e) 
+        {
+            console.log('Cannot get latest version information');
+            $(".viewer-download").hide();
+        }
+
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
         
         prefs.get('log-legend-hidden', function(item) {
