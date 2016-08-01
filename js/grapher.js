@@ -729,6 +729,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             break;
             case FlightLogEvent.INFLIGHT_ADJUSTMENT:
                 drawEventLine(x, labelY, event.data.name + " = " + event.data.value, "rgba(0,255,255,0.5)", 2);
+            break
+            case FlightLogEvent.TWITCH_TEST:
+                drawEventLine(x, labelY, "Twitch Test: " + event.data.name + event.data.value.toFixed(3) + "ms", "rgba(0,133,255,0.5)", 2);
             break;
             case FlightLogEvent.FLIGHT_MODE:
                 drawEventLine(x, labelY, "Flight Mode Change" + FlightLogFieldPresenter.presentChangeEvent(event.data.newFlags, event.data.lastFlags, FLIGHT_LOG_FLIGHT_MODE_NAME), "rgba(0,0,255,0.75)", 3);
