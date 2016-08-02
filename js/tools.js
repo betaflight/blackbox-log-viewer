@@ -187,6 +187,21 @@ function formatTime(msec, displayMsec) {
         + (displayMsec ? "." + leftPad(ms, "0", 3) : "");
 }
 
+function stringLoopTime(loopTime, pid_process_denom, unsynced_fast_pwm, motor_pwm_rate) {
+    var returnString = '';
+    if(loopTime!=null) {
+        returnString = (loopTime +'us (' + parseFloat((1000/loopTime).toFixed(3)) + 'kHz');
+        if(pid_process_denom!=null) {
+            returnString += "/" + (parseFloat((1000/(loopTime*pid_process_denom)).toFixed(3)) +'kHz');
+            if(unsynced_fast_pwm!=null) {
+                returnString += (unsynced_fast_pwm==0)?('/SYNCED') : ( (motor_pwm_rate!=null)?('/' + parseFloat((motor_pwm_rate/1000).toFixed(3)) + "kHz"):('UNSYNCED') ); 
+            }
+        }
+    returnString += ')';
+    }
+    return returnString;
+}
+
 function stringTimetoMsec(input) {
     try {
             var matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);

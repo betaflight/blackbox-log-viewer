@@ -320,6 +320,7 @@
         <div class="configuration-file" id="configuration-file">
 			<!-- auto filled by configuration function -->
         </div>
+	</div>
     <!-- Status Bar -->
     <div id="status-bar">
         <div>
@@ -586,21 +587,7 @@
 										<tbody>
 											<tr>
 												<td></td>
-												<td name="yaw_lpf_hz" class="bf-only"><label>Yaw (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 												<td name="iterm_reset_offset" class="bf-only"><label>Reset Offset</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
-										</tbody>
-									</table>
-									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th colspan="5">D-Term</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td name="dterm_lpf_hz" ><label>Filter (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -623,6 +610,9 @@
 										<tbody>
 											<tr>
 												<td name="acc_lpf_hz"><label>Acc (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="yaw_lpf_hz" class="bf-only"><label>Yaw (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="dterm_lpf_hz" ><label>D-Term (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -654,6 +644,14 @@
 											<!-- table generated here -->
 										</tbody>
 									</table>
+									<table class="parameter cf">
+										<tbody>
+											<tr>
+												<td name='serialrx_provider'><label>Provider</label><select><!-- list generated here --></select></td>
+											</tr>
+										</tbody>
+									</table>
+
 								</div>
 							</div>
 							<div class="gui_box grey hardware">
@@ -665,6 +663,8 @@
 										<tbody>
 											<tr>
 												<td name="loopTime"><label>Looptime</label><input type="number" step="25" min="0" max="3000"/></td>
+												<td name="gyro_sync_denom"><label>Gyro Sync</label><input type="number" step="1" min="0" max="8"/></td>
+												<td name="pid_process_denom"><label>PID Process</label><input type="number" step="1" min="0" max="8"/></td>
 											</tr>
 										</tbody>
 										<tbody>
@@ -672,6 +672,15 @@
 												<td name='acc_hardware'><label>Accelerometer</label><select><!-- list generated here --></select></td>
 												<td name='mag_hardware'><label>Magnetometer</label><select><!-- list generated here --></select></td>
 												<td name='baro_hardware'><label>Barometer</label><select><!-- list generated here --></select></td>
+											</tr>
+										</tbody>
+									</table>
+									<table class="parameter cf">
+										<tbody>
+											<tr>
+												<td name='fast_pwm_protocol'><label>Protocol</label><select><!-- list generated here --></select></td>
+											    <td name='unsynced_fast_pwm'><label>Motors</label><select><!-- list generated here --></select></td>
+												<td name="motor_pwm_rate"><label>Motor Rate</label><input type="number" step="1" min="0" max="32000"/></td>
 											</tr>
 										</tbody>
 									</table>
