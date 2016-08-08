@@ -320,6 +320,7 @@
         <div class="configuration-file" id="configuration-file">
 			<!-- auto filled by configuration function -->
         </div>
+	</div>
     <!-- Status Bar -->
     <div id="status-bar">
         <div>
@@ -586,21 +587,7 @@
 										<tbody>
 											<tr>
 												<td></td>
-												<td name="yaw_lpf_hz" class="bf-only"><label>Yaw (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 												<td name="iterm_reset_offset" class="bf-only"><label>Reset Offset</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
-										</tbody>
-									</table>
-									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th colspan="5">D-Term</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td name="dterm_lpf_hz" ><label>Filter (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -612,17 +599,41 @@
 									</div>
 									<div class="spacer_box">
 									<table class="parameter cf">
+										<thead>
+											<tr>
+												<th colspan="4">Gyro Filters</th>
+											</tr>
+										</thead>
 										<tbody>
 											<tr>
-												<td name='gyro_lpf'><label>Gyro Hardware</label><select><!-- list generated here --></select></td>
-												<td name="gyro_lowpass_hz"><label>Gyro Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name='gyro_notch_hz'><label>Gyro Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="gyro_notch_q"><label>Gyro Notch Q (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
+												<td name='gyro_lpf'><label>Hardware</label><select><!-- list generated here --></select></td>
+												<td name="gyro_lowpass_hz"><label>Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name='gyro_notch_hz'><label>Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="gyro_notch_cutoff"><label>Notch Cutoff (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
+										<thead>
+											<tr>
+												<th colspan="4">D-Term Filters</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td name="dterm_lpf_hz" ><label>Cut-off (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
+												<td name='dterm_notch_hz'><label>Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="dterm_notch_cutoff"><label>Notch Cutoff (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
+											</tr>
+										</tbody>
+										<thead>
+											<tr>
+												<th colspan="4">Other Filters</th>
+											</tr>
+										</thead>
 										<tbody>
 											<tr>
 												<td name="acc_lpf_hz"><label>Acc (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="yaw_lpf_hz" class="bf-only"><label>Yaw (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -654,6 +665,14 @@
 											<!-- table generated here -->
 										</tbody>
 									</table>
+									<table class="parameter cf">
+										<tbody>
+											<tr>
+												<td name='serialrx_provider'><label>Provider</label><select><!-- list generated here --></select></td>
+											</tr>
+										</tbody>
+									</table>
+
 								</div>
 							</div>
 							<div class="gui_box grey hardware">
@@ -665,6 +684,8 @@
 										<tbody>
 											<tr>
 												<td name="loopTime"><label>Looptime</label><input type="number" step="25" min="0" max="3000"/></td>
+												<td name="gyro_sync_denom"><label>Gyro Sync</label><input type="number" step="1" min="0" max="8"/></td>
+												<td name="pid_process_denom"><label>PID Process</label><input type="number" step="1" min="0" max="8"/></td>
 											</tr>
 										</tbody>
 										<tbody>
@@ -695,14 +716,11 @@
 							<div class="spacer_left">
 								<div class="gui_box grey rates">
 									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">Rates and Expo</div>
+										<div class="spacer_box_title">RC Command and Motor Protocols</div>
 									</div>
 									<div class="spacer_box">
 										<table class="parameter cf">
 											<thead>
-												<tr>
-													<th colspan="6">RC Command</th>
-												</tr>
 												<tr>
 													<th colspan="3">ROLL/PITCH</th>
 												</tr>
@@ -726,7 +744,7 @@
 										<table class="parameter cf">
 											<thead>
 												<tr>
-													<th colspan="5">Expo Rates</th>
+													<th colspan="5">Super Expo Rates</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -750,7 +768,8 @@
 										<table class="parameter cf">
 											<tbody>
 												<tr>
-													<td name="rc_smooth_interval"><label>RC Smooth Interval (ms)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+													<td name='rc_interpolation'><label>RC Interpolation</label><select><!-- list generated here --></select></td>
+													<td name="rc_interpolation_interval"><label>RC Interval (ms)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 												</tr>
 											</tbody>
 										</table>									
@@ -760,6 +779,20 @@
 													<td name="rc_smoothing"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label></td>
 													<td><label>RC_SMOOTHING</label></td>
 													<td><span>RC Smoothing Enabled</span></td>
+												</tr>
+											</tbody>
+										</table>
+										<table class="parameter cf">
+											<thead>
+												<tr>
+													<th colspan="5">Motors</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td name='fast_pwm_protocol'><label>Protocol</label><select><!-- list generated here --></select></td>
+													<td name='unsynced_fast_pwm'><label>Motors</label><select><!-- list generated here --></select></td>
+													<td name="motor_pwm_rate"><label>Motor Rate</label><input type="number" step="1" min="0" max="32000"/></td>
 												</tr>
 											</tbody>
 										</table>

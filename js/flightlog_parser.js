@@ -201,9 +201,13 @@ var FlightLogParser = function(logData) {
             thrExpo:null,              	    // Throttle Expo
             dynThrPID:null,                 // TPA
             tpa_breakpoint:null,            // TPA Breakpoint
+            airmode_activate_throttle:null, // airmode activation level
+            serialrx_provider:null,         // name of the serial rx provider
             superExpoFactor:null,           // Super Expo Factor
             rates:[null, null, null],	    // Rates [ROLL, PITCH, YAW]
             looptime:null,                  // Looptime
+            gyro_sync_denom:null,           // Gyro Sync Denom
+            pid_process_denom:null,         // PID Process Denom
             pidController:null,             // Active PID Controller
             rollPID:[null, null, null],	    // Roll [P, I, D]
             pitchPID:[null, null, null],	// Pitch[P, I, D]
@@ -229,7 +233,9 @@ var FlightLogParser = function(logData) {
             gyro_lpf:null,                  // Gyro lpf setting.
             gyro_lowpass_hz:null,           // Gyro Soft Lowpass Filter Hz
             gyro_notch_hz:null,             // Gyro Notch Frequency
-            gyro_notch_q:null,              // Gyro Notch Quality
+            gyro_notch_cutoff:null,         // Gyro Notch Cutoff
+            dterm_notch_hz:null,            // Dterm Notch Frequency
+            dterm_notch_cutoff:null,        // Dterm Notch Cutoff
             acc_lpf_hz:null,                // Accelerometer Lowpass filter Hz
             acc_hardware:null,              // Accelerometer Hardware type
             baro_hardware:null,             // Barometer Hardware type
@@ -237,7 +243,8 @@ var FlightLogParser = function(logData) {
             gyro_cal_on_first_arm:null,     // Gyro Calibrate on first arm
             vbat_pid_compensation:null,     // VBAT PID compensation
             rc_smoothing:null,              // RC Control Smoothing
-            rc_smooth_interval:null,        // RC Control Smoothing
+            rc_interpolation:null, 			// RC Control Interpolation Interval
+            rc_interpolation_interval:null, // RC Control Interpolation Interval
             features:null,                  // Activated features (e.g. MOTORSTOP etc)
             Craft_name:null,                // Craft Name
             unknownHeaders : []             // Unknown Extra Headers
@@ -421,6 +428,9 @@ var FlightLogParser = function(logData) {
             case "airmode_activate_throttle":
                 that.sysConfig.airmode_activate_throttle = parseInt(fieldValue, 10);
             break;
+            case "serialrx_provider":
+                that.sysConfig.serialrx_provider = parseInt(fieldValue, 10);
+            break;
             case "superExpoFactor":
                 if(fieldValue.match(/.*,.*/)!=null) {
                     var expoParams = parseCommaSeparatedIntegers(fieldValue);
@@ -436,6 +446,12 @@ var FlightLogParser = function(logData) {
             break;
             case "looptime":
                 that.sysConfig.loopTime = parseInt(fieldValue, 10);
+            break;
+            case "gyro_sync_denom":
+                that.sysConfig.gyro_sync_denom = parseInt(fieldValue, 10);
+            break;
+            case "pid_process_denom":
+                that.sysConfig.pid_process_denom = parseInt(fieldValue, 10);
             break;
             case "pidController":
                 that.sysConfig.pidController = parseInt(fieldValue, 10);
@@ -560,13 +576,30 @@ var FlightLogParser = function(logData) {
             case "gyro_notch_hz": // Betaflight Only
                 that.sysConfig.gyro_notch_hz = parseInt(fieldValue, 10);
             break;
-            case "gyro_notch_q": // Betaflight Only
-                that.sysConfig.gyro_notch_q = parseInt(fieldValue, 10);
+            case "gyro_notch_cutoff": // Betaflight Only
+                that.sysConfig.gyro_notch_cutoff = parseInt(fieldValue, 10);
             break;
-            case "rc_smooth_interval": // Betaflight Only
-                that.sysConfig.rc_smooth_interval = parseInt(fieldValue, 10);
+           case "dterm_notch_hz": // Betaflight Only
+                that.sysConfig.dterm_notch_hz = parseInt(fieldValue, 10);
             break;
-                        
+            case "dterm_notch_cutoff": // Betaflight Only
+                that.sysConfig.dterm_notch_cutoff = parseInt(fieldValue, 10);
+            break;
+            case "rc_interpolation": // Betaflight Only
+                that.sysConfig.rc_interpolation = parseInt(fieldValue, 10);
+            break;
+            case "rc_interpolation_interval": // Betaflight Only
+                that.sysConfig.rc_interpolation_interval = parseInt(fieldValue, 10);
+            break;
+            case "unsynced_fast_pwm": // Betaflight Only
+                that.sysConfig.unsynced_fast_pwm = parseInt(fieldValue, 10);
+            break;
+            case "fast_pwm_protocol": // Betaflight Only
+                that.sysConfig.fast_pwm_protocol = parseInt(fieldValue, 10);
+            break;
+            case "motor_pwm_rate": // Betaflight Only
+                that.sysConfig.motor_pwm_rate = parseInt(fieldValue, 10);
+            break;
             /****************************/
 
             case "vbatscale":

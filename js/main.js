@@ -357,7 +357,7 @@ function BlackboxLogViewer() {
         var sysConfig = flightLog.getSysConfig();
         $('#status-bar .version').text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
                                         ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
-        $('#status-bar .looptime').text( ((sysConfig['loopTime']!=null)?(sysConfig['loopTime'] +'us (' + (1000000/sysConfig['loopTime']).toFixed(0) + 'Hz)'):''));
+        $('#status-bar .looptime').text( stringLoopTime(sysConfig.loopTime, sysConfig.pid_process_denom, sysConfig.unsynced_fast_pwm, sysConfig.motor_pwm_rate));
         $('#status-bar .lograte').text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Logging Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
 
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
@@ -513,7 +513,7 @@ function BlackboxLogViewer() {
         if((flightLog.getSysConfig().loopTime             != null) &&
             (flightLog.getSysConfig().frameIntervalPNum   != null) &&
             (flightLog.getSysConfig().frameIntervalPDenom != null) ) {
-                userSettings.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
+                userSettings.analyserSampleRate = 1000000 / (flightLog.getSysConfig().loopTime * (validate(flightLog.getSysConfig().pid_process_denom,1)) * flightLog.getSysConfig().frameIntervalPDenom / flightLog.getSysConfig().frameIntervalPNum);
                 }
 
         graph = new FlightLogGrapher(flightLog, activeGraphConfig, canvas, craftCanvas, analyserCanvas, userSettings);

@@ -114,6 +114,38 @@ var
             "ON"
     ]),
 
+    FAST_PROTOCOL = makeReadOnly([
+            "OFF",
+            "ONESHOT125",
+            "ONESHOT42", 
+            "MULTISHOT",
+            "BRUSHED"
+    ]),
+
+    MOTOR_SYNC = makeReadOnly([
+            "SYNCED",
+            "UNSYNCED" 
+    ]),
+
+    SERIALRX_PROVIDER = makeReadOnly([
+			"SPEK1024",
+			"SPEK2048",
+			"SBUS",
+			"SUMD",
+			"SUMH",
+			"XB-B",
+			"XB-B-RJ01",
+			"IBUS",
+			"JETIEXBUS"
+    ]),
+
+    RC_INTERPOLATION = makeReadOnly([
+            "OFF",
+            "DEFAULT",
+            "AUTO",
+            "MANUAL"             
+    ]),
+
     SUPER_EXPO_YAW = makeReadOnly([
             "OFF",
             "ON",
