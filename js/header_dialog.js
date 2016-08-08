@@ -29,8 +29,11 @@ function HeaderDialog(dialog, onSave) {
             {name:'rollPitchItermIgnoreRate'	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
             {name:'yawItermIgnoreRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:2.8, max:999.9},
             {name:'gyro_notch_hz'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
-            {name:'gyro_notch_q'			    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
-            {name:'rc_smooth_interval'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'gyro_notch_cutoff'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'dterm_notch_hz'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'dterm_notch_cutoff'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'rc_interpolation'   			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'rc_interpolation_interval'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'gyro_sync_denom'			    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'pid_process_denom'    		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'unsynced_fast_pwm'    		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
@@ -418,8 +421,11 @@ function HeaderDialog(dialog, onSave) {
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
     	renderSelect('dynamic_pid'				,sysConfig.dynamic_pid, OFF_ON);
         setParameter('gyro_notch_hz'			,sysConfig.gyro_notch_hz,2);
-        setParameter('gyro_notch_q'				,sysConfig.gyro_notch_q,1);
-        setParameter('rc_smooth_interval'		,sysConfig.rc_smooth_interval,0);
+        setParameter('gyro_notch_cutoff'		,sysConfig.gyro_notch_cutoff,2);
+        setParameter('dterm_notch_hz'			,sysConfig.dterm_notch_hz,2);
+        setParameter('dterm_notch_cutoff'		,sysConfig.dterm_notch_cutoff,2);
+    	renderSelect('rc_interpolation'		    ,sysConfig.rc_interpolation, RC_INTERPOLATION);
+        setParameter('rc_interpolation_interval',sysConfig.rc_interpolation_interval,0);
     	renderSelect('unsynced_fast_pwm'		,sysConfig.unsynced_fast_pwm, MOTOR_SYNC);
     	renderSelect('fast_pwm_protocol'		,sysConfig.fast_pwm_protocol, FAST_PROTOCOL);
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);

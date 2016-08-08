@@ -115,9 +115,11 @@ var
     ]),
 
     FAST_PROTOCOL = makeReadOnly([
+            "OFF",
             "ONESHOT125",
             "ONESHOT42", 
-            "MULTISHOT"
+            "MULTISHOT",
+            "BRUSHED"
     ]),
 
     MOTOR_SYNC = makeReadOnly([
@@ -135,6 +137,13 @@ var
 			"XB-B-RJ01",
 			"IBUS",
 			"JETIEXBUS"
+    ]),
+
+    RC_INTERPOLATION = makeReadOnly([
+            "OFF",
+            "DEFAULT",
+            "AUTO",
+            "MANUAL"             
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
