@@ -3,7 +3,7 @@
 // Global Level Variables
 var userSettings = {};
 
-var VIEWER_VERSION = '2.5.0'; // Current version
+var VIEWER_VERSION = '2.5.1'; // Current version
 
 function BlackboxLogViewer() {
     function supportsRequiredAPIs() {
