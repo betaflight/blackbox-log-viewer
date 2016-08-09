@@ -28,13 +28,10 @@ var that = this;
 try {
 	var sysConfig = flightLog.getSysConfig();
 	var gyroRate = (1000000/sysConfig['loopTime']).toFixed(0);
-	var pidRate = gyroRate;
+	var pidRate = 1000; //default for old logs
 	
-	for(var i=0; i<sysConfig.unknownHeaders.length; i++) {
-		if (sysConfig.unknownHeaders[i].name == "pid_process_denom"){
-			pidRate = gyroRate / parseInt(sysConfig.unknownHeaders[i].value, 10);
-			break;
-		}
+	if (sysConfig.pid_process_denom != null) {
+		pidRate = gyroRate / sysConfig.pid_process_denom;
 	}
 	
 	var blackBoxRate = pidRate * (sysConfig['frameIntervalPNum'] / sysConfig['frameIntervalPDenom']);
