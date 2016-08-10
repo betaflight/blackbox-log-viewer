@@ -256,7 +256,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.5,
-                    inputRange: sysConfig.acc_1G * 3.0, /* Reasonable typical maximum for acc */
+                    inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^axisError\[/)  ||     // Custom Gyro, rcCommand and axisError Scaling
