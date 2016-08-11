@@ -1154,6 +1154,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     this.setGraphZoom = function(zoom) {
         windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
+		if (analyser != null)
+			analyser.setGraphZoom(zoom);
     };
     
     this.setInTime = function(time) {

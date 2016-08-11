@@ -1,8 +1,5 @@
 "use strict";
 
-// The audioContext is global scoped and only created once
-var audioCtx = new AudioContext();
-
 function FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options) {
 
 var
@@ -28,21 +25,16 @@ var // inefficient; copied from grapher.js
 
 var that = this;
 	  
-var AudioContext = window.AudioContext || window.webkitAudioContext;
 try {
-	var frameCount = 4096;
-//	var audioCtx = new AudioContext();
-	var audioBuffer   	= audioCtx.createBuffer(1, frameCount, audioCtx.sampleRate);
-	var source        	= audioCtx.createBufferSource();
-		source.buffer 	= audioBuffer; 
-		source.loop	  	= true;
-		source.start();
-
-	var spectrumAnalyser = audioCtx.createAnalyser();	  
-		spectrumAnalyser.fftSize = 256;
-		spectrumAnalyser.smoothingTimeConstant = 0.8;
-		spectrumAnalyser.minDecibels = -100;
-		spectrumAnalyser.maxDecibels = -30;    
+	var sysConfig = flightLog.getSysConfig();
+	var gyroRate = (1000000/sysConfig['loopTime']).toFixed(0);
+	var pidRate = 1000; //default for old logs
+	
+	if (sysConfig.pid_process_denom != null) {
+		pidRate = gyroRate / sysConfig.pid_process_denom;
+	}
+	
+	var blackBoxRate = pidRate * (sysConfig['frameIntervalPNum'] / sysConfig['frameIntervalPDenom']);
 
 	var dataBuffer = {
 			chunks: 0, 
@@ -52,15 +44,17 @@ try {
 			windowCenterTime: 0, 
 			windowEndTime: 0
 		};
+		
+	var fftData = {
+		fieldIndex: -1,
+		fftLength: 0,
+		fftOutput: 0,
+		maxNoiseIdx: 0
+	};
 
 	var initialised = false;
+	var zoom = 1.0;
 	var analyserFieldName;   // Name of the field being analysed
-	var analyserSampleRange; // Start and Endtime of sampling as string
-
-	// Setup the audio path
-	source.connect(spectrumAnalyser);
-
-	var audioIterations = 0; // variable to monitor spectrum processing
 
 	var isFullscreen = false;
 
@@ -101,42 +95,55 @@ try {
 		});
 
 	}
+	
+	this.setGraphZoom =	function(newZoom) {
+		zoom = 1.0 / newZoom * 100;
+	}
 
-	function dataLoad(dataBuffer, audioBuffer) {
-
-			var chunkIndex, frameIndex;
-			var i = 0;            
-
-			var startTime = null; // Debugging variables
-			var endTime   = null;
-
-			var audioBufferData = audioBuffer.getChannelData(0); // link to the first channel
-
-			//We may start partway through the first chunk:
-			frameIndex = dataBuffer.startFrameIndex;
-
-			dataCollectionLoop:
-			for (chunkIndex = 0; chunkIndex < dataBuffer.chunks.length; chunkIndex++) {
-				var chunk = dataBuffer.chunks[chunkIndex];
-				for (; frameIndex < chunk.frames.length; frameIndex++) {
-					var fieldValue = chunk.frames[frameIndex][dataBuffer.fieldIndex];
-					var frameTime  = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]
-					if(frameTime >= dataBuffer.windowCenterTime) {
-						if(startTime === null) startTime = formatTime((frameTime - flightLog.getMinTime())/1000, true);
-						
-						audioBufferData[i++] = (dataBuffer.curve.lookupRaw(fieldValue));
-
-						if (i >= audioBuffer.length || frameTime >= dataBuffer.windowEndTime) {
-							endTime = formatTime((frameTime - flightLog.getMinTime())/1000, true);
-							analyserSampleRange = '(' + startTime + ' to ' + endTime + ')';
-							//console.log("Samples : " + i + analyserSampleRange);
-							break dataCollectionLoop;
-							}
-						}
-				}
-				frameIndex = 0;
+	function dataLoad() {
+		//load all samples
+		var allChunks = flightLog.getChunksInTimeRange(0, 300 * 1000 * 1000); //300 seconds
+		var chunkIndex = 0;
+		var frameIndex = 0;
+		var samples = new Float64Array(300 * 1000);
+		var i = 0;
+		
+		for (chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
+			var chunk = allChunks[chunkIndex];
+			for (frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
+				var fieldValue = chunk.frames[frameIndex][dataBuffer.fieldIndex];
+				var sample = (dataBuffer.curve.lookupRaw(fieldValue));
+				samples[i++] = sample;
 			}
-			audioIterations++;
+		}
+
+		//calculate fft
+		var fftLength = samples.length;
+		var fftOutput = new Float64Array(fftLength * 2);
+		var fft = new FFT.complex(fftLength, false);
+		
+		fft.simple(fftOutput, samples, 'real');
+
+		//calculate absolute values and find motor noise above 100hz
+		var maxFrequency = (blackBoxRate / 2.0);
+		var noiseLowEndIdx = 100 / maxFrequency * fftLength;
+		var maxNoiseIdx = 0;
+		var maxNoise = 0;
+		
+		for (var i = 0; i < fftLength; i++) {
+			fftOutput[i] = Math.abs(fftOutput[i]);
+			if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
+				maxNoise = fftOutput[i];
+				maxNoiseIdx = i;
+			}
+		}
+
+		maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
+		
+		fftData.fieldIndex = dataBuffer.fieldIndex;
+		fftData.fftLength = fftLength;
+		fftData.fftOutput = fftOutput;
+		fftData.maxNoiseIdx = maxNoiseIdx;
 	}
 
 	/* Function to actually draw the spectrum analyser overlay
@@ -145,66 +152,61 @@ try {
 		*/
 
 	function draw() {
+		canvasCtx.save();
+		canvasCtx.lineWidth = 1;
+		canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
 
-		  canvasCtx.save();
+		var MARGIN = 10; // pixels
+		var HEIGHT = canvasCtx.canvas.height - MARGIN;
+		var WIDTH  = canvasCtx.canvas.width;
+		var LEFT   = canvasCtx.canvas.left;
+		var TOP    = canvasCtx.canvas.top;
 
-		  canvasCtx.lineWidth = 1;
-		  
-		  var bufferLength = spectrumAnalyser.frequencyBinCount;
-		  var dataArray = new Uint8Array(bufferLength);
+		var PLOTTED_BUFFER_LENGTH = fftData.fftLength;
 
+		canvasCtx.translate(LEFT, TOP);
 
+		var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+			gradient.addColorStop(1,   'rgba(255,255,255,0.25)');
+			gradient.addColorStop(0,   'rgba(255,255,255,0)');
+		canvasCtx.fillStyle = gradient; //'rgba(255, 255, 255, .25)'; /* white */
+		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-		  canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
+		var barWidth = (WIDTH / (PLOTTED_BUFFER_LENGTH / 10)) - 1;
+		var barHeight;
+		var x = 0;
 
-		  var MARGIN = 10; // pixels
-		  var HEIGHT = canvasCtx.canvas.height - MARGIN;
-		  var WIDTH  = canvasCtx.canvas.width;
-		  var LEFT   = canvasCtx.canvas.left;
-		  var TOP    = canvasCtx.canvas.top;
+		var gradient = canvasCtx.createLinearGradient(0,HEIGHT,0,0);
+			gradient.addColorStop(0,   'rgba(0,255,0,0.2)');
+			gradient.addColorStop(0.15, 'rgba(128,255,0,0.2)');
+			gradient.addColorStop(0.45, 'rgba(255,0,0,0.5)');
+			gradient.addColorStop(1,   'rgba(255,128,128,1.0)');
 
-		  /* only plot the lower half of the FFT, as the top half
-		  never seems to have any values in it - too high frequency perhaps. */
-		  var PLOTTED_BUFFER_LENGTH = bufferLength; // / 2;
+		for(var i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
+			barHeight = (fftData.fftOutput[i] / zoom * HEIGHT);
 
-		  canvasCtx.translate(LEFT, TOP);
-
-		  spectrumAnalyser.getByteFrequencyData(dataArray);
-
-		  var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
-    		  gradient.addColorStop(1,   'rgba(255,255,255,0.25)');
-			  gradient.addColorStop(0,   'rgba(255,255,255,0)');
-		  canvasCtx.fillStyle = gradient; //'rgba(255, 255, 255, .25)'; /* white */
-		  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-		  var barWidth = (WIDTH / PLOTTED_BUFFER_LENGTH) - 1;// * 2.5;
-		  var barHeight;
-		  var x = 0;
-
-		  var gradient = canvasCtx.createLinearGradient(0,HEIGHT,0,0);
-    		  gradient.addColorStop(0,   'rgba(0,255,0,0.2)');
-    		  gradient.addColorStop(0.15, 'rgba(128,255,0,0.2)');
-			  gradient.addColorStop(0.45, 'rgba(255,0,0,0.5)');
-			  gradient.addColorStop(1,   'rgba(255,128,128,1.0)');
-
-		  for(var i = 0; i < (PLOTTED_BUFFER_LENGTH); i++) {
-		  barHeight = (dataArray[i]/255 * (HEIGHT));
-
-			canvasCtx.fillStyle = gradient; //'rgba(0,255,0,0.3)'; /* green */
+			canvasCtx.fillStyle = gradient; //'rgba(0,255,0,0.3)'; //green
 			canvasCtx.fillRect(x,(HEIGHT)-barHeight,barWidth,barHeight);
 
 			x += barWidth + 1;
-		  }
-		  drawAxisLabel(analyserFieldName + ' ' + analyserSampleRange, WIDTH - 4, HEIGHT - 6, 'right');
-		  drawGridLines(options.analyserSampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
-		  
-		  var offset = 0;
-		  if(flightLog.getSysConfig().gyro_lowpass_hz!=null) drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  options.analyserSampleRate, 'GYRO Filter ', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		  if(flightLog.getSysConfig().dterm_lpf_hz!=null)    drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  options.analyserSampleRate, 'D-TERM Filter', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		  if(flightLog.getSysConfig().yaw_lpf_hz!=null)      drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  options.analyserSampleRate, 'YAW Filter', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		  
-		  canvasCtx.restore();
 		}
+
+		drawAxisLabel(analyserFieldName, WIDTH - 4, HEIGHT - 6, 'right');
+		drawGridLines(blackBoxRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
+
+		var offset = 0;
+		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  blackBoxRate, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		if(flightLog.getSysConfig().dterm_lpf_hz!=null)    drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  blackBoxRate, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		if(flightLog.getSysConfig().yaw_lpf_hz!=null)      drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  blackBoxRate, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		if(flightLog.getSysConfig().gyro_notch_hz!=null) drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		if(flightLog.getSysConfig().gyro_notch_cutoff!=null) drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  blackBoxRate, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		if(flightLog.getSysConfig().dterm_notch_hz!=null) drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+		if(flightLog.getSysConfig().dterm_notch_cutoff!=null) drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  blackBoxRate, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
+
+		drawMarkerLine(fftData.maxNoiseIdx,  blackBoxRate, 'max motor noise', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+
+		canvasCtx.restore();
+	}
 	
 	function drawMarkerLine(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET){
 		var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequncy lies
@@ -273,23 +275,17 @@ try {
 			};
 
 			analyserFieldName = fieldName;
-
-			if (audioBuffer) {
-				dataLoad(dataBuffer, audioBuffer);
-			}
+			if (fieldIndex != fftData.fieldIndex)
+				dataLoad();
+			
 			draw(); // draw the analyser on the canvas....
 	}
-	} catch (e) {
+	}	catch (e) {
 		console.log('Failed to create analyser... error:' + e);
 	};
 
 	// release the hardware context associated with the analyser
 	this.closeAnalyserHardware = function() {
-		try {
-			if(audioCtx!=null) audioCtx.close();
-		} catch(e) {
-			console.log('Failed to close analyser... error:' + e);
-		}
 	}
 
 }
