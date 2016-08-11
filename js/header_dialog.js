@@ -40,6 +40,18 @@ function HeaderDialog(dialog, onSave) {
             {name:'fast_pwm_protocol'    		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'motor_pwm_rate'    			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
 			{name:'serialrx_provider'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'dterm_filter_type'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'pidAtMinThrottle'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'toleranceBand'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'toleranceBandReduction'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'zeroCrossAllowanceCount'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'itermThrottleGain'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'ptermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'dtermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'yawRateAccelLimit'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'rateAccelLimit'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'gyro_soft_type'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'debug_mode'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
 
 	];
 
@@ -396,7 +408,7 @@ function HeaderDialog(dialog, onSave) {
 	        setParameter('rates[2]'				,sysConfig.rates[2],2);
 		}
 
-        setParameter('loopTime'					,sysConfig.loopTime,0);
+        setParameter('loopTime'					,sysConfig.looptime,0);
         setParameter('gyro_sync_denom'			,sysConfig.gyro_sync_denom,0);
         setParameter('pid_process_denom'		,sysConfig.pid_process_denom,0);
         setParameter('yaw_p_limit'				,sysConfig.yaw_p_limit,0);
@@ -429,7 +441,17 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('unsynced_fast_pwm'		,sysConfig.unsynced_fast_pwm, MOTOR_SYNC);
     	renderSelect('fast_pwm_protocol'		,sysConfig.fast_pwm_protocol, FAST_PROTOCOL);
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);
-
+        renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
+        setParameter('toleranceBand'		    ,sysConfig.toleranceBand,2);
+        setParameter('toleranceBandReduction'	,sysConfig.toleranceBandReduction,2);
+        setParameter('zeroCrossAllowanceCount'	,sysConfig.zeroCrossAllowanceCount,0);
+        setParameter('itermThrottleGain'	    ,sysConfig.itermThrottleGain,2);
+        setParameter('ptermSetpointWeight'		,sysConfig.ptermSetpointWeight,2);
+        setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
+        setParameter('yawRateAccelLimit'		,sysConfig.yawRateAccelLimit,0);
+        setParameter('rateAccelLimit'		    ,sysConfig.rateAccelLimit,0);
+        renderSelect('gyro_soft_type'			,sysConfig.gyro_soft_type, FILTER_TYPE);
+        renderSelect('debug_mode'				,sysConfig.debug_mode, DEBUG_MODE);
 		/* Packed Flags */
 
         builtFeaturesList(sysConfig);
@@ -444,6 +466,7 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('gyro_cal_on_first_arm'		,sysConfig.gyro_cal_on_first_arm);
         setCheckbox('vbat_pid_compensation'		,sysConfig.vbat_pid_compensation);
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
+        setCheckbox('pidAtMinThrottle'			,sysConfig.pidAtMinThrottle);
 
         /* Show Unknown Fields */
         renderUnknownHeaders(sysConfig.unknownHeaders);

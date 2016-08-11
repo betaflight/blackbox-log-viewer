@@ -115,7 +115,7 @@ var
     ]),
 
     FAST_PROTOCOL = makeReadOnly([
-            "OFF",
+            "PWM",
             "ONESHOT125",
             "ONESHOT42", 
             "MULTISHOT",
@@ -144,6 +144,26 @@ var
             "DEFAULT",
             "AUTO",
             "MANUAL"             
+    ]),
+
+    FILTER_TYPE = makeReadOnly([
+            "PT1",
+            "BIQUAD",
+    ]),
+
+    DEBUG_MODE = makeReadOnly([
+			"NONE",
+			"CYCLETIME",
+			"BATTERY",
+			"GYRO",
+			"ACCELEROMETER",
+			"MIXER",
+			"AIRMODE",
+			"PIDLOOP",
+			"NOTCH",
+			"RC_INTERPOLATION",
+			"VELOCITY",
+			"DFILTER",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([

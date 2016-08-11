@@ -243,8 +243,20 @@ var FlightLogParser = function(logData) {
             gyro_cal_on_first_arm:null,     // Gyro Calibrate on first arm
             vbat_pid_compensation:null,     // VBAT PID compensation
             rc_smoothing:null,              // RC Control Smoothing
-            rc_interpolation:null, 			// RC Control Interpolation Interval
+            rc_interpolation:null, 			// RC Control Interpolation type
             rc_interpolation_interval:null, // RC Control Interpolation Interval
+            dterm_filter_type:null,         // D term filtering type (PT1, BIQUAD)
+            pidAtMinThrottle:null,          // Stabilisation at zero throttle
+            toleranceBand:null,             // Betaflight PID
+            toleranceBandReduction:null,    // Betaflight PID
+            zeroCrossAllowanceCount:null,   // Betaflight PID
+            itermThrottleGain:null,         // Betaflight PID
+            ptermSetpointWeight:null,       // Betaflight PID
+            dtermSetpointWeight:null,       // Betaflight PID
+            yawRateAccelLimit:null,         // Betaflight PID
+            rateAccelLimit:null,            // Betaflight PID
+            gyro_soft_type:null,            // Gyro soft filter type (PT1, BIQUAD)
+            debug_mode:null,                // Selected Debug Mode
             features:null,                  // Activated features (e.g. MOTORSTOP etc)
             Craft_name:null,                // Craft Name
             unknownHeaders : []             // Unknown Extra Headers
@@ -393,44 +405,85 @@ var FlightLogParser = function(logData) {
                         $('html').removeClass('isINAV');
                 }
             break;
+
+            // Betaflight Log Header Parameters
             case "minthrottle":
-                that.sysConfig.minthrottle = parseInt(fieldValue, 10);
-            break;
             case "maxthrottle":
-                that.sysConfig.maxthrottle = parseInt(fieldValue, 10);
-            break;
             case "rcRate":
-                that.sysConfig.rcRate = parseInt(fieldValue, 10);
+            case "rcExpo":
+            case "rcYawExpo":
+            case "rcYawRate":
+            case "thrMid":
+            case "thrExpo":
+            case "dynThrPID":
+            case "tpa_breakpoint":
+            case "airmode_activate_throttle":
+            case "serialrx_provider":
+            case "looptime":
+            case "gyro_sync_denom":
+            case "pid_process_denom":
+            case "pidController":
+            case "yaw_p_limit":
+            case "yaw_lpf_hz":
+            case "dterm_average_count":
+            case "rollPitchItermResetRate":
+            case "yawItermResetRate": 
+            case "rollPitchItermIgnoreRate":
+            case "yawItermIgnoreRate":
+            case "dterm_lpf_hz":
+            case "dterm_differentiator":
+            case "deltaMethod":
+            case "dynamic_dterm_threshold":
+            case "dynamic_pterm":
+            case "iterm_reset_offset":
+            case "deadband":
+            case "yaw_deadband":
+            case "gyro_lpf":
+            case "gyro_lowpass_hz":
+            case "acc_lpf_hz":
+            case "acc_hardware":
+            case "baro_hardware":
+            case "mag_hardware":
+            case "gyro_cal_on_first_arm":
+            case "vbat_pid_compensation": 
+            case "rc_smoothing":
+            case "superExpoYawMode":
+            case "features":
+            case "dynamic_pid":
+            case "gyro_notch_hz":
+            case "gyro_notch_cutoff":
+            case "dterm_notch_hz":
+            case "dterm_notch_cutoff":
+            case "rc_interpolation":
+            case "rc_interpolation_interval":
+            case "unsynced_fast_pwm":
+            case "fast_pwm_protocol":
+            case "motor_pwm_rate":
+            case "vbatscale":
+            case "vbatref":
+            case "acc_1G":
+            case "dterm_filter_type":
+            case "pidAtMinThrottle":
+            case "toleranceBand":
+            case "toleranceBandReduction":
+            case "zeroCrossAllowanceCount":
+            case "itermThrottleGain":
+            case "ptermSetpointWeight":
+            case "dtermSetpointWeight":
+            case "yawRateAccelLimit":
+            case "rateAccelLimit":
+            case "gyro_soft_type":
+            case "debug_mode":
+                that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
-            // Extended Fields in the header
-            case "rcExpo":
-                that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+            /**  Cleanflight Only log headers **/
+            case "dterm_cut_hz":
+            case "acc_cut_hz":
+                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
-            case "rcYawExpo":
-                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
-            break;
-            case "rcYawRate":
-                that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
-            break;
-            case "thrMid":
-                that.sysConfig.thrMid = parseInt(fieldValue, 10);
-            break;
-            case "thrExpo":
-                that.sysConfig.thrExpo = parseInt(fieldValue, 10);
-            break;
-            case "dynThrPID":
-                that.sysConfig.dynThrPID = parseInt(fieldValue, 10);
-            break;
-            case "tpa_breakpoint":
-                that.sysConfig.tpa_breakpoint = parseInt(fieldValue, 10);
-            break;
-            case "airmode_activate_throttle":
-                that.sysConfig.airmode_activate_throttle = parseInt(fieldValue, 10);
-            break;
-            case "serialrx_provider":
-                that.sysConfig.serialrx_provider = parseInt(fieldValue, 10);
-            break;
+            /** End of cleanflight only log headers **/
+            
             case "superExpoFactor":
                 if(fieldValue.match(/.*,.*/)!=null) {
                     var expoParams = parseCommaSeparatedIntegers(fieldValue);
@@ -441,173 +494,25 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
                 }
             break;
+
+            /* CSV packed values */
             case "rates":
-                that.sysConfig.rates = parseCommaSeparatedIntegers(fieldValue);
-            break;
-            case "looptime":
-                that.sysConfig.loopTime = parseInt(fieldValue, 10);
-            break;
-            case "gyro_sync_denom":
-                that.sysConfig.gyro_sync_denom = parseInt(fieldValue, 10);
-            break;
-            case "pid_process_denom":
-                that.sysConfig.pid_process_denom = parseInt(fieldValue, 10);
-            break;
-            case "pidController":
-                that.sysConfig.pidController = parseInt(fieldValue, 10);
-            break;
             case "rollPID":
-                that.sysConfig.rollPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "pitchPID":
-                that.sysConfig.pitchPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "yawPID":
-                that.sysConfig.yawPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "altPID":
-                that.sysConfig.altPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "posPID":
-                that.sysConfig.posPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "posrPID":
-                that.sysConfig.posrPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "navrPID":
-                that.sysConfig.navrPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
             case "levelPID":
-                that.sysConfig.levelPID = parseCommaSeparatedIntegers(fieldValue);
+            case "velPID":
+                that.sysConfig[fieldName] = parseCommaSeparatedIntegers(fieldValue);
             break;
             case "magPID":
                 that.sysConfig.magPID = [parseInt(fieldValue, 10), null, null];
             break;
-            case "velPID":
-                that.sysConfig.velPID = parseCommaSeparatedIntegers(fieldValue);
-            break;
-            case "yaw_p_limit":
-                that.sysConfig.yaw_p_limit = parseInt(fieldValue, 10);
-            break;
-            case "yaw_lpf_hz": // Betaflight Only
-                that.sysConfig.yaw_lpf_hz = parseInt(fieldValue, 10);
-            break;
-            case "dterm_average_count": // Betaflight Only
-                that.sysConfig.dterm_average_count = parseInt(fieldValue, 10);
-            break;
-            case "rollPitchItermResetRate": // Betaflight Only
-                that.sysConfig.rollPitchItermResetRate = parseInt(fieldValue, 10);
-            break;
-            case "yawItermResetRate": // Betaflight Only
-                that.sysConfig.yawItermResetRate = parseInt(fieldValue, 10);
-            break;
-            case "rollPitchItermIgnoreRate": // Betaflight Only
-                that.sysConfig.rollPitchItermIgnoreRate = parseInt(fieldValue, 10);
-            break;
-            case "yawItermIgnoreRate": // Betaflight Only
-                that.sysConfig.yawItermIgnoreRate = parseInt(fieldValue, 10);
-            break;
-            case "dterm_lpf_hz": // Betaflight Only
-                that.sysConfig.dterm_lpf_hz = parseInt(fieldValue, 10);
-            break;
-            case "dterm_cut_hz": // Cleanflight Only
-                that.sysConfig.dterm_cut_hz = parseInt(fieldValue, 10);
-            break;
-            case "dterm_differentiator": // Betaflight Only
-                that.sysConfig.dterm_differentiator = parseInt(fieldValue, 10);
-            break;
-            case "deltaMethod": // Betaflight Only
-                that.sysConfig.deltaMethod = parseInt(fieldValue, 10);
-            break;
-            case "dynamic_dterm_threshold": // Betaflight Only
-                that.sysConfig.dynamic_dterm_threshold = parseInt(fieldValue, 10);
-            break;
-            case "dynamic_pterm": // Betaflight Only
-                that.sysConfig.dynamic_pterm = parseInt(fieldValue, 10);
-            break;
-            case "iterm_reset_offset": // Betaflight Only
-                that.sysConfig.iterm_reset_offset = parseInt(fieldValue, 10);
-            break;
-            case "deadband":
-                that.sysConfig.deadband = parseInt(fieldValue, 10);
-            break;
-            case "yaw_deadband":
-                that.sysConfig.yaw_deadband = parseInt(fieldValue, 10);
-            break;
-            case "gyro_lpf":
-                that.sysConfig.gyro_lpf = parseInt(fieldValue, 10);
-            break;
-            case "gyro_lowpass_hz": // Betaflight Only
-                that.sysConfig.gyro_lowpass_hz = parseInt(fieldValue, 10);
-            break;
-            case "acc_lpf_hz": // Betaflight Only
-                that.sysConfig.acc_lpf_hz = parseInt(fieldValue, 10);
-            break;
-            case "acc_cut_hz":  // Cleanflight Only
-                that.sysConfig.acc_cut_hz = parseInt(fieldValue, 10);
-            break;
-            case "acc_hardware":
-                that.sysConfig.acc_hardware = parseInt(fieldValue, 10);
-            break;
-            case "baro_hardware":
-                that.sysConfig.baro_hardware = parseInt(fieldValue, 10);
-            break;
-            case "mag_hardware":
-                that.sysConfig.mag_hardware = parseInt(fieldValue, 10);
-            break;
-            case "gyro_cal_on_first_arm": // Betaflight Only
-                that.sysConfig.gyro_cal_on_first_arm = parseInt(fieldValue, 10);
-            break;
-            case "vbat_pid_compensation": // Betaflight Only
-                that.sysConfig.vbat_pid_compensation = parseInt(fieldValue, 10);
-            break;
-            case "rc_smoothing":
-                that.sysConfig.rc_smoothing = parseInt(fieldValue, 10);
-            break;
-            case "superExpoYawMode":
-                that.sysConfig.superExpoYawMode = parseInt(fieldValue, 10);
-            break;
-            case "features":
-                that.sysConfig.features = parseInt(fieldValue, 10);
-            break;
-            case "dynamic_pid": // Betaflight Only
-                that.sysConfig.dynamic_pid = parseInt(fieldValue, 10);
-            break;
-            case "gyro_notch_hz": // Betaflight Only
-                that.sysConfig.gyro_notch_hz = parseInt(fieldValue, 10);
-            break;
-            case "gyro_notch_cutoff": // Betaflight Only
-                that.sysConfig.gyro_notch_cutoff = parseInt(fieldValue, 10);
-            break;
-           case "dterm_notch_hz": // Betaflight Only
-                that.sysConfig.dterm_notch_hz = parseInt(fieldValue, 10);
-            break;
-            case "dterm_notch_cutoff": // Betaflight Only
-                that.sysConfig.dterm_notch_cutoff = parseInt(fieldValue, 10);
-            break;
-            case "rc_interpolation": // Betaflight Only
-                that.sysConfig.rc_interpolation = parseInt(fieldValue, 10);
-            break;
-            case "rc_interpolation_interval": // Betaflight Only
-                that.sysConfig.rc_interpolation_interval = parseInt(fieldValue, 10);
-            break;
-            case "unsynced_fast_pwm": // Betaflight Only
-                that.sysConfig.unsynced_fast_pwm = parseInt(fieldValue, 10);
-            break;
-            case "fast_pwm_protocol": // Betaflight Only
-                that.sysConfig.fast_pwm_protocol = parseInt(fieldValue, 10);
-            break;
-            case "motor_pwm_rate": // Betaflight Only
-                that.sysConfig.motor_pwm_rate = parseInt(fieldValue, 10);
-            break;
-            /****************************/
+            /* End of CSV packed values */
 
-            case "vbatscale":
-                that.sysConfig.vbatscale = parseInt(fieldValue, 10);
-            break;
-            case "vbatref":
-                that.sysConfig.vbatref = parseInt(fieldValue, 10);
-            break;
             case "vbatcellvoltage":
                 var vbatcellvoltageParams = parseCommaSeparatedIntegers(fieldValue);
 
@@ -632,9 +537,6 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
                     that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
                 }
-            break;
-            case "acc_1G":
-                that.sysConfig.acc_1G = parseInt(fieldValue, 10);
             break;
             case "Firmware revision":
 
