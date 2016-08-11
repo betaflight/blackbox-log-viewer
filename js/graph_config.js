@@ -317,28 +317,87 @@ GraphConfig.load = function(config) {
                     inputRange: 200,
                     outputRange: 1.0
                 };
-            } else {
-                // Scale and center the field based on the whole-log observed ranges for that field
-                var
-                    stats = flightLog.getStats(),
-                    fieldIndex = flightLog.getMainFieldIndexByName(fieldName),
-                    fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+            } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
-                if (fieldStat) {
-                    return {
-                        offset: -(fieldStat.max + fieldStat.min) / 2,
-                        power: 1.0,
-                        inputRange: Math.max((fieldStat.max - fieldStat.min) / 2, 1.0),
-                        outputRange: 1.0
-                    };
-                } else {
-                    return {
-                        offset: 0,
-                        power: 1.0,
-                        inputRange: 500,
-                        outputRange: 1.0
-                    };
+                var debugModeName = DEBUG_MODE[sysConfig.debug_mode]; 
+                switch (debugModeName) {
+                    case 'CYCLETIME':
+                    case 'PIDLOOP': 
+                        return {
+                            offset: 0,
+                            power: 1.0,
+                            inputRange: 1500, // 1500usec
+                            outputRange: 1.0  
+                        };              
+                    case 'GYRO':
+                    case 'NOTCH':
+                        return {
+                            offset: 0,
+                            power: 0.25,
+                            inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
+                            outputRange: 1.0
+                        };
+                    case 'ACCELEROMETER':
+                        return {
+                            offset: 0,
+                            power: 0.5,
+                            inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
+                            outputRange: 1.0
+                        };
+                    case 'MIXER':
+                        return {
+                            offset: -(sysConfig.maxthrottle + sysConfig.minthrottle) / 2,
+                            power: 1.0,
+                            inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
+                            outputRange: 1.0
+                        };
+                    case 'RC_INTERPOLATION':
+                        switch (fieldName) {
+                            case 'debug[2]': //Yaw
+                                return {
+                                    offset: 0,
+                                    power: 0.8,
+                                    inputRange: 500,
+                                    outputRange: 1.0
+                                };                            
+                            case 'debug[3]': // refresh period
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1500,
+                                    outputRange: 1.0  
+                                }; 
+                            default:
+                                return {
+                                    offset: 0,
+                                    power: 0.8,
+                                    inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
+                                    outputRange: 1.0
+                                };
+                        }				
                 }
+            }
+            // if not found above then
+            // Scale and center the field based on the whole-log observed ranges for that field
+            var
+                stats = flightLog.getStats(),
+                fieldIndex = flightLog.getMainFieldIndexByName(fieldName),
+                fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+
+            if (fieldStat) {
+                return {
+                    offset: -(fieldStat.max + fieldStat.min) / 2,
+                    power: 1.0,
+                    inputRange: Math.max((fieldStat.max - fieldStat.min) / 2, 1.0),
+                    outputRange: 1.0
+                };
+            } else {
+                return {
+                    offset: 0,
+                    power: 1.0,
+                    inputRange: 500,
+                    outputRange: 1.0
+                };
             }
         } catch(e) {
             return {

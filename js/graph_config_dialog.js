@@ -47,7 +47,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     function renderFieldOption(fieldName, selectedName) {
         var 
             option = $("<option></option>")
-                .text(FlightLogFieldPresenter.fieldNameToFriendly(fieldName))
+                .text(FlightLogFieldPresenter.fieldNameToFriendly(fieldName, activeFlightLog.getSysConfig().debug_mode))
                 .attr("value", fieldName);
     
         if (fieldName == selectedName) {

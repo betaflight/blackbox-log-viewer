@@ -159,7 +159,7 @@ function BlackboxLogViewer() {
                     var 
                         row = 
                             "<tr>" +
-                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[i]) + '</td>' +
+                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[i], flightLog.getSysConfig().debug_mode) + '</td>' +
                             '<td class="raw-value">' + atMost2DecPlaces(frame[i]) + '</td>' +
                             '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode) + "</td>",
 
@@ -167,7 +167,7 @@ function BlackboxLogViewer() {
 
                     if (secondColumn < fieldNames.length) {
                         row += 
-                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn]) + '</td>' +
+                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn], flightLog.getSysConfig().debug_mode) + '</td>' +
                             '<td>' + atMost2DecPlaces(frame[secondColumn]) + '</td>' +
                             '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn], currentFlightMode) + '</td>';
                     }
