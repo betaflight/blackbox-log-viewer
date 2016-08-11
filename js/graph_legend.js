@@ -108,7 +108,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
           
               $(".graph-legend-field").each(function(index, value) {
                  var value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, $(this).attr('name'), frame[flightLog.getMainFieldIndexByName($(this).attr('name'))], currentFlightMode);
-                 $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name')) + ((value)?' (' + value + ')':' ') );
+                 $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'), flightLog.getSysConfig().debug_mode) + ((value)?' (' + value + ')':' ') );
                  $(this).append('<span class="glyphicon glyphicon-equalizer"></span>');
               });
           } catch(e) {
