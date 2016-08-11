@@ -27,7 +27,7 @@ var that = this;
 	  
 try {
 	var sysConfig = flightLog.getSysConfig();
-	var gyroRate = (1000000/sysConfig['loopTime']).toFixed(0);
+	var gyroRate = (1000000/sysConfig['looptime']).toFixed(0);
 	var pidRate = 1000; //default for old logs
 	
 	if (sysConfig.pid_process_denom != null) {
