@@ -358,7 +358,7 @@ function BlackboxLogViewer() {
         $('#status-bar .version').text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
                                         ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
         $('#status-bar .looptime').text( stringLoopTime(sysConfig.looptime, sysConfig.pid_process_denom, sysConfig.unsynced_fast_pwm, sysConfig.motor_pwm_rate));
-        $('#status-bar .lograte').text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Logging Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
+        $('#status-bar .lograte').text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
 
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
         seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
@@ -781,6 +781,7 @@ function BlackboxLogViewer() {
         
         // Get Latest Version Information
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
+        $("#status-bar .viewer-version").text('v'+VIEWER_VERSION);
         try {
             $.getJSON('https://api.github.com/repos/GaryKeeble/blackbox-log-viewer/releases/latest',{},function(data){
                 latestVersion = data;

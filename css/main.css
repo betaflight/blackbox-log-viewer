@@ -764,20 +764,6 @@ html:not(.has-log) #status-bar {
     display: none;
 }
 
-#status-bar div {
-    float: left;
-    padding-right: 10px;
-    margin-right: 10px;
-    border-right: 1px solid #7d7d79;
-}
-
-#status-bar .version {
-    float: right;
-    margin: 0;
-    padding: 0;
-    border: 0;
-}
-
 #status-bar .bookmark-1,
 #status-bar .bookmark-2,
 #status-bar .bookmark-3,
@@ -789,11 +775,11 @@ html:not(.has-log) #status-bar {
 #status-bar .bookmark-9 {
     background-color: red;
     color : white;
-    padding-left: 0;
-    padding-right: 0;
-    width: 30px;
-    margin-right: 0px;
-    margin-left: 0px;
+    /* padding-left: 5px; */
+    /* padding-right: 0; */
+    width: 20px;
+    /* margin-right: 0px; */
+    /* margin-left: 0px; */
     text-align: center;
     visibility: hidden;
     cursor: pointer;
@@ -825,6 +811,20 @@ html:not(.has-config) #status-bar .configuration-file-name {
     display: none;    
 }
 
+#status-bar div:not(:last-child) {
+    float: left;
+    padding-right: 5px;
+    margin-right: 5px;
+    border-right: 1px solid #7d7d79;
+}
+
+#status-bar div:first-child {
+    margin-left: 10px;
+}
+
+#status-bar div:last-child {
+    float: right;
+}
 
 /***
 
