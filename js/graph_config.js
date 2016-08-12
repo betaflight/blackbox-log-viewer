@@ -322,13 +322,29 @@ GraphConfig.load = function(config) {
                 var debugModeName = DEBUG_MODE[sysConfig.debug_mode]; 
                 switch (debugModeName) {
                     case 'CYCLETIME':
+                        switch (fieldName) {
+                            case 'debug[1]': //CPU Load
+                                return {
+                                    offset: -50,
+                                    power: 1,
+                                    inputRange: 50,
+                                    outputRange: 1.0
+                                };                            
+                            default:
+                                return {
+                                    offset: -1000,    // zero offset
+                                    power: 1.0,
+                                    inputRange: 1000, //  0-2000uS
+                                    outputRange: 1.0
+                                };
+                        }
                     case 'PIDLOOP': 
-                        return {
-                            offset: 0,
-                            power: 1.0,
-                            inputRange: 1500, // 1500usec
-                            outputRange: 1.0  
-                        };              
+                            return {
+                                offset: -250,    // zero offset
+                                power: 1.0,
+                                inputRange: 250, //  0-500uS
+                                outputRange: 1.0
+                            };       
                     case 'GYRO':
                     case 'NOTCH':
                         return {
@@ -351,6 +367,23 @@ GraphConfig.load = function(config) {
                             inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                             outputRange: 1.0
                         };
+                    case 'BATTERY':
+                        switch (fieldName) {
+                            case 'debug[0]': //Raw Value (0-4095)
+                                return {
+                                    offset: -2048,
+                                    power: 1,
+                                    inputRange: 2048,
+                                    outputRange: 1.0
+                                };                            
+                            default:
+                                return {
+                                    offset: -130,
+                                    power: 1.0,
+                                    inputRange: 130, // 0-26.0v
+                                    outputRange: 1.0
+                                };
+                        }
                     case 'RC_INTERPOLATION':
                         switch (fieldName) {
                             case 'debug[2]': //Yaw
@@ -362,9 +395,9 @@ GraphConfig.load = function(config) {
                                 };                            
                             case 'debug[3]': // refresh period
                                 return {
-                                    offset: 0,
+                                    offset: -15000,
                                     power: 1.0,
-                                    inputRange: 1500,
+                                    inputRange: 15000, // 30mS max
                                     outputRange: 1.0  
                                 }; 
                             default:

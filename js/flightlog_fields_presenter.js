@@ -98,24 +98,24 @@ function FlightLogFieldPresenter() {
 						},
 			'BATTERY' : 	{	
 							'debug[all]':'Debug Battery',	
-							'debug[0]':'vbat_sample',
+							'debug[0]':'vbat_ADC',
 							'debug[1]':'vbat',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',
+							'debug[2]':'Not Used',
+							'debug[3]':'Not Used',
 						},
 			'GYRO' : 	{	
 							'debug[all]':'Debug Gyro',	
 							'debug[0]':'gyro_raw[X]',
 							'debug[1]':'gyro_raw[Y]',
 							'debug[2]':'gyro_raw[Z]',
-							'debug[3]':'debug[3]',
+							'debug[3]':'Not Used',
 						},
 			'ACCELEROMETER' : 	{	
 							'debug[all]':'Debug Acc',	
 							'debug[0]':'acc_raw[X]',
 							'debug[1]':'acc_raw[Y]',
 							'debug[2]':'acc_raw[Z]',
-							'debug[3]':'debug[3]',
+							'debug[3]':'Not Used',
 						},
 			'MIXER' : 	{	
 							'debug[all]':'Debug Mixer',	
@@ -134,9 +134,9 @@ function FlightLogFieldPresenter() {
 			'PIDLOOP' : 	{	
 							'debug[all]':'Debug PID',	
 							'debug[0]':'Wait Time',
-							'debug[1]':'Main Execution Time',
-							'debug[2]':'PID Execution Time',
-							'debug[3]':'debug[3]',
+							'debug[1]':'Sub Update Time',
+							'debug[2]':'PID Update Time',
+							'debug[3]':'Motor Update Time',
 						},
 			'NOTCH' : 	{	
 							'debug[all]':'Debug Notch',	
@@ -163,8 +163,8 @@ function FlightLogFieldPresenter() {
 							'debug[all]':'Debug Filter',	
 							'debug[0]':'dterm_filter[roll]',
 							'debug[1]':'dterm_filter[pitch]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',
+							'debug[2]':'Not Used',
+							'debug[3]':'Not Used',
 						},
      };
     
@@ -337,13 +337,24 @@ function FlightLogFieldPresenter() {
 				case 'VELOCITY':
 					return "";
 				case 'CYCLETIME':
+					switch (fieldName) {
+						case 'debug[1]':
+							return value.toFixed(0) + "%";
+						default:
+							return value.toFixed(0) + "\u03BCS";
+					}				
 				case 'PIDLOOP': 
-					return formatTime(value / 1000, true);
+					return value.toFixed(0) + "\u03BCS";
 				case 'BATTERY':
-					return (value/1000).toFixed(2) + "V"
+					switch (fieldName) {
+						case 'debug[0]':
+							return value.toFixed(0);
+						default:
+							return (value/10).toFixed(1) + "V"
+					}	
 				case 'GYRO':
 				case 'NOTCH':
-					return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
+					return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
 				case 'ACCELEROMETER':
 				    return flightLog.accRawToGs(value).toFixed(2) + "g";
 				case 'MIXER':
@@ -351,9 +362,9 @@ function FlightLogFieldPresenter() {
 				case 'RC_INTERPOLATION':
 					switch (fieldName) {
 						case 'debug[3]':
-							return formatTime(value / 1000, true);
+							return (value / 1000).toFixed(0) + 'mS';
 						default:
-							return "";
+							return value.toFixed(0);
 					}				
 				case 'DFILTER':
 					return "";
