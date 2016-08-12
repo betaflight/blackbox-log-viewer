@@ -93,8 +93,8 @@ function FlightLogFieldPresenter() {
 							'debug[all]':'Debug Cycle Time',	
 							'debug[0]':'Cycle Time',
 							'debug[1]':'CPU Load',
-							'debug[2]':'Delta Time',
-							'debug[3]':'Loop Delta',
+							'debug[2]':'Motor Update',
+							'debug[3]':'Motor Deviation',
 						},
 			'BATTERY' : 	{	
 							'debug[all]':'Debug Battery',	
