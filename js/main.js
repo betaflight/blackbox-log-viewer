@@ -286,6 +286,10 @@ function BlackboxLogViewer() {
             
             logIndexPicker.change(function() {
                 selectLog(parseInt($(this).val(), 10));
+                if(graph) {
+                    (hasAnalyserFullscreen)?$("html").addClass("has-analyser-fullscreen"):$("html").removeClass("has-analyser-fullscreen");       
+                    graph.setAnalyser(hasAnalyserFullscreen);
+                }
             });
         }
         
@@ -600,6 +604,12 @@ function BlackboxLogViewer() {
             (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");
             
             selectLog(null);
+            
+            if (graph) {
+                (hasAnalyserFullscreen)?$("html").addClass("has-analyser-fullscreen"):$("html").removeClass("has-analyser-fullscreen");       
+                graph.setAnalyser(hasAnalyserFullscreen);
+            }
+
         };
     
         reader.readAsArrayBuffer(file);

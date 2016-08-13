@@ -24,6 +24,35 @@ var // inefficient; copied from grapher.js
         };
 
 var that = this;
+
+var MAX_ANALYSER_LENGTH = 300 * 1000 * 1000; // 5min
+var analyserTimeRange  = { 
+							in: 0,
+						   out: MAX_ANALYSER_LENGTH, 
+						 };
+var dataReload = false;
+
+this.setInTime = function(time) {
+	if (time) {
+		analyserTimeRange.in = time;
+	} else {
+		analyserTimeRange.in = 0;
+	}
+	dataReload = true;
+	return analyserTimeRange.in;
+}
+this.setOutTime = function(time) {
+	if (time) {
+		if((time - analyserTimeRange.in) <= MAX_ANALYSER_LENGTH) {
+			analyserTimeRange.out = time;
+			dataReload = true;
+			return analyserTimeRange.out;
+		}
+	}
+	analyserTimeRange.out = analyserTimeRange.in + MAX_ANALYSER_LENGTH; // 5min
+	return analyserTimeRange.out;
+	dataReload = true;
+}
 	  
 try {
 	var sysConfig = flightLog.getSysConfig();
@@ -102,7 +131,7 @@ try {
 
 	function dataLoad() {
 		//load all samples
-		var allChunks = flightLog.getChunksInTimeRange(0, 300 * 1000 * 1000); //300 seconds
+		var allChunks = flightLog.getChunksInTimeRange(((analyserTimeRange.in)?analyserTimeRange.in:0), ((analyserTimeRange.out)?analyserTimeRange.out:MAX_ANALYSER_LENGTH)); //300 seconds
 		var chunkIndex = 0;
 		var frameIndex = 0;
 		var samples = new Float64Array(300 * 1000);
@@ -275,8 +304,10 @@ try {
 			};
 
 			analyserFieldName = fieldName;
-			if (fieldIndex != fftData.fieldIndex)
-				dataLoad();
+			if ((fieldIndex != fftData.fieldIndex) || dataReload) {
+				dataReload = false;
+				dataLoad();				
+			}
 			
 			draw(); // draw the analyser on the canvas....
 	}
