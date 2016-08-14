@@ -24,6 +24,37 @@ var // inefficient; copied from grapher.js
         };
 
 var that = this;
+
+var mouseFrequency= null;
+
+var MAX_ANALYSER_LENGTH = 300 * 1000 * 1000; // 5min
+var analyserTimeRange  = { 
+							in: 0,
+						   out: MAX_ANALYSER_LENGTH, 
+						 };
+var dataReload = false;
+
+this.setInTime = function(time) {
+	if (time) {
+		analyserTimeRange.in = time;
+	} else {
+		analyserTimeRange.in = 0;
+	}
+	dataReload = true;
+	return analyserTimeRange.in;
+}
+this.setOutTime = function(time) {
+	if (time) {
+		if((time - analyserTimeRange.in) <= MAX_ANALYSER_LENGTH) {
+			analyserTimeRange.out = time;
+			dataReload = true;
+			return analyserTimeRange.out;
+		}
+	}
+	analyserTimeRange.out = analyserTimeRange.in + MAX_ANALYSER_LENGTH; // 5min
+	return analyserTimeRange.out;
+	dataReload = true;
+}
 	  
 try {
 	var sysConfig = flightLog.getSysConfig();
@@ -102,7 +133,7 @@ try {
 
 	function dataLoad() {
 		//load all samples
-		var allChunks = flightLog.getChunksInTimeRange(0, 300 * 1000 * 1000); //300 seconds
+		var allChunks = flightLog.getChunksInTimeRange(((analyserTimeRange.in)?analyserTimeRange.in:0), ((analyserTimeRange.out)?analyserTimeRange.out:MAX_ANALYSER_LENGTH)); //300 seconds
 		var chunkIndex = 0;
 		var frameIndex = 0;
 		var samples = new Float64Array(300 * 1000);
@@ -167,8 +198,14 @@ try {
 		canvasCtx.translate(LEFT, TOP);
 
 		var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+		if(isFullscreen) {
+			gradient.addColorStop(1,   'rgba(0,0,0,0.9)');
+			gradient.addColorStop(0,   'rgba(0,0,0,0.7)');
+		} else {
 			gradient.addColorStop(1,   'rgba(255,255,255,0.25)');
 			gradient.addColorStop(0,   'rgba(255,255,255,0)');
+
+		}
 		canvasCtx.fillStyle = gradient; //'rgba(255, 255, 255, .25)'; /* white */
 		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
@@ -194,33 +231,68 @@ try {
 		drawAxisLabel(analyserFieldName, WIDTH - 4, HEIGHT - 6, 'right');
 		drawGridLines(blackBoxRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
 
-		var offset = 0;
-		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  blackBoxRate, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		if(flightLog.getSysConfig().dterm_lpf_hz!=null)    drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  blackBoxRate, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		if(flightLog.getSysConfig().yaw_lpf_hz!=null)      drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  blackBoxRate, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		if(flightLog.getSysConfig().gyro_notch_hz!=null) drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		if(flightLog.getSysConfig().gyro_notch_cutoff!=null) drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  blackBoxRate, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		if(flightLog.getSysConfig().dterm_notch_hz!=null) drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN)
-		if(flightLog.getSysConfig().dterm_notch_cutoff!=null) drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  blackBoxRate, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN)
 
-		drawMarkerLine(fftData.maxNoiseIdx,  blackBoxRate, 'max motor noise', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+
+		var isYawField = (analyserFieldName.match(/(.*yaw.*)/i)!=null);
+		var offset = 0;
+		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency,  blackBoxRate, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
+		offset++; // make some space!
+		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) 		drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  blackBoxRate, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
+		if(flightLog.getSysConfig().gyro_notch_hz!=null) {
+			if(flightLog.getSysConfig().gyro_notch_hz > 0) {
+				var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+				gradient.addColorStop(1,   'rgba(128,255,128,0.10)');
+				gradient.addColorStop(0,   'rgba(128,255,128,0.35)');
+	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().gyro_notch_hz - flightLog.getSysConfig().gyro_notch_cutoff)/100.0);
+	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)"); // highlight the center
+				if(flightLog.getSysConfig().gyro_notch_cutoff!=null) {
+					drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  blackBoxRate, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
+				}
+			}
+		}
+		offset++; // make some space!
+		if(isYawField) {
+			if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  blackBoxRate, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+		} else {
+			if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  blackBoxRate, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+			if(flightLog.getSysConfig().dterm_notch_hz!=null) {
+				if(flightLog.getSysConfig().dterm_notch_hz > 0) {
+					var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+					gradient.addColorStop(1,   'rgba(128,128,255,0.10)');
+					gradient.addColorStop(0,   'rgba(128,128,255,0.35)');
+					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().dterm_notch_hz - flightLog.getSysConfig().dterm_notch_cutoff)/100.0);
+					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN); // highlight the center
+					if(flightLog.getSysConfig().dterm_notch_cutoff!=null) {
+						drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  blackBoxRate, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+					}
+				}
+			}
+		}
+		offset++; // make some space!
+		drawMarkerLine(fftData.maxNoiseIdx,  blackBoxRate, 'Max motor noise', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(255,0,0,0.50)", 3);
 
 		canvasCtx.restore();
 	}
 	
-	function drawMarkerLine(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET){
+	function drawMarkerLine(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth){
 		var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequncy lies
 
-		canvasCtx.beginPath();
-		canvasCtx.lineWidth = 1;
-		canvasCtx.strokeStyle = "rgba(128,128,255,0.50)";
+		lineWidth = (lineWidth || 1);
+		if (lineWidth > 5) { // is the linewidth specified as a frequency band
+			lineWidth = WIDTH *  (2 * lineWidth) / (sampleRate / 2);		
+		}
+		if(lineWidth < 1) lineWidth = 1;
 
-		canvasCtx.moveTo(x, 0);
+		canvasCtx.beginPath();
+		canvasCtx.lineWidth = lineWidth || 1;
+		canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
+
+		canvasCtx.moveTo(x, OFFSET - 10);
 		canvasCtx.lineTo(x, HEIGHT);
 
 		canvasCtx.stroke();
 		
-		drawAxisLabel(label + ' ' + (frequency.toFixed(0))+"Hz", (x + 2), OFFSET, 'left');
+		if(label!=null) drawAxisLabel(label + ' ' + (frequency.toFixed(0))+"Hz", (x + 2), OFFSET, 'left');
 		
 	}
 
@@ -275,11 +347,28 @@ try {
 			};
 
 			analyserFieldName = fieldName;
-			if (fieldIndex != fftData.fieldIndex)
-				dataLoad();
+			if ((fieldIndex != fftData.fieldIndex) || dataReload) {
+				dataReload = false;
+				dataLoad();				
+			}
 			
 			draw(); // draw the analyser on the canvas....
 	}
+
+    this.destroy = function() {
+        $(analyserCanvas).off("mousemove", trackFrequency);
+    };
+
+    this.refresh = function() {
+    	draw();
+    }
+
+	/* Add mouse over event to read the frequency */
+	$(analyserCanvas).on('mousemove', function (e) {
+		trackFrequency(e, that);
+	});
+
+
 	}	catch (e) {
 		console.log('Failed to create analyser... error:' + e);
 	};
@@ -288,4 +377,20 @@ try {
 	this.closeAnalyserHardware = function() {
 	}
 
+    
+	// track frequency under mouse
+	function trackFrequency(e, analyser) {
+		var lastFrequency;
+		if(e.shiftKey) {
+			var rect = analyserCanvas.getBoundingClientRect();
+			mouseFrequency = ((e.clientX - rect.left) / analyserCanvas.width) * (blackBoxRate / 2);
+			if(lastFrequency!=mouseFrequency) {
+				lastFrequency = mouseFrequency;
+				if(analyser) analyser.refresh();
+			}
+			e.preventDefault();
+		}
+	}
+
 }
+

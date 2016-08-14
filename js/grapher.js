@@ -89,6 +89,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     this.onSeek = null;
     
+    this.getAnalyser = function() {
+        return analyser;
+    }
+
     function extend(base, top) {
         var 
             target = {};
@@ -842,7 +846,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
                 outMarkerX = outTime === false ? false : timeToCanvasX(outTime); 
 
-            canvasContext.fillStyle = "rgba(200,200,200,0.4)";
+            canvasContext.fillStyle = "rgba(0,0,0,0.8)";
             
             if (inTime !== false && inTime >= windowStartTime) {
                 canvasContext.fillRect(0, 0, Math.min(inMarkerX, canvas.width), canvas.height);
@@ -1160,17 +1164,21 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     this.setInTime = function(time) {
         inTime = time;
-        
+        analyser.setInTime(inTime);
+
         if (outTime <= inTime) {
             outTime = false;
+            analyser.setOutTime(outTime);
         }
     };
 
     this.setOutTime = function(time) {
         outTime = time;
+        analyser.setOutTime(outTime);
         
         if (inTime >= outTime) {
             inTime = false;
+            analyser.setInTime(inTime);
         }
     };
 
