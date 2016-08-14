@@ -349,7 +349,7 @@ html.has-log .log-graph-config {
     position:absolute;
     top:0;
     left:0;
-    pointer-events:none; /* Allow the user to drag the graph lines instead of hitting the craft */
+    /* pointer-events:none; */ /* Allow the user to drag the graph lines instead of hitting the craft */
     display:none;
 }
 
