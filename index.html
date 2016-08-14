@@ -289,7 +289,11 @@
                 <video></video>
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
-                <canvas width="0" height="0" id="analyserCanvas"></canvas>
+                <div class="analyser">
+                	<canvas width="0" height="0" id="analyserCanvas"></canvas>
+                	<input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="100"/>
+					<input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10"/>
+				</div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" data-placement="auto top" title="Show the legend"></span>
             </div>

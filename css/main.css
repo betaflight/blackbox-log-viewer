@@ -358,6 +358,36 @@ html.has-analyser #analyserCanvas {
 	display:block;
 }
 
+html.has-analyser-fullscreen .analyser  input {
+	display:block;
+}
+
+.analyser input#analyserZoomX {
+	width: 100px;
+	height : 10px;
+	right: 41px;
+	top: 30px;
+}
+.analyser input#analyserZoomY {
+	width: 10px;
+	height: 100px;
+	-webkit-appearance: slider-vertical;
+	right: 22px;
+	top: 50px;
+}
+
+.analyser input {
+	display: none;
+	padding: 3px;
+	margin-right: 3px;
+	z-index: 9;
+	position: absolute;
+}
+
+.analyser {
+	position:relative;
+}
+
 .log-graph video {
     position:absolute;
     top:0;
