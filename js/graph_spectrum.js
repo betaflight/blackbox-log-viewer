@@ -26,6 +26,8 @@ var // inefficient; copied from grapher.js
 var that = this;
 
 var mouseFrequency= null;
+var analyserZoomX = 1.0; /* 100% */
+var analyserZoomY = 1.0; /* 100% */
 
 var MAX_ANALYSER_LENGTH = 300 * 1000 * 1000; // 5min
 var analyserTimeRange  = { 
@@ -84,7 +86,7 @@ try {
 	};
 
 	var initialised = false;
-	var zoom = 1.0;
+	// var zoom = 1.0;
 	var analyserFieldName;   // Name of the field being analysed
 
 	var isFullscreen = false;
@@ -128,7 +130,7 @@ try {
 	}
 	
 	this.setGraphZoom =	function(newZoom) {
-		zoom = 1.0 / newZoom * 100;
+		// zoom = 1.0 / newZoom * 100;
 	}
 
 	function dataLoad() {
@@ -193,11 +195,12 @@ try {
 		var LEFT   = canvasCtx.canvas.left;
 		var TOP    = canvasCtx.canvas.top;
 
-		var PLOTTED_BUFFER_LENGTH = fftData.fftLength;
+		var PLOTTED_BUFFER_LENGTH = fftData.fftLength / (analyserZoomX);
+		var PLOTTED_BLACKBOX_RATE = blackBoxRate / (analyserZoomX);
 
 		canvasCtx.translate(LEFT, TOP);
 
-		var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+		var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT+((isFullscreen)?MARGIN:0)));
 		if(isFullscreen) {
 			gradient.addColorStop(1,   'rgba(0,0,0,0.9)');
 			gradient.addColorStop(0,   'rgba(0,0,0,0.7)');
@@ -207,7 +210,7 @@ try {
 
 		}
 		canvasCtx.fillStyle = gradient; //'rgba(255, 255, 255, .25)'; /* white */
-		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT+((isFullscreen)?MARGIN:0));
 
 		var barWidth = (WIDTH / (PLOTTED_BUFFER_LENGTH / 10)) - 1;
 		var barHeight;
@@ -220,7 +223,7 @@ try {
 			gradient.addColorStop(1,   'rgba(255,128,128,1.0)');
 
 		for(var i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
-			barHeight = (fftData.fftOutput[i] / zoom * HEIGHT);
+			barHeight = (fftData.fftOutput[i] / (analyserZoomY*100) * HEIGHT);
 
 			canvasCtx.fillStyle = gradient; //'rgba(0,255,0,0.3)'; //green
 			canvasCtx.fillRect(x,(HEIGHT)-barHeight,barWidth,barHeight);
@@ -229,47 +232,45 @@ try {
 		}
 
 		drawAxisLabel(analyserFieldName, WIDTH - 4, HEIGHT - 6, 'right');
-		drawGridLines(blackBoxRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
-
-
+		drawGridLines(PLOTTED_BLACKBOX_RATE, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
 
 		var isYawField = (analyserFieldName.match(/(.*yaw.*)/i)!=null);
 		var offset = 0;
-		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency,  blackBoxRate, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
+		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency,  PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
 		offset++; // make some space!
-		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) 		drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  blackBoxRate, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
+		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) 		drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
 		if(flightLog.getSysConfig().gyro_notch_hz!=null) {
 			if(flightLog.getSysConfig().gyro_notch_hz > 0) {
 				var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
 				gradient.addColorStop(1,   'rgba(128,255,128,0.10)');
 				gradient.addColorStop(0,   'rgba(128,255,128,0.35)');
-	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().gyro_notch_hz - flightLog.getSysConfig().gyro_notch_cutoff)/100.0);
-	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)"); // highlight the center
+	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  PLOTTED_BLACKBOX_RATE, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().gyro_notch_hz - flightLog.getSysConfig().gyro_notch_cutoff)/100.0);
+	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  PLOTTED_BLACKBOX_RATE, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)"); // highlight the center
 				if(flightLog.getSysConfig().gyro_notch_cutoff!=null) {
-					drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  blackBoxRate, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
+					drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  PLOTTED_BLACKBOX_RATE, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
 				}
 			}
 		}
 		offset++; // make some space!
 		if(isYawField) {
-			if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  blackBoxRate, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+			if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
 		} else {
-			if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  blackBoxRate, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+			if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
 			if(flightLog.getSysConfig().dterm_notch_hz!=null) {
 				if(flightLog.getSysConfig().dterm_notch_hz > 0) {
 					var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
 					gradient.addColorStop(1,   'rgba(128,128,255,0.10)');
 					gradient.addColorStop(0,   'rgba(128,128,255,0.35)');
-					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().dterm_notch_hz - flightLog.getSysConfig().dterm_notch_cutoff)/100.0);
-					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN); // highlight the center
+					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  PLOTTED_BLACKBOX_RATE, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().dterm_notch_hz - flightLog.getSysConfig().dterm_notch_cutoff)/100.0);
+					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  PLOTTED_BLACKBOX_RATE, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN); // highlight the center
 					if(flightLog.getSysConfig().dterm_notch_cutoff!=null) {
-						drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  blackBoxRate, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+						drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  PLOTTED_BLACKBOX_RATE, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
 					}
 				}
 			}
 		}
 		offset++; // make some space!
-		drawMarkerLine(fftData.maxNoiseIdx,  blackBoxRate, 'Max motor noise', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(255,0,0,0.50)", 3);
+		drawMarkerLine(fftData.maxNoiseIdx,  PLOTTED_BLACKBOX_RATE, 'Max motor noise', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(255,0,0,0.50)", 3);
 
 		canvasCtx.restore();
 	}
@@ -368,6 +369,19 @@ try {
 		trackFrequency(e, that);
 	});
 
+	/* add zoom controls */
+	$("#analyserZoomX").on('input',        
+		function () {
+		analyserZoomX = ($( "#analyserZoomX" ).val() / 100);
+		that.refresh();
+		}            
+	); $( "#analyserZoomX" ).val(100);
+	$("#analyserZoomY").on('input',        
+		function () {
+		analyserZoomY = 1 / ($( "#analyserZoomY" ).val() / 100);
+		that.refresh();
+		}            
+	); $( "#analyserZoomY" ).val(100);
 
 	}	catch (e) {
 		console.log('Failed to create analyser... error:' + e);
@@ -383,7 +397,7 @@ try {
 		var lastFrequency;
 		if(e.shiftKey) {
 			var rect = analyserCanvas.getBoundingClientRect();
-			mouseFrequency = ((e.clientX - rect.left) / analyserCanvas.width) * (blackBoxRate / 2);
+			mouseFrequency = ((e.clientX - rect.left) / analyserCanvas.width) * ((blackBoxRate / analyserZoomX) / 2);
 			if(lastFrequency!=mouseFrequency) {
 				lastFrequency = mouseFrequency;
 				if(analyser) analyser.refresh();
