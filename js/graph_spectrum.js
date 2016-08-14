@@ -231,27 +231,45 @@ try {
 		drawAxisLabel(analyserFieldName, WIDTH - 4, HEIGHT - 6, 'right');
 		drawGridLines(blackBoxRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
 
-		var offset = 0;
-		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) 		drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  blackBoxRate, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-		if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  blackBoxRate, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-		if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  blackBoxRate, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
 
+
+		var isYawField = (analyserFieldName.match(/(.*yaw.*)/i)!=null);
+		var offset = 0;
+		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency,  blackBoxRate, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
+		offset++; // make some space!
+		if(flightLog.getSysConfig().gyro_lowpass_hz!=null) 		drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz/100.0,  blackBoxRate, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
 		if(flightLog.getSysConfig().gyro_notch_hz!=null) {
 			if(flightLog.getSysConfig().gyro_notch_hz > 0) {
-	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-				if(flightLog.getSysConfig().gyro_notch_cutoff!=null) drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  blackBoxRate, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+				var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+				gradient.addColorStop(1,   'rgba(128,255,128,0.10)');
+				gradient.addColorStop(0,   'rgba(128,255,128,0.35)');
+	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().gyro_notch_hz - flightLog.getSysConfig().gyro_notch_cutoff)/100.0);
+	 			drawMarkerLine(flightLog.getSysConfig().gyro_notch_hz/100.0,  blackBoxRate, 'GYRO notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)"); // highlight the center
+				if(flightLog.getSysConfig().gyro_notch_cutoff!=null) {
+					drawMarkerLine(flightLog.getSysConfig().gyro_notch_cutoff/100.0,  blackBoxRate, 'GYRO notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
+				}
 			}
 		}
-		if(flightLog.getSysConfig().dterm_notch_hz!=null) {
-			if(flightLog.getSysConfig().dterm_notch_hz > 0) {
-				drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-				if(flightLog.getSysConfig().dterm_notch_cutoff!=null) drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  blackBoxRate, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+		offset++; // make some space!
+		if(isYawField) {
+			if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz/100.0,  blackBoxRate, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+		} else {
+			if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz/100.0,  blackBoxRate, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+			if(flightLog.getSysConfig().dterm_notch_hz!=null) {
+				if(flightLog.getSysConfig().dterm_notch_hz > 0) {
+					var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+					gradient.addColorStop(1,   'rgba(128,128,255,0.10)');
+					gradient.addColorStop(0,   'rgba(128,128,255,0.35)');
+					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().dterm_notch_hz - flightLog.getSysConfig().dterm_notch_cutoff)/100.0);
+					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz/100.0,  blackBoxRate, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN); // highlight the center
+					if(flightLog.getSysConfig().dterm_notch_cutoff!=null) {
+						drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff/100.0,  blackBoxRate, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+					}
+				}
 			}
 		}
-
+		offset++; // make some space!
 		drawMarkerLine(fftData.maxNoiseIdx,  blackBoxRate, 'Max motor noise', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(255,0,0,0.50)", 3);
-
-		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency,  blackBoxRate, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
 
 		canvasCtx.restore();
 	}
@@ -259,16 +277,22 @@ try {
 	function drawMarkerLine(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth){
 		var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequncy lies
 
+		lineWidth = (lineWidth || 1);
+		if (lineWidth > 5) { // is the linewidth specified as a frequency band
+			lineWidth = WIDTH *  (2 * lineWidth) / (sampleRate / 2);		
+		}
+		if(lineWidth < 1) lineWidth = 1;
+
 		canvasCtx.beginPath();
 		canvasCtx.lineWidth = lineWidth || 1;
 		canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
 
-		canvasCtx.moveTo(x, 0);
+		canvasCtx.moveTo(x, OFFSET - 10);
 		canvasCtx.lineTo(x, HEIGHT);
 
 		canvasCtx.stroke();
 		
-		drawAxisLabel(label + ' ' + (frequency.toFixed(0))+"Hz", (x + 2), OFFSET, 'left');
+		if(label!=null) drawAxisLabel(label + ' ' + (frequency.toFixed(0))+"Hz", (x + 2), OFFSET, 'left');
 		
 	}
 
