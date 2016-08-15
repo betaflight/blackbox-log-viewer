@@ -787,7 +787,7 @@ function BlackboxLogViewer() {
     
     $(document).ready(function() {
 
-        $('[data-toggle="tooltip"]').tooltip(); // initialise tooltips
+        $('[data-toggle="tooltip"]').tooltip({trigger: "hover"}); // initialise tooltips
         
         // Get Latest Version Information
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
@@ -838,12 +838,17 @@ function BlackboxLogViewer() {
            } 
         });
         
+        /**
         prefs.get('hasAnalyser', function(item) {
            if (item) {
                hasAnalyser = item;
                (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
            } 
         });
+        **/
+        // Reset the analyser window on application startup.
+        hasAnalyser = false;
+        (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
 
         $(".file-open").change(function(e) {
             var 
