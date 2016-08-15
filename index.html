@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<title></title>
+<title>Betaflight - Blackbox Explorer</title>
+<link rel="icon" type="image/png" href="images/icon-128.png">
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -36,9 +37,9 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <div class="navbar-form navbar-right" role="form">
                 	<div class="btn-group">
-						<a class="btn btn-default btn-video-export" data-toggle="tooltip" data-placement="auto top" title="Export your vide and chart setup to file"> Export video...</a>
-						<a class="btn btn-primary btn-workspaces-export" data-toggle="tooltip" data-placement="auto top" title="Export your workspace confifurations to file"> Export Workspaces...</a>
-						<span class="btn btn-primary btn-file" data-toggle="tooltip" data-placement="auto top" title="Open another log file, video file, exported workspace file or configuration dump file"> Open log file/video <input type="file" class="file-open" multiple></span>
+						<a class="btn btn-default btn-video-export" data-toggle="tooltip" title="Export your vide and chart setup to file"> Export video...</a>
+						<a class="btn btn-primary btn-workspaces-export" data-toggle="tooltip" title="Export your workspace confifurations to file"> Export Workspaces...</a>
+						<span class="btn btn-primary btn-file" data-toggle="tooltip" title="Open another log file, video file, exported workspace file or configuration dump file"> Open log file/video <input type="file" class="file-open" multiple></span>
 	                </div>
                 </div>
             </div>
@@ -50,7 +51,7 @@
             <div class="jumbotron">
                 <h1>Welcome to the Enhanced Blackbox Explorer!</h1>
                 <p>This tool allows you to view and analyze logs created by Cleanflight's and Betaflight's Blackbox feature.</p>
-                <span class="btn btn-primary btn-lg btn-file"  data-toggle="tooltip" data-placement="auto top" title="Start by opening a log or video file"> Open log file/video <input type="file" class="file-open" multiple></span>
+                <span class="btn btn-primary btn-lg btn-file"  data-toggle="tooltip" title="Start by opening a log or video file"> Open log file/video <input type="file" class="file-open" multiple></span>
             </div>
         </div>
 
@@ -154,7 +155,7 @@
                                 <div id="viewer-version"><!-- current version shown here --></div>
                             </p>
                             <p class="viewer-download">
-								The latest official version is <a class="btn btn-default btn-md btn-viewer-download"  data-toggle="tooltip" data-placement="auto top" title="Goto the latest version download page" href="https://github.com/betaflight/blackbox-log-viewer/releases/latest"> vX.X.XX </a>
+								The latest official version is <a class="btn btn-default btn-md btn-viewer-download"  data-toggle="tooltip" title="Goto the latest version download page" href="https://github.com/betaflight/blackbox-log-viewer/releases/latest"> vX.X.XX </a>
                             </p>
                         </div>
                     </div>
@@ -181,31 +182,31 @@
                 <h4>View</h4>
                 <div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default open-user-settings-dialog" data-toggle="tooltip" data-placement="auto top" title="Show User Settings">
+                        <button type="button" class="btn btn-default open-user-settings-dialog" data-toggle="tooltip" title="Show User Settings">
                             <span class="glyphicon glyphicon-cog"></span>
                         </button>
-                        <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" data-placement="auto top" title="View/hide header">
+                        <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" title="View/hide header">
                             <span class="glyphicon glyphicon-info-sign"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-video" data-toggle="tooltip" data-placement="auto top" title="View/hide video display">
+                        <button type="button" class="btn btn-default view-video" data-toggle="tooltip" title="View/hide video display">
                             <span class="glyphicon glyphicon-film"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-craft" data-toggle="tooltip" data-placement="auto top" title="View/hide craft display">
+                        <button type="button" class="btn btn-default view-craft" data-toggle="tooltip" title="View/hide craft display">
                             <span class="glyphicon glyphicon-plane"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-sticks" data-toggle="tooltip" data-placement="auto top" title="View/hide stick display">
+                        <button type="button" class="btn btn-default view-sticks" data-toggle="tooltip" title="View/hide stick display">
                             <span class="glyphicon glyphicon-pawn"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-table" data-toggle="tooltip" data-placement="auto top" title="View/hide statistics display">
+                        <button type="button" class="btn btn-default view-table" data-toggle="tooltip" title="View/hide statistics display">
                             <span class="glyphicon glyphicon-list-alt"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-analyser-sticks" style="display:none" data-toggle="tooltip" data-placement="auto top" title="View/hide stick analyser">
+                        <button type="button" class="btn btn-default view-analyser-sticks" style="display:none" data-toggle="tooltip" title="View/hide stick analyser">
                             <span class="glyphicon glyphicon-screenshot"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-analyser" data-toggle="tooltip" data-placement="auto top" title="View/hide analyser display">
+                        <button type="button" class="btn btn-default view-analyser" data-toggle="tooltip" title="View/hide analyser display">
                             <span class="glyphicon glyphicon-equalizer"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" data-placement="auto top" title="Zoom Analyser Window">
+                        <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
                             <span class="glyphicon glyphicon-resize-full"></span><span class="glyphicon glyphicon-resize-small"></span>
                         </button>
                    </div>
@@ -215,25 +216,25 @@
                 <h4>Playback</h4>
                 <div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default video-jump-start" data-toggle="tooltip" data-placement="auto top" title="Jump to start of video">
+                        <button type="button" class="btn btn-default video-jump-start" data-toggle="tooltip" title="Jump to start of video">
                             <span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span>
                         </button>
-                        <button type="button" class="btn btn-default log-jump-start" data-toggle="tooltip" data-placement="auto top" title="Jump to start of log">
+                        <button type="button" class="btn btn-default log-jump-start" data-toggle="tooltip" title="Jump to start of log">
                             <span class="glyphicon glyphicon-fast-backward"></span>
                         </button>
-                        <button type="button" class="btn btn-default log-jump-back" data-toggle="tooltip" data-placement="auto top" title="Jump back">
+                        <button type="button" class="btn btn-default log-jump-back" data-toggle="tooltip" title="Jump back">
                             <span class="glyphicon glyphicon-step-backward"></span>
                         </button>
-                        <button type="button" class="btn btn-default log-play-pause" data-toggle="tooltip" data-placement="auto top" title="Play/Pause log/video">
+                        <button type="button" class="btn btn-default log-play-pause" data-toggle="tooltip" title="Play/Pause log/video">
                             <span class="glyphicon glyphicon-play"></span>
                         </button>
-                        <button type="button" class="btn btn-default log-jump-forward" data-toggle="tooltip" data-placement="auto top" title="Jump forward">
+                        <button type="button" class="btn btn-default log-jump-forward" data-toggle="tooltip" title="Jump forward">
                             <span class="glyphicon glyphicon-step-forward"></span>
                         </button>
-                        <button type="button" class="btn btn-default log-jump-end" data-toggle="tooltip" data-placement="auto top" title="Jump to end of log">
+                        <button type="button" class="btn btn-default log-jump-end" data-toggle="tooltip" title="Jump to end of log">
                             <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
-                        <button type="button" class="btn btn-default video-jump-end" data-toggle="tooltip" data-placement="auto top" title="Jump to end of video">
+                        <button type="button" class="btn btn-default video-jump-end" data-toggle="tooltip" title="Jump to end of video">
                             <span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
                     </div>
@@ -244,7 +245,7 @@
                 <div class="form-inline">
                     <div class="form-group">
                         <div class="playback-rate-control btn-group btn-group-vertical"></div>
-                        <input type="text" class="form-control playback-rate" value="1.0" size="5" data-toggle="tooltip" data-placement="auto top" title="Directly set the playback speed">
+                        <input type="text" class="form-control playback-rate" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
                     </div>
                 </div>
             </li>
@@ -253,7 +254,7 @@
                 <div class="form-inline">
                     <div class="form-group">
                         <div class="graph-zoom-control btn-group btn-group-vertical"></div>
-                        <input type="text" class="form-control graph-zoom" value="-" size="6" data-toggle="tooltip" data-placement="auto top" title="Directly set the zoom level">
+                        <input type="text" class="form-control graph-zoom" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level">
                     </div>
                 </div>
             </li>
@@ -261,7 +262,7 @@
                 <h4>Time</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <input type="text" class="form-control graph-time" value="1.0" size="8" data-toggle="tooltip" data-placement="auto top" title="Enter a time to jump to">
+                        <input type="text" class="form-control graph-time" value="1.0" size="8" data-toggle="tooltip" title="Enter a time to jump to">
                     </div>
                 </div>
             </li>
@@ -270,15 +271,15 @@
                 <div class="form-inline">
                     <div class="form-group">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" data-placement="auto top" title="Move log earlier">
+                            <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
                                 <span class="glyphicon glyphicon-step-backward"></span>
                             </button>
                             <button type="button" class="btn btn-default log-sync-here">Start log here</button>
-                            <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" data-placement="auto top" title="Move log later">
+                            <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
                                 <span class="glyphicon glyphicon-step-forward"></span>
                             </button>
                         </div>
-                        <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" data-placement="auto top" title="Enter a time offset">
+                        <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" title="Enter a time offset">
                     </div>
                 </div>
             </li>
@@ -295,14 +296,14 @@
 					<input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10"/>
 				</div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
-                <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" data-placement="auto top" title="Show the legend"></span>
+                <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
             </div>
             <div class="log-graph-config">
-                <h2>Legend <span class="log-close-legend-dialog glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="auto top" title="Hide the legend"></span><span class="open-keys-dialog glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="auto top" title="Show the keyboard shortcuts"></span></h2>
+                <h2>Legend <span class="log-close-legend-dialog glyphicon glyphicon-remove" data-toggle="tooltip" title="Hide the legend"></span><span class="open-keys-dialog glyphicon glyphicon-question-sign" data-toggle="tooltip" title="Show the keyboard shortcuts"></span></h2>
 				<div class="log-index"></div>
                 <div class="log-graph-legend">
                 </div>
-                <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog" data-toggle="tooltip" data-placement="auto top" title="Setup chart pens">Graph setup</button>
+                <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
             </div>
         </div>
         <div class="log-seek-bar">
@@ -390,7 +391,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" data-placement="auto top" title="Close without saving changes">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" title="Close without saving changes">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">Configure graphs</h4>
@@ -407,8 +408,8 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default graph-configuration-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Close without saving changes">Cancel</button>
-                    <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Close and save changes">Save changes</button>
+                    <button type="button" class="btn btn-default graph-configuration-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Cancel</button>
+                    <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal" data-toggle="tooltip" title="Close and save changes">Save changes</button>
                 </div>
             </div>
         </div>
@@ -417,7 +418,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" data-placement="auto top" title="Close without saving changes">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" title="Close without saving changes">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">Log Header Information</h4>
@@ -963,9 +964,9 @@
                 	<div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default header-dialog-toggle"  data-toggle="tooltip" data-placement="auto top" title="Change the header display for the respective firmware type">Cleanflight</button>
-                    <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Close without saving changes">Cancel</button>
-                    <button type="button" class="btn btn-primary header-dialog-save" style="display:none;" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Close and save changes">Save changes</button>
+                    <button type="button" class="btn btn-default header-dialog-toggle"  data-toggle="tooltip" title="Change the header display for the respective firmware type">Cleanflight</button>
+                    <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Cancel</button>
+                    <button type="button" class="btn btn-primary header-dialog-save" style="display:none;" data-dismiss="modal" data-toggle="tooltip" title="Close and save changes">Save changes</button>
                 </div>
             </div>
         </div>
@@ -974,7 +975,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" data-placement="auto top" title="Close the dialog box">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" title="Close the dialog box">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">Shortcut Keys</h4>
@@ -1087,7 +1088,7 @@
                 	<div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default keys-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Close the dialog box">Cancel</button>
+                    <button type="button" class="btn btn-default keys-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close the dialog box">Cancel</button>
                 </div>
             </div>
         </div>
@@ -1197,9 +1198,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default video-export-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Cancel video generation">Cancel</button>
-                    <button type="button" class="btn btn-default video-export-dialog-close" data-dismiss="modal" data-toggle="tooltip" data-placement="auto top" title="Close dialog box">Close</button>
-                    <button type="button" class="btn btn-primary video-export-dialog-start" data-toggle="tooltip" data-placement="auto top" title="Start generating video file">Begin export</button>
+                    <button type="button" class="btn btn-default video-export-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Cancel video generation">Cancel</button>
+                    <button type="button" class="btn btn-default video-export-dialog-close" data-dismiss="modal" data-toggle="tooltip" title="Close dialog box">Close</button>
+                    <button type="button" class="btn btn-primary video-export-dialog-start" data-toggle="tooltip" title="Start generating video file">Begin export</button>
                 </div>
             </div>
         </div>
