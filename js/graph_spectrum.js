@@ -20,7 +20,8 @@ var // inefficient; copied from grapher.js
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
         
         drawingParams = {
-            fontSizeFrameLabel: null
+            fontSizeFrameLabel: null,
+            fontSizeFrameLabelFullscreen: "9",
         };
 
 var that = this;
@@ -315,7 +316,7 @@ try {
 	}
 
 	function drawAxisLabel(axisLabel, X, Y, align) {
-			canvasCtx.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
+			canvasCtx.font = ((isFullscreen)?drawingParams.fontSizeFrameLabelFullscreen:drawingParams.fontSizeFrameLabel) + "pt " + DEFAULT_FONT_FACE;
 			canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
 			if(align) {
 				 canvasCtx.textAlign = align;
