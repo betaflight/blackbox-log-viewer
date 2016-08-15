@@ -123,10 +123,20 @@ try {
         canvasCtx.canvas.width     = (canvas.width  * getSize().width);
 
 		// Recenter the analyser canvas in the bottom left corner
-		$(analyserCanvas).css({
+		var parentElem = $(analyserCanvas).parent();
+		
+		$(parentElem).css({
 			left: (canvas.width  * getSize().left) + "px",
 			top:  (canvas.height * getSize().top ) + "px",
 		});
+		// place the sliders.
+		$("input:first-of-type", parentElem).css({
+			left: (canvasCtx.canvas.width - 130) + "px",
+		});
+		$("input:last-of-type", parentElem).css({
+			left: (canvasCtx.canvas.width - 20) + "px",
+		});
+
 
 	}
 	
