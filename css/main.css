@@ -3,6 +3,7 @@ body {
 }
 
 html, body {
+	height:100%;
     overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
 }
 
