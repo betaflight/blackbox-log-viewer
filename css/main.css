@@ -358,7 +358,7 @@ html.has-analyser #analyserCanvas {
 	display:block;
 }
 
-html.has-analyser-fullscreen .analyser  input {
+html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
 }
 
