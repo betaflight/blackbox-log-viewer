@@ -3,6 +3,7 @@ body {
 }
 
 html, body {
+	height:100%;
     overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
 }
 
@@ -365,15 +366,17 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 .analyser input#analyserZoomX {
 	width: 100px;
 	height : 10px;
-	right: 41px;
-	top: 30px;
+	left: 975px;
+	top: 10px;
+	float: right;
 }
 .analyser input#analyserZoomY {
 	width: 10px;
 	height: 100px;
 	-webkit-appearance: slider-vertical;
-	right: 22px;
-	top: 50px;
+	left: 1085px;
+	top: 30px;
+	 */
 }
 
 .analyser input {
@@ -385,7 +388,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 }
 
 .analyser {
-	position:relative;
+	position: absolute;
 }
 
 .log-graph video {

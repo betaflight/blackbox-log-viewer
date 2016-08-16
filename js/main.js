@@ -787,7 +787,7 @@ function BlackboxLogViewer() {
     
     $(document).ready(function() {
 
-        $('[data-toggle="tooltip"]').tooltip({trigger: "hover"}); // initialise tooltips
+        $('[data-toggle="tooltip"]').tooltip({trigger: "hover", placement: "auto bottom"}); // initialise tooltips
         
         // Get Latest Version Information
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);

@@ -20,7 +20,8 @@ var // inefficient; copied from grapher.js
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
         
         drawingParams = {
-            fontSizeFrameLabel: null
+            fontSizeFrameLabel: null,
+            fontSizeFrameLabelFullscreen: "9",
         };
 
 var that = this;
@@ -122,10 +123,20 @@ try {
         canvasCtx.canvas.width     = (canvas.width  * getSize().width);
 
 		// Recenter the analyser canvas in the bottom left corner
-		$(analyserCanvas).css({
+		var parentElem = $(analyserCanvas).parent();
+		
+		$(parentElem).css({
 			left: (canvas.width  * getSize().left) + "px",
 			top:  (canvas.height * getSize().top ) + "px",
 		});
+		// place the sliders.
+		$("input:first-of-type", parentElem).css({
+			left: (canvasCtx.canvas.width - 130) + "px",
+		});
+		$("input:last-of-type", parentElem).css({
+			left: (canvasCtx.canvas.width - 20) + "px",
+		});
+
 
 	}
 	
@@ -315,7 +326,7 @@ try {
 	}
 
 	function drawAxisLabel(axisLabel, X, Y, align) {
-			canvasCtx.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
+			canvasCtx.font = ((isFullscreen)?drawingParams.fontSizeFrameLabelFullscreen:drawingParams.fontSizeFrameLabel) + "pt " + DEFAULT_FONT_FACE;
 			canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
 			if(align) {
 				 canvasCtx.textAlign = align;
