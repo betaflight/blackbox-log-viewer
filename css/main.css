@@ -1055,3 +1055,37 @@ div#lap-timer td:first-child {
 .viewer-download {
     display: none;
 }
+
+/*
+ Bootstrap Tooltip Overrides
+*/
+.tooltip {
+    --tooltip-color: #363636;
+}    
+.tooltip-inner {
+  background-color: var(--tooltip-color);
+}
+.tooltip.top .tooltip-arrow {
+  border-top-color: var(--tooltip-color);
+}
+.tooltip.top-left .tooltip-arrow {
+  border-top-color: var(--tooltip-color);
+}
+.tooltip.top-right .tooltip-arrow {
+  border-top-color: var(--tooltip-color);
+}
+.tooltip.right .tooltip-arrow {
+ border-right-color: var(--tooltip-color);
+}
+.tooltip.left .tooltip-arrow {
+  border-left-color: var(--tooltip-color);
+}
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: var(--tooltip-color);
+}
+.tooltip.bottom-left .tooltip-arrow {
+  border-bottom-color: var(--tooltip-color);
+}
+.tooltip.bottom-right .tooltip-arrow {
+  border-bottom-color: var(--tooltip-color);
+}
