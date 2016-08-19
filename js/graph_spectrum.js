@@ -32,7 +32,7 @@ var analyserZoomY = 1.0; /* 100% */
 
 var MAX_ANALYSER_LENGTH = 300 * 1000 * 1000; // 5min
 var analyserTimeRange  = { 
-							in: 0,
+							in: null,
 						   out: MAX_ANALYSER_LENGTH, 
 						 };
 var dataReload = false;
@@ -41,7 +41,7 @@ this.setInTime = function(time) {
 	if (time) {
 		analyserTimeRange.in = time;
 	} else {
-		analyserTimeRange.in = 0;
+		analyserTimeRange.in = null;
 	}
 	dataReload = true;
 	return analyserTimeRange.in;
@@ -146,10 +146,16 @@ try {
 
 	function dataLoad() {
 		//load all samples
-		var allChunks = flightLog.getChunksInTimeRange(((analyserTimeRange.in)?analyserTimeRange.in:0), ((analyserTimeRange.out)?analyserTimeRange.out:MAX_ANALYSER_LENGTH)); //300 seconds
+		var logStart = flightLog.getMinTime();
+		var logEnd = ((flightLog.getMaxTime() - logStart)<=MAX_ANALYSER_LENGTH)?flightLog.getMaxTime():(logStart+MAX_ANALYSER_LENGTH);
+		if(analyserTimeRange.in!=null) {
+			logStart = analyserTimeRange.in;
+			logEnd = analyserTimeRange.out;
+		}
+		var allChunks = flightLog.getChunksInTimeRange(logStart, logEnd); //300 seconds
 		var chunkIndex = 0;
 		var frameIndex = 0;
-		var samples = new Float64Array(300 * 1000);
+		var samples = new Float64Array(MAX_ANALYSER_LENGTH/1000);
 		var i = 0;
 		
 		for (chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
