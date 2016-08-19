@@ -19,7 +19,6 @@ function BlackboxLogViewer() {
         GRAPH_STATE_PLAY = 1,
         
         SMALL_JUMP_TIME = 100 * 1000,
-        LARGE_JUMP_TIME = 1000 * 1000,
         PLAYBACK_MIN_RATE = 5,
         PLAYBACK_MAX_RATE = 300,
         PLAYBACK_DEFAULT_RATE = 100,
@@ -75,6 +74,9 @@ function BlackboxLogViewer() {
         analyserCanvas = $("#analyserCanvas")[0],
         analyserStickCanvas = $("#analyserStickCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
+        statusBar = $('#status-bar'),
+        html = $('html'),
+
 
         videoURL = false,
         videoOffset = 0.0,
@@ -99,7 +101,7 @@ function BlackboxLogViewer() {
 
         graphZoom = GRAPH_DEFAULT_ZOOM,
         lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
-    
+
     function blackboxTimeFromVideoTime() {
         return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
     }
@@ -182,14 +184,14 @@ function BlackboxLogViewer() {
             }
 
             // Update flight mode flags on status bar
-            $("#status-bar .flight-mode").text(
+            $(".flight-mode", statusBar).text(
             		fieldPresenter.decodeFieldToFriendly(null, 'flightModeFlags', currentFlightMode, null)	
             	);
 
             // update time field on status bar
             $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
             if(hasMarker) {
-                $("#status-bar .marker-offset").text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms ' + (1000000/(currentBlackboxTime-markerTime)).toFixed(0) + "Hz");
+                $(".marker-offset", statusBar).text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms ' + (1000000/(currentBlackboxTime-markerTime)).toFixed(0) + "Hz");
             }
 
             // Update the Legend Values
@@ -272,13 +274,13 @@ function BlackboxLogViewer() {
     
     function renderLogFileInfo(file) {
         $(".log-filename").text(file.name);
-        
-        var 
+
+        var
             logIndexContainer = $(".log-index"),
             logIndexPicker,
             logCount = flightLog.getLogCount(),
             index;
-        
+
         logIndexContainer.empty();
         
         if (logCount > 1) {
@@ -287,7 +289,7 @@ function BlackboxLogViewer() {
             logIndexPicker.change(function() {
                 selectLog(parseInt($(this).val(), 10));
                 if(graph) {
-                    (hasAnalyserFullscreen)?$("html").addClass("has-analyser-fullscreen"):$("html").removeClass("has-analyser-fullscreen");       
+                    (hasAnalyserFullscreen)?html.addClass("has-analyser-fullscreen"):html.removeClass("has-analyser-fullscreen");
                     graph.setAnalyser(hasAnalyserFullscreen);
                 }
             });
@@ -359,10 +361,10 @@ function BlackboxLogViewer() {
         
         // Add log version information to status bar
         var sysConfig = flightLog.getSysConfig();
-        $('#status-bar .version').text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
+        $('.version', statusBar).text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
                                         ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
-        $('#status-bar .looptime').text( stringLoopTime(sysConfig.looptime, sysConfig.pid_process_denom, sysConfig.unsynced_fast_pwm, sysConfig.motor_pwm_rate));
-        $('#status-bar .lograte').text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
+        $('.looptime', statusBar).text( stringLoopTime(sysConfig.looptime, sysConfig.pid_process_denom, sysConfig.unsynced_fast_pwm, sysConfig.motor_pwm_rate));
+        $('.lograte', statusBar).text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
 
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
         seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
@@ -377,7 +379,8 @@ function BlackboxLogViewer() {
     
     function setGraphState(newState) {
         graphState = newState;
-        
+        var btnLogPlayPause = $(".log-play-pause");
+
         lastRenderTime = false;
         
         switch (newState) {
@@ -385,13 +388,13 @@ function BlackboxLogViewer() {
                 if (hasVideo) {
                     video.play();
                 }
-                $(".log-play-pause span").attr('class', 'glyphicon glyphicon-pause');
+                $("span", btnLogPlayPause).attr('class', 'glyphicon glyphicon-pause');
             break;
             case GRAPH_STATE_PAUSED:
                 if (hasVideo) {
                     video.pause();
                 }
-                $(".log-play-pause span").attr('class', 'glyphicon glyphicon-play');
+                $("span", btnLogPlayPause).attr('class', 'glyphicon glyphicon-play');
             break;
         }
         
@@ -474,7 +477,7 @@ function BlackboxLogViewer() {
                 } else { //state defined, just set item
                     hasConfigOverlay = (state)?true:false;
                 }
-                (hasConfigOverlay)?$("html").addClass("has-config-overlay"):$("html").removeClass("has-config-overlay");
+                html.toggleClass("has-config-overlay", hasConfigOverlay);
             }
         }
 
@@ -574,7 +577,7 @@ function BlackboxLogViewer() {
 
                        configuration = new Configuration(file, configurationDefaults, showConfigFile); // the configuration class will actually re-open the file as a text object.
                        hasConfig = true;
-                       (hasConfig)?$("html").addClass("has-config"):$("html").removeClass("has-config");
+                       html.toggleClass("has-config", hasConfig);
                    }
                    
                    } catch(e) {
@@ -597,16 +600,15 @@ function BlackboxLogViewer() {
             currentOffsetCache.log      = file.name; // store the name of the loaded log file
             currentOffsetCache.index    = null;      // and clear the index
             
-            hasLog = true;
-            $("html").addClass("has-log");
-            (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");
-            (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
-            (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");
+            hasLog = true; html.toggleClass("has-log", hasLog);
+            html.toggleClass("has-craft", hasCraft);
+            html.toggleClass("has-table", hasTable);
+            html.toggleClass("has-sticks", hasSticks);
             
             selectLog(null);
             
             if (graph) {
-                (hasAnalyserFullscreen)?$("html").addClass("has-analyser-fullscreen"):$("html").removeClass("has-analyser-fullscreen");       
+                (hasAnalyserFullscreen)?html.addClass("has-analyser-fullscreen"):html.removeClass("has-analyser-fullscreen");
                 graph.setAnalyser(hasAnalyserFullscreen);
             }
 
@@ -638,8 +640,7 @@ function BlackboxLogViewer() {
     
     function videoLoaded(e) {
         hasVideo = true;
-        
-        $("html").addClass("has-video");
+        html.toggleClass("has-video", hasVideo);
         
         setGraphState(GRAPH_STATE_PAUSED);
         invalidateGraph();
@@ -657,19 +658,19 @@ function BlackboxLogViewer() {
     function onLegendSelectionChange() {
             hasAnalyser = true;
             graph.setDrawAnalyser(hasAnalyser);            
-            (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
+            html.toggleClass("has-analyser", hasAnalyser);
             prefs.set('hasAnalyser', hasAnalyser);
             invalidateGraph();
     }
 
     function setMarker(state) { // update marker field
         hasMarker = state;
-        (state)?$("html").addClass("has-marker"):$("html").removeClass("has-marker");       
+        html.toggleClass("has-marker",state);
     }
 
     function setFullscreen(state) { // update fullscreen status
         isFullscreen = state;
-        (state)?$("html").addClass("is-fullscreen"):$("html").removeClass("is-fullscreen");       
+        html.toggleClass("is-fullscreen",state);
     }
     
     this.getMarker = function() { // get marker field
@@ -791,7 +792,7 @@ function BlackboxLogViewer() {
         
         // Get Latest Version Information
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
-        $("#status-bar .viewer-version").text('v'+VIEWER_VERSION);
+        $(".viewer-version", statusBar).text('v'+VIEWER_VERSION);
         try {
             $.getJSON('https://api.github.com/repos/GaryKeeble/blackbox-log-viewer/releases/latest',{},function(data){
                 latestVersion = data;
@@ -819,36 +820,27 @@ function BlackboxLogViewer() {
         prefs.get('hasCraft', function(item) {
            if (item) {
                hasCraft = item;
-               (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");       
+               html.toggleClass("has-craft", hasCraft);
            } 
         });
 
         prefs.get('hasSticks', function(item) {
            if (item) {
                hasSticks = item;
-               (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");  
+               html.toggleClass("has-sticks", hasSticks);
            } 
         });
-
 
         prefs.get('hasTable', function(item) {
            if (item) {
                hasTable = item;
-               (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
+               html.toggleClass("has-table", hasTable);
            } 
         });
         
-        /**
-        prefs.get('hasAnalyser', function(item) {
-           if (item) {
-               hasAnalyser = item;
-               (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
-           } 
-        });
-        **/
         // Reset the analyser window on application startup.
         hasAnalyser = false;
-        (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
+        html.toggleClass("has-analyser", hasAnalyser);
 
         $(".file-open").change(function(e) {
             var 
@@ -892,32 +884,32 @@ function BlackboxLogViewer() {
         // New View Controls
         $(".view-video").click(function() {
             viewVideo = !viewVideo;
-            (!viewVideo)?$("html").addClass("video-hidden"):$("html").removeClass("video-hidden");       
+            html.toggleClass("video-hidden", !viewVideo);       
         });
 
         $(".view-craft").click(function() {
             hasCraft = !hasCraft;
-            (hasCraft)?$("html").addClass("has-craft"):$("html").removeClass("has-craft");       
+            html.toggleClass("has-craft", hasCraft);       
             prefs.set('hasCraft', hasCraft);
         });
 
         $(".view-sticks").click(function() {
             hasSticks = !hasSticks;
             graph.setDrawSticks(hasSticks);            
-            (hasSticks)?$("html").addClass("has-sticks"):$("html").removeClass("has-sticks");  
+            html.toggleClass("has-sticks", hasSticks);  
             prefs.set('hasSticks', hasSticks);
             invalidateGraph();
         });
         
         $(".view-table").click(function() {
             hasTable = !hasTable;
-            (hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");       
+            html.toggleClass("has-table", hasTable);       
             prefs.set('hasTable', hasTable);
         });
        
         $(".view-analyser-sticks").click(function() {
             hasAnalyserSticks = !hasAnalyserSticks;
-            (hasAnalyserSticks)?$("html").addClass("has-analyser-sticks"):$("html").removeClass("has-analyser-sticks");       
+            html.toggleClass("has-analyser-sticks", hasAnalyserSticks);
             prefs.set('hasAnalyserSticks', hasAnalyserSticks);
         });
 
@@ -926,7 +918,7 @@ function BlackboxLogViewer() {
                 hasAnalyser = !hasAnalyser; 
             } else hasAnalyser = false;
             graph.setDrawAnalyser(hasAnalyser);            
-            (hasAnalyser)?$("html").addClass("has-analyser"):$("html").removeClass("has-analyser");       
+            html.toggleClass("has-analyser", hasAnalyser);       
             prefs.set('hasAnalyser', hasAnalyser);
             invalidateGraph();
         });
@@ -935,7 +927,7 @@ function BlackboxLogViewer() {
             if(hasAnalyser) {
                 hasAnalyserFullscreen = !hasAnalyserFullscreen; 
             } else hasAnalyserFullscreen = false;
-            (hasAnalyserFullscreen)?$("html").addClass("has-analyser-fullscreen"):$("html").removeClass("has-analyser-fullscreen");       
+            (hasAnalyserFullscreen)?html.addClass("has-analyser-fullscreen"):html.removeClass("has-analyser-fullscreen");
             graph.setAnalyser(hasAnalyserFullscreen);
             invalidateGraph();
         });
@@ -1192,28 +1184,28 @@ function BlackboxLogViewer() {
             userSettingsDialog.show(flightLog, userSettings);
         });
 
-        $("#status-bar .marker-offset").click(function(e) {
+        $(".marker-offset", statusBar).click(function(e) {
 	        setCurrentBlackboxTime(markerTime);
 	        invalidateGraph(); 
         });
         
         for(var i=1; i< 9; i++) { // Loop through all the bookmarks.
-            $('#status-bar .bookmark-'+i).click(function(e) {
+            $('.bookmark-'+i, statusBar).click(function() {
     	        setCurrentBlackboxTime(bookmarkTimes[parseInt(this.className.slice(-1))]);
     	        invalidateGraph(); 
             });
         }
 
-        $('#status-bar .bookmark-clear').click(function(e) {
+        $('.bookmark-clear', statusBar).click(function() {
             bookmarkTimes = null;
             for(var i=1; i<=9; i++) {
-                $('#status-bar .bookmark-'+ i).css('visibility', 'hidden' );
+                $('.bookmark-'+ i, statusBar).css('visibility', 'hidden' );
             }
-            $('#status-bar .bookmark-clear').css('visibility', 'hidden' );
+            $('.bookmark-clear', statusBar).css('visibility', 'hidden' );
 	        invalidateGraph(); 
         });
 
-        $('#status-bar .configuration-file-name').click(function(e) {
+        $('.configuration-file-name', statusBar).click(function(e) {
             showConfigFile(true); // show the config file
             e.preventDefault();
         });
@@ -1263,8 +1255,8 @@ function BlackboxLogViewer() {
             $(".log-seek-bar").css("top", newHeight+"px");
             $(".log-field-values").css("top", newHeight+"px");
             invalidateGraph();
-        };
-        
+        }
+
         $(document).on("mousewheel", function(e) {
         if (graph && $(e.target).parents('.modal').length == 0 && $(e.target).attr('id') == 'graphCanvas') {
                 var delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
@@ -1320,17 +1312,17 @@ function BlackboxLogViewer() {
                     case "M".charCodeAt(0): 
                         if (e.altKey && hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
                           try{
-                            setVideoOffset(videoOffset + (stringTimetoMsec($("#status-bar .marker-offset").text()) / 1000000), true);  
+                            setVideoOffset(videoOffset + (stringTimetoMsec($(".marker-offset", statusBar).text()) / 1000000), true);  
                           } catch(e) {
                              console.log('Failed to set video offset');
                           }
                         } else { // Add a marker to graph window
                             markerTime = currentBlackboxTime;
-                            $("#status-bar .marker-offset").text('Marker Offset ' + formatTime(0) + 'ms');
+                            $(".marker-offset", statusBar).text('Marker Offset ' + formatTime(0) + 'ms');
                             
                         }                        
                         setMarker(!hasMarker);
-                        $("#status-bar .marker-offset").css('visibility', (hasMarker)?'visible':'hidden');
+                        $(".marker-offset", statusBar).css('visibility', (hasMarker)?'visible':'hidden');
                         invalidateGraph();
                         e.preventDefault();
                     break;
@@ -1344,7 +1336,7 @@ function BlackboxLogViewer() {
 
                     case "T".charCodeAt(0):
                         hasTableOverlay = !hasTableOverlay;
-                    	(hasTableOverlay)?$("html").addClass("has-table-overlay"):$("html").removeClass("has-table-overlay");
+                    	html.toggleClass("has-table-overlay", hasTableOverlay);
 
                         if (hasTableOverlay) hadTable = hasTable; // Store the state of the table view when quickshow selected
 
@@ -1355,7 +1347,7 @@ function BlackboxLogViewer() {
                     		hasTable = false; // return table state when we remove quickshow.
                     		}
 
-                    	(hasTable)?$("html").addClass("has-table"):$("html").removeClass("has-table");
+                    	html.toggleClass("has-table", hasTable);
                     	invalidateGraph();
                         e.preventDefault();
                     break;
@@ -1394,9 +1386,9 @@ function BlackboxLogViewer() {
 		                            if(e.which==48) {
 		                                bookmarkTimes = null;
 		                                for(var i=1; i<=9; i++) {
-	                                        $('#status-bar .bookmark-'+ i).css('visibility', 'hidden' );
+	                                        $('.bookmark-'+ i, statusBar).css('visibility', 'hidden' );
 		                                }
-                                        $('#status-bar .bookmark-clear').css('visibility', 'hidden' );
+                                        $('.bookmark-clear', statusBar).css('visibility', 'hidden' );
 		                            } else {
 		                                if(bookmarkTimes==null) bookmarkTimes = new Array();
                                         if (bookmarkTimes[e.which-48] == null) {
@@ -1404,12 +1396,12 @@ function BlackboxLogViewer() {
                                         } else {
                                              bookmarkTimes[e.which-48] = null; 			            // clear the bookmark
                                         }
-                                        $('#status-bar .bookmark-'+(e.which-48)).css('visibility', ((bookmarkTimes[e.which-48]!=null)?('visible'):('hidden')) );
+                                        $('.bookmark-'+(e.which-48), statusBar).css('visibility', ((bookmarkTimes[e.which-48]!=null)?('visible'):('hidden')) );
                                         var countBookmarks = 0;
                                         for(var i=0; i<=9; i++) {
                                         	countBookmarks += (bookmarkTimes[i]!=null)?1:0;
                                         }
-                                        $('#status-bar .bookmark-clear').css('visibility', ((countBookmarks>0)?('visible'):('hidden')) );
+                                        $('.bookmark-clear', statusBar).css('visibility', ((countBookmarks>0)?('visible'):('hidden')) );
 
 		                            }
 		                            invalidateGraph();
@@ -1447,7 +1439,7 @@ function BlackboxLogViewer() {
                                 var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
                                                      ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
                                                      ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $("#status-bar .overrides").text(overrideStatus);
+                                $(".overrides", statusBar).text(overrideStatus);
 
                                 e.preventDefault();
                             }
@@ -1468,7 +1460,7 @@ function BlackboxLogViewer() {
                                 var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
                                                      ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
                                                      ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $("#status-bar .overrides").text(overrideStatus);
+                                $(".overrides", statusBar).text(overrideStatus);
                                 e.preventDefault();
                             }
                         } catch(e) {
@@ -1488,7 +1480,7 @@ function BlackboxLogViewer() {
                                 var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
                                                      ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
                                                      ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $("#status-bar .overrides").text(overrideStatus);
+                                $(".overrides", statusBar).text(overrideStatus);
 
                                 e.preventDefault();
                             }

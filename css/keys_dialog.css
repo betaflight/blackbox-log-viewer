@@ -1,7 +1,7 @@
 .keys-dialog .parameter th {
     background-color: #828885;
     padding: 4px;
-    border-left: 0px solid #ccc;
+    border-left: 0 solid #ccc;
     border-bottom: 1px solid #ccc;
     font-weight: bold;
     color: white;
@@ -14,7 +14,7 @@
 }
 
 .keys-dialog .gui_box {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .keys-dialog .spacer_box {
@@ -60,25 +60,20 @@
 
 .keys-dialog .key {
     margin: 3px;
-    padding: 5px;
     background-color: beige;
     display: inline-block;
     border-radius: 8px;
     border-style: groove;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 5px 10px;
     vertical-align: middle;
 }
 
 .keys-dialog .normal {
     margin: 3px;
-    padding: 8px;
-    background-color: none;
     display: inline-block;
     border-radius: 8px;
     border-style: none;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding: 8px 0;
     vertical-align: middle;
 }
 
@@ -100,12 +95,12 @@
 }
 
 .keys-dialog .noline td {
-    border: 0px solid #ccc;
+    border: 0 solid #ccc;
 }
 
 .keys-dialog .gui_box span {
     font-style: normal;
-    font-family: 'open_sansregular', Arial;
+    font-family: 'open_sansregular', Arial, sans-serif;
     line-height: 19px;
     color: #7d7d7d;
     font-size: 11px;
@@ -115,7 +110,7 @@
 }
 
 .noline {
-	border:0px;
+	border:0;
 }
 
 .keys-dialog .right {
@@ -123,7 +118,7 @@
 }
 
 .keys-dialog .leftzero {
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .keys-dialog .borderleft {
