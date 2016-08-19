@@ -292,7 +292,7 @@
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <div class="analyser">
                 	<canvas width="0" height="0" id="analyserCanvas"></canvas>
-                	<input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="100"/>
+                	<input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="100" title=""/>
 					<input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10"/>
 				</div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
@@ -617,12 +617,12 @@
 												<td name="toleranceBandReduction"><label>Reduction</label><input type="number" step="1" min="0" max="999" /></td>
 												<td name="zeroCrossAllowanceCount" class="bf-only"><label>Zero Cross Count</label><input type="number" step="1" min="0" max="999" /></td>
 												<td name="itermThrottleGain" class="bf-only"><label>I-Term Throttle Gain</label><input type="number" step="0.01" min="0" max="999" /></td>
-											<tr>
+											</tr>
 											<tr>
 												<th colspan="2">Setpoint Weight</th>
 												<th colspan="2">Acceleration Limit</th>
 											</tr>
-											</tr>
+											<tr>
 												<td name="ptermSetpointWeight" class="bf-only"><label>P-Term</label><input type="number" step="0.01" min="0" max="999" /></td>
 												<td name="dtermSetpointWeight" class="bf-only"><label>D-Term </label><input type="number" step="0.01" min="0" max="999" /></td>
 												<td name="rateAccelLimit" class="bf-only"><label>Roll/Pitch Rate</label><input type="number" step="1" min="0" max="999" /></td>

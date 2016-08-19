@@ -30,7 +30,7 @@ html, body {
     }
     .navbar-nav {
         float: none!important;
-        margin: 7.5px -15px;
+        margin: 7px -15px;
     }
     .navbar-nav>li {
         float: none;
@@ -219,8 +219,8 @@ html.has-log .log-graph-config {
 }
 
 .config-graph-header {
-    margin-bottom: 0px;
-    margin-right: 0px;
+    margin-bottom: 0;
+    margin-right: 0;
     width: 100%;
 }
 
@@ -230,7 +230,7 @@ html.has-log .log-graph-config {
 }
 
 .config-graph-field-header {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .config-graph-field select {
@@ -376,7 +376,6 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 	-webkit-appearance: slider-vertical;
 	left: 1085px;
 	top: 30px;
-	 */
 }
 
 .analyser input {
@@ -429,12 +428,11 @@ html.has-table-overlay .log-field-values {
     left: 10%;
     width: 78.5%;
     display:block;
-    padding-left:0px;
-    padding-right:0px;
+    padding-left:0;
+    padding-right:0;
     font-size:xx-small;
     background-color: white;
-    border: #337ab7;
-    border-style: groove;
+    border: groove #337ab7;
     z-index: 10;
 }
 
@@ -466,8 +464,7 @@ html.has-config .configuration-file {
     width: 78.5%;
     padding:10px;
     background-color: white;
-    border: #337ab7;
-    border-style: groove;
+    border: groove #337ab7;
     z-index: 11;
 }
 
@@ -753,12 +750,12 @@ html.isINAV .navbar-logo img {
 	position:relative;
 	height: 35px;
 	width: 210px;
-	padding: 0px;
+	padding: 0;
 	display:block;
 }
 
 .navbar-logo a {
-    padding: 0px;
+    padding: 0;
     position: absolute;
     top: 44%;
     left: 68%;
@@ -766,7 +763,7 @@ html.isINAV .navbar-logo img {
 }
 
 .navbar-logo span {
-	padding-left: 0px;
+	padding-left: 0;
 	position: relative;
 	left: -150px;
 	top: 20px;
@@ -780,7 +777,7 @@ html.isINAV .navbar-logo img {
 
 #status-bar {
     position: fixed;
-    bottom: 0px;
+    bottom: 0;
     width: 100%;
     height: 20px;
     line-height: 20px;
@@ -811,8 +808,8 @@ html:not(.has-log) #status-bar {
     /* padding-left: 5px; */
     /* padding-right: 0; */
     width: 20px;
-    /* margin-right: 0px; */
-    /* margin-left: 0px; */
+    /* margin-right: 0; */
+    /* margin-left: 0; */
     text-align: center;
     visibility: hidden;
     cursor: pointer;
@@ -829,8 +826,8 @@ html:not(.has-log) #status-bar {
     padding-left: 0;
     padding-right: 0;
     width: 60px;
-    margin-right: 0px;
-    margin-left: 0px;
+    margin-right: 0;
+    margin-left: 0;
     text-align: center;
     visibility: hidden;
     cursor: pointer;
@@ -880,17 +877,16 @@ input[type="checkbox"].ios-switch + div {
 	background-color: rgba(0, 0, 0, 0.1);
 	-webkit-transition-duration: .4s;
 	-webkit-transition-property: background-color, box-shadow;
-	box-shadow: inset 0 0 0 0px rgba(0,0,0,0.4);
-	margin: 0px 0em 0px 2.5em;
+	box-shadow: inset 0 0 0 0 rgba(0,0,0,0.4);
+	margin: 0 0 0 2.5em;
 	display: inherit;
 }
 
 /* Checked Track (Blue) */
 input[type="checkbox"].ios-switch:checked + div {
 	width: 40px;
-	background-position: 0 0;
-	background-color: #3b89ec;
-	border: 1px solid #0e62cd;
+    background: #3b89ec 0 0;
+    border: 1px solid #0e62cd;
 	box-shadow: inset 0 0 0 10px rgba(59,137,259,1);
 }
 
@@ -933,10 +929,9 @@ input[type="checkbox"].ios-switch + div > div {
 	-moz-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
 	-moz-transition-duration: 0.4s;
 	-moz-transition-property: transform, background-color;
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0px 0px 0 1px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.4);
 	pointer-events: none;
-	margin-left: 0px;
-	margin-left: 1px;
+	margin-left: 0;
 }
 
 /* Checked Knob (Blue Style) */
@@ -944,7 +939,7 @@ input[type="checkbox"].ios-switch:checked + div > div {
 	-webkit-transform: translate3d(20px, 0, 0);
 	-moz-transform: translate3d(20px, 0, 0);
 	background-color: #ffffff;
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0px 0px 0 1px rgba(8, 80, 172,1);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 /* Tiny Knob */
@@ -957,7 +952,7 @@ input[type="checkbox"].tinyswitch.ios-switch + div > div {
 input[type="checkbox"].tinyswitch.ios-switch:checked + div > div {
 	-webkit-transform: translate3d(16px, 0, 0);
 	-moz-transform: translate3d(16px, 0, 0);
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0px 0px 0 1px rgba(8, 80, 172,1);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 /* Big Knob */
@@ -970,25 +965,25 @@ input[type="checkbox"].bigswitch.ios-switch + div > div {
 input[type="checkbox"].bigswitch.ios-switch:checked + div > div {
 	-webkit-transform: translate3d(25px, 0, 0);
 	-moz-transform: translate3d(16px, 0, 0);
-	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3), 0px 0px 0 1px rgba(8, 80, 172,1);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 /* Green Knob */
 input[type="checkbox"].green.ios-switch:checked + div > div ,
 html.isCF input[type="checkbox"].ios-switch:checked + div > div {
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 162, 63,1);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 162, 63,1);
 }
 
 /* Orange Knob */
 input[type="checkbox"].orange.ios-switch:checked + div > div ,
 html.isBF input[type="checkbox"].ios-switch:checked + div > div {
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0,1);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0,1);
 }
 
 /* Blue Knob */
 input[type="checkbox"].blue.ios-switch:checked + div > div ,
 html.isINAV input[type="checkbox"].ios-switch:checked + div > div {
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 html.isBF .config-graph h4 span,
@@ -1009,10 +1004,7 @@ html.isINAV .log-graph-config h3 span {
 .config-graph h4 span,
 .log-graph-config h3 span {
     /* background-color: rgba(239,187,0,0.5); */
-    padding-top: 2px;
-    padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 2px 4px 4px;
     border-radius: 5px;
     margin-right:3px;
     background-image: linear-gradient(to bottom,#fff8e9 0,#ffbb00 100%);
@@ -1027,16 +1019,13 @@ div#lap-timer {
     border-radius: 5px;
     padding: 5px;
     color: #bbb;
-    border-style: solid;
-    border-width: thin;
+    border: thin solid;
 }
 
 tr.lap-timer-heading td {
     font-style: italic;
-    border-bottom-color: white;
-    border-bottom-width: thin;
     /* text-decoration: underline; */
-    border-bottom-style: solid;
+    border-bottom: thin solid white;
 }
 
 table#lap-timer-laps {
