@@ -1055,7 +1055,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 try{ // If we do not select a graph/field, then the analyser is hidden
                 var graph = graphs[graphConfig.selectedGraphIndex]; 		
 				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
-                analyser.plotSpectrum(chunks, startFrameIndex, field.index, field.curve, graphConfig.selectedFieldName, windowCenterTime, windowEndTime);
+                analyser.plotSpectrum(field.index, field.curve, graphConfig.selectedFieldName);
                 } catch(err) {console.log('Cannot plot analyser');}            
             }
 
@@ -1158,8 +1158,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     this.setGraphZoom = function(zoom) {
         windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
-		if (analyser != null)
-			analyser.setGraphZoom(zoom);
     };
     
     this.setInTime = function(time) {
@@ -1224,7 +1222,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     this.refreshLogo();
     
     /* Create the FlightLogAnalyser object */
-	analyser = new FlightLogAnalyser(flightLog, graphConfig, canvas, analyserCanvas, options);
+	analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
 
     /* Create the Lap Timer object */
 	lapTimer = new LapTimer();
@@ -1236,4 +1234,5 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     this.refreshGraphConfig();
     
     this.resize(canvas.width, canvas.height);
+
 }

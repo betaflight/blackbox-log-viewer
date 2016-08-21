@@ -62,11 +62,11 @@ function GraphConfig(graphConfig) {
                     matches,
                     defaultCurve;
                 
-                var adaptField = function(field, colorIndexOffset) {
+                var adaptField = function(field, colorIndexOffset, forceNewCurve) {
                     defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
                     
 
-                    if (field.curve === undefined) {
+                    if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
                     } else {
                         /* The curve may have been originally created for a craft with different endpoints, so use the 
@@ -105,7 +105,8 @@ function GraphConfig(graphConfig) {
                     
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
-                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset));
+                            // add special condition for rcCommand as each of the fields requires a different scaling.
+                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, (nameRoot=='rcCommand')));
                             colorIndexOffset++;
                         }
                     }
@@ -286,7 +287,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.8,
-                    inputRange: 500,
+                    inputRange: 500 * (sysConfig.rcYawRate ? sysConfig.rcYawRate : 100) / 100,
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
