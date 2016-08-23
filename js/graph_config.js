@@ -59,11 +59,10 @@ function GraphConfig(graphConfig) {
             for (var j = 0; j < graph.fields.length; j++) {
                 var
                     field = graph.fields[j],
-                    matches,
-                    defaultCurve;
+                    matches;
                 
                 var adaptField = function(field, colorIndexOffset, forceNewCurve) {
-                    defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
+                    const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
                     
 
                     if (field.curve === undefined || forceNewCurve) {
@@ -141,7 +140,7 @@ GraphConfig.PALETTE = [
     {color: "#d9d9d9", name: "Grey" },
     {color: "#bc80bd", name: "Dark Purple" },
     {color: "#ccebc5", name: "Light Green" },
-    {color: "#ffed6f", name: "Dark Yellow" },
+    {color: "#ffed6f", name: "Dark Yellow" }
 ];
 
 
@@ -206,7 +205,7 @@ GraphConfig.load = function(config) {
             {
                 label: "Accelerometers",
                 fields: ["accSmooth[all]"]
-            },
+            }
         ];
 
     GraphConfig.getDefaultSmoothingForField = function(flightLog, fieldName) {
@@ -481,7 +480,7 @@ GraphConfig.load = function(config) {
                 var 
                     srcFieldName = srcGraph.fields[j],
                     destField = {
-                        name: srcFieldName, 
+                        name: srcFieldName
                     };
                 
                 destGraph.fields.push(destField);
