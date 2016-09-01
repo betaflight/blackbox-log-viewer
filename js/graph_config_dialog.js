@@ -34,7 +34,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     		for(var i=1; i<=MAX_HEIGHT; i++) {
     			var option = $('<option></option>')
     				.text(i)
-    				.attr('value', i)
+    				.attr('value', i);
     			if(currentSelection == i || (currentSelection==null && i==1)) {
     				option.attr('selected', 'selected');
     			}
@@ -113,7 +113,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         
 
         // Ade event when selection changed to retreive the current smoothing settings.
-        $('select.form-control', elem).change( function(e) {
+        $('select.form-control', elem).change( function() {
             var selectedField = {
                 name: $('select.form-control option:selected', elem).val()
                     };
@@ -121,7 +121,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         });
 
         // Add event when color picker is changed to change the dropdown coloe
-        $('select.color-picker', elem).change( function(e) {
+        $('select.color-picker', elem).change( function() {
             $(this).css('background', $('select.color-picker option:selected', elem).val())
                    .css('color', $('select.color-picker option:selected', elem).val());
         });
@@ -283,8 +283,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
-                    grid: (($('div#grid', this).attr("value")==="true")?true:false),
-                }
+                    grid: (($('div#grid', this).attr("value")==="true")?true:false)
+                };
                 
                 if (field.name.length > 0) {
                     graph.fields.push(field);
@@ -362,30 +362,32 @@ function GraphConfigurationDialog(dialog, onSave) {
         renderGraphs(flightLog, config);
     };
  
-    $(".graph-configuration-dialog-save").click(function(e) {
+    $(".graph-configuration-dialog-save").click(function() {
         onSave(convertUIToGraphConfig());
     });
 
-    // Make the graph order dragabble
-    $('.config-graphs-list').sortable( 
-        {
-            cursor: "move",
-        }
-    );
-    $('.config-graphs-list').disableSelection();  
-    
-    $(".config-graphs-add").dropdown();
-    
+
     var
         exampleGraphsButton = $(".config-graphs-add"),
-        exampleGraphsMenu = $(".config-graphs-add ~ .dropdown-menu");
-    
+        exampleGraphsMenu = $(".config-graphs-add ~ .dropdown-menu"),
+        configGraphsList = $('.config-graphs-list');
+
+    // Make the graph order drag-able
+    configGraphsList
+        .sortable(
+            {
+                cursor: "move"
+            }
+        )
+        .disableSelection();
+
+    exampleGraphsButton.dropdown();
     exampleGraphsMenu.on("click", "a", function(e) {
         var 
             graph = exampleGraphs[$(this).data("graphIndex")],
             graphElem = renderGraph(activeFlightLog, $(".config-graph", dialog).length, graph);
         
-        $(".config-graphs-list", dialog).append(graphElem);
+        $(configGraphsList, dialog).append(graphElem);
         
         // Dismiss the dropdown button
         exampleGraphsButton.dropdown("toggle");

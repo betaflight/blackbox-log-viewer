@@ -83,8 +83,8 @@ try {
 	var getSize = function () {
 		if (isFullscreen){
 				return {
-					height: canvas.height - 20, // ANALYSER_LARGE_HEIGHT_PROPORTION,
-					width: canvas.width - 20,   // ANALYSER_LARGE_WIDTH_PROPORTION,
+					height: canvas.clientHeight - 20, // ANALYSER_LARGE_HEIGHT_PROPORTION,
+					width: canvas.clientWidth - 20,   // ANALYSER_LARGE_WIDTH_PROPORTION,
 					left: '10px',               // ANALYSER_LARGE_LEFT_PROPORTION,
 					top: '10px'                 // ANALYSER_LARGE_TOP_PROPORTION
                 }
@@ -101,16 +101,18 @@ try {
 
    	this.resize = function() {
 
+   		var newSize = getSize();
+
         // Determine the analyserCanvas location
-        canvasCtx.canvas.height    =  getSize().height; // (canvas.height * getSize().height);
-        canvasCtx.canvas.width     =  getSize().width; // (canvas.width  * getSize().width);
+        canvasCtx.canvas.height    =  newSize.height; // (canvas.height * getSize().height);
+        canvasCtx.canvas.width     =  newSize.width; // (canvas.width  * getSize().width);
 
 		// Recenter the analyser canvas in the bottom left corner
 		var parentElem = $(analyserCanvas).parent();
 		
 		$(parentElem).css({
-			left: getSize().left, // (canvas.width  * getSize().left) + "px",
-			top:  getSize().top   // (canvas.height * getSize().top ) + "px"
+			left: newSize.left, // (canvas.width  * getSize().left) + "px",
+			top:  newSize.top   // (canvas.height * getSize().top ) + "px"
         });
 		// place the sliders.
 		$("input:first-of-type", parentElem).css({
