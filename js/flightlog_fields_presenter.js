@@ -368,6 +368,8 @@ function FlightLogFieldPresenter() {
 					}				
 				case 'DFILTER':
 					return "";
+                case 'ANGLERATE':
+                    return value.toFixed(0) + "deg/s";
 				default:
 					return "";
 			}	

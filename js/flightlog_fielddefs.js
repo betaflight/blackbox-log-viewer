@@ -163,7 +163,8 @@ var
 			"NOTCH",
 			"RC_INTERPOLATION",
 			"VELOCITY",
-			"DFILTER",
+			"DTERM_FILTER",
+            "ANGLERATE",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
