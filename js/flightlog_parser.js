@@ -196,6 +196,7 @@ var FlightLogParser = function(logData) {
 
         defaultSysConfigExtension = {
             rcExpo:null,              	    // RC Expo
+            rcExpoPwr:3,                    // RC Expo Power TODO: This is not in the header yet!
             rcYawExpo:null,                 // Yaw Expo
             thrMid:null,              	    // Throttle Mid Position
             thrExpo:null,              	    // Throttle Expo
@@ -411,6 +412,7 @@ var FlightLogParser = function(logData) {
             case "maxthrottle":
             case "rcRate":
             case "rcExpo":
+            case "rcExpoPwr":
             case "rcYawExpo":
             case "rcYawRate":
             case "thrMid":

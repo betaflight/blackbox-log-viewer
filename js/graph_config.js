@@ -59,14 +59,13 @@ function GraphConfig(graphConfig) {
             for (var j = 0; j < graph.fields.length; j++) {
                 var
                     field = graph.fields[j],
-                    matches,
-                    defaultCurve;
+                    matches;
                 
-                var adaptField = function(field, colorIndexOffset) {
-                    defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
+                var adaptField = function(field, colorIndexOffset, forceNewCurve) {
+                    const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
                     
 
-                    if (field.curve === undefined) {
+                    if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
                     } else {
                         /* The curve may have been originally created for a craft with different endpoints, so use the 
@@ -105,7 +104,8 @@ function GraphConfig(graphConfig) {
                     
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
-                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset));
+                            // add special condition for rcCommand as each of the fields requires a different scaling.
+                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, (nameRoot=='rcCommand')));
                             colorIndexOffset++;
                         }
                     }
@@ -140,7 +140,7 @@ GraphConfig.PALETTE = [
     {color: "#d9d9d9", name: "Grey" },
     {color: "#bc80bd", name: "Dark Purple" },
     {color: "#ccebc5", name: "Light Green" },
-    {color: "#ffed6f", name: "Dark Yellow" },
+    {color: "#ffed6f", name: "Dark Yellow" }
 ];
 
 
@@ -205,7 +205,7 @@ GraphConfig.load = function(config) {
             {
                 label: "Accelerometers",
                 fields: ["accSmooth[all]"]
-            },
+            }
         ];
 
     GraphConfig.getDefaultSmoothingForField = function(flightLog, fieldName) {
@@ -286,7 +286,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.8,
-                    inputRange: 500,
+                    inputRange: 500 * (sysConfig.rcYawRate ? sysConfig.rcYawRate : 100) / 100,
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
@@ -407,7 +407,14 @@ GraphConfig.load = function(config) {
                                     inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
                                     outputRange: 1.0
                                 };
-                        }				
+                        }
+                    case 'ANGLERATE':
+                        return {
+                            offset: 0,
+                            power: 0.25, /* Make this 1.0 to scale linearly */
+                            inputRange: flightLog.gyroRawToDegreesPerSecond((2.0e-3 * Math.PI/180) / sysConfig.gyroScale),
+                            outputRange: 1.0
+                        };
                 }
             }
             // if not found above then
@@ -480,7 +487,7 @@ GraphConfig.load = function(config) {
                 var 
                     srcFieldName = srcGraph.fields[j],
                     destField = {
-                        name: srcFieldName, 
+                        name: srcFieldName
                     };
                 
                 destGraph.fields.push(destField);
