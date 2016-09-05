@@ -112,7 +112,7 @@ function BlackboxLogViewer() {
         }
     }
     
-    function setVideoOffset(offset, withoutRefresh) { // optionally prevent the graph refresh until later
+    function setVideoOffset(offset, withRefresh) { // optionally prevent the graph refresh until later
         videoOffset = offset;
         
         /* 
@@ -121,7 +121,7 @@ function BlackboxLogViewer() {
          */
         $(".video-offset").val((videoOffset >= 0 ? "+" : "") + (videoOffset.toFixed(3) != videoOffset ? videoOffset.toFixed(3) : videoOffset));
         
-        if (withoutRefresh) invalidateGraph();
+        if (withRefresh) invalidateGraph();
     }
     
     function isInteger(value) {
@@ -1012,12 +1012,12 @@ function BlackboxLogViewer() {
         $(".log-sync-here").click(logSyncHere);
         
         var logSyncBack = function() {
-            setVideoOffset(videoOffset - 1 / 15);
+            setVideoOffset(videoOffset - 1 / 15, true);
         };
         $(".log-sync-back").click(logSyncBack);
     
         var logSyncForward = function() {
-            setVideoOffset(videoOffset + 1 / 15);
+            setVideoOffset(videoOffset + 1 / 15, true);
         };
         $(".log-sync-forward").click(logSyncForward);
     
