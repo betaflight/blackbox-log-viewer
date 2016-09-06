@@ -964,6 +964,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
     if(sysConfig.firmware >= 3.0) {
 
         const RC_RATE_INCREMENTAL = 14.54;
+        const RC_EXPO_POWER = 3;
 
         var rcInput = [];
         var that = this;
@@ -986,7 +987,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 
             if (rcExpo) {
                 var expof = rcExpo / 100.0;
-                rcCommandf = rcCommandf * (expof * (Math.pow(rcInput[axis], sysConfig.rcExpoPwr)) + rcInput[axis]*(1-expof));
+                rcCommandf = rcCommandf * Math.pow(rcInput[axis], RC_EXPO_POWER) * expof + rcCommandf * (1-expof);
             }
 
             angleRate = 200.0 * rcRate * rcCommandf;
