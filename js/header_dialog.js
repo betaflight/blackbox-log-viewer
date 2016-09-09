@@ -43,7 +43,7 @@ function HeaderDialog(dialog, onSave) {
             {name:'dterm_filter_type'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'pidAtMinThrottle'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'itermThrottleGain'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
-            {name:'ptermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
+            {name:'ptermSRateWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'dtermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'yawRateAccelLimit'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'rateAccelLimit'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
@@ -440,7 +440,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);
         renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
         setParameter('itermThrottleGain'	    ,sysConfig.itermThrottleGain,2);
-        setParameter('ptermSetpointWeight'		,sysConfig.ptermSetpointWeight,2);
+        setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
         setParameter('yawRateAccelLimit'		,sysConfig.yawRateAccelLimit,0);
         setParameter('rateAccelLimit'		    ,sysConfig.rateAccelLimit,0);
