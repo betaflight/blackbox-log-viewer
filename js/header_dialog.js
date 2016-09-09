@@ -42,9 +42,6 @@ function HeaderDialog(dialog, onSave) {
 			{name:'serialrx_provider'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'dterm_filter_type'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'pidAtMinThrottle'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
-            {name:'toleranceBand'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
-            {name:'toleranceBandReduction'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
-            {name:'zeroCrossAllowanceCount'		, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'itermThrottleGain'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'ptermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
             {name:'dtermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:3.0, max:999.9},
@@ -442,9 +439,6 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('fast_pwm_protocol'		,sysConfig.fast_pwm_protocol, FAST_PROTOCOL);
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);
         renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
-        setParameter('toleranceBand'		    ,sysConfig.toleranceBand,2);
-        setParameter('toleranceBandReduction'	,sysConfig.toleranceBandReduction,2);
-        setParameter('zeroCrossAllowanceCount'	,sysConfig.zeroCrossAllowanceCount,0);
         setParameter('itermThrottleGain'	    ,sysConfig.itermThrottleGain,2);
         setParameter('ptermSetpointWeight'		,sysConfig.ptermSetpointWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);

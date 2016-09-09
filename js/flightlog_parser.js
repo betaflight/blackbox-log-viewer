@@ -247,9 +247,6 @@ var FlightLogParser = function(logData) {
             rc_interpolation_interval:null, // RC Control Interpolation Interval
             dterm_filter_type:null,         // D term filtering type (PT1, BIQUAD)
             pidAtMinThrottle:null,          // Stabilisation at zero throttle
-            toleranceBand:null,             // Betaflight PID
-            toleranceBandReduction:null,    // Betaflight PID
-            zeroCrossAllowanceCount:null,   // Betaflight PID
             itermThrottleGain:null,         // Betaflight PID
             ptermSetpointWeight:null,       // Betaflight PID
             dtermSetpointWeight:null,       // Betaflight PID
@@ -464,9 +461,6 @@ var FlightLogParser = function(logData) {
             case "acc_1G":
             case "dterm_filter_type":
             case "pidAtMinThrottle":
-            case "toleranceBand":
-            case "toleranceBandReduction":
-            case "zeroCrossAllowanceCount":
             case "itermThrottleGain":
             case "ptermSetpointWeight":
             case "dtermSetpointWeight":
