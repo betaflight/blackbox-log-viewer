@@ -68,10 +68,10 @@ function FlightLogFieldPresenter() {
         'axisError[2]' : 'PID_Error[yaw]',
 
         //Virtual fields - add the Scaled rcCommands
-        'rcCommands[all]': 'rcCommands',
-        'rcCommands[0]' : 'rcCommands[roll]',
-        'rcCommands[1]' : 'rcCommands[pitch]',
-        'rcCommands[2]' : 'rcCommands[yaw]',
+        'rcCommands[all]': 'setpointRates',
+        'rcCommands[0]' : 'setpointRate[roll]',
+        'rcCommands[1]' : 'setpointRate[pitch]',
+        'rcCommands[2]' : 'setpointRate[yaw]',
 
         //Virtual fields - add the Scaled gyros
         'gyroADCs[all]': 'gyros',
@@ -140,10 +140,10 @@ function FlightLogFieldPresenter() {
 						},
 			'NOTCH' : 	{	
 							'debug[all]':'Debug Notch',	
-							'debug[0]':'gyro_raw[roll]',
-							'debug[1]':'gyro_notch[roll]',
-							'debug[2]':'gyro_raw[pitch]',
-							'debug[3]':'gyro_notch[pitch]',
+							'debug[0]':'gyro_preNotch[roll]',
+							'debug[1]':'gyro_preNotch[pitch]',
+							'debug[2]':'gyro_preNotch[yaw]',
+							'debug[3]':'Not Used',
 						},
 			'RC_INTERPOLATION' : 	{	
 							'debug[all]':'Debug RC',	
