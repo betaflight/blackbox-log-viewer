@@ -465,14 +465,14 @@ var
     function extractKeyframeFromWebP(webP) {
         // Assume that Chrome will generate a Simple Lossy WebP which has this header:
         var
-            keyframeStartIndex = webP.indexOf('WEBPVP8 ');
+            keyframeStartIndex = webP.indexOf('VP8 ');
         
         if (keyframeStartIndex == -1) {
             throw "Failed to identify beginning of keyframe in WebP image";
         }
         
         // Skip the header and the 4 bytes that encode the length of the VP8 chunk
-        keyframeStartIndex += 'WEBPVP8 '.length + 4;
+        keyframeStartIndex += 'VP8 '.length + 4;
         
         return webP.substring(keyframeStartIndex);
     }
@@ -798,7 +798,7 @@ var
         /**
          * Create a SimpleBlock keyframe header using these fields:
          *     timecode    - Time of this keyframe
-         *     trackNumber - Track number from 1 to 127 (inclusive)
+         *     trackNumber - Track number from 1 to 126 (inclusive)
          *     frame       - Raw frame data payload string
          * 
          * Returns an EBML element.
@@ -841,7 +841,7 @@ var
                 "data": [
                      {
                         "id": 0xe7, // Timecode
-                        "data": Math.round(cluster.timecode),
+                        "data": Math.round(cluster.timecode)
                      }
                 ]
             };
@@ -873,7 +873,7 @@ var
         }
         
         /**
-         * Write a Cues element to the blobStream using the global `cues` array of CuePoints (use createCuePoint()).
+         * Write a Cues element to the blobStream using the global `cues` array of CuePoints (use addCuePoint()).
          * The seek entry for the Cues in the SeekHead is updated.
          */
         function writeCues() {
@@ -913,21 +913,10 @@ var
 
                 cluster = createCluster({
                     timecode: Math.round(clusterStartTime),
-                }),
+                });
                 
-                timecodeOffset = 0;
-            
             for (var i = 0; i < clusterFrameBuffer.length; i++) {
-                var
-                    block = createKeyframeBlock({
-                        trackNumber: DEFAULT_TRACK_NUMBER,
-                        timecode: Math.round(timecodeOffset),
-                        frame: clusterFrameBuffer[i].frame
-                    });
-                
-                cluster.data.push(block);
-                
-                timecodeOffset += clusterFrameBuffer[i].duration;
+                cluster.data.push(createKeyframeBlock(clusterFrameBuffer[i]));
             }
             
             writeEBML(buffer, blobBuffer.pos, cluster);
@@ -951,8 +940,14 @@ var
             }
         }
         
-        function addFrameToBuffer(frame) {
+        function addFrameToCluster(frame) {
+            frame.trackNumber = DEFAULT_TRACK_NUMBER;
+            
+            // Frame timecodes are relative to the start of their cluster:
+            frame.timecode = Math.round(clusterDuration);
+
             clusterFrameBuffer.push(frame);
+            
             clusterDuration += frame.duration;
             
             if (clusterDuration >= MAX_CLUSTER_DURATION_MSEC) {
@@ -1021,7 +1016,7 @@ var
                 throw "Couldn't decode WebP frame, does the browser support WebP?";
             }
             
-            addFrameToBuffer({
+            addFrameToCluster({
                 frame: extractKeyframeFromWebP(webP),
                 duration: options.frameDuration
             });
