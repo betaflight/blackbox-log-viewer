@@ -230,7 +230,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
         currentSettings.stickMode = val;
 
 		if(val>0 && val <= 5) {
-				$('.modePreview img').attr('src', './images/stick_modes/mode_' + val + '.png');
+				$('.modePreview img').attr('src', './images/stick_modes/Mode_' + val + '.png');
 			}
 	}
 
