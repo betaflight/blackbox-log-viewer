@@ -849,7 +849,7 @@ function BlackboxLogViewer() {
 
             for (i = 0; i < files.length; i++) {
                 var
-                    isLog = files[i].name.match(/\.(TXT|CFL|LOG)$/i),
+                    isLog = files[i].name.match(/\.(TXT|CFL|BFL|LOG)$/i),
                     isVideo = files[i].name.match(/\.(AVI|MOV|MP4|MPEG)$/i),
                     isWorkspaces = files[i].name.match(/\.(JSON)$/i);
                 
