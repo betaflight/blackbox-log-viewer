@@ -631,7 +631,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         // horizontal lines
         for(var y=1; y<GRID_LINES; y++) {
             var yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
-            if(yValue!=0) {
+            if(yValue!=0 && Math.abs(yValue < plotHeight/2)) {
                 canvasContext.moveTo(0, yValue );
                 canvasContext.lineTo(canvas.width, yValue);
             }

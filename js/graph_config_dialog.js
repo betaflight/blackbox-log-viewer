@@ -61,14 +61,14 @@ function GraphConfigurationDialog(dialog, onSave) {
     function renderSmoothingOptions(elem, flightLog, field) {
         if(elem) {
             // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
-            $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
+            $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
             if(field.curve!=null) {
-                $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
+                $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
+                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
             } else
             {
-                $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-                $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
+                $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
+                $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100).toFixed(0)+'%');
             }
         }
     }
@@ -82,10 +82,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             elem = $(
                 '<li class="config-graph-field">'
                     + '<select class="form-control"><option value="">(choose a field)</option></select>'
-                    + '<input name="smoothing" class="form-control" type="text"></input>'
-                    + '<input name="power" class="form-control" type="text"></input>'
-                    + '<input name="scale" class="form-control" type="text"></input>'
-                    + '<input name="linewidth" class="form-control" type="text"></input>'
+                    + '<input name="smoothing" class="form-control" type="text"/>'
+                    + '<input name="power" class="form-control" type="text"/>'
+                    + '<input name="scale" class="form-control" type="text"/>'
+                    + '<input name="linewidth" class="form-control" type="text"/>'
                     + '<select class="color-picker"></select>'
                     + '<button type="button" class="btn btn-default btn-sm">Remove</button>'
                     + '<div id="grid" value=""/>'
@@ -280,6 +280,11 @@ function GraphConfigurationDialog(dialog, onSave) {
                     curve: {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exagerate center values - expo)
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
+                    },
+                    default: { // These are used to restore configuration if using mousewheel adjustments
+                        smoothing: parseInt($("input[name=smoothing]", this).val())*100,
+                        power: parseInt($("input[name=power]", this).val())/100.0,
+                        outputRange: parseInt($("input[name=scale]", this).val())/100.0
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),

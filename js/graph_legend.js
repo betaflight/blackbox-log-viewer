@@ -14,7 +14,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         for (i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
+                graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 class="graph-legend-group" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
             
@@ -36,6 +36,9 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
 
         // Add a trigger on legend; select the analyser graph/field to plot
         $('.graph-legend-field').on('click', function(e) {
+
+            if(e.which!=1) return false; // only accept left mouse clicks
+
             var
                selectedGraphIndex    = $(this).attr('graph'),
                selectedFieldIndex    = $(this).attr('field');
@@ -60,6 +63,9 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
 
         // Add a trigger on legend list title; select the graph to expland
         $('.graph-legend h3').on('click', function(e) {
+
+               if(e.which!=1) return false; // only accept left mouse clicks
+
                var selectedGraph = $(this).attr('graph');
                if(!e.altKey) {
                    if (onZoomGraph) {                   
