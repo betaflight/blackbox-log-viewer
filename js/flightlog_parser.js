@@ -125,7 +125,7 @@ var FlightLogParser = function(logData) {
                 scalef: 1000
             },
             {
-                name: "Rare Profile"
+                name: "Rate Profile"
             },
             {
                 name: 'Pitch Rate',
