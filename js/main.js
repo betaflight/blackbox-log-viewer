@@ -1259,6 +1259,39 @@ function BlackboxLogViewer() {
             invalidateGraph();
         }
 
+        function savePenDefaults(graphConfig, graph, field) {
+            /**
+             * graphConfig is the current graph configuration
+             * group is the set of pens to change, null means individual pen within group
+             * field is the actual pen to change, null means all pens within group
+             */
+
+            if(graph==null && field==null) return false; // no pen specified, just exit
+
+            if(graph!=null && field==null) { // save ALL pens withing group
+                for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
+                    if(graphConfig[parseInt(graph)].fields[i].default==null) {
+                        graphConfig[parseInt(graph)].fields[i].default = [];
+                        graphConfig[parseInt(graph)].fields[i].default.smoothing   = graphConfig[parseInt(graph)].fields[i].smoothing;
+                        graphConfig[parseInt(graph)].fields[i].default.outputRange = graphConfig[parseInt(graph)].fields[i].curve.outputRange;
+                        graphConfig[parseInt(graph)].fields[i].default.power       = graphConfig[parseInt(graph)].fields[i].curve.power;
+                    }
+                }
+                return '<h4>Stored defaults for all pens</h4>';
+            }
+            if(graph!=null && field!=null) { // restore single pen
+                if(graphConfig[parseInt(graph)].fields[parseInt(field)].default==null) {
+                    graphConfig[parseInt(graph)].fields[parseInt(field)].default = [];
+                    graphConfig[parseInt(graph)].fields[parseInt(field)].default.smoothing    = graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing;
+                    graphConfig[parseInt(graph)].fields[parseInt(field)].default.outputRange  = graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange;
+                    graphConfig[parseInt(graph)].fields[parseInt(field)].default.power        = graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power;
+                    return '<h4>Stored defaults for single pen</h4>';
+                }
+            }
+            return false; // nothing was changed
+
+        }
+
         function restorePenDefaults(graphConfig, graph, field) {
             /**
              * graphConfig is the current graph configuration
@@ -1302,6 +1335,8 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
+            savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
+
             var changedValue = '<h4>Smoothing</h4>';
             if(graph!=null && field==null) { // change ALL pens withing group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
@@ -1332,6 +1367,8 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
+            savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
+
             var changedValue = '<h4>Zoom</h4>';
             if(graph!=null && field==null) { // change ALL pens withing group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
@@ -1361,6 +1398,8 @@ function BlackboxLogViewer() {
             const scroll = 0.05;
 
             if(graph==null && field==null) return false; // no pen specified, just exit
+
+            savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Expo</h4>';
             if(graph!=null && field==null) { // change ALL pens withing group
