@@ -14,12 +14,12 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         for (i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 class="graph-legend-group" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
+                graphDiv = $('<div class="graph-legend no-wheel" id="' + i +'"><h3 class="graph-legend-group" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list no-wheel"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
             
             graphTitle.text(graph.label);
-            graphTitle.prepend('<span class="glyphicon glyphicon-minus"></span>');
+            graphTitle.prepend('<span class="glyphicon glyphicon-minus no-wheel"></span>');
             
             for (j = 0; j < graph.fields.length; j++) { 
                 var 
@@ -117,7 +117,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
               $(".graph-legend-field").each(function(index, value) {
                  var value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, $(this).attr('name'), frame[flightLog.getMainFieldIndexByName($(this).attr('name'))], currentFlightMode);
                  $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'), flightLog.getSysConfig().debug_mode) + ((value)?' (' + value + ')':' ') );
-                 $(this).append('<span class="glyphicon glyphicon-equalizer"></span>');
+                 $(this).append('<span class="glyphicon glyphicon-equalizer no-wheel"></span>');
               });
           } catch(e) {
               console.log('Cannot update legend with values');
