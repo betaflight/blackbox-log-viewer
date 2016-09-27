@@ -1078,3 +1078,33 @@ div#lap-timer td:first-child {
 .tooltip.bottom-right .tooltip-arrow {
   border-bottom-color: var(--tooltip-color);
 }
+
+/*
+ Mouse Notification styling
+*/
+.mouseNotification {
+    position: absolute;
+    margin: 0 auto;
+    white-space: pre-wrap;
+}
+
+.mouseNotification-box {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-break: normal;
+    word-spacing: normal;
+    word-wrap: normal;
+    z-index: 10;
+    padding: 4px;
+    color: white;
+    background-color: #363636;
+    border: 2px;
+    border-radius: 3px;
+}

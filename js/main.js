@@ -284,7 +284,7 @@ function BlackboxLogViewer() {
         logIndexContainer.empty();
         
         if (logCount > 1) {
-            logIndexPicker = $('<select class="log-index form-control">');
+            logIndexPicker = $('<select class="log-index form-control no-wheel">');
             
             logIndexPicker.change(function() {
                 selectLog(parseInt($(this).val(), 10));
@@ -322,7 +322,7 @@ function BlackboxLogViewer() {
                 
                 logIndexPicker.append(option);
             } else {
-                holder = $('<div class="form-control-static"></div>');
+                holder = $('<div class="form-control-static no-wheel"></div>');
                 
                 holder.text(logLabel);
                 logIndexContainer.append(holder);
@@ -604,7 +604,9 @@ function BlackboxLogViewer() {
             html.toggleClass("has-craft", hasCraft);
             html.toggleClass("has-table", hasTable);
             html.toggleClass("has-sticks", hasSticks);
-            
+
+            setTimeout(function(){$(window).resize();}, 500 ); // refresh the window size;
+
             selectLog(null);
             
             if (graph) {
@@ -1274,14 +1276,14 @@ function BlackboxLogViewer() {
                         graphConfig[parseInt(graph)].fields[i].curve.power       = graphConfig[parseInt(graph)].fields[i].default.power;
                     } else return false;
                 }
-                return true;
+                return '<h4>Restored defaults for all pens</h4>';
             }
             if(graph!=null && field!=null) { // restore single pen
                 if(graphConfig[parseInt(graph)].fields[parseInt(field)].default!=null) {
                     graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing         = graphConfig[parseInt(graph)].fields[parseInt(field)].default.smoothing;
                     graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange = graphConfig[parseInt(graph)].fields[parseInt(field)].default.outputRange;
                     graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power       = graphConfig[parseInt(graph)].fields[parseInt(field)].default.power;
-                    return true;
+                    return '<h4>Restored defaults for single pen</h4>';
                 } else return false;
             }
             return false; // nothing was changed
@@ -1300,17 +1302,19 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
+            var changedValue = '<h4>Smoothing</h4>';
             if(graph!=null && field==null) { // change ALL pens withing group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].smoothing += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].smoothing = constrain(graphConfig[parseInt(graph)].fields[i].smoothing, range.min, range.max);
+                    changedValue += fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[i].name) + ' ' + (graphConfig[parseInt(graph)].fields[i].smoothing / 100).toFixed(2)+ '%\n';
                 }
-                return true;
+                return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing, range.min, range.max);
-                return true;
+                return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing / 100).toFixed(2) + '%\n';
             }
             return false; // nothing was changed
         }
@@ -1328,17 +1332,19 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
+            var changedValue = '<h4>Zoom</h4>';
             if(graph!=null && field==null) { // change ALL pens withing group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[i].curve.outputRange, range.min, range.max);
+                    changedValue += fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[i].name) + ' x' + (graphConfig[parseInt(graph)].fields[i].curve.outputRange).toFixed(1)+ '\n';
                 }
-                return true;
+                return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange, range.min, range.max);
-                return true;
+                return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' x' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange).toFixed(1) + '\n';;
             }
             return false; // nothing was changed
         }
@@ -1356,24 +1362,27 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
+            var changedValue = '<h4>Expo</h4>';
             if(graph!=null && field==null) { // change ALL pens withing group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.power += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.power = constrain(graphConfig[parseInt(graph)].fields[i].curve.power, range.min, range.max);
+                    changedValue += fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[i].name) + ' ' + (graphConfig[parseInt(graph)].fields[i].curve.power * 100).toFixed(2)+ '%\n';
                 }
-                return true;
+                return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power, range.min, range.max);
-                return true;
+                return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100).toFixed(2) + '%\n';;
             }
             return false; // nothing was changed
         }
 
-        $('.log-graph-legend').on("mouseup", function(e) {
+        
+        $('.log-graph-legend').on("mousedown", function(e) {
 
-            if(e.which != 2) return false; // is it the middle mouse button, no, then ignore
+            if(e.which != 2) return; // is it the middle mouse button, no, then ignore
 
             if($(e.target).hasClass('graph-legend-group') || $(e.target).hasClass('graph-legend-field')) {
                 var refreshRequired = restorePenDefaults(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'));
@@ -1381,51 +1390,61 @@ function BlackboxLogViewer() {
                 if(refreshRequired) {
                     graph.refreshGraphConfig();
                     invalidateGraph();
+                    mouseNotification.show($('.log-graph'), null, null, refreshRequired, 1000, null, 'bottom-right', 0);
                 }
                 e.preventDefault();
-                return true;
+                return;
             }
         });
-
+        
         $(document).on("mousewheel", function(e) {
+
+        if($(e.target).hasClass('no-wheel')) { // prevent mousewheel scrolling on non scrollable elements.
+            e.preventDefault();
+            return;
+        }
+        
         if (graph && $(e.target).parents('.modal').length == 0){
             var delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
-            if($(e.target).attr('id') == 'graphCanvas') { // we are scrolling the graph
-                if (delta < 0) { // scroll down (or left)
-                    if (e.altKey || e.shiftKey) {
-                        setGraphZoom(graphZoom - 10.0 - ((e.altKey) ? 15.0 : 0.0));
-                        $(".graph-zoom").val(graphZoom + "%");
-                    } else {
-                        logJumpBack(0.1 /*10%*/);
+            if (delta!=0) {
+                if($(e.target).attr('id') == 'graphCanvas') { // we are scrolling the graph
+                    if (delta < 0) { // scroll down (or left)
+                        if (e.altKey || e.shiftKey) {
+                            setGraphZoom(graphZoom - 10.0 - ((e.altKey) ? 15.0 : 0.0));
+                            $(".graph-zoom").val(graphZoom + "%");
+                        } else {
+                            logJumpBack(0.1 /*10%*/);
+                        }
+                    } else { // scroll up or right
+                        if (e.altKey || e.shiftKey) {
+                            setGraphZoom(graphZoom + 10.0 + ((e.altKey) ? 15.0 : 0.0));
+                            $(".graph-zoom").val(graphZoom + "%");
+                        } else {
+                            logJumpForward(0.1 /*10%*/);
+                        }
                     }
-                } else { // scroll up or right
-                    if (e.altKey || e.shiftKey) {
-                        setGraphZoom(graphZoom + 10.0 + ((e.altKey) ? 15.0 : 0.0));
-                        $(".graph-zoom").val(graphZoom + "%");
-                    } else {
-                        logJumpForward(0.1 /*10%*/);
+                    e.preventDefault();
+                    return true;
+                }
+                if($(e.target).hasClass('graph-legend-group') || $(e.target).hasClass('graph-legend-field')) {
+                    var refreshRequired = false;
+
+                    if(e.shiftKey) { // change zoom
+                        refreshRequired = changePenZoom(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                    } else if(e.altKey) { // change Expo
+                        refreshRequired = changePenExpo(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                    } else { // Change smoothing
+                        refreshRequired = changePenSmoothing(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
                     }
-                }
-                e.preventDefault();
-                return true;
-            }
-            if($(e.target).hasClass('graph-legend-group') || $(e.target).hasClass('graph-legend-field')) {
-                var refreshRequired = false;
 
-                if(e.shiftKey) { // change zoom
-                    refreshRequired = changePenZoom(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
-                } else if(e.altKey) { // change Expo
-                    refreshRequired = changePenExpo(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
-                } else { // Change smoothing
-                    refreshRequired = changePenSmoothing(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                    if(refreshRequired) {
+                        graph.refreshGraphConfig();
+                        invalidateGraph();
+                        mouseNotification.show($('.log-graph'), null, null, refreshRequired, 750, null, 'bottom-right', 0);
+                    }
+                    e.preventDefault();
+                    return true;
                 }
-
-                if(refreshRequired) {
-                    graph.refreshGraphConfig();
-                    invalidateGraph();
-                }
-                e.preventDefault();
-                return true;
             }
         }
         });
@@ -1741,6 +1760,7 @@ function BlackboxLogViewer() {
         });
         
         seekBar.onSeek = setCurrentBlackboxTime;
+
     });
 }
 

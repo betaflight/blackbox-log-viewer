@@ -37,7 +37,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         // Add a trigger on legend; select the analyser graph/field to plot
         $('.graph-legend-field').on('click', function(e) {
 
-            if(e.which!=1) return false; // only accept left mouse clicks
+            if(e.which!=1) return; // only accept left mouse clicks
 
             var
                selectedGraphIndex    = $(this).attr('graph'),
@@ -59,12 +59,13 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                    onNewGraphConfig(graphs);
                }
            };
+           e.preventDefault();
         });
 
         // Add a trigger on legend list title; select the graph to expland
         $('.graph-legend h3').on('click', function(e) {
 
-               if(e.which!=1) return false; // only accept left mouse clicks
+               if(e.which!=1) return; // only accept left mouse clicks
 
                var selectedGraph = $(this).attr('graph');
                if(!e.altKey) {
@@ -76,6 +77,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                        onExpandGraph(selectedGraph);
                    }
                }
+           e.preventDefault();
         });
 
         // Make the legend dragabble
