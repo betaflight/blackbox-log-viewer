@@ -314,8 +314,6 @@ var mouseNotification = {
 
         var popupRect  = $(this.elem).get(0).getBoundingClientRect(); // get the popup metrics
         var targetRect = $(target).get(0).getBoundingClientRect();
-        var targetOffset = $(target).offset();
-        var popupOffset = $(this.elem).offset();
 
         var left = 0, top = 0;
 
@@ -335,8 +333,8 @@ var mouseNotification = {
             } else { // default top
                 top = margin;
             }
-            this.elem.css('left', left);//left - targetOffset.left);
-            this.elem.css('top', top);//top - targetOffset.top);
+            this.elem.css('left', left);
+            this.elem.css('top', top);
 
         } else { // default is at the mouse position
             this.elem.css('left', (x || 0) - targetRect.left  + margin);
