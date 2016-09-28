@@ -259,3 +259,99 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
       ctx.stroke();
     }
   }
+
+var mouseNotification = {
+    enabled: true,
+    elem: $('.mouseNotification'),
+    timeout: null,
+    show: function(target, x, y, message, delay, messageClass, align, margin) {
+
+        /**
+         target 			is the target element that triggered the mouse notification
+         x,y				are the mouse coordinates (if required)
+         message 		is the text to display (supports html endcoding)
+         delay 			is how long the message will remain before auto clearing
+         messageClass 	is the css class that should be used to draw the box, null for default
+         align 			is the position to put the popup to, null means at the mouse position, 'top-left' etc,
+         margin 			is the margin from the mouse cursor or border, null for default 10px
+
+         the index.html should have an entry <div class="mouseNotification"></div>
+         and the .css should have two definitions...
+
+         .mouseNotification {
+                position: absolute;
+                margin 0 auto;
+                white-space: pre-wrap;
+            }
+
+         .mouseNotification-box {
+                padding: 4px;
+                color: black;
+                background-color: #EAEAEA;
+                border: 2px solid white;
+                border-radius: 3px;
+            }
+
+         **/
+
+        if (!this.enabled) return false;
+
+        this.elem = this.elem || $('.mouseNotification');
+
+        messageClass = messageClass || 'mouseNotification-box';
+        margin = margin || 10;
+
+        var mouseNotificationElem = $('#mouse-notification');
+        if (mouseNotificationElem.length != 0) {
+            clearTimeout(this.timeout);
+            mouseNotificationElem.replaceWith('<div class="' + messageClass + '" id="mouse-notification">' + message  + "</div>");
+        } else {
+            this.elem.append('<div class="' + messageClass + '" id="mouse-notification">' + message + "</div>");
+        }
+        this.timeout = setTimeout(function() {
+            $('#mouse-notification').remove();
+        }, (delay || 1000));
+
+        var popupRect  = $(this.elem).get(0).getBoundingClientRect(); // get the popup metrics
+        var targetRect = $(target).get(0).getBoundingClientRect();
+
+        var left = 0, top = 0;
+
+        // reposition the notification;
+        if (align != null) { // default is at the mouse position
+            if (align.indexOf('right') !== -1) {
+                left = targetRect.width - (popupRect.width + margin);
+            } else if (align.indexOf('center') !== -1) {
+                left = targetRect.width / 2 - (popupRect.width + margin) / 2;
+            } else { // default left
+                left = margin;
+            }
+            if (align.indexOf('bottom') !== -1) {
+                top = targetRect.height - (popupRect.height + margin);
+            } else if (align.indexOf('middle') !== -1) {
+                top = targetRect.height / 2 - (popupRect.height + margin) / 2;
+            } else { // default top
+                top = margin;
+            }
+            this.elem.css('left', left);
+            this.elem.css('top', top);
+
+        } else { // default is at the mouse position
+            this.elem.css('left', (x || 0) - targetRect.left  + margin);
+            this.elem.css('top', (y || 0) - targetRect.top  + margin);
+        }
+
+        // now re-position the box if it goes out of the target element
+        popupRect = $(this.elem).get(0).getBoundingClientRect(); // now get them again now that we have positioned it.
+        if (popupRect.right > (targetRect.right - margin)) {
+            this.elem.css('left', targetRect.right - popupRect.width - margin);
+        }
+        /* // disable the overflow to the bottom as single elements will overflow.
+         if (popupRect.bottom > (targetRect.bottom - margin)) {
+         this.elem.css('top', targetRect.bottom - popupRect.height - margin);
+         }
+         */
+
+        return true;
+    }
+};
