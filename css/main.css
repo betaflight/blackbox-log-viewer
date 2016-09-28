@@ -986,17 +986,17 @@ html.isINAV input[type="checkbox"].ios-switch:checked + div > div {
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
-html.isBF .config-graph h4 span,
+html.isBF .config-graph h4 span:first-child,
 html.isBF .log-graph-config h3 span {
     background-image: linear-gradient(to bottom,#fff8e9 0,#ffbb00 100%);
 }
 
-html.isCF .config-graph h4 span,
+html.isCF .config-graph h4 span:first-child,
 html.isCF .log-graph-config h3 span {
     background-image: linear-gradient(to bottom,#fff8e9 0,#00a23f 100%);
 }
 
-html.isINAV .config-graph h4 span,
+html.isINAV .config-graph h4 span:first-child,
 html.isINAV .log-graph-config h3 span {
     background-image: linear-gradient(to bottom,#fff8e9 0,#0850ac 100%);
 }
@@ -1007,7 +1007,6 @@ html.isINAV .log-graph-config h3 span {
     padding: 2px 4px 4px;
     border-radius: 5px;
     margin-right:3px;
-    background-image: linear-gradient(to bottom,#fff8e9 0,#ffbb00 100%);
 }
 
 div#lap-timer {

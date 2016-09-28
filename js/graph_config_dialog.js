@@ -44,6 +44,28 @@ function GraphConfigurationDialog(dialog, onSave) {
     	return selectHeight;
     }
 
+    // Show/Hide remove all button
+     function updateRemoveAllButton() {
+         var graphCount = $('.config-graph').length;
+
+         if (graphCount > 0) {
+            $('.config-graphs-remove-all-graphs').show();
+         } else {
+            $('.config-graphs-remove-all-graphs').hide();
+         }
+                renumberGraphIndexes();
+     }
+
+    // Renumber the "Graph X" blocks after additions/deletions
+    function renumberGraphIndexes() {
+            var graphIndexes = $('.graph-index-number');
+            var graphCount = graphIndexes.length;
+            for (var i = 0; i < graphCount; i++) {
+                    var currentGraphNumber = i+1;
+                    $(graphIndexes[i]).html(currentGraphNumber);
+                }
+            }
+
     function renderFieldOption(fieldName, selectedName) {
         var 
             option = $("<option></option>")
@@ -87,7 +109,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<input name="scale" class="form-control" type="text"/>'
                     + '<input name="linewidth" class="form-control" type="text"/>'
                     + '<select class="color-picker"></select>'
-                    + '<button type="button" class="btn btn-default btn-sm">Remove</button>'
+                    + '<button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button>'
                     + '<div id="grid" value=""/>'
                 + '</li>'
             ),
@@ -135,8 +157,11 @@ function GraphConfigurationDialog(dialog, onSave) {
             graphElem = $(
                 '<li class="config-graph" id="'+index+'">'
                     + '<dl>'
-                        + '<dt><h4><span class="glyphicon glyphicon-minus"></span> Graph ' + (index + 1) + '</dt>'
-                        + '<dd>'
+                        + '<dt><span>'
+                            + '<h4 style="display:inline-block;vertical-align: baseline;"><span class="glyphicon glyphicon-minus"></span>Graph ' + '<span class="graph-index-number">' + (index + 1) + '</span>' + '</h4>'
+                                + '<button type="button" class="btn btn-default btn-sm pull-right remove-single-graph-button" style="display:inline-block;vertical-align: baseline;"><span class="glyphicon glyphicon-trash"></span> Remove graph ' + '</button>'
+                            + '</span></dt>'
+                            + '<dd>'
                             + '<div class="form-horizontal">'
                                 + '<div class="form-group">'
                                     + '<label class="col-sm-2 control-label">Axis label</label>'
@@ -167,7 +192,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                                     + '<label class="col-sm-2 control-label">Fields</label>'
                                     + '<div class="col-sm-10">'
                                         + '<ul class="config-graph-field-list form-inline list-unstyled"></ul>'
-                                        + '<button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add field</button>'
+                                        + '<button type="button" class="btn btn-default btn-sm add-field-button"><span class="glyphicon glyphicon-plus"></span> Add field</button>'
                                     + '</div>'
                                 + '</div>'
                             + '</div>'
@@ -182,11 +207,19 @@ function GraphConfigurationDialog(dialog, onSave) {
         var fieldCount = graph.fields.length;
 
         // "Add field" button
-        $("button", graphElem).click(function(e) {
+        $(".add-field-button", graphElem).click(function(e) {
             fieldList.append(renderField(flightLog, {}, GraphConfig.PALETTE[fieldCount++].color));
             e.preventDefault();
         });
-        
+
+        // "Remove Graph" button
+        $(".remove-single-graph-button", graphElem).click(function(e) {
+            var parentGraph = $(this).parents('.config-graph');
+            parentGraph.remove();
+            updateRemoveAllButton();
+            e.preventDefault();
+        });
+
         //Populate the Height seletor
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));        
 
@@ -209,9 +242,12 @@ function GraphConfigurationDialog(dialog, onSave) {
             if ($(".config-graph-field", parentGraph).length === 0) {
                 parentGraph.remove();
             }
-            
+            updateRemoveAllButton();
+
             e.preventDefault();
         });
+
+        updateRemoveAllButton();
         
         return graphElem;
     }
@@ -393,10 +429,18 @@ function GraphConfigurationDialog(dialog, onSave) {
             graphElem = renderGraph(activeFlightLog, $(".config-graph", dialog).length, graph);
         
         $(configGraphsList, dialog).append(graphElem);
+        updateRemoveAllButton();
         
         // Dismiss the dropdown button
         exampleGraphsButton.dropdown("toggle");
         
         e.preventDefault();
+    });
+
+    // Remove all Graphs button
+    var removeAllGraphsButton = $(".config-graphs-remove-all-graphs");
+    removeAllGraphsButton.on("click", function() {
+            $('.config-graph').remove();
+            updateRemoveAllButton();
     });
 }
