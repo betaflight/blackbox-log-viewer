@@ -421,13 +421,11 @@ var FlightLogParser = function(logData) {
             case "pid_process_denom":
             case "pidController":
             case "yaw_p_limit":
-            case "yaw_lpf_hz":
             case "dterm_average_count":
             case "rollPitchItermResetRate":
             case "yawItermResetRate": 
             case "rollPitchItermIgnoreRate":
             case "yawItermIgnoreRate":
-            case "dterm_lpf_hz":
             case "dterm_differentiator":
             case "deltaMethod":
             case "dynamic_dterm_threshold":
@@ -436,7 +434,6 @@ var FlightLogParser = function(logData) {
             case "deadband":
             case "yaw_deadband":
             case "gyro_lpf":
-            case "gyro_lowpass_hz":
             case "acc_lpf_hz":
             case "acc_hardware":
             case "baro_hardware":
@@ -447,10 +444,6 @@ var FlightLogParser = function(logData) {
             case "superExpoYawMode":
             case "features":
             case "dynamic_pid":
-            case "gyro_notch_hz":
-            case "gyro_notch_cutoff":
-            case "dterm_notch_hz":
-            case "dterm_notch_cutoff":
             case "rc_interpolation":
             case "rc_interpolation_interval":
             case "unsynced_fast_pwm":
@@ -471,6 +464,28 @@ var FlightLogParser = function(logData) {
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
+            case "yaw_lpf_hz":
+            case "gyro_lowpass_hz":
+            case "dterm_notch_hz":
+            case "dterm_notch_cutoff":
+            case "dterm_lpf_hz":
+                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && that.sysConfig.firmware == 3.0 && that.sysConfig.firmwarePatch >= 1) {
+                    that.sysConfig[fieldName] = parseInt(fieldValue, 10);
+                } else {
+                    that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
+                }
+            break;
+
+            case "gyro_notch_hz":
+            case "gyro_notch_cutoff":
+                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && that.sysConfig.firmware == 3.0 && that.sysConfig.firmwarePatch >= 1) {
+                    that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
+                } else {
+                    that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
+                }
+            break;
+
+
             /**  Cleanflight Only log headers **/
             case "dterm_cut_hz":
             case "acc_cut_hz":
@@ -480,7 +495,7 @@ var FlightLogParser = function(logData) {
             
             case "superExpoFactor":
                 if(fieldValue.match(/.*,.*/)!=null) {
-                    var expoParams = parseCommaSeparatedIntegers(fieldValue);
+                    var expoParams = parseCommaSeparatedString(fieldValue);
                     that.sysConfig.superExpoFactor    = expoParams[0];
                     that.sysConfig.superExpoFactorYaw = expoParams[1];
 
@@ -500,22 +515,22 @@ var FlightLogParser = function(logData) {
             case "navrPID":
             case "levelPID":
             case "velPID":
-                that.sysConfig[fieldName] = parseCommaSeparatedIntegers(fieldValue);
+                that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
             case "magPID":
-                that.sysConfig.magPID = [parseInt(fieldValue, 10), null, null];
+                that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
             break;
             /* End of CSV packed values */
 
             case "vbatcellvoltage":
-                var vbatcellvoltageParams = parseCommaSeparatedIntegers(fieldValue);
+                var vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
 
                 that.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
                 that.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
                 that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
             break;
             case "currentMeter":
-                var currentMeterParams = parseCommaSeparatedIntegers(fieldValue);
+                var currentMeterParams = parseCommaSeparatedString(fieldValue);
 
                 that.sysConfig.currentMeterOffset = currentMeterParams[0];
                 that.sysConfig.currentMeterScale = currentMeterParams[1];
@@ -603,10 +618,10 @@ var FlightLogParser = function(logData) {
 
                     switch (frameInfo) {
                         case "predictor":
-                            frameDef.predictor = parseCommaSeparatedIntegers(fieldValue);
+                            frameDef.predictor = parseCommaSeparatedString(fieldValue);
                         break;
                         case "encoding":
-                            frameDef.encoding = parseCommaSeparatedIntegers(fieldValue);
+                            frameDef.encoding = parseCommaSeparatedString(fieldValue);
                         break;
                         case "name":
                             frameDef.name = translateLegacyFieldNames(fieldValue.split(","));
@@ -621,7 +636,7 @@ var FlightLogParser = function(logData) {
                             frameDef.signed.length = frameDef.count;
                         break;
                         case "signed":
-                            frameDef.signed = parseCommaSeparatedIntegers(fieldValue);
+                            frameDef.signed = parseCommaSeparatedString(fieldValue);
                         break;
                         default:
                             console.log("Saw unsupported field header \"" + fieldName + "\"");
