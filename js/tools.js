@@ -92,16 +92,41 @@ function memmem(haystack, needle, startIndex) {
     return -1;
 }
 
-function parseCommaSeparatedIntegers(string) {
-    var 
+function parseCommaSeparatedString(string, length) {
+    /***
+     * Parse a comma separated string for individual values.
+     *
+     * string               is the comma separated string to parse
+     * length (optional)    the returned array will be forced to be this long; extra fields will be discarded,
+     *                      missing fields will be padded. if length is not specified, then array will be auto
+     *                      sized.
+     *
+     * returns              if the string does not contain a comma, then the first integer/float/string is returned
+     *                      else an Array is returned containing all the values up to the length (if specified)
+     ***/
+    var
         parts = string.split(","),
-        result = new Array(parts.length);
-    
-    for (var i = 0; i < parts.length; i++) {
-        result[i] = parseInt(parts[i], 10);
-    }
+        result, value;
 
-    return result;
+    length = length || parts.length; // we can force a length if we like
+
+    if (length < 2) {
+        // this is not actually a list, just return the value
+        value = (parts.indexOf('.'))?parseFloat(parts):parseInt(parts, 10);
+        return (isNaN(value) ? string : value);
+    } else {
+        // this really is a list; build an array
+        result = new Array(length);
+        for (var i = 0; i < length; i++) {
+            if(i<parts.length) {
+                value = (parts[i].indexOf('.'))?parseFloat(parts[i]):parseInt(parts[i], 10);
+                result[i] = isNaN(value) ? parts[i] : value;
+            } else {
+                result[i] = null;
+            }
+        }
+        return result;
+    }
 }
 
 /**
