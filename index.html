@@ -652,21 +652,15 @@
 										<tbody>
 											<tr>
 												<td name='gyro_lpf'><label>Hardware</label><select><!-- list generated here --></select></td>
-												<td></td>
-												<td></td>
+                                                <td name='gyro_soft_type'><label>Type</label><select><!-- list generated here --></select></td>
+                                                <td name="gyro_lowpass_hz"><label>Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 												<td></td>
 											</tr>
 											<tr>
-												<td name='gyro_soft_type'><label>Type</label><select><!-- list generated here --></select></td>
-												<td name="gyro_lowpass_hz"><label>Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name='gyro_notch_hz'><label>Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="gyro_notch_cutoff"><label>Notch Cutoff (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
-											</tr>
-                                            <tr>
-                                                <td</td>
-                                                <td</td>
-                                                <td name='gyro_notch_hz_2'><label>Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-                                                <td name="gyro_notch_cutoff_2"><label>Notch Cutoff (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
+												<td name='gyro_notch_hz'><label>Notch 1<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="gyro_notch_cutoff"><label>Notch 1 Cutoff<br>(Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
+                                                <td name='gyro_notch_hz_2'><label>Notch 2<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+                                                <td name="gyro_notch_cutoff_2"><label>Notch 2 Cutoff<br>(Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
                                             </tr>
 										</tbody>
 									</table>
@@ -678,11 +672,11 @@
 										</thead>
 										<tbody>
 											<tr>
-												<td name='dterm_filter_type'><label>Type</label><select><!-- list generated here --></select></td>
-												<td name="dterm_lpf_hz" ><label>Cut-off (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name='dterm_filter_type'><label>Type<br>&nbsp;</label><select><!-- list generated here --></select></td>
+												<td name="dterm_lpf_hz" ><label>Cut-off<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
 												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
-												<td name='dterm_notch_hz'><label>Notch (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="dterm_notch_cutoff"><label>Notch Cutoff (Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
+												<td name='dterm_notch_hz'><label>Notch<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
+												<td name="dterm_notch_cutoff"><label>Notch Cutoff<br>(Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -874,10 +868,12 @@
 													<td name="maxthrottle"><label>Max Throttle</label><input type="number" step="10" min="1000" max="2000" /></td>
 												</tr>
 											</tbody>
+                                        </table>
+                                        <table class="parameter cf">
 											<tbody>
 												<tr>
-													<td name="dynThrPID" colspan="2"><label>TPA</label><input type="number" step="0.01" min="0" max="1.00" /></td>
-													<td name="tpa-breakpoint"><label>TPA Breakpoint</label><input type="number" step="10" min="1000" max="2000" /></td>
+													<td name="dynThrPID"><label>TPA</label><input type="number" step="0.01" min="0" max="1.00" /></td>
+													<td name="tpa-breakpoint"><label>TPA&nbsp;Breakpoint</label><input type="number" step="10" min="1000" max="2000" /></td>
 													<td name="airmode_activate_throttle" class="bf-only"><label>Airmode Activate</label><input type="number" step="10" min="1000" max="2000" /></td>
 												</tr>
 											</tbody>
@@ -905,8 +901,8 @@
 										<tbody>
 											<tr>
 												<td name="vbatmincellvoltage"><label>Min Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-												<td name="vbatmaxcellvoltage"><label>Max Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 												<td name="vbatwarningcellvoltage"><label>Warning Voltage</label><input type="number" step="0.01" min="0" max="2.55" /></td>
+                                                <td name="vbatmaxcellvoltage"><label>Max Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 											</tr>
 										</tbody>
 										</table>
