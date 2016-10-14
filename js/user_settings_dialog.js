@@ -42,6 +42,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		stickMode 			: 2,				// Default to Mode 2
 		stickUnits			: false,			// Show units on stick display?
 		stickTrails			: false,			// Show stick trails?
+		stickInvertYaw		: false,			// Invert yaw in stick display?
 		gapless				: false,
 		drawCraft			: "3D", 
 		drawPidTable		: true, 
@@ -282,7 +283,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     $(".stick-trails").click(function() {
     	currentSettings.stickTrails = $(this).is(":checked");
     });
-    
+
+	$(".invert-yaw").click(function() {
+		currentSettings.stickInvertYaw = $(this).is(":checked");
+	});
+
     // Load Custom Logo
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -336,9 +341,14 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		if(currentSettings.stickTrails!=null) {
     			// set the toggle switch
     			$(".stick-trails").prop('checked', currentSettings.stickTrails);
-    		} 
+    		}
 
-    		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
+			if(currentSettings.stickInvertYaw!=null) {
+				// set the toggle switch
+				$(".invert-yaw").prop('checked', currentSettings.stickInvertYaw);
+			}
+
+		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
     		stickModeSelection(currentSettings.stickMode);
 
     		// setup the stick mode and dropdowns;
