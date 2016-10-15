@@ -55,9 +55,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         graphGridOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
-        
-
 		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log
+		analyserHanning	    : false,  			// use a hanning window on the analyser sample data
 		eraseBackground		: true,           	// Set to false if you want the graph to draw on top of an existing canvas image
 		craft				: {
 									left  : '15%',	// position from left (as a percentage of width)
@@ -288,6 +287,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		currentSettings.stickInvertYaw = $(this).is(":checked");
 	});
 
+	$(".analyser-hanning").click(function() {
+		currentSettings.analyserHanning = $(this).is(":checked");
+	});
+
     // Load Custom Logo
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -346,6 +349,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 			if(currentSettings.stickInvertYaw!=null) {
 				// set the toggle switch
 				$(".invert-yaw").prop('checked', currentSettings.stickInvertYaw);
+			}
+
+			if(currentSettings.analyserHanning!=null) {
+				// set the toggle switch
+				$(".analyser-hanning").prop('checked', currentSettings.analyserHanning);
 			}
 
 		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration

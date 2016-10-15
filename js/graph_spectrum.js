@@ -138,15 +138,22 @@ try {
 		var samples = new Float64Array(MAX_ANALYSER_LENGTH/1000);
 
         // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
-        var sampleIndex = 0;
+        fftData.samples	= 0;
 		for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
 			var chunk = allChunks[chunkIndex];
 			for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-				samples[sampleIndex++] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
+				samples[fftData.samples++] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
 			}
 		}
 
-		//calculate fft
+        if(userSettings.analyserHanning) {
+            // apply hanning window function
+            for(var i=0; i<fftData.samples; i++) {
+                samples[i] *= 0.5 * (1-Math.cos((2*Math.PI*i)/(fftData.samples - 1)));
+            }
+        }
+
+        //calculate fft
 		var fftLength = samples.length;
 		var fftOutput = new Float64Array(fftLength * 2);
 		var fft = new FFT.complex(fftLength, false);
