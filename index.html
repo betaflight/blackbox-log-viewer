@@ -292,8 +292,18 @@
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <div class="analyser">
                 	<canvas width="0" height="0" id="analyserCanvas"></canvas>
-                	<input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="100" title=""/>
-					<input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10"/>
+                	<input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"/>
+					<input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"/>
+                    <datalist id="analyserZoomXTicks">
+                        <option>100</option>
+                        <option>200</option>
+                        <option>300</option>
+                        <option>400</option>
+                        <option>500</option>
+                    </datalist>
+                    <datalist id="analyserZoomYTicks">
+                        <option>100</option>
+                    </datalist>
 				</div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
@@ -1314,7 +1324,10 @@
 									<div class="spacer_box_title">Analyser Settings</div>
 								</div>
 								<div class="spacer_box">
-									<table>
+                                    <div>
+                                        <label class="option">Hanning<input class="analyser-hanning ios-switch" type="checkbox"/><div><div></div></div><span>Use Hanning Window for Analyser</span></label>
+                                    </div>
+                                    <table>
 										<tr>
 											<td>
 												<label>Position</label>
