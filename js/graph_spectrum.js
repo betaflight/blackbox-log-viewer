@@ -219,10 +219,10 @@ try {
 		var x = 0;
 
 		var barGradient = canvasCtx.createLinearGradient(0,HEIGHT,0,0);
-			barGradient.addColorStop(0,   'rgba(0,255,0,0.2)');
-			barGradient.addColorStop(0.15, 'rgba(128,255,0,0.2)');
-			barGradient.addColorStop(0.45, 'rgba(255,0,0,0.5)');
-			barGradient.addColorStop(1,   'rgba(255,128,128,1.0)');
+            barGradient.addColorStop(constrain(0/analyserZoomY,0,1),      'rgba(0,255,0,0.2)');
+            barGradient.addColorStop(constrain(0.15/analyserZoomY,0,1),   'rgba(128,255,0,0.2)');
+            barGradient.addColorStop(constrain(0.45/analyserZoomY,0,1),   'rgba(255,0,0,0.5)');
+            barGradient.addColorStop(constrain(1/analyserZoomY, 0, 1),    'rgba(255,128,128,1.0)');
         canvasCtx.fillStyle = barGradient; //'rgba(0,255,0,0.3)'; //green
 
         var fftScale = HEIGHT / (analyserZoomY*100);
