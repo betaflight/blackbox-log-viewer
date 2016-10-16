@@ -605,14 +605,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
 
     //Draw an background for the line for a graph (at the origin and spanning the window)
     function drawAxisBackground(plotHeight) {
-        canvasContext.strokeStyle = "rgba(255,255,255,0.1)";
-        canvasContext.lineWidth = plotHeight;
-        
-        canvasContext.beginPath();
-        canvasContext.moveTo(0, 0);
-        canvasContext.lineTo(canvas.width, 0);
-        
-        canvasContext.stroke();
+        var axisGradient = canvasContext.createLinearGradient(0,-plotHeight/2,0,plotHeight/2);
+        axisGradient.addColorStop(0.0,   'rgba(255,255,255,0.1)');
+        axisGradient.addColorStop(0.15,  'rgba(0,0,0,0)');
+        axisGradient.addColorStop(0.5,   'rgba(0,0,0,0)');
+        axisGradient.addColorStop(0.85,  'rgba(0,0,0,0)');
+        axisGradient.addColorStop(1.0,   'rgba(255,255,255,0.1)');
+        canvasContext.fillStyle = axisGradient;
+        canvasContext.fillRect(0,-plotHeight/2,canvas.width, plotHeight);
     }
 
     //Draw a grid
