@@ -833,12 +833,16 @@ function BlackboxLogViewer() {
            } 
         });
 
+        /* Always start with the table hidden
         prefs.get('hasTable', function(item) {
            if (item) {
                hasTable = item;
                html.toggleClass("has-table", hasTable);
            } 
         });
+        */
+        hasTable = false;
+        html.toggleClass("has-table", hasTable);
         
         // Reset the analyser window on application startup.
         hasAnalyser = false;
