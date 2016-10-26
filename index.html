@@ -19,32 +19,6 @@
 <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
 <body>
-	<!-- Navigation Bar -->
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-        <div class="container header-pane">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-                </button>
-                <div class="navbar-logo">
-                	<div>
-						<img src="./images/cf_logo_white.svg" class="navbar-brand"/>
-						<span>Blackbox&nbspExplorer</span>
-					</div>
-	                <a class="navbar-brand log-filename" html="#"></a>
-				</div>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <div class="navbar-form navbar-right" role="form">
-                	<div class="btn-group">
-						<a class="btn btn-default btn-video-export" data-toggle="tooltip" title="Export your vide and chart setup to file"> Export video...</a>
-						<a class="btn btn-primary btn-workspaces-export" data-toggle="tooltip" title="Export your workspace confifurations to file"> Export Workspaces...</a>
-						<span class="btn btn-primary btn-file" data-toggle="tooltip" title="Open another log file, video file, exported workspace file or configuration dump file"> Open log file/video <input type="file" class="file-open" multiple></span>
-	                </div>
-                </div>
-            </div>
-        </div>
-    </nav>
 	<!--  Welcome Page -->
     <div class="welcome-pane">
         <div class="container">
@@ -163,6 +137,32 @@
             </div>
         </div>
     </div>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container header-pane">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-logo">
+                    <div>
+                        <img src="./images/cf_logo_white.svg" class="navbar-brand"/>
+                        <span>Blackbox&nbspExplorer</span>
+                    </div>
+                    <a class="navbar-brand log-filename" html="#"></a>
+                </div>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <div class="navbar-form navbar-right" role="form">
+                    <div class="btn-group">
+                        <a class="btn btn-default btn-video-export" data-toggle="tooltip" title="Export your vide and chart setup to file"> Export video...</a>
+                        <a class="btn btn-primary btn-workspaces-export" data-toggle="tooltip" title="Export your workspace confifurations to file"> Export Workspaces...</a>
+                        <span class="btn btn-primary btn-file" data-toggle="tooltip" title="Open another log file, video file, exported workspace file or configuration dump file"> Open log file/video <input type="file" class="file-open" multiple></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 	<!-- Main Page -->
     <div class="container-fluid main-pane">
         <ul class="video-top-controls list-unstyled">
@@ -228,7 +228,7 @@
                     </div>
                 </div>
             </li>
-            <li class="log-playback-rate-panel">
+            <li class="log-playback-rate-panel nowrap">
                 <h4>Playback speed</h4>
                 <div class="form-inline">
                     <div class="form-group">
@@ -237,7 +237,7 @@
                     </div>
                 </div>
             </li>
-            <li class="log-chart-zoom-panel">
+            <li class="log-chart-zoom-panel nowrap">
                 <h4>Zoom</h4>
                 <div class="form-inline">
                     <div class="form-group">
@@ -305,9 +305,6 @@
             </div>
             <div class="mouseNotification"></div>
         </div>
-        <div class="log-seek-bar">
-            <canvas width="200" height="100"></canvas>
-        </div>
         <div class="log-field-values" id="log-field-values">
             <a href="#log-field-values"><h4>Field values</h4></a>
             <table class="table table-condensed">
@@ -325,10 +322,14 @@
 			<!-- auto filled by configuration function -->
         </div>
 	</div>
+    <!-- Log Scroll bar -->
+    <div class="log-seek-bar">
+        <canvas width="200" height="100"></canvas>
+    </div>
     <!-- Status Bar -->
     <div id="status-bar">
         <div>
-			<span class="version">-</span>
+            <span class="version">-</span>
         </div>
         <div>
             <span class="log-cells">-</span>
@@ -337,54 +338,54 @@
             <span class="looptime">-</span>
         </div>
         <div>
-             <span class="lograte">-</span>
+            <span class="lograte">-</span>
         </div>
         <div>
-			<span class="flight-mode">-</span>
+            <span class="flight-mode">-</span>
         </div>
         <div>
-			<span class="marker-offset">00:00.000</span>
+            <span class="marker-offset">00:00.000</span>
         </div>
         <div>
-			<span class="overrides"></span>
+            <span class="overrides"></span>
         </div>
         <div class="bookmark-1">
-			<span>1</span>
+            <span>1</span>
         </div>
         <div class="bookmark-2">
-			<span>2</span>
+            <span>2</span>
         </div>
         <div class="bookmark-3">
-			<span>3</span>
+            <span>3</span>
         </div>
         <div class="bookmark-4">
-			<span>4</span>
+            <span>4</span>
         </div>
         <div class="bookmark-5">
-			<span>5</span>
+            <span>5</span>
         </div>
-       	<div class="bookmark-6">
-			<span>6</span>
+        <div class="bookmark-6">
+            <span>6</span>
         </div>
         <div class="bookmark-7">
-			<span>7</span>
+            <span>7</span>
         </div>
         <div class="bookmark-8">
-			<span>8</span>
+            <span>8</span>
         </div>
         <div class="bookmark-9">
-			<span>9</span>
+            <span>9</span>
         </div>
         <div class="bookmark-clear">
-			<span>Clear All</span>
+            <span>Clear All</span>
         </div>
         <div>
-			<span class="configuration-file-name">-</span>
+            <span class="configuration-file-name">-</span>
         </div>
         <div>
-			<span class="viewer-version">-</span>
+            <span class="viewer-version">-</span>
         </div>
-      </div>
+    </div>
 	<!-- Dialog Boxes and Popup Windows -->
     <div class="modal fade graph-configuration-dialog" id="dlgGraphConfiguration">
         <div class="modal-dialog">

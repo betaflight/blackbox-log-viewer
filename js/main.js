@@ -1252,7 +1252,7 @@ function BlackboxLogViewer() {
                 .tooltip();
         }
 
-        $(window).resize(function() { updateCanvasSize(); updateHeaderSize() });
+        $(window).resize(function() { updateCanvasSize(); /*updateHeaderSize()*/ });
 
         function updateHeaderSize() {
             var newHeight = $(".video-top-controls").height() - 20; // 23px offset
