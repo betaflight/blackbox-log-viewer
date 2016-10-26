@@ -434,7 +434,7 @@ function HeaderDialog(dialog, onSave) {
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
     	renderSelect('dynamic_pid'				,sysConfig.dynamic_pid, OFF_ON);
 
-		if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && firmwareVersion(that.sysConfig.firmware, that.sysConfig.firmwarePatch) >= firmwareVersion(3.0,1)) {
+		if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && firmwareVersion(sysConfig.firmware, sysConfig.firmwarePatch) >= firmwareVersion(3.0,1)) {
 			setParameter('gyro_notch_hz'			,sysConfig.gyro_notch_hz[0],0);
 			setParameter('gyro_notch_cutoff'		,sysConfig.gyro_notch_cutoff[0],0);
 			setParameter('gyro_notch_hz_2'			,sysConfig.gyro_notch_hz[1],0);
