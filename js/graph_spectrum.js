@@ -263,22 +263,26 @@ try {
 			}
 		}
 		offset++; // make some space!
-		if(dataBuffer.fieldName.match(/(.*yaw.*)/i)!=null) {
-			if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-		} else {
-			if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-			if(flightLog.getSysConfig().dterm_notch_hz!=null && flightLog.getSysConfig().dterm_notch_cutoff!=null ) {
-				if(flightLog.getSysConfig().dterm_notch_hz > 0 && flightLog.getSysConfig().dterm_notch_cutoff > 0) {
-					var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
-					gradient.addColorStop(1,   'rgba(128,128,255,0.10)');
-					gradient.addColorStop(0,   'rgba(128,128,255,0.35)');
-					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz,  PLOTTED_BLACKBOX_RATE, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().dterm_notch_hz - flightLog.getSysConfig().dterm_notch_cutoff));
-					drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN); // highlight the center
-					drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff,  PLOTTED_BLACKBOX_RATE, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+		try {
+			if(dataBuffer.fieldName.match(/(.*yaw.*)/i)!=null) {
+				if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+			} else {
+				if(flightLog.getSysConfig().dterm_lpf_hz!=null)    		drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+				if(flightLog.getSysConfig().dterm_notch_hz!=null && flightLog.getSysConfig().dterm_notch_cutoff!=null ) {
+					if(flightLog.getSysConfig().dterm_notch_hz > 0 && flightLog.getSysConfig().dterm_notch_cutoff > 0) {
+						var gradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT));
+						gradient.addColorStop(1,   'rgba(128,128,255,0.10)');
+						gradient.addColorStop(0,   'rgba(128,128,255,0.35)');
+						drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz,  PLOTTED_BLACKBOX_RATE, null, WIDTH, HEIGHT, (15*offset) + MARGIN, gradient, (flightLog.getSysConfig().dterm_notch_hz - flightLog.getSysConfig().dterm_notch_cutoff));
+						drawMarkerLine(flightLog.getSysConfig().dterm_notch_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM notch center', WIDTH, HEIGHT, (15*offset++) + MARGIN); // highlight the center
+						drawMarkerLine(flightLog.getSysConfig().dterm_notch_cutoff,  PLOTTED_BLACKBOX_RATE, 'D-TERM notch cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+					}
 				}
 			}
+			offset++; // make some space!
+		} catch (e) {
+			console.log('Notch filter fieldName missing');
 		}
-		offset++; // make some space!
 		drawMarkerLine(fftData.maxNoiseIdx,  PLOTTED_BLACKBOX_RATE, 'Max motor noise', WIDTH, HEIGHT, (15*offset) + MARGIN, "rgba(255,0,0,0.50)", 3);
 
 		canvasCtx.restore();
