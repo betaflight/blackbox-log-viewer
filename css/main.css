@@ -60,7 +60,7 @@ html, body {
 
 .welcome-pane, .main-pane {
     position: fixed;
-    top: 100px;
+    top: 15px;
     bottom: 100px;
     left: 0;
     right: 0;

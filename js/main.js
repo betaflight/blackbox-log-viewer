@@ -938,6 +938,14 @@ function BlackboxLogViewer() {
             invalidateGraph();
         });
 
+        $(".view-zoom-in").click(function() {
+            zoomIn();
+        });
+
+        $(".view-zoom-out").click(function() {
+            zoomOut();
+        });
+
         var logJumpBack = function(fast, slow) {
             var scrollTime  = SMALL_JUMP_TIME;
             if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):scrollTime;
