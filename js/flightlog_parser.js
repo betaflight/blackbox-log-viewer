@@ -469,7 +469,7 @@ var FlightLogParser = function(logData) {
             case "dterm_notch_hz":
             case "dterm_notch_cutoff":
             case "dterm_lpf_hz":
-                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && firmwareVersion(that.sysConfig.firmware, that.sysConfig.firmwarePatch) >= firmwareVersion(3.0,1)) {
+                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10);
                 } else {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
@@ -478,7 +478,7 @@ var FlightLogParser = function(logData) {
 
             case "gyro_notch_hz":
             case "gyro_notch_cutoff":
-                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && firmwareVersion(that.sysConfig.firmware, that.sysConfig.firmwarePatch) >= firmwareVersion(3.0,1)) {
+                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) {
                     that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
                 } else {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
@@ -554,9 +554,10 @@ var FlightLogParser = function(logData) {
                 // Extract the firmware revision in case of Betaflight/Raceflight/Other
                 var matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
                 if(matches!=null) {
-                    that.sysConfig.firmwareType  = FIRMWARE_TYPE_BETAFLIGHT;
-                    that.sysConfig.firmware      = parseFloat(matches[2] + '.' + matches[3]);
-                    that.sysConfig.firmwarePatch = (matches[5] != null)?parseInt(matches[5]):'';
+                    that.sysConfig.firmwareType    = FIRMWARE_TYPE_BETAFLIGHT;
+                    that.sysConfig.firmware        = parseFloat(matches[2] + '.' + matches[3]).toFixed(1);
+                    that.sysConfig.firmwarePatch   = (matches[5] != null)?parseInt(matches[5]):'0';
+                    that.sysConfig.firmwareVersion = that.sysConfig.firmware + '.' + that.sysConfig.firmwarePatch;
                     $('html').removeClass('isBaseF');
 					$('html').removeClass('isCF');
                     $('html').addClass('isBF');
