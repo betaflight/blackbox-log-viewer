@@ -54,16 +54,11 @@ function HeaderDialog(dialog, onSave) {
 
 	];
 
-	function isParametervalid(name) {
+	function isParameterValid(name) {
 
 		for(var i=0; i<parameterVersion.length; i++) {
 			if (parameterVersion[i].name == name && parameterVersion[i].type == activeSysConfig.firmwareType) {
-				var matches = parameterVersion[i].min.match(/(\d+)\.(\d+)(?:\.(\d+))/); // extract the firmware version and patch
-				var min = parseFloat(matches[1] + '.' + matches[2]) + matches[3]/10000;
-				matches = parameterVersion[i].max.match(/(\d+)\.(\d+)(?:\.(\d+))/);
-				var max = parseFloat(matches[1] + '.' + matches[2]) + matches[3]/10000;
-				var current = activeSysConfig.firmware + activeSysConfig.firmwarePatch/10000;
-				return ((current >= min) && (current <= max));
+				return (semver.gte(activeSysConfig.firmwareVersion, parameterVersion[i].min) && semver.lte(activeSysConfig.firmwareVersion, parameterVersion[i].max));
 			}
 		}
 		return true; // default is to show parameter
@@ -92,7 +87,7 @@ function HeaderDialog(dialog, onSave) {
 			}
 			parameterElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
 
-			parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
+			parameterElem.css('display', isParameterValid(name)?('table-cell'):('none'));
 
 			if(selected!=null) {
 				parameterElem.removeClass('missing');
@@ -113,7 +108,7 @@ function HeaderDialog(dialog, onSave) {
 		} else {
 			parameterElem.addClass('missing');
 		}
-		parameterElem.css('display', isParametervalid(name)?('table-cell'):('none'));
+		parameterElem.css('display', isParameterValid(name)?('table-cell'):('none'));
 
 	}
 
@@ -128,7 +123,7 @@ function HeaderDialog(dialog, onSave) {
 		} else {
 			nameElem.closest('tr').addClass('missing');
 		}
-		parameterElem.parent().css('display', isParametervalid(name)?('table-cell'):('none'));
+		parameterElem.parent().css('display', isParameterValid(name)?('table-cell'):('none'));
 	}
 
 	function populatePID(name, data) {
@@ -434,7 +429,7 @@ function HeaderDialog(dialog, onSave) {
 	    renderSelect('superExpoYawMode'		    ,sysConfig.superExpoYawMode, SUPER_EXPO_YAW);
     	renderSelect('dynamic_pid'				,sysConfig.dynamic_pid, OFF_ON);
 
-		if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && firmwareVersion(sysConfig.firmware, sysConfig.firmwarePatch) >= firmwareVersion(3.0,1)) {
+		if(isParameterValid('gyro_notch_hz_2')) {
 			setParameter('gyro_notch_hz'			,sysConfig.gyro_notch_hz[0],0);
 			setParameter('gyro_notch_cutoff'		,sysConfig.gyro_notch_cutoff[0],0);
 			setParameter('gyro_notch_hz_2'			,sysConfig.gyro_notch_hz[1],0);

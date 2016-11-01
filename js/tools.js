@@ -130,6 +130,7 @@ function parseCommaSeparatedString(string, length) {
 }
 
 /**
+<<<<<<< HEAD
  * Convert firmware and patch to single float for comparison
 **/
 function firmwareVersion(firmware, patch) {
@@ -164,6 +165,8 @@ function zoomOut() {
 }
 
 /**
+=======
+>>>>>>> master
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
  * of the next-smaller element (or 0 if `item` is smaller than all values in `list`).
  */
