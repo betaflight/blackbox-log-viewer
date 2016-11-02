@@ -151,7 +151,7 @@ function BlackboxLogViewer() {
 
             var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
 
-            if(hasTable) { // Only redraw the table if it is enabled
+            if(hasTable || hasTableOverlay) { // Only redraw the table if it is enabled
 
                 var 
                     rows = [],
@@ -235,7 +235,8 @@ function BlackboxLogViewer() {
         graphRendersCount++;
         
         seekBar.setCurrentTime(currentBlackboxTime);
-    
+        seekBar.setWindow(graph.getWindowWidthTime());
+
         updateValuesChartRateLimited();
         
         if (graphState == GRAPH_STATE_PLAY) {
@@ -481,6 +482,16 @@ function BlackboxLogViewer() {
             }
         }
 
+    function showValueTable(state) {
+        if(state == null) { // no state specified, just toggle
+            hasTableOverlay = !hasTableOverlay;
+        } else { //state defined, just set item
+            hasTableOverlay = (state)?true:false;
+        }
+        html.toggleClass("has-table-overlay", hasTableOverlay);
+        updateValuesChart();
+    }
+
     /**
      * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
      * available log.
@@ -565,7 +576,7 @@ function BlackboxLogViewer() {
             
             var fileContents = String.fromCharCode.apply(null, new Uint8Array(bytes, 0,100));
 
-            if(fileContents.match(/# dump/i)) { // this is actually a configuration file
+            if(fileContents.match(/# dump|# diff/i)) { // this is actually a configuration file
                 try{
 
                    // Firstly, is this a configuration defaults file
@@ -908,9 +919,13 @@ function BlackboxLogViewer() {
         });
         
         $(".view-table").click(function() {
+            showValueTable();
+            showConfigFile(false); // hide the config file
+            /*
             hasTable = !hasTable;
             html.toggleClass("has-table", hasTable);       
             prefs.set('hasTable', hasTable);
+            */
         });
        
         $(".view-analyser-sticks").click(function() {
@@ -1181,9 +1196,8 @@ function BlackboxLogViewer() {
         });
 
         $(".open-header-dialog").click(function(e) {
-            e.preventDefault();
-            
             headerDialog.show(flightLog.getSysConfig());
+            e.preventDefault();
         });
 
         $(".open-keys-dialog").click(function(e) {
@@ -1549,28 +1563,27 @@ function BlackboxLogViewer() {
                     break;
 
                     case "C".charCodeAt(0):
-                        if(!(shifted)) { 
+                        if(!(shifted)) {
+                            showValueTable(false); // hide the values table if shown
                             showConfigFile(); // toggle the config file popup
                             e.preventDefault();
                         }
                     break;
 
+                    case "H".charCodeAt(0):
+                        if(!(shifted)) {
+                            headerDialog.show(flightLog.getSysConfig());
+                            e.preventDefault();
+                        }
+                        break;
+
                     case "T".charCodeAt(0):
-                        hasTableOverlay = !hasTableOverlay;
-                    	html.toggleClass("has-table-overlay", hasTableOverlay);
-
-                        if (hasTableOverlay) hadTable = hasTable; // Store the state of the table view when quickshow selected
-
-                    	if (hasTableOverlay && !hasTable) { 
-                    		hasTable = true; // force display the table if it is off when we quickshow.
-                    		}
-                		if (!hasTableOverlay && !hadTable) {
-                    		hasTable = false; // return table state when we remove quickshow.
-                    		}
-
-                    	html.toggleClass("has-table", hasTable);
-                    	invalidateGraph();
-                        e.preventDefault();
+                        if(!(shifted)) {
+                            showValueTable();
+                            showConfigFile(false); // hide the config file (if shown)
+                            invalidateGraph();
+                            e.preventDefault();
+                        }
                     break;
 
                     // Workspace shortcuts

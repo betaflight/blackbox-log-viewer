@@ -408,8 +408,15 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
     width:15%;
 }
 
-.log-field-values td {
+.log-field-values td,
+.configuration-file li {
     font-family: monospace;
+    font-size: small;
+    margin-left: 10px;
+}
+
+.configuration-file li:nth-child(even) {
+    background-color: #EBF3F7;
 }
 
 .log-field-values .raw-value {
@@ -419,6 +426,8 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 .log-field-values table,
 .log-field-values h4 {
     background-color: #FFFFFF;
+    overflow-y: auto;
+    height: 20px;
 }
 
 .log-field-values tr:nth-child(even) {
@@ -434,10 +443,12 @@ html.has-table-overlay .log-field-values {
     padding: 9px;
     font-size: small;
     background-color: white;
-    border: aliceblue;
+    border: black;
     z-index: 10;
     bottom: 80px;
     overflow-y: auto;
+    border-style: solid;
+    border-width: 1px;
 }
 
 html:not(.has-config-overlay) .configuration-file,
@@ -463,19 +474,24 @@ html:not(.has-marker) .marker-offset {
 
 html.has-config .configuration-file {
     position: fixed;
-    top: 7%;
-    left: 10%;
-    width: 78.5%;
-    padding:10px;
+    top: 134px;
+    left: 15px;
+    width: calc(100% - 30px);
+    padding: 9px;
     background-color: white;
-    border: groove #337ab7;
-    z-index: 11;
+    border: black;
+    z-index: 10;
+    bottom: 80px;
+    overflow-y: hidden;
+    border-style: solid;
+    border-width: 1px;
 }
 
 html.has-config .configuration-list {
     height:580px;
     overflow:hidden;
     overflow-y:scroll;
+    margin-top: 5px;
 }
 
 .graph-legend-field {

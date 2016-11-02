@@ -23,14 +23,17 @@ function Configuration(file, configurationDefaults, showConfigFile) {
 
 		for(var i=0; i<fileLinesArray.length; i++) {
 			if(!filter || filter.length<1) { //Everything
-				li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + fileLinesArray[i] + '</li>');
-				configurationList.append(li);	
+				// li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + fileLinesArray[i] + '</li>');
+
+				li = $('<li class="configuration-row"' + ((fileLinesArray[i].length==0)?' style="background-color: white; height: 10px;"':'') + '>' + ((fileLinesArray[i].length==0)?'&nbsp':fileLinesArray[i]) + '</li>'); // Removed default syntax highlighting
+				configurationList.append(li);
+
 			} else {
 				try {
 				var regFilter = new RegExp('(.*)(' + filter + ')(.*)','i');
 				var highLight = fileLinesArray[i].match(regFilter);
-				if(highLight!=null) { // dont include blank lines
-					li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + highLight[1] + '<b>' + highLight[2] + '</b>' + highLight[3] + '</li>');
+				if(highLight!=null) { // don't include blank lines
+					li = $('<li class="configuration-row">' + highLight[1] + '<b>' + highLight[2] + '</b>' + highLight[3] + '</li>'); // Removed default syntax highlighting
 					configurationList.append(li);
 					} 
 				} catch(e) {
@@ -46,9 +49,9 @@ function Configuration(file, configurationDefaults, showConfigFile) {
 		configurationElem  = ('.configuration-file'), // point to the actual element in index.html 
 		configurationDiv   = $('<div class="configuration-file">' 
 							  +		'<div class="configuration-header">' 
-							  + 		'<h3>' + file.name
+							  + 		'<h4>' + file.name
 							  + 			'<span class="configuration-close glyphicon glyphicon-remove"></span>'
-							  + 		'</h3>'
+							  + 		'</h4>'
 							  +     	'<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>'
 							  + 	'</div>'
 							  +		'<div><ul class="list-unstyled configuration-list"></ul></div>'
