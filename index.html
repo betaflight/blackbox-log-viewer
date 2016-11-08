@@ -175,13 +175,72 @@
             <li class="log-view-panel">
                 <h4>View</h4>
                 <div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default open-user-settings-dialog" data-toggle="tooltip" title="Show User Settings">
-                            <span class="glyphicon glyphicon-cog"></span>
-                        </button>
+                    <div class="btn-group view-buttons" role="group">
                         <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" title="View/hide header">
                             <span class="glyphicon glyphicon-info-sign"></span>
                         </button>
+                    </div>
+                    <div class="btn-group view-menu">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="view-menu" >
+                                View <span class="caret"></span></button>
+                            <ul class="dropdown-menu" role="menu"  aria-labelledby="view-menu">
+                                <li>
+                                    <a href="#" class="open-header-dialog auto-hide-menu" data-toggle="tooltip" title="View/hide header">
+                                        <span class="glyphicon glyphicon-info-sign"></span> Header<span class="pull-right">H</span>
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Overlays</li>
+                                <li>
+                                    <a href="#"  id="auto-hide-menu" class="view-video auto-hide-menu" data-toggle="tooltip" title="View/hide video display">
+                                        <span class="glyphicon glyphicon-film"></span> Video
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#"  id="auto-hide-menu" class="view-craft auto-hide-menu" data-toggle="tooltip" title="View/hide craft display">
+                                        <span class="glyphicon glyphicon-plane"></span> Craft
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#"  id="auto-hide-menu" class="view-sticks auto-hide-menu" data-toggle="tooltip" title="View/hide stick display">
+                                        <span class="glyphicon glyphicon-pawn"></span> Sticks
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Details</li>
+                                <li>
+                                    <a href="#" class="view-table auto-hide-menu" data-toggle="tooltip" title="View/hide statistics display">
+                                        <span class="glyphicon glyphicon-list-alt"></span> Values Table<span class="pull-right">T</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="view-config auto-hide-menu" data-toggle="tooltip" title="View/hide configuration file">
+                                        <span class="glyphicon glyphicon-list-alt"></span> Config<span class="pull-right">C</span>
+                                    </a>
+                                </li>
+                                <li class="divider has-analyser"></li>
+                                <li class="dropdown-header has-analyser">Analyser</li>
+                                <li>
+                                    <a href="#" class="view-analyser auto-hide-menu" data-toggle="tooltip" title="View/hide analyser display">
+                                        <span class="glyphicon glyphicon-equalizer"></span> Show/Hide<span class="pull-right">A</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="view-analyser-fullscreen auto-hide-menu" data-toggle="tooltip" title="Zoom Analyser Window">
+                                        <span class="glyphicon glyphicon-resize-full"></span><span class="glyphicon glyphicon-resize-small"></span> Re-size<span class="pull-right">&#x21E7;A</span>
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#" class="open-user-settings-dialog auto-hide-menu" data-toggle="tooltip" title="Show User Settings">
+                                        <span class="glyphicon glyphicon-cog"></span> Preferences
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="btn-group view-buttons-expanded" role="group">
                         <button type="button" class="btn btn-default view-video" data-toggle="tooltip" title="View/hide video display">
                             <span class="glyphicon glyphicon-film"></span>
                         </button>
@@ -203,7 +262,7 @@
                         <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
                             <span class="glyphicon glyphicon-resize-full"></span><span class="glyphicon glyphicon-resize-small"></span>
                         </button>
-                   </div>
+                    </div>
                 </div>
             </li>
             <li class="log-playback-panel">
@@ -234,25 +293,78 @@
                     </div>
                 </div>
             </li>
-            <li class="log-playback-rate-panel nowrap">
-                <h4>Playback speed</h4>
+            <li class="log-playback-rate-panel">
+                <h4>Speed</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <div class="playback-rate-control btn-group btn-group-vertical"></div>
-                        <input type="text" class="form-control playback-rate" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
+                        <div class="btn-group playback-menu">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="playback-menu" >
+                                    Speed <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu"  aria-labelledby="playback-menu">
+                                    <li>
+                                        <div class="pull-right">
+                                            <div class="panel-body">
+                                                Speed
+                                                <div class="playback-rate-control btn-group btn-group-vertical"></div>
+                                                <input type="text" class="form-control playback-rate small-screen" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="playback-rate-expanded">
+                            <div class="playback-rate-control btn-group btn-group-vertical"></div>
+                            <input type="text" class="form-control playback-rate small-screen" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
+                        </div>
                     </div>
                 </div>
             </li>
-            <li class="log-chart-zoom-panel nowrap">
+            <li class="log-chart-zoom-panel">
                 <h4>Zoom</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <div class="graph-zoom-control btn-group btn-group-vertical"></div>
-                        <input type="text" class="form-control graph-zoom" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level">
+                        <div class="btn-group zoom-menu">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="zoom-menu" >
+                                    Zoom <span class="caret"></span></button>
+                                <ul class="dropdown-menu pull-right" role="menu"  aria-labelledby="zoom-menu">
+                                    <li>
+                                        <div class="pull-right">
+                                            <div class="panel-body">
+                                                Zoom
+                                                <div class="graph-zoom-control btn-group btn-group-vertical"></div>
+                                                <input type="text" class="form-control graph-zoom small-screen" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level"/>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#"  class="toggle-smoothing auto-hide-menu" data-toggle="tooltip" title="Smoothing On/Off">
+                                            <span class="glyphicon glyphicon-check"></span> Disable Smoothing<span class="pull-right">S</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"  class="toggle-expo auto-hide-menu" data-toggle="tooltip" title="Expo On/Off">
+                                            <span class="glyphicon glyphicon-check"></span> Disable Expo<span class="pull-right">X</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"  class="toggle-grid auto-hide-menu" data-toggle="tooltip" title="Grid On/Off">
+                                            <span class="glyphicon glyphicon-check"></span> Disable Grid Lines<span class="pull-right">G</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="graph-zoom-expanded">
+                            <div class="graph-zoom-control btn-group btn-group-vertical"></div>
+                            <input type="text" class="form-control graph-zoom small-screen" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level">
+                        </div>
                     </div>
                 </div>
             </li>
-            <li class="log-chart-time-panel">
+            <li class="log-chart-time-panel small-screen">
                 <h4>Time</h4>
                 <div class="form-inline">
                     <div class="form-group">
@@ -264,16 +376,50 @@
                 <h4>Log sync</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
-                                <span class="glyphicon glyphicon-step-backward"></span>
-                            </button>
-                            <button type="button" class="btn btn-default log-sync-here">Start log here</button>
-                            <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
-                                <span class="glyphicon glyphicon-step-forward"></span>
-                            </button>
+                        <div class="btn-group sync-menu">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="sync-menu" >
+                                    Sync <span class="caret"></span></button>
+                                <ul class="dropdown-menu pull-right" role="menu"  aria-labelledby="sync-menu">
+                                    <li>
+                                        <div class="pull-right">
+                                            <div class="panel-body">
+                                                Sync
+                                                <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
+                                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                                </button>
+                                                <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" title="Enter a time offset">
+                                                <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
+                                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#"  class="log-sync-here auto-hide-menu" data-toggle="tooltip" title="Set the log start to this video frame">
+                                            <span class="glyphicon glyphicon-fast-backward"></span> Start Log Here
+                                        </a>
+                                    </li>
+                                    <li  class="has-marker">
+                                        <a href="#"  class="log-smart-sync auto-hide-menu" data-toggle="tooltip" title="Set the marked position to here...">
+                                            <span class="glyphicon glyphicon-object-align-left"></span> Smart Sync<span class="pull-right">&#x2325;M</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" title="Enter a time offset">
+                        <div class="log-sync-expanded">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default log-sync-here">Start log here</button>
+                                <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                            </div>
+                            <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" title="Enter a time offset">
+                        </div>
                     </div>
                 </div>
             </li>

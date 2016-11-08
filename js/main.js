@@ -802,7 +802,11 @@ function BlackboxLogViewer() {
     $(document).ready(function() {
 
         $('[data-toggle="tooltip"]').tooltip({trigger: "hover", placement: "auto bottom"}); // initialise tooltips
-        
+        $('[data-toggle="dropdown"]').dropdown(); // initialise menus
+        $('a.auto-hide-menu').click(function() {
+            var test = $(this).closest('.dropdown').children().first().dropdown("toggle");
+        });
+
         // Get Latest Version Information
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
         $(".viewer-version", statusBar).text('v'+VIEWER_VERSION);
@@ -928,10 +932,9 @@ function BlackboxLogViewer() {
             */
         });
        
-        $(".view-analyser-sticks").click(function() {
-            hasAnalyserSticks = !hasAnalyserSticks;
-            html.toggleClass("has-analyser-sticks", hasAnalyserSticks);
-            prefs.set('hasAnalyserSticks', hasAnalyserSticks);
+        $(".view-config").click(function() {
+            showValueTable(false); // hide the table
+            showConfigFile();
         });
 
         $(".view-analyser").click(function() {
@@ -1049,7 +1052,22 @@ function BlackboxLogViewer() {
             setVideoOffset(videoOffset + 1 / 15, true);
         };
         $(".log-sync-forward").click(logSyncForward);
-    
+
+        var logSmartSync = function() {
+            if (hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
+                try {
+                    setVideoOffset(videoOffset + (stringTimetoMsec($(".marker-offset", statusBar).text()) / 1000000), true);
+                } catch (e) {
+                    console.log('Failed to set video offset');
+                }
+            }
+            setMarker(!hasMarker);
+            $(".marker-offset", statusBar).css('visibility', (hasMarker)?'visible':'hidden');
+            invalidateGraph();
+        };
+        $(".log-smart-sync").click(logSmartSync);
+
+
         $(".video-offset").change(function() {
             var offset = parseFloat($(".video-offset").val());
             
@@ -1515,6 +1533,9 @@ function BlackboxLogViewer() {
         });
 
         $(document).keydown(function(e) {
+            // Pressing any key hides dropdown menus
+            //$(".dropdown-toggle").dropdown("toggle");
+
             var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
             if(e.which === 13 && e.target.type === 'text' && $(e.target).parents('.modal').length == 0) {
                 // pressing return on a text field clears the focus.
@@ -1545,20 +1566,14 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
                     case "M".charCodeAt(0): 
-                        if (e.altKey && hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
-                          try{
-                            setVideoOffset(videoOffset + (stringTimetoMsec($(".marker-offset", statusBar).text()) / 1000000), true);  
-                          } catch(e) {
-                             console.log('Failed to set video offset');
-                          }
+                        if (e.altKey) { // adjust the video sync offset and remove marker
+                          logSmartSync();
                         } else { // Add a marker to graph window
                             markerTime = currentBlackboxTime;
-                            $(".marker-offset", statusBar).text('Marker Offset ' + formatTime(0) + 'ms');
-                            
+                            setMarker(!hasMarker);
+                            $(".marker-offset", statusBar).text('Marker Offset ' + formatTime(0) + 'ms').css('visibility', (hasMarker)?'visible':'hidden');
+                            invalidateGraph();
                         }                        
-                        setMarker(!hasMarker);
-                        $(".marker-offset", statusBar).css('visibility', (hasMarker)?'visible':'hidden');
-                        invalidateGraph();
                         e.preventDefault();
                     break;
 
@@ -1569,6 +1584,26 @@ function BlackboxLogViewer() {
                             e.preventDefault();
                         }
                     break;
+
+                    case "A".charCodeAt(0):
+                        if(!(shifted)) {
+                            if(activeGraphConfig.selectedFieldName != null) {
+                                hasAnalyser = !hasAnalyser;
+                            } else hasAnalyser = false;
+                            graph.setDrawAnalyser(hasAnalyser);
+                            html.toggleClass("has-analyser", hasAnalyser);
+                            prefs.set('hasAnalyser', hasAnalyser);
+                            invalidateGraph();
+                            e.preventDefault();
+                        } else { // Maximize
+                            if(hasAnalyser) {
+                                hasAnalyserFullscreen = !hasAnalyserFullscreen;
+                            } else hasAnalyserFullscreen = false;
+                            (hasAnalyserFullscreen)?html.addClass("has-analyser-fullscreen"):html.removeClass("has-analyser-fullscreen");
+                            graph.setAnalyser(hasAnalyserFullscreen);
+                            invalidateGraph();
+                        }
+                        break;
 
                     case "H".charCodeAt(0):
                         if(!(shifted)) {

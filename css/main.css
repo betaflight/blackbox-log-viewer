@@ -58,6 +58,61 @@ html, body {
     }
 }
 
+/* toolbar expansion */
+
+@media (max-width: 1200px) {
+    html.has-video .playback-rate-expanded,
+    html.has-video .graph-zoom-expanded,
+    html.has-video .log-sync-expanded {
+        display: none !important;
+    }
+}
+@media (min-width: 1200px) {
+    html.has-video .playback-menu,
+    html.has-video .zoom-menu,
+    html.has-video .sync-menu
+        {display: none!important;}
+}
+
+@media (max-width: 800px) {
+    html:not(.has-video) .playback-rate-expanded,
+    html:not(.has-video) .graph-zoom-expanded,
+    html:not(.has-video) .log-sync-expanded {
+        display: none !important;
+    }
+}
+@media (min-width: 800px) {
+    html:not(.has-video) .playback-menu,
+    html:not(.has-video) .zoom-menu,
+    html:not(.has-video) .sync-menu
+        {display: none!important;}
+}
+
+@media (max-width: 900px) {
+    /* hidden depending upon screen size */
+    html:not(.has-video) .log-chart-time-panel
+        { display: none!important;}
+}
+
+@media (max-width: 1300px) {
+    /* hidden depending upon screen size */
+    html.has-video .log-chart-time-panel
+        { display: none!important;}
+}
+
+@media (max-width: 1200px) {
+    /* hidden depending upon screen size */
+    html:not(.has-video) .view-buttons-expanded
+    { display: none!important;}
+}
+
+@media (max-width: 1540px) {
+    /* hidden depending upon screen size */
+    html.has-video .view-buttons-expanded
+    { display: none!important;}
+}
+
+
 .welcome-pane, .main-pane {
     position: fixed;
     top: 15px;
@@ -444,7 +499,7 @@ html.has-table-overlay .log-field-values {
     font-size: small;
     background-color: white;
     border: black;
-    z-index: 10;
+    /*z-index: 10;*/
     bottom: 80px;
     overflow-y: auto;
     border-style: solid;
@@ -480,7 +535,7 @@ html.has-config .configuration-file {
     padding: 9px;
     background-color: white;
     border: black;
-    z-index: 10;
+    /* z-index: 10; */
     bottom: 80px;
     overflow-y: hidden;
     border-style: solid;
@@ -576,7 +631,7 @@ html.has-analyser .view-analyser-fullscreen {
      visibility:inherit;
 }
 
-html:not(has-analyser) .view-analyser-fullscreen {
+html:not(.has-analyser) .view-analyser-fullscreen {
      visibility:hidden;
 }
 
@@ -584,11 +639,12 @@ html:not(has-analyser) .view-analyser-fullscreen {
     display:inline-block;
     margin-right: 17px;
     vertical-align: top;
+    height: 80px;
 }
 
 html.has-log .video-top-controls > li.log-view-panel, html.has-log .video-top-controls > li.log-chart-zoom-panel, html.has-log .video-top-controls > li.log-chart-time-panel {
     display: inline-block;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
 }
 
 .video-top-controls > li.log-view-panel, .video-top-controls > li.log-chart-zoom-panel, .video-top-controls > li.log-chart-time-panel {
@@ -649,7 +705,7 @@ html.has-log:not(.is-fullscreen).has-table .log-field-values {
 }
 
 .nowrap {
-	overflow-y: hidden;
+	/* overflow-y: hidden; */
 	/* width: 40px; */
 	/* white-space: nowrap; */
 }
@@ -697,7 +753,16 @@ html.video-hidden video {
 }
 
 html:not(.has-video) .view-video {
-	visibility:hidden
+    visibility:hidden;
+}
+
+html:not(.has-video) a.view-video,
+html:not(.has-config) a.view-config,
+html:not(.has-analyser) a.view-analyser,
+html:not(.has-analyser) a.view-analyser-fullscreen,
+html:not(.has-analyser) li.has-analyser,
+html:not(.has-marker) li.has-marker {
+    display:none;
 }
 
 html.has-log .main-pane,
