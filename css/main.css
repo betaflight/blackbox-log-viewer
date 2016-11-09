@@ -417,6 +417,12 @@ html.has-analyser #analyserCanvas {
 	display:block;
 }
 
+html:not(.has-smoothing-override) span.has-smoothing-override,
+html:not(.has-expo-override) span.has-expo-override,
+html:not(.has-grid-override) span.has-grid-override {
+    visibility:hidden!important;
+}
+
 html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
 }

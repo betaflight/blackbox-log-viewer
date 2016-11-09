@@ -964,6 +964,18 @@ function BlackboxLogViewer() {
             zoomOut();
         });
 
+        $(".toggle-smoothing").click(function () {
+            toggleOverrideStatus('graphSmoothOverride', 'has-smoothing-override');
+        });
+
+        $(".toggle-expo").click(function () {
+            toggleOverrideStatus('graphExpoOverride', 'has-expo-override');
+        });
+
+        $(".toggle-grid").click(function () {
+            toggleOverrideStatus('graphGridOverride', 'has-grid-override');
+        });
+
         var logJumpBack = function(fast, slow) {
             var scrollTime  = SMALL_JUMP_TIME;
             if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):scrollTime;
@@ -1462,6 +1474,23 @@ function BlackboxLogViewer() {
             return false; // nothing was changed
         }
 
+        function updateOverrideStatus() {
+            // Update override status flags on status bar
+            var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') +
+                ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
+                ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
+            $(".overrides", statusBar).text(overrideStatus);
+        }
+
+        function toggleOverrideStatus(userSetting, className) {
+            userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
+            html.toggleClass(className, userSettings[userSetting]);
+            graph.refreshOptions(userSettings);
+            graph.refreshGraphConfig();
+            invalidateGraph();
+            updateOverrideStatus();
+        }
+
         
         $('.log-graph-legend').on("mousedown", function(e) {
 
@@ -1699,17 +1728,8 @@ function BlackboxLogViewer() {
 
                     case "S".charCodeAt(0): // S key to toggle between last graph smooth and none
                         try {
-                            if(!(shifted)) { 
-                                userSettings.graphSmoothOverride = !userSettings.graphSmoothOverride; // toggle current setting
-                                graph.refreshOptions(userSettings);
-                                graph.refreshGraphConfig();
-                                invalidateGraph();
-                                // Update smoothing status flags on status bar
-                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $(".overrides", statusBar).text(overrideStatus);
-
+                            if(!(shifted)) {
+                                toggleOverrideStatus('graphSmoothOverride', 'has-smoothing-override' );
                                 e.preventDefault();
                             }
                         } catch(e) {
@@ -1720,16 +1740,8 @@ function BlackboxLogViewer() {
 
                     case "X".charCodeAt(0): // S key to toggle between last graph smooth and none
                         try {
-                            if(!(shifted)) { 
-                                userSettings.graphExpoOverride = !userSettings.graphExpoOverride; // toggle current setting
-                                graph.refreshOptions(userSettings);
-                                graph.refreshGraphConfig();
-                                invalidateGraph();
-                                // Update smoothing status flags on status bar
-                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $(".overrides", statusBar).text(overrideStatus);
+                            if(!(shifted)) {
+                                toggleOverrideStatus('graphExpoOverride', 'has-expo-override' );
                                 e.preventDefault();
                             }
                         } catch(e) {
@@ -1741,16 +1753,7 @@ function BlackboxLogViewer() {
                     case "G".charCodeAt(0): // S key to toggle between last graph smooth and none
                         try {
                             if(!(shifted)) { 
-                                userSettings.graphGridOverride = !userSettings.graphGridOverride; // toggle current setting
-                                graph.refreshOptions(userSettings);
-                                graph.refreshGraphConfig();
-                                invalidateGraph();
-                                // Update smoothing status flags on status bar
-                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $(".overrides", statusBar).text(overrideStatus);
-
+                                toggleOverrideStatus('graphGridOverride', 'has-grid-override' );
                                 e.preventDefault();
                             }
                         } catch(e) {
