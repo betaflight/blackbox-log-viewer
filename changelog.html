@@ -245,6 +245,45 @@
         <li>Marker/Measure mode (M key) will now show the time difference directly on the graph when you scroll; also the calculated frequency is displayed to quickly measure noise (for example).</li>
         <li>Log controls now locked to the top of the display so they are visible even if you scroll down the page.</li>
         <li>The multiple log selection and dropdown is now shown in the graph legend for easier selection. (and to prevent it being hidden on lower resolution displays).</li>
+        <li>Selecting [all] fields in graph config will cyclically assign alternate colors to fields (starting with the selected color)</li>
+        <li>When entering filters on configuration file, the updating list would generate errors if the grep statement was invalid. (could only be seen in developer mode).</li>
+        <li>Video export now fixed (still no sound though :-( ); also if you hide an item on the graph display (hide the craft for example), then it will also be hidden on exported video.</li>
+        <li>Cleanup hide/display of popup table (key 'T'); originally if the table was hidden and you popped up the overlay, when you hid the table again, it would show at the bottom of the page; now it will return to its originally selected state.</li>
+        <li>You can load 2 configuration dump files; if you load a second one with the the word 'default' in its filename (e.g. Betaflight V2.7.2 Default.txt) then this file will be used as a baseline for the first loaded file; all differences between the two files will be highlighted in red. Also, once a "default" file is loaded, it will be cached and autoloaded next time you open up the log viewer; thus you only have to re-load the "default" file if and when the default values are changed.</li>
+        <li>Header and Scaling now Betaflight v2.8.0 compliant; will auto-detect version from log file and scale accordingly.</li>
+        <li>Analyser Crash fix for crash that occurs if switching between many logs repeatedly (more than 6 times per session).</li>
+        <li>Code improvements for operation in Linux.</li>
+        <li>Additional User Settings Dialog for custom motor mixes (for those not running a standard X quad). Note that this setting only affects the craft overlay icon that is displayed. Deselecting "Custom" will display craft the traditional way (this is the default, you only need to change it if you are running a special motor configuration).</li>
+        <li>When using the Marker function (M), the time offset from the marker also shows the frequency in Hz (so if you mark the peak of a wave, then scroll to the next peak, you can quickly see the frequency of the wave). Quickly identify the frequency of your noisy gyro's.</li>
+        <li>Shortcut key 'T' will toggle the field value table as an overlay; no need to keep scrolling down to look at the values; the table is still dynamic and will update if the the log is scrolled, played...</li>
+        <li>Users can select their own colors for the graph fields on the graph configuration dialog. Colors are workspace aware and can be set on a per workspace.</li>
+        <li>FOCUS, selecting the graph title on the legend will hide the other graphs leaving only the selected one displayed; selecting the title again will put them back.</li>
+        <li>The log filename is now in the header and the header is fixed so that it doesn't scroll off the top of the display.</li>
+        <li>The filter settings from the header are shown on the analyser screen for reference</li>
+        <li>Configurable relative graph heights.</li>
+        <li>Workspace Export and Load feature. (New Export button for workspaces shown on page header creates a file "workspaces.json" in your downloads folder, these can be renamed to whatever but MUST have the extension .json). To re-load saved workspaces from file, use the standard open log file/video to select the archived file.</li>
+        <li>Configuration Dump text file load and view; it is now possible to open up a "dump" file for the flight controller configuration. This has to be a text file, with extension .TXT and must include the "# dump" line near the top of the file for the viewer to recognise it as a configuration file (rather than a normal LOG.txt file). Simply copy the CLI dump output to a text file and save it as "something.txt". Use the standard open log file/video button to open the file. The name of the loaded file is shown on the status bar (bottom right). To view it, either click the name in the status bar or press key 'C' (pressing C repeatedly will toggle the display). The view is scrollable and there is a filter search feature if your looking for a particular entry.</li>
+        <li>Added new status bar feature.</li>
+        <li>Minor changes to tidy up log header to match released version of Betaflight v2.7.0.</li>
+        <li>Noticed that the Smart Sync combination M and ALT M only worked if you dragged the graph in the positive direction only. This is now fixed so that you can sync backwards and forwards of the marked point.</li>
+        <li>Also moved the header and keyboard shortcut buttons off the legend and up into the view toolbar to maximise space for the legend.</li>
+        <li>New dialog box added to review extra log header data;</li>
+        <li>Added Keyboard Shortcut Pop-up dialog.</li>
+        <li>Added ability to maximise the analyser window.</li>
+        <li>Added bookmarks</li>
+        <li>Legend now shows values</li>
+        <li>New icon alongside legend fields to show that they can be clicked.</li>
+        <li>New View toolbar to allow user to hide/view overlays. (table, craft and sticks).</li>
+        <li>The graph smoothing, expo and scale automatically match the original log viewer settings when first adding the graph field to the chart; you can, of course, change these on the dialog to what you want, but at least you now know what the defaults were in the original log viewer.</li>
+        <li>Bug fix the 'Log Setup' dialog so that the log file does not have to be re-loaded after changing the settings.</li>
+        <li>Fixed bug where the Anaylser would cause a crash after loading a log file 6 times.</li>
+        <li>Fixed Issue #6.</li>
+        <li>Added user configurable time to main chart window; user can now enter the desired log time to view directly without the need to scroll.</li>
+        <li>Added measure mode to graph; pressing 'M' will put a marker on the graph; then the difference between the current time and the marker is displayed in the toolbar. Pressing 'M' again removes the marker.</li>
+        <li>Easy log/video sync, press 'M' on the log to mark an event (start of flip or roll), then scroll until the first video frame that shows the event (video frame shows start of corresponding roll or flip). Now press [Alt]M to move the log/video sync to this point. 8 New Feature : Workspaces;</li>
+        <li>Shortcut Keys Added</li>
+        <li>Mouse Wheel Controls Added</li>
+        <li>Custom Field Smoothing, Expo and Zoom</li>
     </ul>
 
     </div>
