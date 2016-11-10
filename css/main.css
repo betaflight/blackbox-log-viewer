@@ -1219,3 +1219,62 @@ div#lap-timer td:first-child {
     border: 2px;
     border-radius: 3px;
 }
+
+/* changelog block */
+#changelog {
+    width: 700px;
+    height: 100%;
+    position: fixed;
+    right: -695px;
+    top: 0px;
+}
+
+#changelog .wrapper {
+    height: 100%;
+    padding: 0 0;
+    border-left: 5px solid #ffbb00;
+    overflow: hidden;
+    display: none;
+}
+
+#changelog .button {
+    transform: rotate(270deg);
+    top: 50px;
+    right: 665px;
+    position: absolute;
+    background: #ffbb00;
+    border-radius: 5px 5px 0 0;
+    border-bottom: none;
+    height: 30px;
+}
+
+#changelog .button a {
+    display: block;
+    padding: 5px 10px;
+    width: 90px;
+    text-align: center;
+    color: #000;
+}
+
+#changelog .title {
+    margin: 20px 0;
+    font-size: 16px;
+}
+
+html.log_open #changelog {
+    right: 0px;
+    background: white;
+}
+
+html.log_open #changelog .wrapper {
+    display: block;
+}
+
+/* changelog content */
+#changelog iframe {
+    border: 1px;
+    width: calc(100% - 20px);
+    border-style: solid;
+    height: calc(100% - 20px);
+    margin: 10px 10px 10px 10px;
+}

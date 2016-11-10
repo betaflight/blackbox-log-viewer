@@ -976,6 +976,23 @@ function BlackboxLogViewer() {
             toggleOverrideStatus('graphGridOverride', 'has-grid-override');
         });
 
+        /** changelog trigger **/
+        $("#changelog_toggle").on('click', function() {
+            var state = $(this).data('state2');
+            if (state) { // log closed
+                $("#changelog").animate({right: -695}, 200, function () {
+                    html.removeClass('log_open');
+                });
+                state = false;
+            } else { // log open
+                $("#changelog").animate({right: 0}, 200);
+                html.addClass('log_open');
+                state = true;
+            }
+            $(this).text(state ? 'Close' : 'Changelog');
+            $(this).data('state2', state);
+        });
+
         var logJumpBack = function(fast, slow) {
             var scrollTime  = SMALL_JUMP_TIME;
             if(fast!=null) scrollTime = (fast!=0)?(graph.getWindowWidthTime() * fast):scrollTime;

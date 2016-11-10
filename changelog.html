@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="no-js isBF">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Betaflight - Blackbox Explorer Changelog</title>
+    <link rel="icon" type="image/png" href="images/icon-128.png">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <style>
+        .log {
+            line-height: 17px;
+            padding: 3px;
+        }
+        .log span {
+            display: block;
+            font-weight: bold;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .log ul {
+            margin: 5px 0 20px 10px;
+        }
+        .log li {
+            font-weight: normal;
+            margin-bottom: 5px;
+        }
+        .log p {
+            margin-bottom: 20px;
+        }
+        .notes {
+            padding-left: 30px;
+            padding-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="log">
+    <h2> 2.5.8 - Minor Bug Fixes and UI layout</h2>
+
+    <p>Some fixes in response to user observations.</p>
+
+    <ul>
+        <li>Bump version to v2.5.8</li>
+        <li>Compatibility with Version 3.1.0 of Betaflight</li>
+        <li>Fix to Analyser display going blank for users using logging to onboard flash memory.</li>
+        <li>Always start with the values table hidden; pressing key 'T' will toggle the table; pressing the toolbar button will put it back at the bottom of the graph.</li>
+        <li>Fix Issue #36; viewer was not parsing version number correctly for filter scaling. Refactored functions to use library semver.</li>
+        <li>UI Overhall; improved handling for smaller screens.</li>
+        <li>Changelog added to Welcome screen</li>
+    </ul>
+
+    <h2> 2.5.7 - Minor Bug Fixes and Feature Improvements</h2>
+    <ul>
+
+        <li>Correct case on Mode_x.png icons to prevent file not found on user settings dialog.</li>
+        <li>Update of video export vendor function from cleanflight/master; many thanks to @thenickdude. This is for users experiencing difficulties (linux?) generating video exports. Issue #30.</li>
+        <li>Added filename extension .BFL to auto-detect large log files; thanks to @mikeller</li>
+        <li>Mousewheel controls update as per feature request #31;</li>
+        <li>Add remove all button to graph config dialog #34; this is a port of the original viewer feature added by StewLG.</li>
+        <li>Added new log header parameters for second gyro notch filter.</li>
+        <li>Removed x100 frequency scaling for BF 3.0.1 to keep in sync with latest BF</li>
+        <li>Minor HTML code tidy-up for header dialog.</li>
+        <li>Add user setting to invert yaw on stick display. Off is normal; On is inverted.</li>
+        <li>Add user setting to apply hanning window to analyser FFT.</li>
+        <li>Add snap points to analyser zoom bars; to make it easier to get back to zoom level x1</li>
+        <li>Scale the colour gradient based upon zoom level so that zooming the fft doesn't push the bars into the red.</li>
+        <li>Improve graph background, add transparent gradient for better contrast.</li>
+
+    </ul>
+    <div class="notes">
+    <h3>Notes</h3>
+
+    <h4>Log file extension</h4>
+
+    <p>BB Viewer attempts to determine the file type you are opening by examining the file extension first. Where no file extension is used in the name,
+        then BB Viewer will guess the type of file; which is usually fine for small log files (<10MB). </p>
+        <p>For log files larger than 10MB, then BB Viewer guesses they are video files and tries to load it (and fails because it is not a video)</p>
+        <p>So as a tip, it's best to use a file extension when you save your logs.</p>
+        <p>The file extensions that are automatically recognised are: -</p>
+    <ul>
+        <li>.TXT, .CFL, .BFL and .LOG as log files,</li>
+        <li>.AVI, .MOV, .MP4, .MPEG as video files,</li>
+        <li>.JSON as workspace backups</li>
+    </ul>
+
+    <p>If it is not one of those extensions, it takes a guess on the type by file size (if file-size < 10MB then Log file else its a video);</p>
+
+    <h4>Mousewheel Improvements</h4>
+    <p>
+        As you are probably already aware, scrolling the mouse wheel whilst the mouse pointer is over the graph will move the timeline forwards and backwards: -
+    <ul>
+        <li> Scrolling moves the timeline,</li>
+        <li>Scrolling whilst holding the SHIFT key, zooms the timeline</li>
+        <li>Scrolling whilst holding the ALY key, speeds up the zooming of the timeline.</li>
+    </ul>
+        <p>But now, thanks to suggestions from Joshua Bardwell, the mouse wheel functionality has been extended...
+            With the mouse pointer over a field in the graph legend...</p>
+     <ul>
+        <li>Scrolling will dynamically adjust the SMOOTHING for the field.</li>
+        <li>Scrolling whilst holding the SHIFT key,adjusts the ZOOM for the field</li>
+        <li>Scrolling whilst holding the ALT key, adjusts the EXPO for the field.</li>
+    </ul>
+
+    <p>With the mouse pointer over the field group heading and then scrolling the mouse-wheel will adjust all fields within the group at the same time.</p>
+    <p>Finally, if you "click" the middle mouse button, then the dynamic settings go back to the values you first set in the graph config dialog when
+        choosing the fields. Again, clicking on a single field will reset just that field, clicking on the group header will reset all pens within the group.</p>
+    <p>So it is no longer necessary to keep going into the graph config dialog to adjust the values; just use the mouse wheel...</p>
+    <p>The smoothing, zooming and expo dynamic changing above do not affect workspaces so you can always go back to your preferred settings by re-selecting the workspace.</p>
+
+    <p>You will also notice now that to scroll the whole page using the mouse-wheel, you must move the pointer off both the graph and legend areas
+        (e.g move the pointer to the toolbar area and then scroll the wheel.</p>
+    <h4>Grids</h4>
+    <p>
+        <ul>
+        <li>TIP 1: It is easier to see the effect of the zooming and expo adjustment if the graph has the grid displayed... to display a grid for a field,
+            then ALT left-click a field and the grid will be shown for that field.</li>
+        <li>TIP 2: After you have selected a grid to display (using TIP 1); pressing the 'G' key will quickly toggle the grid on/off.</li>
+        </ul>
+    </p>
+    </div>
+
+    <h2>2.5.6 - Some minor field name relabelling.</h2>
+    <ul>
+        <li>Version updated to 2.5.6</li>
+        <li>rcCommands[] fields re-labelled as setpointRate[] fields to reflect their actual use as the setpoints into the PID controllers.</li>
+        <li>debug[] fields for debug mode "NOTCH" corrected to gyro_preNotch[] as per revision in RC14.</li>
+    </ul>
+
+    <h2>2.5.5 - Minor code cleanups and re-scaling of rate calculations (for Betaflight v3.0.0 RC12).</h2>
+
+    <ul>
+        <li>Version updated to 2.5.5</li>
+        <li>Fixed #27 selecting rcCommand[all] will now scale pens individually.</li>
+        <li>Updated rate calculation to match new rates in Betaflight v3.0.0 RC12.</li>
+        <li>Updated Analyser window start/end times to allow for logs that start after or cross over the 5 min boundary (for those logging using a switch).</li>
+        <li>Corrected Log Sync Forward/Backwards buttons (thanks Joshua Bardwell for finding that one); the graph window now updates immediately after button is pressed.</li>
+        <li>Removed Obsolete parameters from header.</li>
+    </ul>
+
+    <h2>2.5.4 - Mainly User Interface Tweaks.</h2>
+
+    <ul>
+        <li>Version number updated to 2.5.4</li>
+        <li>Zoom Sliders attached to analyser window rather than graph window. See Issue #23</li>
+        <li>Tooltips adjusted for better readability (changed colour and position); Window scrollbars corrected when run as Chrome App #18, #19 and #20.</li>
+        <li>Added Icon and page title for users running in a browser window.</li>
+        <li>Increased the size of the analyser window filter text when shown in fullscreen mode.</li>
+    </ul>
+
+    <h2>2.5.3 - Patch Update for Notch Filter Widths</h2>
+
+    <ul>
+        <li>Version number increased to 2.5.3</li>
+        <li>Patch to correct the notch filter widths displayed on the analyser window. Range is now only visible when the cutoff frequency is above 0.</li>
+    </ul>
+
+    <h2>2.5.2 - Minor Bug Fixes and Analyser Tweaks</h2>
+    <p>Some fixes and modifications resulting from user suggestions.</p>
+
+    <ul>
+        <li>Version number increased to 2.5.2</li>
+        <li>Bugfix #13 ; changing log file with analyser maximised causes analyser to shrink back to normal size but doesn't update the button on the tool banner.</li>
+        <li>Added scooter to analyser display window; holding SHIFT key whilst moving mouse over analyser window will show the frequency under the mouse. Suggestion #14.</li>
+        <li>Hide frequency labels for unused filters (e.g. if gyro_notch_hz is set to 0 (un-used) then don't show line for it on analyser window (de-clutter the window).</li>
+        <li>Hide frequency parameter labels for Dterm when analysing a Yaw field (as there is no D) and visa versa, only display Yaw LPF frequency parameter when on Yaw fields.</li>
+        <li>Notch filter lines on analyser window show the width of the notch from center to +/- cut-off frequency.</li>
+        <li>User can now choose part of log to analyse if they don't want to examine whole log (which is the default). Mark the start of the analyser window using key 'I' and the end of the analyser using key 'O' (for In/Out). Analysed portion of the log is highlighted in the same way as video export feature.</li>
+        <li>Some spelling corrections.</li>
+        <li>Added independent zoom controls to analyser window (when in fullscreen mode). Can now zoom in the frequency range so that you can ignore higher frequencies.</li>
+        <li>Amended tooltip default behaviour to "hover" only; to prevent tooltips sticking 'on' the page.</li>
+    </ul>
+
+    <h2>2.5.1 - Header Updates and New Analyser</h2>
+
+    <p>This is a maintenance release.</p>
+
+    <ul>
+        <li>Updated version number.</li>
+        <li>Modified header dialog to include new header fields for Betaflight V3.0.0 RC6 (Notch filters/RC interpolation etc).</li>
+        <li>Status bar now shows gyro/pid/motor sync values (e.g. 250us 4k/2k/SYNCED or 250us 4k/4k/32k).</li>
+        <li>Accelerometer range extended from 3G to 16G to prevent graph clipping on high powered craft.</li>
+        <li>Thanks to Rav-Rav, a new enhanced analyser function has replaced the old dynamic one; this analyser is static but shows the noise for the whole log file in far greater detail.</li>
+        <li> When using Betaflight debug mode feature (from the cli), debug fields on the viewer will be shown with their relevant field name, range and scaling; the debug_mode is logged in the header too (BF3.0.0 and later).</li>
+    </ul>
+
+    <h2>2.5.0 - Grids, INAV Header Support and Stick Trails.</h2>
+
+    <p>New Features</p>
+
+    <b>Now also available in chrome store!</b>
+
+    <p>Some New Features and minor code cleanups</p>
+
+    <ul>
+        <li>Added grid's to chart backgrounds;</li>
+        <li>Added Shortcut key 'G' to toggle the grids On, Off globally.</li>
+        <li>Thanks to DzikuVx; INAV header's can be displayed in viewer.</li>
+        <li>Added INAV logo and blue theme to header buttons, graph config dialog. (Theme is Green for Cleanflight, Orange for Betaflight and Blue for INAV).</li>
+        <li>Gyro chart range increased to +/-2000deg/s was a minor calculation error that limited the gyro chart to approx +/-1500deg/s</li>
+        <li>Header update for Betaflight v3.0; added fields gyro_notch_hz, gyro_notch_q, rc_smooth_interval and "Craft name"</li>
+        <li>Craft Name is now shown on status bar (if entered in CLI) and also at top of header dialog (Betaflight v3.0 only).</li>
+        <li>PID Contoller type names on header updated for Betaflight v3.0.</li>
+        <li>Stick Trails; This feature can be turned on from the User Settings dialog, will show a phosphor trail on the stick display that shows the movement of the sticks for the last 500ms.</li>
+        <li>Add tooltips to primary logger controls.</li>
+        <li>Thanks to BorisB, Added New Event names for Betaflight Twitch Testing mode.</li>
+        <li>Added new version information to welcome page; A new button is available to download the the latest official release.</li>
+    </ul>
+
+    <div class="notes">
+        <h3>Notes on Grid Background</h3>
+
+        <p>By default, no grids are shown on the graphs.</p>
+
+        <p>To add a grid background to the chart, 'ALT' Click the graph field name that you want the grid to show for.</p>
+        <p>To select another field to show the grid for, 'ALT' click another field.</p>
+        <p>To remove the grid, 'ALT' click the field again (it is a toggle).</p>
+        <p>Grid settings are workspace aware, so you can have different configurations for each workspace. (Just save the workspace after you have setup the grid display).</p>
+
+        <p>With grids shown, pressing the 'G' key will toggle the grid display on/off globally so that you can quickly hide the grid.</p>
+
+        <p>The lines on the grid represent 100ms time slots and each horizontal gridline represents 20% of the range of the signal. It makes it easier to see how the expo setting for the graph emphasises the centre section of the graph.</p>
+    </div>
+
+    <h2>Other Changes prior to 2.5.0</h2>
+
+    <ul>
+        <li>Adjustable Line Widths</li>
+        <li>Single frame scrolling (Hold ALT key whilst using cursor left and right)</li>
+        <li>Drag/Drop re-ordering of graphs on the chart (works in the graph configuration dialog too).</li>
+        <li>New shortcut keys 'S' and 'X' to toggle on/off all smoothing and expo on the chart.</li>
+        <li>New Watermark feature to add your own logo to exported video's or live-streams.</li>
+        <li>New Lap Time feature to add timing information to your exported video's.</li>
+        <li>Complete Change Summary</li>
+        <li>Custom Stick Configurations for those that fly mode 1; stick display will now show correctly.</li>
+        <li>General Cosmetic Changes;</li>
+        <li>Betaflight and Cleanflight logos displayed on header bar; autodetect log version to display correct logo.</li>
+        <li>Header popup window is disabled for Cleanflight users (as the information is not held in the log file yet).</li>
+        <li>New links on the welcome screen and title has been changed to the Enhanced Blackbox Explorer to distinguish it from the standard viewer.</li>
+        <li>Advanced User Dialog Box to allow user to adjust size and position of the overlay icons (craft, sticks and analyser view)</li>
+        <li>User configurable stick display,can now display the sticks with throttle % and roll,pitch,yaw in deg/s</li>
+        <li>Marker/Measure mode (M key) will now show the time difference directly on the graph when you scroll; also the calculated frequency is displayed to quickly measure noise (for example).</li>
+        <li>Log controls now locked to the top of the display so they are visible even if you scroll down the page.</li>
+        <li>The multiple log selection and dropdown is now shown in the graph legend for easier selection. (and to prevent it being hidden on lower resolution displays).</li>
+    </ul>
+
+    </div>
+</body>
