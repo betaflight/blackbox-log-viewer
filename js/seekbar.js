@@ -5,7 +5,7 @@ function SeekBar(canvas) {
         that = this,
         
         //Times:
-        min, max, current,
+        min, max, current, currentWindow = 0,
         
         //Activity to display on bar:
         activityStrength, activityTime,
@@ -33,10 +33,11 @@ function SeekBar(canvas) {
         OUTSIDE_EXPORT_RANGE_STYLE = 'rgba(100, 100, 100, 0.5)',
         
         // Suggested to be the same as that used by the graph's center mark in order to tie them together
-        CURSOR_STYLE = 'rgba(255, 64, 64, 0.75)',
-        
+        CURSOR_STYLE        = 'rgba(255, 64, 64, 0.75)',
+        CURSOR_STYLE_WINDOW = 'rgba(255, 65, 64, 0.15)',
+
         //Current time cursor:
-        CURSOR_WIDTH = 2.5,
+        CURSOR_WIDTH = 1,
         
         // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
         BAR_INSET = CURSOR_WIDTH;
@@ -133,7 +134,11 @@ function SeekBar(canvas) {
     this.setCurrentTime = function(newTime) {
         current = newTime;
     };
-    
+
+    this.setWindow = function(newTime) {
+        currentWindow = newTime;
+    };
+
     function rebuildBackground() {
         var 
             x, activityIndex, activity,
@@ -239,15 +244,29 @@ function SeekBar(canvas) {
         //Draw cursor
         var 
             pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2),
-            cursorX = (current - min) / pixelTimeStep + BAR_INSET;
+            cursorX = (current - min) / pixelTimeStep + BAR_INSET,
+            cursorWidth = 0;
+
+        if(currentWindow!=0) {
+            cursorWidth = (currentWindow/2) / pixelTimeStep;
+        }
 
         canvasContext.fillStyle = CURSOR_STYLE;
-        canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
-        
+        if(cursorWidth < CURSOR_WIDTH) {
+            cursorWidth = CURSOR_WIDTH;
+            canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
+        } else {
+            canvasContext.fillRect(cursorX - CURSOR_WIDTH, 0, CURSOR_WIDTH * 2, canvas.height);
+
+            canvasContext.fillStyle = CURSOR_STYLE_WINDOW; // paint window
+            canvasContext.fillRect(cursorX - cursorWidth, 0, cursorWidth * 2, canvas.height);
+
+        }
+
         dirtyRegion = {
-            x: Math.max(Math.floor(cursorX - CURSOR_WIDTH - 1), 0),
+            x: Math.max(Math.floor(cursorX - cursorWidth - 1), 0),
             y: 0,
-            width: Math.ceil(CURSOR_WIDTH * 2 + 2),
+            width: Math.ceil(cursorWidth * 2 + 2),
             height: canvas.height
         };
     };

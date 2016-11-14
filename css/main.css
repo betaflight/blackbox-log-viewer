@@ -58,9 +58,67 @@ html, body {
     }
 }
 
+/* toolbar expansion */
+
+@media (max-width: 1200px) {
+    html.has-video .playback-rate-expanded,
+    html.has-video .graph-zoom-expanded,
+    html.has-video .log-sync-expanded {
+        display: none !important;
+    }
+}
+@media (min-width: 1201px) {
+    html.has-video .playback-menu,
+    html.has-video .zoom-menu,
+    html.has-video .sync-menu
+        {display: none!important;}
+}
+
+@media (max-width: 800px) {
+    html:not(.has-video) .playback-rate-expanded,
+    html:not(.has-video) .graph-zoom-expanded,
+    html:not(.has-video) .log-sync-expanded {
+        display: none !important;
+    }
+}
+@media (min-width: 801px) {
+    html:not(.has-video) .playback-menu,
+    html:not(.has-video) .zoom-menu,
+    html:not(.has-video) .sync-menu
+        {display: none!important;}
+}
+
+@media (max-width: 900px) {
+    /* hidden depending upon screen size */
+    html:not(.has-video) .log-chart-time-panel
+        { display: none!important;}
+}
+
+@media (max-width: 1300px) {
+    /* hidden depending upon screen size */
+    html.has-video .log-chart-time-panel
+        { display: none!important;}
+}
+
+@media (max-width: 1200px) {
+    /* hidden depending upon screen size */
+    html:not(.has-video) .view-buttons-expanded
+    { display: none!important;}
+}
+
+@media (max-width: 1540px) {
+    /* hidden depending upon screen size */
+    html.has-video .view-buttons-expanded
+    { display: none!important;}
+}
+
+
 .welcome-pane, .main-pane {
-    position:relative;
-    top:60px;
+    position: fixed;
+    top: 15px;
+    bottom: 100px;
+    left: 0;
+    right: 0;
 }
 
 .header-pane {
@@ -112,11 +170,11 @@ html:not(.has-log):not(.has-video) .header-pane {
     display:none;
 }
 
-/* Phone */
+/* Phone 
 .graph-row {
     height:300px;
 }
-
+*/
 #main-page {
     position: static;
     top: 60px;
@@ -125,19 +183,19 @@ html:not(.has-log):not(.has-video) .header-pane {
 /* Desktop */
 @media (min-height:580px) {
     .graph-row {
-        height:460px;
+        /* height:460px; */
     }
 }
 
 @media (min-height:720px) {
     .graph-row {
-        height:630px;
+        /* height: 630px; */
     }
 }
 
 .log-graph,
 .log-graph-config {
-    height:100%;
+    /* height:100%; */
 }
 
 
@@ -359,6 +417,12 @@ html.has-analyser #analyserCanvas {
 	display:block;
 }
 
+html:not(.has-smoothing-override) span.has-smoothing-override,
+html:not(.has-expo-override) span.has-expo-override,
+html:not(.has-grid-override) span.has-grid-override {
+    visibility:hidden!important;
+}
+
 html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
 }
@@ -405,8 +469,15 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
     width:15%;
 }
 
-.log-field-values td {
+.log-field-values td,
+.configuration-file li {
     font-family: monospace;
+    font-size: small;
+    margin-left: 10px;
+}
+
+.configuration-file li:nth-child(even) {
+    background-color: #EBF3F7;
 }
 
 .log-field-values .raw-value {
@@ -416,6 +487,8 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 .log-field-values table,
 .log-field-values h4 {
     background-color: #FFFFFF;
+    overflow-y: auto;
+    height: 20px;
 }
 
 .log-field-values tr:nth-child(even) {
@@ -424,16 +497,19 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 
 html.has-table-overlay .log-field-values {
     position: fixed;
-    top: 7%;
-    left: 10%;
-    width: 78.5%;
+    top: 134px;
+    left: 15px;
+    width: calc(100% - 30px);
     display:block;
-    padding-left:0;
-    padding-right:0;
-    font-size:xx-small;
+    padding: 9px;
+    font-size: small;
     background-color: white;
-    border: groove #337ab7;
-    z-index: 10;
+    border: black;
+    /*z-index: 10;*/
+    bottom: 80px;
+    overflow-y: auto;
+    border-style: solid;
+    border-width: 1px;
 }
 
 html:not(.has-config-overlay) .configuration-file,
@@ -459,19 +535,24 @@ html:not(.has-marker) .marker-offset {
 
 html.has-config .configuration-file {
     position: fixed;
-    top: 7%;
-    left: 10%;
-    width: 78.5%;
-    padding:10px;
+    top: 134px;
+    left: 15px;
+    width: calc(100% - 30px);
+    padding: 9px;
     background-color: white;
-    border: groove #337ab7;
-    z-index: 11;
+    border: black;
+    /* z-index: 10; */
+    bottom: 80px;
+    overflow-y: hidden;
+    border-style: solid;
+    border-width: 1px;
 }
 
 html.has-config .configuration-list {
     height:580px;
     overflow:hidden;
     overflow-y:scroll;
+    margin-top: 5px;
 }
 
 .graph-legend-field {
@@ -489,7 +570,10 @@ html.has-video .graph-row,
 html.has-log .graph-row {
     display:-webkit-flex;
     display:flex;
-    position: inherit;
+    position: fixed;
+    top: 60px;
+    width: calc(100% - 30px);
+    bottom: 140px;
 }
 
 html.has-video .log-graph {
@@ -553,7 +637,7 @@ html.has-analyser .view-analyser-fullscreen {
      visibility:inherit;
 }
 
-html:not(has-analyser) .view-analyser-fullscreen {
+html:not(.has-analyser) .view-analyser-fullscreen {
      visibility:hidden;
 }
 
@@ -561,10 +645,12 @@ html:not(has-analyser) .view-analyser-fullscreen {
     display:inline-block;
     margin-right: 17px;
     vertical-align: top;
+    height: 80px;
 }
 
 html.has-log .video-top-controls > li.log-view-panel, html.has-log .video-top-controls > li.log-chart-zoom-panel, html.has-log .video-top-controls > li.log-chart-time-panel {
     display: inline-block;
+    /* overflow-y: hidden; */
 }
 
 .video-top-controls > li.log-view-panel, .video-top-controls > li.log-chart-zoom-panel, .video-top-controls > li.log-chart-time-panel {
@@ -575,7 +661,7 @@ html.has-log .video-top-controls > li.log-view-panel, html.has-log .video-top-co
     display:none;
 }
 html.has-video.has-log .video-top-controls > .log-sync-panel {
-    display:inline-block;
+    display: inline-block;
 }
 html .video-jump-start,
 html .video-jump-end,
@@ -598,6 +684,10 @@ html.has-log .log-jump-end {
 html.has-video .log-seek-bar,
 html.has-log .log-seek-bar {
     display:block;
+    position: fixed;
+    bottom: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 html .graph-time-marker-group > .graph-time-marker {
@@ -620,6 +710,12 @@ html.has-log:not(.is-fullscreen).has-table .log-field-values {
     display:none;
 }
 
+.nowrap {
+	/* overflow-y: hidden; */
+	/* width: 40px; */
+	/* white-space: nowrap; */
+}
+
 html.has-video .video-top-controls,
 html.has-log .video-top-controls,
 html.has-video .log-graph,
@@ -636,12 +732,13 @@ html.has-log .video-top-controls {
 	padding-bottom:10px;
 	width: 100%;
 	min-width: 1390px;
+	white-space: nowrap;
+	height: 80px;
 }
 
 html.has-video .log-graph,
 html.has-log .log-graph,
 html.has-log .log-graph-config,
-html.has-log .log-seek-bar,
 html.has-log:not(.has-table-overlay) .log-field-values {
     position:relative;
     top: 60px;
@@ -662,7 +759,16 @@ html.video-hidden video {
 }
 
 html:not(.has-video) .view-video {
-	visibility:hidden
+    visibility:hidden;
+}
+
+html:not(.has-video) a.view-video,
+html:not(.has-config) a.view-config,
+html:not(.has-analyser) a.view-analyser,
+html:not(.has-analyser) a.view-analyser-fullscreen,
+html:not(.has-analyser) li.has-analyser,
+html:not(.has-marker) li.has-marker {
+    display:none;
 }
 
 html.has-log .main-pane,
@@ -770,7 +876,13 @@ html.isINAV .navbar-logo img {
 	color: antiquewhite;
 }
 
+html.has-video .navbar-static-top,
+html.has-log .navbar-static-top {
+    display:block;
+}
+
 .navbar-static-top {
+	display:none;
     position: fixed;
        width: 100%;
 }
@@ -1106,4 +1218,63 @@ div#lap-timer td:first-child {
     background-color: #363636;
     border: 2px;
     border-radius: 3px;
+}
+
+/* changelog block */
+#changelog {
+    width: 700px;
+    height: 100%;
+    position: fixed;
+    right: -695px;
+    top: 0px;
+}
+
+#changelog .wrapper {
+    height: 100%;
+    padding: 0 0;
+    border-left: 5px solid #ffbb00;
+    overflow: hidden;
+    display: none;
+}
+
+#changelog .button {
+    transform: rotate(270deg);
+    top: 50px;
+    right: 665px;
+    position: absolute;
+    background: #ffbb00;
+    border-radius: 5px 5px 0 0;
+    border-bottom: none;
+    height: 30px;
+}
+
+#changelog .button a {
+    display: block;
+    padding: 5px 10px;
+    width: 90px;
+    text-align: center;
+    color: #000;
+}
+
+#changelog .title {
+    margin: 20px 0;
+    font-size: 16px;
+}
+
+html.log_open #changelog {
+    right: 0px;
+    background: white;
+}
+
+html.log_open #changelog .wrapper {
+    display: block;
+}
+
+/* changelog content */
+#changelog iframe {
+    border: 1px;
+    width: calc(100% - 20px);
+    border-style: solid;
+    height: calc(100% - 20px);
+    margin: 10px 10px 10px 10px;
 }

@@ -130,9 +130,36 @@ function parseCommaSeparatedString(string, length) {
 }
 
 /**
+ * Browser Zoom Facilities
+**/
+var zoomLevels = [
+        0.25, 0.33, 0.50, 0.67, 0.75, 0.80, 0.90, 1.00, 1.10, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 4.00, 5.00
+    ];
+
+function zoomIn() {
+    var currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
+    for(var i=0; i<zoomLevels.length; i++) {
+        if(zoomLevels[i] > currentZoom) {
+            document.body.style.zoom = zoomLevels[i];
+            return;
+        }
+    }
+}
+
+function zoomOut() {
+    var currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
+    for(var i=zoomLevels.length-1; i>0; i--) {
+        if(zoomLevels[i] < currentZoom) {
+            document.body.style.zoom = zoomLevels[i];
+            return;
+        }
+    }
+}
+
+/**
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
  * of the next-smaller element (or 0 if `item` is smaller than all values in `list`).
- */
+ **/
 function binarySearchOrPrevious(list, item) {
     var
         min = 0,

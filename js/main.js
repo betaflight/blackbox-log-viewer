@@ -151,7 +151,7 @@ function BlackboxLogViewer() {
 
             var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
 
-            if(hasTable) { // Only redraw the table if it is enabled
+            if(hasTable || hasTableOverlay) { // Only redraw the table if it is enabled
 
                 var 
                     rows = [],
@@ -235,7 +235,8 @@ function BlackboxLogViewer() {
         graphRendersCount++;
         
         seekBar.setCurrentTime(currentBlackboxTime);
-    
+        seekBar.setWindow(graph.getWindowWidthTime());
+
         updateValuesChartRateLimited();
         
         if (graphState == GRAPH_STATE_PLAY) {
@@ -481,6 +482,16 @@ function BlackboxLogViewer() {
             }
         }
 
+    function showValueTable(state) {
+        if(state == null) { // no state specified, just toggle
+            hasTableOverlay = !hasTableOverlay;
+        } else { //state defined, just set item
+            hasTableOverlay = (state)?true:false;
+        }
+        html.toggleClass("has-table-overlay", hasTableOverlay);
+        updateValuesChart();
+    }
+
     /**
      * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
      * available log.
@@ -565,7 +576,7 @@ function BlackboxLogViewer() {
             
             var fileContents = String.fromCharCode.apply(null, new Uint8Array(bytes, 0,100));
 
-            if(fileContents.match(/# dump/i)) { // this is actually a configuration file
+            if(fileContents.match(/# dump|# diff/i)) { // this is actually a configuration file
                 try{
 
                    // Firstly, is this a configuration defaults file
@@ -791,7 +802,11 @@ function BlackboxLogViewer() {
     $(document).ready(function() {
 
         $('[data-toggle="tooltip"]').tooltip({trigger: "hover", placement: "auto bottom"}); // initialise tooltips
-        
+        $('[data-toggle="dropdown"]').dropdown(); // initialise menus
+        $('a.auto-hide-menu').click(function() {
+            var test = $(this).closest('.dropdown').children().first().dropdown("toggle");
+        });
+
         // Get Latest Version Information
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
         $(".viewer-version", statusBar).text('v'+VIEWER_VERSION);
@@ -908,15 +923,18 @@ function BlackboxLogViewer() {
         });
         
         $(".view-table").click(function() {
+            showValueTable();
+            showConfigFile(false); // hide the config file
+            /*
             hasTable = !hasTable;
             html.toggleClass("has-table", hasTable);       
             prefs.set('hasTable', hasTable);
+            */
         });
        
-        $(".view-analyser-sticks").click(function() {
-            hasAnalyserSticks = !hasAnalyserSticks;
-            html.toggleClass("has-analyser-sticks", hasAnalyserSticks);
-            prefs.set('hasAnalyserSticks', hasAnalyserSticks);
+        $(".view-config").click(function() {
+            showValueTable(false); // hide the table
+            showConfigFile();
         });
 
         $(".view-analyser").click(function() {
@@ -936,6 +954,43 @@ function BlackboxLogViewer() {
             (hasAnalyserFullscreen)?html.addClass("has-analyser-fullscreen"):html.removeClass("has-analyser-fullscreen");
             graph.setAnalyser(hasAnalyserFullscreen);
             invalidateGraph();
+        });
+
+        $(".view-zoom-in").click(function() {
+            zoomIn();
+        });
+
+        $(".view-zoom-out").click(function() {
+            zoomOut();
+        });
+
+        $(".toggle-smoothing").click(function () {
+            toggleOverrideStatus('graphSmoothOverride', 'has-smoothing-override');
+        });
+
+        $(".toggle-expo").click(function () {
+            toggleOverrideStatus('graphExpoOverride', 'has-expo-override');
+        });
+
+        $(".toggle-grid").click(function () {
+            toggleOverrideStatus('graphGridOverride', 'has-grid-override');
+        });
+
+        /** changelog trigger **/
+        $("#changelog_toggle").on('click', function() {
+            var state = $(this).data('state2');
+            if (state) { // log closed
+                $("#changelog").animate({right: -695}, 200, function () {
+                    html.removeClass('log_open');
+                });
+                state = false;
+            } else { // log open
+                $("#changelog").animate({right: 0}, 200);
+                html.addClass('log_open');
+                state = true;
+            }
+            $(this).text(state ? 'Close' : 'Changelog');
+            $(this).data('state2', state);
         });
 
         var logJumpBack = function(fast, slow) {
@@ -1026,7 +1081,22 @@ function BlackboxLogViewer() {
             setVideoOffset(videoOffset + 1 / 15, true);
         };
         $(".log-sync-forward").click(logSyncForward);
-    
+
+        var logSmartSync = function() {
+            if (hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
+                try {
+                    setVideoOffset(videoOffset + (stringTimetoMsec($(".marker-offset", statusBar).text()) / 1000000), true);
+                } catch (e) {
+                    console.log('Failed to set video offset');
+                }
+            }
+            setMarker(!hasMarker);
+            $(".marker-offset", statusBar).css('visibility', (hasMarker)?'visible':'hidden');
+            invalidateGraph();
+        };
+        $(".log-smart-sync").click(logSmartSync);
+
+
         $(".video-offset").change(function() {
             var offset = parseFloat($(".video-offset").val());
             
@@ -1173,9 +1243,8 @@ function BlackboxLogViewer() {
         });
 
         $(".open-header-dialog").click(function(e) {
-            e.preventDefault();
-            
             headerDialog.show(flightLog.getSysConfig());
+            e.preventDefault();
         });
 
         $(".open-keys-dialog").click(function(e) {
@@ -1252,7 +1321,7 @@ function BlackboxLogViewer() {
                 .tooltip();
         }
 
-        $(window).resize(function() { updateCanvasSize(); updateHeaderSize() });
+        $(window).resize(function() { updateCanvasSize(); /*updateHeaderSize()*/ });
 
         function updateHeaderSize() {
             var newHeight = $(".video-top-controls").height() - 20; // 23px offset
@@ -1422,6 +1491,23 @@ function BlackboxLogViewer() {
             return false; // nothing was changed
         }
 
+        function updateOverrideStatus() {
+            // Update override status flags on status bar
+            var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') +
+                ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
+                ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
+            $(".overrides", statusBar).text(overrideStatus);
+        }
+
+        function toggleOverrideStatus(userSetting, className) {
+            userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
+            html.toggleClass(className, userSettings[userSetting]);
+            graph.refreshOptions(userSettings);
+            graph.refreshGraphConfig();
+            invalidateGraph();
+            updateOverrideStatus();
+        }
+
         
         $('.log-graph-legend').on("mousedown", function(e) {
 
@@ -1493,6 +1579,9 @@ function BlackboxLogViewer() {
         });
 
         $(document).keydown(function(e) {
+            // Pressing any key hides dropdown menus
+            //$(".dropdown-toggle").dropdown("toggle");
+
             var shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
             if(e.which === 13 && e.target.type === 'text' && $(e.target).parents('.modal').length == 0) {
                 // pressing return on a text field clears the focus.
@@ -1523,46 +1612,59 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
                     case "M".charCodeAt(0): 
-                        if (e.altKey && hasMarker && hasVideo && hasLog) { // adjust the video sync offset and remove marker
-                          try{
-                            setVideoOffset(videoOffset + (stringTimetoMsec($(".marker-offset", statusBar).text()) / 1000000), true);  
-                          } catch(e) {
-                             console.log('Failed to set video offset');
-                          }
+                        if (e.altKey) { // adjust the video sync offset and remove marker
+                          logSmartSync();
                         } else { // Add a marker to graph window
                             markerTime = currentBlackboxTime;
-                            $(".marker-offset", statusBar).text('Marker Offset ' + formatTime(0) + 'ms');
-                            
+                            setMarker(!hasMarker);
+                            $(".marker-offset", statusBar).text('Marker Offset ' + formatTime(0) + 'ms').css('visibility', (hasMarker)?'visible':'hidden');
+                            invalidateGraph();
                         }                        
-                        setMarker(!hasMarker);
-                        $(".marker-offset", statusBar).css('visibility', (hasMarker)?'visible':'hidden');
-                        invalidateGraph();
                         e.preventDefault();
                     break;
 
                     case "C".charCodeAt(0):
-                        if(!(shifted)) { 
+                        if(!(shifted)) {
+                            showValueTable(false); // hide the values table if shown
                             showConfigFile(); // toggle the config file popup
                             e.preventDefault();
                         }
                     break;
 
+                    case "A".charCodeAt(0):
+                        if(!(shifted)) {
+                            if(activeGraphConfig.selectedFieldName != null) {
+                                hasAnalyser = !hasAnalyser;
+                            } else hasAnalyser = false;
+                            graph.setDrawAnalyser(hasAnalyser);
+                            html.toggleClass("has-analyser", hasAnalyser);
+                            prefs.set('hasAnalyser', hasAnalyser);
+                            invalidateGraph();
+                            e.preventDefault();
+                        } else { // Maximize
+                            if(hasAnalyser) {
+                                hasAnalyserFullscreen = !hasAnalyserFullscreen;
+                            } else hasAnalyserFullscreen = false;
+                            (hasAnalyserFullscreen)?html.addClass("has-analyser-fullscreen"):html.removeClass("has-analyser-fullscreen");
+                            graph.setAnalyser(hasAnalyserFullscreen);
+                            invalidateGraph();
+                        }
+                        break;
+
+                    case "H".charCodeAt(0):
+                        if(!(shifted)) {
+                            headerDialog.show(flightLog.getSysConfig());
+                            e.preventDefault();
+                        }
+                        break;
+
                     case "T".charCodeAt(0):
-                        hasTableOverlay = !hasTableOverlay;
-                    	html.toggleClass("has-table-overlay", hasTableOverlay);
-
-                        if (hasTableOverlay) hadTable = hasTable; // Store the state of the table view when quickshow selected
-
-                    	if (hasTableOverlay && !hasTable) { 
-                    		hasTable = true; // force display the table if it is off when we quickshow.
-                    		}
-                		if (!hasTableOverlay && !hadTable) {
-                    		hasTable = false; // return table state when we remove quickshow.
-                    		}
-
-                    	html.toggleClass("has-table", hasTable);
-                    	invalidateGraph();
-                        e.preventDefault();
+                        if(!(shifted)) {
+                            showValueTable();
+                            showConfigFile(false); // hide the config file (if shown)
+                            invalidateGraph();
+                            e.preventDefault();
+                        }
                     break;
 
                     // Workspace shortcuts
@@ -1643,17 +1745,8 @@ function BlackboxLogViewer() {
 
                     case "S".charCodeAt(0): // S key to toggle between last graph smooth and none
                         try {
-                            if(!(shifted)) { 
-                                userSettings.graphSmoothOverride = !userSettings.graphSmoothOverride; // toggle current setting
-                                graph.refreshOptions(userSettings);
-                                graph.refreshGraphConfig();
-                                invalidateGraph();
-                                // Update smoothing status flags on status bar
-                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $(".overrides", statusBar).text(overrideStatus);
-
+                            if(!(shifted)) {
+                                toggleOverrideStatus('graphSmoothOverride', 'has-smoothing-override' );
                                 e.preventDefault();
                             }
                         } catch(e) {
@@ -1664,16 +1757,8 @@ function BlackboxLogViewer() {
 
                     case "X".charCodeAt(0): // S key to toggle between last graph smooth and none
                         try {
-                            if(!(shifted)) { 
-                                userSettings.graphExpoOverride = !userSettings.graphExpoOverride; // toggle current setting
-                                graph.refreshOptions(userSettings);
-                                graph.refreshGraphConfig();
-                                invalidateGraph();
-                                // Update smoothing status flags on status bar
-                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $(".overrides", statusBar).text(overrideStatus);
+                            if(!(shifted)) {
+                                toggleOverrideStatus('graphExpoOverride', 'has-expo-override' );
                                 e.preventDefault();
                             }
                         } catch(e) {
@@ -1685,16 +1770,7 @@ function BlackboxLogViewer() {
                     case "G".charCodeAt(0): // S key to toggle between last graph smooth and none
                         try {
                             if(!(shifted)) { 
-                                userSettings.graphGridOverride = !userSettings.graphGridOverride; // toggle current setting
-                                graph.refreshOptions(userSettings);
-                                graph.refreshGraphConfig();
-                                invalidateGraph();
-                                // Update smoothing status flags on status bar
-                                var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') + 
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                                                     ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-                                $(".overrides", statusBar).text(overrideStatus);
-
+                                toggleOverrideStatus('graphGridOverride', 'has-grid-override' );
                                 e.preventDefault();
                             }
                         } catch(e) {
