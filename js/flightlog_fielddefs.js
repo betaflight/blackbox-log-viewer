@@ -119,7 +119,10 @@ var
             "ONESHOT125",
             "ONESHOT42", 
             "MULTISHOT",
-            "BRUSHED"
+            "BRUSHED",
+            "DSHOT600",
+            "DSHOT300",
+            "DSHOT150"
     ]),
 
     MOTOR_SYNC = makeReadOnly([
