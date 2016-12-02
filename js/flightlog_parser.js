@@ -536,16 +536,22 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.currentMeterScale = currentMeterParams[1];
             break;
             case "gyro.scale":
-                that.sysConfig.gyroScale = hexToFloat(fieldValue);
+            case "gyro_scale":
 
-                /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
-                 * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
-                 * match Baseflight so we can use Baseflight's IMU for both: */
-                if (that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
-                    that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
-                    that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
-                    that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
-                }
+                    if(semver.gte(that.sysConfig.firmwareVersion, '3.1.0') && that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
+                        that.sysConfig.gyroScale = 1.0; // logged gyro data is now scaled in the flight controller for betaflight
+                    } else {
+                        that.sysConfig.gyroScale = hexToFloat(fieldValue);
+                    }
+
+                    /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
+                     * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
+                     * match Baseflight so we can use Baseflight's IMU for both: */
+                    if (that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
+                        that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
+                        that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
+                        that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
+                    }
             break;
             case "Firmware revision":
 
