@@ -257,7 +257,8 @@ function FlightLogFieldPresenter() {
                 return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2), currentFlightMode) + " deg/s";
 
             case 'rcCommand[3]':
-            case 'motor[0]':            
+                return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
+            case 'motor[0]':
             case 'motor[1]':            
             case 'motor[2]':            
             case 'motor[3]':            
@@ -265,7 +266,7 @@ function FlightLogFieldPresenter() {
             case 'motor[5]':            
             case 'motor[6]':            
             case 'motor[7]':            
-                return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
+                return Math.round(flightLog.rcMotorRawToPct(value)) + " %";
 
             case 'rcCommands[0]':
             case 'rcCommands[1]':

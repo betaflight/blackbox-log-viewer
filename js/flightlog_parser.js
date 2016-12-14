@@ -55,6 +55,9 @@ var FlightLogParser = function(logData) {
         //Predict the last time value written in the main stream
         FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME = 10,
 
+        //Predict that this field is minthrottle
+        FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR       = 11,
+
         //Home coord predictors appear in pairs (two copies of FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD). Rewrite the second
         //one we see to this to make parsing easier
         FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1   = 256,
@@ -256,6 +259,8 @@ var FlightLogParser = function(logData) {
             debug_mode:null,                // Selected Debug Mode
             features:null,                  // Activated features (e.g. MOTORSTOP etc)
             Craft_name:null,                // Craft Name
+            motorOutput:[null,null],        // Minimum and maximum outputs to motor's
+            digitalIdleOffset:null,         // min throttle for d-shot (as a percentage)
             unknownHeaders : []             // Unknown Extra Headers
         },
 
@@ -405,7 +410,13 @@ var FlightLogParser = function(logData) {
 
             // Betaflight Log Header Parameters
             case "minthrottle":
+                that.sysConfig[fieldName] = parseInt(fieldValue, 10);
+                that.sysConfig.motorOutput[0] = that.sysConfig[fieldName]; // by default, set the minMotorOutput to match minThrottle
+            break;
             case "maxthrottle":
+                that.sysConfig[fieldName] = parseInt(fieldValue, 10);
+                that.sysConfig.motorOutput[1] = that.sysConfig[fieldName]; // by default, set the maxMotorOutput to match maxThrottle
+            break;
             case "rcRate":
             case "rcExpo":
             case "rcYawExpo":
@@ -485,6 +496,8 @@ var FlightLogParser = function(logData) {
                 }
             break;
 
+            case "digitalIdleOffset":
+                    that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
 
             /**  Cleanflight Only log headers **/
             case "dterm_cut_hz":
@@ -515,6 +528,7 @@ var FlightLogParser = function(logData) {
             case "navrPID":
             case "levelPID":
             case "velPID":
+            case "motorOutput":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
             case "magPID":
@@ -931,6 +945,15 @@ var FlightLogParser = function(logData) {
                  * corresponding 32-bit signed values.
                  */
                 value = (value | 0) + that.sysConfig.minthrottle;
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR:
+                /*
+                 * Force the value to be a *signed* 32-bit integer. Encoded motor values can be negative when motors are
+                 * below minthrottle, but despite this motor[0] is encoded in I-frames using *unsigned* encoding (to
+                 * save space for positive values). So we need to convert those very large unsigned values into their
+                 * corresponding 32-bit signed values.
+                 */
+                value = (value | 0) + (that.sysConfig.motorOutput[0] | 0); // motorOutput[0] is the min motor output
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_1500:
                 value += 1500;

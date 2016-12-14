@@ -51,7 +51,10 @@ function HeaderDialog(dialog, onSave) {
             {name:'debug_mode'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
 			{name:'gyro_notch_hz_2'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.1', max:'999.9.9'},
 			{name:'gyro_notch_cutoff_2'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.1', max:'999.9.9'},
-			{name:'pidController'		    	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'0.0.0', max:'3.0.1'}
+			{name:'pidController'		    	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'0.0.0', max:'3.0.1'},
+			{name:'motorOutputLow'		        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
+			{name:'motorOutputHigh'		        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
+			{name:'digitalIdleOffset'	        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'}
 
 	];
 
@@ -460,6 +463,10 @@ function HeaderDialog(dialog, onSave) {
         setParameter('rateAccelLimit'		    ,sysConfig.rateAccelLimit,0);
         renderSelect('gyro_soft_type'			,sysConfig.gyro_soft_type, FILTER_TYPE);
         renderSelect('debug_mode'				,sysConfig.debug_mode, DEBUG_MODE);
+		setParameter('motorOutputLow'			,sysConfig.motorOutput[0],0);
+		setParameter('motorOutputHigh'			,sysConfig.motorOutput[1],0);
+		setParameter('digitalIdleOffset'		,sysConfig.digitalIdleOffset,2);
+
 		/* Packed Flags */
 
         builtFeaturesList(sysConfig);

@@ -287,7 +287,7 @@ function Craft3D(flightLog, canvas, propColors) {
                 propShells[i].remove(props[i]);
             
             var 
-                throttlePos = Math.min(Math.max(frame[frameFieldIndexes["motor[" + motorOrder[i] + "]"]] - sysInfo.minthrottle, 0) / (sysInfo.maxthrottle - sysInfo.minthrottle), 1.0),
+                throttlePos = Math.min(Math.max(frame[frameFieldIndexes["motor[" + motorOrder[i] + "]"]] - sysInfo.motorOutput[0], 0) / (sysInfo.motorOutput[1] - sysInfo.motorOutput[0]), 1.0),
                 propLevel = Math.round(throttlePos * (NUM_PROP_LEVELS - 1)),
                 geometry = propGeometry[propLevel],
                 prop = new THREE.Mesh(geometry, propMaterials[motorOrder[i]]);

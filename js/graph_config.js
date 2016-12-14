@@ -233,9 +233,9 @@ GraphConfig.load = function(config) {
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
-                    offset: -(sysConfig.maxthrottle + sysConfig.minthrottle) / 2,
+                    offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
                     power: 1.0,
-                    inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
+                    inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^servo\[/)) {
@@ -362,9 +362,9 @@ GraphConfig.load = function(config) {
                         };
                     case 'MIXER':
                         return {
-                            offset: -(sysConfig.maxthrottle + sysConfig.minthrottle) / 2,
+                            offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
                             power: 1.0,
-                            inputRange: (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
+                            inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
                             outputRange: 1.0
                         };
                     case 'BATTERY':
