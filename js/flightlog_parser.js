@@ -537,12 +537,7 @@ var FlightLogParser = function(logData) {
             break;
             case "gyro.scale":
             case "gyro_scale":
-
-                    if(semver.gte(that.sysConfig.firmwareVersion, '3.1.0') && that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
-                        that.sysConfig.gyroScale = 1.0; // logged gyro data is now scaled in the flight controller for betaflight
-                    } else {
-                        that.sysConfig.gyroScale = hexToFloat(fieldValue);
-                    }
+                    that.sysConfig.gyroScale = hexToFloat(fieldValue);
 
                     /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
                      * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
