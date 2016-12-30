@@ -466,6 +466,7 @@ var FlightLogParser = function(logData) {
             case "dterm_filter_type":
             case "pidAtMinThrottle":
             case "itermThrottleGain":
+            case "itermThrottleThreshold":
             case "ptermSRateWeight":
             case "dtermSetpointWeight":
             case "yawRateAccelLimit":
