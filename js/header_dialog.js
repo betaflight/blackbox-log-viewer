@@ -208,7 +208,6 @@ function HeaderDialog(dialog, onSave) {
             {bit: 15, group: 'other', name: 'RSSI_ADC', description: 'ADC RSSI Monitoring'},
             {bit: 16, group: 'other', name: 'LED_STRIP', description: 'Addressible RGB LED strip support'},
             {bit: 17, group: 'other', name: 'DISPLAY', description: 'OLED Screen Display'},
-            {bit: 18, group: 'other', name: 'ONESHOT125', description: 'Oneshot 125 Enabled'},
             {bit: 19, group: 'other', name: 'BLACKBOX', description: 'Blackbox flight data recorder'},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
             {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Transponder enabled'}
@@ -216,12 +215,35 @@ function HeaderDialog(dialog, onSave) {
 
 
         // Add specific features for betaflight v2.8 onwards....
-        if (sysConfig.firmware >=2.8) {
-        	features.push(
-        	            {bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'},
-            			{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
-						);
+		if (semver.gte(sysConfig.firmwareVersion, "2.8.0")) {
+			features.push(
+				{bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'}
+			);
+		}
+
+		if (semver.gte(sysConfig.firmwareVersion, "2.8.0") && !semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
+			features.push(
+				{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
+			);
+		}
+
+        if (semver.gte(sysConfig.firmwareVersion, "2.8.0") && !semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
+            features.push(
+                {bit: 18, group: 'other', name: 'ONESHOT125', description: 'Oneshot 125 Enabled'}
+            );
         }
+
+		if (semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
+			features.push(
+				{bit: 18, group: 'other', name: 'OSD', description: 'On Screen Display'}
+			);
+		}
+
+		if (semver.gte(sysConfig.firmwareVersion, "3.1.0")) {
+			features.push(
+				{bit: 27, group: 'other', name: 'ESC_SENSOR', description: 'Use KISS ESC 24A telemetry as sensor'}
+			)
+		}
 
         var radioGroups = [];
 
