@@ -468,6 +468,7 @@ var FlightLogParser = function(logData) {
             case "itermThrottleGain":
             case "itermThrottleThreshold":
             case "ptermSRateWeight":
+            case "setpointRelaxRatio":
             case "dtermSetpointWeight":
             case "yawRateAccelLimit":
             case "rateAccelLimit":
