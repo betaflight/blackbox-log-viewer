@@ -168,6 +168,9 @@ var
 			"VELOCITY",
 			"DTERM_FILTER",
             "ANGLERATE",
+            "ESC_SENSOR",
+            "SCHEDULER",
+            "STACK"
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
