@@ -227,7 +227,7 @@ function Craft2D(flightLog, canvas, propColors) {
     
                 canvasContext.moveTo(0, 0);
                 canvasContext.arc(0, 0, bladeRadius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 
-                        * Math.max(motorValue - sysConfig.minthrottle, 0) / (sysConfig.maxthrottle - sysConfig.minthrottle), false);
+                        * Math.max(motorValue - sysConfig.motorOutput[0], 0) / (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]), false);
                 
                 canvasContext.fill();
     
