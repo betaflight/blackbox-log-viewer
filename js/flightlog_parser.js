@@ -470,12 +470,19 @@ var FlightLogParser = function(logData) {
             case "ptermSRateWeight":
             case "setpointRelaxRatio":
             case "dtermSetpointWeight":
-            case "yawRateAccelLimit":
-            case "rateAccelLimit":
             case "gyro_soft_type":
             case "debug_mode":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
+
+            case "yawRateAccelLimit":
+            case "rateAccelLimit":
+                if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) {
+                    that.sysConfig[fieldName] = uint32ToFloat(fieldValue, 10);
+                } else {
+                    that.sysConfig[fieldName] = parseInt(fieldValue, 10);
+                }
+                break;
 
             case "yaw_lpf_hz":
             case "gyro_lowpass_hz":

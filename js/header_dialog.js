@@ -118,6 +118,22 @@ function HeaderDialog(dialog, onSave) {
 
 	}
 
+    function setParameterFloat(name, data, decimalPlaces) {
+        var parameterElem = $('.parameter td[name="' + name + '"]');
+        var nameElem = $('input', parameterElem);
+        if(data!=null) {
+            nameElem.val(data.toFixed(decimalPlaces));
+            nameElem.attr('decPl', decimalPlaces);
+            parameterElem.attr('title', 'set '+name+'='+data);
+            parameterElem.removeClass('missing');
+        } else {
+            parameterElem.addClass('missing');
+        }
+        parameterElem.css('display', isParameterValid(name)?('table-cell'):('none'));
+
+    }
+
+
 	function setCheckbox(name, data) {
     	var parameterElem = $('.static-features td[name="' + name + '"]');
 		var nameElem = $('input', parameterElem);
@@ -483,8 +499,13 @@ function HeaderDialog(dialog, onSave) {
         setParameter('itermThrottleGain'	    ,sysConfig.itermThrottleGain,2);
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
-        setParameter('yawRateAccelLimit'		,sysConfig.yawRateAccelLimit,0);
-        setParameter('rateAccelLimit'		    ,sysConfig.rateAccelLimit,0);
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
+            setParameterFloat('yawRateAccelLimit', sysConfig.yawRateAccelLimit, 2);
+            setParameterFloat('rateAccelLimit'   , sysConfig.rateAccelLimit, 2);
+        } else {
+            setParameter('yawRateAccelLimit'    , sysConfig.yawRateAccelLimit, 1);
+            setParameter('rateAccelLimit'       , sysConfig.rateAccelLimit, 1);
+        }
         renderSelect('gyro_soft_type'			,sysConfig.gyro_soft_type, FILTER_TYPE);
         renderSelect('debug_mode'				,sysConfig.debug_mode, DEBUG_MODE);
 		setParameter('motorOutputLow'			,sysConfig.motorOutput[0],0);
