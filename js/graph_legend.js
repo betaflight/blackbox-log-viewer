@@ -115,9 +115,14 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
           var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
           
               $(".graph-legend-field").each(function(index, value) {
-                 var value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, $(this).attr('name'), frame[flightLog.getMainFieldIndexByName($(this).attr('name'))], currentFlightMode);
-                 $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'), flightLog.getSysConfig().debug_mode) + ((value)?' (' + value + ')':' ') );
-                 $(this).append('<span class="glyphicon glyphicon-equalizer no-wheel"></span>');
+                  var value = frame[flightLog.getMainFieldIndexByName($(this).attr('name'))]; // get the raw value from log
+                  if(userSettings.legendUnits) { // if we want the legend to show engineering units
+                      value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, $(this).attr('name'), value, currentFlightMode);
+                  } else { // raw value
+                    if(value%1!=0) { value = value.toFixed(2); }
+                  }
+                  $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'), flightLog.getSysConfig().debug_mode) + ((value!=null)?' (' + value + ')':' ') );
+                  $(this).append('<span class="glyphicon glyphicon-equalizer no-wheel"></span>');
               });
           } catch(e) {
               console.log('Cannot update legend with values');

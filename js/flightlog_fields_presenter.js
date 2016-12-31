@@ -166,6 +166,27 @@ function FlightLogFieldPresenter() {
 							'debug[2]':'Not Used',
 							'debug[3]':'Not Used',
 						},
+            'ESC_SENSOR' : 	{
+                            'debug[all]':'ESC Sensor',
+                            'debug[0]':'Motor Index',
+                            'debug[1]':'Timeouts',
+                            'debug[2]':'Temperature',
+                            'debug[3]':'RPM',
+            },
+            'SCHEDULER' : 	{
+                            'debug[all]':'Scheduler',
+                            'debug[0]':'Not Used',
+                            'debug[1]':'Not Used',
+                            'debug[2]':'Schedule Time',
+                            'debug[3]':'Function Exec Time',
+            },
+            'STACK' : 	{
+                            'debug[all]':'Stack',
+                            'debug[0]':'Stack High Mem',
+                            'debug[1]':'Stack Low Mem',
+                            'debug[2]':'Stack Current',
+                            'debug[3]':'Stack p',
+            },
      };
     
     function presentFlags(flags, flagNames) {
@@ -371,7 +392,20 @@ function FlightLogFieldPresenter() {
 					return "";
                 case 'ANGLERATE':
                     return value.toFixed(0) + "deg/s";
-				default:
+                case 'ESC_SENSOR':
+                    switch (fieldName) {
+                        case 'debug[2]':
+                            return value.toFixed(0) + "°C";
+                        case 'debug[3]':
+                            return value.toFixed(0) + "rpm";
+                        default:
+                            return value.toFixed(0) + "\u03BCS";
+                    }
+                case 'SCHEDULER':
+                        return value.toFixed(0) + "\u03BCS";
+                case 'STACK':
+                    return value.toFixed(0);
+                default:
 					return "";
 			}	
 		}

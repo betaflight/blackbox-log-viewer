@@ -368,7 +368,7 @@ function BlackboxLogViewer() {
         $('.lograte', statusBar).text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
 
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
-        seekBar.setActivityRange(flightLog.getSysConfig().minthrottle, flightLog.getSysConfig().maxthrottle);
+        seekBar.setActivityRange(flightLog.getSysConfig().motorOutput[0], flightLog.getSysConfig().motorOutput[1]);
         
         var 
             activity = flightLog.getActivitySummary();

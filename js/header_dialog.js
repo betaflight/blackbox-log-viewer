@@ -42,8 +42,8 @@ function HeaderDialog(dialog, onSave) {
 			{name:'serialrx_provider'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'dterm_filter_type'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'pidAtMinThrottle'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
-            {name:'itermThrottleGain'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
-            {name:'ptermSRateWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
+            {name:'itermThrottleGain'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.0.1'},
+            {name:'ptermSRateWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.0.0'},
             {name:'dtermSetpointWeight'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'yawRateAccelLimit'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'rateAccelLimit'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
@@ -54,7 +54,9 @@ function HeaderDialog(dialog, onSave) {
 			{name:'pidController'		    	, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'0.0.0', max:'3.0.1'},
 			{name:'motorOutputLow'		        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
 			{name:'motorOutputHigh'		        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
-			{name:'digitalIdleOffset'	        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'}
+			{name:'digitalIdleOffset'	        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
+	        {name:'setpointRelaxRatio'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
+	        {name:'itermThrottleThreshold'	    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'}
 
 	];
 
@@ -115,6 +117,22 @@ function HeaderDialog(dialog, onSave) {
 		parameterElem.css('display', isParameterValid(name)?('table-cell'):('none'));
 
 	}
+
+    function setParameterFloat(name, data, decimalPlaces) {
+        var parameterElem = $('.parameter td[name="' + name + '"]');
+        var nameElem = $('input', parameterElem);
+        if(data!=null) {
+            nameElem.val(data.toFixed(decimalPlaces));
+            nameElem.attr('decPl', decimalPlaces);
+            parameterElem.attr('title', 'set '+name+'='+data);
+            parameterElem.removeClass('missing');
+        } else {
+            parameterElem.addClass('missing');
+        }
+        parameterElem.css('display', isParameterValid(name)?('table-cell'):('none'));
+
+    }
+
 
 	function setCheckbox(name, data) {
     	var parameterElem = $('.static-features td[name="' + name + '"]');
@@ -206,7 +224,6 @@ function HeaderDialog(dialog, onSave) {
             {bit: 15, group: 'other', name: 'RSSI_ADC', description: 'ADC RSSI Monitoring'},
             {bit: 16, group: 'other', name: 'LED_STRIP', description: 'Addressible RGB LED strip support'},
             {bit: 17, group: 'other', name: 'DISPLAY', description: 'OLED Screen Display'},
-            {bit: 18, group: 'other', name: 'ONESHOT125', description: 'Oneshot 125 Enabled'},
             {bit: 19, group: 'other', name: 'BLACKBOX', description: 'Blackbox flight data recorder'},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
             {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Transponder enabled'}
@@ -214,12 +231,35 @@ function HeaderDialog(dialog, onSave) {
 
 
         // Add specific features for betaflight v2.8 onwards....
-        if (sysConfig.firmware >=2.8) {
-        	features.push(
-        	            {bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'},
-            			{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
-						);
+		if (semver.gte(sysConfig.firmwareVersion, "2.8.0")) {
+			features.push(
+				{bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'}
+			);
+		}
+
+		if (semver.gte(sysConfig.firmwareVersion, "2.8.0") && !semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
+			features.push(
+				{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
+			);
+		}
+
+        if (semver.gte(sysConfig.firmwareVersion, "2.8.0") && !semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
+            features.push(
+                {bit: 18, group: 'other', name: 'ONESHOT125', description: 'Oneshot 125 Enabled'}
+            );
         }
+
+		if (semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
+			features.push(
+				{bit: 18, group: 'other', name: 'OSD', description: 'On Screen Display'}
+			);
+		}
+
+		if (semver.gte(sysConfig.firmwareVersion, "3.1.0")) {
+			features.push(
+				{bit: 27, group: 'other', name: 'ESC_SENSOR', description: 'Use KISS ESC 24A telemetry as sensor'}
+			)
+		}
 
         var radioGroups = [];
 
@@ -459,13 +499,20 @@ function HeaderDialog(dialog, onSave) {
         setParameter('itermThrottleGain'	    ,sysConfig.itermThrottleGain,2);
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
-        setParameter('yawRateAccelLimit'		,sysConfig.yawRateAccelLimit,0);
-        setParameter('rateAccelLimit'		    ,sysConfig.rateAccelLimit,0);
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
+            setParameterFloat('yawRateAccelLimit', sysConfig.yawRateAccelLimit, 2);
+            setParameterFloat('rateAccelLimit'   , sysConfig.rateAccelLimit, 2);
+        } else {
+            setParameter('yawRateAccelLimit'    , sysConfig.yawRateAccelLimit, 1);
+            setParameter('rateAccelLimit'       , sysConfig.rateAccelLimit, 1);
+        }
         renderSelect('gyro_soft_type'			,sysConfig.gyro_soft_type, FILTER_TYPE);
         renderSelect('debug_mode'				,sysConfig.debug_mode, DEBUG_MODE);
 		setParameter('motorOutputLow'			,sysConfig.motorOutput[0],0);
 		setParameter('motorOutputHigh'			,sysConfig.motorOutput[1],0);
 		setParameter('digitalIdleOffset'		,sysConfig.digitalIdleOffset,2);
+        setParameter('itermThrottleThreshold'	,sysConfig.itermThrottleThreshold,0);
+        setParameter('setpointRelaxRatio'		,sysConfig.setpointRelaxRatio,2);
 
 		/* Packed Flags */
 
@@ -485,6 +532,13 @@ function HeaderDialog(dialog, onSave) {
 
         /* Show Unknown Fields */
         renderUnknownHeaders(sysConfig.unknownHeaders);
+
+        /* Remove some version specific headers */
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
+            $(".BFPIDController").css("display","none");
+        } else {
+            $(".BFPIDController").css("display","table-header-group");
+        }
 
 		/*
 		 * In case of INAV, hide irrelevant options
