@@ -305,7 +305,7 @@ function BlackboxLogViewer() {
             error = flightLog.getLogError(index);
             
             if (error) {
-                logLabel = "Error: " + error;
+                logLabel = error;
             } else {
                 logLabel = formatTime(flightLog.getMinTime(index) / 1000, false) 
                     + " - " + formatTime(flightLog.getMaxTime(index) / 1000 , false)
