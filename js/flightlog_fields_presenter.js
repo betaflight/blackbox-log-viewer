@@ -314,11 +314,19 @@ function FlightLogFieldPresenter() {
                 return flightLog.accRawToGs(value).toFixed(2) + "g";
             
             case 'vbatLatest':
-                return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
-    
+                if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                    return (value / 10).toFixed(2) + "V" + ", " + (value / 10 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+                } else {
+                    return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+                }
+
             case 'amperageLatest':
-                return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
-    
+                if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                    return (value / 10).toFixed(2) + "A" + ", " + (value / 10 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+                } else {
+                    return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+                }
+
             case 'heading[0]':
             case 'heading[1]':
             case 'heading[2]':

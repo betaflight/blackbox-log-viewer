@@ -252,8 +252,14 @@ function FlightLog(logData) {
             i,
             fieldNames = that.getMainFieldNames(),
             sysConfig = that.getSysConfig(),
-            refVoltage = that.vbatADCToMillivolts(sysConfig.vbatref) / 100,
             found = false;
+
+        var refVoltage;
+        if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(sysConfig.firmwareVersion, '3.1.0')) {
+            refVoltage = sysConfig.vbatref;
+        } else {
+            refVoltage = that.vbatADCToMillivolts(sysConfig.vbatref) / 100;
+        }
 
         //Are we even logging VBAT?
         if (!fieldNameToIndex.vbatLatest) {
@@ -1092,7 +1098,12 @@ FlightLog.prototype.getPIDPercentage = function(value) {
 
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
-    return this.vbatADCToMillivolts(this.getSysConfig().vbatref);
+    if(this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) {
+        return this.getSysConfig().vbatref * 100;
+    } else {
+        return this.vbatADCToMillivolts(this.getSysConfig().vbatref);
+    }
+
 };
 
 FlightLog.prototype.vbatADCToMillivolts = function(vbatADC) {
