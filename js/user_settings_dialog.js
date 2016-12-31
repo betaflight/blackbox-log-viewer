@@ -43,6 +43,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		stickUnits			: false,			// Show units on stick display?
 		stickTrails			: false,			// Show stick trails?
 		stickInvertYaw		: false,			// Invert yaw in stick display?
+        legendUnits			: true,	            // Show units on legend?
 		gapless				: false,
 		drawCraft			: "3D", 
 		drawPidTable		: true, 
@@ -278,7 +279,6 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     	currentSettings.stickUnits = $(this).is(":checked");
     });
 
-
     $(".stick-trails").click(function() {
     	currentSettings.stickTrails = $(this).is(":checked");
     });
@@ -290,6 +290,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 	$(".analyser-hanning").click(function() {
 		currentSettings.analyserHanning = $(this).is(":checked");
 	});
+
+    $(".legend-units").click(function() {
+        currentSettings.legendUnits = $(this).is(":checked");
+    });
 
     // Load Custom Logo
     function readURL(input) {
@@ -341,6 +345,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     			// set the toggle switch
     			$(".stick-units").prop('checked', currentSettings.stickUnits);
     		} 
+
     		if(currentSettings.stickTrails!=null) {
     			// set the toggle switch
     			$(".stick-trails").prop('checked', currentSettings.stickTrails);
@@ -356,7 +361,13 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 				$(".analyser-hanning").prop('checked', currentSettings.analyserHanning);
 			}
 
-		mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
+			if(currentSettings.legendUnits!=null) {
+				// set the toggle switch
+				$(".legend-units").prop('checked', currentSettings.legendUnits);
+			}
+
+
+        mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
     		stickModeSelection(currentSettings.stickMode);
 
     		// setup the stick mode and dropdowns;
