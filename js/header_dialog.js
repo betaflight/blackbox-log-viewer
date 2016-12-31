@@ -533,6 +533,13 @@ function HeaderDialog(dialog, onSave) {
         /* Show Unknown Fields */
         renderUnknownHeaders(sysConfig.unknownHeaders);
 
+        /* Remove some version specific headers */
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
+            $(".BFPIDController").css("display","none");
+        } else {
+            $(".BFPIDController").css("display","table-header-group");
+        }
+
 		/*
 		 * In case of INAV, hide irrelevant options
 		 */
