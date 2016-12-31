@@ -193,9 +193,9 @@ function FlightLogIndex(logData) {
             // Did we not find any events in this log?
             if (intraIndex.minTime === false) {
                 if (sawEndMarker) {
-                    intraIndex.error = "Logging was paused, no data recorded";
+                    intraIndex.error = "Logging paused, no data";
                 } else {
-                    intraIndex.error = "Log is truncated, contains no data";
+                    intraIndex.error = "Log truncated, no data";
                 }
             }
         
