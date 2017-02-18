@@ -3,7 +3,7 @@
 // Global Level Variables
 var userSettings = {};
 
-var VIEWER_VERSION = '2.5.9'; // Current version
+var VIEWER_VERSION = '2.5.10'; // Current version
 
 function BlackboxLogViewer() {
     function supportsRequiredAPIs() {
@@ -1098,18 +1098,10 @@ function BlackboxLogViewer() {
 
 
         $(".video-offset").change(function() {
-            var offset = parseFloat($(".video-offset").val());
-            
+            var offset = parseFloat(this.value);
+
             if (!isNaN(offset)) {
-                videoOffset = offset;                
-                // Store the video offset to the local cache
-                currentOffsetCache.offset = offset;
-                if(hasLog && hasVideo) {
-                    if(offsetCache.length > 20) offsetCache.shift();
-                    offsetCache.push(currentOffsetCache);
-                    prefs.set('offsetCache', offsetCache);
-                }
-                invalidateGraph();
+                setVideoOffset(offset, true);
             }
         });
 
