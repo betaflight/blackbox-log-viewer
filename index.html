@@ -732,46 +732,8 @@
 									<div class="gui_box_titlebar">
 										<div class="spacer_box_title">PID Other</div>
 									</div>
-								<div class="spacer_box">
-									<table class="no-inav parameter cf">
-										<tbody>
-											<tr>
-											    <td name='dynamic_pid' class="bf-only"><label>Dynamic PID</label><select><!-- list generated here --></select></td>
-											</tr>
-										</tbody>
-									</table>
+									<div class="spacer_box">
 									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th colspan="2">P-Term</th>
-												<th class="bf-only" colspan="2">I-Term</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-											    <td name='dynamic_pterm' class="bf-only"><label>Dynamic P</label><select><!-- list generated here --></select></td>
-												<td name="yaw_p_limit"><label>Yaw Limit</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="rollPitchItermResetRate" class="bf-only"><label>Roll/Pitch Reset</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="rollPitchItermIgnoreRate" class="bf-only"><label>Roll/Pitch Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="yawItermResetRate" class="bf-only"><label>Yaw Reset</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="yawItermIgnoreRate" class="bf-only"><label>Yaw Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
-										</tbody>
-										<tbody>
-											<tr>
-												<td></td>
-												<td name="iterm_reset_offset" class="bf-only"><label>Reset Offset</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-								<div class="spacer_box">
-									<table class="parameter cf">
-										<thead class="BFPIDController">
-											<tr>
-												<th colspan="5">Betaflight PID Controller</th>
-											</tr>
-										</thead>
 										<tbody>
 											<tr>
 												<td name="ptermSRateWeight" class="bf-only"><label>P-Term<br>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
@@ -781,9 +743,43 @@
 												<td name="yawRateAccelLimit" class="bf-only"><label>Yaw Rate<br>Acceleration Limit</label><input type="number" step="1" min="0" max="999" /></td>
 											</tr>
                                             <tr>
-                                                <td name="itermThrottleGain" class="bf-only"><label>I-Term Throttle Gain</label><input type="number" step="0.01" min="0" max="999" /></td>
-                                                <td name="itermThrottleThreshold" class="bf-only"><label>I-Term Throttle Threshold</label><input type="number" step="0.01" min="0" max="999" /></td>
+                                                <td name="antiGravityGain" class="bf-only"><label>AG Gain</label><input type="number" step="0.01" min="0" max="999" /></td>
+                                                <td name="antiGravityThreshold" class="bf-only"><label>AG Threshold</label><input type="number" step="0.01" min="0" max="999" /></td>
+                                                <td name="itermWindupPointPercent" class="bf-only"><label>Windup Threshold</label><input type="number" step="1" min="0" max="999" /></td>
                                             </tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="spacer_box">
+									<table class="no-inav parameter cf">
+										<tbody>
+											<tr>
+											    <td name='dynamic_pid' class="bf-only"><label>Dynamic PID</label><select><!-- list generated here --></select></td>
+											</tr>
+										</tbody>
+									</table>
+									<table class="parameter cf">
+										<thead class="BFPIDController">
+											<tr>
+												<th colspan="2">P-Term</th>
+												<th class="bf-only" colspan="2">I-Term</th>
+											</tr>
+										</thead>
+										<tbody class="BFPIDController">
+											<tr>
+											    <td name='dynamic_pterm' class="bf-only"><label>Dynamic P</label><select><!-- list generated here --></select></td>
+												<td name="yaw_p_limit"><label>Yaw Limit</label><input type="number" step="1" min="0" max="999" /></td>
+												<td name="rollPitchItermResetRate" class="bf-only"><label>Roll/Pitch Reset</label><input type="number" step="1" min="0" max="999" /></td>
+												<td name="rollPitchItermIgnoreRate" class="bf-only"><label>Roll/Pitch Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
+												<td name="yawItermResetRate" class="bf-only"><label>Yaw Reset</label><input type="number" step="1" min="0" max="999" /></td>
+												<td name="yawItermIgnoreRate" class="bf-only"><label>Yaw Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
+											</tr>
+										</tbody>
+										<tbody class="BFPIDController">
+											<tr>
+												<td></td>
+												<td name="iterm_reset_offset" class="bf-only"><label>Reset Offset</label><input type="number" step="1" min="0" max="999" /></td>
+											</tr>
 										</tbody>
 									</table>
 								</div>

@@ -465,8 +465,8 @@ var FlightLogParser = function(logData) {
             case "acc_1G":
             case "dterm_filter_type":
             case "pidAtMinThrottle":
-            case "itermThrottleGain":
-            case "itermThrottleThreshold":
+            case "anti_gravity_threshold":
+            case "itermWindupPointPercent":
             case "ptermSRateWeight":
             case "setpointRelaxRatio":
             case "dtermSetpointWeight":
@@ -477,6 +477,7 @@ var FlightLogParser = function(logData) {
 
             case "yawRateAccelLimit":
             case "rateAccelLimit":
+            case "anti_gravity_gain":
                 if(that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) {
                     that.sysConfig[fieldName] = uint32ToFloat(fieldValue, 10);
                 } else {
