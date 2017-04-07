@@ -1131,7 +1131,7 @@ FlightLog.prototype.getFlightMode = function(currentFlightMode) {
             Angle:                 (currentFlightMode & (1<<1))!=0,
             Horizon:               (currentFlightMode & (1<<2))!=0,
             Baro:                  (currentFlightMode & (1<<3))!=0,
-            Mag:                   (currentFlightMode & (1<<4))!=0,
+            AntiGravity:           (currentFlightMode & (1<<4))!=0,
             Headfree:              (currentFlightMode & (1<<5))!=0,
             HeadAdj:               (currentFlightMode & (1<<6))!=0,
             CamStab:               (currentFlightMode & (1<<7))!=0,
@@ -1187,5 +1187,6 @@ FlightLog.prototype.getFeatures = function(enabledFeatures) {
             TRANSPONDER         : (enabledFeatures & (1 << 21))!=0,
             AIRMODE             : (enabledFeatures & (1 << 22))!=0,
             SUPEREXPO_RATES     : (enabledFeatures & (1 << 23))!=0,
+            ANTI_GRAVITY        : (enabledFeatures & (1 << 24))!=0,
         };
 };
