@@ -159,7 +159,7 @@ function HeaderDialog(dialog, onSave) {
 				switch (i) {
 					case 0:
 						if(data[i]!=null) {
-								$(this).val((data[i]/10.0).toFixed(1));
+								$(this).val((data[i]).toFixed(0));
 								$(this).attr('decPl', 1);
 								$(this).removeClass('missing');
 							} else {
@@ -169,7 +169,7 @@ function HeaderDialog(dialog, onSave) {
 						break;
 					case 1:
 						if(data[i]!=null) {
-								$(this).val((data[i]/1000.0).toFixed(3));
+								$(this).val((data[i]).toFixed(0));
 								$(this).attr('decPl', 3);
 								$(this).removeClass('missing');
 							} else {
