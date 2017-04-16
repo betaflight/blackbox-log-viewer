@@ -255,7 +255,8 @@ function FlightLog(logData) {
             found = false;
 
         var refVoltage;
-        if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(sysConfig.firmwareVersion, '3.1.0')) {
+        if((sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '3.1.0')) || 
+           (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(sysConfig.firmwareVersion, '2.0.0'))) {
             refVoltage = sysConfig.vbatref;
         } else {
             refVoltage = that.vbatADCToMillivolts(sysConfig.vbatref) / 100;
@@ -967,7 +968,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 
     var sysConfig = this.getSysConfig();
 
-    if(sysConfig.firmware >= 3.0) {
+    if(sysConfig.firmware >= 3.0 || (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && sysConfig.firmware >= 2.0)) {
 
         const RC_RATE_INCREMENTAL = 14.54;
         const RC_EXPO_POWER = 3;
@@ -1018,7 +1019,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
         return calculateSetpointRate(axis, value);
 
     }
-    else if(sysConfig.firmware >= 2.8) {
+    else if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && sysConfig.firmware >= 2.8) {
 
             var that = this;
 
@@ -1098,7 +1099,8 @@ FlightLog.prototype.getPIDPercentage = function(value) {
 
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
-    if(this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) {
+    if((this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
+       (this.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(this.getSysConfig().firmwareVersion, '2.0.0'))) {
         return this.getSysConfig().vbatref * 100;
     } else {
         return this.vbatADCToMillivolts(this.getSysConfig().vbatref);
