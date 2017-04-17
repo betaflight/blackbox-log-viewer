@@ -159,13 +159,20 @@ function FlightLogFieldPresenter() {
 							'debug[2]':'debug[2]',
 							'debug[3]':'debug[3]',
 						},
-			'DFILTER' : 	{	
+			'DTERM_FILTER' : 	{	
 							'debug[all]':'Debug Filter',	
 							'debug[0]':'dterm_filter[roll]',
 							'debug[1]':'dterm_filter[pitch]',
 							'debug[2]':'Not Used',
 							'debug[3]':'Not Used',
 						},
+			'ANGLERATE' : 	{	
+							'debug[all]':'Debug Anglerate',	
+							'debug[0]':'Anglerate[roll]',
+							'debug[1]':'Anglerate[pitch]',
+							'debug[2]':'Anglerate[yaw]',
+							'debug[3]':'Not Used',
+						},						
             'ESC_SENSOR' : 	{
                             'debug[all]':'ESC Sensor',
                             'debug[0]':'Motor Index',
@@ -187,7 +194,29 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Stack Current',
                             'debug[3]':'Stack p',
             },
-     };
+            'DEBUG_ESC_SENSOR_RPM' : {
+                            'debug[all]':'Debug ESC Sensor RPM',
+							'debug[0]':'debug[0]',
+							'debug[1]':'debug[1]',
+							'debug[2]':'debug[2]',
+							'debug[3]':'debug[3]',
+            
+            },
+    		'DEBUG_ESC_SENSOR_TMP' : {
+                            'debug[all]':'Debug ESC Sensor TMP',
+							'debug[0]':'debug[0]',
+							'debug[1]':'debug[1]',
+							'debug[2]':'debug[2]',
+							'debug[3]':'debug[3]',    		
+    		},
+    		'DEBUG_ALTITUDE' : {
+                            'debug[all]':'Debug Altitude',
+							'debug[0]':'debug[0]',
+							'debug[1]':'debug[1]',
+							'debug[2]':'debug[2]',
+							'debug[3]':'debug[3]',    		
+    		}
+    		};
     
     function presentFlags(flags, flagNames) {
         var 
