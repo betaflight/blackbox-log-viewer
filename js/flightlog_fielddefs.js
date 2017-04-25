@@ -42,6 +42,7 @@ var
             'ANGLE',
             'HORIZON',
             'BARO',
+            'VARIO',
             'MAG',
             'HEADFREE',
             'HEADADJ',
@@ -66,8 +67,7 @@ var
             'BLACKBOX',
             'FAILSAFE',
             'AIRMODE',
-            'SUPEREXPO',
-            '3DDISABLESWITCH',
+            'VTX',
             'CHECKBOX_ITEM_COUNT'
     ]),
 
