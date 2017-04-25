@@ -79,6 +79,82 @@ ArrayDataStream.prototype.readTag2_3S32 = function(values) {
     }
 };
 
+ArrayDataStream.prototype.readTag2_3SVariable = function(values) {
+    var 
+        leadByte, leadByte2, leadByte3,
+        byte1, byte2, byte3, byte4,
+        i;
+    
+    leadByte = this.readByte();
+
+    // Check the selector in the top two bits to determine the field layout
+    switch (leadByte >> 6) {
+        case 0:
+            // 2 bits per field  ss11 2233,
+            values[0] = signExtend2Bit((leadByte >> 4) & 0x03);
+            values[1] = signExtend2Bit((leadByte >> 2) & 0x03);
+            values[2] = signExtend2Bit(leadByte & 0x03);
+        break;
+        case 1:
+            // 554 bits per field  ss11 1112 2222 3333
+            values[0] = signExtend5Bit((leadByte & 0x3E) >> 1);
+
+            leadByte2 = this.readByte();
+
+            values[1] = signExtend5Bit(((leadByte & 0x01) << 5) | ((leadByte2 & 0x0F) >> 4));
+            values[2] = signExtend4Bit(leadByte2 & 0x0F);
+        break;
+        case 2:
+            // 877 bits per field  ss11 1111 1122 2222 2333 3333
+            leadByte2 = this.readByte();
+            values[1] = signExtend8Bit(((leadByte & 0x3F) << 2) | ((leadByte2 & 0xC0) >> 6));
+
+            leadByte3 = this.readByte();
+            values[1] = signExtend7Bit(((leadByte2 & 0x3F) << 1) | ((leadByte2 & 0x80) >> 7));
+
+            values[2] = signExtend7Bit(leadByte3 & 0x7F);
+        break;
+        case 3:
+            // Fields are 8, 16 or 24 bits, read selector to figure out which field is which size
+
+            for (i = 0; i < 3; i++) {
+                switch (leadByte & 0x03) {
+                    case 0: // 8-bit
+                        byte1 = this.readByte();
+
+                        // Sign extend to 32 bits
+                        values[i] = signExtend8Bit(byte1);
+                    break;
+                    case 1: // 16-bit
+                        byte1 = this.readByte();
+                        byte2 = this.readByte();
+
+                        // Sign extend to 32 bits
+                        values[i] = signExtend16Bit(byte1 | (byte2 << 8));
+                    break;
+                    case 2: // 24-bit
+                        byte1 = this.readByte();
+                        byte2 = this.readByte();
+                        byte3 = this.readByte();
+
+                        values[i] = signExtend24Bit(byte1 | (byte2 << 8) | (byte3 << 16));
+                    break;
+                    case 3: // 32-bit
+                        byte1 = this.readByte();
+                        byte2 = this.readByte();
+                        byte3 = this.readByte();
+                        byte4 = this.readByte();
+
+                        values[i] = (byte1 | (byte2 << 8) | (byte3 << 16) | (byte4 << 24));
+                    break;
+                }
+
+                leadByte >>= 2;
+            }
+        break;
+    }
+};
+
 ArrayDataStream.prototype.readTag8_4S16_v1 = function(values) {
     var
         selector, combinedChar,

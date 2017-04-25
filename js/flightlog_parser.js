@@ -69,6 +69,7 @@ var FlightLogParser = function(logData) {
         FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32       = 7,
         FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16       = 8,
         FLIGHT_LOG_FIELD_ENCODING_NULL            = 9, // Nothing is written to the file, take value to be zero
+        FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE = 10,
 
         FLIGHT_LOG_EVENT_LOG_END = 255,
 
@@ -829,6 +830,15 @@ var FlightLogParser = function(logData) {
                     break;
                     case FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32:
                         stream.readTag2_3S32(values);
+
+                        //Apply the predictors for the fields:
+                        for (j = 0; j < 3; j++, i++)
+                            current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
+
+                        continue;
+                    break;
+                    case FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE:
+                        stream.readTag2_3SVariable(values);
 
                         //Apply the predictors for the fields:
                         for (j = 0; j < 3; j++, i++)
