@@ -272,6 +272,41 @@ var FlightLogParser = function(logData) {
             unknownHeaders : []             // Unknown Extra Headers
         },
 
+        // Translation of the field values name to the sysConfig var where it must be stored
+        translationValues = {                
+            acc_limit_yaw             : "yawRateAccelLimit",
+            accel_limit               : "rateAccelLimit",
+            acc_limit                 : "rateAccelLimit",
+            anti_gravity_thresh       : "anti_gravity_threshold",
+            d_notch_cut               : "dterm_notch_cutoff", 
+            d_setpoint_weight         : "dtermSetpointWeight",
+            dterm_setpoint_weight     : "dtermSetpointWeight",  
+            digital_idle_value        : "digitalIdleOffset",
+            dshot_idle_value          : "digitalIdleOffset",
+            gyro_lowpass              : "gyro_lowpass_hz",
+            gyro_lowpass_type         : "gyro_lpf",
+            "gyro.scale"              : "gyro_scale",
+            iterm_windup              : "itermWindupPointPercent",
+            motor_pwm_protocol        : "fast_pwm_protocol",
+            pidsum_limit_yaw          : "yaw_p_limit",
+            rc_expo                   : "rcExpo",
+            rc_expo_yaw               : "rcYawExpo",
+            rc_interp                 : "rc_interpolation",
+            rc_interp_int             : "rc_interpolation_interval",
+            rc_rate                   : "rcRate",
+            rc_rate_yaw               : "rcYawRate",
+            rc_yaw_expo               : "rcYawExpo",            
+            setpoint_relax_ratio      : "setpointRelaxRatio",
+            setpoint_relaxation_ratio : "setpointRelaxRatio",
+            thr_expo                  : "thrExpo",
+            thr_mid                   : "thrMid",
+            tpa_rate                  : "dynThrPID",
+            use_unsynced_pwm          : "unsynced_fast_pwm",
+            vbat_scale                : "vbatscale",
+            vbat_pid_gain             : "vbat_pid_compensation",
+            yaw_accel_limit           : "yawRateAccelLimit"            	
+    	},
+    	
         frameTypes,
 
         // Blackbox state:
@@ -348,6 +383,21 @@ var FlightLogParser = function(logData) {
         return names;
     }
 
+    /**
+     * Translates the name of a field to the parameter in sysConfig object equivalent
+     * 
+     * fieldName Name of the field to translate
+     * returns The equivalent in the sysConfig object or the fieldName if not found
+     */
+    function translateFieldName(fieldName) {
+        var translation = translationValues[fieldName]; 
+        if (typeof translation !== 'undefined') {
+        	return translation;
+        } else {
+        	return fieldName;
+        }
+    }
+    
     function parseHeaderLine() {
         var
             COLON = ":".charCodeAt(0),
@@ -381,6 +431,10 @@ var FlightLogParser = function(logData) {
         fieldName = asciiArrayToString(stream.data.subarray(lineStart, separatorPos));
         fieldValue = asciiArrayToString(stream.data.subarray(separatorPos + 1, lineEnd));
 
+        // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
+        // In this way is easier to maintain the code        
+        fieldName = translateFieldName(fieldName);
+        
         switch (fieldName) {
             case "I interval":
                 that.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
