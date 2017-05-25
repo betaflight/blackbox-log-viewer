@@ -415,6 +415,27 @@ GraphConfig.load = function(config) {
                             inputRange: flightLog.gyroRawToDegreesPerSecond((2.0e-3 * Math.PI/180) / sysConfig.gyroScale),
                             outputRange: 1.0
                         };
+                    case 'DEBUG_FFT':
+                        return {
+                            offset: 0,
+                            power: 0.25,
+                            inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
+                            outputRange: 1.0
+                        };      
+                    case 'DEBUG_FFT_FREQ':
+                        return {
+                            offset: 0,
+                            power: 0.25,
+                            inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
+                            outputRange: 1.0
+                        };     
+                    case 'DEBUG_FFT_TIME':
+                        return {
+                            offset: 0,
+                            power: 1.0,
+                            inputRange: 100,
+                            outputRange: 1.0
+                        };      
                 }
             }
             // if not found above then
