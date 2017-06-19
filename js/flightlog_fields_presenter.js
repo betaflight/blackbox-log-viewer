@@ -227,15 +227,15 @@ function FlightLogFieldPresenter() {
                             'debug[all]':'Debug FFT TIME',
                             'debug[0]':'Active calc step',
                             'debug[1]':'Step duration',
-                            'debug[2]':'Aditional steps',
-                            'debug[3]':'Not used',           
+                            'debug[2]':'Additional steps',
+                            'debug[3]':'Not used',
             },
             'DEBUG_FFT_FREQ' : {
-                            'debug[all]':'Debug FFT FREQ',                            
+                            'debug[all]':'Debug FFT FREQ',
                             'debug[0]':'center_freq[roll]',
                             'debug[1]':'center_freq[pitch]',
                             'debug[2]':'center_freq[yaw]',
-                            'debug[3]':'Not used',           
+                            'debug[3]':'Not used',
             }
     		};
     
@@ -466,11 +466,11 @@ function FlightLogFieldPresenter() {
                 case 'STACK':
                     return value.toFixed(0);
                 case 'DEBUG_FFT':
-                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";               
+                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
                 case 'DEBUG_FFT_TIME':
-                    return value.toFixed(0) + "\u03BCS";                    
+                    return value.toFixed(0) + "\u03BCS";
                 case 'DEBUG_FFT_FREQ':
-                    return value.toFixed(0) + "Hz";                                                  
+                    return value.toFixed(0) + "Hz";
                 default:
 					return "";
 			}	
