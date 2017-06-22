@@ -159,13 +159,20 @@ function FlightLogFieldPresenter() {
 							'debug[2]':'debug[2]',
 							'debug[3]':'debug[3]',
 						},
-			'DFILTER' : 	{	
+			'DTERM_FILTER' : 	{	
 							'debug[all]':'Debug Filter',	
 							'debug[0]':'dterm_filter[roll]',
 							'debug[1]':'dterm_filter[pitch]',
 							'debug[2]':'Not Used',
 							'debug[3]':'Not Used',
 						},
+			'ANGLERATE' : 	{	
+							'debug[all]':'Debug Anglerate',	
+							'debug[0]':'Anglerate[roll]',
+							'debug[1]':'Anglerate[pitch]',
+							'debug[2]':'Anglerate[yaw]',
+							'debug[3]':'Not Used',
+						},						
             'ESC_SENSOR' : 	{
                             'debug[all]':'ESC Sensor',
                             'debug[0]':'Motor Index',
@@ -187,7 +194,50 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Stack Current',
                             'debug[3]':'Stack p',
             },
-     };
+            'DEBUG_ESC_SENSOR_RPM' : {
+                            'debug[all]':'Debug ESC Sensor RPM',
+							'debug[0]':'debug[0]',
+							'debug[1]':'debug[1]',
+							'debug[2]':'debug[2]',
+							'debug[3]':'debug[3]',
+            
+            },
+    		'DEBUG_ESC_SENSOR_TMP' : {
+                            'debug[all]':'Debug ESC Sensor TMP',
+							'debug[0]':'debug[0]',
+							'debug[1]':'debug[1]',
+							'debug[2]':'debug[2]',
+							'debug[3]':'debug[3]',    		
+    		},
+    		'DEBUG_ALTITUDE' : {
+                            'debug[all]':'Debug Altitude',
+							'debug[0]':'debug[0]',
+							'debug[1]':'debug[1]',
+							'debug[2]':'debug[2]',
+							'debug[3]':'debug[3]',    		
+    		},
+    		'DEBUG_FFT' : {
+    		                'debug[all]':'Debug FFT',
+    		                'debug[0]':'gyro_raw[roll]',
+    		                'debug[1]':'gyro_dyn_notch[roll]',
+    		                'debug[2]':'gyro_bpf[roll]',
+    		                'debug[3]':'fft_center_index[roll]',    		
+    		},
+            'DEBUG_FFT_TIME' : {
+                            'debug[all]':'Debug FFT TIME',
+                            'debug[0]':'Active calc step',
+                            'debug[1]':'Step duration',
+                            'debug[2]':'Additional steps',
+                            'debug[3]':'Not used',
+            },
+            'DEBUG_FFT_FREQ' : {
+                            'debug[all]':'Debug FFT FREQ',
+                            'debug[0]':'center_freq[roll]',
+                            'debug[1]':'center_freq[pitch]',
+                            'debug[2]':'center_freq[yaw]',
+                            'debug[3]':'Not used',
+            }
+    		};
     
     function presentFlags(flags, flagNames) {
         var 
@@ -314,14 +364,18 @@ function FlightLogFieldPresenter() {
                 return flightLog.accRawToGs(value).toFixed(2) + "g";
             
             case 'vbatLatest':
-                if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                if((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
+                   (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
                     return (value / 10).toFixed(2) + "V" + ", " + (value / 10 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
                 } else {
                     return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
                 }
 
             case 'amperageLatest':
-                if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                if((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
+                   (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
+                    return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+                } else if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
                     return (value / 10).toFixed(2) + "A" + ", " + (value / 10 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
                 } else {
                     return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
@@ -410,9 +464,15 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + "\u03BCS";
                     }
                 case 'SCHEDULER':
-                        return value.toFixed(0) + "\u03BCS";
+                    return value.toFixed(0) + "\u03BCS";
                 case 'STACK':
                     return value.toFixed(0);
+                case 'DEBUG_FFT':
+                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                case 'DEBUG_FFT_TIME':
+                    return value.toFixed(0) + "\u03BCS";
+                case 'DEBUG_FFT_FREQ':
+                    return value.toFixed(0) + "Hz";
                 default:
 					return "";
 			}	

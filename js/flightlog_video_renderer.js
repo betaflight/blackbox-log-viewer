@@ -288,7 +288,7 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
         delete logParameters.flightVideo;
     }
 
-    var options = $.extend({}, userSettings || {}, {eraseBackground : !logParameters.flightVideo, drawEvents : false});
+    var options = $.extend({}, userSettings || {}, {background: logParameters.flightVideo ? "none" : "fill", drawEvents : false});
     
     graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, craftCanvas, analyserCanvas, options);
     

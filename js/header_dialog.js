@@ -393,7 +393,9 @@ function HeaderDialog(dialog, onSave) {
 				});
 		}
 
-		if(sysConfig.firmware >= 3.0 && sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
+		if((sysConfig.firmware >= 3.0 && sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) ||
+		   (sysConfig.firmware >= 2.0 && sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT)) {
+		   
 			PID_CONTROLLER_TYPE = ([
 					'LEGACY',
 					'BETAFLIGHT'

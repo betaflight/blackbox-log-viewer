@@ -4,8 +4,7 @@ function FlightLogIndex(logData) {
     //Private:
     var 
         that = this,
-        logBeginOffsets = false,
-        logCount = false,
+        logBeginOffsets = false,        
         intraframeDirectories = false;
         
     function buildLogOffsetsIndex() {
@@ -46,19 +45,17 @@ function FlightLogIndex(logData) {
                     initialIMU: [],
                     initialSlow: [],
                     initialGPSHome: [],
+                    initialTimeRolloverAccumulator: [],
                     hasEvent: [],
                     minTime: false,
                     maxTime: false
                 },
                 
-                imu = new IMU(),
-                gyroADC, accSmooth, magADC,
+                imu = new IMU(),                
                 
                 iframeCount = 0,
                 motorFields = [],
-                matches,
                 throttleTotal,
-                eventInThisChunk = null,
                 parsedHeader,
                 sawEndMarker = false;
             
@@ -122,6 +119,7 @@ function FlightLogIndex(logData) {
                                     // Log the beginning of the new chunk
                                     intraIndex.times.push(frameTime);
                                     intraIndex.offsets.push(frameOffset);
+                                    intraIndex.initialTimeRolloverAccumulator.push(frameTime - (frameTime >>> 0) /* i.e. frameTime with the lower 32-bits masked out */);
                                     
                                     if (motorFields.length) {
                                         throttleTotal = 0;
@@ -218,7 +216,6 @@ function FlightLogIndex(logData) {
             var 
                 lastTime, lastLastTime, 
                 lastOffset, lastLastOffset,
-                lastThrottle,
                 
                 sourceIndex = intraframeDirectories[i],
                 

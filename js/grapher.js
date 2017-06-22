@@ -60,7 +60,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
             drawAnalyser:true,              // add an analyser option
             analyserSampleRate:2000/*Hz*/,  // the loop time for the log
-            eraseBackground: true           // Set to false if you want the graph to draw on top of an existing canvas image
+            /*
+            * What background should be drawn behind the graph? Either "none", "clear" (to clear the background)
+            * or "fill" to fill the background with black.
+            */
+            background: "clear"
         },
         
         windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
@@ -932,8 +936,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         windowStartTime = windowCenterTime - windowWidthMicros / 2;
         windowEndTime = windowStartTime + windowWidthMicros;
         
-        if (options.eraseBackground) {
-            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        switch (options.background) {
+            case "fill":
+                canvasContext.fillStyle = 'black';
+                canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+            break;
+            case "clear":
+                 canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            break;        
         }
         
         var 
