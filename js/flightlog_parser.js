@@ -588,7 +588,7 @@ var FlightLogParser = function(logData) {
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
                         $('html').removeClass('isBaseF');
                         $('html').removeClass('isCF');
-                      	$('html').addClass('isBF');
+                        $('html').addClass('isBF');
                         $('html').removeClass('isINAV');
                     }
 
