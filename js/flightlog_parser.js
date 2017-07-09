@@ -585,18 +585,17 @@ var FlightLogParser = function(logData) {
 
                     // Detecting Betaflight requires looking at the revision string
                     if (matches[1] === "Betaflight") {
-                    	   that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
+                        that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
                         $('html').removeClass('isBaseF');
-    						        $('html').removeClass('isCF');
+                        $('html').removeClass('isCF');
                       	$('html').addClass('isBF');
-    						        $('html').removeClass('isINAV');
+                        $('html').removeClass('isINAV');
                     }
 
-                	  that.sysConfig.firmware        = parseFloat(matches[2] + '.' + matches[3]).toFixed(1);
+                    that.sysConfig.firmware        = parseFloat(matches[2] + '.' + matches[3]).toFixed(1);
                     that.sysConfig.firmwarePatch   = (matches[5] != null)?parseInt(matches[5]):'0';
                     that.sysConfig.firmwareVersion = that.sysConfig.firmware + '.' + that.sysConfig.firmwarePatch;
 
-                    
                 } else {
 
                     /*
