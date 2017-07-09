@@ -434,7 +434,7 @@ var FlightLogParser = function(logData) {
             case "yaw_p_limit":
             case "dterm_average_count":
             case "rollPitchItermResetRate":
-            case "yawItermResetRate": 
+            case "yawItermResetRate":
             case "rollPitchItermIgnoreRate":
             case "yawItermIgnoreRate":
             case "dterm_differentiator":
@@ -450,7 +450,7 @@ var FlightLogParser = function(logData) {
             case "baro_hardware":
             case "mag_hardware":
             case "gyro_cal_on_first_arm":
-            case "vbat_pid_compensation": 
+            case "vbat_pid_compensation":
             case "rc_smoothing":
             case "superExpoYawMode":
             case "features":
@@ -518,7 +518,7 @@ var FlightLogParser = function(logData) {
                  that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
             /** End of cleanflight only log headers **/
-            
+
             case "superExpoFactor":
                 if(fieldValue.match(/.*,.*/)!=null) {
                     var expoParams = parseCommaSeparatedString(fieldValue);
@@ -582,23 +582,21 @@ var FlightLogParser = function(logData) {
                 // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
                 var matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
                 if(matches!=null) {
-                
-                    // The that.sysConfig.firmwareType usually has been detected before that. Default value.
-                    if (typeof that.sysConfig.firmwareType === 'undefined' || !that.sysConfig.firmwareType) {
-                	    that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;                    
+
+                    // Detecting Betaflight requires looking at the revision string
+                    if (matches[1] === "Betaflight") {
+                    	   that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
+                        $('html').removeClass('isBaseF');
+    						        $('html').removeClass('isCF');
+                      	$('html').addClass('isBF');
+    						        $('html').removeClass('isINAV');
                     }
-                                         
-                	that.sysConfig.firmware        = parseFloat(matches[2] + '.' + matches[3]).toFixed(1);
+
+                	  that.sysConfig.firmware        = parseFloat(matches[2] + '.' + matches[3]).toFixed(1);
                     that.sysConfig.firmwarePatch   = (matches[5] != null)?parseInt(matches[5]):'0';
                     that.sysConfig.firmwareVersion = that.sysConfig.firmware + '.' + that.sysConfig.firmwarePatch;
+
                     
-                    // TODO: Study if this can be done in the "Firmware type" field for all firmwares
-                    if (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
-                    	$('html').removeClass('isBaseF');
-						$('html').removeClass('isCF');
-                    	$('html').addClass('isBF');
-						$('html').removeClass('isINAV');
-                	}
                 } else {
 
                     /*
@@ -616,15 +614,15 @@ var FlightLogParser = function(logData) {
                         $('html').removeClass('isBF');
                         $('html').addClass('isINAV');
                     } else {
-                    
+
                     	// Cleanflight 1.x and others
-                        that.sysConfig.firmwareVersion = '0.0.0';                    	
-                        that.sysConfig.firmware        = 0.0;                        
+                        that.sysConfig.firmwareVersion = '0.0.0';
+                        that.sysConfig.firmware        = 0.0;
                         that.sysConfig.firmwarePatch   = 0;
                     }
                 }
                 that.sysConfig[fieldName] = fieldValue;
-                
+
             break;
             case "Product":
             case "Blackbox version":
