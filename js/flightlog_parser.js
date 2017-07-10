@@ -562,7 +562,6 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.currentMeterOffset = currentMeterParams[0];
                 that.sysConfig.currentMeterScale = currentMeterParams[1];
             break;
-            case "gyro.scale":
             case "gyro_scale":
                     that.sysConfig.gyroScale = hexToFloat(fieldValue);
 
