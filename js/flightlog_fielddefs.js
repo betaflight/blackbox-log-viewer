@@ -171,7 +171,13 @@ var
             "ANGLERATE",
             "ESC_SENSOR",
             "SCHEDULER",
-            "STACK"
+            "STACK",
+            "ESC_SENSOR_RPM",
+            "ESC_SENSOR_TMP",
+            "ALTITUDE",
+            "FFT",
+            "FFT_TIME",
+            "FFT_FREQ"
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([

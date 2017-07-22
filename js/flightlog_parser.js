@@ -179,13 +179,13 @@ var FlightLogParser = function(logData) {
             frameIntervalPNum: 1,
             frameIntervalPDenom: 1,
             firmwareType: FIRMWARE_TYPE_UNKNOWN,
-            rc_rate: 90,
+            rcRate: 90,
             vbatscale: 110,
             vbatref: 4095,
             vbatmincellvoltage: 33,
             vbatmaxcellvoltage:43,
             vbatwarningcellvoltage: 35,
-            gyro_scale: 0.0001, // Not even close to the default, but it's hardware specific so we can't do much better
+            gyroScale: 0.0001, // Not even close to the default, but it's hardware specific so we can't do much better
             acc_1G: 4096, // Ditto ^
             minthrottle: 1150,
             maxthrottle: 1850,
@@ -198,11 +198,11 @@ var FlightLogParser = function(logData) {
         // standard logger.
 
         defaultSysConfigExtension = {
-            rc_expo:null,              	    // RC Expo
-            rc_expo_yaw:null,                 // Yaw Expo
-            thr_mid:null,              	    // Throttle Mid Position
-            thr_expo:null,              	    // Throttle Expo
-            tpa_rate:null,                 // TPA
+            rcExpo:null,              	    // RC Expo
+            rcYawExpo:null,                 // Yaw Expo
+            thrMid:null,              	    // Throttle Mid Position
+            thrExpo:null,              	    // Throttle Expo
+            dynThrPID:null,                 // TPA
             tpa_breakpoint:null,            // TPA Breakpoint
             airmode_activate_throttle:null, // airmode activation level
             serialrx_provider:null,         // name of the serial rx provider
@@ -417,13 +417,13 @@ var FlightLogParser = function(logData) {
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
                 that.sysConfig.motorOutput[1] = that.sysConfig[fieldName]; // by default, set the maxMotorOutput to match maxThrottle
             break;
-            case "rc_rate":
-            case "rc_expo":
-            case "rc_expo_yaw":
-            case "rc_rate_yaw":
-            case "thr_mid":
-            case "thr_expo":
-            case "tpa_rate":
+            case "rcRate":
+            case "rcExpo":
+            case "rcYawExpo":
+            case "rcYawRate":
+            case "thrMid":
+            case "thrExpo":
+            case "dynThrPID":
             case "tpa_breakpoint":
             case "airmode_activate_throttle":
             case "serialrx_provider":
@@ -474,6 +474,29 @@ var FlightLogParser = function(logData) {
             case "debug_mode":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
+
+
+            case "rc_rate":
+                that.sysConfig.rcRate = parseInt(fieldValue, 10);
+                break;
+            case "rc_expo":
+                that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+                break;
+            case "rc_rate_yaw":
+                that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
+                break;
+            case "rc_expo_yaw":
+                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
+                break;
+            case "thr_mid":
+                that.sysConfig.thrMid = parseInt(fieldValue, 10);
+                break;
+            case "thr_expo":
+                that.sysConfig.thrExpo = parseInt(fieldValue, 10);
+                break;
+            case "tpa_rate":
+                that.sysConfig.dynThrPID = parseInt(fieldValue, 10);
+                break;
 
             case "yawRateAccelLimit":
             case "rateAccelLimit":
@@ -563,16 +586,17 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.currentMeterScale = currentMeterParams[1];
             break;
             case "gyro.scale":
+            case "gyroScale":
             case "gyro_scale":
-                    that.sysConfig.gyro_scale = hexToFloat(fieldValue);
+                    that.sysConfig.gyroScale = hexToFloat(fieldValue);
 
-                    /* Baseflight uses a gyro_scale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
+                    /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
                      * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
                      * match Baseflight so we can use Baseflight's IMU for both: */
                     if (that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
                         that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
                         that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
-                        that.sysConfig.gyro_scale = that.sysConfig.gyro_scale * (Math.PI / 180.0) * 0.000001;
+                        that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
                     }
             break;
             case "Firmware revision":

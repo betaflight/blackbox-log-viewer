@@ -559,7 +559,7 @@ function FlightLog(logData) {
                         [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
                         srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
                         sysConfig.acc_1G,
-                        sysConfig.gyro_scale,
+                        sysConfig.gyroScale,
                         magADC ? [srcFrame[magADC[0]], srcFrame[magADC[1]], srcFrame[magADC[2]]] : false);
 
                     destFrame[fieldIndex++] = attitude.roll;
@@ -951,7 +951,7 @@ FlightLog.prototype.accRawToGs = function(value) {
 };
 
 FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
-    return this.getSysConfig().gyro_scale * 1000000 / (Math.PI / 180.0) * value;
+    return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
 };
 
 
@@ -981,11 +981,11 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             var rcExpo;
 
             if (axis != AXIS.YAW) {
-                rcExpo = sysConfig.rc_expo;
-                rcRate = sysConfig.rc_rate / 100.0;
+                rcExpo = sysConfig.rcExpo;
+                rcRate = sysConfig.rcRate / 100.0;
             } else {
-                rcExpo = sysConfig.rc_expo_yaw;
-                rcRate = sysConfig.rc_rate_yaw / 100.0;
+                rcExpo = sysConfig.rcYawExpo;
+                rcRate = sysConfig.rcYawRate / 100.0;
             }
 
             if (rcRate > 2.0) rcRate = rcRate + (RC_RATE_INCREMENTAL * (rcRate - 2.0));
@@ -1033,7 +1033,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
                 var angleRate;
 
                 if (isSuperExpoActive()) {
-                    var rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rate_yaw,100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rate,100) / 100.0)));
+                    var rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(sysConfig.rcYawRate,100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(sysConfig.rcRate,100) / 100.0)));
                     rcFactor = 1.0 / (constrain(1.0 - (rcFactor * (validate(sysConfig.rates[axis],100) / 100.0)), 0.01, 1.00));
 
                     angleRate = rcFactor * ((27 * value) / 16.0);

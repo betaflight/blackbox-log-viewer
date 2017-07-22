@@ -262,6 +262,12 @@ function HeaderDialog(dialog, onSave) {
 			)
 		}
 
+        if (semver.gte(sysConfig.firmwareVersion, "3.2.0")) {
+            features.push(
+                {bit: 29, group: 'other', name: 'DYNAMIC_FILTER', description: 'Dynamic gyro notch filter based on Fast Fourier Transform'}
+            )
+        }
+
         var radioGroups = [];
 
         var features_e = $('.features');
@@ -424,7 +430,7 @@ function HeaderDialog(dialog, onSave) {
         populatePID('levelPID'					, sysConfig.levelPID);
 
         // Fill in data from for the rates object
-        setParameter('rcRate'					,sysConfig.rc_rate,2);
+        setParameter('rcRate'					,sysConfig.rcRate,2);
         setParameter('vbatscale'				,sysConfig.vbatscale,0);
         setParameter('vbatref'					,sysConfig.vbatref,0);
         setParameter('vbatmincellvoltage'		,sysConfig.vbatmincellvoltage,1);
@@ -434,12 +440,12 @@ function HeaderDialog(dialog, onSave) {
         setParameter('maxthrottle'				,sysConfig.maxthrottle,0);
         setParameter('currentMeterOffset'		,sysConfig.currentMeterOffset,0);
         setParameter('currentMeterScale'		,sysConfig.currentMeterScale,0);
-        setParameter('rcExpo'					,sysConfig.rc_expo,2);
-        setParameter('rcYawRate'				,sysConfig.rc_rate_yaw,2);
-        setParameter('rcYawExpo'				,sysConfig.rc_expo_yaw,2);
+        setParameter('rcExpo'					,sysConfig.rcExpo,2);
+        setParameter('rcYawRate'				,sysConfig.rcYawRate,2);
+        setParameter('rcYawExpo'				,sysConfig.rcYawExpo,2);
         setParameter('thrMid'					,sysConfig.thrMid,2);
         setParameter('thrExpo'					,sysConfig.thrExpo,2);
-        setParameter('dynThrPID'				,sysConfig.tpa_rate,2);
+        setParameter('dynThrPID'				,sysConfig.dynThrPID,2);
         setParameter('tpa-breakpoint'			,sysConfig.tpa_breakpoint,0);
 		setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
 		setParameter('superExpoFactorYaw'		,sysConfig.superExpoFactorYaw,2);

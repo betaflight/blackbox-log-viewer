@@ -194,7 +194,7 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Stack Current',
                             'debug[3]':'Stack p',
             },
-            'DEBUG_ESC_SENSOR_RPM' : {
+            'ESC_SENSOR_RPM' : {
                             'debug[all]':'Debug ESC Sensor RPM',
 							'debug[0]':'debug[0]',
 							'debug[1]':'debug[1]',
@@ -202,21 +202,42 @@ function FlightLogFieldPresenter() {
 							'debug[3]':'debug[3]',
             
             },
-    		'DEBUG_ESC_SENSOR_TMP' : {
+    		'ESC_SENSOR_TMP' : {
                             'debug[all]':'Debug ESC Sensor TMP',
 							'debug[0]':'debug[0]',
 							'debug[1]':'debug[1]',
 							'debug[2]':'debug[2]',
 							'debug[3]':'debug[3]',    		
     		},
-    		'DEBUG_ALTITUDE' : {
+    		'ALTITUDE' : {
                             'debug[all]':'Debug Altitude',
 							'debug[0]':'debug[0]',
 							'debug[1]':'debug[1]',
 							'debug[2]':'debug[2]',
 							'debug[3]':'debug[3]',    		
+    		},
+            "FFT"      : {
+                            'debug[all]':'Debug Dynamic Filter',
+                            'debug[0]':'gyro_preDynamicNotch[roll]',
+                            'debug[1]':'gyro_postDynamicNotch[roll]',
+                            'debug[2]':'gyro_fftMean[roll]',
+                            'debug[3]':'gyro_fftMeanIndex[roll]'
+            },
+            "FFT_TIME" : {
+                            'debug[all]':'Debug Dynamic Filter Performance',
+                            'debug[0]':'Step Id',
+                            'debug[1]':'Step Time',
+                            'debug[2]':'Step Time (Aux)',
+                            'debug[3]':'Not Used'
+            },
+            "FFT_FREQ" : {
+                            'debug[all]':'Debug Dynamic Filter Frequency',
+                            'debug[0]':'notch_hz[roll]',
+                            'debug[1]':'notch_hz[pitch]',
+                            'debug[2]':'notch_hz[yaw]',
+                            'debug[3]':'Not Used'
     		}
-    		};
+        }
     
     function presentFlags(flags, flagNames) {
         var 
@@ -444,6 +465,13 @@ function FlightLogFieldPresenter() {
                         return value.toFixed(0) + "\u03BCS";
                 case 'STACK':
                     return value.toFixed(0);
+                case 'ESC_SENSOR_RPM':
+                case 'ESC_SENSOR_TMP':
+                case 'ALTITUDE':
+                case 'FFT':
+                case 'FFT_TIME':
+                case 'FFT_FREQ':
+
                 default:
 					return "";
 			}	
