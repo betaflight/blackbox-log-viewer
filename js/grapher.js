@@ -70,7 +70,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         sysConfig = flightLog.getSysConfig(),
 
         graphs = [],
-        pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
+        pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rc_rate ? sysConfig.rc_rate : 100) / 100, 1.0, 10),
 
         inTime = false, outTime = false,
         

@@ -262,6 +262,12 @@ function HeaderDialog(dialog, onSave) {
 			)
 		}
 
+        if (semver.gte(sysConfig.firmwareVersion, "3.2.0")) {
+            features.push(
+                {bit: 29, group: 'other', name: 'DYNAMIC_FILTER', description: 'Dynamic gyro notch filter based on Fast Fourier Transform'}
+            )
+        }
+
         var radioGroups = [];
 
         var features_e = $('.features');

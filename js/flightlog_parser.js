@@ -475,6 +475,29 @@ var FlightLogParser = function(logData) {
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
+
+            case "rc_rate":
+                that.sysConfig.rcRate = parseInt(fieldValue, 10);
+                break;
+            case "rc_expo":
+                that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+                break;
+            case "rc_rate_yaw":
+                that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
+                break;
+            case "rc_expo_yaw":
+                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
+                break;
+            case "thr_mid":
+                that.sysConfig.thrMid = parseInt(fieldValue, 10);
+                break;
+            case "thr_expo":
+                that.sysConfig.thrExpo = parseInt(fieldValue, 10);
+                break;
+            case "tpa_rate":
+                that.sysConfig.dynThrPID = parseInt(fieldValue, 10);
+                break;
+
             case "yawRateAccelLimit":
             case "rateAccelLimit":
             case "anti_gravity_gain":
@@ -563,6 +586,7 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.currentMeterScale = currentMeterParams[1];
             break;
             case "gyro.scale":
+            case "gyroScale":
             case "gyro_scale":
                     that.sysConfig.gyroScale = hexToFloat(fieldValue);
 
