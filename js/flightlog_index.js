@@ -149,7 +149,7 @@ function FlightLogIndex(logData) {
                                 [frame[accSmooth[0]], frame[accSmooth[1]], frame[accSmooth[2]]],
                                 frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
                                 sysConfig.acc_1G, 
-                                sysConfig.gyroScale, 
+                                sysConfig.gyro_scale, 
                                 magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
                             );
                         break;
