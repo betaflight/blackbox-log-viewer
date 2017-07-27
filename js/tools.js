@@ -52,9 +52,19 @@ function signExtend8Bit(byte) {
     return (byte & 0x80) ? (byte | 0xFFFFFF00) : byte;
 }
 
+function signExtend7Bit(byte) {
+    //If sign bit is set, fill the top bits with 1s to sign-extend
+    return (byte & 0x40) ? (byte | 0xFFFFFF80) : byte;
+}
+
 function signExtend6Bit(byte) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (byte & 0x20) ? (byte | 0xFFFFFFC0) : byte;
+}
+
+function signExtend5Bit(byte) {
+    //If sign bit is set, fill the top bits with 1s to sign-extend
+    return (byte & 0x10) ? (byte | 0xFFFFFFE0) : byte;
 }
 
 function signExtend4Bit(nibble) {
