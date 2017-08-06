@@ -215,7 +215,28 @@ function FlightLogFieldPresenter() {
 							'debug[1]':'debug[1]',
 							'debug[2]':'debug[2]',
 							'debug[3]':'debug[3]',    		
-    		}
+    		},
+    		'DEBUG_FFT' : {
+    		                'debug[all]':'Debug FFT',
+    		                'debug[0]':'gyro_raw[roll]',
+    		                'debug[1]':'gyro_dyn_notch[roll]',
+    		                'debug[2]':'gyro_bpf[roll]',
+    		                'debug[3]':'fft_center_index[roll]',    		
+    		},
+            'DEBUG_FFT_TIME' : {
+                            'debug[all]':'Debug FFT TIME',
+                            'debug[0]':'Active calc step',
+                            'debug[1]':'Step duration',
+                            'debug[2]':'Additional steps',
+                            'debug[3]':'Not used',
+            },
+            'DEBUG_FFT_FREQ' : {
+                            'debug[all]':'Debug FFT FREQ',
+                            'debug[0]':'center_freq[roll]',
+                            'debug[1]':'center_freq[pitch]',
+                            'debug[2]':'center_freq[yaw]',
+                            'debug[3]':'Not used',
+            }
     		};
     
     function presentFlags(flags, flagNames) {
@@ -441,9 +462,15 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + "\u03BCS";
                     }
                 case 'SCHEDULER':
-                        return value.toFixed(0) + "\u03BCS";
+                    return value.toFixed(0) + "\u03BCS";
                 case 'STACK':
                     return value.toFixed(0);
+                case 'DEBUG_FFT':
+                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                case 'DEBUG_FFT_TIME':
+                    return value.toFixed(0) + "\u03BCS";
+                case 'DEBUG_FFT_FREQ':
+                    return value.toFixed(0) + "Hz";
                 default:
 					return "";
 			}	
