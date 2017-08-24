@@ -476,6 +476,59 @@ var FlightLogParser = function(logData) {
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
+            case "rc_rate":
+                that.sysConfig.rcRate = parseInt(fieldValue, 10);
+                break
+            case "rc_rate_yaw":
+                that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
+                break
+            case "rc_expo":
+                that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+                break
+            case "rc_expo_yaw":
+                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
+                break
+            case "thr_mid":
+                that.sysConfig.thrMid = parseInt(fieldValue, 10);
+                break
+            case "thr_expo":
+                that.sysConfig.thrExpo = parseInt(fieldValue, 10);
+                break
+            case "setpoint_relaxation_ratio":
+                that.sysConfig.setpointRelaxRatio = parseInt(fieldValue, 10);
+                break;
+                dynThrPID
+            case "dterm_setpoint_weight":
+                that.sysConfig.dtermSetpointWeight = parseInt(fieldValue, 10);
+                break
+            case "gyro_lowpass_type":
+                that.sysConfig.gyro_soft_type = parseInt(fieldValue, 10);
+                break
+            case "vbat_pid_gain":
+                that.sysConfig.vbat_pid_compensation = parseInt(fieldValue, 10);
+                break
+            case "dshot_idle_value":
+                that.sysConfig.digitalIdleOffset = parseInt(fieldValue, 10);
+                break
+            case "acc_limit":
+                that.sysConfig.rateAccelLimit = parseInt(fieldValue, 10);
+                break
+            case "acc_limit_yaw":
+                that.sysConfig.yawRateAccelLimit = parseInt(fieldValue, 10);
+                break
+            case "iterm_windup":
+                that.sysConfig.itermWindupPointPercent = parseInt(fieldValue, 10);
+                break
+            case "use_unsynced_pwm":
+                that.sysConfig.unsynced_fast_pwm = parseInt(fieldValue, 10);
+                break
+            case "motor_pwm_protocol":
+                that.sysConfig.fast_pwm_protocol = parseInt(fieldValue, 10);
+                break
+            case "tpa_rate":
+                that.sysConfig.dynThrPID = parseInt(fieldValue, 10);
+                break
+
             case "yawRateAccelLimit":
             case "rateAccelLimit":
             case "anti_gravity_gain":
@@ -628,6 +681,7 @@ var FlightLogParser = function(logData) {
             case "Blackbox version":
             case "Firmware date":
             case "Craft name":
+            case "Log start datetime":
                 // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
                 // Just Add them anyway
                 that.sysConfig[fieldName] = fieldValue;
