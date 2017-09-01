@@ -177,7 +177,8 @@ var
             "DEBUG_ALTITUDE",
             "DEBUG_FFT",
             "DEBUG_FFT_TIME",
-            "DEBUG_FFT_FREQ"
+            "DEBUG_FFT_FREQ",
+            "GYRO_RAW"
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
