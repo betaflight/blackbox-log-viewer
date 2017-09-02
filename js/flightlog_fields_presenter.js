@@ -237,7 +237,15 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'center_freq[yaw]',
                             'debug[3]':'Not used',
             },
-            'GYRO_RAW' :   {   
+            'DEBUG_FRSKY_D_RX' : {
+                            'debug[all]':'Debug FRSKY_D_RX',
+                            'debug[0]':'debug[0]',
+                            'debug[1]':'debug[1]',
+                            'debug[2]':'debug[2]',
+                            'debug[3]':'debug[3]',
+            
+            },
+            'DEBUG_GYRO_RAW' :   {   
                             'debug[all]':'Debug Gyro Raw', 
                             'debug[0]':'gyro_raw[X]',
                             'debug[1]':'gyro_raw[Y]',
