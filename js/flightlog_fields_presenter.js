@@ -236,8 +236,23 @@ function FlightLogFieldPresenter() {
                             'debug[1]':'center_freq[pitch]',
                             'debug[2]':'center_freq[yaw]',
                             'debug[3]':'Not used',
-            }
-    		};
+            },
+            'DEBUG_FRSKY_D_RX' : {
+                            'debug[all]':'Debug FRSKY_D_RX',
+                            'debug[0]':'debug[0]',
+                            'debug[1]':'debug[1]',
+                            'debug[2]':'debug[2]',
+                            'debug[3]':'debug[3]',
+            
+            },
+            'DEBUG_GYRO_RAW' :   {   
+                            'debug[all]':'Debug Gyro Raw', 
+                            'debug[0]':'gyro_raw[X]',
+                            'debug[1]':'gyro_raw[Y]',
+                            'debug[2]':'gyro_raw[Z]',
+                            'debug[3]':'Not Used',
+                        },
+            };
     
     function presentFlags(flags, flagNames) {
         var 
@@ -481,7 +496,7 @@ function FlightLogFieldPresenter() {
     FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
     	if(debugMode) {
 			if(fieldName.includes('debug')) {
-				var debugFields = DEBUG_FRIENDLY_FIELD_NAMES[DEBUG_MODE[debugMode]];
+				var debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugMode < DEBUG_MODE.length ? DEBUG_MODE[debugMode] : DEBUG_MODE[0]];
 				return debugFields[fieldName];
 			}			
     	}

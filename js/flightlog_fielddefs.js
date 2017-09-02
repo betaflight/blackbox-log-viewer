@@ -153,6 +153,7 @@ var
     FILTER_TYPE = makeReadOnly([
             "PT1",
             "BIQUAD",
+            "FIR",
     ]),
 
     DEBUG_MODE = makeReadOnly([
@@ -177,7 +178,9 @@ var
             "DEBUG_ALTITUDE",
             "DEBUG_FFT",
             "DEBUG_FFT_TIME",
-            "DEBUG_FFT_FREQ"
+            "DEBUG_FFT_FREQ",
+            "DEBUG_FRSKY_D_RX",
+            "DEBUG_GYRO_RAW"
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
