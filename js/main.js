@@ -5,6 +5,9 @@ var userSettings = {};
 
 var VIEWER_VERSION = '2.5.13'; // Current version
 
+var INNER_BOUNDS_WIDTH  = 1340,
+    INNER_BOUNDS_HEIGHT = 900;
+
 function BlackboxLogViewer() {
     function supportsRequiredAPIs() {
         return window.File && window.FileReader && window.FileList && Modernizr.canvas;
@@ -863,6 +866,15 @@ function BlackboxLogViewer() {
         hasAnalyser = false;
         html.toggleClass("has-analyser", hasAnalyser);
 
+        $(".btn-new-window").click(function(e) {            
+            chrome.app.window.create('index.html', {
+                'innerBounds' : {
+                    'width'  : INNER_BOUNDS_WIDTH,
+                    'height' : INNER_BOUNDS_HEIGHT
+                }
+            });            
+        });
+        
         $(".file-open").change(function(e) {
             var 
                 files = e.target.files,
