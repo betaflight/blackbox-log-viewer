@@ -5,3 +5,13 @@
 .idea/workspace.xml
 .idea/tasks.xml
 /.idea/
+node_modules/
+npm-debug.log
+cache/
+apps/
+dist/
+debug/
+release/
+
+# artefacts for Visual Studio Code
+/.vscode/

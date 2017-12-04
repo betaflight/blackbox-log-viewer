@@ -69,6 +69,45 @@ This tool is currently in the Beta stage, so a number of key features have yet t
 - There is no control over the amount of smoothing applied to the graph lines
 - There is no way to single-step between loop iterations with the arrow keys
 
+## Native app build via NW.js
+
+### Development
+
+1. Install node.js
+2. Change to project folder and run `npm install`.
+3. Run `npm start` to build & run the debug flavor.
+
+### App build and release
+
+The tasks are defined in `gulpfile.js` and can be run either via `gulp <task-name>` (if the command is in PATH or via `../node_modules/gulp/bin/gulp.js <task-name>`:
+
+1. Optional, install gulp `npm install --global gulp-cli`.
+2. Run `gulp <taskname> [[platform] [platform] ...]`.
+
+List of possible values of `<task-name>`:
+* **dist** copies all the JS and CSS files in the `./dist` folder.
+* **apps** builds the apps in the `./apps` folder [1].
+* **debug** builds debug version of the apps in the `./debug` folder [1].
+* **release** zips up the apps into individual archives in the `./release` folder [1]. 
+
+[1] Running this task on macOS or Linux requires Wine, since it's needed to set the icon for the Windows app (build for specific platform to avoid errors).
+
+#### Build or release app for one specific platform
+To build or release only for one specific platform you can append the plaform after the `task-name`.
+If no platform is provided, only for the platform you are builing from will be build.
+
+* **MacOS** use `gulp <task-name> --osx64`
+* **Linux** use `gulp <task-name> --linux64`
+* **Windows** use `gulp <task-name> --win32`
+* **ChromeOS** use `gulp <task-name> --chromeos`
+
+You can also use multiple platforms e.g. `gulp <taskname> --osx64 --linux64`.
+
+#### macOS DMG installation background image
+
+The release distribution for macOS uses a DMG file to install the application.
+The PSD source for the DMG backgound image can be found in the root (`dmg-background.png`). After changing the source, export the image to PNG format in folder `./images/`.
+
 ## Flight video won't load, or jumpy flight video upon export
 
 Some flight video formats aren't supported by Chrome, so the viewer can't open them. You can fix this by re-encoding
