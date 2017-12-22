@@ -7,6 +7,17 @@ html, body {
     overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
 }
 
+a:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: #999;
+}
+
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
     .container.main-pane {
@@ -1277,4 +1288,47 @@ html.log_open #changelog .wrapper {
     border-style: solid;
     height: calc(100% - 20px);
     margin: 10px 10px 10px 10px;
+}
+
+
+dialog {
+    background-color: white;
+    padding: 1em;
+    height: auto;
+    margin: auto auto;
+    position: absolute;
+    width: 50%;
+    border-radius: 3px;
+    border: 1px solid silver;
+}
+
+dialog h3 {
+    display: block;
+    font-size: 1.17em;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    font-weight: bold;
+}
+
+.regular-button {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-right: 10px;
+    background-color: #ffbb00;
+    border-radius: 3px;
+    border: 1px solid #dba718;
+    color: #000;
+    font-family: 'open_sansbold', Arial;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0px 1px rgba(255, 255, 255, 0.25);
+    display: inline-block;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    padding: 0px;
+    padding-left: 9px;
+    padding-right: 9px;
+    line-height: 28px;
 }

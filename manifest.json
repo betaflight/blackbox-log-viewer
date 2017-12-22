@@ -1,7 +1,7 @@
 {
   "name": "Betaflight - Blackbox Explorer",
   "description": "Interactive flight log viewer for Betaflight",
-  "version": "2.5.13",
+  "version": "3.0.0-rc1",
   "manifest_version": 2,
   "app": {
     "background": {
@@ -12,5 +12,5 @@
        {"fileSystem": ["write"]},
        "storage"
    ],
-  "icons": { "128": "images/icon-128.png" }
+  "icons": { "128": "images/bf_icon_128.png" }
 }

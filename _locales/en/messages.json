@@ -1,0 +1,20 @@
+{
+    "translation_version": {
+        "message": "0"
+    },
+    "noticeTitle": {
+        "message": "Notice"
+    },
+    "checkForUnstableVersions": {
+        "message": "Show update notifications for unstable versions of the configurator"
+    },
+    "updateNotice": {
+        "message": "You are using an outdated version of the <b>Betaflight Blackbox Explorer</b>.<br>Version <b>$1</b> is available online, please visit <a href=\"$2\" target=\"_blank\">the release page</a> to download and install the latest version with fixes and improvements.<br><br>Please close the app before updating."
+    },
+    "updateWebsite": {
+        "message": "Go to Release Website"
+    },
+    "close": {
+        "message": "Close"
+    }
+}

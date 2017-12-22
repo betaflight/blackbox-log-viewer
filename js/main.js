@@ -3,7 +3,7 @@
 // Global Level Variables
 var userSettings = {};
 
-var VIEWER_VERSION = '2.5.13'; // Current version
+var VIEWER_VERSION = getManifestVersion(); // Current version
 
 var INNER_BOUNDS_WIDTH  = 1340,
     INNER_BOUNDS_HEIGHT = 900;
@@ -1885,6 +1885,19 @@ function BlackboxLogViewer() {
         seekBar.onSeek = setCurrentBlackboxTime;
 
     });
+}
+
+function getManifestVersion(manifest) {
+    if (!manifest) {
+        manifest = chrome.runtime.getManifest();
+    }
+
+    var version = manifest.version_name;
+    if (!version) {
+        version = manifest.version;
+    }
+
+    return version;
 }
 
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
