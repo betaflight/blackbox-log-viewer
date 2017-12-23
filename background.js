@@ -7,8 +7,7 @@ function startApplication() {
         innerBounds : {
             'width' : 1340,
             'height' : 920
-        },
-        title: 'Betaflight - Blackbox Explorer'
+        }
     });
 }
 
