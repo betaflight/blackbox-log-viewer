@@ -1,8 +1,8 @@
-# Cleanflight Blackbox Explorer
+# Betaflight Blackbox Explorer
 
 ![Main explorer interface](screenshots/main-interface.jpg)
 
-This tool allows you to open logs recorded by Cleanflight's Blackbox feature in your web browser. You can seek through
+This tool allows you to open logs recorded by Betaflight's Blackbox feature in your web browser. You can seek through
 the log to examine graphed values at each timestep. If you have a flight video, you can load that in as well and it'll
 be played behind the log. You can export the graphs as a WebM video to share with others.
 
@@ -14,7 +14,7 @@ There are three methods of installation available:
 
 The easiest way to get the explorer (if you have Google Chrome) is to install it from the Chrome Web Store:
 
-https://chrome.google.com/webstore/detail/cleanflight-blackbox-expl/cahpidddaimdojnddnahjpnefajpheep
+https://chrome.google.com/webstore/detail/betaflight-blackbox-explo/canpiagfkeefejklcojkhojdijglnghc
 
 This will add it to your computer as a Chrome App.
 
