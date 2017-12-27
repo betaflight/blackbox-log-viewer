@@ -7,7 +7,8 @@ function startApplication() {
         innerBounds : {
             'width' : 1340,
             'height' : 920
-        }
+        },
+        icon: 'images/bf_icon_128.png'
     });
 }
 
