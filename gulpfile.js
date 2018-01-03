@@ -9,6 +9,7 @@ var path = require('path');
 var archiver = require('archiver');
 var del = require('del');
 var NwBuilder = require('nw-builder');
+var makensis = require('makensis');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
@@ -320,18 +321,34 @@ gulp.task('post-build', function(done) {
     done();
 });
 
-// Create distribution package for windows platform
-function release_win32() {
-    var src = path.join(appsDir, pkg.name, 'win32');
-    var output = fs.createWriteStream(path.join(releaseDir, get_release_filename('win32', 'zip')));
-    var archive = archiver('zip', {
-        zlib: { level: 9 }
+//Create installer package for windows platforms
+function release_win(arch) {
+
+    // Create the output directory, with write permissions
+    fs.mkdir(releaseDir, '0775', function(err) {
+        if (err) {
+            if (err.code !== 'EEXIST') {
+                throw err;
+            }
+        }
     });
-    archive.on('warning', function (err) { throw err; });
-    archive.on('error', function (err) { throw err; });
-    archive.pipe(output);
-    archive.directory(src, 'Betaflight Blackbox Explorer');
-    return archive.finalize();
+    
+    // Parameters passed to the installer script
+    const options = {
+            verbose: 2,
+            define: {
+                'VERSION': pkg.version,
+                'PLATFORM': arch,
+                'DEST_FOLDER': releaseDir
+            }
+        }
+    var output = makensis.compileSync('./assets/windows/installer.nsi', options);
+    
+    if (output.status === 0) {
+        console.log('Installer finished for platform: ' + arch);
+    } else {
+        console.error('Installer for platform ' + arch + ' finished with error ' + output.status + ': ' + output.stderr);
+    }
 }
 
 // Create distribution package for linux platform
@@ -415,7 +432,7 @@ gulp.task('release', ['apps', 'clean-release'], function () {
     }
 
     if (platforms.indexOf('win32') !== -1) {
-        release_win32();
+        release_win('win32');
     }
 });
 
