@@ -1,3 +1,6 @@
+
+openLinksInExternalBrowserByDefault();
+
 $(document).ready(function () {
     // translate to user-selected language
     localize();
@@ -64,4 +67,22 @@ function getManifestVersion(manifest) {
 }
 
 checkForConfiguratorUpdates();
+
+function openLinksInExternalBrowserByDefault() {
+    try {
+        var gui = require('nw.gui');
+
+        //Get the current window
+        var win = gui.Window.get();
+
+        //Listen to the new window event
+        win.on('new-win-policy', function (frame, url, policy) {
+          gui.Shell.openExternal(url);
+          policy.ignore();
+        });
+    } catch (ex) {
+        console.log("require does not exist, maybe inside chrome");
+    }
+}
+
 
