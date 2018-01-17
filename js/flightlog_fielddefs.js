@@ -254,10 +254,10 @@ var
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if((firmwareType == FIRMWARE_TYPE_BETAFLIGHT) && semver.gte(firmwareVersion, '3.3.0')) {
         DEBUG_MODE = DEBUG_MODE_COMPLETE.slice(0);
-        DEBUG_MODE.splice(DEBUG_MODE.indexOf('MIXER'),    1);
-        DEBUG_MODE.splice(DEBUG_MODE.indexOf('AIRMODE'),  1);
-        DEBUG_MODE.splice(DEBUG_MODE.indexOf('VELOCITY'), 1);
-        DEBUG_MODE.splice(DEBUG_MODE.indexOf('DFILTER'),  1);
+        DEBUG_MODE.splice(DEBUG_MODE.indexOf('MIXER'),        1);
+        DEBUG_MODE.splice(DEBUG_MODE.indexOf('AIRMODE'),      1);
+        DEBUG_MODE.splice(DEBUG_MODE.indexOf('VELOCITY'),     1);
+        DEBUG_MODE.splice(DEBUG_MODE.indexOf('DTERM_FILTER'), 1);
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
     } else {
         DEBUG_MODE = DEBUG_MODE_COMPLETE;
