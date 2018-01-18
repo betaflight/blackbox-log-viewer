@@ -72,10 +72,10 @@ gulp.task('default', debugBuild);
 
 // Get platform from commandline args
 // #
-// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --osx64, --win32 or --chromeos)
+// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32, --win64, or --chromeos)
 // # 
 function getInputPlatforms() {
-    var supportedPlatforms = ['linux64', 'osx64', 'win32', 'chromeos'];
+    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64', 'chromeos'];
     var platforms = [];
     var regEx = /--(\w+)/;
     for (var i = 3; i < process.argv.length; i++) {
@@ -133,7 +133,6 @@ function getDefaultPlatform() {
     return defaultPlatform;
 }
 
-
 function getPlatforms() {
     return SELECTED_PLATFORMS.slice();
 }
@@ -153,11 +152,13 @@ function getRunDebugAppCommand(arch) {
         break;
 
     case 'linux64':
+    case 'linux32':
         return path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
 
         break;
 
     case 'win32':
+    case 'win64':
         return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
 
         break;
@@ -293,6 +294,14 @@ function listPostBuildTasks(folder, done) {
         postBuildTasks.push(function post_build_win32(done){ return post_build('win32', folder, done) });
     }
 
+    if (platforms.indexOf('win64') != -1) {
+        postBuildTasks.push(function post_build_win64(done){ return post_build('win64', folder, done) });
+    }
+
+    if (platforms.indexOf('linux32') != -1) {
+        postBuildTasks.push(function post_build_linux32(done){ return post_build('linux32', folder, done) });
+    }
+
     if (platforms.indexOf('linux64') != -1) {
         postBuildTasks.push(function post_build_linux64(done){ return post_build('linux64', folder, done) });
     }
@@ -310,7 +319,7 @@ function listPostBuildTasks(folder, done) {
 
 function post_build(arch, folder, done) {
 
-    if (arch == 'win32') {
+    if ((arch == 'win32') || (arch == 'win64')) {
         // Copy ffmpeg codec library into Windows app
         var libSrc = './library/' + arch + '/ffmpeg.dll'
         var libDest = path.join(folder, pkg.name, arch);
@@ -319,7 +328,7 @@ function post_build(arch, folder, done) {
                    .pipe(gulp.dest(libDest));
     }
 
-    if (arch == 'linux64') {
+    if ((arch == 'linux32') || (arch == 'linux64')) {
 
         // Copy Ubuntu launcher scripts to destination dir
         var launcherDir = path.join(folder, pkg.name, arch);
@@ -466,6 +475,9 @@ function release_deb(arch) {
     var debArch;
 
     switch (arch) {
+    case 'linux32':
+        debArch = 'i386';
+        break;
     case 'linux64':
         debArch = 'amd64';
         break;
@@ -555,12 +567,21 @@ function listReleaseTasks(done) {
         releaseTasks.push(function release_linux64_deb(){ return release_deb('linux64') });
     }
 
+    if (platforms.indexOf('linux32') !== -1) {
+        releaseTasks.push(function release_linux32_zip(){ return release_zip('linux32') });
+        releaseTasks.push(function release_linux32_deb(){ return release_deb('linux32') });
+    }
+
     if (platforms.indexOf('osx64') !== -1) {
         releaseTasks.push(release_osx64);
     }
 
     if (platforms.indexOf('win32') !== -1) {
         releaseTasks.push(function release_win32(done){ return release_win('win32', done) });
+    }
+
+    if (platforms.indexOf('win64') !== -1) {
+        releaseTasks.push(function release_win64(done){ return release_win('win64', done) });
     }
 
     return releaseTasks;
