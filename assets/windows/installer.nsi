@@ -8,17 +8,17 @@
 # ${DEST_FOLDER} - Destination folder for the installer files
 
 # Some definitions
-!define SOURCE_FILES          "..\..\apps\cleanflight-blackbox-explorer\${PLATFORM}\*"
-!define APP_NAME              "Cleanflight Blackbox Explorer"
-!define COMPANY_NAME          "Cleanflight Team"
-!define GROUP_NAME            "Cleanflight"
-!define FOLDER_NAME           "Cleanflight-Blackbox-Explorer"
-!define FILE_NAME_INSTALLER   "cleanflight-blackbox-explorer-installer_${VERSION}_${PLATFORM}.exe"
-!define FILE_NAME_UNINSTALLER "uninstall-cleanflight-blackbox-explorer.exe"
-!define FILE_NAME_EXECUTABLE  "cleanflight-blackbox-explorer.exe"
+!define SOURCE_FILES          "..\..\apps\betaflight-blackbox-explorer\${PLATFORM}\*"
+!define APP_NAME              "Betaflight Blackbox Explorer"
+!define COMPANY_NAME          "Betaflight Team"
+!define GROUP_NAME            "Betaflight"
+!define FOLDER_NAME           "Betaflight-Blackbox-Explorer"
+!define FILE_NAME_INSTALLER   "betaflight-blackbox-explorer-installer_${VERSION}_${PLATFORM}.exe"
+!define FILE_NAME_UNINSTALLER "uninstall-betaflight-blackbox-explorer.exe"
+!define FILE_NAME_EXECUTABLE  "betaflight-blackbox-explorer.exe"
 !define LICENSE               "..\..\LICENSE"
-!define MUI_ICON              ".\cf_installer_icon.ico"
-!define MUI_UNICON            ".\cf_uninstaller_icon.ico"
+!define MUI_ICON              ".\bf_installer_icon.ico"
+!define MUI_UNICON            ".\bf_uninstaller_icon.ico"
 
 Name "${APP_NAME}"
 BrandingText "${COMPANY_NAME}"
