@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Cleanflight Blackbox Explorer
-Comment=Interactive flight log viewer for CleanFlight/Betaflight and others
-Exec=/opt/cleanflight/cleanflight-blackbox-explorer/cleanflight-blackbox-explorer
-Icon=/opt/cleanflight/cleanflight-blackbox-explorer/icon/cf_icon_128.png
-Terminal=false
-Type=Application
