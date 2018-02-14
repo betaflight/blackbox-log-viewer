@@ -62,7 +62,7 @@ try {
     if (sysConfig.pid_process_denom != null) {
 		pidRate = gyroRate / sysConfig.pid_process_denom;
 	}
-	var blackBoxRate = pidRate * (sysConfig['frameIntervalPNum'] / sysConfig['frameIntervalPDenom']);
+	var blackBoxRate = 2 * pidRate * (sysConfig['frameIntervalPNum'] / sysConfig['frameIntervalPDenom']);
 	var dataBuffer = {
 			fieldIndex: 0,
 			curve: 0,
