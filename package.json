@@ -22,9 +22,7 @@
   },
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
-  "dependencies": {
-    "gulp-appdmg": "^1.0.3"
-  },
+  "dependencies": {},
   "devDependencies": {
     "command-exists": "^1.2.2",
     "del": "^3.0.0",

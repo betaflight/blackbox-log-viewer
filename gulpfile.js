@@ -11,6 +11,7 @@ const del = require('del');
 const NwBuilder = require('nw-builder');
 const makensis = require('makensis');
 const deb = require('gulp-debian');
+const buildRpm = require('rpm-builder')
 const commandExistsSync = require('command-exists').sync;
 
 const gulp = require('gulp');
@@ -582,6 +583,29 @@ function release_osx64() {
             },
         })
     );
+}
+
+function getLinuxPackageArch(type, arch) {
+    var packArch;
+
+    switch (arch) {
+    case 'linux32':
+        packArch = 'i386';
+        break;
+    case 'linux64':
+        if (type == 'rpm') {
+            packArch = 'x86_64';
+        } else {
+            packArch = 'amd64';
+        }
+        break;
+    default:
+        console.error("Package error, arch: " + arch);
+        process.exit(1);
+        break;
+    }
+
+    return packArch;
 }
 
 // Create the dir directory, with write permissions
