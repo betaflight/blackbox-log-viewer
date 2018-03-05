@@ -209,6 +209,8 @@ var FlightLogParser = function(logData) {
             serialrx_provider:null,         // name of the serial rx provider
             superExpoFactor:null,           // Super Expo Factor
             rates:[null, null, null],	    // Rates [ROLL, PITCH, YAW]
+            rc_rates:[null, null, null],	// RC Rates [ROLL, PITCH, YAW]
+            rc_expo:[null, null, null],	    // RC Expo [ROLL, PITCH, YAW]
             looptime:null,                  // Looptime
             gyro_sync_denom:null,           // Gyro Sync Denom
             pid_process_denom:null,         // PID Process Denom
@@ -262,6 +264,8 @@ var FlightLogParser = function(logData) {
             Craft_name:null,                // Craft Name
             motorOutput:[null,null],        // Minimum and maximum outputs to motor's
             digitalIdleOffset:null,         // min throttle for d-shot (as a percentage)
+            pidSumLimit:null,               // PID sum limit
+            pidSumLimitYaw:null,            // PID sum limit yaw
             unknownHeaders : []             // Unknown Extra Headers
         },
 
@@ -388,6 +392,8 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.frameIntervalPDenom = parseInt(matches[2], 10);
                 }
             break;
+            case "P denom":
+                that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
             case "Data version":
                 dataVersion = parseInt(fieldValue, 10);
             break;
@@ -462,6 +468,7 @@ var FlightLogParser = function(logData) {
             case "fast_pwm_protocol":
             case "motor_pwm_rate":
             case "vbatscale":
+            case "vbat_scale":
             case "vbatref":
             case "acc_1G":
             case "dterm_filter_type":
@@ -483,7 +490,14 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
                 break
             case "rc_expo":
-                that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+                if(fieldValue.match(/.*,.*/)!=null) {
+                    var expos = parseCommaSeparatedString(fieldValue);
+                    that.sysConfig[fieldName] = expos
+                    that.sysConfig.rcExpo = expos[0];
+                    that.sysConfig.rcYawExpo = expos[1];
+                } else {
+                    that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+                }
                 break
             case "rc_expo_yaw":
                 that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
@@ -534,7 +548,7 @@ var FlightLogParser = function(logData) {
             case "anti_gravity_gain":
                 if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
-                    that.sysConfig[fieldName] = uint32ToFloat(fieldValue, 10);
+                    that.sysConfig[fieldName] = parseInt(fieldValue, 10)/1000;
                 } else {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10);
                 }
@@ -584,6 +598,13 @@ var FlightLogParser = function(logData) {
                 }
             break;
 
+            case "pidsum_limit":
+                that.sysConfig.pidSumLimit = parseInt(fieldValue, 10);
+                break;
+            case "pidsum_limit_yaw":
+                that.sysConfig.pidSumLimitYaw = parseInt(fieldValue, 10);
+                break;
+
             /* CSV packed values */
             case "rates":
             case "rollPID":
@@ -598,6 +619,12 @@ var FlightLogParser = function(logData) {
             case "motorOutput":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
+            case "rc_rates":
+                var rc_rates = parseCommaSeparatedString(fieldValue);
+                that.sysConfig[fieldName] = rc_rates
+                that.sysConfig.rcRate = rc_rates[0];
+                that.sysConfig.rcYawRate = rc_rates[1];
+            break;
             case "magPID":
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
             break;
@@ -611,6 +638,7 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
             break;
             case "currentMeter":
+            case "currentSensor":
                 var currentMeterParams = parseCommaSeparatedString(fieldValue);
 
                 that.sysConfig.currentMeterOffset = currentMeterParams[0];

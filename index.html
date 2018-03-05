@@ -551,6 +551,7 @@
             <span class="viewer-version">-</span>
         </div>
     </div>
+    
 	<!-- Dialog Boxes and Popup Windows -->
     <div class="modal fade graph-configuration-dialog" id="dlgGraphConfiguration">
         <div class="modal-dialog">
@@ -580,6 +581,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade header-dialog" id="dlgHeaderDialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -737,16 +739,28 @@
 									<table class="parameter cf">
 										<tbody>
 											<tr>
-												<td name="ptermSRateWeight" class="bf-only"><label>P-Term<br>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
-                                                <td name="setpointRelaxRatio" class="bf-only"><label>Setpoint Relax<br>Ratio</label><input type="number" step="0.01" min="0" max="999" /></td>
-												<td name="dtermSetpointWeight" class="bf-only"><label>D-Term Setpoint<br>Weight</label><input type="number" step="0.01" min="0" max="999" /></td>
+												<td name="ptermSRateWeight" class="bf-only"><label>P-Term<br>&nbsp;<br/>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
+                                                <td name="setpointRelaxRatio" class="bf-only"><label>Setpoint Relax<br>Ratio<br/>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
+												<td name="dtermSetpointWeight" class="bf-only"><label>D-Term Setpoint<br>Weight<br/>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
 												<td name="rateAccelLimit" class="bf-only"><label>Roll/Pitch Rate<br>Acceleration Limit</label><input type="number" step="1" min="0" max="999" /></td>
 												<td name="yawRateAccelLimit" class="bf-only"><label>Yaw Rate<br>Acceleration Limit</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
+                                            </tr>
+										</tbody>
+                                    </table>
+									<table class="parameter cf">
+										<tbody>
                                             <tr>
                                                 <td name="antiGravityGain" class="bf-only"><label>AG Gain</label><input type="number" step="0.01" min="0" max="999" /></td>
                                                 <td name="antiGravityThreshold" class="bf-only"><label>AG Threshold</label><input type="number" step="0.01" min="0" max="999" /></td>
                                                 <td name="itermWindupPointPercent" class="bf-only"><label>Windup Threshold</label><input type="number" step="1" min="0" max="999" /></td>
+                                            </tr>
+										</tbody>
+                                    </table>
+									<table class="parameter cf">
+										<tbody>
+                                            <tr>
+                                                <td name="pidSumLimit" class="bf-only"><label>PIDSum Limit</label><input type="number" step="0.01" min="0" max="999" /></td>
+                                                <td name="pidSumLimitYaw" class="bf-only"><label>PIDSum Limit Yaw</label><input type="number" step="0.01" min="0" max="999" /></td>
                                             </tr>
 										</tbody>
 									</table>
@@ -789,8 +803,8 @@
 										<tbody class="static-features noline">
 											<tr>
 												<td name="pidAtMinThrottle"><label class="option"><input class="ios-switch" type="checkbox"/><div><div></div></div></label></td>
-												<td><label>pidAtMinThrottle</label></td>
-												<td><span>Stabilisation at zero throttle ?</span></td>
+												<td><label>PID controller active at min-throttle</label></td>
+												<td><span>Stabilisation at zero throttle</span></td>
 											</tr>
 										</tbody>
 									</table>
@@ -954,15 +968,9 @@
 													<td name="rcYawExpo" ><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
 													<td name="yaw_deadband" ><label>Deadband</label><input type="number" step="1" min="0" max="100"/></td>
 												</tr>
-											</tbody>
-										</table>
-										<table class="parameter cf">
-											<thead>
 												<tr>
 													<th colspan="5">Super Expo Rates</th>
 												</tr>
-											</thead>
-											<tbody>
 												<tr>
 													<td name="rates[0]"><label>ROLL Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
 													<td name="rates[1]"><label>PITCH Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
@@ -1129,12 +1137,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default header-dialog-toggle"  data-toggle="tooltip" title="Change the header display for the respective firmware type">Cleanflight</button>
-                    <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Cancel</button>
+                    <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Close</button>
                     <button type="button" class="btn btn-primary header-dialog-save" style="display:none;" data-dismiss="modal" data-toggle="tooltip" title="Close and save changes">Save changes</button>
                 </div>
             </div>
         </div>
     </div>
+    
     <div class="modal fade keys-dialog" id="dlgKeysDialog">
         <div class="modal-dialog">
             <div class="modal-content">

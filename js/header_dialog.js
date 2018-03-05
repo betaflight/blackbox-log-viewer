@@ -58,7 +58,9 @@ function HeaderDialog(dialog, onSave) {
 	        {name:'setpointRelaxRatio'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
             {name:'antiGravityGain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
 	        {name:'antiGravityThreshold'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
-            {name:'itermWindupPointPercent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'}
+			{name:'itermWindupPointPercent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
+			{name:'pidSumLimit'        			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
+            {name:'pidSumLimitYaw'     			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'}
 	];
 
 	function isParameterValid(name) {
@@ -208,30 +210,35 @@ function HeaderDialog(dialog, onSave) {
         // generate features
         var features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM', description: 'PPM Receiver Selected'},
-            {bit: 1, group: 'battery', name: 'VBAT', description: 'Battery Monitoring'},
             {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', description: 'In-flight level calibration'},
             {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL', description: 'Serial Receiver Selected'},
             {bit: 4, group: 'other', name: 'MOTOR_STOP', description: 'Motor Stop on low throttle'},
             {bit: 5, group: 'other', name: 'SERVO_TILT', description: 'Servo gimbal'},
             {bit: 6, group: 'other', name: 'SOFTSERIAL', description: 'Enable CPU based serial port'},
             {bit: 7, group: 'other', name: 'GPS', description: 'GPS device connected'},
-            {bit: 8, group: 'other', name: 'FAILSAFE', description: 'Failsafe mode enabled'},
             {bit: 9, group: 'other', name: 'SONAR', description: 'Sonar'},
             {bit: 10, group: 'other', name: 'TELEMETRY', description: 'Telemetry Output'},
-            {bit: 11, group: 'battery', name: 'CURRENT_METER', description: 'Battery current monitoring'},
             {bit: 12, group: 'other', name: '3D', description: '3D mode (for use with reversible ESCs)'},
             {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM', description: 'PWM receiver selected'},
             {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP', description: 'Controller over MSP'},
             {bit: 15, group: 'other', name: 'RSSI_ADC', description: 'ADC RSSI Monitoring'},
             {bit: 16, group: 'other', name: 'LED_STRIP', description: 'Addressible RGB LED strip support'},
-            {bit: 17, group: 'other', name: 'DISPLAY', description: 'OLED Screen Display'},
-            {bit: 19, group: 'other', name: 'BLACKBOX', description: 'Blackbox flight data recorder'},
+			{bit: 17, group: 'other', name: 'DISPLAY', description: 'OLED Screen Display'},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
-            {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Transponder enabled'}
+			{bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Race Transponder'},
         ];
 
 
-        // Add specific features for betaflight v2.8 onwards....
+		// Add specific features for betaflight v2.8 onwards....
+		if (semver.lte(sysConfig.firmwareVersion, "3.2.0")) {
+			features.push(
+				{bit: 1, group: 'battery', name: 'VBAT', description: 'Battery Monitoring'},
+				{bit: 11, group: 'battery', name: 'CURRENT_METER', description: 'Battery current monitoring'},
+				{bit: 8, group: 'other', name: 'FAILSAFE', description: 'Failsafe mode enabled'},
+				{bit: 19, group: 'other', name: 'BLACKBOX', description: 'Blackbox flight data recorder'},
+			);
+		}
+
 		if (semver.gte(sysConfig.firmwareVersion, "2.8.0")) {
 			features.push(
 				{bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'}
@@ -258,7 +265,9 @@ function HeaderDialog(dialog, onSave) {
 
 		if (semver.gte(sysConfig.firmwareVersion, "3.1.0")) {
 			features.push(
-				{bit: 27, group: 'other', name: 'ESC_SENSOR', description: 'Use KISS ESC 24A telemetry as sensor'}
+				{bit: 27, group: 'other', name: 'ESC_SENSOR', description: 'Use KISS ESC 24A telemetry as sensor'},
+				{bit: 28, group: 'other', name: 'ANTI_GRAVITY', description: 'Temporary boost I-Term on high throttle changes'},
+				{bit: 29, group: 'other', name: 'DYNAMIC_FILTER', description: 'Dynamic gyro notch filtering'}
 			)
 		}
 
@@ -516,7 +525,9 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('digitalIdleOffset'		,sysConfig.digitalIdleOffset,2);
         setParameter('antiGravityGain'          ,sysConfig.anti_gravity_gain,0);
         setParameter('antiGravityThreshold'     ,sysConfig.anti_gravity_threshold,0);
-        setParameter('setpointRelaxRatio'		,sysConfig.setpointRelaxRatio,2);
+		setParameter('setpointRelaxRatio'		,sysConfig.setpointRelaxRatio,2);
+		setParameter('pidSumLimit'     			,sysConfig.pidSumLimit,0);
+        setParameter('pidSumLimitYaw'			,sysConfig.pidSumLimitYaw,0);
 
 		/* Packed Flags */
 
@@ -622,8 +633,10 @@ function HeaderDialog(dialog, onSave) {
 
     this.show = function(sysConfig) {
             dialog.modal('show');
-            renderSysConfig(sysConfig);
-
+			renderSysConfig(sysConfig);
+			// Disable changing input and dropdowns
+			$('#dlgHeaderDialog input').prop('disabled', 'disabled');
+			$('#dlgHeaderDialog select').prop('disabled', 'disabled');
     }
 
  	// Buttons
