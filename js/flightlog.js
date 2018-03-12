@@ -255,8 +255,7 @@ function FlightLog(logData) {
             found = false;
 
         var refVoltage;
-        if((sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '3.1.0')) || 
-           (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(sysConfig.firmwareVersion, '2.0.0'))) {
+        if(firmwareGreaterOrEqual(sysConfig, '3.1.0', '2.0.0')) {
             refVoltage = sysConfig.vbatref;
         } else {
             refVoltage = that.vbatADCToMillivolts(sysConfig.vbatref) / 100;
@@ -968,7 +967,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 
     var sysConfig = this.getSysConfig();
 
-    if(sysConfig.firmware >= 3.0 || (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && sysConfig.firmware >= 2.0)) {
+    if(firmwareGreaterOrEqual(sysConfig, '3.0.0', '2.0.0')) {
 
         const RC_RATE_INCREMENTAL = 14.54;
         const RC_EXPO_POWER = 3;
@@ -980,12 +979,30 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             var angleRate, rcRate, rcSuperfactor, rcCommandf;
             var rcExpo;
 
-            if (axis != AXIS.YAW) {
-                rcExpo = sysConfig.rcExpo;
-                rcRate = sysConfig.rcRate / 100.0;
-            } else {
-                rcExpo = sysConfig.rcYawExpo;
-                rcRate = sysConfig.rcYawRate / 100.0;
+            if (firmwareGreaterOrEqual(sysConfig, '3.3.0', '2.3.0')) {
+                switch(axis) {
+                    case AXIS.ROLL:
+                        rcExpo = sysConfig["rc_expo"][0];
+                        rcRate = sysConfig["rc_rates"][0] / 100.0;
+                        break;
+                    case AXIS.PITCH:
+                        rcExpo = sysConfig["rc_expo"][1];
+                        rcRate = sysConfig["rc_rates"][1] / 100.0;
+                        break;
+                    case AXIS.YAW:
+                        rcExpo = sysConfig["rc_expo"][2];
+                        rcRate = sysConfig["rc_rates"][2] / 100.0;
+                        break;
+                }
+            }
+            else {
+                if (axis != AXIS.YAW) {
+                    rcExpo = sysConfig.rcExpo;
+                    rcRate = sysConfig.rcRate / 100.0;
+                } else {
+                    rcExpo = sysConfig.rcYawExpo;
+                    rcRate = sysConfig.rcYawRate / 100.0;
+                }
             }
 
             if (rcRate > 2.0) rcRate = rcRate + (RC_RATE_INCREMENTAL * (rcRate - 2.0));
@@ -1019,7 +1036,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
         return calculateSetpointRate(axis, value);
 
     }
-    else if(sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && sysConfig.firmware >= 2.8) {
+    else if(firmwareGreaterOrEqual(sysConfig, '2.8.0')) {
 
             var that = this;
 

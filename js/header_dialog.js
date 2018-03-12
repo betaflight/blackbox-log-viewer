@@ -58,8 +58,8 @@ function HeaderDialog(dialog, onSave) {
 	        {name:'setpointRelaxRatio'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
             {name:'antiGravityGain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
 	        {name:'antiGravityThreshold'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
-			{name:'itermWindupPointPercent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
-			{name:'pidSumLimit'        			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
+            {name:'itermWindupPointPercent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
+            {name:'pidSumLimit'        			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
             {name:'pidSumLimitYaw'     			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'}
 	];
 
@@ -225,7 +225,7 @@ function HeaderDialog(dialog, onSave) {
             {bit: 16, group: 'other', name: 'LED_STRIP', description: 'Addressible RGB LED strip support'},
 			{bit: 17, group: 'other', name: 'DISPLAY', description: 'OLED Screen Display'},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
-			{bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Race Transponder'},
+            {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Race Transponder'},
         ];
 
 

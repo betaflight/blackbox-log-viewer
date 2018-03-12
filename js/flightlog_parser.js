@@ -490,11 +490,15 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
                 break
             case "rc_expo":
-                if(fieldValue.match(/.*,.*/)!=null) {
+                if(stringHasComma(fieldValue)) {
                     var expos = parseCommaSeparatedString(fieldValue);
                     that.sysConfig[fieldName] = expos
                     that.sysConfig.rcExpo = expos[0];
-                    that.sysConfig.rcYawExpo = expos[1];
+                    if (firmwareGreaterOrEqual(that.sysConfig, '3.3.0', '2.3.0')) {
+                        that.sysConfig.rcYawExpo = expos[2];
+                    } else {
+                        that.sysConfig.rcYawExpo = expos[1];
+                    }
                 } else {
                     that.sysConfig.rcExpo = parseInt(fieldValue, 10);
                 }
@@ -588,7 +592,7 @@ var FlightLogParser = function(logData) {
             /** End of cleanflight only log headers **/
 
             case "superExpoFactor":
-                if(fieldValue.match(/.*,.*/)!=null) {
+                if(stringHasComma(fieldValue)) {
                     var expoParams = parseCommaSeparatedString(fieldValue);
                     that.sysConfig.superExpoFactor    = expoParams[0];
                     that.sysConfig.superExpoFactorYaw = expoParams[1];
@@ -623,7 +627,11 @@ var FlightLogParser = function(logData) {
                 var rc_rates = parseCommaSeparatedString(fieldValue);
                 that.sysConfig[fieldName] = rc_rates
                 that.sysConfig.rcRate = rc_rates[0];
-                that.sysConfig.rcYawRate = rc_rates[1];
+                if (firmwareGreaterOrEqual(that.sysConfig, '3.3.0', '2.3.0')) {
+                    that.sysConfig.rcYawRate = rc_rates[2];
+                } else {
+                    that.sysConfig.rcYawRate = rc_rates[1];
+                }
             break;
             case "magPID":
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
