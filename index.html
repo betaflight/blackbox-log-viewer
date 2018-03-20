@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html class="no-js isBF">
+
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<title>Betaflight - Blackbox Explorer</title>
-<link rel="icon" type="image/png" href="images/bf_icon_128.png">
-<meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Betaflight - Blackbox Explorer</title>
+    <link rel="icon" type="image/png" href="images/bf_icon_128.png">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/jquery.nouislider.min.css">
-<link rel="stylesheet" href="css/main.css">
-<link rel="stylesheet" href="css/header_dialog.css">
-<link rel="stylesheet" href="css/keys_dialog.css">
-<link rel="stylesheet" href="css/user_settings_dialog.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/jquery.nouislider.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header_dialog.css">
+    <link rel="stylesheet" href="css/keys_dialog.css">
+    <link rel="stylesheet" href="css/user_settings_dialog.css">
 
-<script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
+
 <body>
-	<!--  Welcome Page -->
+    <!--  Welcome Page -->
     <div class="welcome-pane">
         <div class="container">
             <div class="jumbotron">
                 <h1>Welcome to the Enhanced Blackbox Explorer!</h1>
                 <p>This tool allows you to view and analyze logs created by Cleanflight's and Betaflight's Blackbox feature.</p>
-                <span class="btn btn-primary btn-lg btn-file"  data-toggle="tooltip" title="Start by opening a log or video file"> Open log file/video <input type="file" class="file-open" multiple></span>
+                <span class="btn btn-primary btn-lg btn-file" data-toggle="tooltip" title="Start by opening a log or video file"> Open log file/video
+                    <input type="file" class="file-open" multiple>
+                </span>
             </div>
         </div>
         <div class="container">
@@ -37,22 +41,22 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                The Blackbox feature is built in to <a href="https://github.com/cleanflight/cleanflight">Cleanflight</a> and <a href="https://github.com/betaflight/betaflight/releases">Betaflight</a>,
-                                and is supported on most of CF's flight controllers (Naze32, CC3D, SPRacingF3, etc.).
+                                The Blackbox feature is built in to
+                                <a href="https://github.com/cleanflight/cleanflight">Cleanflight</a> and
+                                <a href="https://github.com/betaflight/betaflight/releases">Betaflight</a>, and is supported on most of CF's flight controllers (Naze32, CC3D, SPRacingF3,
+                                etc.).
                             </p>
                             <p>
                                 To get started with Blackbox recording, read
-                                <a href="https://github.com/cleanflight/cleanflight/blob/master/docs/Blackbox.md">Cleanflight and Betaflight's
-                                Blackbox feature documentation</a>.
+                                <a href="https://github.com/cleanflight/cleanflight/blob/master/docs/Blackbox.md">Cleanflight and Betaflight's Blackbox feature documentation</a>.
                             </p>
                             <p>
                                 Already have a log recorded? View
-                                <a href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md">the
-                                documentation for this log viewer</a> for details on how to best use this tool.
+                                <a href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md">the documentation for this log viewer</a> for details on how to best use this tool.
                             </p>
                             <p>
-                                If you believe you've found a bug in this viewer (e.g. the viewer crashes upon attempting to
-                                open a log file), or you have a suggestion, please add it to
+                                If you believe you've found a bug in this viewer (e.g. the viewer crashes upon attempting to open a log file), or you have
+                                a suggestion, please add it to
                                 <a href="https://github.com/betaflight/blackbox-log-viewer/issues">the viewer's GitHub bug tracker</a>.
                             </p>
                         </div>
@@ -65,8 +69,8 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                The Blackbox can deliver insights on your flight performance that will allow you to tune
-                                variables such as your PIDs and low-pass filter settings.
+                                The Blackbox can deliver insights on your flight performance that will allow you to tune variables such as your PIDs and
+                                low-pass filter settings.
                             </p>
                             <p>
                                 For help and instructions on how to tune your craft, please read some of these resources:
@@ -104,16 +108,16 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                If you want to analyze your logs with your own mathematics package (such as Matlab)
-                                you can use the separate <a href="https://github.com/cleanflight/blackbox-tools">blackbox_decode tool</a>
-                                to convert your log file into a CSV file for analysis.
+                                If you want to analyze your logs with your own mathematics package (such as Matlab) you can use the separate
+                                <a
+                                    href="https://github.com/cleanflight/blackbox-tools">blackbox_decode tool</a>
+                                    to convert your log file into a CSV file for analysis.
                             </p>
                             <p>
-                                If you want to share your log as a video, you can use the "export video" button at the
-                                top to render a WebM video, or use the commandline
+                                If you want to share your log as a video, you can use the "export video" button at the top to render a WebM video, or use
+                                the commandline
                                 <a href="https://github.com/cleanflight/blackbox-tools">blackbox_render tool</a>
-                                tool to turn your log into a series of PNG files, or use a
-                                screen recording tool to record the playback of this log viewer.
+                                tool to turn your log into a series of PNG files, or use a screen recording tool to record the playback of this log viewer.
                             </p>
                         </div>
                     </div>
@@ -125,10 +129,15 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                <div id="viewer-version"><!-- current version shown here --></div>
+                                <div id="viewer-version">
+                                    <!-- current version shown here -->
+                                </div>
                             </p>
                             <p class="viewer-download">
-								The latest official version is <a class="btn btn-default btn-md btn-viewer-download"  data-toggle="tooltip" title="Goto the latest version download page" href="https://github.com/betaflight/blackbox-log-viewer/releases/latest"> vX.X.XX </a>
+                                The latest official version is
+                                <a class="btn btn-default btn-md btn-viewer-download" data-toggle="tooltip"
+                                    title="Goto the latest version download page" href="https://github.com/betaflight/blackbox-log-viewer/releases/latest">
+                                vX.X.XX </a>
                             </p>
                         </div>
                     </div>
@@ -149,12 +158,16 @@
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <div class="container header-pane">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
                 </button>
                 <div class="navbar-logo">
                     <div>
-                        <img src="./images/cf_logo_white.svg" class="navbar-brand"/>
+                        <img src="./images/cf_logo_white.svg" class="navbar-brand" />
                         <span>Blackbox&nbspExplorer</span>
                     </div>
                     <a class="navbar-brand log-filename" html="#"></a>
@@ -165,8 +178,12 @@
                     <div class="btn-group">
                         <a class="btn btn-default btn-new-window" data-toggle="tooltip" title="Open a new Blackbox Log Viewer window"> New Window </a>
                         <a class="btn btn-primary btn-video-export" data-toggle="tooltip" title="Export your vide and chart setup to file"> Export video...</a>
-                        <a class="btn btn-primary btn-workspaces-export" data-toggle="tooltip" title="Export your workspace configurations to file"> Export Workspaces...</a>
-                        <span class="btn btn-primary btn-file" data-toggle="tooltip" title="Open another log file, video file, exported workspace file or configuration dump file"> Open log file/video <input type="file" class="file-open" multiple></span>
+                        <a class="btn btn-primary btn-workspaces-export" data-toggle="tooltip" title="Export your workspace configurations to file">
+                        Export Workspaces...</a>
+                        <span class="btn btn-primary btn-file" data-toggle="tooltip" title="Open another log file, video file, exported workspace file or configuration dump file">
+                        Open log file/video
+                            <input type="file" class="file-open" multiple>
+                        </span>
                         <button type="button" class="btn btn-default view-zoom-in" data-toggle="tooltip" title="Zoom In Window" style="display: none;">
                             <span class="glyphicon glyphicon-zoom-in"></span>
                         </button>
@@ -178,7 +195,7 @@
             </div>
         </div>
     </nav>
-	<!-- Main Page -->
+    <!-- Main Page -->
     <div class="container-fluid main-pane">
         <ul class="video-top-controls list-unstyled">
             <li class="log-view-panel">
@@ -191,28 +208,31 @@
                     </div>
                     <div class="btn-group view-menu">
                         <div class="dropdown">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="view-menu" >
-                                View <span class="caret"></span></button>
-                            <ul class="dropdown-menu" role="menu"  aria-labelledby="view-menu">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="view-menu">
+                                View
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="view-menu">
                                 <li>
                                     <a href="#" class="open-header-dialog auto-hide-menu" data-toggle="tooltip" title="View/hide header">
-                                        <span class="glyphicon glyphicon-info-sign"></span> Header<span class="pull-right">H</span>
+                                        <span class="glyphicon glyphicon-info-sign"></span> Header
+                                        <span class="pull-right">H</span>
                                     </a>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Overlays</li>
                                 <li>
-                                    <a href="#"  id="auto-hide-menu" class="view-video auto-hide-menu" data-toggle="tooltip" title="View/hide video display">
+                                    <a href="#" id="auto-hide-menu" class="view-video auto-hide-menu" data-toggle="tooltip" title="View/hide video display">
                                         <span class="glyphicon glyphicon-film"></span> Video
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#"  id="auto-hide-menu" class="view-craft auto-hide-menu" data-toggle="tooltip" title="View/hide craft display">
+                                    <a href="#" id="auto-hide-menu" class="view-craft auto-hide-menu" data-toggle="tooltip" title="View/hide craft display">
                                         <span class="glyphicon glyphicon-plane"></span> Craft
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#"  id="auto-hide-menu" class="view-sticks auto-hide-menu" data-toggle="tooltip" title="View/hide stick display">
+                                    <a href="#" id="auto-hide-menu" class="view-sticks auto-hide-menu" data-toggle="tooltip" title="View/hide stick display">
                                         <span class="glyphicon glyphicon-pawn"></span> Sticks
                                     </a>
                                 </li>
@@ -220,24 +240,29 @@
                                 <li class="dropdown-header">Details</li>
                                 <li>
                                     <a href="#" class="view-table auto-hide-menu" data-toggle="tooltip" title="View/hide statistics display">
-                                        <span class="glyphicon glyphicon-list-alt"></span> Values Table<span class="pull-right">T</span>
+                                        <span class="glyphicon glyphicon-list-alt"></span> Values Table
+                                        <span class="pull-right">T</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" class="view-config auto-hide-menu" data-toggle="tooltip" title="View/hide configuration file">
-                                        <span class="glyphicon glyphicon-list-alt"></span> Config<span class="pull-right">C</span>
+                                        <span class="glyphicon glyphicon-list-alt"></span> Config
+                                        <span class="pull-right">C</span>
                                     </a>
                                 </li>
                                 <li class="divider has-analyser"></li>
                                 <li class="dropdown-header has-analyser">Analyser</li>
                                 <li>
                                     <a href="#" class="view-analyser auto-hide-menu" data-toggle="tooltip" title="View/hide analyser display">
-                                        <span class="glyphicon glyphicon-equalizer"></span> Show/Hide<span class="pull-right">A</span>
+                                        <span class="glyphicon glyphicon-equalizer"></span> Show/Hide
+                                        <span class="pull-right">A</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" class="view-analyser-fullscreen auto-hide-menu" data-toggle="tooltip" title="Zoom Analyser Window">
-                                        <span class="glyphicon glyphicon-resize-full"></span><span class="glyphicon glyphicon-resize-small"></span> Re-size<span class="pull-right">&#x21E7;A</span>
+                                        <span class="glyphicon glyphicon-resize-full"></span>
+                                        <span class="glyphicon glyphicon-resize-small"></span> Re-size
+                                        <span class="pull-right">&#x21E7;A</span>
                                     </a>
                                 </li>
                                 <li class="divider"></li>
@@ -269,7 +294,8 @@
                             <span class="glyphicon glyphicon-equalizer"></span>
                         </button>
                         <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
-                            <span class="glyphicon glyphicon-resize-full"></span><span class="glyphicon glyphicon-resize-small"></span>
+                            <span class="glyphicon glyphicon-resize-full"></span>
+                            <span class="glyphicon glyphicon-resize-small"></span>
                         </button>
                     </div>
                 </div>
@@ -279,7 +305,8 @@
                 <div>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-default video-jump-start" data-toggle="tooltip" title="Jump to start of video">
-                            <span class="glyphicon glyphicon-fast-backward"></span> <span class="glyphicon-text-alike">VID</span>
+                            <span class="glyphicon glyphicon-fast-backward"></span>
+                            <span class="glyphicon-text-alike">VID</span>
                         </button>
                         <button type="button" class="btn btn-default log-jump-start" data-toggle="tooltip" title="Jump to start of log">
                             <span class="glyphicon glyphicon-fast-backward"></span>
@@ -297,7 +324,8 @@
                             <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
                         <button type="button" class="btn btn-default video-jump-end" data-toggle="tooltip" title="Jump to end of video">
-                            <span class="glyphicon-text-alike">VID</span> <span class="glyphicon glyphicon-fast-forward"></span>
+                            <span class="glyphicon-text-alike">VID</span>
+                            <span class="glyphicon glyphicon-fast-forward"></span>
                         </button>
                     </div>
                 </div>
@@ -308,9 +336,11 @@
                     <div class="form-group">
                         <div class="btn-group playback-menu">
                             <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="playback-menu" >
-                                    Speed <span class="caret"></span></button>
-                                <ul class="dropdown-menu pull-right" role="menu"  aria-labelledby="playback-menu">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="playback-menu">
+                                    Speed
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="playback-menu">
                                     <li>
                                         <div class="pull-right">
                                             <div class="panel-body">
@@ -336,31 +366,37 @@
                     <div class="form-group">
                         <div class="btn-group zoom-menu">
                             <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="zoom-menu" >
-                                    Zoom <span class="caret"></span></button>
-                                <ul class="dropdown-menu pull-right" role="menu"  aria-labelledby="zoom-menu">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="zoom-menu">
+                                    Zoom
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="zoom-menu">
                                     <li>
                                         <div class="pull-right">
                                             <div class="panel-body">
                                                 Zoom
                                                 <div class="graph-zoom-control btn-group btn-group-vertical"></div>
-                                                <input type="text" class="form-control graph-zoom small-screen" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level"/>
+                                                <input type="text" class="form-control graph-zoom small-screen" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level"
+                                                />
                                             </div>
                                         </div>
                                     </li>
                                     <li>
-                                        <a href="#"  class="toggle-smoothing auto-hide-menu" data-toggle="tooltip" title="Smoothing On/Off">
-                                            <span class="glyphicon glyphicon-ok has-smoothing-override"></span> Disable Smoothing<span class="pull-right">S</span>
+                                        <a href="#" class="toggle-smoothing auto-hide-menu" data-toggle="tooltip" title="Smoothing On/Off">
+                                            <span class="glyphicon glyphicon-ok has-smoothing-override"></span> Disable Smoothing
+                                            <span class="pull-right">S</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#"  class="toggle-expo auto-hide-menu" data-toggle="tooltip" title="Expo On/Off">
-                                            <span class="glyphicon glyphicon-ok has-expo-override"></span> Disable Expo<span class="pull-right">X</span>
+                                        <a href="#" class="toggle-expo auto-hide-menu" data-toggle="tooltip" title="Expo On/Off">
+                                            <span class="glyphicon glyphicon-ok has-expo-override"></span> Disable Expo
+                                            <span class="pull-right">X</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#"  class="toggle-grid auto-hide-menu" data-toggle="tooltip" title="Grid On/Off">
-                                            <span class="glyphicon glyphicon-ok has-grid-override"></span> Disable Grid Lines<span class="pull-right">G</span>
+                                        <a href="#" class="toggle-grid auto-hide-menu" data-toggle="tooltip" title="Grid On/Off">
+                                            <span class="glyphicon glyphicon-ok has-grid-override"></span> Disable Grid Lines
+                                            <span class="pull-right">G</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -387,9 +423,11 @@
                     <div class="form-group">
                         <div class="btn-group sync-menu">
                             <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="sync-menu" >
-                                    Sync <span class="caret"></span></button>
-                                <ul class="dropdown-menu pull-right" role="menu"  aria-labelledby="sync-menu">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="sync-menu">
+                                    Sync
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="sync-menu">
                                     <li>
                                         <div class="pull-right">
                                             <div class="panel-body">
@@ -405,13 +443,14 @@
                                         </div>
                                     </li>
                                     <li>
-                                        <a href="#"  class="log-sync-here auto-hide-menu" data-toggle="tooltip" title="Set the log start to this video frame">
+                                        <a href="#" class="log-sync-here auto-hide-menu" data-toggle="tooltip" title="Set the log start to this video frame">
                                             <span class="glyphicon glyphicon-fast-backward"></span> Start Log Here
                                         </a>
                                     </li>
-                                    <li  class="has-marker">
-                                        <a href="#"  class="log-smart-sync auto-hide-menu" data-toggle="tooltip" title="Set the marked position to here...">
-                                            <span class="glyphicon glyphicon-object-align-left"></span> Smart Sync<span class="pull-right">&#x2325;M</span>
+                                    <li class="has-marker">
+                                        <a href="#" class="log-smart-sync auto-hide-menu" data-toggle="tooltip" title="Set the marked position to here...">
+                                            <span class="glyphicon glyphicon-object-align-left"></span> Smart Sync
+                                            <span class="pull-right">&#x2325;M</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -439,9 +478,11 @@
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <div class="analyser">
-                	<canvas width="0" height="0" id="analyserCanvas"></canvas>
-                	<input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"/>
-					<input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"/>
+                    <canvas width="0" height="0" id="analyserCanvas"></canvas>
+                    <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
+                    />
+                    <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
+                    />
                     <datalist id="analyserZoomXTicks">
                         <option>100</option>
                         <option>200</option>
@@ -452,13 +493,17 @@
                     <datalist id="analyserZoomYTicks">
                         <option>100</option>
                     </datalist>
-				</div>
+                </div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
             </div>
             <div class="log-graph-config no-wheel">
-                <h2 class="no-wheel">Legend <span class="log-close-legend-dialog glyphicon glyphicon-remove no-wheel" data-toggle="tooltip" title="Hide the legend"></span><span class="open-keys-dialog glyphicon glyphicon-question-sign no-wheel" data-toggle="tooltip" title="Show the keyboard shortcuts"></span></h2>
-				<div class="log-index no-wheel"></div>
+                <h2 class="no-wheel">Legend
+                    <span class="log-close-legend-dialog glyphicon glyphicon-remove no-wheel" data-toggle="tooltip" title="Hide the legend"></span>
+                    <span class="open-keys-dialog glyphicon glyphicon-question-sign no-wheel" data-toggle="tooltip"
+                        title="Show the keyboard shortcuts"></span>
+                </h2>
+                <div class="log-index no-wheel"></div>
                 <div class="log-graph-legend no-wheel">
                 </div>
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog no-wheel" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
@@ -466,7 +511,9 @@
             <div class="mouseNotification"></div>
         </div>
         <div class="log-field-values" id="log-field-values">
-            <a href="#log-field-values"><h4>Field values</h4></a>
+            <a href="#log-field-values">
+                <h4>Field values</h4>
+            </a>
             <table class="table table-condensed">
                 <thead>
                     <tr>
@@ -479,14 +526,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><!-- auto filled by updateValues function --></tr>
+                    <tr>
+                        <!-- auto filled by updateValues function -->
+                    </tr>
                 </tbody>
             </table>
         </div>
         <div class="configuration-file" id="configuration-file">
-			<!-- auto filled by configuration function -->
+            <!-- auto filled by configuration function -->
         </div>
-	</div>
+    </div>
     <!-- Log Scroll bar -->
     <div class="log-seek-bar">
         <canvas width="200" height="100"></canvas>
@@ -551,8 +600,8 @@
             <span class="viewer-version">-</span>
         </div>
     </div>
-    
-	<!-- Dialog Boxes and Popup Windows -->
+
+    <!-- Dialog Boxes and Popup Windows -->
     <div class="modal fade graph-configuration-dialog" id="dlgGraphConfiguration">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -565,18 +614,22 @@
                 <div class="modal-body">
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle config-graphs-add" data-toggle="dropdown" aria-expanded="false">
-                            <span class="glyphicon glyphicon-plus"></span> Add graph <span class="caret"></span>
+                            <span class="glyphicon glyphicon-plus"></span> Add graph
+                            <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
                         </ul>
                     </div>
-                    <button type="button" class="btn btn-default config-graphs-remove-all-graphs pull-right" style="display:none;" ><span class="glyphicon glyphicon-trash"></span> Remove all graphs</button>
+                    <button type="button" class="btn btn-default config-graphs-remove-all-graphs pull-right" style="display:none;">
+                        <span class="glyphicon glyphicon-trash"></span> Remove all graphs</button>
                     <ul class="list-unstyled config-graphs-list">
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default graph-configuration-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Cancel</button>
-                    <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal" data-toggle="tooltip" title="Close and save changes">Save changes</button>
+                    <button type="button" class="btn btn-default graph-configuration-dialog-cancel" data-dismiss="modal" data-toggle="tooltip"
+                        title="Close without saving changes">Cancel</button>
+                    <button type="button" class="btn btn-primary graph-configuration-dialog-save" data-dismiss="modal" data-toggle="tooltip"
+                        title="Close and save changes">Save changes</button>
                 </div>
             </div>
         </div>
@@ -595,337 +648,591 @@
                     <h5 class="modal-title-craft"></h5>
                 </div>
                 <div class="modal-body">
-					<form name="header-information" id="pid-tuning">
-						<div class="cf_column half left">
-							<div class="gui_box grey PID-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">PID Settings</div>
-								</div>
-								<div class="spacer_box">
-									<table class="no-inav parameter cf">
-										<tbody>
-											<tr>
-												<td name='pidController'><label>Controller</label><select ><!-- list generated here --></select></td>
-											</tr>
-										</tbody>
-									</table>
-									<table class="pid_titlebar">
-										<tr>
-											<th class="name">Name</th>
-											<th class="proportional">Proportional</th>
-											<th class="integral">Integral</th>
-											<th class="derivative">Derivative</th>
-										</tr>
-									</table>
-									<table id="pid_main" class="pid_tuning">
-										<tr>
-											<th colspan="4">
-												<div class="pid_mode">Basic/Acro</div>
-											</th>
-										</tr>
-										<tr class="rollPID">
-											<!-- 0 -->
-											<td>ROLL</td>
-											<td><input type="number" name="p" step="1" min="0" max="255" /></td>
-											<td><input type="number" name="i" step="1" min="0" max="255" /></td>
-											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
-										</tr>
-										<tr class="pitchPID">
-											<!-- 1 -->
-											<td>PITCH</td>
-											<td><input type="number" name="p" step="1" min="0" max="255" /></td>
-											<td><input type="number" name="i" step="1" min="0" max="255" /></td>
-											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
-										</tr>
-										<tr class="yawPID">
-											<!-- 2 -->
-											<td>YAW</td>
-											<td><input type="number" name="p" step="1" min="0" max="255" /></td>
-											<td><input type="number" name="i" step="1" min="0" max="255" /></td>
-											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
-										</tr>
-									</table>
-									<table id="pid_baro" class="pid_tuning">
-										<tr>
-											<th colspan="4">
-												<div class="pid_mode">Barometer & Sonar/Altitude</div>
-											</th>
-										</tr>
-										<tr class="altPID">
-											<!-- 3 -->
-											<td>ALT</td>
-											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
-											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
-											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
-										</tr>
-										<tr class="velPID">
-											<!-- 9 -->
-											<td>VEL</td>
-											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
-											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
-											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
-										</tr>
-									</table>
-									<table id="pid_mag" class="pid_tuning">
-										<tr>
-											<th colspan="4">
-												<div class="pid_mode">Heading</div>
-											</th>
-										</tr>
-										<tr class="magPID">
-											<!-- 8 -->
-											<td>MAG</td>
-											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
-											<td></td>
-											<td></td>
-										</tr>
-									</table>
-									<table id="pid_gps" class="pid_tuning">
-										<tr>
-											<th colspan="4">
-												<div class="pid_mode">GPS</div>
-											</th>
-										</tr>
-										<tr class="posPID">
-											<!-- 4 -->
-											<td>POS</td>
-											<td><input type="number" name="p" step="0.01" min="0" max="2.55" /></td>
-											<td><input type="number" name="i" step="0.01" min="0" max="2.55" /></td>
-											<td></td>
-										</tr>
-										<tr class="posrPID">
-											<!-- 5 -->
-											<td>POSR</td>
-											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
-											<td><input type="number" name="i" step="0.01" min="0" max="2.55" /></td>
-											<td><input type="number" name="d" step="0.001" min="0" max="0.255" /></td>
-										</tr>
-										<tr class="navrPID">
-											<!-- 6 -->
-											<td>NAVR</td>
-											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
-											<td><input type="number" name="i" step="0.01" min="0" max="2.55" /></td>
-											<td><input type="number" name="d" step="0.001" min="0" max="0.255" /></td>
-										</tr>
-									</table>
-									<table id="pid_accel" class="pid_tuning">
-										<tr>
-											<th colspan="4">
-												<div class="pid_mode borderleft">
-													<div class="textleft">
-														<div class="pidTuningLevel">Angle/Horizon</div>
-													</div>
-													<div class="pids">Strength (Angle)</div>
-													<div class="pids">Strength (Horizon)</div>
-													<div class="pids">Transition (Horizon)</div>
-												</div>
-											</th>
-										</tr>
-										<tr class="levelPID">
-											<!-- 7 -->
-											<td>LEVEL</td>
-											<td><input type="number" name="p" step="0.1" min="0" max="25.5" /></td>
-											<td><input type="number" name="i" step="0.001" min="0" max="0.255" /></td>
-											<td><input type="number" name="d" step="1" min="0" max="255" /></td>
-										</tr>
-									</table>
-								</div>
-							</div>
-							<div class="gui_box grey PID-extra">
-									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">PID Other</div>
-									</div>
-									<div class="spacer_box">
-									<table class="parameter cf">
-										<tbody>
-											<tr>
-												<td name="ptermSRateWeight" class="bf-only"><label>P-Term<br>&nbsp;<br/>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
-                                                <td name="setpointRelaxRatio" class="bf-only"><label>Setpoint Relax<br>Ratio<br/>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
-												<td name="dtermSetpointWeight" class="bf-only"><label>D-Term Setpoint<br>Weight<br/>&nbsp;</label><input type="number" step="0.01" min="0" max="999" /></td>
-												<td name="rateAccelLimit" class="bf-only"><label>Roll/Pitch Rate<br>Acceleration Limit</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="yawRateAccelLimit" class="bf-only"><label>Yaw Rate<br>Acceleration Limit</label><input type="number" step="1" min="0" max="999" /></td>
-                                            </tr>
-										</tbody>
-                                    </table>
-									<table class="parameter cf">
-										<tbody>
+                    <form name="header-information" id="pid-tuning">
+                        <div class="cf_column half left">
+                            <div class="gui_box grey PID-settings">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">PID Settings</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="no-inav parameter cf">
+                                        <tbody>
                                             <tr>
-                                                <td name="antiGravityGain" class="bf-only"><label>AG Gain</label><input type="number" step="0.01" min="0" max="999" /></td>
-                                                <td name="antiGravityThreshold" class="bf-only"><label>AG Threshold</label><input type="number" step="0.01" min="0" max="999" /></td>
-                                                <td name="itermWindupPointPercent" class="bf-only"><label>Windup Threshold</label><input type="number" step="1" min="0" max="999" /></td>
+                                                <td name='pidController'>
+                                                    <label>Controller</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
                                             </tr>
-										</tbody>
+                                        </tbody>
                                     </table>
-									<table class="parameter cf">
-										<tbody>
+                                    <table class="pid_titlebar">
+                                        <tr>
+                                            <th class="name">Name</th>
+                                            <th class="proportional">Proportional</th>
+                                            <th class="integral">Integral</th>
+                                            <th class="derivative">Derivative</th>
+                                        </tr>
+                                    </table>
+                                    <table id="pid_main" class="pid_tuning">
+                                        <tr>
+                                            <th colspan="4">
+                                                <div class="pid_mode">Basic/Acro</div>
+                                            </th>
+                                        </tr>
+                                        <tr class="rollPID">
+                                            <!-- 0 -->
+                                            <td>ROLL</td>
+                                            <td>
+                                                <input type="number" name="p" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                        </tr>
+                                        <tr class="pitchPID">
+                                            <!-- 1 -->
+                                            <td>PITCH</td>
+                                            <td>
+                                                <input type="number" name="p" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                        </tr>
+                                        <tr class="yawPID">
+                                            <!-- 2 -->
+                                            <td>YAW</td>
+                                            <td>
+                                                <input type="number" name="p" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table id="pid_baro" class="pid_tuning">
+                                        <tr>
+                                            <th colspan="4">
+                                                <div class="pid_mode">Barometer & Sonar/Altitude</div>
+                                            </th>
+                                        </tr>
+                                        <tr class="altPID">
+                                            <!-- 3 -->
+                                            <td>ALT</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.1" min="0" max="25.5" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="0.001" min="0" max="0.255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                        </tr>
+                                        <tr class="velPID">
+                                            <!-- 9 -->
+                                            <td>VEL</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.1" min="0" max="25.5" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="0.001" min="0" max="0.255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table id="pid_mag" class="pid_tuning">
+                                        <tr>
+                                            <th colspan="4">
+                                                <div class="pid_mode">Heading</div>
+                                            </th>
+                                        </tr>
+                                        <tr class="magPID">
+                                            <!-- 8 -->
+                                            <td>MAG</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.1" min="0" max="25.5" />
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                    <table id="pid_gps" class="pid_tuning">
+                                        <tr>
+                                            <th colspan="4">
+                                                <div class="pid_mode">GPS</div>
+                                            </th>
+                                        </tr>
+                                        <tr class="posPID">
+                                            <!-- 4 -->
+                                            <td>POS</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.01" min="0" max="2.55" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="0.01" min="0" max="2.55" />
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr class="posrPID">
+                                            <!-- 5 -->
+                                            <td>POSR</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.1" min="0" max="25.5" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="0.01" min="0" max="2.55" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="0.001" min="0" max="0.255" />
+                                            </td>
+                                        </tr>
+                                        <tr class="navrPID">
+                                            <!-- 6 -->
+                                            <td>NAVR</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.1" min="0" max="25.5" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="0.01" min="0" max="2.55" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="0.001" min="0" max="0.255" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table id="pid_accel" class="pid_tuning">
+                                        <tr>
+                                            <th colspan="4">
+                                                <div class="pid_mode borderleft">
+                                                    <div class="textleft">
+                                                        <div class="pidTuningLevel">Angle/Horizon</div>
+                                                    </div>
+                                                    <div class="pids">Strength (Angle)</div>
+                                                    <div class="pids">Strength (Horizon)</div>
+                                                    <div class="pids">Transition (Horizon)</div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                        <tr class="levelPID">
+                                            <!-- 7 -->
+                                            <td>LEVEL</td>
+                                            <td>
+                                                <input type="number" name="p" step="0.1" min="0" max="25.5" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="i" step="0.001" min="0" max="0.255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="gui_box grey PID-extra">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">PID Other</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="parameter cf">
+                                        <tbody>
                                             <tr>
-                                                <td name="pidSumLimit" class="bf-only"><label>PIDSum Limit</label><input type="number" step="0.01" min="0" max="999" /></td>
-                                                <td name="pidSumLimitYaw" class="bf-only"><label>PIDSum Limit Yaw</label><input type="number" step="0.01" min="0" max="999" /></td>
+                                                <td name="ptermSRateWeight" class="bf-only">
+                                                    <label>P-Term
+                                                        <br>&nbsp;
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0.01" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="setpointRelaxRatio" class="bf-only">
+                                                    <label>Setpoint Relax
+                                                        <br>Ratio
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0.01" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="dtermSetpointWeight" class="bf-only">
+                                                    <label>D-Term Setpoint
+                                                        <br>Weight
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0.01" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="rateAccelLimit" class="bf-only">
+                                                    <label>Roll/Pitch Rate
+                                                        <br>Acceleration Limit</label>
+                                                    <input type="number" step="1" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="yawRateAccelLimit" class="bf-only">
+                                                    <label>Yaw Rate
+                                                        <br>Acceleration Limit</label>
+                                                    <input type="number" step="1" min="0" max="999"
+                                                    />
+                                                </td>
                                             </tr>
-										</tbody>
-									</table>
-								</div>
-								<div class="spacer_box">
-									<table class="no-inav parameter cf">
-										<tbody>
-											<tr>
-											    <td name='dynamic_pid' class="bf-only"><label>Dynamic PID</label><select><!-- list generated here --></select></td>
-											</tr>
-										</tbody>
-									</table>
-									<table class="parameter cf">
-										<thead class="BFPIDController">
-											<tr>
-												<th colspan="2">P-Term</th>
-												<th class="bf-only" colspan="2">I-Term</th>
-											</tr>
-										</thead>
-										<tbody class="BFPIDController">
-											<tr>
-											    <td name='dynamic_pterm' class="bf-only"><label>Dynamic P</label><select><!-- list generated here --></select></td>
-												<td name="yaw_p_limit"><label>Yaw Limit</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="rollPitchItermResetRate" class="bf-only"><label>Roll/Pitch Reset</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="rollPitchItermIgnoreRate" class="bf-only"><label>Roll/Pitch Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="yawItermResetRate" class="bf-only"><label>Yaw Reset</label><input type="number" step="1" min="0" max="999" /></td>
-												<td name="yawItermIgnoreRate" class="bf-only"><label>Yaw Ignore Rate</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
-										</tbody>
-										<tbody class="BFPIDController">
-											<tr>
-												<td></td>
-												<td name="iterm_reset_offset" class="bf-only"><label>Reset Offset</label><input type="number" step="1" min="0" max="999" /></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-								<div class="spacer_box">
-									<table class="bf-only" cellpadding="0" cellspacing="0">
-										<tbody class="static-features noline">
-											<tr>
-												<td name="pidAtMinThrottle"><label class="option"><input class="ios-switch" type="checkbox"/><div><div></div></div></label></td>
-												<td><label>PID controller active at min-throttle</label></td>
-												<td><span>Stabilisation at zero throttle</span></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-							<div class="gui_box grey filters">
-									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">Filters</div>
-									</div>
-									<div class="spacer_box">
-									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th colspan="4">Gyro Filters</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td name='gyro_lpf'><label>Hardware</label><select><!-- list generated here --></select></td>
-                                                <td name='gyro_soft_type'><label>Type</label><select><!-- list generated here --></select></td>
-                                                <td name="gyro_lowpass_hz"><label>Soft (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td></td>
-											</tr>
-											<tr>
-												<td name='gyro_notch_hz'><label>Notch 1<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="gyro_notch_cutoff"><label>Notch 1 Cutoff<br>(Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
-                                                <td name='gyro_notch_hz_2'><label>Notch 2<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-                                                <td name="gyro_notch_cutoff_2"><label>Notch 2 Cutoff<br>(Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <tbody>
+                                            <tr>
+                                                <td name="antiGravityGain" class="bf-only">
+                                                    <label>AG Gain</label>
+                                                    <input type="number" step="0.01" min="0" max="999" />
+                                                </td>
+                                                <td name="antiGravityThreshold" class="bf-only">
+                                                    <label>AG Threshold</label>
+                                                    <input type="number" step="0.01" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="itermWindupPointPercent" class="bf-only">
+                                                    <label>Windup Threshold</label>
+                                                    <input type="number" step="1" min="0" max="999"
+                                                    />
+                                                </td>
                                             </tr>
-										</tbody>
-									</table>
-									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th colspan="4">D-Term Filters</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td name='dterm_filter_type'><label>Type<br>&nbsp;</label><select><!-- list generated here --></select></td>
-												<td name="dterm_lpf_hz" ><label>Cut-off<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="dterm_average_count" class="bf-only"><label>Average Count</label><input type="number" step="1" min="0" max="12" /></td>
-												<td name='dterm_notch_hz'><label>Notch<br>(Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="dterm_notch_cutoff"><label>Notch Cutoff<br>(Hz)</label><input type="number" step="0.1" min="0" max="999.00" /></td>
-											</tr>
-										</tbody>
-									</table>
-									<table class="parameter cf">
-										<thead>
-											<tr>
-												<th colspan="4">Other Filters</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td name="acc_lpf_hz"><label>Acc (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												<td name="yaw_lpf_hz" class="bf-only"><label>Yaw (Hz)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-							<div class="gui_box grey rxMode">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Receiver Mode</div>
-								</div>
-								<div class="spacer_box">
-									<table cellpadding="0" cellspacing="0">
-										<thead class="rxMode noline">
-											<tr>
-												<th class="cbox"></th>
-												<th class="item"></th>
-												<th class="description"></th>
-											</tr>
-										</thead>
-										<tbody class="features rxMode noline">
-											<!-- table generated here -->
-										</tbody>
-									</table>
-									<table class="parameter cf">
-										<tbody>
-											<tr>
-												<td name='serialrx_provider'><label>Provider</label><select><!-- list generated here --></select></td>
-											</tr>
-										</tbody>
-									</table>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <tbody>
+                                            <tr>
+                                                <td name="pidSumLimit" class="bf-only">
+                                                    <label>PIDSum Limit</label>
+                                                    <input type="number" step="0.01" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="pidSumLimitYaw" class="bf-only">
+                                                    <label>PIDSum Limit Yaw</label>
+                                                    <input type="number" step="0.01" min="0" max="999"
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="no-inav parameter cf">
+                                        <tbody>
+                                            <tr>
+                                                <td name='dynamic_pid' class="bf-only">
+                                                    <label>Dynamic PID</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <thead class="BFPIDController">
+                                            <tr>
+                                                <th colspan="2">P-Term</th>
+                                                <th class="bf-only" colspan="2">I-Term</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="BFPIDController">
+                                            <tr>
+                                                <td name='dynamic_pterm' class="bf-only">
+                                                    <label>Dynamic P</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name="yaw_p_limit">
+                                                    <label>Yaw Limit</label>
+                                                    <input type="number" step="1" min="0" max="999" />
+                                                </td>
+                                                <td name="rollPitchItermResetRate" class="bf-only">
+                                                    <label>Roll/Pitch Reset</label>
+                                                    <input type="number" step="1" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="rollPitchItermIgnoreRate" class="bf-only">
+                                                    <label>Roll/Pitch Ignore Rate</label>
+                                                    <input type="number" step="1" min="0" max="999"
+                                                    />
+                                                </td>
+                                                <td name="yawItermResetRate" class="bf-only">
+                                                    <label>Yaw Reset</label>
+                                                    <input type="number" step="1" min="0" max="999" />
+                                                </td>
+                                                <td name="yawItermIgnoreRate" class="bf-only">
+                                                    <label>Yaw Ignore Rate</label>
+                                                    <input type="number" step="1" min="0" max="999"
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody class="BFPIDController">
+                                            <tr>
+                                                <td></td>
+                                                <td name="iterm_reset_offset" class="bf-only">
+                                                    <label>Reset Offset</label>
+                                                    <input type="number" step="1" min="0" max="999" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="bf-only" cellpadding="0" cellspacing="0">
+                                        <tbody class="static-features noline">
+                                            <tr>
+                                                <td name="pidAtMinThrottle">
+                                                    <label class="option">
+                                                        <input class="ios-switch" type="checkbox" />
+                                                        <div>
+                                                            <div></div>
+                                                        </div>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <label>PID controller active at min-throttle</label>
+                                                </td>
+                                                <td>
+                                                    <span>Stabilisation at zero throttle</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="gui_box grey filters">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">Filters</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="parameter cf">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">Gyro Filters</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td name='gyro_lpf'>
+                                                    <label>Hardware</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name='gyro_soft_type'>
+                                                    <label>Type</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name="gyro_lowpass_hz">
+                                                    <label>Soft (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td name='gyro_notch_hz'>
+                                                    <label>Notch 1
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td name="gyro_notch_cutoff">
+                                                    <label>Notch 1 Cutoff
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.1" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td name='gyro_notch_hz_2'>
+                                                    <label>Notch 2
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td name="gyro_notch_cutoff_2">
+                                                    <label>Notch 2 Cutoff
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.1" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">D-Term Filters</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td name='dterm_filter_type'>
+                                                    <label>Type
+                                                        <br>&nbsp;</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name="dterm_lpf_hz">
+                                                    <label>Cut-off
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td name="dterm_average_count" class="bf-only">
+                                                    <label>Average Count</label>
+                                                    <input type="number" step="1" min="0" max="12" />
+                                                </td>
+                                                <td name='dterm_notch_hz'>
+                                                    <label>Notch
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td name="dterm_notch_cutoff">
+                                                    <label>Notch Cutoff
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.1" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">Other Filters</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td name="acc_lpf_hz">
+                                                    <label>Acc (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                                <td name="yaw_lpf_hz" class="bf-only">
+                                                    <label>Yaw (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00"
+                                                    />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="gui_box grey rxMode">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">Receiver Mode</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <table cellpadding="0" cellspacing="0">
+                                        <thead class="rxMode noline">
+                                            <tr>
+                                                <th class="cbox"></th>
+                                                <th class="item"></th>
+                                                <th class="description"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="features rxMode noline">
+                                            <!-- table generated here -->
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <tbody>
+                                            <tr>
+                                                <td name='serialrx_provider'>
+                                                    <label>Provider</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
-								</div>
-							</div>
-							<div class="gui_box grey hardware">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Hardware Options</div>
-								</div>
-								<div class="spacer_box">
-									<table class="parameter cf">
-										<tbody>
-											<tr>
-												<td name="loopTime"><label>Looptime</label><input type="number" step="25" min="0" max="3000"/></td>
-												<td name="gyro_sync_denom"><label>Gyro Sync</label><input type="number" step="1" min="0" max="8"/></td>
-												<td name="pid_process_denom"><label>PID Process</label><input type="number" step="1" min="0" max="8"/></td>
-											</tr>
-										</tbody>
-										<tbody>
-											<tr>
-												<td name='acc_hardware'><label>Accelerometer</label><select><!-- list generated here --></select></td>
-												<td name='mag_hardware'><label>Magnetometer</label><select><!-- list generated here --></select></td>
-												<td name='baro_hardware'><label>Barometer</label><select><!-- list generated here --></select></td>
-											</tr>
-										</tbody>
-									</table>
-									<table class="bf-only" cellpadding="0" cellspacing="0">
-										<tbody class="static-features noline">
-											<tr>
-												<td name="gyro_cal_on_first_arm"><label class="option"><input class="ios-switch" type="checkbox"/><div><div></div></div></label></td>
-												<td><label>GYRO_CAL_ON_FIRST_ARM</label></td>
-												<td><span>Calibrate Gyro on first arm</span></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
+                                </div>
+                            </div>
+                            <div class="gui_box grey hardware">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">Hardware Options</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <table class="parameter cf">
+                                        <tbody>
+                                            <tr>
+                                                <td name="loopTime">
+                                                    <label>Looptime</label>
+                                                    <input type="number" step="25" min="0" max="3000" />
+                                                </td>
+                                                <td name="gyro_sync_denom">
+                                                    <label>Gyro Sync</label>
+                                                    <input type="number" step="1" min="0" max="8" />
+                                                </td>
+                                                <td name="pid_process_denom">
+                                                    <label>PID Process</label>
+                                                    <input type="number" step="1" min="0" max="8" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody>
+                                            <tr>
+                                                <td name='acc_hardware'>
+                                                    <label>Accelerometer</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name='mag_hardware'>
+                                                    <label>Magnetometer</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name='baro_hardware'>
+                                                    <label>Barometer</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="bf-only" cellpadding="0" cellspacing="0">
+                                        <tbody class="static-features noline">
+                                            <tr>
+                                                <td name="gyro_cal_on_first_arm">
+                                                    <label class="option">
+                                                        <input class="ios-switch" type="checkbox" />
+                                                        <div>
+                                                            <div></div>
+                                                        </div>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <label>GYRO_CAL_ON_FIRST_ARM</label>
+                                                </td>
+                                                <td>
+                                                    <span>Calibrate Gyro on first arm</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                             <div class="gui_box grey debug">
                                 <div class="gui_box_titlebar">
                                     <div class="spacer_box_title">Debug Settings</div>
@@ -933,200 +1240,365 @@
                                 <div class="spacer_box">
                                     <table class="parameter cf">
                                         <tbody>
-                                        <tr>
-                                            <td name='debug_mode'><label>Debug Mode</label><select><!-- list generated here --></select></td>
-                                        </tr>
+                                            <tr>
+                                                <td name='debug_mode'>
+                                                    <label>Debug Mode</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-						</div>
-						<div class="cf_column half right">
-							<div class="spacer_left">
-								<div class="gui_box grey rates">
-									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">RC Command and Motor Protocols</div>
-									</div>
-									<div class="spacer_box">
-										<table class="parameter cf">
-											<tbody>
+                        </div>
+                        <div class="cf_column half right">
+                            <div class="spacer_left">
+                                <div class="gui_box grey rates">
+                                    <div class="gui_box_titlebar">
+                                        <div class="spacer_box_title">RC Command and Motor Protocols</div>
+                                    </div>
+                                    <div class="spacer_box">
+                                        <table class="parameter cf">
+                                            <tbody>
                                                 <tr>
                                                     <th colspan="3">ROLL</th>
                                                 </tr>
-												<tr>
-                                                    <td name="rcRollRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-                                                    <td name="rates[0]"><label>Super Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
-                                                    <td name="rcRollExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                <tr>
+                                                    <td name="rcRollRate" class="no-inav">
+                                                        <label>Rate</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
+                                                    <td name="rates[0]">
+                                                        <label>Super Rate</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00"
+                                                        />
+                                                    </td>
+                                                    <td name="rcRollExpo">
+                                                        <label>Expo</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <th colspan="3">PITCH</th>
                                                 </tr>
-                                                    <tr>
-                                                        <td name="rcPitchRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-                                                        <td name="rates[1]"><label>Super Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
-                                                        <td name="rcPitchExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-                                                    </tr>
-												<tr>
-													<th colspan="3">YAW</th>
-												</tr>
-												<tr>
-													<td name="rcYawRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-                                                    <td name="rates[2]"><label>Super Rate</label><input type="number" step="0.01" min="0" max="2.55" /></td>
-                                                    <td name="rcYawExpo" ><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                <tr>
+                                                    <td name="rcPitchRate" class="no-inav">
+                                                        <label>Rate</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
+                                                    <td name="rates[1]">
+                                                        <label>Super Rate</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00"
+                                                        />
+                                                    </td>
+                                                    <td name="rcPitchExpo">
+                                                        <label>Expo</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
                                                 </tr>
-												<tr>
-                                                    <td name="superExpoFactor" class="bf-only"><label>ROLL/PITCH SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-                                                    <td name="superExpoFactorYaw" class="bf-only"><label>YAW SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                <tr>
+                                                    <th colspan="3">YAW</th>
+                                                </tr>
+                                                <tr>
+                                                    <td name="rcYawRate" class="no-inav">
+                                                        <label>Rate</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
+                                                    <td name="rates[2]">
+                                                        <label>Super Rate</label>
+                                                        <input type="number" step="0.01" min="0" max="2.55"
+                                                        />
+                                                    </td>
+                                                    <td name="rcYawExpo">
+                                                        <label>Expo</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td name="superExpoFactor" class="bf-only">
+                                                        <label>ROLL/PITCH SuperExpo</label>
+                                                        <input type="number" step="0.01" min="0"
+                                                            max="1.00" />
+                                                    </td>
+                                                    <td name="superExpoFactorYaw" class="bf-only">
+                                                        <label>YAW SuperExpo</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00"
+                                                        />
+                                                    </td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
                                                     <td></td>
-                                                    <td name='superExpoYawMode' class="bf-only"><select><!-- list generated here --></select></td>
+                                                    <td name='superExpoYawMode' class="bf-only">
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
                                                     <td></td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                         <table class="parameter cf">
+
                                             <body>
-												<tr>
-													<th colspan="5">Deadband</th>
-												</tr>
-												<tr>
-                                                    <td name="deadband"><label>Pitch/Roll</label><input type="number" step="1" min="0" max="32"/></td>
-                                                    <td name="yaw_deadband" ><label>Yaw</label><input type="number" step="1" min="0" max="100"/></td>
+                                                <tr>
+                                                    <th colspan="5">Deadband</th>
+                                                </tr>
+                                                <tr>
+                                                    <td name="deadband">
+                                                        <label>Pitch/Roll</label>
+                                                        <input type="number" step="1" min="0" max="32"
+                                                        />
+                                                    </td>
+                                                    <td name="yaw_deadband">
+                                                        <label>Yaw</label>
+                                                        <input type="number" step="1" min="0" max="100" />
+                                                    </td>
                                                     <td></td>
-												</tr>
-											</tbody>
-										</table>
-										<table class="parameter cf">
-											<tbody>
-												<tr>
-													<td name='rc_interpolation'><label>RC Interpolation</label><select><!-- list generated here --></select></td>
-													<td name="rc_interpolation_interval"><label>RC Interval (ms)</label><input type="number" step="0.01" min="0" max="999.00" /></td>
-												</tr>
-											</tbody>
-										</table>									
-										<table class="noline" cellpadding="0" cellspacing="0">
-											<tbody class="static-features misc noline">
-												<tr>
-													<td name="rc_smoothing"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label></td>
-													<td><label>RC_SMOOTHING</label></td>
-													<td><span>RC Smoothing Enabled</span></td>
-												</tr>
-											</tbody>
-										</table>
-										<table class="parameter cf">
-											<thead>
-												<tr>
-													<th colspan="5">Motors</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr>
-													<td name='fast_pwm_protocol'><label>Protocol</label><select><!-- list generated here --></select></td>
-													<td name='unsynced_fast_pwm'><label>Motors</label><select><!-- list generated here --></select></td>
-													<td name="motor_pwm_rate"><label>Motor Rate</label><input type="number" step="1" min="0" max="32000"/></td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<div class="gui_box grey throttle">
-									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">Throttle</div>
-									</div>
-									<div class="spacer_box">
-										<table class="parameter cf">
-											<tbody>
-												<tr>
-													<td name="thrMid"><label>Throttle Mid</label><input type="number" step="0.01" min="0" max="1" /></td>
-													<td name="thrExpo"><label>Throttle Expo</label><input type="number" step="0.01" min="0" max="1" /></td>
-													<td name="minthrottle"><label>Min Throttle</label><input type="number" step="10" min="1000" max="2000" /></td>
-													<td name="maxthrottle"><label>Max Throttle</label><input type="number" step="10" min="1000" max="2000" /></td>
-												</tr>
-											</tbody>
+                                                </tr>
+                                                </tbody>
                                         </table>
                                         <table class="parameter cf">
-											<tbody>
-												<tr>
-													<td name="dynThrPID"><label>TPA</label><input type="number" step="0.01" min="0" max="1.00" /></td>
-													<td name="tpa-breakpoint"><label>TPA&nbsp;Breakpoint</label><input type="number" step="10" min="1000" max="2000" /></td>
-													<td name="airmode_activate_throttle" class="bf-only"><label>Airmode Activate</label><input type="number" step="10" min="1000" max="2000" /></td>
-												</tr>
-											</tbody>
-										</table>
-                                        <table class="parameter cf">
                                             <tbody>
-                                            <tr>
-                                                <td name="digitalIdleOffset"><label>D-Shot Offset (%)</label><input type="number" step="0.01" min="0" max="1" /></td>
-                                                <td name="motorOutputLow"><label>D-Shot Motor Low</label><input type="number" step="10" min="0" max="2047" /></td>
-                                                <td name="motorOutputHigh"><label>D-Shot Motor High</label><input type="number" step="10" min="0" max="2047" /></td>
-                                            </tr>
+                                                <tr>
+                                                    <td name='rc_interpolation'>
+                                                        <label>RC Interpolation</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
+                                                    <td name="rc_interpolation_interval">
+                                                        <label>RC Interval (ms)</label>
+                                                        <input type="number" step="0.01" min="0"
+                                                            max="999.00" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="noline" cellpadding="0" cellspacing="0">
+                                            <tbody class="static-features misc noline">
+                                                <tr>
+                                                    <td name="rc_smoothing">
+                                                        <label class="option">
+                                                            <input class="ios-switch orange" type="checkbox" />
+                                                            <div>
+                                                                <div></div>
+                                                            </div>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label>RC_SMOOTHING</label>
+                                                    </td>
+                                                    <td>
+                                                        <span>RC Smoothing Enabled</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="parameter cf">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="5">Motors</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td name='fast_pwm_protocol'>
+                                                        <label>Protocol</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
+                                                    <td name='unsynced_fast_pwm'>
+                                                        <label>Motors</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
+                                                    <td name="motor_pwm_rate">
+                                                        <label>Motor Rate</label>
+                                                        <input type="number" step="1" min="0" max="32000"
+                                                        />
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
-								</div>
-								<div class="gui_box grey voltagecurrent">
-									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">Voltage and Current</div>
-									</div>
-									<div class="spacer_box">
-									<table class="parameter cf">
-										<tbody>
-											<tr>
-												<td name="currentMeterScale"><label>Current Scale</label><input type="number" step="1" min="0" max="500" /></td>
-												<td name="currentMeterOffset"><label>Current Offset</label><input type="number" step="1" min="0" max="500" /></td>
-											</tr>
-										</tbody>
-										<tbody>
-											<tr>
-												<td name="vbatscale"><label>VBat Scale</label><input type="number" step="1" min="0" max="500" /></td>
-												<td name="vbatref"><label>VBat Ref</label><input type="number" step="1" min="0" max="500" /></td>
-											</tr>
-										</tbody>
-										<tbody>
-											<tr>
-												<td name="vbatmincellvoltage"><label>Min Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-												<td name="vbatwarningcellvoltage"><label>Warning Voltage</label><input type="number" step="0.01" min="0" max="2.55" /></td>
-                                                <td name="vbatmaxcellvoltage"><label>Max Cell Voltage</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-											</tr>
-										</tbody>
-										</table>
-									<table class="noline bf-only" cellpadding="0" cellspacing="0">
-										<tbody class="static-features misc noline">
-											<tr>
-												<td name="vbat_pid_compensation"><label class="option"><input class="ios-switch orange" type="checkbox"/><div><div></div></div></label>
-												<td><label>VBAT_PID_COMPENSATION</label></td>
-												<td><span>Scale PID parameters based upon current battery voltage</span></td>
-											</tr>
-										</tbody>
-									</table>
-									<table cellpadding="0" cellspacing="0">
-										<tbody class="features battery noline">
-											<!-- table generated here -->
-										</tbody>
-									</table>
-									</div>
-								</div>
-								<div class="gui_box grey other">
-									<div class="gui_box_titlebar">
-										<div class="spacer_box_title">Other Features</div>
-									</div>
-									<div class="spacer_box">
-										<table cellpadding="0" cellspacing="0">
-											<thead class="features other noline">
-												<tr>
-													<th class="checkbox"></th>
-													<th class="item"></th>
-													<th class="description"></th>
-												</tr>
-											</thead>
-											<tbody class="features other noline">
-												<!-- table generated here -->
-											</tbody>
-										</table>
-									</div>
-								</div>
+                                </div>
+                                <div class="gui_box grey throttle">
+                                    <div class="gui_box_titlebar">
+                                        <div class="spacer_box_title">Throttle</div>
+                                    </div>
+                                    <div class="spacer_box">
+                                        <table class="parameter cf">
+                                            <tbody>
+                                                <tr>
+                                                    <td name="thrMid">
+                                                        <label>Throttle Mid</label>
+                                                        <input type="number" step="0.01" min="0" max="1"
+                                                        />
+                                                    </td>
+                                                    <td name="thrExpo">
+                                                        <label>Throttle Expo</label>
+                                                        <input type="number" step="0.01" min="0" max="1"
+                                                        />
+                                                    </td>
+                                                    <td name="minthrottle">
+                                                        <label>Min Throttle</label>
+                                                        <input type="number" step="10" min="1000" max="2000"
+                                                        />
+                                                    </td>
+                                                    <td name="maxthrottle">
+                                                        <label>Max Throttle</label>
+                                                        <input type="number" step="10" min="1000" max="2000"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="parameter cf">
+                                            <tbody>
+                                                <tr>
+                                                    <td name="dynThrPID">
+                                                        <label>TPA</label>
+                                                        <input type="number" step="0.01" min="0" max="1.00" />
+                                                    </td>
+                                                    <td name="tpa-breakpoint">
+                                                        <label>TPA&nbsp;Breakpoint</label>
+                                                        <input type="number" step="10" min="1000"
+                                                            max="2000" />
+                                                    </td>
+                                                    <td name="airmode_activate_throttle" class="bf-only">
+                                                        <label>Airmode Activate</label>
+                                                        <input type="number" step="10" min="1000"
+                                                            max="2000" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="parameter cf">
+                                            <tbody>
+                                                <tr>
+                                                    <td name="digitalIdleOffset">
+                                                        <label>D-Shot Offset (%)</label>
+                                                        <input type="number" step="0.01" min="0"
+                                                            max="1" />
+                                                    </td>
+                                                    <td name="motorOutputLow">
+                                                        <label>D-Shot Motor Low</label>
+                                                        <input type="number" step="10" min="0" max="2047"
+                                                        />
+                                                    </td>
+                                                    <td name="motorOutputHigh">
+                                                        <label>D-Shot Motor High</label>
+                                                        <input type="number" step="10" min="0" max="2047"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="gui_box grey voltagecurrent">
+                                    <div class="gui_box_titlebar">
+                                        <div class="spacer_box_title">Voltage and Current</div>
+                                    </div>
+                                    <div class="spacer_box">
+                                        <table class="parameter cf">
+                                            <tbody>
+                                                <tr>
+                                                    <td name="currentMeterScale">
+                                                        <label>Current Scale</label>
+                                                        <input type="number" step="1" min="0" max="500"
+                                                        />
+                                                    </td>
+                                                    <td name="currentMeterOffset">
+                                                        <label>Current Offset</label>
+                                                        <input type="number" step="1" min="0" max="500"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody>
+                                                <tr>
+                                                    <td name="vbatscale">
+                                                        <label>VBat Scale</label>
+                                                        <input type="number" step="1" min="0" max="500"
+                                                        />
+                                                    </td>
+                                                    <td name="vbatref">
+                                                        <label>VBat Ref</label>
+                                                        <input type="number" step="1" min="0" max="500" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody>
+                                                <tr>
+                                                    <td name="vbatmincellvoltage">
+                                                        <label>Min Cell Voltage</label>
+                                                        <input type="number" step="0.01" min="0"
+                                                            max="1.00" />
+                                                    </td>
+                                                    <td name="vbatwarningcellvoltage">
+                                                        <label>Warning Voltage</label>
+                                                        <input type="number" step="0.01" min="0" max="2.55"
+                                                        />
+                                                    </td>
+                                                    <td name="vbatmaxcellvoltage">
+                                                        <label>Max Cell Voltage</label>
+                                                        <input type="number" step="0.01" min="0"
+                                                            max="1.00" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="noline bf-only" cellpadding="0" cellspacing="0">
+                                            <tbody class="static-features misc noline">
+                                                <tr>
+                                                    <td name="vbat_pid_compensation">
+                                                        <label class="option">
+                                                            <input class="ios-switch orange" type="checkbox" />
+                                                            <div>
+                                                                <div></div>
+                                                            </div>
+                                                        </label>
+                                                        <td>
+                                                            <label>VBAT_PID_COMPENSATION</label>
+                                                        </td>
+                                                        <td>
+                                                            <span>Scale PID parameters based upon current battery voltage</span>
+                                                        </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table cellpadding="0" cellspacing="0">
+                                            <tbody class="features battery noline">
+                                                <!-- table generated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="gui_box grey other">
+                                    <div class="gui_box_titlebar">
+                                        <div class="spacer_box_title">Other Features</div>
+                                    </div>
+                                    <div class="spacer_box">
+                                        <table cellpadding="0" cellspacing="0">
+                                            <thead class="features other noline">
+                                                <tr>
+                                                    <th class="checkbox"></th>
+                                                    <th class="item"></th>
+                                                    <th class="description"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="features other noline">
+                                                <!-- table generated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                                 <div class="gui_box grey unknown">
                                     <div class="gui_box_titlebar">
                                         <div class="spacer_box_title">Unknown Header Fields</div>
@@ -1140,20 +1612,21 @@
                                         </table>
                                     </div>
                                 </div>
-							</div>
-						</div>
-					</form>
-                	<div class="clear-both"></div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default header-dialog-toggle"  data-toggle="tooltip" title="Change the header display for the respective firmware type">Cleanflight</button>
+                    <button type="button" class="btn btn-default header-dialog-toggle" data-toggle="tooltip" title="Change the header display for the respective firmware type">Cleanflight</button>
                     <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Close</button>
-                    <button type="button" class="btn btn-primary header-dialog-save" style="display:none;" data-dismiss="modal" data-toggle="tooltip" title="Close and save changes">Save changes</button>
+                    <button type="button" class="btn btn-primary header-dialog-save" style="display:none;" data-dismiss="modal" data-toggle="tooltip"
+                        title="Close and save changes">Save changes</button>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="modal fade keys-dialog" id="dlgKeysDialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -1165,254 +1638,325 @@
                 </div>
                 <div class="modal-body">
                     <div class="cf_column half left">
-						<div class="clear-both"></div>
-							<div class="gui_box grey">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Scrolling, Zooming, Play and Pause</div>
-								</div>
-								<div class="clear-both"></div>
-								<div class="spacer_box">
-									<ul>
-										<li><span class=keys"><div class="key">Home</div><div class="normal">and</div><div class="key">End</div></span>
-													<div class="description">Go to the start or end of the current log.</div></li>
-										<li><span class=keys"><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-													<div class="description">Moves through log backwards and forwards by exactly 100ms.</div></li>
-										<li><span class=keys"><div class="key">Alt</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-													<div class="description">Moves through log backwards and forwards by exactly one frame. If a video is loaded, then scroll one video frame otherwise scroll one log frame.</div></li>
-										<li><span class=keys"><div class="key">PgUp</div><div class="normal">and</div><div class="key">PgDn</div></span>
-													<div class="description">Moves through log backwards and forwards fast.</div></li>
-									</ul>
-									<ul>
-										<li><span class=keys"><div class="key">Shift</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-													<div class="description">Zoom Log Out and In.</div></li>
-										<li><span class=keys"><div class="key">Shift</div><div class="key">Alt</div><div class="key">&larr;</div><div class="normal">and</div><div class="key">&rarr;</div></span>
-													<div class="description">Zoom Log Out and In but faster.</div></li>
-									</ul>
-									<ul>
-										<li><span class=keys"><div class="key">Spacebar</div></span><div class="description">Starts / Pauses Log and/or Video</div></li>
+                        <div class="clear-both"></div>
+                        <div class="gui_box grey">
+                            <div class="gui_box_titlebar">
+                                <div class="spacer_box_title">Scrolling, Zooming, Play and Pause</div>
+                            </div>
+                            <div class="clear-both"></div>
+                            <div class="spacer_box">
+                                <ul>
+                                    <li>
+                                        <span class=keys "><div class="key ">Home</div><div class="normal
+                                            ">and</div><div class="key ">End</div></span>
+													<div class="description ">Go to the start or end of the current log.</div></li>
+										<li><span class=keys">
+                                            <div class="key">&larr;</div>
+                                            <div class="normal">and</div>
+                                            <div class="key">&rarr;</div>
+                                        </span>
+                                        <div class="description">Moves through log backwards and forwards by exactly 100ms.</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">Alt</div><div class="key
+                                            ">&larr;</div><div class="normal ">and</div><div class="key ">&rarr;</div></span>
+													<div class="description ">Moves through log backwards and forwards by exactly one frame. If a video is loaded, then scroll one video frame otherwise scroll one log frame.</div></li>
+										<li><span class=keys">
+                                            <div class="key">PgUp</div>
+                                            <div class="normal">and</div>
+                                            <div class="key">PgDn</div>
+                                        </span>
+                                        <div class="description">Moves through log backwards and forwards fast.</div>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li>
+                                        <span class=keys "><div class="key ">Shift</div><div class="key
+                                            ">&larr;</div><div class="normal ">and</div><div class="key ">&rarr;</div></span>
+													<div class="description ">Zoom Log Out and In.</div></li>
+										<li><span class=keys">
+                                            <div class="key">Shift</div>
+                                            <div class="key">Alt</div>
+                                            <div class="key">&larr;</div>
+                                            <div class="normal">and</div>
+                                            <div class="key">&rarr;</div>
+                                        </span>
+                                        <div class="description">Zoom Log Out and In but faster.</div>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li>
+                                        <span class=keys "><div class="key ">Spacebar</div></span><div class="description ">Starts / Pauses Log and/or Video</div></li>
 									</ul>
 								</div>
 							</div>
-                			<div class="gui_box grey topspacer">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Quick Modes</div>
+                			<div class="gui_box grey topspacer ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Quick Modes</div>
 								</div>
-								<div class="clear-both"></div>
-								<div class="spacer_box">
+								<div class="clear-both "></div>
+								<div class="spacer_box ">
 									<ul>
-										<li><span class=keys"><div class="key">Z</div></span>
-													<div class="description">Toggle QuickZoom. Quickly Zoom out to Max and back</div></li>
-										<li><span class=keys"><div class="key">S</div></span>
-													<div class="description">Toggle QuickSmooth, Quickly override graph smoothing and force all graph smoothing to zero.</div></li>
-										<li><span class=keys"><div class="key">X</div></span>
-													<div class="description">Toggle QuickExpo, Quickly override graph expo and force all graph expo to linear.</div></li>
-										<li><span class=keys"><div class="key">G</div></span>
-													<div class="description">Toggle QuickGrid, Quickly override graph grid view's and force all grids to disappear.</div></li>
-										<li><span class=keys"><div class="key">T</div></span>
-													<div class="description">Toggle QuickTable, Quickly show the field values table.</div></li>
-										<li><span class=keys"><div class="key">C</div></span>
-													<div class="description">Toggle QuickConfig, Quickly show the configuration dump file (if loaded).</div></li>
+										<li><span class=keys">
+                                            <div class="key">Z</div>
+                                        </span>
+                                        <div class="description">Toggle QuickZoom. Quickly Zoom out to Max and back</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">S</div></span>
+													<div class="description ">Toggle QuickSmooth, Quickly override graph smoothing and force all graph smoothing to zero.</div></li>
+										<li><span class=keys">
+                                            <div class="key">X</div>
+                                        </span>
+                                        <div class="description">Toggle QuickExpo, Quickly override graph expo and force all graph expo to linear.</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">G</div></span>
+													<div class="description ">Toggle QuickGrid, Quickly override graph grid view's and force all grids to disappear.</div></li>
+										<li><span class=keys">
+                                            <div class="key">T</div>
+                                        </span>
+                                        <div class="description">Toggle QuickTable, Quickly show the field values table.</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">C</div></span>
+													<div class="description ">Toggle QuickConfig, Quickly show the configuration dump file (if loaded).</div></li>
 									</ul>
 								</div>
 							</div>
 						</div>
-                    <div class="cf_column half right">
-						<div class="spacer_left">
-                			<div class="clear-both"></div>
-							<div class="gui_box grey">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Marking, Smart Sync</div>
+                    <div class="cf_column half right ">
+						<div class="spacer_left ">
+                			<div class="clear-both "></div>
+							<div class="gui_box grey ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Marking, Smart Sync</div>
 								</div>
-								<div class="clear-both"></div>
-								<div class="spacer_box">
+								<div class="clear-both "></div>
+								<div class="spacer_box ">
 									<ul>
-										<li><span class=keys"><div class="key">M</div></span>
-													<div class="description">Toggles a Marker on the log at the current time. As you scroll, time from marker (offset) is displayed on the toolbar. (Useful for measuring times between events.)</div></li>
-										<li><span class=keys"><div class="key">Alt</div><div class="key">M</div></span>
-													<div class="description">Smart Sync. With both a log AND a video loaded, Press 'M' to place a marker on the log where an event occurs (such as the exact start of a roll). Then scroll backwards and forwards until your video shows the exaxt same start of event. Now press 'Alt M' to sync the log and video at this point.</div></li>
+										<li><span class=keys">
+                                            <div class="key">M</div>
+                                        </span>
+                                        <div class="description">Toggles a Marker on the log at the current time. As you scroll, time from marker
+                                            (offset) is displayed on the toolbar. (Useful for measuring times between events.)</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">Alt</div><div class="key ">M</div></span>
+													<div class="description ">Smart Sync. With both a log AND a video loaded, Press 'M' to place a marker on the log where an event occurs (such as the exact start of a roll). Then scroll backwards and forwards until your video shows the exaxt same start of event. Now press 'Alt M' to sync the log and video at this point.</div></li>
 									</ul>
 									<ul>
 										<li></li>
-										<li><span class=keys"><div class="key">I</div></span>
-													<div class="description">Mark the start of (IN) video export or analyser start.</div></li>
-										<li><span class=keys"><div class="key">O</div></span>
-													<div class="description">Mark the end of (OUT) video export or analyser end.</div></li>
+										<li><span class=keys">
+                                            <div class="key">I</div>
+                                        </span>
+                                        <div class="description">Mark the start of (IN) video export or analyser start.</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">O</div></span>
+													<div class="description ">Mark the end of (OUT) video export or analyser end.</div></li>
 									</ul>
 								</div>
 							</div>
-                			<div class="gui_box grey topspacer">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Workspaces / Favourites</div>
+                			<div class="gui_box grey topspacer ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Workspaces / Favourites</div>
 								</div>
-								<div class="clear-both"></div>
-								<div class="spacer_box">
+								<div class="clear-both "></div>
+								<div class="spacer_box ">
 									<ul>
-										<li><span class=keys"><div class="key">Shift</div><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
-													<div class="description">Save the current displayed graph configuration to workspace/favourite key 0 through 9 (this includes all graph smoothing and expo etc.).</div></li>
-										<li><span class=keys"><div class="key">0</div><div class="normal">to</div><div class="key">9</div></span>
-													<div class="description">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration swapping useful for comparing traces.</div></li>
+										<li><span class=keys">
+                                            <div class="key">Shift</div>
+                                            <div class="key">0</div>
+                                            <div class="normal">to</div>
+                                            <div class="key">9</div>
+                                        </span>
+                                        <div class="description">Save the current displayed graph configuration to workspace/favourite key 0 through
+                                            9 (this includes all graph smoothing and expo etc.).</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">0</div><div class="normal ">to</div><div class="key ">9</div></span>
+													<div class="description ">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration swapping useful for comparing traces.</div></li>
 									</ul>
 									<ul>
-										<li><span class=keys"><div class="key">Ctrl</div><div class="key">Z</div></span>
-													<div class="description">Swap back to your last graph configuration. Repeatedly pressing Ctrl-Z will toggle the last two graph configurations.</div></li>
-									</ul>
-									<ul>
-										<li><span class=keys"><div class="key">Alt</div><div class="key">Shift</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
-													<div class="description">Save the current time to Bookmark hotkeys 1 through 9</div></li>
-										<li><span class=keys"><div class="key">Alt</div><div class="key">1</div><div class="normal">to</div><div class="key">9</div></span>
-													<div class="description">Recall Bookmark 1 though 9 to jump to specific time quickly.</div></li>
-										<li><span class=keys"><div class="key">Alt</div><div class="key">0</div></span>
-													<div class="description">Special Case, clear all bookmarks</div></li>
+										<li><span class=keys">
+                                            <div class="key">Ctrl</div>
+                                            <div class="key">Z</div>
+                                        </span>
+                                        <div class="description">Swap back to your last graph configuration. Repeatedly pressing Ctrl-Z will toggle
+                                            the last two graph configurations.</div>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li>
+                                        <span class=keys "><div class="key ">Alt</div><div class="key
+                                            ">Shift</div><div class="key ">1</div><div class="normal ">to</div><div class="key ">9</div></span>
+													<div class="description ">Save the current time to Bookmark hotkeys 1 through 9</div></li>
+										<li><span class=keys">
+                                            <div class="key">Alt</div>
+                                            <div class="key">1</div>
+                                            <div class="normal">to</div>
+                                            <div class="key">9</div>
+                                        </span>
+                                        <div class="description">Recall Bookmark 1 though 9 to jump to specific time quickly.</div>
+                                    </li>
+                                    <li>
+                                        <span class=keys "><div class="key ">Alt</div><div class="key ">0</div></span>
+													<div class="description ">Special Case, clear all bookmarks</div></li>
 									</ul>
 								</div>
 							</div>
 						</div>
 					</div>
-                	<div class="clear-both"></div>
+                	<div class="clear-both "></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default keys-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close the dialog box">Cancel</button>
+                <div class="modal-footer ">
+                    <button type="button " class="btn btn-default keys-dialog-cancel " data-dismiss="modal
+                                            " data-toggle="tooltip " title="Close the dialog box ">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade video-export-dialog" id="dlgVideoExport">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Export video</h4>
+    <div class="modal fade video-export-dialog " id="dlgVideoExport ">
+        <div class="modal-dialog ">
+            <div class="modal-content ">
+                <div class="modal-header ">
+                    <h4 class="modal-title ">Export video</h4>
                 </div>
-                <div class="modal-body">
-                    <div class="pane-video-settings form-horizontal">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Video duration</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static video-duration"></p>
+                <div class="modal-body ">
+                    <div class="pane-video-settings form-horizontal ">
+                        <div class="form-group ">
+                            <label class="col-sm-3 control-label ">Video duration</label>
+                            <div class="col-sm-9 ">
+                                <p class="form-control-static video-duration "></p>
                                 <p>You can use the I (In) and O (Out) keys while
                                 viewing the log to mark the start and end points of the video</p>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Framerate</label>
-                            <div class="col-sm-9">
-                                <select class="form-control video-frame-rate">
-                                    <option value="15">15 fps</option>
-                                    <option value="30">30 fps</option>
-                                    <option value="60">60 fps</option>
-                                    <option value="120">120 fps</option>
-                                    <option value="240">240 fps</option>
+                        <div class="form-group ">
+                            <label class="col-sm-3 control-label ">Framerate</label>
+                            <div class="col-sm-9 ">
+                                <select class="form-control video-frame-rate ">
+                                    <option value="15 ">15 fps</option>
+                                    <option value="30 ">30 fps</option>
+                                    <option value="60 ">60 fps</option>
+                                    <option value="120 ">120 fps</option>
+                                    <option value="240 ">240 fps</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Resolution</label>
-                            <div class="col-sm-9">
-                                <select class="form-control video-resolution">
-                                    <option value="854x480">480p</option>
-                                    <option value="1280x720">720p</option>
-                                    <option value="1920x1080">1080p</option>
+                        <div class="form-group ">
+                            <label class="col-sm-3 control-label ">Resolution</label>
+                            <div class="col-sm-9 ">
+                                <select class="form-control video-resolution ">
+                                    <option value="854x480 ">480p</option>
+                                    <option value="1280x720 ">720p</option>
+                                    <option value="1920x1080 ">1080p</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group video-dim-section">
-                            <label class="col-sm-3 control-label">Dim flight video</label>
-                            <div class="col-sm-9">
-                                <select class="form-control video-dim">
-                                    <option value="0.0">0%</option>
-                                    <option value="0.2">20%</option>
-                                    <option value="0.4">40%</option>
-                                    <option value="0.5">50%</option>
-                                    <option value="0.6">60%</option>
-                                    <option value="0.8">80%</option>
-                                    <option value="1.0">100%</option>
+                        <div class="form-group video-dim-section ">
+                            <label class="col-sm-3 control-label ">Dim flight video</label>
+                            <div class="col-sm-9 ">
+                                <select class="form-control video-dim ">
+                                    <option value="0.0 ">0%</option>
+                                    <option value="0.2 ">20%</option>
+                                    <option value="0.4 ">40%</option>
+                                    <option value="0.5 ">50%</option>
+                                    <option value="0.6 ">60%</option>
+                                    <option value="0.8 ">80%</option>
+                                    <option value="1.0 ">100%</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Video format</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static video-format">WebM</p>
+                        <div class="form-group ">
+                            <label class="col-sm-3 control-label ">Video format</label>
+                            <div class="col-sm-9 ">
+                                <p class="form-control-static video-format ">WebM</p>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Audio format</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static audio-format">Not supported yet (no audio will be included)</p>
+                        <div class="form-group ">
+                            <label class="col-sm-3 control-label ">Audio format</label>
+                            <div class="col-sm-9 ">
+                                <p class="form-control-static audio-format ">Not supported yet (no audio will be included)</p>
                             </div>
                         </div>
-                        <div class="form-group jumpy-video-note">
-                            <label class="col-sm-3 control-label">Note</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static">
+                        <div class="form-group jumpy-video-note ">
+                            <label class="col-sm-3 control-label ">Note</label>
+                            <div class="col-sm-9 ">
+                                <p class="form-control-static ">
                                     If you experience problems with the background flight video being glitchy
-                                    in the exported video, <a target="_blank" href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md">follow
+                                    in the exported video, <a target="_blank " href="https://github.com/cleanflight/blackbox-log-viewer/blob/master/Readme.md ">follow
                                     the instructions here</a> to re-encode your flight video.
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <div class="pane-video-progress">
-                        <progress max="100" value="0"></progress>
+                    <div class="pane-video-progress ">
+                        <progress max="100 " value="0 "></progress>
 
-                        <div class="form-horizontal">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Rendered frames</label>
-                                <div class="col-sm-9">
-                                    <p class="form-control-static video-export-rendered-frames"></p>
+                        <div class="form-horizontal ">
+                            <div class="form-group ">
+                                <label class="col-sm-3 control-label ">Rendered frames</label>
+                                <div class="col-sm-9 ">
+                                    <p class="form-control-static video-export-rendered-frames "></p>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">File size</label>
-                                <div class="col-sm-9">
-                                    <p class="form-control-static video-export-size"></p>
-                                    <div class="alert alert-danger" role="alert">You must install this tool as a Chrome App in order to export videos larger than 500MB</div>
+                            <div class="form-group ">
+                                <label class="col-sm-3 control-label ">File size</label>
+                                <div class="col-sm-9 ">
+                                    <p class="form-control-static video-export-size "></p>
+                                    <div class="alert alert-danger " role="alert ">You must install this tool as a Chrome App in order to export videos larger than 500MB</div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Remaining time</label>
-                                <div class="col-sm-9">
-                                    <p class="form-control-static video-export-remaining"></p>
+                            <div class="form-group ">
+                                <label class="col-sm-3 control-label ">Remaining time</label>
+                                <div class="col-sm-9 ">
+                                    <p class="form-control-static video-export-remaining "></p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="pane-video-complete">
-                        <p class="video-export-result"></p>
+                    <div class="pane-video-complete ">
+                        <p class="video-export-result "></p>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default video-export-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Cancel video generation">Cancel</button>
-                    <button type="button" class="btn btn-default video-export-dialog-close" data-dismiss="modal" data-toggle="tooltip" title="Close dialog box">Close</button>
-                    <button type="button" class="btn btn-primary video-export-dialog-start" data-toggle="tooltip" title="Start generating video file">Begin export</button>
+                <div class="modal-footer ">
+                    <button type="button " class="btn btn-default video-export-dialog-cancel " data-dismiss="modal
+                                            " data-toggle="tooltip " title="Cancel video generation ">Cancel</button>
+                    <button type="button " class="btn btn-default video-export-dialog-close " data-dismiss="modal
+                                            " data-toggle="tooltip " title="Close dialog box ">Close</button>
+                    <button type="button " class="btn btn-primary video-export-dialog-start " data-toggle="tooltip
+                                            " title="Start generating video file ">Begin export</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade user-settings-dialog" id="dlgUserSettings">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Advanced User Settings</h4>
+    <div class="modal fade user-settings-dialog " id="dlgUserSettings ">
+        <div class="modal-dialog ">
+            <div class="modal-content ">
+                <div class="modal-header ">
+                    <h4 class="modal-title ">Advanced User Settings</h4>
                 </div>
-                <div class="modal-body">
-                	<div class="cf_column half left">
-	                    <div class="pane-user-settings form-horizontal">
-							<div class="gui_box grey mixer-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Mixer Settings</div>
+                <div class="modal-body ">
+                	<div class="cf_column half left ">
+	                    <div class="pane-user-settings form-horizontal ">
+							<div class="gui_box grey mixer-settings ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Mixer Settings</div>
 								</div>
-								<div class="spacer_box">
+								<div class="spacer_box ">
 		                            <div>
-		                               <label class="option">Custom<input class="custom-mixes ios-switch" type="checkbox"/><div><div></div></div><span>Select custom craft display.</span></label>
+		                               <label class="option ">Custom<input class="custom-mixes ios-switch " type="checkbox "/><div><div></div></div><span>Select custom craft display.</span></label>
 		                            </div>
-		                            <div class="custom-mixes-group">
+		                            <div class="custom-mixes-group ">
 										<table>
 											<tr>
-												<td><label>Mixer Type</label><select class="mixerList"><!-- list generated here --></select></td>
-												<td class="mixerPreview"><img src="./images/motor_order/quad_x.svg"/></td>
+												<td><label>Mixer Type</label><select class="mixerList "><!-- list generated here --></select></td>
+												<td class="mixerPreview "><img src="./images/motor_order/quad_x.svg "/></td>
 											</tr>
 										</table>
-										<table class="motorList">
+										<table class="motorList ">
 											<!-- list generated here -->
 										</table>
 										<p>The custom mixer settings ONLY affect the craft icon that is displayed over the log. Please set the closest craft type (e.g. QuadX)
@@ -1422,31 +1966,31 @@
 									</div>
 								</div>
 							</div>
-							<div class="gui_box grey stick-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Stick Settings</div>
+							<div class="gui_box grey stick-settings ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Stick Settings</div>
 								</div>
-								<div class="spacer_box">
+								<div class="spacer_box ">
 									<div>
-		                               <label class="option">Units<input class="stick-units ios-switch" type="checkbox"/><div><div></div></div><span>Display actual units on stick display.</span></label>
+		                               <label class="option ">Units<input class="stick-units ios-switch " type="checkbox "/><div><div></div></div><span>Display actual units on stick display.</span></label>
 		                            </div>
 									<div>
-		                               <label class="option">Stick Trails<input class="stick-trails ios-switch" type="checkbox"/><div><div></div></div><span>Show stick trails.</span></label>
+		                               <label class="option ">Stick Trails<input class="stick-trails ios-switch " type="checkbox "/><div><div></div></div><span>Show stick trails.</span></label>
 		                            </div>
                                     <div>
-                                        <label class="option">Invert Yaw<input class="invert-yaw ios-switch" type="checkbox"/><div><div></div></div><span>Invert Yaw in Stick Display</span></label>
+                                        <label class="option ">Invert Yaw<input class="invert-yaw ios-switch " type="checkbox "/><div><div></div></div><span>Invert Yaw in Stick Display</span></label>
                                     </div>
-		                            <div class="stick-mode-group">
+		                            <div class="stick-mode-group ">
 										<table>
 											<tr>
 												<td>
 														<label>Mode</label>
-													  	<input type="radio" name="stick-mode" value="1">Mode 1</input><br>
-		  												<input type="radio" name="stick-mode" value="2">Mode 2</input><br>
-		  												<input type="radio" name="stick-mode" value="3">Mode 3</input><br>
-		  												<input type="radio" name="stick-mode" value="4">Mode 4</input><br>
+													  	<input type="radio " name="stick-mode " value="1 ">Mode 1</input><br>
+		  												<input type="radio " name="stick-mode " value="2 ">Mode 2</input><br>
+		  												<input type="radio " name="stick-mode " value="3 ">Mode 3</input><br>
+		  												<input type="radio " name="stick-mode " value="4 ">Mode 4</input><br>
 												</td>
-												<td class="modePreview"><img src="./images/stick_modes/Mode_2.png"/></td>
+												<td class="modePreview "><img src="./images/stick_modes/Mode_2.png "/></td>
 											</tr>
 										</table>
 										<table>
@@ -1454,108 +1998,109 @@
 												<td>
 													<label>Position</label>
 												</td>
-												<td class="position">
-													<label>Top</label><input name="stick-top" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Top</label><input name="stick-top " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
-												<td class="position">
-													<label>Left</label><input  name="stick-left" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Left</label><input  name="stick-left " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
-												<td class="position">
-													<label>Size</label><input name="stick-size" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Size</label><input name="stick-size " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
 											</tr>
 										</table>
 									</div>
 								</div>
 							</div>
-                            <div class="gui_box grey legend-settings">
-                                <div class="gui_box_titlebar">
-                                    <div class="spacer_box_title">Legend Settings</div>
+                            <div class="gui_box grey legend-settings ">
+                                <div class="gui_box_titlebar ">
+                                    <div class="spacer_box_title ">Legend Settings</div>
                                 </div>
-                                <div class="spacer_box">
+                                <div class="spacer_box ">
                                     <div>
-                                        <label class="option">Units<input class="legend-units ios-switch" type="checkbox"/><div><div></div></div><span>Display actual units on legend.</span></label>
+                                        <label class="option ">Units<input class="legend-units ios-switch " type="checkbox "/><div><div></div></div><span>Display actual units on legend.</span></label>
                                     </div>
                                 </div>
                             </div>
 	                    </div>
 					</div>
-                	<div class="cf_column half right">
-						<div class="spacer_left">
-							<div class="gui_box grey craft-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Craft Settings</div>
+                	<div class="cf_column half right ">
+						<div class="spacer_left ">
+							<div class="gui_box grey craft-settings ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Craft Settings</div>
 								</div>
-								<div class="spacer_box">
+								<div class="spacer_box ">
 									<table>
 										<tr>
 											<td>
 												<label>Position</label>
 											</td>
-											<td class="position">
-												<label>Top</label><input name="craft-top" type="number" step="1" min="0" max="100"/><p>%</p>
+											<td class="position ">
+												<label>Top</label><input name="craft-top " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 											</td>
-											<td class="position">
-												<label>Left</label><input name="craft-left" type="number" step="1" min="0" max="100"/><p>%</p>
+											<td class="position ">
+												<label>Left</label><input name="craft-left " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 											</td>
-											<td class="position">
-												<label>Size</label><input name="craft-size" type="number" step="1" min="0" max="100"/><p>%</p>
+											<td class="position ">
+												<label>Size</label><input name="craft-size " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 											</td>
 										</tr>
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey top-spacer analyser-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Analyser Settings</div>
+							<div class="gui_box grey top-spacer analyser-settings ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Analyser Settings</div>
 								</div>
-								<div class="spacer_box">
+								<div class="spacer_box ">
                                     <div>
-                                        <label class="option">Hanning<input class="analyser-hanning ios-switch" type="checkbox"/><div><div></div></div><span>Use Hanning Window for Analyser</span></label>
+                                        <label class="option ">Hanning<input class="analyser-hanning ios-switch
+                                            " type="checkbox "/><div><div></div></div><span>Use Hanning Window for Analyser</span></label>
                                     </div>
                                     <table>
 										<tr>
 											<td>
 												<label>Position</label>
 											</td>
-											<td class="position">
-												<label>Top</label><input name="analyser-top" type="number" step="1" min="0" max="100"/><p>%</p>
+											<td class="position ">
+												<label>Top</label><input name="analyser-top " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 											</td>
-											<td class="position">
-												<label>Left</label><input name="analyser-left" type="number" step="1" min="0" max="100"/><p>%</p>
+											<td class="position ">
+												<label>Left</label><input name="analyser-left " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 											</td>
-											<td class="position">
-												<label>Size</label><input name="analyser-size" type="number" step="1" min="0" max="100"/><p>%</p>
+											<td class="position ">
+												<label>Size</label><input name="analyser-size " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 											</td>
 										</tr>
 									</table>
 								</div>
 							</div>
-							<div class="gui_box grey top-spacer watermark-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Watermark Settings</div>
+							<div class="gui_box grey top-spacer watermark-settings ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Watermark Settings</div>
 								</div>
-								<div class="spacer_box">
+								<div class="spacer_box ">
 									<div>
-		                               <label class="option">Watermark<input class="watermark ios-switch" type="checkbox"/><div><div></div></div><span>Show the watermark.</span></label>
+		                               <label class="option ">Watermark<input class="watermark ios-switch " type="checkbox "/><div><div></div></div><span>Show the watermark.</span></label>
 		                            </div>
-		                            <div class="watermark-group">
+		                            <div class="watermark-group ">
 										<table>
 											<tr>
 												<td>
 													<label>Logo</label>
 												</td>
 												<td>
-													<div class="watermark-logo-button">
-														<input type='file' id="watermark-logo-load" />
+													<div class="watermark-logo-button ">
+														<input type='file' id="watermark-logo-load " />
 													</div>
 												</td>
 											</tr>
 											<tr>
 												<td>
 												</td>
-												<td class="watermark-logo-image">
-												    <img id="watermark-logo" src="./images/logo.png" alt="choose your own logo"/>
+												<td class="watermark-logo-image ">
+												    <img id="watermark-logo " src="./images/logo.png " alt="choose your own logo "/>
 												</td>
 											</tr>
 										</table>
@@ -1564,22 +2109,22 @@
 												<td>
 													<label>Position</label>
 												</td>
-												<td class="position">
-													<label>Top</label><input name="watermark-top" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Top</label><input name="watermark-top " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
-												<td class="position">
-													<label>Left</label><input  name="watermark-left" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Left</label><input  name="watermark-left " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
-												<td class="position">
-													<label>Size</label><input name="watermark-size" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Size</label><input name="watermark-size " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
 											</tr>
 											<tr>
 												<td>
 													<label>Transparency</label>
 												</td>
-												<td class="position">
-													<input name="watermark-transparency" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<input name="watermark-transparency " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
 												<td></td>
 												<td></td>
@@ -1589,42 +2134,42 @@
 									</div>
 								</div>
 							</div>
-							<div class="gui_box grey top-spacer laptimer-settings">
-								<div class="gui_box_titlebar">
-									<div class="spacer_box_title">Lap Timer Settings</div>
+							<div class="gui_box grey top-spacer laptimer-settings ">
+								<div class="gui_box_titlebar ">
+									<div class="spacer_box_title ">Lap Timer Settings</div>
 								</div>
-								<div class="spacer_box">
+								<div class="spacer_box ">
 									<div>
-		                               <label class="option">Lap Timer<input class="laptimer ios-switch" type="checkbox"/><div><div></div></div><span>Show the lap timer.</span></label>
+		                               <label class="option ">Lap Timer<input class="laptimer ios-switch " type="checkbox "/><div><div></div></div><span>Show the lap timer.</span></label>
 		                            </div>
-		                            <div class="laptimer-group">
+		                            <div class="laptimer-group ">
 										<table>
 											<tr>
 												<td>
 													<label>Position</label>
 												</td>
-												<td class="position">
-													<label>Top</label><input name="laptimer-top" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Top</label><input name="laptimer-top " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
-												<td class="position">
-													<label>Left</label><input  name="laptimer-left" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<label>Left</label><input  name="laptimer-left " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
-												<td class="position">
+												<td class="position ">
 												</td>
 											</tr>
 											<tr>
 												<td>
 													<label>Transparency</label>
 												</td>
-												<td class="position">
-													<input name="laptimer-transparency" type="number" step="1" min="0" max="100"/><p>%</p>
+												<td class="position ">
+													<input name="laptimer-transparency " type="number " step="1 " min="0 " max="100 "/><p>%</p>
 												</td>
 												<td></td>
 												<td></td>
 												<td></td>
 											</tr>
 										</table>
-										<p>To use the lap timer feature, you MUST set a "start time" bookmark at the beginning
+										<p>To use the lap timer feature, you MUST set a "start time " bookmark at the beginning
 										of the log/video (where the race starts for example) plus additional bookmarks to mark the start of each lap.
 										Bookmark the video frames where you actually cross the start/finish line for best results.
 										</p>
@@ -1633,69 +2178,69 @@
 							</div>
 						</div>
 					</div>
-                	<div class="clear-both"></div>
+                	<div class="clear-both "></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default user-settings-dialog-cancel" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary user-settings-dialog-save" data-dismiss="modal">Save</button>
+                <div class="modal-footer ">
+                    <button type="button " class="btn btn-default user-settings-dialog-cancel " data-dismiss="modal ">Cancel</button>
+                    <button type="button " class="btn btn-primary user-settings-dialog-save " data-dismiss="modal ">Save</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- Scripts -->
-    <script src="js/complex.js"></script>
-    <script src="js/real.js"></script>
-    <script src="js/vendor/jquery-1.11.3.min.js"></script>
-    <script src="js/vendor/jquery-ui-1.11.4.min.js"></script>
-    <script src="js/vendor/bootstrap.min.js"></script>
-    <script src="js/vendor/jquery.ba-throttle-debounce.js"></script>
-    <script src="js/vendor/three.min.js"></script>
-    <script src="js/vendor/jquery.nouislider.all.min.js"></script>
-    <script src="js/vendor/FileSaver.js"></script>
-    <script src="js/vendor/webm-writer-0.1.1.js"></script>
-    <script src="js/vendor/semver.js"></script>
-    <script src="js/pref_storage.js"></script>
-    <script src="js/tools.js"></script>
-    <script src="js/cache.js"></script>
-    <script src="js/expo.js"></script>
-    <script src="js/datastream.js"></script>
-    <script src="js/decoders.js"></script>
-    <script src="js/imu.js"></script>
-    <script src="js/craft_2d.js"></script>
-    <script src="js/craft_3d.js"></script>
-    <script src="js/flightlog_fielddefs.js"></script>
-    <script src="js/flightlog_fields_presenter.js"></script>
-    <script src="js/flightlog_parser.js"></script>
-    <script src="js/flightlog_index.js"></script>
-    <script src="js/flightlog.js"></script>
-    <script src="js/grapher.js"></script>
-    <script src="js/graph_config.js"></script>
-    <script src="js/graph_legend.js"></script>
-    <script src="js/graph_config_dialog.js"></script>
-    <script src="js/graph_spectrum.js"></script>
-    <script src="js/gui.js"></script>
-    <script src="js/header_dialog.js"></script>
-    <script src="js/keys_dialog.js"></script>
-    <script src="js/user_settings_dialog.js"></script>
-    <script src="js/release_checker.js"></script>
-    <script src="js/seekbar.js"></script>
-    <script src="js/video_export_dialog.js"></script>
-    <script src="js/flightlog_video_renderer.js"></script>
-    <script src="js/graph_config.js"></script>
-    <script src="js/configuration.js"></script>
-    <script src="js/laptimer.js"></script>
-    <script src="js/localization.js"></script>
-    <script src="js/main.js"></script>
-    <script src="index.js"></script>
+    <script src="js/complex.js "></script>
+    <script src="js/real.js "></script>
+    <script src="js/vendor/jquery-1.11.3.min.js "></script>
+    <script src="js/vendor/jquery-ui-1.11.4.min.js "></script>
+    <script src="js/vendor/bootstrap.min.js "></script>
+    <script src="js/vendor/jquery.ba-throttle-debounce.js "></script>
+    <script src="js/vendor/three.min.js "></script>
+    <script src="js/vendor/jquery.nouislider.all.min.js "></script>
+    <script src="js/vendor/FileSaver.js "></script>
+    <script src="js/vendor/webm-writer-0.1.1.js "></script>
+    <script src="js/vendor/semver.js "></script>
+    <script src="js/pref_storage.js "></script>
+    <script src="js/tools.js "></script>
+    <script src="js/cache.js "></script>
+    <script src="js/expo.js "></script>
+    <script src="js/datastream.js "></script>
+    <script src="js/decoders.js "></script>
+    <script src="js/imu.js "></script>
+    <script src="js/craft_2d.js "></script>
+    <script src="js/craft_3d.js "></script>
+    <script src="js/flightlog_fielddefs.js "></script>
+    <script src="js/flightlog_fields_presenter.js "></script>
+    <script src="js/flightlog_parser.js "></script>
+    <script src="js/flightlog_index.js "></script>
+    <script src="js/flightlog.js "></script>
+    <script src="js/grapher.js "></script>
+    <script src="js/graph_config.js "></script>
+    <script src="js/graph_legend.js "></script>
+    <script src="js/graph_config_dialog.js "></script>
+    <script src="js/graph_spectrum.js "></script>
+    <script src="js/gui.js "></script>
+    <script src="js/header_dialog.js "></script>
+    <script src="js/keys_dialog.js "></script>
+    <script src="js/user_settings_dialog.js "></script>
+    <script src="js/release_checker.js "></script>
+    <script src="js/seekbar.js "></script>
+    <script src="js/video_export_dialog.js "></script>
+    <script src="js/flightlog_video_renderer.js "></script>
+    <script src="js/graph_config.js "></script>
+    <script src="js/configuration.js "></script>
+    <script src="js/laptimer.js "></script>
+    <script src="js/localization.js "></script>
+    <script src="js/main.js "></script>
+    <script src="index.js "></script>
 
-    <dialog class="dialogUpdate">
-        <h3 i18n="noticeTitle"></h3>
-        <div class="content">
-            <div class="dialogUpdate-content" style="margin-top: 10px;margin-bottom: 10px;"></div>
+    <dialog class="dialogUpdate ">
+        <h3 i18n="noticeTitle "></h3>
+        <div class="content ">
+            <div class="dialogUpdate-content " style="margin-top: 10px;margin-bottom: 10px; "></div>
         </div>
-        <div class="buttons">
-            <a href="#" class="dialogUpdate-websitebtn regular-button" i18n="updateWebsite"></a>
-            <a href="#" class="dialogUpdate-closebtn regular-button" i18n="close"></a>
+        <div class="buttons ">
+            <a href="# " class="dialogUpdate-websitebtn regular-button " i18n="updateWebsite "></a>
+            <a href="# " class="dialogUpdate-closebtn regular-button " i18n="close "></a>
         </div>
     </dialog>
 
