@@ -433,7 +433,12 @@ function HeaderDialog(dialog, onSave) {
         populatePID('levelPID'					, sysConfig.levelPID);
 
         // Fill in data from for the rates object
-        setParameter('rcRate'					,sysConfig.rcRate,2);
+        setParameter('rcRollRate'			    ,sysConfig.rcRate,2);
+        setParameter('rcRollExpo'		    	,sysConfig.rcExpo,2);
+        setParameter('rcPitchRate'		    	,sysConfig.rcRate,2);
+        setParameter('rcPitchExpo'		    	,sysConfig.rcExpo,2);
+        setParameter('rcYawRate'		    	,sysConfig.rcYawRate,2);
+        setParameter('rcYawExpo'		    	,sysConfig.rcYawExpo,2);
         setParameter('vbatscale'				,sysConfig.vbatscale,0);
         setParameter('vbatref'					,sysConfig.vbatref,0);
         setParameter('vbatmincellvoltage'		,sysConfig.vbatmincellvoltage,1);
@@ -443,9 +448,6 @@ function HeaderDialog(dialog, onSave) {
         setParameter('maxthrottle'				,sysConfig.maxthrottle,0);
         setParameter('currentMeterOffset'		,sysConfig.currentMeterOffset,0);
         setParameter('currentMeterScale'		,sysConfig.currentMeterScale,0);
-        setParameter('rcExpo'					,sysConfig.rcExpo,2);
-        setParameter('rcYawRate'				,sysConfig.rcYawRate,2);
-        setParameter('rcYawExpo'				,sysConfig.rcYawExpo,2);
         setParameter('thrMid'					,sysConfig.thrMid,2);
         setParameter('thrExpo'					,sysConfig.thrExpo,2);
         setParameter('dynThrPID'				,sysConfig.dynThrPID,2);
@@ -591,14 +593,14 @@ function HeaderDialog(dialog, onSave) {
 					}
 				}
 			}
-			});
+		});
 
     	// Scan all the drop-down lists
 		$(".parameter select").each(function() {
 			if($(this).val()!=null) {
 					newSysConfig[$(this).attr('name')] = parseInt($(this).val());
 			}
-			});
+		});
 
 
 		// Scan the pid_tuning table
@@ -615,15 +617,15 @@ function HeaderDialog(dialog, onSave) {
 					newSysConfig[$(this).attr('name')] = $(this).val();
 				}
 			}
-			});
+		});
 
 		//Build the features value
 		var newFeatureValue = 0;
 		$(".features td input").each(function() {
-				if ($(this).prop('checked')) {
-					newFeatureValue |= (1<<parseInt($(this).attr('bit')));
-				}
-			});
+            if ($(this).prop('checked')) {
+                newFeatureValue |= (1<<parseInt($(this).attr('bit')));
+            }
+        });
 		newSysConfig['features'] = newFeatureValue;
 
 		return newSysConfig;
@@ -632,11 +634,11 @@ function HeaderDialog(dialog, onSave) {
 	// Public variables
 
     this.show = function(sysConfig) {
-            dialog.modal('show');
-			renderSysConfig(sysConfig);
-			// Disable changing input and dropdowns
-			$('#dlgHeaderDialog input').prop('disabled', 'disabled');
-			$('#dlgHeaderDialog select').prop('disabled', 'disabled');
+        dialog.modal('show');
+        renderSysConfig(sysConfig);
+        // Disable changing input and dropdowns
+        $('#dlgHeaderDialog input').prop('disabled', 'disabled');
+        $('#dlgHeaderDialog select').prop('disabled', 'disabled');
     }
 
  	// Buttons

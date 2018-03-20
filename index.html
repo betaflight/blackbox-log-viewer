@@ -949,42 +949,52 @@
 									</div>
 									<div class="spacer_box">
 										<table class="parameter cf">
-											<thead>
-												<tr>
-													<th colspan="3">ROLL/PITCH</th>
-												</tr>
-											</thead>
 											<tbody>
+                                                <tr>
+                                                    <th colspan="3">ROLL</th>
+                                                </tr>
 												<tr>
-													<td name="rcRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-													<td name="rcExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-													<td name="deadband"><label>Deadband</label><input type="number" step="1" min="0" max="32"/></td>
-												</tr>
+                                                    <td name="rcRollRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                    <td name="rates[0]"><label>Super Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
+                                                    <td name="rcRollExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="3">PITCH</th>
+                                                </tr>
+                                                    <tr>
+                                                        <td name="rcPitchRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                        <td name="rates[1]"><label>Super Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
+                                                        <td name="rcPitchExpo"><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                    </tr>
 												<tr>
 													<th colspan="3">YAW</th>
 												</tr>
 												<tr>
 													<td name="rcYawRate" class="no-inav"><label>Rate</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-													<td name="rcYawExpo" ><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-													<td name="yaw_deadband" ><label>Deadband</label><input type="number" step="1" min="0" max="100"/></td>
+                                                    <td name="rates[2]"><label>Super Rate</label><input type="number" step="0.01" min="0" max="2.55" /></td>
+                                                    <td name="rcYawExpo" ><label>Expo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                </tr>
+												<tr>
+                                                    <td name="superExpoFactor" class="bf-only"><label>ROLL/PITCH SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                    <td name="superExpoFactorYaw" class="bf-only"><label>YAW SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td name='superExpoYawMode' class="bf-only"><select><!-- list generated here --></select></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="parameter cf">
+                                            <body>
+												<tr>
+													<th colspan="5">Deadband</th>
 												</tr>
 												<tr>
-													<th colspan="5">Super Expo Rates</th>
-												</tr>
-												<tr>
-													<td name="rates[0]"><label>ROLL Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
-													<td name="rates[1]"><label>PITCH Rate</label><input type="number" step="0.01" min="0" max="1.00" /></td>
-													<td name="rates[2]"><label>YAW Rate</label><input type="number" step="0.01" min="0" max="2.55" /></td>
-												</tr>
-												<tr>
-													<td name="superExpoFactor" class="bf-only"><label>ROLL/PITCH SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-													<td name="superExpoFactorYaw" class="bf-only"><label>YAW SuperExpo</label><input type="number" step="0.01" min="0" max="1.00"/></td>
-													<td></td>
-												</tr>
-												<tr>
-													<td></td>
-													<td name='superExpoYawMode' class="bf-only"><select><!-- list generated here --></select></td>
-													<td></td>
+                                                    <td name="deadband"><label>Pitch/Roll</label><input type="number" step="1" min="0" max="32"/></td>
+                                                    <td name="yaw_deadband" ><label>Yaw</label><input type="number" step="1" min="0" max="100"/></td>
+                                                    <td></td>
 												</tr>
 											</tbody>
 										</table>
