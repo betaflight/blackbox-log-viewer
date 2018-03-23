@@ -177,8 +177,8 @@ function FlightLogFieldPresenter() {
                             'debug[all]':'ESC Sensor',
                             'debug[0]':'Motor Index',
                             'debug[1]':'Timeouts',
-                            'debug[2]':'Temperature',
-                            'debug[3]':'RPM',
+                            'debug[2]':'CNC errors',
+                            'debug[3]':'Data age',
             },
             'SCHEDULER' : 	{
                             'debug[all]':'Scheduler',
@@ -469,13 +469,15 @@ function FlightLogFieldPresenter() {
                     return value.toFixed(0) + "deg/s";
                 case 'ESC_SENSOR':
                     switch (fieldName) {
-                        case 'debug[2]':
-                            return value.toFixed(0) + "°C";
                         case 'debug[3]':
-                            return value.toFixed(0) + "rpm";
-                        default:
                             return value.toFixed(0) + "\u03BCS";
+                        default:
+                            return value.toFixed(0) + "";
                     }
+                case 'DEBUG_ESC_SENSOR_RPM':
+                    return value.toFixed(0) + "rpm";
+                case 'DEBUG_ESC_SENSOR_TMP':
+                    return value.toFixed(0) + "°C";
                 case 'SCHEDULER':
                     return value.toFixed(0) + "\u03BCS";
                 case 'STACK':
