@@ -481,6 +481,8 @@ function HeaderDialog(dialog, onSave) {
         setParameter('deadband'					,sysConfig.deadband,0);
         setParameter('yaw_deadband'				,sysConfig.yaw_deadband,0);
     	renderSelect('gyro_lpf'			    	,sysConfig.gyro_lpf, GYRO_LPF);
+    	renderSelect('gyro_hardware_lpf'		,sysConfig.gyro_hardware_lpf, GYRO_HARDWARE_LPF);
+    	renderSelect('gyro_32khz_hardware_lpf'		,sysConfig.gyro_32khz_hardware_lpf, GYRO_32KHZ_HARDWARE_LPF);
         setParameter('acc_lpf_hz'				,sysConfig.acc_lpf_hz,2);
         setParameter('acc_cut_hz'				,sysConfig.acc_cut_hz,2);
 	    setParameter('airmode_activate_throttle',sysConfig.airmode_activate_throttle, 0);
