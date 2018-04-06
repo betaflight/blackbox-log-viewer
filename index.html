@@ -183,11 +183,21 @@
                             Open log file/video
                             <input type="file" class="file-open" multiple>
                         </span>
-                        <button type="button" class="btn btn-default view-zoom-in" data-toggle="tooltip" title="Zoom In Window" style="display: none;">
+                    </div>
+                    <div class="btn-group"  style="display: none;">
+                        <button type="button" class="btn btn-default view-zoom-in" data-toggle="tooltip" title="Zoom In Window">
                             <span class="glyphicon glyphicon-zoom-in"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-zoom-out" data-toggle="tooltip" title="Zoom Out Window" style="display: none;">
+                        <button type="button" class="btn btn-default view-zoom-out" data-toggle="tooltip" title="Zoom Out Window">
                             <span class="glyphicon glyphicon-zoom-out"></span>
+                        </button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-nobg open-user-settings-dialog" data-toggle="tooltip" title="Show Settings">
+                            <span class="glyphicon glyphicon-cog"></span>
+                        </button>
+                        <button type="button" class="btn btn-nobg open-keys-dialog" data-toggle="tooltip" title="Show Shortcuts">
+                            <span class="glyphicon glyphicon-question-sign"></span>
                         </button>
                     </div>
                 </div>
@@ -201,79 +211,22 @@
                 <h4>View</h4>
                 <div>
                     <div class="btn-group view-buttons" role="group">
-                        <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" title="View/hide header">
+                        <button type="button" class="btn btn-default view-config" data-toggle="tooltip" title="View graph">
+                            <span class="glyphicon glyphicon-home"></span>
+                        </button>
+                        <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" title="View log header">
                             <span class="glyphicon glyphicon-info-sign"></span>
                         </button>
+                        <button type="button" class="btn btn-default view-table" data-toggle="tooltip" title="View table">
+                            <span class="glyphicon glyphicon-list-alt"></span>
+                        </button>
                     </div>
-                    <div class="btn-group view-menu">
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="view-menu">
-                                View
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="view-menu">
-                                <li>
-                                    <a href="#" class="open-header-dialog auto-hide-menu" data-toggle="tooltip" title="View/hide header">
-                                        <span class="glyphicon glyphicon-info-sign"></span> Header
-                                        <span class="pull-right">H</span>
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Overlays</li>
-                                <li>
-                                    <a href="#" id="auto-hide-menu" class="view-video auto-hide-menu" data-toggle="tooltip" title="View/hide video display">
-                                        <span class="glyphicon glyphicon-film"></span> Video
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" id="auto-hide-menu" class="view-craft auto-hide-menu" data-toggle="tooltip" title="View/hide craft display">
-                                        <span class="glyphicon glyphicon-plane"></span> Craft
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" id="auto-hide-menu" class="view-sticks auto-hide-menu" data-toggle="tooltip" title="View/hide stick display">
-                                        <span class="glyphicon glyphicon-pawn"></span> Sticks
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Details</li>
-                                <li>
-                                    <a href="#" class="view-table auto-hide-menu" data-toggle="tooltip" title="View/hide statistics display">
-                                        <span class="glyphicon glyphicon-list-alt"></span> Values Table
-                                        <span class="pull-right">T</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="view-config auto-hide-menu" data-toggle="tooltip" title="View/hide configuration file">
-                                        <span class="glyphicon glyphicon-list-alt"></span> Config
-                                        <span class="pull-right">C</span>
-                                    </a>
-                                </li>
-                                <li class="divider has-analyser"></li>
-                                <li class="dropdown-header has-analyser">Analyser</li>
-                                <li>
-                                    <a href="#" class="view-analyser auto-hide-menu" data-toggle="tooltip" title="View/hide analyser display">
-                                        <span class="glyphicon glyphicon-equalizer"></span> Show/Hide
-                                        <span class="pull-right">A</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="view-analyser-fullscreen auto-hide-menu" data-toggle="tooltip" title="Zoom Analyser Window">
-                                        <span class="glyphicon glyphicon-resize-full"></span>
-                                        <span class="glyphicon glyphicon-resize-small"></span> Re-size
-                                        <span class="pull-right">&#x21E7;A</span>
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="open-user-settings-dialog auto-hide-menu" data-toggle="tooltip" title="Show User Settings">
-                                        <span class="glyphicon glyphicon-cog"></span> Preferences
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="btn-group view-buttons-expanded" role="group">
+                </div>
+            </li>
+            <li class="log-overlay-panel">
+                <h4>Overlay</h4>
+                <div>
+                    <div class="btn-group view-buttons" role="group">
                         <button type="button" class="btn btn-default view-video" data-toggle="tooltip" title="View/hide video display">
                             <span class="glyphicon glyphicon-film"></span>
                         </button>
@@ -282,9 +235,6 @@
                         </button>
                         <button type="button" class="btn btn-default view-sticks" data-toggle="tooltip" title="View/hide stick display">
                             <span class="glyphicon glyphicon-pawn"></span>
-                        </button>
-                        <button type="button" class="btn btn-default view-table" data-toggle="tooltip" title="View/hide statistics display">
-                            <span class="glyphicon glyphicon-list-alt"></span>
                         </button>
                         <button type="button" class="btn btn-default view-analyser-sticks" style="display:none" data-toggle="tooltip" title="View/hide stick analyser">
                             <span class="glyphicon glyphicon-screenshot"></span>
@@ -477,21 +427,24 @@
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <div class="analyser">
-                    <canvas width="0" height="0" id="analyserCanvas"></canvas>
-                    <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
-                    />
-                    <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
-                    />
-                    <datalist id="analyserZoomXTicks">
-                        <option>100</option>
-                        <option>200</option>
-                        <option>300</option>
-                        <option>400</option>
-                        <option>500</option>
-                    </datalist>
-                    <datalist id="analyserZoomYTicks">
-                        <option>100</option>
-                    </datalist>
+                    <div style="position: relative">
+                        <canvas width="0" height="0" id="analyserCanvas"></canvas>
+                        <span class="visibility glyphicon glyphicon-resize-full view-analyser-fullscreen"></span>
+                        <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
+                        />
+                        <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
+                        />
+                        <datalist id="analyserZoomXTicks">
+                            <option>100</option>
+                            <option>200</option>
+                            <option>300</option>
+                            <option>400</option>
+                            <option>500</option>
+                        </datalist>
+                        <datalist id="analyserZoomYTicks">
+                            <option>100</option>
+                        </datalist>
+                    </div>
                 </div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
@@ -499,7 +452,6 @@
             <div class="log-graph-config no-wheel">
                 <h2 class="no-wheel">Legend
                     <span class="log-close-legend-dialog glyphicon glyphicon-remove no-wheel" data-toggle="tooltip" title="Hide the legend"></span>
-                    <span class="open-keys-dialog glyphicon glyphicon-question-sign no-wheel" data-toggle="tooltip" title="Show the keyboard shortcuts"></span>
                 </h2>
                 <div class="log-index no-wheel"></div>
                 <div class="log-graph-legend no-wheel">

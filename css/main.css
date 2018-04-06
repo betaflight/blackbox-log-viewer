@@ -133,9 +133,7 @@ a.disabled {
 }
 
 .header-pane {
-    margin-left:5%;
-    margin-right: 5%;
-    width: 90%;
+    width: 100%;
 }
 
 html:not(.has-log):not(.has-video) .header-pane {
@@ -211,8 +209,7 @@ html:not(.has-log):not(.has-video) .header-pane {
 
 
 
-.log-close-legend-dialog,
-.open-keys-dialog {
+.log-close-legend-dialog {
     float: right;
     font-size: 14px;
     color: #bbb;
@@ -437,7 +434,19 @@ html:not(.has-grid-override) span.has-grid-override {
 html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
 }
-
+.analyser:hover .visibility{
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+}
+.analyser .visibility{
+    color: #bbb;
+    opacity: 0;
+}
+.analyser .visibility:hover{
+    color: white;
+    cursor: pointer;
+    animation: ease-in 500ms;
+}
 .analyser input#analyserZoomX {
 	width: 100px;
 	height : 10px;
@@ -830,6 +839,18 @@ progress {
 
 .navbar {
     margin-bottom:5px;
+}
+
+.btn-nobg{
+    color: lightgray;
+    border: 1px solid #00000000;
+    background: none;
+}
+
+.btn-nobg:hover{
+    border: 1px solid grey; 
+    color: white;
+    margin: -1px;
 }
 
 .navbar-logo {
