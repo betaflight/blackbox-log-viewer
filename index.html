@@ -242,10 +242,10 @@
                         <button type="button" class="btn btn-default view-analyser" data-toggle="tooltip" title="View/hide analyser display">
                             <span class="glyphicon glyphicon-equalizer"></span>
                         </button>
-                        <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
+                        <!-- <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
                             <span class="glyphicon glyphicon-resize-full"></span>
                             <span class="glyphicon glyphicon-resize-small"></span>
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </li>
@@ -429,7 +429,12 @@
                 <div class="analyser">
                     <div style="position: relative">
                         <canvas width="0" height="0" id="analyserCanvas"></canvas>
-                        <span class="visibility glyphicon glyphicon-resize-full view-analyser-fullscreen"></span>
+                        
+                        <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
+                            <span class="glyphicon glyphicon-resize-full"></span>
+                            <span class="glyphicon glyphicon-resize-small"></span>
+                        </div>
+
                         <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
                         />
                         <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"

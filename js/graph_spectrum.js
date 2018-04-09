@@ -120,7 +120,10 @@ try {
         });
 		$("input:last-of-type", parentElem).css({
 			left: (canvasCtx.canvas.width - 20) + "px"
-        });
+		});
+		$("#analyserResize", parentElem).css({
+			left: (canvasCtx.canvas.width - 28) + "px"
+		})
 
 	};
 	

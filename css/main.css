@@ -434,19 +434,27 @@ html:not(.has-grid-override) span.has-grid-override {
 html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
 }
-.analyser:hover .visibility{
+
+.analyser:hover #analyserResize{
     opacity: 1;
     transition: opacity 500ms ease-in;
 }
-.analyser .visibility{
+.analyser #analyserResize {
     color: #bbb;
     opacity: 0;
+    top: 5px;
+	left: 975px;
+    float: right;
+	z-index: 9;
+    position: absolute;
+    font-size: 18px;
 }
-.analyser .visibility:hover{
+.analyser #analyserResize:hover {
     color: white;
     cursor: pointer;
     animation: ease-in 500ms;
 }
+
 .analyser input#analyserZoomX {
 	width: 100px;
 	height : 10px;
@@ -841,16 +849,14 @@ progress {
     margin-bottom:5px;
 }
 
-.btn-nobg{
-    color: lightgray;
-    border: 1px solid #00000000;
+.btn-nobg {
+    color: #BBB;
     background: none;
 }
 
-.btn-nobg:hover{
-    border: 1px solid grey; 
+.btn-nobg:hover {
     color: white;
-    margin: -1px;
+    text-shadow: 1px 1px 2px gray, 0 0 5px blue, 0 0 10px white;
 }
 
 .navbar-logo {
