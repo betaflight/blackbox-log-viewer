@@ -390,6 +390,9 @@ var FlightLogParser = function(logData) {
                 if (matches) {
                     that.sysConfig.frameIntervalPNum = parseInt(matches[1], 10);
                     that.sysConfig.frameIntervalPDenom = parseInt(matches[2], 10);
+                } else {
+                    that.sysConfig.frameIntervalPNum = 1;
+                    that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
                 }
             break;
             // case "P denom":
