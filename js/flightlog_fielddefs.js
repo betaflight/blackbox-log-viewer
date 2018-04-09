@@ -207,6 +207,17 @@ var
             "EXPERIMENTAL"
     ]),
 
+    GYRO_HARDWARE_LPF = makeReadOnly([
+            "NORMAL",
+            "EXPERIMENTAL",
+            "1KHZ_SAMPLING"
+    ]),
+
+    GYRO_32KHZ_HARDWARE_LPF = makeReadOnly([
+            "NORMAL",
+            "EXPERIMENTAL"
+    ]),
+
     ACC_HARDWARE = makeReadOnly([
 	        "AUTO",
 	        "NONE",
