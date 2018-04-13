@@ -579,6 +579,14 @@ var FlightLogParser = function(logData) {
                 }
             break;
 
+            case "dterm_lowpass_hz":
+                that.sysConfig['dterm_lpf_hz'] = parseInt(fieldValue, 10);
+            break;
+            
+            case "yaw_lowpass_hz":
+                that.sysConfig['yaw_lpf_hz'] = parseInt(fieldValue, 10);
+            break;
+            
             case "gyro_notch_hz":
             case "gyro_notch_cutoff":
                 if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) ||
