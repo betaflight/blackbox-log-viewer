@@ -209,24 +209,65 @@
         <ul class="video-top-controls list-unstyled">
             <li class="log-view-panel">
                 <h4>View</h4>
-                <div>
-                    <div class="btn-group view-buttons" role="group">
-                        <button type="button" class="btn btn-default view-config" data-toggle="tooltip" title="View graph">
-                            <span class="glyphicon glyphicon-home"></span>
-                        </button>
-                        <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" title="View log header">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                        </button>
-                        <button type="button" class="btn btn-default view-table" data-toggle="tooltip" title="View table">
-                            <span class="glyphicon glyphicon-list-alt"></span>
-                        </button>
-                    </div>
+                <div class="dropdown view-buttons">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="view-menu">
+                        View
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="view-menu">
+                        <li>
+                            <a href="#" class="open-header-dialog auto-hide-menu" data-toggle="tooltip" title="View/hide header">
+                                <span class="glyphicon glyphicon-info-sign"></span> Header
+                                <span class="pull-right">H</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="view-table auto-hide-menu" data-toggle="tooltip" title="View/hide statistics display">
+                                <span class="glyphicon glyphicon-list-alt"></span> Values Table
+                                <span class="pull-right">T</span>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Overlay</li>
+                        <li>
+                            <a href="#" id="auto-hide-menu" class="view-video auto-hide-menu" data-toggle="tooltip" title="View/hide video display">
+                                <span class="glyphicon glyphicon-film"></span> Video
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="auto-hide-menu" class="view-craft auto-hide-menu" data-toggle="tooltip" title="View/hide craft display">
+                                <span class="glyphicon glyphicon-plane"></span> Craft
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="auto-hide-menu" class="view-sticks auto-hide-menu" data-toggle="tooltip" title="View/hide stick display">
+                                <span class="glyphicon glyphicon-pawn"></span> Sticks
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="auto-hide-menu" class="view-analyser auto-hide-menu" data-toggle="tooltip" title="View/hide analyser display">
+                                <span class="glyphicon glyphicon-equalizer"></span> Analyser
+                                <span class="pull-right">A</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="btn-group view-buttons-expanded" role="group">
+                    <button type="button" class="btn btn-default view-config" data-toggle="tooltip" title="View graph">
+                        <span class="glyphicon glyphicon-home"></span>
+                    </button>
+                    <button type="button" class="btn btn-default open-header-dialog" data-toggle="tooltip" title="View log header">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                    </button>
+                    <button type="button" class="btn btn-default view-table" data-toggle="tooltip" title="View table">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </button>
                 </div>
             </li>
-            <li class="log-overlay-panel">
+            <li class="log-overlay-panel view-buttons-expanded">
                 <h4>Overlay</h4>
                 <div>
-                    <div class="btn-group view-buttons" role="group">
+                    <div class="btn-group" role="group">
                         <button type="button" class="btn btn-default view-video" data-toggle="tooltip" title="View/hide video display">
                             <span class="glyphicon glyphicon-film"></span>
                         </button>
@@ -242,10 +283,6 @@
                         <button type="button" class="btn btn-default view-analyser" data-toggle="tooltip" title="View/hide analyser display">
                             <span class="glyphicon glyphicon-equalizer"></span>
                         </button>
-                        <!-- <button type="button" class="btn btn-default view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
-                            <span class="glyphicon glyphicon-resize-full"></span>
-                            <span class="glyphicon glyphicon-resize-small"></span>
-                        </button> -->
                     </div>
                 </div>
             </li>
@@ -283,19 +320,19 @@
                 <h4>Speed</h4>
                 <div class="form-inline">
                     <div class="form-group">
-                        <div class="btn-group playback-menu">
+                        <div class="btn-group playback-rate">
                             <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="playback-menu">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="playback-rate">
                                     Speed
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="playback-menu">
+                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="playback-rate">
                                     <li>
                                         <div class="pull-right">
                                             <div class="panel-body">
                                                 Speed
                                                 <div class="playback-rate-control btn-group btn-group-vertical"></div>
-                                                <input type="text" class="form-control playback-rate small-screen" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
+                                                <input type="text" class="form-control playback-rate-text" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
                                             </div>
                                         </div>
                                     </li>
@@ -304,7 +341,7 @@
                         </div>
                         <div class="playback-rate-expanded">
                             <div class="playback-rate-control btn-group btn-group-vertical"></div>
-                            <input type="text" class="form-control playback-rate small-screen" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
+                            <input type="text" class="form-control playback-rate-text" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
                         </div>
                     </div>
                 </div>
@@ -393,12 +430,12 @@
                                     </li>
                                     <li>
                                         <a href="#" class="log-sync-here auto-hide-menu" data-toggle="tooltip" title="Set the log start to this video frame">
-                                            <span class="glyphicon glyphicon-fast-backward"></span> Start Log Here
+                                            <span class="glyphicon glyphicon-object-align-left"></span> Start Log Here
                                         </a>
                                     </li>
                                     <li class="has-marker">
                                         <a href="#" class="log-smart-sync auto-hide-menu" data-toggle="tooltip" title="Set the marked position to here...">
-                                            <span class="glyphicon glyphicon-object-align-left"></span> Smart Sync
+                                            <span class="glyphicon glyphicon-object-align-vertical"></span> Smart Sync
                                             <span class="pull-right">&#x2325;M</span>
                                         </a>
                                     </li>
@@ -410,7 +447,9 @@
                                 <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default log-sync-here">Start log here</button>
+                                <button type="button" class="btn btn-default log-sync-here" data-toggle="tooltip" title="Start log here">
+                                    <span class="glyphicon glyphicon-object-align-left"></span>
+                                </button>
                                 <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
@@ -427,29 +466,27 @@
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <div class="analyser">
-                    <div style="position: relative">
-                        <canvas width="0" height="0" id="analyserCanvas"></canvas>
-                        
-                        <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
-                            <span class="glyphicon glyphicon-resize-full"></span>
-                            <span class="glyphicon glyphicon-resize-small"></span>
-                        </div>
-
-                        <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
-                        />
-                        <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
-                        />
-                        <datalist id="analyserZoomXTicks">
-                            <option>100</option>
-                            <option>200</option>
-                            <option>300</option>
-                            <option>400</option>
-                            <option>500</option>
-                        </datalist>
-                        <datalist id="analyserZoomYTicks">
-                            <option>100</option>
-                        </datalist>
+                    <canvas width="0" height="0" id="analyserCanvas"></canvas>
+                    
+                    <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
+                        <span class="glyphicon glyphicon-resize-full"></span>
+                        <span class="glyphicon glyphicon-resize-small"></span>
                     </div>
+
+                    <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
+                    />
+                    <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
+                    />
+                    <datalist id="analyserZoomXTicks">
+                        <option>100</option>
+                        <option>200</option>
+                        <option>300</option>
+                        <option>400</option>
+                        <option>500</option>
+                    </datalist>
+                    <datalist id="analyserZoomYTicks">
+                        <option>100</option>
+                    </datalist>
                 </div>
                 <canvas width="0" height="0" id="analyserStickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>

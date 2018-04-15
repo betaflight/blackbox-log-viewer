@@ -1857,7 +1857,7 @@ function BlackboxLogViewer() {
             .on("slide change set", function() {
                 setPlaybackRate(parseFloat($(this).val()));
             })
-            .Link("lower").to($(".playback-rate"));
+            .Link("lower").to($(".playback-rate-text"));
     
         $(".graph-zoom-control")
             .noUiSlider({
