@@ -69,60 +69,121 @@ a.disabled {
     }
 }
 
-/* toolbar expansion */
+/*** toolbar expansion ***/
 
-@media (max-width: 1200px) {
+/* With video */
+
+@media (max-width: 950px) {
+    /* hidden when width is 1200px or less */
+    html.has-video .view-buttons-expanded
+    { display: none!important;}
+}
+
+@media (min-width: 951px) {
+    /* hidden when width is 1200px or less */
+    html.has-video .view-buttons
+    { display: none!important;}
+}
+
+@media (max-width: 1150px) {
+    /* Hide if smaller than 1150px */
     html.has-video .playback-rate-expanded,
     html.has-video .graph-zoom-expanded,
     html.has-video .log-sync-expanded {
         display: none !important;
     }
 }
-@media (min-width: 1201px) {
-    html.has-video .playback-menu,
+@media (min-width: 1151px) {
+    /* Hide if larger than 1150px */
+    html.has-video .playback-rate,
     html.has-video .zoom-menu,
     html.has-video .sync-menu
         {display: none!important;}
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1285px) {
+    /*  Hide if smaller than 1285px */
+    html.has-video .log-chart-time-panel
+        { display: none!important;}
+}
+
+@media (max-width: 1420px) {
+    /*  Hide if smaller than 1500px */
+    html.has-video .playback-rate-expanded input.playback-rate-text,
+    html.has-video .graph-zoom-expanded input.graph-zoom
+    { display: none!important;}
+}
+
+/* Without video */
+
+@media (max-width: 750px) {
+    /* hide titles when width is 500px or less */
+    .video-top-controls * h4 { 
+        display: none!important;
+    }
+    .video-top-controls {
+        height: 50px;
+        padding-top: 10px;
+    }
+    .graph-row,
+    .log-field-values    {
+        top: 30px!important;
+    }
+}
+
+
+@media (max-width: 650px) {
+    /* hidden when width is 1200px or less */
+    html:not(.has-video) .view-buttons-expanded
+    { display: none!important;}
+}
+
+@media (min-width: 651px) {
+    /* hidden when width is 1200px or less */
+    html:not(.has-video) .view-buttons
+    { display: none!important;}
+}
+
+@media (max-width: 750px) {
+    /* Hide if smaller than 750px */
     html:not(.has-video) .playback-rate-expanded,
     html:not(.has-video) .graph-zoom-expanded,
     html:not(.has-video) .log-sync-expanded {
         display: none !important;
     }
 }
-@media (min-width: 801px) {
-    html:not(.has-video) .playback-menu,
+
+@media (min-width: 751px) {
+    /* Hide if larger than 750px */
+    html:not(.has-video) .playback-rate,
     html:not(.has-video) .zoom-menu,
     html:not(.has-video) .sync-menu
         {display: none!important;}
 }
 
 @media (max-width: 900px) {
-    /* hidden depending upon screen size */
+    /*  Hide if smaller than 900px */
     html:not(.has-video) .log-chart-time-panel
         { display: none!important;}
 }
 
-@media (max-width: 1300px) {
-    /* hidden depending upon screen size */
-    html.has-video .log-chart-time-panel
-        { display: none!important;}
-}
-
-@media (max-width: 1200px) {
-    /* hidden depending upon screen size */
-    html:not(.has-video) .view-buttons-expanded
+@media (max-width: 1050px) {
+    /*  Hide if smaller than 1050px */
+    html:not(.has-video) .playback-rate-expanded input.playback-rate-text,
+    html:not(.has-video) .graph-zoom-expanded input.graph-zoom
     { display: none!important;}
 }
 
-@media (max-width: 1540px) {
-    /* hidden depending upon screen size */
-    html.has-video .view-buttons-expanded
-    { display: none!important;}
+/*** end toolbar expansion ***/
+input.playback-rate-text,
+input.graph-zoom, 
+input.video-offset {
+    width: 65px!important;
 }
 
+input.graph-time {
+    text-align: right;
+}
 
 .welcome-pane, .main-pane {
     position: fixed;
@@ -133,9 +194,7 @@ a.disabled {
 }
 
 .header-pane {
-    margin-left:5%;
-    margin-right: 5%;
-    width: 90%;
+    width: 100%;
 }
 
 html:not(.has-log):not(.has-video) .header-pane {
@@ -181,38 +240,12 @@ html:not(.has-log):not(.has-video) .header-pane {
     display:none;
 }
 
-/* Phone 
-.graph-row {
-    height:300px;
-}
-*/
 #main-page {
     position: static;
     top: 60px;
 }
 
-/* Desktop */
-@media (min-height:580px) {
-    .graph-row {
-        /* height:460px; */
-    }
-}
-
-@media (min-height:720px) {
-    .graph-row {
-        /* height: 630px; */
-    }
-}
-
-.log-graph,
-.log-graph-config {
-    /* height:100%; */
-}
-
-
-
-.log-close-legend-dialog,
-.open-keys-dialog {
+.log-close-legend-dialog {
     float: right;
     font-size: 14px;
     color: #bbb;
@@ -436,6 +469,26 @@ html:not(.has-grid-override) span.has-grid-override {
 
 html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
+}
+
+.analyser:hover #analyserResize{
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+}
+.analyser #analyserResize {
+    color: #bbb;
+    opacity: 0;
+    top: 5px;
+	left: 975px;
+    float: right;
+	z-index: 9;
+    position: absolute;
+    font-size: 18px;
+}
+.analyser #analyserResize:hover {
+    color: white;
+    cursor: pointer;
+    animation: ease-in 500ms;
 }
 
 .analyser input#analyserZoomX {
@@ -740,11 +793,9 @@ html.has-log .video-top-controls {
 	position:fixed;
 	z-index:10;
 	background-color:white;
-	padding-bottom:10px;
 	width: 100%;
 	min-width: 1390px;
 	white-space: nowrap;
-	height: 80px;
 }
 
 html.has-video .log-graph,
@@ -770,7 +821,7 @@ html.video-hidden video {
 }
 
 html:not(.has-video) .view-video {
-    visibility:hidden;
+	display:none;
 }
 
 html:not(.has-video) a.view-video,
@@ -830,6 +881,16 @@ progress {
 
 .navbar {
     margin-bottom:5px;
+}
+
+.btn-nobg {
+    color: #BBB;
+    background: none;
+}
+
+.btn-nobg:hover {
+    color: white;
+    text-shadow: 1px 1px 2px gray, 0 0 5px blue, 0 0 10px white;
 }
 
 .navbar-logo {
