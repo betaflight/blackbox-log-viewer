@@ -1,16 +1,24 @@
 'use strict';
 
 function startApplication() {
-    chrome.app.window.create('index.html', {
+    chrome.app.window.create('index.html', 
+    {
         id: 'main',
         frame: 'chrome',
         innerBounds : {
             'width' : 1340,
             'height' : 920
         }
-    }, function (createdWindow) {
+    }, 
+    function (createdWindow) {
         if (getChromeVersion() >= 54) {
             createdWindow.icon = 'images/bf_icon_128.png';
+        }
+        try {
+            var gui = require('nw.gui');
+            createdWindow.contentWindow.argv = gui.App.argv;
+        } catch (e) {
+            // Require not supported, inside chrome
         }
     });
 }

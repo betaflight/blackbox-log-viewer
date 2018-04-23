@@ -2,6 +2,7 @@
 !include "FileFunc.nsh"
 !include "LogicLib.nsh"
 !include "UnInst.nsh"
+!include "FileAssociation.nsh"
 
 # Receives variables from the command line
 # ${VERSION} - Version to generate (x.y.z)
@@ -18,7 +19,10 @@
 !define FILE_NAME_UNINSTALLER "uninstall-betaflight-blackbox-explorer.exe"
 !define FILE_NAME_EXECUTABLE  "betaflight-blackbox-explorer.exe"
 !define LICENSE               "..\..\LICENSE"
-
+!define EXT1                  ".BFL"
+!define EXT1_NAME             "Betaflight Blackbox Explorer log file"
+!define EXT2                  ".BBL"
+!define EXT2_NAME             "Blackbox Explorer log file"
 
 Name "${APP_NAME}"
 BrandingText "${COMPANY_NAME}"
@@ -163,6 +167,9 @@ Section
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" \
                 "EstimatedSize" "$0"
 
+	# Register extension
+	${registerExtension} "$INSTDIR\${FILE_NAME_EXECUTABLE}" "${EXT1}" "${EXT1_NAME}"
+	${registerExtension} "$INSTDIR\${FILE_NAME_EXECUTABLE}" "${EXT2}" "${EXT2_NAME}"
 
 SectionEnd
 
@@ -189,5 +196,9 @@ Section "Uninstall"
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
     DeleteRegKey HKCU "Software\${GROUP_NAME}\${APP_NAME}"
     DeleteRegKey /ifempty HKCU "Software\${GROUP_NAME}"
+
+	# UnRegister extension	
+	${unregisterExtension} "${EXT1}" "${EXT1_NAME}"
+	${unregisterExtension} "${EXT2}" "${EXT2_NAME}"
 
 SectionEnd
