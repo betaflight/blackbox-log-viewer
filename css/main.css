@@ -875,6 +875,17 @@ progress {
 .jumbotron {
     padding: 15px;
 }
+
+.hiddenElement {
+    display: none;
+}
+
+.loading-message {
+    padding-left: 30px;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
 .navbar-inverse .navbar-brand {
     color: #EAEAEA;
 }
