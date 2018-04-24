@@ -548,6 +548,7 @@ var FlightLogParser = function(logData) {
             case "dtermSetpointWeight":
             case "gyro_soft_type":
             case "debug_mode":
+            case "anti_gravity_gain":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
@@ -567,8 +568,7 @@ var FlightLogParser = function(logData) {
                 break
 
             case "yawRateAccelLimit":
-            case "rateAccelLimit":
-            case "anti_gravity_gain":
+            case "rateAccelLimit":            
                 if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10)/1000;
