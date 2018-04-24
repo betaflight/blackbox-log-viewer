@@ -272,6 +272,44 @@ var FlightLogParser = function(logData) {
             unknownHeaders : []             // Unknown Extra Headers
         },
 
+        // Translation of the field values name to the sysConfig var where it must be stored
+        translationValues = {                
+            acc_limit_yaw             : "yawRateAccelLimit",
+            accel_limit               : "rateAccelLimit",
+            acc_limit                 : "rateAccelLimit",
+            anti_gravity_thresh       : "anti_gravity_threshold",
+            d_notch_cut               : "dterm_notch_cutoff", 
+            d_setpoint_weight         : "dtermSetpointWeight",
+            dterm_lowpass_hz          : "dterm_lpf_hz",
+            dterm_setpoint_weight     : "dtermSetpointWeight",  
+            digital_idle_value        : "digitalIdleOffset",
+            dshot_idle_value          : "digitalIdleOffset",
+            gyro_lowpass              : "gyro_lowpass_hz",
+            gyro_lowpass_type         : "gyro_lpf",
+            "gyro.scale"              : "gyro_scale",
+            iterm_windup              : "itermWindupPointPercent",
+            motor_pwm_protocol        : "fast_pwm_protocol",
+            pidsum_limit              : "pidSumLimit",
+            pidsum_limit_yaw          : "pidSumLimitYaw",
+            rc_expo                   : "rcExpo",
+            rc_expo_yaw               : "rcYawExpo",
+            rc_interp                 : "rc_interpolation",
+            rc_interp_int             : "rc_interpolation_interval",
+            rc_rate                   : "rcRate",
+            rc_rate_yaw               : "rcYawRate",
+            rc_yaw_expo               : "rcYawExpo",
+            setpoint_relax_ratio      : "setpointRelaxRatio",
+            setpoint_relaxation_ratio : "setpointRelaxRatio",
+            thr_expo                  : "thrExpo",
+            thr_mid                   : "thrMid",
+            tpa_rate                  : "dynThrPID",
+            use_unsynced_pwm          : "unsynced_fast_pwm",
+            vbat_scale                : "vbatscale",
+            vbat_pid_gain             : "vbat_pid_compensation",
+            yaw_accel_limit           : "yawRateAccelLimit",
+            yaw_lowpass_hz            : "yaw_lpf_hz"
+        },
+
         frameTypes,
 
         // Blackbox state:
@@ -348,6 +386,21 @@ var FlightLogParser = function(logData) {
         return names;
     }
 
+    /**
+     * Translates the name of a field to the parameter in sysConfig object equivalent
+     * 
+     * fieldName Name of the field to translate
+     * returns The equivalent in the sysConfig object or the fieldName if not found
+     */
+    function translateFieldName(fieldName) {
+        var translation = translationValues[fieldName]; 
+        if (typeof translation !== 'undefined') {
+        	return translation;
+        } else {
+        	return fieldName;
+        }
+    }
+    
     function parseHeaderLine() {
         var
             COLON = ":".charCodeAt(0),
@@ -381,6 +434,10 @@ var FlightLogParser = function(logData) {
         fieldName = asciiArrayToString(stream.data.subarray(lineStart, separatorPos));
         fieldValue = asciiArrayToString(stream.data.subarray(separatorPos + 1, lineEnd));
 
+        // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
+        // In this way is easier to maintain the code        
+        fieldName = translateFieldName(fieldName);
+        
         switch (fieldName) {
             case "I interval":
                 that.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
@@ -398,8 +455,10 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
                 }
             break;
-            // case "P denom":
-            //     that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
+            case "P denom":
+            case "P ratio":
+                // Don't do nothing with this, because is the same than frameIntervalI/frameIntervalPDenom so we don't need it
+            break;
             case "Data version":
                 dataVersion = parseInt(fieldValue, 10);
             break;
@@ -476,11 +535,12 @@ var FlightLogParser = function(logData) {
             case "fast_pwm_protocol":
             case "motor_pwm_rate":
             case "vbatscale":
-            case "vbat_scale":
             case "vbatref":
             case "acc_1G":
             case "dterm_filter_type":
             case "pidAtMinThrottle":
+            case "pidSumLimit":
+            case "pidSumLimitYaw":
             case "anti_gravity_threshold":
             case "itermWindupPointPercent":
             case "ptermSRateWeight":
@@ -491,12 +551,6 @@ var FlightLogParser = function(logData) {
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
-            case "rc_rate":
-                that.sysConfig.rcRate = parseInt(fieldValue, 10);
-                break
-            case "rc_rate_yaw":
-                that.sysConfig.rcYawRate = parseInt(fieldValue, 10);
-                break
             case "rc_expo":
                 if(stringHasComma(fieldValue)) {
                     var expos = parseCommaSeparatedString(fieldValue);
@@ -510,49 +564,6 @@ var FlightLogParser = function(logData) {
                 } else {
                     that.sysConfig.rcExpo = parseInt(fieldValue, 10);
                 }
-                break
-            case "rc_expo_yaw":
-                that.sysConfig.rcYawExpo = parseInt(fieldValue, 10);
-                break
-            case "thr_mid":
-                that.sysConfig.thrMid = parseInt(fieldValue, 10);
-                break
-            case "thr_expo":
-                that.sysConfig.thrExpo = parseInt(fieldValue, 10);
-                break
-            case "setpoint_relaxation_ratio":
-                that.sysConfig.setpointRelaxRatio = parseInt(fieldValue, 10);
-                break;
-                dynThrPID
-            case "dterm_setpoint_weight":
-                that.sysConfig.dtermSetpointWeight = parseInt(fieldValue, 10);
-                break
-            case "gyro_lowpass_type":
-                that.sysConfig.gyro_soft_type = parseInt(fieldValue, 10);
-                break
-            case "vbat_pid_gain":
-                that.sysConfig.vbat_pid_compensation = parseInt(fieldValue, 10);
-                break
-            case "dshot_idle_value":
-                that.sysConfig.digitalIdleOffset = parseInt(fieldValue, 10);
-                break
-            case "acc_limit":
-                that.sysConfig.rateAccelLimit = parseInt(fieldValue, 10);
-                break
-            case "acc_limit_yaw":
-                that.sysConfig.yawRateAccelLimit = parseInt(fieldValue, 10);
-                break
-            case "iterm_windup":
-                that.sysConfig.itermWindupPointPercent = parseInt(fieldValue, 10);
-                break
-            case "use_unsynced_pwm":
-                that.sysConfig.unsynced_fast_pwm = parseInt(fieldValue, 10);
-                break
-            case "motor_pwm_protocol":
-                that.sysConfig.fast_pwm_protocol = parseInt(fieldValue, 10);
-                break
-            case "tpa_rate":
-                that.sysConfig.dynThrPID = parseInt(fieldValue, 10);
                 break
 
             case "yawRateAccelLimit":
@@ -609,13 +620,6 @@ var FlightLogParser = function(logData) {
                     that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
                 }
             break;
-
-            case "pidsum_limit":
-                that.sysConfig.pidSumLimit = parseInt(fieldValue, 10);
-                break;
-            case "pidsum_limit_yaw":
-                that.sysConfig.pidSumLimitYaw = parseInt(fieldValue, 10);
-                break;
 
             /* CSV packed values */
             case "rates":
