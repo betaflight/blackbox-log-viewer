@@ -36,13 +36,14 @@ var
             YAW:   2
     }),
 
-        
-    FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly([
+    FLIGHT_LOG_FLIGHT_MODE_NAME = [],
+    
+    FLIGHT_LOG_FLIGHT_MODE_NAME_PRE_3_3 = makeReadOnly([
             'ARM',
             'ANGLE',
             'HORIZON',
             'BARO',
-            'VARIO',
+            'ANTIGRAVITY',
             'MAG',
             'HEADFREE',
             'HEADADJ',
@@ -67,8 +68,63 @@ var
             'BLACKBOX',
             'FAILSAFE',
             'AIRMODE',
-            'VTX',
+            '3DDISABLE',
+            'FPVANGLEMIX',
+            'BLACKBOXERASE',
+            'CAMERA1',
+            'CAMERA2',
+            'CAMERA3',
+            'FLIPOVERAFTERCRASH',
+            'PREARM',
             'CHECKBOX_ITEM_COUNT'
+    ]),
+
+    FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3 = makeReadOnly([
+        'ARM',
+        'ANGLE',
+        'HORIZON',
+        'MAG',
+        'BARO',
+        'GPSHOME',
+        'GPSHOLD',
+        'HEADFREE',
+        'PASSTHRU',
+        'RANGEFINDER',
+        'FAILSAFE',
+        'ANTIGRAVITY',
+        'HEADADJ',
+        'CAMSTAB',
+        'CAMTRIG',
+        'BEEPER',
+        'LEDMAX',
+        'LEDLOW',
+        'LLIGHTS',
+        'CALIB',
+        'GOV',
+        'OSD',
+        'TELEMETRY',
+        'GTUNE',
+        'SERVO1',
+        'SERVO2',
+        'SERVO3',
+        'BLACKBOX',
+        'AIRMODE',
+        '3D',
+        'FPVANGLEMIX',
+        'BLACKBOXERASE',
+        'CAMERA1',
+        'CAMERA2',
+        'CAMERA3',
+        'FLIPOVERAFTERCRASH',
+        'PREARM',
+        'BEEPGPSCOUNT',
+        'VTXPITMODE',
+        'USER1',
+        'USER2',
+        'USER3',
+        'USER4',
+        'PIDAUDIO',
+        'CHECKBOX_ITEM_COUNT'
     ]),
 
     FLIGHT_LOG_FEATURES = makeReadOnly([
@@ -191,7 +247,6 @@ var
             "MAX7456_SPICLOCK",
             "SBUS",
             "FPORT",
-            "RANGEFINDER",
             "RANGEFINDER_QUALITY",
             "LIDAR_TF",
             "CORE_TEMP",
@@ -286,7 +341,18 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('VELOCITY'),     1);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('DTERM_FILTER'), 1);
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
+
+        FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3);
+
     } else {
         DEBUG_MODE = DEBUG_MODE_COMPLETE;
+
+        FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_PRE_3_3.slice(0);
+
+        if((firmwareType == FIRMWARE_TYPE_BETAFLIGHT) && semver.lte(firmwareVersion, '3.1.6')) {
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('ANTIGRAVITY'), 1);
+        }
+
+        FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
     }
 }
