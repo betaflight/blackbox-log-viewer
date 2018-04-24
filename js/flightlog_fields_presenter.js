@@ -124,13 +124,6 @@ function FlightLogFieldPresenter() {
 							'debug[2]':'rollPitchYawMix[2]',
 							'debug[3]':'rollPitchYawMix[3]',
 						},
-			'AIRMODE' : 	{	
-							'debug[all]':'debug[all]',	
-							'debug[0]':'debug[0]',
-							'debug[1]':'debug[1]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',
-						},
 			'PIDLOOP' : 	{	
 							'debug[all]':'Debug PID',	
 							'debug[0]':'Wait Time',
@@ -151,13 +144,6 @@ function FlightLogFieldPresenter() {
 							'debug[1]':'rcCommand_raw[pitch]',
 							'debug[2]':'rcCommand_raw[yaw]',
 							'debug[3]':'rxRefreshRate',
-						},
-			'VELOCITY' : 	{	
-							'debug[all]':'debug[all]',	
-							'debug[0]':'debug[0]',
-							'debug[1]':'debug[1]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',
 						},
 			'DTERM_FILTER' : 	{	
 							'debug[all]':'Debug Filter',	
@@ -194,58 +180,28 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Stack Current',
                             'debug[3]':'Stack p',
             },
-            'DEBUG_ESC_SENSOR_RPM' : {
-                            'debug[all]':'Debug ESC Sensor RPM',
-							'debug[0]':'debug[0]',
-							'debug[1]':'debug[1]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',
-            
-            },
-    		'DEBUG_ESC_SENSOR_TMP' : {
-                            'debug[all]':'Debug ESC Sensor TMP',
-							'debug[0]':'debug[0]',
-							'debug[1]':'debug[1]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',    		
-    		},
-    		'DEBUG_ALTITUDE' : {
-                            'debug[all]':'Debug Altitude',
-							'debug[0]':'debug[0]',
-							'debug[1]':'debug[1]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',    		
-    		},
-    		'DEBUG_FFT' : {
+            'FFT' : {
     		                'debug[all]':'Debug FFT',
     		                'debug[0]':'gyro_raw[roll]',
     		                'debug[1]':'gyro_dyn_notch[roll]',
     		                'debug[2]':'gyro_bpf[roll]',
     		                'debug[3]':'fft_center_index[roll]',    		
     		},
-            'DEBUG_FFT_TIME' : {
+            'FFT_TIME' : {
                             'debug[all]':'Debug FFT TIME',
                             'debug[0]':'Active calc step',
                             'debug[1]':'Step duration',
                             'debug[2]':'Additional steps',
                             'debug[3]':'Not used',
             },
-            'DEBUG_FFT_FREQ' : {
+            'FFT_FREQ' : {
                             'debug[all]':'Debug FFT FREQ',
                             'debug[0]':'center_freq[roll]',
                             'debug[1]':'center_freq[pitch]',
                             'debug[2]':'center_freq[yaw]',
                             'debug[3]':'Not used',
             },
-            'DEBUG_FRSKY_D_RX' : {
-                            'debug[all]':'Debug FRSKY_D_RX',
-                            'debug[0]':'debug[0]',
-                            'debug[1]':'debug[1]',
-                            'debug[2]':'debug[2]',
-                            'debug[3]':'debug[3]',
-            
-            },
-            'DEBUG_GYRO_RAW' :   {   
+            'GYRO_RAW' :   {
                             'debug[all]':'Debug Gyro Raw', 
                             'debug[0]':'gyro_raw[X]',
                             'debug[1]':'gyro_raw[Y]',
@@ -489,16 +445,28 @@ function FlightLogFieldPresenter() {
                 case 'DEBUG_FFT_FREQ':
                     return value.toFixed(0) + "Hz";
                 default:
-					return "";
+					return value.toFixed(0);
 			}	
 		}
 		return "";
 	};
         
     FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
-    	if(debugMode) {
+        if (debugMode) {
 			if(fieldName.includes('debug')) {
-				var debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugMode < DEBUG_MODE.length ? DEBUG_MODE[debugMode] : DEBUG_MODE[0]];
+                var debugModeName = DEBUG_MODE[debugMode];
+                var debugFields;
+                if (debugModeName) {
+				    debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugModeName];
+                }
+
+                if (!debugFields) {
+                    if (fieldName === 'debug[all]') {
+                        return 'Debug (' + (debugModeName || debugMode) + ')';
+                    }
+                    debugFields = DEBUG_FRIENDLY_FIELD_NAMES[DEBUG_MODE[0]];
+                }
+
 				return debugFields[fieldName];
 			}			
     	}
