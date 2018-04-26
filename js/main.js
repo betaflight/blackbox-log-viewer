@@ -22,7 +22,7 @@ function BlackboxLogViewer() {
         GRAPH_STATE_PLAY = 1,
         
         SMALL_JUMP_TIME = 100 * 1000,
-        PLAYBACK_MIN_RATE = 5,
+        PLAYBACK_MIN_RATE = 10,
         PLAYBACK_MAX_RATE = 300,
         PLAYBACK_DEFAULT_RATE = 100,
         PLAYBACK_RATE_STEP = 5,
