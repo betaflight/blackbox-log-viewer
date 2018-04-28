@@ -28,7 +28,7 @@
                 <h1>Welcome to the Enhanced Blackbox Explorer!</h1>
                 <p>This tool allows you to view and analyze logs created by Cleanflight's and Betaflight's Blackbox feature.</p>
                 <span class="btn btn-primary btn-lg btn-file" data-toggle="tooltip" title="Start by opening a log or video file"> Open log file/video
-                    <input type="file" class="file-open" multiple>
+                    <input type="file" class="file-open" accept=".bbl,.txt,.cfl,.bfl,.log,.avi,.mov,.mp4,.mpeg,.json" multiple />
                 </span>
                 <span id="loading-file-text" class="hiddenElement loading-message"></span>
             </div>
@@ -182,7 +182,7 @@
                             Export Workspaces...</a>
                         <span class="btn btn-primary btn-file" data-toggle="tooltip" title="Open another log file, video file, exported workspace file or configuration dump file">
                             Open log file/video
-                            <input type="file" class="file-open" multiple>
+                            <input type="file" class="file-open" accept=".bbl,.txt,.cfl,.bfl,.log,.avi,.mov,.mp4,.mpeg,.json" multiple>
                         </span>
                     </div>
                     <div class="btn-group"  style="display: none;">
