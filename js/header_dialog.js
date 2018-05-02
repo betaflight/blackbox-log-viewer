@@ -641,11 +641,13 @@ function HeaderDialog(dialog, onSave) {
 	// Public variables
 
     this.show = function(sysConfig) {
-        dialog.modal('show');
-        renderSysConfig(sysConfig);
-        // Disable changing input and dropdowns
-        $('#dlgHeaderDialog input').prop('disabled', 'disabled');
-        $('#dlgHeaderDialog select').prop('disabled', 'disabled');
+        dialog.modal('toggle');
+        if (dialog.data('bs.modal').isShown) {
+            renderSysConfig(sysConfig);
+            // Disable changing input and dropdowns
+            $('#dlgHeaderDialog input').prop('disabled', 'disabled');
+            $('#dlgHeaderDialog select').prop('disabled', 'disabled');
+        }
     }
 
  	// Buttons
