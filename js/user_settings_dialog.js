@@ -133,6 +133,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 					   	   left: $('.laptimer-settings input[name="laptimer-left"]').val() + '%',
 					   	   transparency: $('.laptimer-settings input[name="laptimer-transparency"]').val() + '%', },
 				drawLapTimer: ($(".laptimer").is(":checked")),
+                graphSmoothOverride: ($(".smooth-default").is(":checked")),
+                graphExpoOverride: ($(".expo-default").is(":checked")),
     	});
     	return settings;
     }
@@ -294,6 +296,14 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     $(".legend-units").click(function() {
         currentSettings.legendUnits = $(this).is(":checked");
     });
+    
+    $(".smooth-default").click(function() {
+        currentSettings.graphSmoothOverride = $(this).is(":checked");
+    });
+    
+    $(".expo-default").click(function() {
+        currentSettings.graphExpoOverride = $(this).is(":checked");
+    });
 
     // Load Custom Logo
     function readURL(input) {
@@ -365,6 +375,16 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 				// set the toggle switch
 				$(".legend-units").prop('checked', currentSettings.legendUnits);
 			}
+
+            if(currentSettings.graphSmoothOverride!=null) {
+                // set the toggle switch
+                $(".smooth-default").prop('checked', currentSettings.graphSmoothOverride);
+            }
+
+            if(currentSettings.graphExpoOverride!=null) {
+                // set the toggle switch
+                $(".expo-default").prop('checked', currentSettings.graphExpoOverride);
+            }
 
 
         mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration

@@ -297,7 +297,18 @@ function BlackboxLogViewer() {
             invalidateGraph();
         }
     }
-    
+
+    function updateOverrideStatus() {
+        // Update override status flags on status bar
+        var overrideStatus = '';
+
+        overrideStatus += (userSettings.graphSmoothOverride?'SMOOTH':'');        
+        overrideStatus += ((userSettings.graphExpoOverride && overrideStatus != '')?'|':'') + (userSettings.graphExpoOverride?'EXPO':'');
+        overrideStatus += ((userSettings.graphGridOverride && overrideStatus != '')?'|':'') + (userSettings.graphGridOverride?'GRID':'');
+
+        $(".overrides", statusBar).text(overrideStatus);
+    }
+
     function renderLogFileInfo(file) {
         $(".log-filename").text(file.name);
 
@@ -586,7 +597,9 @@ function BlackboxLogViewer() {
         }
         
         renderSelectedLogInfo();
-        
+
+        updateOverrideStatus();
+
         updateCanvasSize();
         
         setGraphState(GRAPH_STATE_PAUSED);
@@ -1260,6 +1273,7 @@ function BlackboxLogViewer() {
 	                graph.refreshOptions(newSettings);
 	                graph.refreshLogo();
 	                graph.initializeCraftModel();
+	                updateOverrideStatus();
 	                updateCanvasSize();
 	            }
 
@@ -1524,14 +1538,6 @@ function BlackboxLogViewer() {
                 return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100).toFixed(2) + '%\n';;
             }
             return false; // nothing was changed
-        }
-
-        function updateOverrideStatus() {
-            // Update override status flags on status bar
-            var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') +
-                ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-            $(".overrides", statusBar).text(overrideStatus);
         }
 
         function toggleOverrideStatus(userSetting, className) {
