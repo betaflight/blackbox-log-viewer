@@ -106,9 +106,11 @@ function BlackboxLogViewer() {
         lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
         currentWindowId;
 
-        chrome.windows.getCurrent(function(currentWindow) {
-            currentWindowId = currentWindow.id;
-        });
+        if (chrome.windows) {
+            chrome.windows.getCurrent(function(currentWindow) {
+                currentWindowId = currentWindow.id;
+            });
+        }
 
         function createNewBlackboxWindow(fileToOpen) {
             chrome.app.window.create('index.html', 
@@ -1914,7 +1916,7 @@ function BlackboxLogViewer() {
         seekBar.onSeek = setCurrentBlackboxTime;
 
         var checkIfFileAsParameter = function() {
-            if ((argv !== undefined) && (argv.length > 0)) {
+            if ((typeof argv !== 'undefined') && (argv.length > 0)) {
                 var fullPath = argv[0];
                 var filename = fullPath.replace(/^.*[\\\/]/, '')
                 var file = new File(fullPath, filename);
