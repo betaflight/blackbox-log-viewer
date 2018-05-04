@@ -107,8 +107,8 @@ function GraphConfig(graphConfig) {
                     
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
-                            // add special condition for rcCommand as each of the fields requires a different scaling.
-                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, (nameRoot=='rcCommand')));
+                            // add special condition for rcCommands as each of the fields requires a different scaling.
+                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, (nameRoot=='rcCommands')));
                             colorIndexOffset++;
                         }
                     }
@@ -181,7 +181,11 @@ GraphConfig.load = function(config) {
                 label: "Gyros",
                 fields: ["gyroADC[all]"]
             },
-            {	/* Add custom graph configurations to the main menu ! */
+            { /* Add custom graph configurations to the main menu ! */
+                label: "RC Rates",
+                fields: ["rcCommands[all]"]
+            },
+            {
                 label: "RC Command",
                 fields: ["rcCommand[all]"]
             },
@@ -248,13 +252,6 @@ GraphConfig.load = function(config) {
                     inputRange: 500,
                     outputRange: 1.0
                 };
-            } else if (fieldName.match(/^gyroADC\[/)) {
-                return {
-                    offset: 0,
-                    power: 0.25, /* Make this 1.0 to scale linearly */
-                    inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
-                    outputRange: 1.0
-                };
             } else if (fieldName.match(/^accSmooth\[/)) {
                 return {
                     offset: 0,
@@ -262,13 +259,23 @@ GraphConfig.load = function(config) {
                     inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
                     outputRange: 1.0
                 };
-            } else if (fieldName.match(/^axisError\[/)  ||     // Custom Gyro, rcCommand and axisError Scaling
+            } else if (fieldName == "rcCommands[3]") { // Throttle scaled
+                return {
+                    offset: -50,
+                    power: 1.0, /* Make this 1.0 to scale linearly */
+                    inputRange: 50,
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^axisError\[/)  ||     // Gyro, Gyro Scaled, RC Command Scaled and axisError
                        fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
-                       fieldName.match(/^gyroADCs\[/)      ) { // same range.
+                       fieldName.match(/^gyroADCs\[/)   ||     // same range.
+                       fieldName.match(/^gyroADC\[/)) { 
                 return {
                     offset: 0,
                     power: 0.25, /* Make this 1.0 to scale linearly */
-                    inputRange: flightLog.gyroRawToDegreesPerSecond((2.0e-3 * Math.PI/180) / sysConfig.gyroScale),
+                    inputRange: Math.max(flightLog.rcCommandRawToDegreesPerSecond(500,0) * 1.20, 
+                                         flightLog.rcCommandRawToDegreesPerSecond(500,1) * 1.20, 
+                                         flightLog.rcCommandRawToDegreesPerSecond(500,2) * 1.20), // Maximum grad/s + 20% 
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
@@ -282,21 +289,14 @@ GraphConfig.load = function(config) {
                 return {
                     offset: -1500,
                     power: 1.0,
-                    inputRange: 500,
-                    outputRange: 1.0
-                };
-            } else if (fieldName == "rcCommand[2]") { // Yaw
-                return {
-                    offset: 0,
-                    power: 0.8,
-                    inputRange: 500 * (sysConfig.rcYawRate ? sysConfig.rcYawRate : 100) / 100,
+                    inputRange: 500, 
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
                     offset: 0,
-                    power: 0.8,
-                    inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
+                    power: 0.25,
+                    inputRange: 500 * 1.20, // +20% to let compare in the same scale with the rccommands 
                     outputRange: 1.0
                 };           
             } else if (fieldName == "heading[2]") {

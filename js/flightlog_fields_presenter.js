@@ -18,11 +18,11 @@ function FlightLogFieldPresenter() {
         'axisD[1]': 'PID_D[pitch]',
         'axisD[2]': 'PID_D[yaw]',
         
-        'rcCommand[all]': 'rcCommand',
-        'rcCommand[0]': 'rcCommand[roll]',
-        'rcCommand[1]': 'rcCommand[pitch]',
-        'rcCommand[2]': 'rcCommand[yaw]',
-        'rcCommand[3]': 'rcCommand[throttle]',
+        'rcCommand[all]': 'RC Command',
+        'rcCommand[0]': 'RC Command[roll]',
+        'rcCommand[1]': 'RC Command[pitch]',
+        'rcCommand[2]': 'RC Command[yaw]',
+        'rcCommand[3]': 'RC Command[throttle]',
     
         'gyroADC[all]': 'gyro',
         'gyroADC[0]': 'gyro[roll]',
@@ -68,10 +68,11 @@ function FlightLogFieldPresenter() {
         'axisError[2]' : 'PID_Error[yaw]',
 
         //Virtual fields - add the Scaled rcCommands
-        'rcCommands[all]': 'setpointRates',
-        'rcCommands[0]' : 'setpointRate[roll]',
-        'rcCommands[1]' : 'setpointRate[pitch]',
-        'rcCommands[2]' : 'setpointRate[yaw]',
+        'rcCommands[all]': 'RC Rates',
+        'rcCommands[0]' : 'RC Rate[roll]',
+        'rcCommands[1]' : 'RC Rate[pitch]',
+        'rcCommands[2]' : 'RC Rate[yaw]',
+        'rcCommands[3]' : 'RC Rate[throttle]',
 
         //Virtual fields - add the Scaled gyros
         'gyroADCs[all]': 'gyros',
@@ -292,14 +293,12 @@ function FlightLogFieldPresenter() {
                 return Math.round(value) + " deg/s";
 
             case 'rcCommand[0]':
-                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,0), currentFlightMode) + " deg/s";
             case 'rcCommand[1]':
-                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,1), currentFlightMode) + " deg/s";
             case 'rcCommand[2]':
-                return Math.round(flightLog.rcCommandRawToDegreesPerSecond(value,2), currentFlightMode) + " deg/s";
-
+                return (value + 1500).toFixed(0) + " us";
             case 'rcCommand[3]':
-                return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
+                return value.toFixed(0) + " us";
+                
             case 'motor[0]':
             case 'motor[1]':            
             case 'motor[2]':            
@@ -314,7 +313,9 @@ function FlightLogFieldPresenter() {
             case 'rcCommands[1]':
             case 'rcCommands[2]':
                 return value.toFixed(0) + " deg/s";
-                
+            case 'rcCommands[3]':
+                return value.toFixed(0) + "%";
+
             case 'axisSum[0]':
             case 'axisSum[1]':
             case 'axisSum[2]':
