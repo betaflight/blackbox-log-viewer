@@ -5,3 +5,4 @@ Exec=/opt/betaflight/betaflight-blackbox-explorer/betaflight-blackbox-explorer
 Icon=/opt/betaflight/betaflight-blackbox-explorer/icon/bf_icon_128.png
 Terminal=false
 Type=Application
+MimeType=application/x-blackboxlog
