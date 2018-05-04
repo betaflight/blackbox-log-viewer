@@ -1959,6 +1959,28 @@ function BlackboxLogViewer() {
         }
         onOpenFileAssociation();
 
+        /* drag and drop support */
+
+        window.ondragover = function(e) {
+            // prevent default behavior from changing page on dropped file
+            // NOTE: ondrop events WILL NOT WORK if you do not "preventDefault" in the ondragover event!!
+            e.preventDefault(); 
+            e.dataTransfer.dropEffect = 'copy';
+            return false; 
+        };
+
+        window.ondrop = function(e) { 
+            e.preventDefault();
+
+            const item = e.dataTransfer.items[0];
+            const entry = item.webkitGetAsEntry();
+            if (entry.isFile) {              
+              var file = e.dataTransfer.files[0];
+              loadFiles([file]);              
+            } 
+            return false;
+        };
+
     });
 }
 
