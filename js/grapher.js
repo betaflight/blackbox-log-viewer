@@ -500,7 +500,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
      * Plot the given field within the specified time period. When the output from the curve applied to a field
      * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
      */
-    function plotField(chunks, startFrameIndex, fieldIndex, curve, plotHeight, color, lineWidth) {
+    function plotField(chunks, startFrameIndex, fieldIndex, curve, plotHeight, color, lineWidth, highlight) {
         var
             GAP_WARNING_BOX_RADIUS = 3,
             chunkIndex, frameIndex,
@@ -587,6 +587,17 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             frameIndex = 0;
         }
 
+        if (highlight) {
+            // Draw semi-transparent stroke with wider line to simulate glow
+            // Decided not to use canvasContext.shadowBlur for performance reasons
+            var lineWidthTemp = canvasContext.lineWidth;
+            canvasContext.lineWidth = 1.5*canvasContext.lineWidth+3;
+            canvasContext.globalAlpha = 0.5;
+            canvasContext.stroke();
+            canvasContext.lineWidth = lineWidthTemp;
+            canvasContext.globalAlpha = 1.0;
+        }
+        
         canvasContext.stroke();
     }
     
@@ -978,10 +989,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                     
                     for (j = 0; j < graph.fields.length; j++) {
                         var field = graph.fields[j];
-                        
                         plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, 
                             field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
-                            field.lineWidth ? field.lineWidth : null);
+                            field.lineWidth ? field.lineWidth : null, 
+                            graphConfig.highlightGraphIndex==i && graphConfig.highlightFieldIndex==j);
                     }
                     
                     if (graph.label) {

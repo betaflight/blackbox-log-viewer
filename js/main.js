@@ -735,11 +735,15 @@ function BlackboxLogViewer() {
     }
 
     function onLegendSelectionChange() {
-            hasAnalyser = true;
-            graph.setDrawAnalyser(hasAnalyser);            
-            html.toggleClass("has-analyser", hasAnalyser);
-            prefs.set('hasAnalyser', hasAnalyser);
-            invalidateGraph();
+        hasAnalyser = true;
+        graph.setDrawAnalyser(hasAnalyser);            
+        html.toggleClass("has-analyser", hasAnalyser);
+        prefs.set('hasAnalyser', hasAnalyser);
+        invalidateGraph();
+    }
+
+    function onLegendHighlightChange() {
+        invalidateGraph();
     }
 
     function setMarker(state) { // update marker field
@@ -892,7 +896,7 @@ function BlackboxLogViewer() {
             $(".viewer-download").hide();
         }
 
-        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
+        graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
         
         prefs.get('log-legend-hidden', function(item) {
             if (item) {

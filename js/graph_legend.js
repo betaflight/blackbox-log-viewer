@@ -1,6 +1,6 @@
 "use strict";
 
-function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onZoomGraph, onExpandGraph, onNewGraphConfig) {
+function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onHighlightChange, onZoomGraph, onExpandGraph, onNewGraphConfig) {
     var
         that = this;
 
@@ -27,12 +27,31 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                     li = $('<li class="graph-legend-field" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>');
                 
                 li.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
-                li.css('border-bottom', "2px solid " + field.color);
+                li.css('border-bottom', "3px solid " + field.color);
                 fieldList.append(li);
             }
             
             targetElem.append(graphDiv);
         }
+
+        // Add a trigger on legend; highlight the hovered field in plot
+        $('.graph-legend-field').on('mouseenter', function(e){
+            $(this).addClass("highlight")
+            config.highlightGraphIndex = $(this).attr('graph');
+            config.highlightFieldIndex = $(this).attr('field');
+            if (onHighlightChange) {
+                onHighlightChange();
+            }
+        });
+
+        $('.graph-legend-field').on('mouseleave', function(e){
+            $(this).removeClass("highlight")
+            config.highlightGraphIndex = null;
+            config.highlightFieldIndex = null;
+            if (onHighlightChange) {
+                onHighlightChange();
+            }
+        });
 
         // Add a trigger on legend; select the analyser graph/field to plot
         $('.graph-legend-field').on('click', function(e) {

@@ -630,6 +630,10 @@ html.has-config .configuration-list {
     margin-left: 0.7em;
 }
 
+.graph-legend-field.highlight{
+    box-shadow: 0px 2px 4px -2px white
+}
+
 html.has-video .graph-row,
 html.has-log .graph-row {
     display:-webkit-flex;

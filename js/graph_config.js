@@ -16,6 +16,9 @@ function GraphConfig(graphConfig) {
     this.selectedGraphIndex = 0;
     this.selectedFieldIndex = 0;
 
+    this.highlightGraphIndex = null;
+    this.highlightFieldIndex = null;
+
     this.getGraphs = function() {
         return graphs;
     };
