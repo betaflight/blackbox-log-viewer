@@ -278,6 +278,7 @@ var FlightLogParser = function(logData) {
             accel_limit               : "rateAccelLimit",
             acc_limit                 : "rateAccelLimit",
             anti_gravity_thresh       : "anti_gravity_threshold",
+            currentSensor             : "currentMeter",
             d_notch_cut               : "dterm_notch_cutoff", 
             d_setpoint_weight         : "dtermSetpointWeight",
             dterm_lowpass_hz          : "dterm_lpf_hz",
