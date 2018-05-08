@@ -1,23 +1,14 @@
 "use strict";
 
-function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserCanvas, options) {
+function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options) {
     var
         PID_P = 0,
         PID_I = 1,
         PID_D = 2,
-
-        STICK_MODE_1 = 1,
-        STICK_MODE_2 = 2,
-        STICK_MODE_3 = 3,
-        STICK_MODE_4 = 4,
-        
-        WHITE = "white",
         
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
         
         drawingParams = {
-            fontSizeCurrentValueLabel: null,
-            fontSizeCommandStickLabel: null,
             fontSizePIDTableLabel: null,
             fontSizeAxisLabel: null,
             fontSizeFrameLabel: null,
@@ -25,12 +16,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             
             plotLineWidth: null,
             
-            stickSpacing: null,
-            commandStickLabelMargin: null,
         },
         
-        // How far the center of the craft and command sticks are from the top of the canvas, as a portion of height
-        COMMAND_STICK_POSITION_Y_PROPORTION =  parseInt(options.sticks.top) / 100.0 || 0.2,
+        // How far the center of the craft is from the top of the canvas, as a portion of height
         // CRAFT_POSITION_Y_PROPORTION         =  parseInt(options.craft.top) / 100.0 ||0.2,
         
         lineColors = [
@@ -70,11 +58,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
         sysConfig = flightLog.getSysConfig(),
 
         graphs = [],
-        pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10),
 
         inTime = false, outTime = false,
         
         lastMouseX, lastMouseY,
+
+        sticks = null,
         
         craft3D = null, craft2D = null,
         
@@ -250,252 +239,26 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     	lapTimer.drawCanvas(canvas, options);
     }
 
-    function getStickValues(frame, stickPositions, stickLabel, config) {
-        var
-            stickIndex,
-            rcCommand = [], rcCommandLabels = [];
-
-        for (stickIndex = 0; stickIndex < 4; stickIndex++) {
-            //Check that stick data is present to be drawn:
-            if (idents.rcCommandFields[stickIndex] === undefined)
-                return;
-
-            rcCommand[stickIndex] = frame[idents.rcCommandFields[stickIndex]];
-            if(stickLabel!=null) {
-                rcCommandLabels[stickIndex] = (rcCommand[stickIndex] * ((stickIndex==2)?-1:1)) + ""; // correct the value for Yaw being inverted
-                if(options.stickUnits!=null) {
-                    if(options.stickUnits) {
-                        var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
-                        rcCommandLabels[stickIndex] = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, flightLog.getMainFieldNames()[idents.rcCommandFields[stickIndex]], frame[idents.rcCommandFields[stickIndex]], currentFlightMode);
-                    }
-                }
-            }            
-        }
-
-        var yawValue = ((userSettings.stickInvertYaw)?1:-1) * rcCommand[2];
-        // map the stick positions based upon selected stick mode (default is mode 2)
-
-        //Compute the position of the sticks in the range [-1..1] (left stick x, left stick y, right stick x, right stick y)
-        switch(options.stickMode) {
-            case STICK_MODE_1:
-                stickPositions[0] = yawValue / config.yawStickMax; //Yaw
-                stickPositions[1] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch 
-                stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-                stickPositions[3] = (1500 - rcCommand[3]) / 500; //Throttle
-                
-                if(stickLabel!=null) {
-                    stickLabel[0] = rcCommandLabels[2];
-                    stickLabel[1] = rcCommandLabels[1];
-                    stickLabel[2] = rcCommandLabels[0];
-                    stickLabel[3] = rcCommandLabels[3];
-                }
-
-                break;
-            case STICK_MODE_3:
-                stickPositions[0] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-                stickPositions[1] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
-                stickPositions[2] = yawValue / config.yawStickMax; //Yaw
-                stickPositions[3] = (1500 - rcCommand[3]) / 500; //Throttle
-
-                if(stickLabel!=null) {
-                    stickLabel[0] = rcCommandLabels[0];
-                    stickLabel[1] = rcCommandLabels[1];
-                    stickLabel[2] = rcCommandLabels[2];
-                    stickLabel[3] = rcCommandLabels[3];
-                }
-
-                break;
-            case STICK_MODE_4:
-                stickPositions[0] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-                stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
-                stickPositions[2] = yawValue / config.yawStickMax; //Yaw
-                stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
-
-                if(stickLabel!=null) {
-                    stickLabel[0] = rcCommandLabels[0];
-                    stickLabel[1] = rcCommandLabels[3];
-                    stickLabel[2] = rcCommandLabels[2];
-                    stickLabel[3] = rcCommandLabels[1];
-                }
-
-                break;
-            default: // Mode 2
-                stickPositions[0] = yawValue / config.yawStickMax; //Yaw
-                stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
-                stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-                stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
-
-                if(stickLabel!=null) {
-                    stickLabel[0] = rcCommandLabels[2];
-                    stickLabel[1] = rcCommandLabels[3];
-                    stickLabel[2] = rcCommandLabels[0];
-                    stickLabel[3] = rcCommandLabels[1];
-                }
-        }
-
-        for (stickIndex = 0; stickIndex < 4; stickIndex++) {
-            //Clamp to [-1..1]
-            stickPositions[stickIndex] = stickPositions[stickIndex] > 1 ? 1 : (stickPositions[stickIndex] < -1 ? -1 : stickPositions[stickIndex]);
-
-            //Scale to our stick size
-            stickPositions[stickIndex] *= config.stickSurroundRadius;
-        }
-
-    }
-    
-    function drawCommandSticks(frame, chunks, startFrameIndex) {
-
-            canvasContext.save();
-
-        var
-            // The total width available to draw both sticks in:
-            sticksDisplayWidth = canvas.width * parseInt(options.sticks.size) / 100.0,
-            
-            // Use that plus the inter-stick spacing that has been determined already to decide how big each stick should be:
-            stickSurroundRadius = Math.min((sticksDisplayWidth - drawingParams.stickSpacing) / 4, canvas.height / 10), 
-            yawStickMax = 500,
-            
-            stickColor = "rgba(255,102,102,1.0)",
-            stickAreaColor = "rgba(76,76,76,0.2)",
-            crosshairColor = "rgba(191,191,191,0.5)";
-        
-        var
-            stickIndex,
-            stickPositions = [],
-            stickLabel = [];
-
-        // Get the stick values
-        getStickValues(frame, stickPositions, stickLabel, {stickSurroundRadius:stickSurroundRadius, yawStickMax:yawStickMax});
-
-        if(options.stickTrails) {
-            // Get the stick trail data
-            var stickPositionsTrail = [];
-            if(chunks && startFrameIndex) {
-                // we have the data for the stick trails
-
-                 //We may start partway through the first chunk:
-                var frameIndex = startFrameIndex;
-                stickLoop:
-                for (var chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-                    var 
-                        chunk = chunks[chunkIndex];
-
-                    for (; frameIndex < chunk.frames.length; frameIndex++) {
-                        var
-                            frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-                            frameStickPositions = [];
-
-                        if(frameTime > windowCenterTime - 500000) { // only go back 500ms
-                            getStickValues(chunk.frames[frameIndex], frameStickPositions, null, {stickSurroundRadius:stickSurroundRadius, yawStickMax:yawStickMax});
-                            stickPositionsTrail.push(frameStickPositions);
-                        } 
-                        if(frameTime >= windowCenterTime) break stickLoop; // we only get the trail up to the center line
-                    }
-                    frameIndex = 0;
-                }     
-            }
-        }
-
-        // Move origin to center of left stick
-        canvasContext.translate(-drawingParams.stickSpacing / 2 - stickSurroundRadius, 0);
-
-        canvasContext.font = drawingParams.fontSizeCommandStickLabel + "pt " + DEFAULT_FONT_FACE;
-
-        //For each stick
-        for (var i = 0; i < 2; i++) {
-            //Fill in background
-            canvasContext.fillStyle = stickAreaColor;
-            roundRect(canvasContext, -stickSurroundRadius, -stickSurroundRadius, 
-                                      stickSurroundRadius * 2, stickSurroundRadius * 2, 10, true, false);
-
-            //Draw crosshair
-            canvasContext.beginPath();
-            canvasContext.lineWidth = 1;
-            canvasContext.strokeStyle = crosshairColor;
-            
-            canvasContext.moveTo(-stickSurroundRadius, 0);
-            canvasContext.lineTo(stickSurroundRadius, 0);
-            
-            canvasContext.moveTo(0, -stickSurroundRadius);
-            canvasContext.lineTo(0, stickSurroundRadius);
-            
-            canvasContext.stroke();
-
-            if (drawingParams.fontSizeCommandStickLabel) {
-                canvasContext.fillStyle = WHITE;
-    
-                //Draw horizontal stick label
-                canvasContext.textAlign = 'center';
-                canvasContext.fillText(stickLabel[i * 2 + 0], 0, stickSurroundRadius + drawingParams.fontSizeCurrentValueLabel + drawingParams.commandStickLabelMargin);
-    
-                //Draw vertical stick label
-                canvasContext.textAlign = ((i==0)?'right':'left');
-                canvasContext.fillText(stickLabel[i * 2 + 1], ((i==0)?-1:1) * stickSurroundRadius, drawingParams.fontSizeCurrentValueLabel / 2);
-
-            
-                // put the mode label on the throttle stick
-                if(     (i==0 && (options.stickMode==STICK_MODE_2 || options.stickMode==STICK_MODE_4 )) ||
-                        (i==1 && (options.stickMode==STICK_MODE_1 || options.stickMode==STICK_MODE_3 ))
-                 ) {
-                    //Draw stick mode label
-
-                    canvasContext.fillStyle = crosshairColor;
-
-                    canvasContext.textAlign = 'center';
-                    canvasContext.fillText('Mode ' + options.stickMode, 0, stickSurroundRadius - (drawingParams.fontSizeCurrentValueLabel / 2));
-                }
-
-            }
-
-            if(options.stickTrails) {
-                //Draw circle to represent stick position trail
-                for(var j=0; j<stickPositionsTrail.length; j++) {
-                    canvasContext.beginPath();
-                    canvasContext.fillStyle = "rgba(255,255,255," + (j/stickPositionsTrail.length * 0.05) + ")";
-                    canvasContext.arc(stickPositionsTrail[j][i * 2 + 0], stickPositionsTrail[j][i * 2 + 1], stickSurroundRadius / 20, 0, 2 * Math.PI);
-                    canvasContext.fill();
-                }
-            }
-
-            //Draw circle to represent stick position
-            canvasContext.beginPath();
-            canvasContext.fillStyle = stickColor;
-            canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], stickSurroundRadius / 7.5, 0, 2 * Math.PI);
-            canvasContext.fill();
-
-            
-            //Advance to next stick
-            canvasContext.translate(stickSurroundRadius + drawingParams.stickSpacing + stickSurroundRadius, 0);
-        }
-
-        canvasContext.restore();
-
-    }
-    
     var
         frameLabelTextWidthFrameNumber,
         frameLabelTextWidthFrameTime;
-    
-    function drawFrameLabel(frameIndex, timeMsec)
-    {
-        var 
-            extentFrameNumber, extentFrameTime;
 
+    function drawFrameLabel(frameIndex, timeMsec) {
         canvasContext.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
         canvasContext.fillStyle = "rgba(255,255,255,0.65)";
-
+        
         if (frameLabelTextWidthFrameNumber === undefined)
             frameLabelTextWidthFrameNumber = canvasContext.measureText("#0000000").width;
-        
+
         canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - frameLabelTextWidthFrameNumber - 8, canvas.height - 8);
 
         if (frameLabelTextWidthFrameTime === undefined)
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
-        
+
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
 
     }
-    
+
     /**
      * Plot the given field within the specified time period. When the output from the curve applied to a field
      * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
@@ -896,29 +659,35 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             fontSizeBase = Math.max(8, canvas.height / 60),
             
             newParams = {
-                fontSizeCurrentValueLabel: fontSizeBase * 1.0,
                 fontSizePIDTableLabel:     fontSizeBase * 3.4,
                 fontSizeAxisLabel:         fontSizeBase * 0.9,
                 fontSizeFrameLabel:        fontSizeBase * 0.9,
                 fontSizeEventLabel:        fontSizeBase * 0.8,
                 
-                // We're concerned about the horizontal span of this text too: 
-                fontSizeCommandStickLabel: canvas.width < 500 ? 0 : Math.min(fontSizeBase, canvas.width / 60) * 1.0,
-                commandStickLabelMargin:   Math.min(canvas.width / 80, 8),
-                
                 plotLineWidth:             Math.max(1.25, canvas.height / 400),
             };
-
-        /* Need enough space between sticks for the pitch axis label to fit */
-        newParams.stickSpacing = /*newParams.fontSizeCommandStickLabel * 4 +*/ newParams.commandStickLabelMargin * 2;
-        
+  
         drawingParams = extend(drawingParams, newParams);
     }
     
     this.resize = function(width, height) {
         canvas.width = width;
         canvas.height = height;
-            
+        
+        var sticksHeight = canvas.height * parseInt(options.sticks.size) / 2 / 100.0;
+        // The total width available to draw both sticks in:
+        var sticksWidth = canvas.width * parseInt(options.sticks.size) / 100.0;
+
+        if (sticks){
+            sticks.resize(sticksWidth, sticksHeight);
+        }
+
+         // Recenter the craft canvas in the top left corner
+         $(stickCanvas).css({
+            left:Math.max(((canvas.width * parseInt(options.sticks.left) / 100.0) - (sticksWidth / 2)), 0) + "px",
+            top: Math.max(((canvas.height * parseInt(options.sticks.top) / 100.0) - (sticksHeight / 2)), 0) + "px",
+        });
+
         var craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
         
         if (craft2D) {
@@ -927,7 +696,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             craft3D.resize(craftSize, craftSize);
         }
 
-        // Recenter the craft canvas in the top left corner
+        // Positon the craft canvas according to options
         $(craftCanvas).css({
             left:Math.max(((canvas.width * parseInt(options.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
             top: Math.max(((canvas.height * parseInt(options.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",
@@ -1039,13 +808,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
             
             if (centerFrame) {
                 if (options.drawSticks) {
-                    canvasContext.save();
-                    
-                    canvasContext.translate(canvas.width * parseInt(options.sticks.left) / 100.0, canvas.height * parseInt(options.sticks.top) / 100.0);
-                    
-                    drawCommandSticks(centerFrame, chunks, startFrameIndex);
-                    
-                    canvasContext.restore();
+                    sticks.render(centerFrame, chunks, startFrameIndex, windowCenterTime);
                 }
                 
                 if (options.drawTime) {
@@ -1055,8 +818,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
                 if (options.drawCraft == '3D') {
                     craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
                 } else if (options.drawCraft == '2D') {
-//                   canvasContext.font = drawingParams.fontSizeCurrentValueLabel + "pt " + DEFAULT_FONT_FACE;
-
                     craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
                     
                 }
@@ -1228,6 +989,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     options = extend(defaultOptions, options || {});
     
     identifyFields();
+
+    /* Create the FlightLogSticks object */
+    sticks = new FlightLogSticks(flightLog, idents.rcCommandFields, stickCanvas, options);
 
     this.initializeCraftModel();
 

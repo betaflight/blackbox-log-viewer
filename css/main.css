@@ -448,7 +448,8 @@ html.has-log .log-graph-config {
 }
 
 #craftCanvas,
-#analyserCanvas {
+#analyserCanvas,
+#stickCanvas {
     position:absolute;
     top:0;
     left:0;
@@ -457,7 +458,8 @@ html.has-log .log-graph-config {
 }
 
 html.has-craft #craftCanvas,
-html.has-analyser #analyserCanvas {
+html.has-analyser #analyserCanvas,
+html.has-sticks #stickCanvas {
 	display:block;
 }
 
