@@ -461,12 +461,6 @@ html.has-analyser #analyserCanvas {
 	display:block;
 }
 
-html:not(.has-smoothing-override) span.has-smoothing-override,
-html:not(.has-expo-override) span.has-expo-override,
-html:not(.has-grid-override) span.has-grid-override {
-    visibility:hidden!important;
-}
-
 html.has-analyser-fullscreen.has-analyser .analyser input {
 	display:block;
 }
@@ -816,6 +810,20 @@ html.has-log:not(.has-table-overlay) .log-field-values {
     margin-right: 13px;
 }
 
+.override-button-group button {
+    width: 33%;
+    padding-bottom: 8px;
+}
+
+html.has-scaling-override .toggle-scaling,
+html.has-expo-override .toggle-expo,
+html.has-smoothing-override .toggle-smoothing,
+html.has-grid-override .toggle-grid
+{
+    stroke-opacity: 0.2;
+    fill-opacity: 0.2;
+}
+
 .main-pane {
     display:none;
 }
@@ -906,6 +914,11 @@ progress {
 .btn-nobg:hover {
     color: white;
     text-shadow: 1px 1px 2px gray, 0 0 5px blue, 0 0 10px white;
+}
+
+.btn-svg-icon {
+    padding: 3px 7px;
+    line-height: 1em;
 }
 
 .navbar-logo {

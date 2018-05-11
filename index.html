@@ -331,7 +331,6 @@
                                     <li>
                                         <div class="pull-right">
                                             <div class="panel-body">
-                                                Speed
                                                 <div class="playback-rate-control btn-group btn-group-vertical"></div>
                                                 <input type="text" class="form-control playback-rate-text" value="1.0" size="5" data-toggle="tooltip" title="Directly set the playback speed">
                                             </div>
@@ -361,30 +360,11 @@
                                     <li>
                                         <div class="pull-right">
                                             <div class="panel-body">
-                                                Zoom
                                                 <div class="graph-zoom-control btn-group btn-group-vertical"></div>
                                                 <input type="text" class="form-control graph-zoom small-screen" value="-" size="6" data-toggle="tooltip" title="Directly set the zoom level"
                                                 />
                                             </div>
                                         </div>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="toggle-smoothing auto-hide-menu" data-toggle="tooltip" title="Smoothing On/Off">
-                                            <span class="glyphicon glyphicon-ok has-smoothing-override"></span> Disable Smoothing
-                                            <span class="pull-right">S</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="toggle-expo auto-hide-menu" data-toggle="tooltip" title="Expo On/Off">
-                                            <span class="glyphicon glyphicon-ok has-expo-override"></span> Disable Expo
-                                            <span class="pull-right">X</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="toggle-grid auto-hide-menu" data-toggle="tooltip" title="Grid On/Off">
-                                            <span class="glyphicon glyphicon-ok has-grid-override"></span> Disable Grid Lines
-                                            <span class="pull-right">G</span>
-                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -499,6 +479,31 @@
                 <div class="log-index no-wheel"></div>
                 <div class="log-graph-legend no-wheel">
                 </div>
+
+                <div class="btn-group override-button-group" role="group">
+                    <button type="button" class="btn btn-nobg btn-svg-icon toggle-expo" data-toggle="tooltip" title="Expo On/Off">
+                        <svg width="24" height="24" viewBox="0 0 8.467 8.467">
+                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"/>
+                            <path fill="#FFF" d="M4.233 0L3.175 1.058h2.117L4.233 0zm0 1.058L3.175 2.117h.794V6.35h-.794l1.058 1.058L5.292 6.35h-.794V2.117h.794L4.233 1.058zm0 6.35H3.175l1.058 1.059 1.059-1.059H4.233z"/>
+                            </svg>                                                        
+                    </button>
+                    <button type="button" class="btn btn-nobg btn-svg-icon toggle-smoothing" data-toggle="tooltip" title="Smoothing On/Off">
+                        <svg width="24" height="24" viewBox="0 0 8.467 8.467">
+                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"></path>
+                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width=".265"
+                                d="M0 4.233l1.058 3.97 1.059-2.911 1.058 2.91 1.058-7.144 1.059 4.234L6.35.265l1.058 3.968h1.059"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn-nobg btn-svg-icon toggle-grid" data-toggle="tooltip" title="Grid On/Off">
+                        <svg width="24" height="24" viewBox="0 0 8.467 8.467">
+                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"/>
+                            <g fill="none" stroke="#FFF" stroke-width=".198">
+                                <path d="M0 3.175h8.467M0 7.408h8.467M0 5.292h8.467M0 1.058h8.467" opacity=".75"/>
+                            </g>
+                            </svg>                              
+                    </button>
+                </div>
+
                 <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog no-wheel" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
             </div>
             <div class="mouseNotification"></div>
