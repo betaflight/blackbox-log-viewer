@@ -114,7 +114,7 @@ function VideoExportDialog(dialog, onSave) {
     function convertUIToVideoConfig() {
         var 
             videoConfig = {
-                frameRate: parseInt($(".video-frame-rate", dialog).val(), 10),
+                frameRate: parseFloat($(".video-frame-rate", dialog).val()),
                 videoDim: parseFloat($(".video-dim", dialog).val())
             },
             resolution;
