@@ -30,6 +30,7 @@ function HeaderDialog(dialog, onSave) {
             {name:'yawItermIgnoreRate'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'2.8.0', max:'3.0.1'},
             {name:'gyro_notch_hz'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'gyro_notch_cutoff'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
+            {name:'dterm_lpf2_hz'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
             {name:'dterm_notch_hz'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'dterm_notch_cutoff'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'rc_interpolation'   			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
@@ -512,6 +513,7 @@ function HeaderDialog(dialog, onSave) {
 		}
 		setParameter('dterm_notch_hz'			,sysConfig.dterm_notch_hz,0);
 		setParameter('dterm_notch_cutoff'		,sysConfig.dterm_notch_cutoff,0);
+        setParameter('dterm_lpf2_hz'            ,sysConfig.dterm_lpf2_hz,0);
 		setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,0);
 		setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,0);
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
