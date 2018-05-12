@@ -997,31 +997,59 @@
                                     <div class="spacer_box_title">Filters</div>
                                 </div>
                                 <div class="spacer_box">
+
                                     <table class="parameter cf">
                                         <thead>
-                                            <tr>
-                                                <th colspan="4">Gyro Filters</th>
-                                            </tr>
-                                        </thead>
+                                               <tr>
+                                                   <th colspan="4">Gyro Hardware Lowpass Filters</th>
+                                               </tr>
+                                           </thead>
                                         <tbody>
                                             <tr>
-                                                <td name='gyro_lpf'>
-                                                    <label>Hardware</label>
+                                                <td name='gyro_hardware_lpf' colspan="2">
+                                                    <label>Gyro Hardware LPF</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
+                                                <td name='gyro_32khz_hardware_lpf' colspan="2">
+                                                    <label>Gyro 32KHz Hardware LPF</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="parameter cf">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">Gyro Software Filters</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
                                                 <td name='gyro_soft_type'>
-                                                    <label>Type</label>
+                                                    <label>Type Stage 1<br>&nbsp;</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
                                                 <td name="gyro_lowpass_hz">
-                                                    <label>Soft (Hz)</label>
+                                                    <label>Soft Stage 1<br>(Hz)</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
-                                                <td></td>
+                                                <td name='gyro_soft2_type'>
+                                                    <label>Type Stage 2<br>&nbsp;</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                                <td name="gyro_lowpass2_hz">
+                                                    <label>Soft Stage 2<br>(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td name='gyro_notch_hz'>
@@ -1214,33 +1242,6 @@
                                             <tr>
                                                 <td name='debug_mode'>
                                                     <label>Debug Mode</label>
-                                                    <select>
-                                                        <!-- list generated here -->
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="gui_box grey debug">
-                                <div class="gui_box_titlebar">
-                                    <div class="spacer_box_title">Gyro Hardware Lowpass Settings</div>
-                                </div>
-                                <div class="spacer_box">
-                                    <table class="parameter cf">
-                                        <tbody>
-                                            <tr>
-                                                <td name='gyro_hardware_lpf'>
-                                                    <label>Gyro Hardware LPF</label>
-                                                    <select>
-                                                        <!-- list generated here -->
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td name='gyro_32khz_hardware_lpf'>
-                                                    <label>Gyro 32KHz Hardware LPF</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>

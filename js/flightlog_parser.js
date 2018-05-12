@@ -236,11 +236,10 @@ var FlightLogParser = function(logData) {
             iterm_reset_offset:null,        // I-Term reset offset
             deadband:null,                  // Roll, Pitch Deadband
             yaw_deadband:null,              // Yaw Deadband
-            gyro_lpf:null,                  // Gyro lpf setting. (pre BF3.4)
-            gyro_hardware_lpf:null,         // Gyro hardware lpf setting. (post BF3.4)
-            gyro_32khz_hardware_lpf:null,   // Gyro 32khz hardware lpf setting. (post BF3.4)
             gyro_lpf:null,                  // Gyro lpf setting.
+            gyro_32khz_hardware_lpf:null,   // Gyro 32khz hardware lpf setting. (post BF3.4)
             gyro_lowpass_hz:null,           // Gyro Soft Lowpass Filter Hz
+            gyro_lowpass2_hz:null,          // Gyro Soft Lowpass Filter Hz 2
             gyro_notch_hz:null,             // Gyro Notch Frequency
             gyro_notch_cutoff:null,         // Gyro Notch Cutoff
             dterm_notch_hz:null,            // Dterm Notch Frequency
@@ -262,6 +261,7 @@ var FlightLogParser = function(logData) {
             yawRateAccelLimit:null,         // Betaflight PID
             rateAccelLimit:null,            // Betaflight PID
             gyro_soft_type:null,            // Gyro soft filter type (PT1, BIQUAD)
+            gyro_soft2_type:null,           // Gyro soft filter 2 type (PT1, BIQUAD)
             debug_mode:null,                // Selected Debug Mode
             features:null,                  // Activated features (e.g. MOTORSTOP etc)
             Craft_name:null,                // Craft Name
@@ -285,8 +285,10 @@ var FlightLogParser = function(logData) {
             dterm_setpoint_weight     : "dtermSetpointWeight",  
             digital_idle_value        : "digitalIdleOffset",
             dshot_idle_value          : "digitalIdleOffset",
+            gyro_hardware_lpf         : "gyro_lpf",
             gyro_lowpass              : "gyro_lowpass_hz",
-            gyro_lowpass_type         : "gyro_lpf",
+            gyro_lowpass_type         : "gyro_soft_type",
+            gyro_lowpass2_type        : "gyro_soft2_type",
             "gyro.scale"              : "gyro_scale",
             iterm_windup              : "itermWindupPointPercent",
             motor_pwm_protocol        : "fast_pwm_protocol",
@@ -548,6 +550,7 @@ var FlightLogParser = function(logData) {
             case "setpointRelaxRatio":
             case "dtermSetpointWeight":
             case "gyro_soft_type":
+            case "gyro_soft2_type":
             case "debug_mode":
             case "anti_gravity_gain":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
@@ -580,6 +583,7 @@ var FlightLogParser = function(logData) {
 
             case "yaw_lpf_hz":
             case "gyro_lowpass_hz":
+            case "gyro_lowpass2_hz":
             case "dterm_notch_hz":
             case "dterm_notch_cutoff":
             case "dterm_lpf_hz":

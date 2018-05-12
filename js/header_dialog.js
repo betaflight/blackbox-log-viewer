@@ -48,6 +48,9 @@ function HeaderDialog(dialog, onSave) {
             {name:'yawRateAccelLimit'			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'rateAccelLimit'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'gyro_soft_type'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
+            {name:'gyro_soft2_type'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
+            {name:'gyro_lowpass2_hz'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
+            {name:'gyro_32khz_hardware_lpf'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
             {name:'debug_mode'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
 			{name:'gyro_notch_hz_2'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.1', max:'999.9.9'},
 			{name:'gyro_notch_cutoff_2'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.1', max:'999.9.9'},
@@ -480,9 +483,15 @@ function HeaderDialog(dialog, onSave) {
         setParameter('iterm_reset_offset'		,sysConfig.iterm_reset_offset,0);
         setParameter('deadband'					,sysConfig.deadband,0);
         setParameter('yaw_deadband'				,sysConfig.yaw_deadband,0);
-    	renderSelect('gyro_lpf'			    	,sysConfig.gyro_lpf, GYRO_LPF);
-    	renderSelect('gyro_hardware_lpf'		,sysConfig.gyro_hardware_lpf, GYRO_HARDWARE_LPF);
-    	renderSelect('gyro_32khz_hardware_lpf'		,sysConfig.gyro_32khz_hardware_lpf, GYRO_32KHZ_HARDWARE_LPF);
+
+        if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
+            renderSelect('gyro_hardware_lpf'       ,sysConfig.gyro_lpf, GYRO_HARDWARE_LPF);
+            
+        } else {
+            renderSelect('gyro_hardware_lpf'       ,sysConfig.gyro_lpf, GYRO_LPF);
+        }
+
+        renderSelect('gyro_32khz_hardware_lpf'  ,sysConfig.gyro_32khz_hardware_lpf, GYRO_32KHZ_HARDWARE_LPF);
         setParameter('acc_lpf_hz'				,sysConfig.acc_lpf_hz,2);
         setParameter('acc_cut_hz'				,sysConfig.acc_cut_hz,2);
 	    setParameter('airmode_activate_throttle',sysConfig.airmode_activate_throttle, 0);
@@ -506,6 +515,7 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('dterm_lpf_hz'				,sysConfig.dterm_lpf_hz,0);
 		setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,0);
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
+		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
 
     	renderSelect('rc_interpolation'		    ,sysConfig.rc_interpolation, RC_INTERPOLATION);
         setParameter('rc_interpolation_interval',sysConfig.rc_interpolation_interval,0);
@@ -523,6 +533,7 @@ function HeaderDialog(dialog, onSave) {
             setParameter('rateAccelLimit'       , sysConfig.rateAccelLimit, 1);
         }
         renderSelect('gyro_soft_type'			,sysConfig.gyro_soft_type, FILTER_TYPE);
+        renderSelect('gyro_soft2_type'          ,sysConfig.gyro_soft2_type, FILTER_TYPE);
         renderSelect('debug_mode'				,sysConfig.debug_mode, DEBUG_MODE);
 		setParameter('motorOutputLow'			,sysConfig.motorOutput[0],0);
 		setParameter('motorOutputHigh'			,sysConfig.motorOutput[1],0);
