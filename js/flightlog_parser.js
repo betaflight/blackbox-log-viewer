@@ -199,18 +199,15 @@ var FlightLogParser = function(logData) {
         // standard logger.
 
         defaultSysConfigExtension = {
-            rcExpo:null,              	    // RC Expo
-            rcYawExpo:null,                 // Yaw Expo
             thrMid:null,              	    // Throttle Mid Position
             thrExpo:null,              	    // Throttle Expo
-            dynThrPID:null,                 // TPA
             tpa_breakpoint:null,            // TPA Breakpoint
             airmode_activate_throttle:null, // airmode activation level
             serialrx_provider:null,         // name of the serial rx provider
             superExpoFactor:null,           // Super Expo Factor
             rates:[null, null, null],	    // Rates [ROLL, PITCH, YAW]
-            rc_rates:[null, null, null],	// RC Rates [ROLL, PITCH, YAW]
-            rc_expo:[null, null, null],	    // RC Expo [ROLL, PITCH, YAW]
+            rc_rates:[null, null, null],    // RC Rates [ROLL, PITCH, YAW]
+            rc_expo:[null, null, null],     // RC Expo [ROLL, PITCH, YAW]
             looptime:null,                  // Looptime
             gyro_sync_denom:null,           // Gyro Sync Denom
             pid_process_denom:null,         // PID Process Denom
@@ -294,13 +291,14 @@ var FlightLogParser = function(logData) {
             motor_pwm_protocol        : "fast_pwm_protocol",
             pidsum_limit              : "pidSumLimit",
             pidsum_limit_yaw          : "pidSumLimitYaw",
-            rc_expo                   : "rcExpo",
             rc_expo_yaw               : "rcYawExpo",
             rc_interp                 : "rc_interpolation",
             rc_interp_int             : "rc_interpolation_interval",
-            rc_rate                   : "rcRate",
+            rc_rate                   : "rc_rates",
             rc_rate_yaw               : "rcYawRate",
             rc_yaw_expo               : "rcYawExpo",
+            rcExpo                    : "rc_expo",
+            rcRate                    : "rc_rates",
             setpoint_relax_ratio      : "setpointRelaxRatio",
             setpoint_relaxation_ratio : "setpointRelaxRatio",
             thr_expo                  : "thrExpo",
@@ -493,9 +491,6 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.motorOutput[1] = that.sysConfig[fieldName]; // by default, set the maxMotorOutput to match maxThrottle
             break;
             case "rcRate":
-            case "rcExpo":
-            case "rcYawExpo":
-            case "rcYawRate":
             case "thrMid":
             case "thrExpo":
             case "dynThrPID":
@@ -557,19 +552,21 @@ var FlightLogParser = function(logData) {
             break;
 
             case "rc_expo":
+            case "rc_rates":
                 if(stringHasComma(fieldValue)) {
-                    var expos = parseCommaSeparatedString(fieldValue);
-                    that.sysConfig[fieldName] = expos
-                    that.sysConfig.rcExpo = expos[0];
-                    if (firmwareGreaterOrEqual(that.sysConfig, '3.3.0', '2.3.0')) {
-                        that.sysConfig.rcYawExpo = expos[2];
-                    } else {
-                        that.sysConfig.rcYawExpo = expos[1];
-                    }
+                    that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
                 } else {
-                    that.sysConfig.rcExpo = parseInt(fieldValue, 10);
+                    that.sysConfig[fieldName][0] = parseInt(fieldValue, 10);
+                    that.sysConfig[fieldName][1] = parseInt(fieldValue, 10);
                 }
-                break
+            break;
+            case "rcYawExpo":
+                that.sysConfig["rc_expo"][2] = parseInt(fieldValue, 10);
+            break;
+            case "rcYawRate":
+                that.sysConfig["rc_rates"][2] = parseInt(fieldValue, 10);
+            break;
+
 
             case "yawRateAccelLimit":
             case "rateAccelLimit":            
@@ -639,16 +636,6 @@ var FlightLogParser = function(logData) {
             case "velPID":
             case "motorOutput":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-            break;
-            case "rc_rates":
-                var rc_rates = parseCommaSeparatedString(fieldValue);
-                that.sysConfig[fieldName] = rc_rates
-                that.sysConfig.rcRate = rc_rates[0];
-                if (firmwareGreaterOrEqual(that.sysConfig, '3.3.0', '2.3.0')) {
-                    that.sysConfig.rcYawRate = rc_rates[2];
-                } else {
-                    that.sysConfig.rcYawRate = rc_rates[1];
-                }
             break;
             case "magPID":
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];

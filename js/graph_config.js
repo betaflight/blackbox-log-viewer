@@ -298,7 +298,7 @@ GraphConfig.load = function(config) {
                     power: 0.25,
                     inputRange: 500 * 1.20, // +20% to let compare in the same scale with the rccommands 
                     outputRange: 1.0
-                };           
+                };
             } else if (fieldName == "heading[2]") {
                 return {
                     offset: -Math.PI,

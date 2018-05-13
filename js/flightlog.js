@@ -993,30 +993,19 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             var angleRate, rcRate, rcSuperfactor, rcCommandf;
             var rcExpo;
 
-            if (firmwareGreaterOrEqual(sysConfig, '3.3.0', '2.3.0')) {
-                switch(axis) {
-                    case AXIS.ROLL:
-                        rcExpo = sysConfig["rc_expo"][0];
-                        rcRate = sysConfig["rc_rates"][0] / 100.0;
-                        break;
-                    case AXIS.PITCH:
-                        rcExpo = sysConfig["rc_expo"][1];
-                        rcRate = sysConfig["rc_rates"][1] / 100.0;
-                        break;
-                    case AXIS.YAW:
-                        rcExpo = sysConfig["rc_expo"][2];
-                        rcRate = sysConfig["rc_rates"][2] / 100.0;
-                        break;
-                }
-            }
-            else {
-                if (axis != AXIS.YAW) {
-                    rcExpo = sysConfig.rcExpo;
-                    rcRate = sysConfig.rcRate / 100.0;
-                } else {
-                    rcExpo = sysConfig.rcYawExpo;
-                    rcRate = sysConfig.rcYawRate / 100.0;
-                }
+            switch(axis) {
+                case AXIS.ROLL:
+                    rcExpo = sysConfig["rc_expo"][0];
+                    rcRate = sysConfig["rc_rates"][0] / 100.0;
+                    break;
+                case AXIS.PITCH:
+                    rcExpo = sysConfig["rc_expo"][1];
+                    rcRate = sysConfig["rc_rates"][1] / 100.0;
+                    break;
+                case AXIS.YAW:
+                    rcExpo = sysConfig["rc_expo"][2];
+                    rcRate = sysConfig["rc_rates"][2] / 100.0;
+                    break;
             }
 
             if (rcRate > 2.0) rcRate = rcRate + (RC_RATE_INCREMENTAL * (rcRate - 2.0));
@@ -1064,7 +1053,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
                 var angleRate;
 
                 if (isSuperExpoActive()) {
-                    var rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(sysConfig.rcYawRate,100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(sysConfig.rcRate,100) / 100.0)));
+                    var rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rates[2],100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rates[0],100) / 100.0)));
                     rcFactor = 1.0 / (constrain(1.0 - (rcFactor * (validate(sysConfig.rates[axis],100) / 100.0)), 0.01, 1.00));
 
                     angleRate = rcFactor * ((27 * value) / 16.0);

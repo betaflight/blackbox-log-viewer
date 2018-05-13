@@ -436,12 +436,12 @@ function HeaderDialog(dialog, onSave) {
         populatePID('levelPID'					, sysConfig.levelPID);
 
         // Fill in data from for the rates object
-        setParameter('rcRollRate'			    ,sysConfig.rcRate,2);
-        setParameter('rcRollExpo'		    	,sysConfig.rcExpo,2);
-        setParameter('rcPitchRate'		    	,sysConfig.rcRate,2);
-        setParameter('rcPitchExpo'		    	,sysConfig.rcExpo,2);
-        setParameter('rcYawRate'		    	,sysConfig.rcYawRate,2);
-        setParameter('rcYawExpo'		    	,sysConfig.rcYawExpo,2);
+        setParameter('rcRollRate'               ,sysConfig.rc_rates[0],2);
+        setParameter('rcRollExpo'               ,sysConfig.rc_expo[0],2);
+        setParameter('rcPitchRate'              ,sysConfig.rc_rates[1],2);
+        setParameter('rcPitchExpo'              ,sysConfig.rc_expo[1],2);
+        setParameter('rcYawRate'                ,sysConfig.rc_rates[2],2);
+        setParameter('rcYawExpo'                ,sysConfig.rc_expo[2],2);
         setParameter('vbatscale'				,sysConfig.vbatscale,0);
         setParameter('vbatref'					,sysConfig.vbatref,0);
         setParameter('vbatmincellvoltage'		,sysConfig.vbatmincellvoltage,1);
