@@ -1244,6 +1244,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, craftCanvas, analyserC
     
     graphConfig.addListener(this.refreshGraphConfig);
     this.refreshGraphConfig();
+        
+    $('html').toggleClass("has-grid-override", options['graphGridOverride']);
     
     this.resize(canvas.width, canvas.height);
 
