@@ -36,7 +36,7 @@
     "jquery-ui-npm": "1.12.0",
     "makensis": "^0.9.0",
     "nw-builder": "^3.4.1",
-    "rpm-builder": "^0.6.1",
+    "rpm-builder": "^0.7.0",
     "os": "^0.1.1",
     "platform-dependent-modules": "0.0.14",
     "temp": "^0.8.3"
