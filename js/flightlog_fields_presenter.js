@@ -5,90 +5,105 @@ function FlightLogFieldPresenter() {
 
 (function() {
     var FRIENDLY_FIELD_NAMES = {
-        'axisP[all]': 'PID_P',
-        'axisP[0]': 'PID_P[roll]',
-        'axisP[1]': 'PID_P[pitch]',
-        'axisP[2]': 'PID_P[yaw]',
-        'axisI[all]': 'PID_I',
-        'axisI[0]': 'PID_I[roll]',
-        'axisI[1]': 'PID_I[pitch]',
-        'axisI[2]': 'PID_I[yaw]',
-        'axisD[all]': 'PID_D',
-        'axisD[0]': 'PID_D[roll]',
-        'axisD[1]': 'PID_D[pitch]',
-        'axisD[2]': 'PID_D[yaw]',
-        
-        'rcCommand[all]': 'RC Command',
-        'rcCommand[0]': 'RC Command[roll]',
-        'rcCommand[1]': 'RC Command[pitch]',
-        'rcCommand[2]': 'RC Command[yaw]',
-        'rcCommand[3]': 'RC Command[throttle]',
-    
-        'gyroADC[all]': 'gyro',
-        'gyroADC[0]': 'gyro[roll]',
-        'gyroADC[1]': 'gyro[pitch]',
-        'gyroADC[2]': 'gyro[yaw]',
-    
-        'accSmooth[all]': 'acc',
-        'accSmooth[0]': 'acc[X]',
-        'accSmooth[1]': 'acc[Y]',
-        'accSmooth[2]': 'acc[Z]',
-        
-        'magADC[all]': 'mag',
-        'magADC[0]': 'mag[X]',
-        'magADC[1]': 'mag[Y]',
-        'magADC[2]': 'mag[Z]',
-    
-        'vbatLatest': 'vbat',
-        'BaroAlt': 'baro',
-        
-        'servo[all]': 'servos',
-        'servo[5]': 'tail servo',
-        
-        'heading[all]': 'heading',
-        'heading[0]': 'heading[roll]',
-        'heading[1]': 'heading[pitch]',
-        'heading[2]': 'heading[yaw]',
-        
-        //End-users prefer 1-based indexing
-        'motor[all]': 'motors',
-        'motor[0]': 'motor[1]', 'motor[1]': 'motor[2]', 'motor[2]': 'motor[3]', 'motor[3]': 'motor[4]',
-        'motor[4]': 'motor[5]', 'motor[5]': 'motor[6]', 'motor[6]': 'motor[7]', 'motor[7]': 'motor[8]',
-        
-        //Virtual fields
-        'axisSum[all]': 'PID_sum',
-        'axisSum[0]' : 'PID_sum[roll]',
-        'axisSum[1]' : 'PID_sum[pitch]',
-        'axisSum[2]' : 'PID_sum[yaw]',
 
-        //Virtual fields - Add the Error fields
-        'axisError[all]': 'PID_Error',
-        'axisError[0]' : 'PID_Error[roll]',
-        'axisError[1]' : 'PID_Error[pitch]',
-        'axisError[2]' : 'PID_Error[yaw]',
+        'axisP[all]': 'PID P',
+        'axisP[0]': 'PID P [roll]',
+        'axisP[1]': 'PID P [pitch]',
+        'axisP[2]': 'PID P [yaw]',
 
-        //Virtual fields - add the Scaled rcCommands
+        'axisI[all]': 'PID I',
+        'axisI[0]': 'PID I [roll]',
+        'axisI[1]': 'PID I [pitch]',
+        'axisI[2]': 'PID I [yaw]',
+
+        'axisD[all]': 'PID D',
+        'axisD[0]': 'PID D [roll]',
+        'axisD[1]': 'PID D [pitch]',
+        'axisD[2]': 'PID D [yaw]',
+
+        //Virtual field
+        'axisSum[all]': 'PID Sum',
+        'axisSum[0]' : 'PID Sum [roll]',
+        'axisSum[1]' : 'PID Sum [pitch]',
+        'axisSum[2]' : 'PID Sum [yaw]',
+
+        //Virtual field
+        'axisError[all]': 'PID Error',
+        'axisError[0]' : 'PID Error [roll]',
+        'axisError[1]' : 'PID Error [pitch]',
+        'axisError[2]' : 'PID Error [yaw]',
+
+        //Virtual field
         'rcCommands[all]': 'RC Rates',
-        'rcCommands[0]' : 'RC Rate[roll]',
-        'rcCommands[1]' : 'RC Rate[pitch]',
-        'rcCommands[2]' : 'RC Rate[yaw]',
-        'rcCommands[3]' : 'RC Rate[throttle]',
+        'rcCommands[0]' : 'RC Rate [roll]',
+        'rcCommands[1]' : 'RC Rate [pitch]',
+        'rcCommands[2]' : 'RC Rate [yaw]',
+        'rcCommands[3]' : 'RC Rate [throttle]',
 
-        //Virtual fields - add the Scaled gyros
-        'gyroADCs[all]': 'gyros',
-        'gyroADCs[0]': 'gyros[roll]',
-        'gyroADCs[1]': 'gyros[pitch]',
-        'gyroADCs[2]': 'gyros[yaw]'        
+        'rcCommand[all]': 'RC Commands',
+        'rcCommand[0]': 'RC Command [roll]',
+        'rcCommand[1]': 'RC Command [pitch]',
+        'rcCommand[2]': 'RC Command [yaw]',
+        'rcCommand[3]': 'RC Command [throttle]',
 
+        'gyroADC[all]': 'Gyros',
+        'gyroADC[0]': 'Gyro [roll]',
+        'gyroADC[1]': 'Gyro [pitch]',
+        'gyroADC[2]': 'Gyro [yaw]',
+
+        //Virtual field
+        'gyroADCs[all]': 'Gyros Scaled',
+        'gyroADCs[0]': 'Gyro Scaled [roll]',
+        'gyroADCs[1]': 'Gyro Scaled [pitch]',
+        'gyroADCs[2]': 'Gyro Scaled [yaw]',
+
+        //End-users prefer 1-based indexing
+        'motor[all]': 'Motors',
+        'motor[0]': 'Motor [1]', 
+        'motor[1]': 'Motor [2]', 
+        'motor[2]': 'Motor [3]', 
+        'motor[3]': 'Motor [4]',
+        'motor[4]': 'Motor [5]', 
+        'motor[5]': 'Motor [6]', 
+        'motor[6]': 'Motor [7]', 
+        'motor[7]': 'Motor [8]',
+
+        'servo[all]': 'Servos',
+        'servo[5]': 'Servo Tail',
+
+        'vbatLatest': 'Battery volt.',
+        'amperageLatest': 'Amperage',
+        'BaroAlt': 'Barometer',
+
+        'heading[all]': 'Heading',
+        'heading[0]': 'Heading [roll]',
+        'heading[1]': 'Heading [pitch]',
+        'heading[2]': 'Heading [yaw]',
+
+        'accSmooth[all]': 'Accel.',
+        'accSmooth[0]': 'Accel. [X]',
+        'accSmooth[1]': 'Accel. [Y]',
+        'accSmooth[2]': 'Accel. [Z]',
+
+        'magADC[all]': 'Compass',
+        'magADC[0]': 'Compass [X]',
+        'magADC[1]': 'Compass [Y]',
+        'magADC[2]': 'Compass [Z]',
+
+        'flightModeFlags': 'Flight Mode Flags',
+        'stateFlags': 'State Flags',
+        'failsafePhase': 'Failsafe Phase',
+        'rxSignalReceived': 'RX Signal Received',
+        'rxFlightChannelsValid': 'RX Flight Ch. Valid',
     };
     
     	var DEBUG_FRIENDLY_FIELD_NAMES = { 
 			'NONE' : 	{
-							'debug[all]':'debug[all]',	
-							'debug[0]':'debug[0]',
-							'debug[1]':'debug[1]',
-							'debug[2]':'debug[2]',
-							'debug[3]':'debug[3]',
+							'debug[all]':'Debug [all]',	
+							'debug[0]':'Debug [0]',
+							'debug[1]':'Debug [1]',
+							'debug[2]':'Debug [2]',
+							'debug[3]':'Debug [3]',
 						},
 			'CYCLETIME' : 	{	
 							'debug[all]':'Debug Cycle Time',	
@@ -99,31 +114,31 @@ function FlightLogFieldPresenter() {
 						},
 			'BATTERY' : 	{	
 							'debug[all]':'Debug Battery',	
-							'debug[0]':'vbat_ADC',
-							'debug[1]':'vbat',
+							'debug[0]':'Battery Volt. ADC',
+							'debug[1]':'Battery Volt.',
 							'debug[2]':'Not Used',
 							'debug[3]':'Not Used',
 						},
 			'GYRO' : 	{	
 							'debug[all]':'Debug Gyro',	
-							'debug[0]':'gyro_raw[X]',
-							'debug[1]':'gyro_raw[Y]',
-							'debug[2]':'gyro_raw[Z]',
+							'debug[0]':'Gyro Raw [X]',
+							'debug[1]':'Gyro Raw [Y]',
+							'debug[2]':'Gyro Raw [Z]',
 							'debug[3]':'Not Used',
 						},
 			'ACCELEROMETER' : 	{	
-							'debug[all]':'Debug Acc',	
-							'debug[0]':'acc_raw[X]',
-							'debug[1]':'acc_raw[Y]',
-							'debug[2]':'acc_raw[Z]',
+							'debug[all]':'Debug Accel.',	
+							'debug[0]':'Accel. Raw [X]',
+							'debug[1]':'Accel. Raw [Y]',
+							'debug[2]':'Accel. Raw [Z]',
 							'debug[3]':'Not Used',
 						},
 			'MIXER' : 	{	
 							'debug[all]':'Debug Mixer',	
-							'debug[0]':'rollPitchYawMix[0]',
-							'debug[1]':'rollPitchYawMix[1]',
-							'debug[2]':'rollPitchYawMix[2]',
-							'debug[3]':'rollPitchYawMix[3]',
+							'debug[0]':'Roll-Pitch-Yaw Mix [0]',
+							'debug[1]':'Roll-Pitch-Yaw Mix [1]',
+							'debug[2]':'Roll-Pitch-Yaw Mix [2]',
+							'debug[3]':'Roll-Pitch-Yaw Mix [3]',
 						},
 			'PIDLOOP' : 	{	
 							'debug[all]':'Debug PID',	
@@ -134,30 +149,30 @@ function FlightLogFieldPresenter() {
 						},
 			'NOTCH' : 	{	
 							'debug[all]':'Debug Notch',	
-							'debug[0]':'gyro_preNotch[roll]',
-							'debug[1]':'gyro_preNotch[pitch]',
-							'debug[2]':'gyro_preNotch[yaw]',
+							'debug[0]':'Gyro Pre-Notch [roll]',
+							'debug[1]':'Gyro Pre-Notch [pitch]',
+							'debug[2]':'Gyro Pre-Notch [yaw]',
 							'debug[3]':'Not Used',
 						},
 			'RC_INTERPOLATION' : 	{	
 							'debug[all]':'Debug RC',	
-							'debug[0]':'rcCommand_raw[roll]',
-							'debug[1]':'rcCommand_raw[pitch]',
-							'debug[2]':'rcCommand_raw[yaw]',
-							'debug[3]':'rxRefreshRate',
+							'debug[0]':'RC Command Raw [roll]',
+							'debug[1]':'RC Command Raw [pitch]',
+							'debug[2]':'RC Command Raw [yaw]',
+							'debug[3]':'RX Refresh Rate',
 						},
 			'DTERM_FILTER' : 	{	
 							'debug[all]':'Debug Filter',	
-							'debug[0]':'dterm_filter[roll]',
-							'debug[1]':'dterm_filter[pitch]',
+							'debug[0]':'DTerm Filter [roll]',
+							'debug[1]':'DTerm Filter [pitch]',
 							'debug[2]':'Not Used',
 							'debug[3]':'Not Used',
 						},
 			'ANGLERATE' : 	{	
-							'debug[all]':'Debug Anglerate',	
-							'debug[0]':'Anglerate[roll]',
-							'debug[1]':'Anglerate[pitch]',
-							'debug[2]':'Anglerate[yaw]',
+							'debug[all]':'Debug Angle Rate',	
+							'debug[0]':'Angle Rate[roll]',
+							'debug[1]':'Angle Rate[pitch]',
+							'debug[2]':'Angle Rate[yaw]',
 							'debug[3]':'Not Used',
 						},						
             'ESC_SENSOR' : 	{
@@ -183,10 +198,10 @@ function FlightLogFieldPresenter() {
             },
             'FFT' : {
     		                'debug[all]':'Debug FFT',
-    		                'debug[0]':'gyro_raw[roll]',
-    		                'debug[1]':'gyro_dyn_notch[roll]',
-    		                'debug[2]':'gyro_bpf[roll]',
-    		                'debug[3]':'fft_center_index[roll]',    		
+    		                'debug[0]':'Gyro Raw [roll]',
+    		                'debug[1]':'Gyro Dyn Notch [roll]',
+    		                'debug[2]':'Gyro BPF [roll]',
+    		                'debug[3]':'FFT Center Index [roll]',
     		},
             'FFT_TIME' : {
                             'debug[all]':'Debug FFT TIME',
@@ -197,16 +212,16 @@ function FlightLogFieldPresenter() {
             },
             'FFT_FREQ' : {
                             'debug[all]':'Debug FFT FREQ',
-                            'debug[0]':'center_freq[roll]',
-                            'debug[1]':'center_freq[pitch]',
-                            'debug[2]':'center_freq[yaw]',
+                            'debug[0]':'Center Freq [roll]',
+                            'debug[1]':'Center Freq [pitch]',
+                            'debug[2]':'Center Freq [yaw]',
                             'debug[3]':'Not used',
             },
             'GYRO_RAW' :   {
                             'debug[all]':'Debug Gyro Raw', 
-                            'debug[0]':'gyro_raw[X]',
-                            'debug[1]':'gyro_raw[Y]',
-                            'debug[2]':'gyro_raw[Z]',
+                            'debug[0]':'Gyro Raw [X]',
+                            'debug[1]':'Gyro Raw [Y]',
+                            'debug[2]':'Gyro Raw [Z]',
                             'debug[3]':'Not Used',
                         },
             };
