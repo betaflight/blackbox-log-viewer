@@ -986,41 +986,27 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
         const RC_RATE_INCREMENTAL = 14.54;
         const RC_EXPO_POWER = 3;
 
-        var rcInput = [];
+        var rcInput;
         var that = this;
 
         var calculateSetpointRate = function(axis, rc) {
-            var angleRate, rcRate, rcSuperfactor, rcCommandf;
-            var rcExpo;
 
-            switch(axis) {
-                case AXIS.ROLL:
-                    rcExpo = sysConfig["rc_expo"][0];
-                    rcRate = sysConfig["rc_rates"][0] / 100.0;
-                    break;
-                case AXIS.PITCH:
-                    rcExpo = sysConfig["rc_expo"][1];
-                    rcRate = sysConfig["rc_rates"][1] / 100.0;
-                    break;
-                case AXIS.YAW:
-                    rcExpo = sysConfig["rc_expo"][2];
-                    rcRate = sysConfig["rc_rates"][2] / 100.0;
-                    break;
+            var rcCommandf    = rc / 500.0;
+            var rcCommandfAbs = Math.abs(rcCommandf);
+
+            if (sysConfig["rc_expo"][axis]) {
+                var expof = sysConfig["rc_expo"][axis] / 100;
+                rcCommandf = rcCommandf * Math.pow(rcCommandfAbs, RC_EXPO_POWER) * expof + rcCommandf * (1-expof);
             }
 
-            if (rcRate > 2.0) rcRate = rcRate + (RC_RATE_INCREMENTAL * (rcRate - 2.0));
-            rcCommandf = rc / 500.0;
-            rcInput[axis] = Math.abs(rcCommandf);
-
-            if (rcExpo) {
-                var expof = rcExpo / 100.0;
-                rcCommandf = rcCommandf * Math.pow(rcInput[axis], RC_EXPO_POWER) * expof + rcCommandf * (1-expof);
+            var rcRate = sysConfig["rc_rates"][axis] / 100.0;
+            if (rcRate > 2.0) { 
+                rcRate += RC_RATE_INCREMENTAL * (rcRate - 2.0);
             }
 
-            angleRate = 200.0 * rcRate * rcCommandf;
-
+            var angleRate = 200.0 * rcRate * rcCommandf;
             if (sysConfig.rates[axis]) {
-                rcSuperfactor = 1.0 / (constrain(1.0 - (Math.abs(rcCommandf) * (sysConfig.rates[axis] / 100.0)), 0.01, 1.00));
+                var rcSuperfactor = 1.0 / (constrain(1.0 - (rcCommandfAbs * (sysConfig.rates[axis] / 100.0)), 0.01, 1.00));
                 angleRate *= rcSuperfactor;
             }
 
@@ -1030,10 +1016,11 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             }
             */
 
-            if (sysConfig.pidController == 0 /* LEGACY */)
+            if (sysConfig.pidController == 0 /* LEGACY */) {
                 return  constrain(angleRate * 4.1, -8190.0, 8190.0) >> 2; // Rate limit protection
-        else
-            return  constrain(angleRate, -1998.0, 1998.0); // Rate limit protection (deg/sec)
+            } else {
+                return  constrain(angleRate, -1998.0, 1998.0); // Rate limit protection (deg/sec)
+            }
         };
 
         return calculateSetpointRate(axis, value);
