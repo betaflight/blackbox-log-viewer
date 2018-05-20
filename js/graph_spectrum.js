@@ -246,10 +246,10 @@ try {
 		var offset = 0;
 		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
 		offset++; // make some space!
-        if(flightLog.getSysConfig().gyro_lowpass_hz != null) {
+        if ((flightLog.getSysConfig().gyro_lowpass_hz != null) && (flightLog.getSysConfig().gyro_lowpass_hz > 0)) {
             drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
         }
-        if(flightLog.getSysConfig().gyro_lowpass2_hz != null) {
+        if ((flightLog.getSysConfig().gyro_lowpass2_hz != null) && (flightLog.getSysConfig().gyro_lowpass2_hz > 0)) {
             drawMarkerLine(flightLog.getSysConfig().gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, 'GYRO LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(95,199,95,0.50)");
         }
 		if(flightLog.getSysConfig().gyro_notch_hz!=null && flightLog.getSysConfig().gyro_notch_cutoff!=null ) {
