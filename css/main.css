@@ -916,6 +916,15 @@ progress {
     text-shadow: 1px 1px 2px gray, 0 0 5px blue, 0 0 10px white;
 }
 
+.btn-nobg:focus,
+.btn-nobg:active:focus,
+.btn-nobg.active:focus,
+.btn-nobg.focus,
+.btn-nobg:active.focus,
+.btn-nobg.active.focus {
+  outline: 0; /* Remove blue border from bootstrap */
+}
+
 .btn-svg-icon {
     padding: 3px 7px;
     line-height: 1em;
