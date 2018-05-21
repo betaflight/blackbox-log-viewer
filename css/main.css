@@ -906,6 +906,10 @@ progress {
     margin-bottom:5px;
 }
 
+.btn-group .btn+.btn, .btn-group .btn+.btn-group, .btn-group .btn-group+.btn, .btn-group .btn-group+.btn-group {
+    margin-left: 0px;
+}
+
 .btn-nobg {
     color: #BBB;
     background: none;
