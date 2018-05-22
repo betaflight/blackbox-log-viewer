@@ -225,9 +225,9 @@ function FlightLog(logData) {
         // Add names for our ADDITIONAL_COMPUTED_FIELDS
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
-        fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
         fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
-        fieldNames.push("gyroADCs[0]", "gyroADCs[1]", "gyroADCs[2]"); // Custom calculated error field
+        fieldNames.push("gyroADCs[0]", "gyroADCs[1]", "gyroADCs[2]"); // Custom calculated gyro deg/sec
+        fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
 
         fieldNameToIndex = {};
         for (i = 0; i < fieldNames.length; i++) {
@@ -584,14 +584,8 @@ function FlightLog(logData) {
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
                     var currentFlightMode = srcFrame[flightModeFlagsIndex];
 
-                    // Calculate the PID Error
-                    for (var axis = 0; axis < 3; axis++) {
-                        destFrame[fieldIndex++] =
-                            (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0) -
-                            (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
-                        }
-
                     // Calculate the Scaled rcCommand (RC Rate)(in deg/s, % for throttle)
+                    var fieldIndexRcCommands = fieldIndex;
                     for (var axis = 0; axis < 4; axis++) {
                         if (axis <= AXIS.YAW) {
                             destFrame[fieldIndex++] =
@@ -603,10 +597,16 @@ function FlightLog(logData) {
                     }
 
                     // Calculate the scaled Gyro ADC
+                    var fieldIndexGyroADCs = fieldIndex;
                     for (var axis = 0; axis < 3; axis++) {
                         destFrame[fieldIndex++] =
                             (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
-                        }
+                    }
+
+                    // Calculate the PID Error
+                    for (var axis = 0; axis < 3; axis++) {
+                        destFrame[fieldIndex++] = destFrame[fieldIndexGyroADCs + axis] - destFrame[fieldIndexRcCommands + axis];
+                    }
 
                 }
             }
