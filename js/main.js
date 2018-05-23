@@ -1530,9 +1530,28 @@ function BlackboxLogViewer() {
             return false; // nothing was changed
         }
 
+        function saveOneUserSetting(name, value) {
+            prefs.get('userSettings', function(data) {
+                data[name] = value;
+                prefs.set('userSettings', data);
+            });
+        }
+
+        var loadInitialOverrideStatus = function() {
+            prefs.get('userSettings', function(data) {
+
+                html.toggleClass('has-expo-override',      data['graphExpoOverride']);
+                html.toggleClass('has-smoothing-override', data['graphSmoothOverride']);
+                html.toggleClass('has-grid-override',      data['graphGridOverride']);
+
+            });
+        }
+        loadInitialOverrideStatus();
+
         function toggleOverrideStatus(userSetting, className) {
-            userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
+            userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting            
             html.toggleClass(className, userSettings[userSetting]);
+            saveOneUserSetting(userSetting, userSettings[userSetting]);
             graph.refreshOptions(userSettings);
             graph.refreshGraphConfig();
             invalidateGraph();
