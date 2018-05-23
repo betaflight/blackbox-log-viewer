@@ -297,7 +297,18 @@ function BlackboxLogViewer() {
             invalidateGraph();
         }
     }
-    
+
+    function updateOverrideStatus() {
+        // Update override status flags on status bar
+        var overrideStatus = '';
+
+        overrideStatus += (userSettings.graphSmoothOverride?'SMOOTH':'');        
+        overrideStatus += ((userSettings.graphExpoOverride && overrideStatus != '')?'|':'') + (userSettings.graphExpoOverride?'EXPO':'');
+        overrideStatus += ((userSettings.graphGridOverride && overrideStatus != '')?'|':'') + (userSettings.graphGridOverride?'GRID':'');
+
+        $(".overrides", statusBar).text(overrideStatus);
+    }
+
     function renderLogFileInfo(file) {
         $(".log-filename").text(file.name);
 
@@ -586,7 +597,9 @@ function BlackboxLogViewer() {
         }
         
         renderSelectedLogInfo();
-        
+
+        updateOverrideStatus();
+
         updateCanvasSize();
         
         setGraphState(GRAPH_STATE_PAUSED);
@@ -1264,6 +1277,7 @@ function BlackboxLogViewer() {
 	                graph.refreshOptions(newSettings);
 	                graph.refreshLogo();
 	                graph.initializeCraftModel();
+	                updateOverrideStatus();
 	                updateCanvasSize();
 	            }
 
