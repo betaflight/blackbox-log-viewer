@@ -1530,21 +1530,12 @@ function BlackboxLogViewer() {
             return false; // nothing was changed
         }
 
-        function updateOverrideStatus() {
-            // Update override status flags on status bar
-            var overrideStatus = ((userSettings.graphSmoothOverride)?'SMOOTH':'') +
-                ((userSettings.graphSmoothOverride && userSettings.graphExpoOverride)?'|':'') + ((userSettings.graphExpoOverride)?'EXPO':'') +
-                ((userSettings.graphSmoothOverride && userSettings.graphGridOverride)?'|':'') + ((userSettings.graphGridOverride)?'GRID':'');
-            $(".overrides", statusBar).text(overrideStatus);
-        }
-
         function toggleOverrideStatus(userSetting, className) {
             userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
             html.toggleClass(className, userSettings[userSetting]);
             graph.refreshOptions(userSettings);
             graph.refreshGraphConfig();
             invalidateGraph();
-            updateOverrideStatus();
         }
 
         
