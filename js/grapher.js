@@ -45,7 +45,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         
         defaultOptions = {
             gapless:false,
-            drawCraft:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
+            craftType:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
             drawAnalyser:true,              // add an analyser option
             analyserSampleRate:2000/*Hz*/,  // the loop time for the log
             eraseBackground: true           // Set to false if you want the graph to draw on top of an existing canvas image
@@ -692,7 +692,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         
         if (craft2D) {
             craft2D.resize(craftSize, craftSize);
-        } else {
+        } else if (craft3D) {
             craft3D.resize(craftSize, craftSize);
         }
 
@@ -815,9 +815,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     drawFrameLabel(centerFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION], Math.round((windowCenterTime - flightLog.getMinTime()) / 1000));
                 }
                 
-                if (options.drawCraft == '3D') {
+                if (options.craftType == '3D') {
                     craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
-                } else if (options.drawCraft == '2D') {
+                } else if (options.craftType == '2D') {
                     craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
                     
                 }
@@ -901,28 +901,30 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     }
     
     this.initializeCraftModel = function() {
-        // Ensure drawCraft is a valid value
-        if (["2D", "3D"].indexOf(options.drawCraft) == -1) {
-            options.drawCraft = false;
+
+        // Ensure craftType is a valid value
+        if (["2D", "3D"].indexOf(options.craftType) == -1) {
+            options.craftType = defaultOptions.craftType;
         }
-        
-        if (options.drawCraft == '3D') {
+
+        if (options.craftType == '3D') {
             if (craftCanvas) {
                 try {
                     craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
                 } catch (e) {
                     //WebGL not supported, fall back to 2D rendering
-                    options.drawCraft = '2D';
+                    options.craftType = '2D';
                 }
             } else {
                 //Dedicated craft canvas not provided so we can't render in 3D, fall back
-                options.drawCraft = '2D';
+                options.craftType = '2D';
             }
         }
         
-        if (options.drawCraft == '2D') {
+        if (options.craftType == '2D') {
             craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
         }
+
     }
     
     this.destroy = function() {
