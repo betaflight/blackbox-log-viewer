@@ -16,10 +16,9 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         //COMMAND_STICK_POSITION_Y_PROPORTION =  parseInt(userSettings.sticks.top) / 100.0 || 0.2,
 
         drawingParams = {
-            stickSpacing: 0,
-            fontSizeCurrentValueLabel: "8",
-            commandStickLabelMargin: 8,
-            fontSizeCommandStickLabel: 0,
+            drawLabels: true,
+            stickSpacing: 0, // Padding between sticks
+            fontSizeValueLabel: 8,
             stickSurroundRadius: 0,
         };
 
@@ -40,24 +39,23 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     userSettings = $.extend(defaultSettings, userSettings || {});
 
     this.resize = function (width, height) {
-        // Add resize code here
+        // Resize canvas if size changed
         if (canvas.width != width || canvas.height != height) {
             canvas.width = width;
             canvas.height = height;
         }
-        var fontSizeBase = Math.max(8, canvas.height / 10);
 
-        // We're concerned about the horizontal span of this text too: 
-        drawingParams.fontSizeCommandStickLabel = canvas.width < 500 ? 0 : fontSizeBase;
-
-        drawingParams.fontSizeCurrentValueLabel = fontSizeBase * 1.0,
-        drawingParams.commandStickLabelMargin = Math.min(canvas.width / 20, 8);
-
-        /* Need enough space between sticks for the pitch axis label to fit */
-        drawingParams.stickSpacing = drawingParams.commandStickLabelMargin * 2;
+        drawingParams.fontSizeValueLabel = Math.max(8, canvas.height / 15);
+        drawingParams.stickSpacing = 16;
         
         // Use that plus the inter-stick spacing that has been determined already to decide how big each stick should be:
-        drawingParams.stickSurroundRadius = Math.min((width - drawingParams.stickSpacing) / 4, (height- drawingParams.stickSpacing)/2);
+        drawingParams.stickSurroundRadius = Math.min((width - drawingParams.stickSpacing) / 4, (height - drawingParams.stickSpacing) / 2);
+
+        // Decide if to show the labels
+        // The length of the 2 label texts are roughly 80% of the fontsize times the number of letters. 
+        var labelLength = (userSettings.stickUnits ? 7 : 4);
+        var minWidthForLabels = drawingParams.stickSurroundRadius * 4 + drawingParams.stickSpacing + 0.8 * labelLength * drawingParams.fontSizeValueLabel * 2;
+        drawingParams.drawLabels = width > minWidthForLabels;
     }
 
     this.render = function (centerFrame, chunks, startFrameIndex, windowCenterTime) {
@@ -113,12 +111,12 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         var radi = drawingParams.stickSurroundRadius;
 
         // Move origin to center of canvas
-        canvasContext.translate(canvas.width/2, canvas.height/2);
+        canvasContext.translate(canvas.width/2, canvas.height / 2 - drawingParams.stickSpacing);
 
         // Move origin to center of left stick
         canvasContext.translate(-drawingParams.stickSpacing / 2 - radi, 0);
 
-        canvasContext.font = drawingParams.fontSizeCommandStickLabel + "pt " + DEFAULT_FONT_FACE;
+        canvasContext.font = drawingParams.fontSizeValueLabel + "pt " + DEFAULT_FONT_FACE;
 
         //For each stick
         for (var i = 0; i < 2; i++) {
@@ -140,16 +138,16 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
 
             canvasContext.stroke();
 
-            if (drawingParams.fontSizeCommandStickLabel) {
+            if (drawingParams.drawLabels) {
                 canvasContext.fillStyle = WHITE;
 
                 //Draw horizontal stick label
                 canvasContext.textAlign = 'center';
-                canvasContext.fillText(stickLabel[i * 2 + 0], 0, radi + drawingParams.fontSizeCurrentValueLabel + drawingParams.commandStickLabelMargin);
+                canvasContext.fillText(stickLabel[i * 2 + 0], 0, radi + drawingParams.fontSizeValueLabel + drawingParams.stickSpacing / 2);
 
                 //Draw vertical stick label
                 canvasContext.textAlign = ((i == 0) ? 'right' : 'left');
-                canvasContext.fillText(stickLabel[i * 2 + 1], ((i == 0) ? -1 : 1) * radi, drawingParams.fontSizeCurrentValueLabel / 2);
+                canvasContext.fillText(stickLabel[i * 2 + 1], ((i == 0) ? -1 : 1) * radi, drawingParams.fontSizeValueLabel / 2);
 
                 // put the mode label on the throttle stick
                 if ((i == 0 && (userSettings.stickMode == STICK_MODE_2 || userSettings.stickMode == STICK_MODE_4)) ||
@@ -160,9 +158,8 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                     canvasContext.fillStyle = crosshairColor;
 
                     canvasContext.textAlign = 'center';
-                    canvasContext.fillText('Mode ' + userSettings.stickMode, 0, radi - (drawingParams.fontSizeCurrentValueLabel / 2));
+                    canvasContext.fillText('Mode ' + userSettings.stickMode, 0, radi - (drawingParams.fontSizeValueLabel / 2));
                 }
-
             }
 
             if (userSettings.stickTrails) {
