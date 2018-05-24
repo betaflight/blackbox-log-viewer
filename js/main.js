@@ -985,9 +985,21 @@ function BlackboxLogViewer() {
         });
 
         $(".view-analyser").click(function() {
-            if(activeGraphConfig.selectedFieldName != null) {
-                hasAnalyser = !hasAnalyser; 
-            } else hasAnalyser = false;
+            // Show the latest graph selected (if any) or the first in the list.
+            if (activeGraphConfig.selectedFieldName != null) {
+                hasAnalyser = !hasAnalyser;
+            } else {
+                var graphs = activeGraphConfig.getGraphs();
+                if (graphs.length == 0 || graphs[0].fields.length == 0) {
+                    hasAnalyser = false;
+                } else { 
+                    activeGraphConfig.selectedFieldName = FlightLogFieldPresenter.fieldNameToFriendly(graphs[0].fields[0].name);
+                    activeGraphConfig.selectedGraphIndex = 0;
+                    activeGraphConfig.selectedFieldIndex = 0;
+                    hasAnalyser = true;
+                }
+            }
+
             graph.setDrawAnalyser(hasAnalyser);            
             html.toggleClass("has-analyser", hasAnalyser);       
             prefs.set('hasAnalyser', hasAnalyser);
