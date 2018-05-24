@@ -1549,7 +1549,7 @@ function BlackboxLogViewer() {
         loadInitialOverrideStatus();
 
         function toggleOverrideStatus(userSetting, className) {
-            userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting            
+            userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
             html.toggleClass(className, userSettings[userSetting]);
             saveOneUserSetting(userSetting, userSettings[userSetting]);
             graph.refreshOptions(userSettings);
