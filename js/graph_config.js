@@ -233,10 +233,19 @@ GraphConfig.load = function(config) {
         } catch (e) { return 0;}
     };
     
+
     GraphConfig.getDefaultCurveForField = function(flightLog, fieldName) {
         var
             sysConfig = flightLog.getSysConfig();
-        
+
+        var maxDegreesSecond = function(scale) {
+            return Math.max(flightLog.rcCommandRawToDegreesPerSecond(500,0) * scale, 
+                            flightLog.rcCommandRawToDegreesPerSecond(500,1) * scale, 
+                            flightLog.rcCommandRawToDegreesPerSecond(500,2) * scale);
+        }
+
+        const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
+
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
@@ -273,9 +282,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.25, /* Make this 1.0 to scale linearly */
-                    inputRange: Math.max(flightLog.rcCommandRawToDegreesPerSecond(500,0) * 1.20, 
-                                         flightLog.rcCommandRawToDegreesPerSecond(500,1) * 1.20, 
-                                         flightLog.rcCommandRawToDegreesPerSecond(500,2) * 1.20), // Maximum grad/s + 20% 
+                    inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20% 
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
@@ -296,7 +303,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.25,
-                    inputRange: 500 * 1.20, // +20% to let compare in the same scale with the rccommands 
+                    inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
                     outputRange: 1.0
                 };
             } else if (fieldName == "heading[2]") {
@@ -353,7 +360,7 @@ GraphConfig.load = function(config) {
                         return {
                             offset: 0,
                             power: 0.25,
-                            inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
+                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0
                         };
                     case 'ACCELEROMETER':
@@ -415,21 +422,21 @@ GraphConfig.load = function(config) {
                         return {
                             offset: 0,
                             power: 0.25, /* Make this 1.0 to scale linearly */
-                            inputRange: flightLog.gyroRawToDegreesPerSecond((2.0e-3 * Math.PI/180) / sysConfig.gyroScale),
+                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0
                         };
                     case 'FFT':
                         return {
                             offset: 0,
                             power: 0.25,
-                            inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
+                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0
                         };
                     case 'FFT_FREQ':
                         return {
                             offset: 0,
                             power: 0.25,
-                            inputRange: (2.0e-3 * Math.PI/180) / sysConfig.gyroScale,
+                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0
                         };
                     case 'FFT_TIME':
