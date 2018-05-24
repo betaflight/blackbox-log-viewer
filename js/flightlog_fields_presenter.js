@@ -448,19 +448,19 @@ function FlightLogFieldPresenter() {
                         default:
                             return value.toFixed(0) + "";
                     }
-                case 'DEBUG_ESC_SENSOR_RPM':
+                case 'ESC_SENSOR_RPM':
                     return value.toFixed(0) + "rpm";
-                case 'DEBUG_ESC_SENSOR_TMP':
+                case 'ESC_SENSOR_TMP':
                     return value.toFixed(0) + "°C";
                 case 'SCHEDULER':
                     return value.toFixed(0) + "\u03BCS";
                 case 'STACK':
                     return value.toFixed(0);
-                case 'DEBUG_FFT':
+                case 'FFT':
                     return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
-                case 'DEBUG_FFT_TIME':
+                case 'FFT_TIME':
                     return value.toFixed(0) + "\u03BCS";
-                case 'DEBUG_FFT_FREQ':
+                case 'FFT_FREQ':
                     return value.toFixed(0) + "Hz";
                 default:
 					return value.toFixed(0);
