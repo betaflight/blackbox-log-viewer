@@ -108,7 +108,8 @@ function GraphConfig(graphConfig) {
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
                             // add special condition for rcCommands as each of the fields requires a different scaling.
-                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, (nameRoot=='rcCommands')));
+                            let forceNewCurve = (nameRoot=='rcCommand') || (nameRoot=='rcCommands');
+                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, forceNewCurve));
                             colorIndexOffset++;
                         }
                     }
