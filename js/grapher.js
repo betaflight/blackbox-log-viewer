@@ -249,16 +249,15 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         
         if (frameLabelTextWidthFrameNumber === undefined)
             frameLabelTextWidthFrameNumber = canvasContext.measureText("#0000000").width;
-
+        
         canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - frameLabelTextWidthFrameNumber - 8, canvas.height - 8);
-
+        
         if (frameLabelTextWidthFrameTime === undefined)
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
-
+        
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
-
     }
-
+    
     /**
      * Plot the given field within the specified time period. When the output from the curve applied to a field
      * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
