@@ -30,8 +30,10 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
         videoWriter,
         
         canvas = document.createElement('canvas'),
+        stickCanvas = document.createElement('canvas'),
         craftCanvas = document.createElement('canvas'),
         analyserCanvas = document.createElement('canvas'),
+        stickCanvasLeft, stickCanvasTop, hasStick,
         craftCanvasLeft, craftCanvasTop, hasCraft,
         analyserCanvasLeft, analyserCanvasTop, hasAnalyser,
         
@@ -180,6 +182,7 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
             renderFrame = function() {
                 graph.render(frameTime);
                 
+                if(logParameters.hasSticks) canvasContext.drawImage(stickCanvas, stickCanvasLeft, stickCanvasTop);
                 if(logParameters.hasCraft) canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
                 if(logParameters.hasAnalyser) canvasContext.drawImage(analyserCanvas, analyserCanvasLeft, analyserCanvasTop);
                 
@@ -290,8 +293,11 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
 
     var options = $.extend({}, userSettings || {}, {eraseBackground : !logParameters.flightVideo, drawEvents : false});
     
-    graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, craftCanvas, analyserCanvas, options);
-    
+    graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options);
+
+    stickCanvasLeft = parseInt($(stickCanvas).css('left'), 10);
+    stickCanvasTop = parseInt($(stickCanvas).css('top'), 10);
+
     craftCanvasLeft = parseInt($(craftCanvas).css('left'), 10);
     craftCanvasTop = parseInt($(craftCanvas).css('top'), 10);
     
