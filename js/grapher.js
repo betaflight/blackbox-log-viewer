@@ -713,7 +713,13 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         windowEndTime = windowStartTime + windowWidthMicros;
         
         if (options.eraseBackground) {
-            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            // Work-around: The webm-writer does not like transparent backgrounds. Fill canvas with black.
+            if (options.fillBackground) {
+                canvasContext.fillStyle = 'black';
+                canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            }
         }
         
         var 
