@@ -66,7 +66,7 @@ function BlackboxLogViewer() {
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
-        hasTable = true, hasCraft = true, hasSticks = true, hasAnalyser, hasAnalyserFullscreen,
+        hasTable = true, hasAnalyser, hasAnalyserFullscreen,
         hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false, hadTable,
         hasConfig = false, hasConfigOverlay = false,
 
@@ -678,9 +678,12 @@ function BlackboxLogViewer() {
             currentOffsetCache.index    = null;      // and clear the index
             
             hasLog = true; html.toggleClass("has-log", hasLog);
-            html.toggleClass("has-craft", hasCraft);
             html.toggleClass("has-table", hasTable);
-            html.toggleClass("has-sticks", hasSticks);
+            html.toggleClass("has-craft",              userSettings.drawCraft);
+            html.toggleClass("has-sticks",             userSettings.drawSticks);
+            html.toggleClass('has-expo-override',      userSettings.graphExpoOverride);
+            html.toggleClass('has-smoothing-override', userSettings.graphSmoothOverride);
+            html.toggleClass('has-grid-override',      userSettings.graphSmoothOverride);
 
             setTimeout(function(){$(window).resize();}, 500 ); // refresh the window size;
 
@@ -904,20 +907,6 @@ function BlackboxLogViewer() {
             }
         });
 
-        prefs.get('hasCraft', function(item) {
-           if (item) {
-               hasCraft = item;
-               html.toggleClass("has-craft", hasCraft);
-           } 
-        });
-
-        prefs.get('hasSticks', function(item) {
-           if (item) {
-               hasSticks = item;
-               html.toggleClass("has-sticks", hasSticks);
-           } 
-        });
-
         /* Always start with the table hidden
         prefs.get('hasTable', function(item) {
            if (item) {
@@ -956,16 +945,16 @@ function BlackboxLogViewer() {
         });
 
         $(".view-craft").click(function() {
-            hasCraft = !hasCraft;
-            html.toggleClass("has-craft", hasCraft);       
-            prefs.set('hasCraft', hasCraft);
+            userSettings.drawCraft = !userSettings.drawCraft;
+            html.toggleClass("has-craft", userSettings.drawCraft);
+            saveOneUserSetting('drawCraft', userSettings.drawCraft);
         });
 
         $(".view-sticks").click(function() {
-            hasSticks = !hasSticks;
-            graph.setDrawSticks(hasSticks);            
-            html.toggleClass("has-sticks", hasSticks);  
-            prefs.set('hasSticks', hasSticks);
+            userSettings.drawSticks = !userSettings.drawSticks;
+            graph.setDrawSticks(userSettings.drawSticks);
+            html.toggleClass("has-sticks", userSettings.drawSticks);
+            saveOneUserSetting('drawSticks', userSettings.drawSticks);
             invalidateGraph();
         });
         
@@ -1353,9 +1342,9 @@ function BlackboxLogViewer() {
                     outTime: videoExportOutTime,
                     flightVideo: (hasVideo && viewVideo) ? video.cloneNode() : false,
                     flightVideoOffset: videoOffset,
-                    hasCraft: hasCraft,
+                    hasCraft: userSettings.drawCraft,
                     hasAnalyser: hasAnalyser,
-                    hasSticks: hasSticks
+                    hasSticks: userSettings.drawSticks
                 }, videoConfig);
                 
                 e.preventDefault();
@@ -1548,17 +1537,6 @@ function BlackboxLogViewer() {
                 prefs.set('userSettings', data);
             });
         }
-
-        var loadInitialOverrideStatus = function() {
-            prefs.get('userSettings', function(data) {
-
-                html.toggleClass('has-expo-override',      data['graphExpoOverride']);
-                html.toggleClass('has-smoothing-override', data['graphSmoothOverride']);
-                html.toggleClass('has-grid-override',      data['graphGridOverride']);
-
-            });
-        }
-        loadInitialOverrideStatus();
 
         function toggleOverrideStatus(userSetting, className) {
             userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
