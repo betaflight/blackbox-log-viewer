@@ -707,7 +707,7 @@ function BlackboxLogViewer() {
         }
         
         if (!URL.createObjectURL) {
-            alert("Sorry, your web browser doesn't support showing videos from your local computer. Try Google Chrome instead.");
+            alert("Sorry, your web browser doesn't support showing videos from your local computer.");
             currentOffsetCache.video = null; // clear the associated video name
             return;
         }
@@ -729,7 +729,11 @@ function BlackboxLogViewer() {
     }
     
     function reportVideoError(e) {
-        alert("Your video could not be loaded, your browser might not support this kind of video. Try Google Chrome instead.");
+        let errorMessage = 'Error while loading the video.';
+        if (e.currentTarget.error.code) {
+            errorMessage += ' ERROR (' + e.currentTarget.error.code + '): ' + e.currentTarget.error.message;
+        }
+        alert(errorMessage);
     }
     
     function onLegendVisbilityChange(hidden) {
