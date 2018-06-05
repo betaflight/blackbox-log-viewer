@@ -228,6 +228,7 @@ var FlightLogParser = function(logData) {
             rollPitchItermResetRate:null,   // ITerm Reset rate for Roll and Pitch
             yawItermResetRate:null,         // ITerm Reset Rate for Yaw
             dterm_lpf_hz:null,              // DTerm Lowpass Filter Hz
+            dterm_lpf2_hz:null,              // DTerm Lowpass Filter Hz 2
             dterm_differentiator:null,      // DTerm Differentiator
             H_sensitivity:null,             // Horizon Sensitivity
             iterm_reset_offset:null,        // I-Term reset offset
@@ -279,6 +280,7 @@ var FlightLogParser = function(logData) {
             d_notch_cut               : "dterm_notch_cutoff", 
             d_setpoint_weight         : "dtermSetpointWeight",
             dterm_lowpass_hz          : "dterm_lpf_hz",
+            dterm_lowpass2_hz         : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",  
             digital_idle_value        : "digitalIdleOffset",
             dshot_idle_value          : "digitalIdleOffset",
@@ -584,6 +586,7 @@ var FlightLogParser = function(logData) {
             case "dterm_notch_hz":
             case "dterm_notch_cutoff":
             case "dterm_lpf_hz":
+            case "dterm_lpf2_hz":
                 if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10);

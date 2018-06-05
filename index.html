@@ -1087,14 +1087,19 @@
                                         <tbody>
                                             <tr>
                                                 <td name='dterm_filter_type'>
-                                                    <label>Type
+                                                    <label>Type Stage 1
                                                         <br>&nbsp;</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
                                                 <td name="dterm_lpf_hz">
-                                                    <label>Cut-off
+                                                    <label>Soft Stage 1
+                                                        <br>(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                                <td name="dterm_lpf2_hz">
+                                                    <label>Soft Stage 2
                                                         <br>(Hz)</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
@@ -1102,12 +1107,14 @@
                                                     <label>Average Count</label>
                                                     <input type="number" step="1" min="0" max="12" />
                                                 </td>
-                                                <td name='dterm_notch_hz'>
+                                            </tr>
+                                            <tr>
+                                                <td name='dterm_notch_hz' colspan="2">
                                                     <label>Notch
                                                         <br>(Hz)</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
-                                                <td name="dterm_notch_cutoff">
+                                                <td name="dterm_notch_cutoff" colspan="2">
                                                     <label>Notch Cutoff
                                                         <br>(Hz)</label>
                                                     <input type="number" step="0.1" min="0" max="999.00" />
