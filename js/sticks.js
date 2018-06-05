@@ -45,16 +45,19 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             canvas.height = height;
         }
 
+        // Calculated size of each number/letter
         drawingParams.fontSizeValueLabel = Math.max(8, canvas.height / 15);
-        drawingParams.stickSpacing = 16;
+
+        // Padding of the sticks. It is a 10% of canvas with a maximum of 16 
+        drawingParams.stickSpacing = Math.min(height / 10, width / 10, 16);
         
         // Use that plus the inter-stick spacing that has been determined already to decide how big each stick should be:
-        drawingParams.stickSurroundRadius = Math.min((width - drawingParams.stickSpacing) / 4, (height - drawingParams.stickSpacing) / 2);
+        drawingParams.stickSurroundRadius = Math.min(width / 4 - drawingParams.stickSpacing, height / 2 - drawingParams.stickSpacing - drawingParams.fontSizeValueLabel);
 
         // Decide if to show the labels
         // The length of the 2 label texts are roughly 80% of the fontsize times the number of letters. 
         var labelLength = (userSettings.stickUnits ? 7 : 4);
-        var minWidthForLabels = drawingParams.stickSurroundRadius * 4 + drawingParams.stickSpacing + 0.8 * labelLength * drawingParams.fontSizeValueLabel * 2;
+        var minWidthForLabels = drawingParams.stickSurroundRadius * 4 + drawingParams.stickSpacing * 2 + 0.8 * labelLength * drawingParams.fontSizeValueLabel * 2;
         drawingParams.drawLabels = width > minWidthForLabels;
     }
 
@@ -111,10 +114,10 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         var radi = drawingParams.stickSurroundRadius;
 
         // Move origin to center of canvas
-        canvasContext.translate(canvas.width/2, canvas.height / 2 - drawingParams.stickSpacing);
+        canvasContext.translate(canvas.width / 2, canvas.height / 2);
 
         // Move origin to center of left stick
-        canvasContext.translate(-drawingParams.stickSpacing / 2 - radi, 0);
+        canvasContext.translate(-drawingParams.stickSpacing - radi, 0);
 
         canvasContext.font = drawingParams.fontSizeValueLabel + "pt " + DEFAULT_FONT_FACE;
 
@@ -143,11 +146,11 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
 
                 //Draw horizontal stick label
                 canvasContext.textAlign = 'center';
-                canvasContext.fillText(stickLabel[i * 2 + 0], 0, radi + drawingParams.fontSizeValueLabel + drawingParams.stickSpacing / 2);
+                canvasContext.fillText(stickLabel[i * 2], 0, radi + drawingParams.fontSizeValueLabel + drawingParams.stickSpacing);
 
                 //Draw vertical stick label
                 canvasContext.textAlign = ((i == 0) ? 'right' : 'left');
-                canvasContext.fillText(stickLabel[i * 2 + 1], ((i == 0) ? -1 : 1) * radi, drawingParams.fontSizeValueLabel / 2);
+                canvasContext.fillText(stickLabel[i * 2 + 1], ((i == 0) ? -1 : 1) * (radi + drawingParams.stickSpacing), drawingParams.fontSizeValueLabel / 2);
 
                 // put the mode label on the throttle stick
                 if ((i == 0 && (userSettings.stickMode == STICK_MODE_2 || userSettings.stickMode == STICK_MODE_4)) ||
