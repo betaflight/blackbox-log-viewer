@@ -170,7 +170,7 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                 for (var j = 0; j < stickPositionsTrail.length; j++) {
                     canvasContext.beginPath();
                     canvasContext.fillStyle = "rgba(255,255,255," + (j / stickPositionsTrail.length * 0.05) + ")";
-                    canvasContext.arc(stickPositionsTrail[j][i * 2 + 0], stickPositionsTrail[j][i * 2 + 1], radi / 20, 0, 2 * Math.PI);
+                    canvasContext.arc(stickPositionsTrail[j][i * 2 + 0], stickPositionsTrail[j][i * 2 + 1], Math.abs(radi) / 20, 0, 2 * Math.PI);
                     canvasContext.fill();
                 }
             }
@@ -178,7 +178,7 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             //Draw circle to represent stick position
             canvasContext.beginPath();
             canvasContext.fillStyle = stickColor;
-            canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], radi / 7.5, 0, 2 * Math.PI);
+            canvasContext.arc(stickPositions[i * 2 + 0], stickPositions[i * 2 + 1], Math.abs(radi) / 7.5, 0, 2 * Math.PI);
             canvasContext.fill();
 
 
