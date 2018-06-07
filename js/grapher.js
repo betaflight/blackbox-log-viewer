@@ -240,19 +240,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     }
 
     var
-        frameLabelTextWidthFrameNumber,
-        frameLabelTextWidthFrameTime;
+        frameLabelTextWidthFrameNumber = null,
+        frameLabelTextWidthFrameTime = null;
 
     function drawFrameLabel(frameIndex, timeMsec) {
         canvasContext.font = drawingParams.fontSizeFrameLabel + "pt " + DEFAULT_FONT_FACE;
         canvasContext.fillStyle = "rgba(255,255,255,0.65)";
 
-        if (frameLabelTextWidthFrameNumber === undefined)
+        if (frameLabelTextWidthFrameNumber == null)
             frameLabelTextWidthFrameNumber = canvasContext.measureText("#0000000").width;
         
         canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - frameLabelTextWidthFrameNumber - 8, canvas.height - 8);
 
-        if (frameLabelTextWidthFrameTime === undefined)
+        if (frameLabelTextWidthFrameTime == null)
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
         
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
@@ -703,6 +703,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         });
         
         if(analyser!=null) analyser.resize();
+
+        // Calculate again the position/size of frame label
+        frameLabelTextWidthFrameNumber = null;
+        frameLabelTextWidthFrameTime = null;
 
         computeDrawingParameters();
     };
