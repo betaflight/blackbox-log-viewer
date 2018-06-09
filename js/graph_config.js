@@ -357,6 +357,8 @@ GraphConfig.load = function(config) {
                                 outputRange: 1.0
                             };       
                     case 'GYRO':
+                    case 'GYRO_FILTERED':
+                    case 'GYRO_SCALED':
                     case 'NOTCH':
                         return {
                             offset: 0,

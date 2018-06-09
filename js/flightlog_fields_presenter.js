@@ -126,6 +126,13 @@ function FlightLogFieldPresenter() {
 							'debug[2]':'Gyro Raw [Z]',
 							'debug[3]':'Not Used',
 						},
+            'GYRO_FILTERED' : {
+                            'debug[all]':'Debug Gyro Filtered',  
+                            'debug[0]':'Gyro Filtered [X]',
+                            'debug[1]':'Gyro Filtered [Y]',
+                            'debug[2]':'Gyro Filtered [Z]',
+                            'debug[3]':'Not Used',
+                        },
 			'ACCELEROMETER' : 	{	
 							'debug[all]':'Debug Accel.',	
 							'debug[0]':'Accel. Raw [X]',
@@ -154,6 +161,13 @@ function FlightLogFieldPresenter() {
 							'debug[2]':'Gyro Pre-Notch [yaw]',
 							'debug[3]':'Not Used',
 						},
+            'GYRO_SCALED' : {
+                            'debug[all]':'Debug Gyro Scaled', 
+                            'debug[0]':'Gyro Scaled [roll]',
+                            'debug[1]':'Gyro Scaled [pitch]',
+                            'debug[2]':'Gyro Scaled [yaw]',
+                            'debug[3]':'Not Used',
+                        },
 			'RC_INTERPOLATION' : 	{	
 							'debug[all]':'Debug RC',	
 							'debug[0]':'RC Command Raw [roll]',
@@ -423,9 +437,11 @@ function FlightLogFieldPresenter() {
 						default:
 							return (value/10).toFixed(1) + "V"
 					}	
-				case 'GYRO':
-				case 'NOTCH':
-					return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                case 'GYRO':
+                case 'GYRO_FILTERED':
+                case 'GYRO_SCALED':
+                case 'NOTCH':
+                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
 				case 'ACCELEROMETER':
 				    return flightLog.accRawToGs(value).toFixed(2) + "g";
 				case 'MIXER':

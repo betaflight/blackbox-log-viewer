@@ -335,13 +335,21 @@ var
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if((firmwareType == FIRMWARE_TYPE_BETAFLIGHT) && semver.gte(firmwareVersion, '3.3.0')) {
+
+        // Debug names
         DEBUG_MODE = DEBUG_MODE_COMPLETE.slice(0);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('MIXER'),        1);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('AIRMODE'),      1);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('VELOCITY'),     1);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('DTERM_FILTER'), 1);
+        
+        if(semver.gte(firmwareVersion, '3.4.0')) {
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('GYRO'),     1, 'GYRO_FILTERED');
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('NOTCH'),    1, 'GYRO_SCALED');
+        }
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
+        // Flight mode names
         FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3);
 
     } else {
