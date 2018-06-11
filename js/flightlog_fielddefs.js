@@ -91,6 +91,7 @@ var
         'PASSTHRU',
         'RANGEFINDER',
         'FAILSAFE',
+        'GPSRESCUE',
         'ANTIGRAVITY',
         'HEADADJ',
         'CAMSTAB',
@@ -350,7 +351,11 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
         // Flight mode names
-        FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3);
+        FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
+        if (semver.lt(firmwareVersion, '3.4.0')) {
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('GPSRESCUE'), 1);
+        }
+        FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
 
     } else {
         DEBUG_MODE = DEBUG_MODE_COMPLETE;
