@@ -942,7 +942,7 @@ function BlackboxLogViewer() {
             loadFiles(files);
 
             // Clear the files, in this way we can open a file with the same path/name again
-            e.target.files.clear();
+            e.target.value = "";
         });
         
         // New View Controls
