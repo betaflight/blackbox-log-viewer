@@ -448,3 +448,30 @@ function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
                (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(sysConfig.firmwareVersion, cf_version));
     }
 }
+
+function isNW(){
+    try{
+        return (typeof require('nw.gui') !== "undefined");
+    } catch (e){
+        return false;
+    }
+}
+
+function getManifestVersion(manifest) {
+    try {
+        if (!manifest) {
+            manifest = chrome.runtime.getManifest();
+        }
+
+        var version = manifest.version_name;
+        if (!version) {
+            version = manifest.version;
+        }
+
+        return version;
+
+    } catch (error) {
+        console.log("manifest does not exist, probably not running nw.js");
+        return "-"
+    }
+}

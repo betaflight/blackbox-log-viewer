@@ -1991,19 +1991,6 @@ function BlackboxLogViewer() {
     });
 }
 
-function getManifestVersion(manifest) {
-    if (!manifest) {
-        manifest = chrome.runtime.getManifest();
-    }
-
-    var version = manifest.version_name;
-    if (!version) {
-        version = manifest.version;
-    }
-
-    return version;
-}
-
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');
 

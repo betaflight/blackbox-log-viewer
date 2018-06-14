@@ -3,7 +3,7 @@ openLinksInExternalBrowserByDefault();
 
 $(document).ready(function () {
     // translate to user-selected language
-    localize();
+    if (isNW()) { localize(); }
 });
 
 function checkForConfiguratorUpdates() {
@@ -53,20 +53,7 @@ function notifyOutdatedVersion(releaseData) {
     });
 }
 
-function getManifestVersion(manifest) {
-    if (!manifest) {
-        manifest = chrome.runtime.getManifest();
-    }
-
-    var version = manifest.version_name;
-    if (!version) {
-        version = manifest.version;
-    }
-
-    return version;
-}
-
-checkForConfiguratorUpdates();
+if (isNW()) { checkForConfiguratorUpdates(); }
 
 function openLinksInExternalBrowserByDefault() {
     try {
