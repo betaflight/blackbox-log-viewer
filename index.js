@@ -3,7 +3,9 @@ openLinksInExternalBrowserByDefault();
 
 $(document).ready(function () {
     // translate to user-selected language
-    if (isNW()) { localize(); }
+    if (isNW()) { 
+        localize(); 
+    }
 });
 
 function checkForConfiguratorUpdates() {
@@ -53,7 +55,9 @@ function notifyOutdatedVersion(releaseData) {
     });
 }
 
-if (isNW()) { checkForConfiguratorUpdates(); }
+if (isNW()) { 
+    checkForConfiguratorUpdates(); 
+}
 
 function openLinksInExternalBrowserByDefault() {
     try {
