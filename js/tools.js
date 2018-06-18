@@ -450,9 +450,9 @@ function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
 }
 
 function isNW() {
-    try{
+    try {
         return (typeof require('nw.gui') !== "undefined");
-    } catch (e){
+    } catch (error) {
         return false;
     }
 }
