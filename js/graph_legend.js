@@ -14,7 +14,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         for (i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend no-wheel" id="' + i +'"><h3 class="graph-legend-group" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list no-wheel"></ul></div>'),
+                graphDiv = $('<div class="graph-legend no-wheel" id="' + i +'"><h3 class="graph-legend-group field-quick-adjust" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list no-wheel"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
             
@@ -24,10 +24,19 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
             for (j = 0; j < graph.fields.length; j++) { 
                 var 
                     field = graph.fields[j],
-                    li = $('<li class="graph-legend-field" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>');
-                
-                li.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
-                li.css('border-bottom', "3px solid " + field.color);
+                    li = $('<li class="graph-legend-field field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>'),
+                    nameElem = $('<span class="graph-legend-field-name field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
+                    valueElem = $('<span class="graph-legend-field-value field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
+                    settingsElem = $('<div class="graph-legend-field-settings field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></div>'),
+                    analyseElem = $('<span class="glyphicon glyphicon-equalizer no-wheel"></span>');
+                li.append(nameElem);
+                li.append(analyseElem);
+                li.append(valueElem);
+                li.append(settingsElem);
+
+                nameElem.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
+                settingsElem.text(" ");
+                settingsElem.css('background', field.color);
                 fieldList.append(li);
             }
             
@@ -128,24 +137,44 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         if(!config.selectedFieldName) $('.hide-analyser-window').hide();
     }
 
-    this.updateValues = function(flightLog, frame) {
-      try {  
-          // New function to show values on legend.
-          var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
-          
-              $(".graph-legend-field").each(function(index, value) {
-                  var value = frame[flightLog.getMainFieldIndexByName($(this).attr('name'))]; // get the raw value from log
-                  if(userSettings.legendUnits) { // if we want the legend to show engineering units
-                      value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, $(this).attr('name'), value, currentFlightMode);
-                  } else { // raw value
-                    if(value%1!=0) { value = value.toFixed(2); }
-                  }
-                  $(this).text(FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'), flightLog.getSysConfig().debug_mode) + ((value!=null)?' (' + value + ')':' ') );
-                  $(this).append('<span class="glyphicon glyphicon-equalizer no-wheel"></span>');
-              });
-          } catch(e) {
-              console.log('Cannot update legend with values');
-          }
+    this.updateValues = function (flightLog, frame) {
+        try {
+            // New function to show values on legend.
+            var currentFlightMode = frame[ flightLog.getMainFieldIndexByName("flightModeFlags") ];
+            var
+                graphs = config.getGraphs(),
+                i, j;
+
+            $(".graph-legend-field-value").each(function (index, value) {
+                var fieldName = $(this).attr('name');
+                var value = frame[ flightLog.getMainFieldIndexByName(fieldName) ]; // get the raw value from log
+                if (userSettings.legendUnits) { // if we want the legend to show engineering units
+                    value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
+                } else { // raw value
+                    if (value % 1 != 0) { value = value.toFixed(2); }
+                }
+
+                if (value != null) {
+                    $(this).text(value);
+                } else {
+                    $(this).text('');
+                }
+            });
+
+            $('.graph-legend-field-settings').each(function (index, value) {
+                var i = $(this).attr('graph');
+                var j = $(this).attr('field');
+                var field = graphs[ i ].fields[ j ];
+                var str = 
+                    "Z"  + (field.curve.outputRange * 100).toFixed(0) +
+                    " E" + (field.curve.power * 100).toFixed(0) +
+                    " S" + (field.smoothing / 100).toFixed(0);
+                $(this).text(str);
+            });
+
+        } catch (e) {
+            console.log('Cannot update legend with values');
+        }
     };
     
     this.show = function() {
