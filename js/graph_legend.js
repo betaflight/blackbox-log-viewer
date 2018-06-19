@@ -151,7 +151,9 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                 if (userSettings.legendUnits) { // if we want the legend to show engineering units
                     value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
                 } else { // raw value
-                    if (value % 1 != 0) { value = value.toFixed(2); }
+                    if (value % 1 != 0) { 
+                        value = value.toFixed(2); 
+                    }
                 }
 
                 if (value != null) {
