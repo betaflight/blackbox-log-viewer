@@ -942,7 +942,7 @@ function BlackboxLogViewer() {
             loadFiles(files);
 
             // Clear the files, in this way we can open a file with the same path/name again
-            e.target.files.clear();
+            e.target.value = "";
         });
         
         // New View Controls
@@ -1989,19 +1989,6 @@ function BlackboxLogViewer() {
         };
 
     });
-}
-
-function getManifestVersion(manifest) {
-    if (!manifest) {
-        manifest = chrome.runtime.getManifest();
-    }
-
-    var version = manifest.version_name;
-    if (!version) {
-        version = manifest.version;
-    }
-
-    return version;
 }
 
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
