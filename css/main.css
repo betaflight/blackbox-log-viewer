@@ -109,8 +109,8 @@ a.disabled {
 
 @media (max-width: 1420px) {
     /*  Hide if smaller than 1500px */
-    html.has-video .playback-rate-expanded input.playback-rate-text,
-    html.has-video .graph-zoom-expanded input.graph-zoom
+    html.has-video .playback-rate-expanded,
+    html.has-video .graph-zoom-expanded
     { display: none!important;}
 }
 
@@ -169,14 +169,12 @@ a.disabled {
 
 @media (max-width: 1050px) {
     /*  Hide if smaller than 1050px */
-    html:not(.has-video) .playback-rate-expanded input.playback-rate-text,
-    html:not(.has-video) .graph-zoom-expanded input.graph-zoom
+    html:not(.has-video) .playback-rate-expanded,
+    html:not(.has-video) .graph-zoom-expanded
     { display: none!important;}
 }
 
 /*** end toolbar expansion ***/
-input.playback-rate-text,
-input.graph-zoom, 
 input.video-offset {
     width: 65px!important;
 }
@@ -718,6 +716,15 @@ html:not(.has-analyser) .view-analyser-fullscreen {
      visibility:hidden;
 }
 
+.noUi-handle{
+    text-align: center;
+    padding: 5px;
+}
+
+.noUi-handle:after,.noUi-handle:before {
+    visibility: hidden;
+}
+
 .video-top-controls > li {
     display:inline-block;
     margin-right: 17px;
@@ -821,8 +828,9 @@ html.has-log:not(.has-table-overlay) .log-field-values {
 
 .playback-rate-control,
 .graph-zoom-control  {
-    width: 100px;
+    width: 130px;
     margin-right: 13px;
+    margin-top: 6px;
 }
 
 .override-button-group button {

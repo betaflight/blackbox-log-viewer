@@ -471,7 +471,7 @@ function BlackboxLogViewer() {
         }
     }
     
-    function setPlaybackRate(rate) {
+    function setPlaybackRate(rate, updateUi) {
         if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
               playbackRate = rate;
               
@@ -479,9 +479,15 @@ function BlackboxLogViewer() {
                   video.playbackRate = rate / 100;
               }
         }
+        
+        if (updateUi) {
+            $(".playback-rate-control").val(playbackRate);
+        }
+        
+        $(".playback-rate-control .noUi-handle").text(playbackRate + '%');
     }
     
-    function setGraphZoom(zoom) {
+    function setGraphZoom(zoom, updateUi) {
         if (zoom == null) { // go back to last zoom value
             zoom = lastGraphZoom;
         }
@@ -494,6 +500,12 @@ function BlackboxLogViewer() {
                 invalidateGraph();
             }
         }
+        
+        if (updateUi) {
+            $(".graph-zoom-control").val(graphZoom);
+        }
+
+        $(".graph-zoom-control .noUi-handle").text(graphZoom + '%');
     }
     
     function showConfigFile(state) {
@@ -590,7 +602,7 @@ function BlackboxLogViewer() {
         updateCanvasSize();
         
         setGraphState(GRAPH_STATE_PAUSED);
-        setGraphZoom(graphZoom);
+        setGraphZoom(graphZoom, true);
     }
 
     function loadFileMessage(fileName) {
@@ -717,7 +729,7 @@ function BlackboxLogViewer() {
         video.src = videoURL;
         
         // Reapply the last playbackRate to the new video
-        setPlaybackRate(playbackRate);
+        setPlaybackRate(playbackRate, true);
     }
     
     function videoLoaded(e) {
@@ -1585,15 +1597,13 @@ function BlackboxLogViewer() {
                 if($(e.target).attr('id') == 'graphCanvas') { // we are scrolling the graph
                     if (delta < 0) { // scroll down (or left)
                         if (e.altKey || e.shiftKey) {
-                            setGraphZoom(graphZoom - 10.0 - ((e.altKey) ? 15.0 : 0.0));
-                            $(".graph-zoom").val(graphZoom + "%");
+                            setGraphZoom(graphZoom - 10.0 - ((e.altKey) ? 15.0 : 0.0), true);
                         } else {
                             logJumpBack(0.1 /*10%*/);
                         }
                     } else { // scroll up or right
                         if (e.altKey || e.shiftKey) {
-                            setGraphZoom(graphZoom + 10.0 + ((e.altKey) ? 15.0 : 0.0));
-                            $(".graph-zoom").val(graphZoom + "%");
+                            setGraphZoom(graphZoom + 10.0 + ((e.altKey) ? 15.0 : 0.0), true);
                         } else {
                             logJumpForward(0.1 /*10%*/);
                         }
@@ -1780,8 +1790,7 @@ function BlackboxLogViewer() {
                                     newGraphConfig(lastGraphConfig);
                                 }
                             } else {
-                                    (graphZoom==GRAPH_MIN_ZOOM)?setGraphZoom(null):setGraphZoom(GRAPH_MIN_ZOOM);
-                                    $(".graph-zoom").val(graphZoom + "%");
+                                    (graphZoom==GRAPH_MIN_ZOOM)?setGraphZoom(null, false):setGraphZoom(GRAPH_MIN_ZOOM, false);
                             }
                         } catch(e) {
                             console.log('Workspace toggle feature not functioning');
@@ -1832,8 +1841,7 @@ function BlackboxLogViewer() {
                     break;
                     case 37: // left arrow (normal scroll, shifted zoom out)
                         if (e.shiftKey) {
-                            setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0));
-                            $(".graph-zoom").val(graphZoom + "%");
+                            setGraphZoom(graphZoom - 10.0 - ((e.altKey)?15.0:0.0), true);
                         } else {
                           logJumpBack(null, e.altKey);
                         }
@@ -1841,8 +1849,7 @@ function BlackboxLogViewer() {
                     break;
                     case 39: // right arrow (normal scroll, shifted zoom in)
                         if (e.shiftKey) {
-                            setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0));
-                            $(".graph-zoom").val(graphZoom + "%");
+                            setGraphZoom(graphZoom + 10.0 + ((e.altKey)?15.0:0.0), true);
                         } else {
                             logJumpForward(null, e.altKey);
                         }
@@ -1894,13 +1901,18 @@ function BlackboxLogViewer() {
                     '50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
                     'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
                 },
+                tooltips: percentageFormat,
                 format: percentageFormat
             })
             .on("slide change set", function() {
-                setPlaybackRate(parseFloat($(this).val()));
+                setPlaybackRate(parseFloat($(this).val()), false);
             })
-            .Link("lower").to($(".playback-rate-text"));
-    
+            .dblclick(function() { 
+                $(this).val(100); 
+            });
+
+        $(".playback-rate-control .noUi-handle").text( playbackRate + '%');
+        
         $(".graph-zoom-control")
             .noUiSlider({
                 start: graphZoom,
@@ -1911,12 +1923,15 @@ function BlackboxLogViewer() {
                     '50%': [ GRAPH_DEFAULT_ZOOM, GRAPH_ZOOM_STEP ],
                     'max': [ GRAPH_MAX_ZOOM, GRAPH_ZOOM_STEP ]
                 },
+                tooltips: true,
                 format: percentageFormat
             })
             .on("slide change set", function() {
-                setGraphZoom(parseFloat($(this).val()));
+                setGraphZoom(parseFloat($(this).val()), false);
             })
-            .Link("lower").to($(".graph-zoom"));
+            .dblclick(function() { 
+                $(this).val(100); 
+            });
         
         $('.navbar-toggle').click(function(e) {
             $('.navbar-collapse').collapse('toggle');
