@@ -616,18 +616,31 @@ html.has-config .configuration-list {
 }
 
 .graph-legend-field {
-    padding-bottom:0.1em;
-    margin-bottom:0.3em;
+    margin-bottom: 0.5em;
     cursor:pointer;
-    text-align: right;
+    padding-left:  0.7em;
+    padding-right: 0.7em;
 }
 
-.graph-legend-field > span {
+.graph-legend-field-value {
+    float: right;
+}
+
+.graph-legend-field-settings {
+    font-size: 8px;
+    color:  black;
+    opacity: 0.8;
+    padding-left: 0.3em;
+}
+
+.graph-legend-field.highlight > .graph-legend-field-settings {
+    opacity: 1.0;
+    box-shadow: 0px 0px 2px white;
+}
+
+.graph-legend-field > .glyphicon-equalizer {
+    float: right;
     margin-left: 0.7em;
-}
-
-.graph-legend-field.highlight{
-    box-shadow: 0px 2px 4px -2px white
 }
 
 html.has-video .graph-row,

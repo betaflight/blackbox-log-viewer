@@ -1601,7 +1601,7 @@ function BlackboxLogViewer() {
                     e.preventDefault();
                     return true;
                 }
-                if($(e.target).hasClass('graph-legend-group') || $(e.target).hasClass('graph-legend-field')) {
+                if($(e.target).hasClass('field-quick-adjust')) {
                     var refreshRequired = false;
 
                     if(e.shiftKey) { // change zoom
