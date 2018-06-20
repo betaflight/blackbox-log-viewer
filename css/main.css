@@ -73,79 +73,72 @@ a.disabled {
 
 /* With video */
 
-@media (max-width: 950px) {
-    /* hidden when width is 1200px or less */
-    html.has-video .view-buttons-expanded
-    { display: none!important;}
+@media (max-width: 969px) {
+    html.has-video .view-buttons-expanded {
+        display: none!important;
+    }
 }
 
-@media (min-width: 951px) {
-    /* hidden when width is 1200px or less */
-    html.has-video .view-buttons
-    { display: none!important;}
+@media (min-width: 970px) {
+    html.has-video .view-buttons {
+        display: none!important;
+    }
 }
 
-@media (max-width: 1150px) {
-    /* Hide if smaller than 1150px */
+@media (max-width: 1223px) {
     html.has-video .playback-rate-expanded,
     html.has-video .graph-zoom-expanded,
     html.has-video .log-sync-expanded {
         display: none !important;
     }
 }
-@media (min-width: 1151px) {
-    /* Hide if larger than 1150px */
+
+@media (min-width: 1224px) {
     html.has-video .playback-rate,
     html.has-video .zoom-menu,
-    html.has-video .sync-menu
-        {display: none!important;}
+    html.has-video .sync-menu {
+        display: none!important;
+    }
 }
 
-@media (max-width: 1285px) {
-    /*  Hide if smaller than 1285px */
-    html.has-video .log-chart-time-panel
-        { display: none!important;}
-}
-
-@media (max-width: 1420px) {
-    /*  Hide if smaller than 1500px */
-    html.has-video .playback-rate-expanded,
-    html.has-video .graph-zoom-expanded
-    { display: none!important;}
+@media (max-width: 1370px) {
+    html.has-video .log-chart-time-panel {
+        display: none!important;
+    }
 }
 
 /* Without video */
 
-@media (max-width: 750px) {
+@media (max-width: 827px) {
     /* hide titles when width is 500px or less */
     .video-top-controls * h4 { 
         display: none!important;
     }
+
     .video-top-controls {
         height: 50px;
         padding-top: 10px;
     }
+
     .graph-row,
-    .log-field-values    {
+    .log-field-values {
         top: 30px!important;
     }
 }
 
-
-@media (max-width: 650px) {
-    /* hidden when width is 1200px or less */
-    html:not(.has-video) .view-buttons-expanded
-    { display: none!important;}
+@media (max-width: 706px) {
+    html:not(.has-video) .view-buttons-expanded {
+        display: none!important;
+    }
 }
 
-@media (min-width: 651px) {
-    /* hidden when width is 1200px or less */
-    html:not(.has-video) .view-buttons
-    { display: none!important;}
+@media (min-width: 707px) {
+    html:not(.has-video) .view-buttons {
+        display: none!important;
+    }
 }
 
-@media (max-width: 750px) {
-    /* Hide if smaller than 750px */
+@media (max-width: 827px) {
     html:not(.has-video) .playback-rate-expanded,
     html:not(.has-video) .graph-zoom-expanded,
     html:not(.has-video) .log-sync-expanded {
@@ -153,25 +146,18 @@ a.disabled {
     }
 }
 
-@media (min-width: 751px) {
-    /* Hide if larger than 750px */
+@media (min-width: 828px) {
     html:not(.has-video) .playback-rate,
     html:not(.has-video) .zoom-menu,
-    html:not(.has-video) .sync-menu
-        {display: none!important;}
+    html:not(.has-video) .sync-menu {
+        display: none!important;
+    }
 }
 
-@media (max-width: 900px) {
-    /*  Hide if smaller than 900px */
-    html:not(.has-video) .log-chart-time-panel
-        { display: none!important;}
-}
-
-@media (max-width: 1050px) {
-    /*  Hide if smaller than 1050px */
-    html:not(.has-video) .playback-rate-expanded,
-    html:not(.has-video) .graph-zoom-expanded
-    { display: none!important;}
+@media (max-width: 971px) {
+    html:not(.has-video) .log-chart-time-panel {
+        display: none!important;
+    }
 }
 
 /*** end toolbar expansion ***/
@@ -716,15 +702,6 @@ html:not(.has-analyser) .view-analyser-fullscreen {
      visibility:hidden;
 }
 
-.noUi-handle{
-    text-align: center;
-    padding: 5px;
-}
-
-.noUi-handle:after,.noUi-handle:before {
-    visibility: hidden;
-}
-
 .video-top-controls > li {
     display:inline-block;
     margin-right: 17px;
@@ -831,6 +808,16 @@ html.has-log:not(.has-table-overlay) .log-field-values {
     width: 130px;
     margin-right: 13px;
     margin-top: 6px;
+}
+
+.noUi-horizontal .noUi-handle{
+    text-align: center;
+    padding: 3px;
+    width: fit-content;
+}
+
+.noUi-handle:after,.noUi-handle:before {
+    visibility: hidden;
 }
 
 .override-button-group button {
