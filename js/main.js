@@ -713,7 +713,7 @@ function BlackboxLogViewer() {
         }
             
         videoURL = URL.createObjectURL(file);
-        video.volume = 0.05;
+        video.volume = 1.00;
         video.src = videoURL;
         
         // Reapply the last playbackRate to the new video
