@@ -250,6 +250,8 @@ function dist() {
         './js/tools.js',
         './js/user_settings_dialog.js',
         './js/video_export_dialog.js',
+        './js/csv-exporter.js',
+        './js/webworkers/csv-export-worker.js',
         './js/vendor/FileSaver.js',
         './js/vendor/bootstrap.js',
         './js/vendor/bootstrap.min.js',
@@ -263,6 +265,7 @@ function dist() {
         './js/vendor/three.js',
         './js/vendor/three.min.js',
         './js/vendor/webm-writer-0.1.1.js',
+        './js/vendor/lodash.min.js',
 
         // everything else
         './package.json', // For NW.js

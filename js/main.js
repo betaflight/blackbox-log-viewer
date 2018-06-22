@@ -866,6 +866,28 @@ function BlackboxLogViewer() {
         reader.readAsText(file);
     }
 
+    function exportCsv(file, options={}) {
+
+        function onSuccess(data) {
+            console.debug("CSV export finished in", (performance.now() - startTime) / 1000, "secs");
+            if (!data) {
+                console.debug("Empty data, nothing to save");
+                return;
+            }
+            let blob = new Blob([data], {type: 'text/csv'}),
+                e    = document.createEvent('MouseEvents'),
+                a    = document.createElement('a');
+            a.download = file || $(".log-filename").text() + ".csv";
+            a.href = window.URL.createObjectURL(blob);
+            //a.dataset.downloadurl =  ['text/csv', a.download, a.href].join(':');
+            e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+
+        let startTime = performance.now();
+        CsvExporter(flightLog, options).dump(onSuccess);
+    }
+
     // New workspaces feature; local storage of user configurations
     prefs.get('workspaceGraphConfigs', function(item) {
         if(item) {
@@ -1349,7 +1371,12 @@ function BlackboxLogViewer() {
             saveWorkspaces();
             e.preventDefault();
         });
-        
+
+        $(".btn-csv-export").click(function(e) {
+            setGraphState(GRAPH_STATE_PAUSED);
+            exportCsv();
+            e.preventDefault();
+        });
                 
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
