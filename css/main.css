@@ -614,6 +614,7 @@ html.has-config .configuration-list {
     font-size: 8px;
     color:  black;
     opacity: 0.8;
+    font-weight: bold;
     padding-left: 0.3em;
 }
 
