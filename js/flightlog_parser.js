@@ -215,6 +215,7 @@ var FlightLogParser = function(logData) {
             rollPID:[null, null, null],	    // Roll [P, I, D]
             pitchPID:[null, null, null],	// Pitch[P, I, D]
             yawPID:[null, null, null],	    // Yaw  [P, I, D]
+            feedforward_transition:null,    // Feedforward transition
             altPID:[null, null, null],	    // Altitude Hold [P, I, D]
             posPID:[null, null, null],	    // Position Hold [P, I, D]
             posrPID:[null, null, null],	    // Position Rate [P, I, D]
@@ -271,7 +272,7 @@ var FlightLogParser = function(logData) {
         },
 
         // Translation of the field values name to the sysConfig var where it must be stored
-        translationValues = {                
+        translationValues = {
             acc_limit_yaw             : "yawRateAccelLimit",
             accel_limit               : "rateAccelLimit",
             acc_limit                 : "rateAccelLimit",
@@ -545,6 +546,7 @@ var FlightLogParser = function(logData) {
             case "itermWindupPointPercent":
             case "ptermSRateWeight":
             case "setpointRelaxRatio":
+            case "feedforward_transition":
             case "dtermSetpointWeight":
             case "gyro_soft_type":
             case "gyro_soft2_type":
@@ -642,6 +644,14 @@ var FlightLogParser = function(logData) {
             break;
             case "magPID":
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
+            break;
+            
+            case "feedforward_weight":
+                // Add it to the end of the rollPID, pitchPID and yawPID
+                var ffValues = parseCommaSeparatedString(fieldValue);
+                that.sysConfig["rollPID"].push(ffValues[0]);
+                that.sysConfig["pitchPID"].push(ffValues[1]);
+                that.sysConfig["yawPID"].push(ffValues[2]);
             break;
             /* End of CSV packed values */
 

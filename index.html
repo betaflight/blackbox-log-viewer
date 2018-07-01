@@ -664,11 +664,12 @@
                                             <th class="proportional">Proportional</th>
                                             <th class="integral">Integral</th>
                                             <th class="derivative">Derivative</th>
+                                            <th class="feedforward">Feedforward</th>
                                         </tr>
                                     </table>
                                     <table id="pid_main" class="pid_tuning">
                                         <tr>
-                                            <th colspan="4">
+                                            <th colspan="5">
                                                 <div class="pid_mode">Basic/Acro</div>
                                             </th>
                                         </tr>
@@ -684,6 +685,9 @@
                                             <td>
                                                 <input type="number" name="d" step="1" min="0" max="255" />
                                             </td>
+                                            <td>
+                                                <input type="number" name="f" step="1" min="0" max="255" />
+                                            </td>
                                         </tr>
                                         <tr class="pitchPID">
                                             <!-- 1 -->
@@ -696,6 +700,9 @@
                                             </td>
                                             <td>
                                                 <input type="number" name="d" step="1" min="0" max="255" />
+                                            </td>
+                                            <td>
+                                                <input type="number" name="f" step="1" min="0" max="255" />
                                             </td>
                                         </tr>
                                         <tr class="yawPID">
@@ -710,11 +717,14 @@
                                             <td>
                                                 <input type="number" name="d" step="1" min="0" max="255" />
                                             </td>
+                                            <td>
+                                                <input type="number" name="f" step="1" min="0" max="255" />
+                                            </td>
                                         </tr>
                                     </table>
                                     <table id="pid_baro" class="pid_tuning">
                                         <tr>
-                                            <th colspan="4">
+                                            <th colspan="5">
                                                 <div class="pid_mode">Barometer & Sonar/Altitude</div>
                                             </th>
                                         </tr>
@@ -730,6 +740,7 @@
                                             <td>
                                                 <input type="number" name="d" step="1" min="0" max="255" />
                                             </td>
+                                            <td></td>
                                         </tr>
                                         <tr class="velPID">
                                             <!-- 9 -->
@@ -743,11 +754,12 @@
                                             <td>
                                                 <input type="number" name="d" step="1" min="0" max="255" />
                                             </td>
+                                            <td></td>
                                         </tr>
                                     </table>
                                     <table id="pid_mag" class="pid_tuning">
                                         <tr>
-                                            <th colspan="4">
+                                            <th colspan="5">
                                                 <div class="pid_mode">Heading</div>
                                             </th>
                                         </tr>
@@ -759,11 +771,12 @@
                                             </td>
                                             <td></td>
                                             <td></td>
+                                            <td></td>
                                         </tr>
                                     </table>
                                     <table id="pid_gps" class="pid_tuning">
                                         <tr>
-                                            <th colspan="4">
+                                            <th colspan="5">
                                                 <div class="pid_mode">GPS</div>
                                             </th>
                                         </tr>
@@ -776,6 +789,7 @@
                                             <td>
                                                 <input type="number" name="i" step="0.01" min="0" max="2.55" />
                                             </td>
+                                            <td></td>
                                             <td></td>
                                         </tr>
                                         <tr class="posrPID">
@@ -790,6 +804,7 @@
                                             <td>
                                                 <input type="number" name="d" step="0.001" min="0" max="0.255" />
                                             </td>
+                                            <td></td>
                                         </tr>
                                         <tr class="navrPID">
                                             <!-- 6 -->
@@ -803,6 +818,7 @@
                                             <td>
                                                 <input type="number" name="d" step="0.001" min="0" max="0.255" />
                                             </td>
+                                            <td></td>
                                         </tr>
                                     </table>
                                     <table id="pid_accel" class="pid_tuning">
@@ -845,6 +861,12 @@
                                                 <td name="ptermSRateWeight" class="bf-only">
                                                     <label>P-Term
                                                         <br>&nbsp;
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0.01" min="0" max="999" />
+                                                </td>
+                                                <td name="feedforward_transition" class="bf-only">
+                                                    <label>Feedforward
+                                                        <br>Transition
                                                         <br/>&nbsp;</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>

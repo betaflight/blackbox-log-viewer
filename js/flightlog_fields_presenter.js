@@ -6,32 +6,37 @@ function FlightLogFieldPresenter() {
 (function() {
     var FRIENDLY_FIELD_NAMES = {
 
-        'axisP[all]': 'PID P',
-        'axisP[0]': 'PID P [roll]',
-        'axisP[1]': 'PID P [pitch]',
-        'axisP[2]': 'PID P [yaw]',
+        'axisP[all]': 'PIDF P',
+        'axisP[0]': 'PIDF P [roll]',
+        'axisP[1]': 'PIDF P [pitch]',
+        'axisP[2]': 'PIDF P [yaw]',
 
-        'axisI[all]': 'PID I',
-        'axisI[0]': 'PID I [roll]',
-        'axisI[1]': 'PID I [pitch]',
-        'axisI[2]': 'PID I [yaw]',
+        'axisI[all]': 'PIDF I',
+        'axisI[0]': 'PIDF I [roll]',
+        'axisI[1]': 'PIDF I [pitch]',
+        'axisI[2]': 'PIDF I [yaw]',
 
-        'axisD[all]': 'PID D',
-        'axisD[0]': 'PID D [roll]',
-        'axisD[1]': 'PID D [pitch]',
-        'axisD[2]': 'PID D [yaw]',
+        'axisD[all]': 'PIDF D',
+        'axisD[0]': 'PIDF D [roll]',
+        'axisD[1]': 'PIDF D [pitch]',
+        'axisD[2]': 'PIDF D [yaw]',
+
+        'axisF[all]': 'PIDF F',
+        'axisF[0]': 'PIDF F [roll]',
+        'axisF[1]': 'PIDF F [pitch]',
+        'axisF[2]': 'PIDF F [yaw]',
 
         //Virtual field
-        'axisSum[all]': 'PID Sum',
-        'axisSum[0]' : 'PID Sum [roll]',
-        'axisSum[1]' : 'PID Sum [pitch]',
-        'axisSum[2]' : 'PID Sum [yaw]',
+        'axisSum[all]': 'PIDF Sum',
+        'axisSum[0]' : 'PIDF Sum [roll]',
+        'axisSum[1]' : 'PIDF Sum [pitch]',
+        'axisSum[2]' : 'PIDF Sum [yaw]',
 
         //Virtual field
-        'axisError[all]': 'PID Error',
-        'axisError[0]' : 'PID Error [roll]',
-        'axisError[1]' : 'PID Error [pitch]',
-        'axisError[2]' : 'PID Error [yaw]',
+        'axisError[all]': 'PIDF Error',
+        'axisError[0]' : 'PIDF Error [roll]',
+        'axisError[1]' : 'PIDF Error [pitch]',
+        'axisError[2]' : 'PIDF Error [yaw]',
 
         //Virtual field
         'rcCommands[all]': 'RC Rates',
@@ -357,6 +362,9 @@ function FlightLogFieldPresenter() {
             case 'axisD[0]':
             case 'axisD[1]':
             case 'axisD[2]':
+            case 'axisF[0]':
+            case 'axisF[1]':
+            case 'axisF[2]':
                 return flightLog.getPIDPercentage(value).toFixed(1) + "%";
 
             case 'accSmooth[0]':
