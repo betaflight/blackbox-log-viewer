@@ -1,9 +1,10 @@
 'use strict';
 
 function startApplication() {
+    var timestampId = Date.now(); 
     chrome.app.window.create('index.html', 
     {
-        id: 'main',
+        id: "main" + timestampId,
         frame: 'chrome',
         innerBounds : {
             'width' : 1340,
