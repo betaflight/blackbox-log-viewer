@@ -103,18 +103,13 @@ function BlackboxLogViewer() {
         playbackRate = PLAYBACK_DEFAULT_RATE,
 
         graphZoom = GRAPH_DEFAULT_ZOOM,
-        lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
-        currentWindowId;
-
-        if (chrome.windows) {
-            chrome.windows.getCurrent(function(currentWindow) {
-                currentWindowId = currentWindow.id;
-            });
-        }
+        lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
 
         function createNewBlackboxWindow(fileToOpen) {
+            var timestampId = Date.now();
             chrome.app.window.create('index.html', 
             {
+                'id': "main" + timestampId,
                 'innerBounds' : {
                     'width'  : INNER_BOUNDS_WIDTH,
                     'height' : INNER_BOUNDS_HEIGHT
@@ -1959,21 +1954,20 @@ function BlackboxLogViewer() {
 
                     // All the windows opened try to open the new blackbox,
                     // so we limit it to one of them, the first in the list for example
-                    chrome.windows.getAll(function(windows) {
+                    var windows = chrome.app.window.getAll();
+                    var firstWindow = windows[0];
+                    var currentWindowId = chrome.app.window.current().id;
 
-                        var firstWindow = windows[0];
+                    if (currentWindowId == firstWindow.id) {
+                        var filePathToOpenExpression = /.*"([^"]*)"$/;
+                        var fileToOpen = path.match(filePathToOpenExpression);
 
-                        if (currentWindowId == firstWindow.id) {
-                            var filePathToOpenExpression = /.*"([^"]*)"$/;
-                            var fileToOpen = path.match(filePathToOpenExpression);
-
-                            if (fileToOpen.length > 1) {
-                                var fullPathFile = fileToOpen[1];
-                                createNewBlackboxWindow([fullPathFile]);
-                            }
+                        if (fileToOpen.length > 1) {
+                            var fullPathFile = fileToOpen[1];
+                            createNewBlackboxWindow([fullPathFile]);
                         }
+                    }
 
-                    });
                 });
             } catch (e) {
                 // Require not supported, chrome app
