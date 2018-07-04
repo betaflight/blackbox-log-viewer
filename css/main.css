@@ -79,6 +79,29 @@ a.disabled {
     }
 }
 
+@media (max-width: 600px) {
+  .container-fluid.main-pane, 
+  html.has-log div.log-seek-bar{
+    padding-left:0;
+    padding-right:0;
+  }
+  
+  .container-fluid.main-pane .graph-row{
+    width:100%;
+  }
+  
+  div.log-graph-config{
+    padding: 1em 0;
+  }
+  
+  html.has-log button.log-jump-start,
+  html.has-log button.log-jump-back,
+  html.has-log button.log-jump-forward,
+  html.has-log button.log-jump-end{
+    display:none;
+  }
+}
+
 @media (min-width: 970px) {
     html.has-video .view-buttons {
         display: none!important;
@@ -604,6 +627,7 @@ html.has-config .configuration-list {
     cursor:pointer;
     padding-left:  0.7em;
     padding-right: 0.7em;
+    min-width:13em;
 }
 
 .graph-legend-field-value {

@@ -97,8 +97,22 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         return target;
     }
     
-    function onMouseMove(e) {
+    function unwrapTouch(e){
+      if(e.originalEvent.touches != null || e.originalEvent.touches.length == 1){
+        e.originalEvent.touches[0].which = 1;
+        return {
+          which: 1,
+          pageX: e.originalEvent.touches[0].pageX,
+          pageY: e.originalEvent.touches[0].pageY
+        };
+      }
+      return e;
+    }
+    
+    function onEventMove(e) {
         e.preventDefault();
+        
+        e = unwrapTouch(e);
         
         if (that.onSeek) {
             //Reverse the seek direction so that it looks like you're dragging the data with the mouse
@@ -109,17 +123,19 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         lastMouseY = e.pageY;
     }
     
-    function onMouseDown(e) {
+    function onEventStart(e) {
+        e = unwrapTouch(e);
+      
         if (e.which == 1) { //Left mouse button only for seeking
             lastMouseX = e.pageX;
             lastMouseY = e.pageY;
             
             //"capture" the mouse so we can drag outside the boundaries of canvas
-            $(document).on("mousemove", onMouseMove);
+            $(document).on("mousemove touchmove", onEventMove);
             
             //Release the capture when the mouse is released
-            $(document).one("mouseup", function () {
-                $(document).off("mousemove", onMouseMove);
+            $(document).one("mouseup touchend", function () {
+                $(document).off("mousemove touchmove", onEventMove);
             });
             
             e.preventDefault();
@@ -938,7 +954,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     }
     
     this.destroy = function() {
-        $(canvas).off("mousedown", onMouseDown);
+        $(canvas).off("mousedown touchstart", onEventStart);
     };
     
     this.setGraphZoom = function(zoom) {
@@ -1016,7 +1032,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 	lapTimer = new LapTimer();
 
     //Handle dragging events
-    $(canvas).on("mousedown",onMouseDown);
+    $(canvas).on("mousedown touchstart", onEventStart);
     
     graphConfig.addListener(this.refreshGraphConfig);
     this.refreshGraphConfig();

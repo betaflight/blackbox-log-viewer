@@ -70,23 +70,37 @@ function SeekBar(canvas) {
         backgroundValid = false;
     }
     
-    function onMouseMove(e) {
+    function unwrapTouch(e){
+      if(e.originalEvent.touches != null || e.originalEvent.touches.length == 1){
+        e.originalEvent.touches[0].which = 1;
+        return {
+          which: 1,
+          pageX: e.originalEvent.touches[0].pageX,
+          pageY: e.originalEvent.touches[0].pageY
+        };
+      }
+      return e;
+    }
+    
+    function onEventMove(e) {
+        e = unwrapTouch(e);
         if (e.which == 1)
             seekToDOMPixel(e.pageX - $(canvas).offset().left);
     }
     
-    $(canvas).mousedown(function(e) {
+    $(canvas).bind("mousedown touchstart", function(e) {
         e.preventDefault();
 
+        e = unwrapTouch(e);
         if (e.which == 1) { //Left mouse button only for seeking
             seekToDOMPixel(e.pageX - $(this).offset().left);
             
             //"capture" the mouse so we can drag outside the boundaries of the seek bar
-            $("body").on("mousemove", onMouseMove);
+            $("body").on("mousemove touchmove", onEventMove);
             
             //Release the capture when the mouse is released
-            $("body").one("mouseup", function () {
-                $("body").off("mousemove", onMouseMove);
+            $("body").one("mouseup touchend", function () {
+                $("body").off("mousemove touchmove", onEventMove);
             });
         }
     });
