@@ -265,7 +265,7 @@ function dist() {
         './js/vendor/three.js',
         './js/vendor/three.min.js',
         './js/vendor/webm-writer-0.1.1.js',
-        './js/vendor/lodash.min.js',
+        './node_modules/lodash/lodash.min.js',
 
         // everything else
         './package.json', // For NW.js

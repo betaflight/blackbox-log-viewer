@@ -879,7 +879,7 @@ function BlackboxLogViewer() {
                 a    = document.createElement('a');
             a.download = file || $(".log-filename").text() + ".csv";
             a.href = window.URL.createObjectURL(blob);
-            //a.dataset.downloadurl =  ['text/csv', a.download, a.href].join(':');
+            a.dataset.downloadurl =  ['text/csv', a.download, a.href].join(':');
             e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             a.dispatchEvent(e);
         }
