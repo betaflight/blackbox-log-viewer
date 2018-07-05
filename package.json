@@ -22,7 +22,9 @@
   },
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.10"
+  },
   "devDependencies": {
     "command-exists": "^1.2.7",
     "del": "^3.0.0",
