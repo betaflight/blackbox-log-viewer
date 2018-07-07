@@ -1812,7 +1812,7 @@ function BlackboxLogViewer() {
                                     newGraphConfig(lastGraphConfig);
                                 }
                             } else {
-                                    (graphZoom==GRAPH_MIN_ZOOM)?setGraphZoom(null, false):setGraphZoom(GRAPH_MIN_ZOOM, false);
+                                    (graphZoom==GRAPH_MIN_ZOOM)?setGraphZoom(null, true):setGraphZoom(GRAPH_MIN_ZOOM, true);
                             }
                         } catch(e) {
                             console.log('Workspace toggle feature not functioning');
@@ -1926,11 +1926,11 @@ function BlackboxLogViewer() {
                 tooltips: percentageFormat,
                 format: percentageFormat
             })
-            .on("slide change set", function() {
+            .on("slide", function() {
                 setPlaybackRate(parseFloat($(this).val()), false);
             })
             .dblclick(function() { 
-                $(this).val(100); 
+                setPlaybackRate(100, true);
             });
 
         $(".playback-rate-control .noUi-handle").text( playbackRate + '%');
@@ -1948,11 +1948,11 @@ function BlackboxLogViewer() {
                 tooltips: true,
                 format: percentageFormat
             })
-            .on("slide change set", function() {
+            .on("slide", function() {
                 setGraphZoom(parseFloat($(this).val()), false);
             })
             .dblclick(function() { 
-                $(this).val(100); 
+                setGraphZoom(100, true);
             });
         
         $('.navbar-toggle').click(function(e) {
