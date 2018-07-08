@@ -468,12 +468,12 @@
                 <canvas width="0" height="0" id="stickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
             </div>
-            <div class="log-graph-config no-wheel">
-                <h2 class="no-wheel">Legend
-                    <span class="log-close-legend-dialog glyphicon glyphicon-remove no-wheel" data-toggle="tooltip" title="Hide the legend"></span>
+            <div class="log-graph-config">
+                <h2>Legend
+                    <span class="log-close-legend-dialog glyphicon glyphicon-remove" data-toggle="tooltip" title="Hide the legend"></span>
                 </h2>
-                <div class="log-index no-wheel"></div>
-                <div class="log-graph-legend no-wheel">
+                <div class="log-index"></div>
+                <div class="log-graph-legend">
                 </div>
 
                 <div class="btn-group override-button-group" role="group">
@@ -500,7 +500,7 @@
                     </button>
                 </div>
 
-                <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog no-wheel" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
+                <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
             </div>
             <div class="mouseNotification"></div>
         </div>
@@ -1865,7 +1865,9 @@
                                     <ul>
                                         <li>
                                             <span class="keys">
-                                                <div><img src="./images/glyphs/scrollwheel.svg" data-toggle="tooltip" title="Mouse Scroll Wheel" /></div>
+                                                <div class="key">Ctrl</div>
+                                                <div class="normal">+</div>
+                                                <img src="./images/glyphs/scrollwheel.svg" data-toggle="tooltip" title="Mouse Scroll Wheel" />
                                             </span>
                                             <div class="description">Adjust Smoothing of field in graph by hovering field in legend and scroll</div>
                                         </li>

@@ -14,12 +14,12 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         for (i = 0; i < graphs.length; i++) {
             var 
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend no-wheel" id="' + i +'"><h3 class="graph-legend-group field-quick-adjust" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list no-wheel"></ul></div>'),
+                graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 class="graph-legend-group field-quick-adjust" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
             
             graphTitle.text(graph.label);
-            graphTitle.prepend('<span class="glyphicon glyphicon-minus no-wheel"></span>');
+            graphTitle.prepend('<span class="glyphicon glyphicon-minus"></span>');
             
             for (j = 0; j < graph.fields.length; j++) { 
                 var 
@@ -28,7 +28,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                     nameElem = $('<span class="graph-legend-field-name field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
                     valueElem = $('<span class="graph-legend-field-value field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
                     settingsElem = $('<div class="graph-legend-field-settings field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></div>'),
-                    analyseElem = $('<span class="glyphicon glyphicon-equalizer no-wheel"></span>');
+                    analyseElem = $('<span class="glyphicon glyphicon-equalizer"></span>');
                 li.append(nameElem);
                 li.append(analyseElem);
                 li.append(valueElem);

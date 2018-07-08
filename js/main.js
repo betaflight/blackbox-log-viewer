@@ -1636,12 +1636,15 @@ function BlackboxLogViewer() {
                 if($(e.target).hasClass('field-quick-adjust')) {
                     var refreshRequired = false;
 
-                    if(e.shiftKey) { // change zoom
+                    if (e.shiftKey) { // change zoom
                         refreshRequired = changePenZoom(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
-                    } else if(e.altKey) { // change Expo
+                        e.preventDefault();
+                    } else if (e.altKey) { // change Expo
                         refreshRequired = changePenExpo(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
-                    } else { // Change smoothing
+                        e.preventDefault();
+                    } else if (e.ctrlKey){ // Change smoothing
                         refreshRequired = changePenSmoothing(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                        e.preventDefault();
                     }
 
                     if(refreshRequired) {
@@ -1649,7 +1652,7 @@ function BlackboxLogViewer() {
                         invalidateGraph();
                         mouseNotification.show($('.log-graph'), null, null, refreshRequired, 750, null, 'bottom-right', 0);
                     }
-                    e.preventDefault();
+
                     return true;
                 }
             }
