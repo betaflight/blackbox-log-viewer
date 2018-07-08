@@ -24,7 +24,7 @@ Please note - the application will automatically update itself when new versions
 ### Alternative way, Chrome app:
 
 1. Clone the repo to any local directory or download it as zip.
-2. Extract to a folder and not the folder.
+2. If downloaded as a zip, extract it into a new directory.
 3. Start Google Chrome.
 4. Click the 3-dots on the far right of the URL bar.
 5. Select "More Tools"
