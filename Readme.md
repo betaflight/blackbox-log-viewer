@@ -8,32 +8,33 @@ be played behind the log. You can export the graphs as a WebM video to share wit
 
 ## Installation
 
-There are three methods of installation available:
+### Standalone
 
-### Chrome Web Store method
+Download the installer from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
 
-The easiest way to get the explorer (if you have Google Chrome) is to install it from the Chrome Web Store:
+### Via Chrome Web Store
 
-https://chrome.google.com/webstore/detail/betaflight-blackbox-explo/canpiagfkeefejklcojkhojdijglnghc
+[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/betaflight-blackbox-explo/canpiagfkeefejklcojkhojdijglnghc)
 
-This will add it to your computer as a Chrome App.
+1. Visit the [Betaflight Blackbox Log Viewer product page in the Chrome web store](https://chrome.google.com/webstore/detail/betaflight-blackbox-explo/canpiagfkeefejklcojkhojdijglnghc)
+2. Click **+ Add to Chrome**
 
-### Manual Chrome App install
-Download the contents of this repository by clicking the "download ZIP" button on the right of this page. Unpack
-the zip somewhere on your computer. In Google Chrome, open up the Extensions page, tick the "developer mode" tickbox, 
-click the "load unpacked extension" button, and point it at the unpacked folder. This will add it as a Chrome App.
+Please note - the application will automatically update itself when new versions are released.
 
-### Run as a webpage
-Download the contents of this repository by clicking the "download ZIP" button on the right of this page. Unpack
-the zip somewhere on your computer, and double click "index.html" file to open it with your web browser. 
+### Alternative way, Chrome app:
 
-Note that the "video export" feature is only available when opened with Google Chrome. Also, running it this way will 
-limit the exported flight video to 500MB in size. Use one of the previous Chrome App install methods to unlock 
-&gt;500MB video export.
+1. Clone the repo to any local directory or download it as zip.
+2. Extract to a folder and not the folder.
+3. Start Google Chrome.
+4. Click the 3-dots on the far right of the URL bar.
+5. Select "More Tools"
+6. Select "Extensions"
+7. Check the Developer Mode checkbox.
+8. Click on load unpacked extension.
+9. Point it to the folder you extracted the zip to.
 
 ## Usage
-Click the "Open log file/video" button at the top right and select your logged ".TXT" file and your flight video (if 
-you recorded one).
+Click the "Open log file/video" button at the top right and select your log file and your flight video (if you recorded one).
 
 You can scroll through the log by clicking or dragging on the seek bar that appears underneath the main graph. The 
 current time is represented by the vertical red bar in the center of the graph. You can also click and drag left and
