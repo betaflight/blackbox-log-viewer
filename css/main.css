@@ -175,6 +175,7 @@ input.graph-time {
     bottom: 100px;
     left: 0;
     right: 0;
+    display: contents;
 }
 
 .header-pane {
