@@ -254,7 +254,14 @@ var
             "RUNAWAY_TAKEOFF",
             "SDIO",
             "CURRENT_SENSOR",
-            "USB"
+            "USB",
+            "SMARTAUDIO",
+            "RTH",
+            "ITERM_RELAX",
+            "ACRO_TRAINER",
+            "RC_SMOOTHING",
+            "RX_SIGNAL_LOSS",
+            "RC_SMOOTHING_RATE",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
