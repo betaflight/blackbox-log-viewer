@@ -573,7 +573,7 @@ function FlightLog(logData) {
                     destFrame[fieldIndex++] = attitude.pitch;
                     destFrame[fieldIndex++] = attitude.heading;
 
-                    // Add the PIDF sum (P+I+D+F)
+                    // Add the Feedforward PID sum (P+I+D+F)
                     for (var axis = 0; axis < 3; axis++) {
                         destFrame[fieldIndex++] =
                             (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +

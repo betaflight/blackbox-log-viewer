@@ -6,37 +6,37 @@ function FlightLogFieldPresenter() {
 (function() {
     var FRIENDLY_FIELD_NAMES = {
 
-        'axisP[all]': 'PIDF P',
-        'axisP[0]': 'PIDF P [roll]',
-        'axisP[1]': 'PIDF P [pitch]',
-        'axisP[2]': 'PIDF P [yaw]',
+        'axisP[all]': 'PID P',
+        'axisP[0]': 'PID P [roll]',
+        'axisP[1]': 'PID P [pitch]',
+        'axisP[2]': 'PID P [yaw]',
 
-        'axisI[all]': 'PIDF I',
-        'axisI[0]': 'PIDF I [roll]',
-        'axisI[1]': 'PIDF I [pitch]',
-        'axisI[2]': 'PIDF I [yaw]',
+        'axisI[all]': 'PID I',
+        'axisI[0]': 'PID I [roll]',
+        'axisI[1]': 'PID I [pitch]',
+        'axisI[2]': 'PID I [yaw]',
 
-        'axisD[all]': 'PIDF D',
-        'axisD[0]': 'PIDF D [roll]',
-        'axisD[1]': 'PIDF D [pitch]',
-        'axisD[2]': 'PIDF D [yaw]',
+        'axisD[all]': 'PID D',
+        'axisD[0]': 'PID D [roll]',
+        'axisD[1]': 'PID D [pitch]',
+        'axisD[2]': 'PID D [yaw]',
 
-        'axisF[all]': 'PIDF F',
-        'axisF[0]': 'PIDF F [roll]',
-        'axisF[1]': 'PIDF F [pitch]',
-        'axisF[2]': 'PIDF F [yaw]',
-
-        //Virtual field
-        'axisSum[all]': 'PIDF Sum',
-        'axisSum[0]' : 'PIDF Sum [roll]',
-        'axisSum[1]' : 'PIDF Sum [pitch]',
-        'axisSum[2]' : 'PIDF Sum [yaw]',
+        'axisF[all]': 'PID Feedforward',
+        'axisF[0]': 'PID Feedforward [roll]',
+        'axisF[1]': 'PID Feedforward [pitch]',
+        'axisF[2]': 'PID Feedforward [yaw]',
 
         //Virtual field
-        'axisError[all]': 'PIDF Error',
-        'axisError[0]' : 'PIDF Error [roll]',
-        'axisError[1]' : 'PIDF Error [pitch]',
-        'axisError[2]' : 'PIDF Error [yaw]',
+        'axisSum[all]': 'PID Sum',
+        'axisSum[0]' : 'PID Sum [roll]',
+        'axisSum[1]' : 'PID Sum [pitch]',
+        'axisSum[2]' : 'PID Sum [yaw]',
+
+        //Virtual field
+        'axisError[all]': 'PID Error',
+        'axisError[0]' : 'PID Error [roll]',
+        'axisError[1]' : 'PID Error [pitch]',
+        'axisError[2]' : 'PID Error [yaw]',
 
         //Virtual field
         'rcCommands[all]': 'RC Rates',
