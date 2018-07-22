@@ -521,9 +521,9 @@ function FlightLog(logData) {
             sysConfig,
             attitude,
 
-            axisPID = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"]],
-                       [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"]],
-                       [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"]]];
+            axisPID = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"], fieldNameToIndex["axisF[0]"]],
+                       [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"]],
+                       [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"]]];
 
         if (destChunks.length === 0) {
             return;
@@ -573,12 +573,13 @@ function FlightLog(logData) {
                     destFrame[fieldIndex++] = attitude.pitch;
                     destFrame[fieldIndex++] = attitude.heading;
 
-                    // Add the PID sum
+                    // Add the PIDF sum (P+I+D+F)
                     for (var axis = 0; axis < 3; axis++) {
                         destFrame[fieldIndex++] =
                             (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
                             (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
-                            (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0);
+                            (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0) +
+                            (axisPID[axis][3] !== undefined ? srcFrame[axisPID[axis][3]] : 0);
                     }
 
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)

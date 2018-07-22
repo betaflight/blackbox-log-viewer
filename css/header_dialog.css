@@ -265,9 +265,10 @@ input[type="number"]::-webkit-inner-spin-button {
     border-right: 0 solid #ccc;
 }
 
-.header-dialog table td {
+.header-dialog table td,
+.header-dialog .pid_titlebar th {
     padding: 1px;
-    width: 25%;
+    width: 20%;
     border-right: 1px solid #ccc;
 }
 
