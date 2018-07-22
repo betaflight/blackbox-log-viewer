@@ -191,23 +191,23 @@ GraphConfig.load = function(config) {
                 fields: ["rcCommand[all]"]
             },
             {
-                label: "PIDFs",
+                label: "PIDs",
                 fields: ["axisSum[all]"]
             },
             {
-                label: "PIDF Error",
+                label: "PID Error",
                 fields: ["axisError[all]"]
             },             
             {
-                label: "Gyro + PIDF roll",
+                label: "Gyro + PID roll",
                 fields: ["axisP[0]", "axisI[0]", "axisD[0]", "axisF[0]", "gyroADC[0]"]
             },
             {
-                label: "Gyro + PIDF pitch",
+                label: "Gyro + PID pitch",
                 fields: ["axisP[1]", "axisI[1]", "axisD[1]", "axisF[1]", "gyroADC[1]"]
             },
             {
-                label: "Gyro + PIDF yaw",
+                label: "Gyro + PID yaw",
                 fields: ["axisP[2]", "axisI[2]", "axisD[2]", "axisF[2]", "gyroADC[2]"]
             },
             {
