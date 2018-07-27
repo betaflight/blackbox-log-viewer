@@ -439,12 +439,20 @@ function HeaderDialog(dialog, onSave) {
         populatePID('rollPID'					, sysConfig.rollPID);
         populatePID('pitchPID'					, sysConfig.pitchPID);
         populatePID('yawPID'					, sysConfig.yawPID);
-        populatePID('altPID'					, sysConfig.altPID);
-        populatePID('velPID'					, sysConfig.velPID);
-        populatePID('magPID'					, sysConfig.magPID); // this is not an array
-        populatePID('posPID'					, sysConfig.posPID);
-        populatePID('posrPID'					, sysConfig.posrPID);
-        populatePID('navrPID'					, sysConfig.navrPID);
+
+        // Removed since GPS Rescue
+        if (semver.lt(sysConfig.firmwareVersion, "3.4.0")) {
+            populatePID('altPID'                , sysConfig.altPID);
+            populatePID('velPID'                , sysConfig.velPID);
+            populatePID('magPID'                , sysConfig.magPID); // this is not an array
+            populatePID('posPID'                , sysConfig.posPID);
+            populatePID('posrPID'               , sysConfig.posrPID);
+            populatePID('navrPID'               , sysConfig.navrPID);
+        } else {
+            $('#pid_baro').hide();
+            $('#pid_mag').hide();
+            $('#pid_gps').hide();
+        }
 
         populatePID('levelPID'					, sysConfig.levelPID);
 
