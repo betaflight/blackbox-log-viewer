@@ -199,76 +199,84 @@ var FlightLogParser = function(logData) {
         // standard logger.
 
         defaultSysConfigExtension = {
-            thrMid:null,              	    // Throttle Mid Position
-            thrExpo:null,              	    // Throttle Expo
-            tpa_breakpoint:null,            // TPA Breakpoint
-            airmode_activate_throttle:null, // airmode activation level
-            serialrx_provider:null,         // name of the serial rx provider
-            superExpoFactor:null,           // Super Expo Factor
-            rates:[null, null, null],	    // Rates [ROLL, PITCH, YAW]
-            rc_rates:[null, null, null],    // RC Rates [ROLL, PITCH, YAW]
-            rc_expo:[null, null, null],     // RC Expo [ROLL, PITCH, YAW]
-            looptime:null,                  // Looptime
-            gyro_sync_denom:null,           // Gyro Sync Denom
-            pid_process_denom:null,         // PID Process Denom
-            pidController:null,             // Active PID Controller
-            rollPID:[null, null, null],	    // Roll [P, I, D]
-            pitchPID:[null, null, null],	// Pitch[P, I, D]
-            yawPID:[null, null, null],	    // Yaw  [P, I, D]
-            feedforward_transition:null,    // Feedforward transition
-            altPID:[null, null, null],	    // Altitude Hold [P, I, D]
-            posPID:[null, null, null],	    // Position Hold [P, I, D]
-            posrPID:[null, null, null],	    // Position Rate [P, I, D]
-            navrPID:[null, null, null],	    // Nav Rate      [P, I, D]
-            levelPID:[null, null, null],	// Level Mode    [P, I, D]
-            magPID:null,              	    // Magnetometer   P
-            velPID:[null, null, null],	    // Velocity      [P, I, D]
-            yaw_p_limit:null,               // Yaw P Limit
-            yaw_lpf_hz:null,                // Yaw LowPass Filter Hz
-            dterm_average_count:null,       // DTerm Average Count
-            rollPitchItermResetRate:null,   // ITerm Reset rate for Roll and Pitch
-            yawItermResetRate:null,         // ITerm Reset Rate for Yaw
-            dterm_lpf_hz:null,              // DTerm Lowpass Filter Hz
-            dterm_lpf2_hz:null,              // DTerm Lowpass Filter Hz 2
-            dterm_differentiator:null,      // DTerm Differentiator
-            H_sensitivity:null,             // Horizon Sensitivity
-            iterm_reset_offset:null,        // I-Term reset offset
-            deadband:null,                  // Roll, Pitch Deadband
-            yaw_deadband:null,              // Yaw Deadband
-            gyro_lpf:null,                  // Gyro lpf setting.
-            gyro_32khz_hardware_lpf:null,   // Gyro 32khz hardware lpf setting. (post BF3.4)
-            gyro_lowpass_hz:null,           // Gyro Soft Lowpass Filter Hz
-            gyro_lowpass2_hz:null,          // Gyro Soft Lowpass Filter Hz 2
-            gyro_notch_hz:null,             // Gyro Notch Frequency
-            gyro_notch_cutoff:null,         // Gyro Notch Cutoff
-            dterm_notch_hz:null,            // Dterm Notch Frequency
-            dterm_notch_cutoff:null,        // Dterm Notch Cutoff
-            acc_lpf_hz:null,                // Accelerometer Lowpass filter Hz
-            acc_hardware:null,              // Accelerometer Hardware type
-            baro_hardware:null,             // Barometer Hardware type
-            mag_hardware:null,              // Magnetometer Hardware type
-            gyro_cal_on_first_arm:null,     // Gyro Calibrate on first arm
-            vbat_pid_compensation:null,     // VBAT PID compensation
-            rc_smoothing:null,              // RC Control Smoothing
-            rc_interpolation:null, 			// RC Control Interpolation type
-            rc_interpolation_interval:null, // RC Control Interpolation Interval
-            dterm_filter_type:null,         // D term filtering type (PT1, BIQUAD)
-            pidAtMinThrottle:null,          // Stabilisation at zero throttle
-            itermThrottleGain:null,         // Betaflight PID
-            ptermSetpointWeight:null,       // Betaflight PID
-            dtermSetpointWeight:null,       // Betaflight PID
-            yawRateAccelLimit:null,         // Betaflight PID
-            rateAccelLimit:null,            // Betaflight PID
-            gyro_soft_type:null,            // Gyro soft filter type (PT1, BIQUAD)
-            gyro_soft2_type:null,           // Gyro soft filter 2 type (PT1, BIQUAD)
-            debug_mode:null,                // Selected Debug Mode
-            features:null,                  // Activated features (e.g. MOTORSTOP etc)
-            Craft_name:null,                // Craft Name
-            motorOutput:[null,null],        // Minimum and maximum outputs to motor's
-            digitalIdleOffset:null,         // min throttle for d-shot (as a percentage)
-            pidSumLimit:null,               // PID sum limit
-            pidSumLimitYaw:null,            // PID sum limit yaw
-            unknownHeaders : []             // Unknown Extra Headers
+            anti_gravity_gain:null,                 // Anti gravity gain
+            anti_gravity_mode:null,                 // Anti gravity mode
+            anti_gravity_threshold:null,            // Anti gravity threshold for step mode
+            thrMid:null,                            // Throttle Mid Position
+            thrExpo:null,                           // Throttle Expo
+            tpa_breakpoint:null,                    // TPA Breakpoint
+            airmode_activate_throttle:null,         // airmode activation level
+            serialrx_provider:null,                 // name of the serial rx provider
+            superExpoFactor:null,                   // Super Expo Factor
+            rates:[null, null, null],               // Rates [ROLL, PITCH, YAW]
+            rc_rates:[null, null, null],            // RC Rates [ROLL, PITCH, YAW]
+            rc_expo:[null, null, null],             // RC Expo [ROLL, PITCH, YAW]
+            looptime:null,                          // Looptime
+            gyro_sync_denom:null,                   // Gyro Sync Denom
+            pid_process_denom:null,                 // PID Process Denom
+            pidController:null,                     // Active PID Controller
+            rollPID:[null, null, null],             // Roll [P, I, D]
+            pitchPID:[null, null, null],            // Pitch[P, I, D]
+            yawPID:[null, null, null],              // Yaw  [P, I, D]
+            feedforward_transition:null,            // Feedforward transition
+            altPID:[null, null, null],              // Altitude Hold [P, I, D]
+            posPID:[null, null, null],              // Position Hold [P, I, D]
+            posrPID:[null, null, null],             // Position Rate [P, I, D]
+            navrPID:[null, null, null],             // Nav Rate      [P, I, D]
+            levelPID:[null, null, null],            // Level Mode    [P, I, D]
+            magPID:null,                            // Magnetometer   P
+            velPID:[null, null, null],              // Velocity      [P, I, D]
+            yaw_p_limit:null,                       // Yaw P Limit
+            yaw_lpf_hz:null,                        // Yaw LowPass Filter Hz
+            dterm_average_count:null,               // DTerm Average Count
+            rollPitchItermResetRate:null,           // ITerm Reset rate for Roll and Pitch
+            yawItermResetRate:null,                 // ITerm Reset Rate for Yaw
+            dterm_lpf_hz:null,                      // DTerm Lowpass Filter Hz
+            dterm_lpf2_hz:null,                     // DTerm Lowpass Filter Hz 2
+            dterm_differentiator:null,              // DTerm Differentiator
+            H_sensitivity:null,                     // Horizon Sensitivity
+            iterm_reset_offset:null,                // I-Term reset offset
+            deadband:null,                          // Roll, Pitch Deadband
+            yaw_deadband:null,                      // Yaw Deadband
+            gyro_lpf:null,                          // Gyro lpf setting.
+            gyro_32khz_hardware_lpf:null,           // Gyro 32khz hardware lpf setting. (post BF3.4)
+            gyro_lowpass_hz:null,                   // Gyro Soft Lowpass Filter Hz
+            gyro_lowpass2_hz:null,                  // Gyro Soft Lowpass Filter Hz 2
+            gyro_notch_hz:null,                     // Gyro Notch Frequency
+            gyro_notch_cutoff:null,                 // Gyro Notch Cutoff
+            dterm_notch_hz:null,                    // Dterm Notch Frequency
+            dterm_notch_cutoff:null,                // Dterm Notch Cutoff
+            acc_lpf_hz:null,                        // Accelerometer Lowpass filter Hz
+            acc_hardware:null,                      // Accelerometer Hardware type
+            baro_hardware:null,                     // Barometer Hardware type
+            mag_hardware:null,                      // Magnetometer Hardware type
+            gyro_cal_on_first_arm:null,             // Gyro Calibrate on first arm
+            vbat_pid_compensation:null,             // VBAT PID compensation
+            rc_smoothing:null,                      // RC Control Smoothing
+            rc_smoothing_type:null,                 // Type of the RC Smoothing
+            rc_interpolation:null,                  // RC Control Interpolation type
+            rc_interpolation_interval:null,         // RC Control Interpolation Interval
+            rc_smoothing_cutoffs:[null, null],      // RC Smoothing input and derivative cutoff
+            rc_smoothing_filter_type:[null,null],   // RC Smoothing input and derivative type
+            rc_smoothing_rx_average:null,           // RC Smoothing rx average readed in ms
+            rc_smoothing_debug_axis:null,           // Axis recorded in the debug mode of rc_smoothing
+            dterm_filter_type:null,                 // D term filtering type (PT1, BIQUAD)
+            pidAtMinThrottle:null,                  // Stabilisation at zero throttle
+            itermThrottleGain:null,                 // Betaflight PID
+            ptermSetpointWeight:null,               // Betaflight PID
+            dtermSetpointWeight:null,               // Betaflight PID
+            yawRateAccelLimit:null,                 // Betaflight PID
+            rateAccelLimit:null,                    // Betaflight PID
+            gyro_soft_type:null,                    // Gyro soft filter type (PT1, BIQUAD)
+            gyro_soft2_type:null,                   // Gyro soft filter 2 type (PT1, BIQUAD)
+            debug_mode:null,                        // Selected Debug Mode
+            features:null,                          // Activated features (e.g. MOTORSTOP etc)
+            Craft_name:null,                        // Craft Name
+            motorOutput:[null,null],                // Minimum and maximum outputs to motor's
+            digitalIdleOffset:null,                 // min throttle for d-shot (as a percentage)
+            pidSumLimit:null,                       // PID sum limit
+            pidSumLimitYaw:null,                    // PID sum limit yaw
+            unknownHeaders : []                     // Unknown Extra Headers
         },
 
         // Translation of the field values name to the sysConfig var where it must be stored
@@ -527,6 +535,9 @@ var FlightLogParser = function(logData) {
             case "gyro_cal_on_first_arm":
             case "vbat_pid_compensation":
             case "rc_smoothing":
+            case "rc_smoothing_type":
+            case "rc_smoothing_debug_axis":
+            case "rc_smoothing_rx_average":
             case "superExpoYawMode":
             case "features":
             case "dynamic_pid":
@@ -551,6 +562,7 @@ var FlightLogParser = function(logData) {
             case "gyro_soft_type":
             case "gyro_soft2_type":
             case "debug_mode":
+            case "anti_gravity_mode":
             case "anti_gravity_gain":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
@@ -640,6 +652,8 @@ var FlightLogParser = function(logData) {
             case "levelPID":
             case "velPID":
             case "motorOutput":
+            case "rc_smoothing_cutoffs":
+            case "rc_smoothing_filter_type":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
             case "magPID":
