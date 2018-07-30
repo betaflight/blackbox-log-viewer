@@ -234,7 +234,7 @@ function FlightLogFieldPresenter() {
                             'debug[0]':'Center Freq [roll]',
                             'debug[1]':'Center Freq [pitch]',
                             'debug[2]':'Center Freq [yaw]',
-                            'debug[3]':'Not used',
+                            'debug[3]':'Gyro Raw [roll]',
             },
             'GYRO_RAW' :   {
                             'debug[all]':'Debug Gyro Raw', 
@@ -485,7 +485,12 @@ function FlightLogFieldPresenter() {
                 case 'FFT_TIME':
                     return value.toFixed(0) + "\u03BCS";
                 case 'FFT_FREQ':
-                    return value.toFixed(0) + "Hz";
+                    switch (fieldName) {
+                    case 'debug[3]':
+                        return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                    default:
+                        return value.toFixed(0) + "Hz";
+                    }
                 default:
 					return value.toFixed(0);
 			}	
