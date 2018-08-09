@@ -65,7 +65,15 @@ function HeaderDialog(dialog, onSave) {
             {name:'itermWindupPointPercent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
             {name:'pidSumLimit'        			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
             {name:'pidSumLimitYaw'     			, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
-            {name:'feedforward_transition'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'}
+            {name:'rc_smoothing_type'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
+            {name:'feedforward_transition'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'antiGravityMode'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'rc_smoothing_cutoffs_1'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'rc_smoothing_cutoffs_2'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'rc_smoothing_filter_type_1'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'rc_smoothing_filter_type_1'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'rc_smoothing_rx_average'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'rc_smoothing_debug_axis'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -539,8 +547,28 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
 		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
 
-    	renderSelect('rc_interpolation'		    ,sysConfig.rc_interpolation, RC_INTERPOLATION);
-        setParameter('rc_interpolation_interval',sysConfig.rc_interpolation_interval,0);
+        renderSelect('rc_smoothing_type'          ,sysConfig.rc_smoothing_type, RC_SMOOTHING_TYPE);
+        renderSelect('rc_interpolation'           ,sysConfig.rc_interpolation, RC_INTERPOLATION);
+        setParameter('rc_interpolation_interval'  ,sysConfig.rc_interpolation_interval,0);
+        setParameter('rc_smoothing_cutoffs_1'     ,sysConfig.rc_smoothing_cutoffs[0], 0);
+        setParameter('rc_smoothing_cutoffs_2'     ,sysConfig.rc_smoothing_cutoffs[1], 0);
+        renderSelect('rc_smoothing_filter_type_1' ,sysConfig.rc_smoothing_filter_type[0], RC_SMOOTHING_INPUT_TYPE);
+        renderSelect('rc_smoothing_filter_type_2' ,sysConfig.rc_smoothing_filter_type[1], RC_SMOOTHING_DERIVATIVE_TYPE);
+        setParameter('rc_smoothing_rx_average'    ,sysConfig.rc_smoothing_rx_average, 3);
+        renderSelect('rc_smoothing_debug_axis'    ,sysConfig.rc_smoothing_filter_type[1], RC_SMOOTHING_DEBUG_AXIS);
+
+        if (sysConfig.rc_smoothing_type === RC_SMOOTHING_TYPE.indexOf('FILTER')) {
+            $('.parameter td[name="rc_interpolation"]').css('display', 'none');
+            $('.parameter td[name="rc_interpolation_interval"]').css('display', 'none');
+        } else {
+            $('.parameter td[name="rc_smoothing_type"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_cutoffs_1"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_cutoffs_2"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_filter_type_1"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_filter_type_2"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_rx_average"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_debug_axis"]').css('display', 'none');
+        }
     	renderSelect('unsynced_fast_pwm'		,sysConfig.unsynced_fast_pwm, MOTOR_SYNC);
     	renderSelect('fast_pwm_protocol'		,sysConfig.fast_pwm_protocol, FAST_PROTOCOL);
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);
@@ -561,6 +589,7 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('motorOutputLow'			,sysConfig.motorOutput[0],0);
 		setParameter('motorOutputHigh'			,sysConfig.motorOutput[1],0);
 		setParameter('digitalIdleOffset'		,sysConfig.digitalIdleOffset,2);
+        renderSelect('antiGravityMode'          ,sysConfig.anti_gravity_mode, ANTI_GRAVITY_MODE);
         if((activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) ||
                 (activeSysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '2.0.0'))) {
             setParameter('antiGravityGain'      ,sysConfig.anti_gravity_gain,3);
@@ -568,6 +597,9 @@ function HeaderDialog(dialog, onSave) {
             setParameter('antiGravityGain'      ,sysConfig.anti_gravity_gain,0);
         }
         setParameter('antiGravityThreshold'     ,sysConfig.anti_gravity_threshold,0);
+        if (sysConfig.anti_gravity_mode === ANTI_GRAVITY_MODE.indexOf('SMOOTH')) {
+            $('.parameter td[name="antiGravityThreshold"]').css('display', 'none');
+        }
 		setParameter('setpointRelaxRatio'		,sysConfig.setpointRelaxRatio,2);
 		setParameter('pidSumLimit'     			,sysConfig.pidSumLimit,0);
         setParameter('pidSumLimitYaw'			,sysConfig.pidSumLimitYaw,0);

@@ -900,6 +900,12 @@
                                     <table class="parameter cf">
                                         <tbody>
                                             <tr>
+                                                <td name="antiGravityMode" class="bf-only">
+                                                    <label>AG Mode</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
                                                 <td name="antiGravityGain" class="bf-only">
                                                     <label>AG Gain</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
@@ -1385,15 +1391,58 @@
                                         <table class="parameter cf">
                                             <tbody>
                                                 <tr>
+                                                    <th colspan="5">RC Smoothing</th>
+                                                </tr>
+                                                <tr>
+                                                    <td name='rc_smoothing_type'>
+                                                        <label>Type</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
                                                     <td name='rc_interpolation'>
-                                                        <label>RC Interpolation</label>
+                                                        <label>Interpolation</label>
                                                         <select>
                                                             <!-- list generated here -->
                                                         </select>
                                                     </td>
                                                     <td name="rc_interpolation_interval">
-                                                        <label>RC Interval (ms)</label>
+                                                        <label>Interval (ms)</label>
                                                         <input type="number" step="0.01" min="0" max="999.00" />
+                                                    </td>
+                                                    <td name="rc_smoothing_cutoffs_1">
+                                                        <label>Input Hz</label>
+                                                        <input type="number" step="1" min="0" max="255" />
+                                                    </td>
+                                                    <td name="rc_smoothing_cutoffs_2">
+                                                        <label>Derivative Hz</label>
+                                                        <input type="number" step="1" min="0" max="255" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td name="rc_smoothing_rx_average">
+                                                        <label>RX Average (ms)</label>
+                                                        <input type="number" step="0.1" min="0"/>
+                                                    </td>
+                                                    <td name='rc_smoothing_filter_type_1'>
+                                                        <label>Input Type</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
+                                                    <td name='rc_smoothing_filter_type_2'>
+                                                        <label>Derivative Type</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td name='rc_smoothing_debug_axis'>
+                                                        <label>Debug Axis</label>
+                                                        <select>
+                                                            <!-- list generated here -->
+                                                        </select>
                                                     </td>
                                                 </tr>
                                             </tbody>

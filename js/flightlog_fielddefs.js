@@ -200,6 +200,34 @@ var
 			"JETIEXBUS"
     ]),
 
+    ANTI_GRAVITY_MODE = makeReadOnly([
+        "SMOOTH",
+        "STEP"
+    ]),
+
+    RC_SMOOTHING_TYPE = makeReadOnly([
+        "INTERPOLATION", 
+        "FILTER"
+    ]),
+
+    RC_SMOOTHING_INPUT_TYPE = makeReadOnly([
+        "PT1", 
+        "BIQUAD"
+    ]),
+
+    RC_SMOOTHING_DERIVATIVE_TYPE = makeReadOnly([
+        "OFF", 
+        "PT1", 
+        "BIQUAD"
+    ]),
+
+    RC_SMOOTHING_DEBUG_AXIS = makeReadOnly([
+        "ROLL", 
+        "PITCH", 
+        "YAW", 
+        "THROTTLE"
+    ]),
+
     RC_INTERPOLATION = makeReadOnly([
             "OFF",
             "DEFAULT",
