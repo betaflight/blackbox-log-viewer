@@ -387,18 +387,22 @@ try {
 
     this.destroy = function() {
         $(analyserCanvas).off("mousemove", trackFrequency);
+        $(analyserCanvas).off("touchmove", trackFrequency);
     };
 
     this.refresh = function() {
     	draw();
     };
 
-	/* Add mouse over event to read the frequency */
-	$(analyserCanvas).on('mousemove', function (e) {
-		trackFrequency(e, that);
-	});
+    /* Add mouse/touch over event to read the frequency */
+    $(analyserCanvas).on('mousemove', function (e) {
+        trackFrequency(e, that);
+    });
+    $(analyserCanvas).on('touchmove', function (e) {
+        trackFrequency(e, that);
+    });
 
-	/* add zoom controls */
+    /* add zoom controls */
     analyserZoomXElem.on('input',
 		function () {
 		analyserZoomX = (analyserZoomXElem.val() / 100);
