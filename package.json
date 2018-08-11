@@ -2,7 +2,7 @@
   "name": "betaflight-blackbox-explorer",
   "displayName": "Betaflight - Blackbox Explorer",
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "main": "main_nwjs.html",
   "bg-script": "background.js",
   "default_locale": "en",
