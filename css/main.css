@@ -79,6 +79,74 @@ a.disabled {
     }
 }
 
+@media (max-width: 600px) {
+    .container-fluid.main-pane,
+    html.has-log div.log-seek-bar {
+        padding-left:0;
+        padding-right:0;
+    }
+
+    .container-fluid.main-pane .graph-row {
+        width:100%;
+    }
+
+    div.log-graph-config{
+        padding: 1em 0;
+        line-height: 1.1;8
+    }
+
+    div.log-graph-config h2 {
+        margin: 0;
+        display: none;
+    }
+
+    div.log-graph-config h3 {
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+        font-size: 115%;
+    }
+
+    div.log-index div.form-control-static {
+        min-height: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
+    button.btn {
+        padding: 3px 6px;
+        font-size: 12px;
+    }
+
+    ul.video-top-controls {
+        height: 30px;
+        padding-top: 5px;
+    }
+
+    div.graph-row {
+        top: 10px!important;
+    }
+
+    div.navbar-logo .log-filename {
+        font-size: 12px;
+    }
+
+    div.navbar-logo img {
+        height: 25px;
+    }
+
+    div.navbar-logo span {
+        top: 25px;
+        line-height: 1.5;
+    }
+
+    html.has-log button.log-jump-start,
+    html.has-log button.log-jump-back,
+    html.has-log button.log-jump-forward,
+    html.has-log button.log-jump-end {
+        display:none;
+    }
+}
+
 @media (min-width: 970px) {
     html.has-video .view-buttons {
         display: none!important;
@@ -598,6 +666,7 @@ html.has-config .configuration-list {
     overflow:hidden;
     overflow-y:scroll;
     margin-top: 5px;
+    min-width:13em;
 }
 
 .graph-legend-field {
