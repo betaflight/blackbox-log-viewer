@@ -102,11 +102,23 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         
         if (that.onSeek) {
             //Reverse the seek direction so that it looks like you're dragging the data with the mouse
-            that.onSeek((lastMouseX - e.pageX) / canvas.width * windowWidthMicros); 
+            that.onSeek((lastMouseX - e.pageX) / canvas.width * windowWidthMicros);
         }
         
         lastMouseX = e.pageX;
         lastMouseY = e.pageY;
+    }
+
+    function onTouchMove(e) {
+        e.preventDefault();
+        
+        if (that.onSeek) {
+            //Reverse the seek direction so that it looks like you're dragging the data
+            that.onSeek((lastMouseX - e.originalEvent.touches[0].pageX) / canvas.width * windowWidthMicros);
+        }
+        
+        lastMouseX = e.originalEvent.touches[0].pageX;
+        lastMouseY = e.originalEvent.touches[0].pageY;
     }
     
     function onMouseDown(e) {
@@ -125,6 +137,24 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             e.preventDefault();
         }
     }
+    
+    function onTouchStart(e) {
+        if (e.which == 0) {
+            lastMouseX = e.originalEvent.touches[0].pageX;
+            lastMouseY = e.originalEvent.touches[0].pageY;
+            
+            //"capture" so we can drag outside the boundaries of canvas
+            $(document).on("touchmove", onTouchMove);
+            
+            //Release the capture when released
+            $(document).one("touchend", function () {
+                $(document).off("touchmove", onTouchMove);
+            });
+            
+            e.preventDefault();
+        }
+    }
+
     
     function identifyFields() {
         var 
@@ -941,6 +971,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         $(canvas).off("mousedown", onMouseDown);
     };
     
+    this.destroy = function() {
+        $(canvas).off("touchstart", onTouchStart);
+    };
+    
     this.setGraphZoom = function(zoom) {
         windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
     };
@@ -1016,7 +1050,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 	lapTimer = new LapTimer();
 
     //Handle dragging events
-    $(canvas).on("mousedown",onMouseDown);
+    $(canvas).on("mousedown", onMouseDown);
+    $(canvas).on("touchstart", onTouchStart);
     
     graphConfig.addListener(this.refreshGraphConfig);
     this.refreshGraphConfig();
