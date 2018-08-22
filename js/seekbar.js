@@ -91,6 +91,33 @@ function SeekBar(canvas) {
         }
     });
     
+    function onTouchMove(e) {
+        if (e.which == 0)
+            seekToDOMPixel(e.originalEvent.touches[0].pageX - $(canvas).offset().left);
+    }
+    
+    function onTouchStart(e) {
+        e.preventDefault();
+
+        if (e.which == 0) { //touch only for seeking
+            seekToDOMPixel(e.originalEvent.touches[0].pageX - $(this).offset().left);
+            
+            //"capture" so we can drag outside the boundaries of the seek bar
+            $("body").on("touchmove", onTouchMove);
+            
+            //Release the capture when touch ends
+            $("body").one("touchend", function () {
+                $("body").off("touchmove", onTouchMove);
+            });
+        }
+    }
+    
+    $(canvas).on("touchstart", onTouchStart);
+    
+    this.destroy = function() {
+        $(canvas).off("touchstart", onTouchStart);
+    };
+
     this.resize = function(width, height) {
         var ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
         
