@@ -368,10 +368,10 @@ function FlightLog(logData) {
                     var
                         destFrame;
 
-                    switch (frameType) {
-                        case 'P':
-                        case 'I':
-                            if (frameValid) {
+                    if (frameValid) {
+                        switch (frameType) {
+                            case 'P':
+                            case 'I':
 
                                 //The parser re-uses the "frame" array so we must copy that data somewhere else
 
@@ -404,40 +404,40 @@ function FlightLog(logData) {
                                 eventNeedsTimestamp.length = 0;
 
                                 mainFrameIndex++;
-                            } else {
-                                chunk.gapStartsHere[mainFrameIndex - 1] = true;
-                            }
 
-                        break;
-                        case 'E':
-                            if (frame.event == FlightLogEvent.LOGGING_RESUME) {
-                                chunk.gapStartsHere[mainFrameIndex - 1] = true;
-                            }
+                            break;
+                            case 'E':
+                                if (frame.event == FlightLogEvent.LOGGING_RESUME) {
+                                    chunk.gapStartsHere[mainFrameIndex - 1] = true;
+                                }
 
-                            /*
-                             * If the event was logged during a loop iteration, it will appear in the log
-                             * before that loop iteration does (since the main log stream is logged at the very
-                             * end of the loop).
-                             *
-                             * So we want to use the timestamp of that later frame as the timestamp of the loop
-                             * iteration this event was logged in.
-                             */
-                            if (!frame.time) {
-                                eventNeedsTimestamp.push(frame);
-                            }
-                            chunk.events.push(frame);
-                        break;
-                        case 'S':
-                            for (var i = 0; i < frame.length; i++) {
-                                lastSlow[i] = frame[i];
-                            }
-                        break;
-                        case 'H':
-                        case 'G':
-                            // TODO pending to do something with GPS frames
-                            // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
-                            // But other data from the G frame can be valid (time, num sats)
-                        break;
+                                /*
+                                * If the event was logged during a loop iteration, it will appear in the log
+                                * before that loop iteration does (since the main log stream is logged at the very
+                                * end of the loop).
+                                *
+                                * So we want to use the timestamp of that later frame as the timestamp of the loop
+                                * iteration this event was logged in.
+                                */
+                                if (!frame.time) {
+                                    eventNeedsTimestamp.push(frame);
+                                }
+                                chunk.events.push(frame);
+                            break;
+                            case 'S':
+                                for (var i = 0; i < frame.length; i++) {
+                                    lastSlow[i] = frame[i];
+                                }
+                            break;
+                            case 'H':
+                            case 'G':
+                                // TODO pending to do something with GPS frames
+                                // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
+                                // But other data from the G frame can be valid (time, num sats)
+                            break;
+                        }
+                    } else {
+                        chunk.gapStartsHere[mainFrameIndex - 1] = true;
                     }
                 };
 
