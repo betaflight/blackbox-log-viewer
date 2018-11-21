@@ -57,10 +57,10 @@ function FlightLogFieldPresenter() {
         'gyroADC[2]': 'Gyro [yaw]',
 
         //Virtual field
-        'gyroADCs[all]': 'Gyros Scaled',
-        'gyroADCs[0]': 'Gyro Scaled [roll]',
-        'gyroADCs[1]': 'Gyro Scaled [pitch]',
-        'gyroADCs[2]': 'Gyro Scaled [yaw]',
+        'gyroADCs[all]': 'Gyros ADC Scaled',
+        'gyroADCs[0]': 'Gyro ADC Scaled [roll]',
+        'gyroADCs[1]': 'Gyro ADC Scaled [pitch]',
+        'gyroADCs[2]': 'Gyro ADC Scaled [yaw]',
 
         //End-users prefer 1-based indexing
         'motor[all]': 'Motors',
