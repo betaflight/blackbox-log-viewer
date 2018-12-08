@@ -11,7 +11,7 @@
  */
 function FlightLog(logData) {
     var
-        ADDITIONAL_COMPUTED_FIELD_COUNT = 16, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GYROADC_SCALED **/
+        ADDITIONAL_COMPUTED_FIELD_COUNT = 15, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/
 
         that = this,
         logIndex = false,
@@ -226,7 +226,6 @@ function FlightLog(logData) {
         fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
         fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
-        fieldNames.push("gyroADCs[0]", "gyroADCs[1]", "gyroADCs[2]"); // Custom calculated gyro deg/sec
         fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
 
         fieldNameToIndex = {};
@@ -600,16 +599,10 @@ function FlightLog(logData) {
                         }
                     }
 
-                    // Calculate the scaled Gyro ADC
-                    var fieldIndexGyroADCs = fieldIndex;
-                    for (var axis = 0; axis < 3; axis++) {
-                        destFrame[fieldIndex++] =
-                            (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
-                    }
-
                     // Calculate the PID Error
                     for (var axis = 0; axis < 3; axis++) {
-                        destFrame[fieldIndex++] = destFrame[fieldIndexGyroADCs + axis] - destFrame[fieldIndexRcCommands + axis];
+                        let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
+                        destFrame[fieldIndex++] = gyroADCdegrees - destFrame[fieldIndexRcCommands + axis];
                     }
 
                 }
