@@ -273,7 +273,7 @@ function FlightLogFieldPresenter() {
     FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(flags, lastFlags, flagNames) {
         var eventState = '';
         var found = false;        
-        for(var i=0; i<=31; i++) {
+        for(var i = 0; i < flagNames.length; i++) {
            if((1<<i) & (flags ^ lastFlags)) { // State Changed
                eventState += '|' + flagNames[i] + ' ' + (((1<<i) & flags)?'ON':'OFF')
                found = true;
