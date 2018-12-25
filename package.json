@@ -23,25 +23,25 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
-    "command-exists": "^1.2.7",
+    "command-exists": "^1.2.8",
     "del": "^3.0.0",
     "gulp": "~4.0.0",
     "gulp-concat": "~2.6.1",
     "gulp-debian": "~0.1.8",
     "gulp-install": "^1.1.0",
-    "gulp-rename": "~1.2.2",
+    "gulp-rename": "^1.4.0",
     "gulp-zip": "^4.1.0",
     "inflection": "1.12.0",
     "jquery-ui-npm": "1.12.0",
-    "makensis": "^0.9.0",
-    "nw-builder": "^3.5.4",
+    "makensis": "^0.16.3",
+    "nw-builder": "^3.5.6",
     "os": "^0.1.1",
     "platform-dependent-modules": "0.0.14",
     "rpm-builder": "^0.7.0",
-    "temp": "^0.8.3"
+    "temp": "^0.9.0"
   },
   "config": {
     "platformDependentModules": {
