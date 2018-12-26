@@ -26,7 +26,7 @@ const DEBUG_DIR = './debug/';
 const RELEASE_DIR = './release/';
 
 var nwBuilderOptions = {
-    version: '0.32.2',
+    version: '0.35.3',
     files: './dist/**/*',
     macIcns: './images/bf_icon.icns',
     macPlist: { 'CFBundleDisplayName': 'Betaflight Blackbox Explorer'},
