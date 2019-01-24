@@ -39,11 +39,11 @@ function FlightLogFieldPresenter() {
         'axisError[2]' : 'PID Error [yaw]',
 
         //Virtual field
-        'rcCommands[all]': 'RC Rates',
-        'rcCommands[0]' : 'RC Rate [roll]',
-        'rcCommands[1]' : 'RC Rate [pitch]',
-        'rcCommands[2]' : 'RC Rate [yaw]',
-        'rcCommands[3]' : 'RC Rate [throttle]',
+        'rcCommands[all]': 'Setpoints',
+        'rcCommands[0]' : 'Setpoint [roll]',
+        'rcCommands[1]' : 'Setpoint [pitch]',
+        'rcCommands[2]' : 'Setpoint [yaw]',
+        'rcCommands[3]' : 'Setpoint [throttle]',
 
         'rcCommand[all]': 'RC Commands',
         'rcCommand[0]': 'RC Command [roll]',
@@ -342,7 +342,7 @@ function FlightLogFieldPresenter() {
             case 'rcCommands[2]':
                 return value.toFixed(0) + " deg/s";
             case 'rcCommands[3]':
-                return value.toFixed(0) + "%";
+                return value.toFixed(1) + "%";
 
             case 'axisSum[0]':
             case 'axisSum[1]':

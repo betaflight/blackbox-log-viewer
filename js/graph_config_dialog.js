@@ -3,7 +3,7 @@
 function GraphConfigurationDialog(dialog, onSave) {
     var
         // Some fields it doesn't make sense to graph
-        BLACKLISTED_FIELDS = {time:true, loopIteration:true, 'setpointRate[0]':true, 'setpointRate[1]':true, 'setpointRate[2]':true, 'setpointRate[3]':true},
+        BLACKLISTED_FIELDS = {time:true, loopIteration:true, 'setpoint[0]':true, 'setpoint[1]':true, 'setpoint[2]':true, 'setpoint[3]':true},
         offeredFieldNames = [],
         exampleGraphs = [],
         activeFlightLog;

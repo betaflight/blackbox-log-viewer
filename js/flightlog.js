@@ -515,7 +515,7 @@ function FlightLog(logData) {
             accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]],
             magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
             rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]],
-            setpointRate = [fieldNameToIndex["setpointRate[0]"], fieldNameToIndex["setpointRate[1]"], fieldNameToIndex["setpointRate[2]"], fieldNameToIndex["setpointRate[3]"]],
+            setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]],
 
             flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"], // This points to the flightmode data
 
@@ -588,20 +588,27 @@ function FlightLog(logData) {
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
                     var currentFlightMode = srcFrame[flightModeFlagsIndex];
 
-                    // Calculate the Scaled rcCommand (RC Rate)(in deg/s, % for throttle)
+                    // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)                    
                     var fieldIndexRcCommands = fieldIndex;
                     for (var axis = 0; axis < 4; axis++) {
-                        if (axis <= AXIS.YAW) {
-                            // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
-                            if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
-                                destFrame[fieldIndex++] = srcFrame[setpointRate[axis]];
+
+                        // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.                        
+                        if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
+                            if (axis <= AXIS.YAW) {
+                                destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
                             } else {
+                                destFrame[fieldIndex++] = srcFrame[setpoint[axis]]/10;
+                            }
+
+                        // Versions earlier to 4.0 we must calculate the expected setpoint
+                        } else {
+                            if (axis <= AXIS.YAW) {
                                 destFrame[fieldIndex++] =
                                     (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
+                            } else {
+                                destFrame[fieldIndex++] =
+                                    (rcCommand[axis] !== undefined ? that.rcCommandRawToThrottle(srcFrame[rcCommand[axis]]) : 0);
                             }
-                        } else {
-                            destFrame[fieldIndex++] =
-                                (rcCommand[axis] !== undefined ? that.rcCommandRawToThrottle(srcFrame[rcCommand[axis]]) : 0);
                         }
                     }
 
