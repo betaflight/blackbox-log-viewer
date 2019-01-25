@@ -590,26 +590,26 @@ function FlightLog(logData) {
 
                     // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)                    
                     var fieldIndexRcCommands = fieldIndex;
-                    for (var axis = 0; axis < 4; axis++) {
 
-                        // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.                        
-                        if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
-                            if (axis <= AXIS.YAW) {
-                                destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
-                            } else {
-                                destFrame[fieldIndex++] = srcFrame[setpoint[axis]]/10;
-                            }
+                    // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.                        
+                    if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
+                        // Roll, pitch and yaw
+                        for (var axis = 0; axis <= AXIS.YAW; axis++) {                            
+                            destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
+                        } 
+                        // Throttle
+                        destFrame[fieldIndex++] = srcFrame[setpoint[AXIS.YAW + 1]]/10;
 
-                        // Versions earlier to 4.0 we must calculate the expected setpoint
-                        } else {
-                            if (axis <= AXIS.YAW) {
-                                destFrame[fieldIndex++] =
-                                    (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
-                            } else {
-                                destFrame[fieldIndex++] =
-                                    (rcCommand[axis] !== undefined ? that.rcCommandRawToThrottle(srcFrame[rcCommand[axis]]) : 0);
-                            }
-                        }
+                    // Versions earlier to 4.0 we must calculate the expected setpoint
+                    } else {
+                        // Roll, pitch and yaw
+                        for (var axis = 0; axis <= AXIS.YAW; axis++) {
+                            destFrame[fieldIndex++] =
+                                (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
+                        } 
+                        // Throttle
+                        destFrame[fieldIndex++] =
+                            (rcCommand[AXIS.YAW + 1] !== undefined ? that.rcCommandRawToThrottle(srcFrame[rcCommand[AXIS.YAW + 1]]) : 0);
                     }
 
                     // Calculate the PID Error
