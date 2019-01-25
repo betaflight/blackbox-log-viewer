@@ -588,13 +588,13 @@ function FlightLog(logData) {
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
                     var currentFlightMode = srcFrame[flightModeFlagsIndex];
 
-                    // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)                    
+                    // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
                     var fieldIndexRcCommands = fieldIndex;
 
-                    // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.                        
+                    // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
                     if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
                         // Roll, pitch and yaw
-                        for (var axis = 0; axis <= AXIS.YAW; axis++) {                            
+                        for (var axis = 0; axis <= AXIS.YAW; axis++) {
                             destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
                         } 
                         // Throttle
