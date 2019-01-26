@@ -1092,7 +1092,13 @@ var FlightLogParser = function(logData) {
                  * save space for positive values). So we need to convert those very large unsigned values into their
                  * corresponding 32-bit signed values.
                  */
-                value = (value | 0) + that.sysConfig.minthrottle;
+                if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '4.0.0')) ||
+                   (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.6.0'))) {
+                    // the value ranges from 0-1000 in the log data
+                    value = (value | 0) + 1000;
+                } else {
+                    value = (value | 0) + that.sysConfig.minthrottle;
+                }
             break;
             case FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR:
                 /*
