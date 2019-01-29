@@ -266,7 +266,7 @@ var
             "FFT",
             "FFT_TIME",
             "FFT_FREQ",
-            "FRSKY_D_RX",
+            "RX_FRSKY_SPI",
             "GYRO_RAW",
             "DUAL_GYRO",
             "DUAL_GYRO_RAW",
@@ -276,9 +276,10 @@ var
             "MAX7456_SPICLOCK",
             "SBUS",
             "FPORT",
+            "RANGEFINDER",
             "RANGEFINDER_QUALITY",
             "LIDAR_TF",
-            "CORE_TEMP",
+            "ADC_INTERNAL",
             "RUNAWAY_TAKEOFF",
             "SDIO",
             "CURRENT_SENSOR",
@@ -290,6 +291,12 @@ var
             "RC_SMOOTHING",
             "RX_SIGNAL_LOSS",
             "RC_SMOOTHING_RATE",
+            "ANTI_GRAVITY",
+            "DYN_LPF",
+            "RX_SPECTRUM_SPI",
+            "DSHOT_RPM_TELEMETRY",
+            "RPM_FILTER",
+            "D_CUT",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
@@ -382,6 +389,9 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         if(semver.gte(firmwareVersion, '3.4.0')) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('GYRO'),     1, 'GYRO_FILTERED');
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('NOTCH'),    1, 'GYRO_SCALED');
+        }
+        if(semver.gte(firmwareVersion, '4.0.0')) {
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('RX_FRSKY_SPI'), 0, 'GYRO_RAW');
         }
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
