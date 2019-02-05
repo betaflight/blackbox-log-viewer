@@ -31,6 +31,9 @@ BrandingText "${COMPANY_NAME}"
 !define MUI_ICON              ".\bf_installer_icon.ico"
 !define MUI_UNICON            ".\bf_uninstaller_icon.ico"
 
+#Define uninstall file list name
+!define FinalUninstName "uninbf00"
+
 # define the resulting installer's name:
 OutFile "..\..\${DEST_FOLDER}\${FILE_NAME_INSTALLER}"
 
@@ -93,13 +96,24 @@ FunctionEnd
 # default section start
 Section
 
+    # delete the installed files of the older version 
+
+    #Versions older than 3.2.0 had a bug in the name of the uninst file
+    Var /GLOBAL RealUninstName
+
+    ${If} ${FileExists} "$INSTDIR\${FinalUninstName}.dat"
+        StrCpy $RealUninstName "${FinalUninstName}"
+    ${Else}
+        StrCpy $RealUninstName "${U+24}{UninstName}"
+    ${EndIf}
+
     # remove the older version, users with admin rights
     ReadRegStr $R3 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" \
             "InstallLocation"
 
     ${If} $R3 != ""
         # delete the installed files of the older version
-        !insertmacro INST_DELETE $R3 "${UninstName}"
+        !insertmacro INST_DELETE $R3 "$RealUninstName"
 
         # remove installation folder if empty
         RMDir "$R3"
@@ -111,7 +125,7 @@ Section
 
         ${If} $R4 != ""
             # delete the installed files of the older version
-            !insertmacro INST_DELETE $R4 "${UninstName}"
+            !insertmacro INST_DELETE $R4 "$RealUninstName"
 
             # remove installation folder if empty
             RMDir "$R4"
@@ -125,6 +139,9 @@ Section
     # define the path to which the installer should install
     SetOutPath $INSTDIR
 
+    # name of the uninstaller list file
+    !insertmacro UNINST_NAME ${FinalUninstName}
+    
     # create an exclusion list for the uninstaller
     !insertmacro UNINSTALLER_DATA_BEGIN
 
