@@ -1116,7 +1116,9 @@ FlightLog.prototype.getPIDPercentage = function(value) {
 
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
-    if((this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
+    if(this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '4.0.0')) {
+        return this.getSysConfig().vbatref * 10;
+    } else if((this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
        (this.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(this.getSysConfig().firmwareVersion, '2.0.0'))) {
         return this.getSysConfig().vbatref * 100;
     } else {
