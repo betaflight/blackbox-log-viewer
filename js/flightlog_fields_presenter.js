@@ -237,6 +237,20 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Gyro Raw [Z]',
                             'debug[3]':'Not Used',
                         },
+            'ESC_SENSOR_RPM' :   {
+                            'debug[all]':'ESC RPM', 
+                            'debug[0]':'ESC RPM [1]',
+                            'debug[1]':'ESC RPM [2]',
+                            'debug[2]':'ESC RPM [3]',
+                            'debug[3]':'ESC RPM [4]',
+                        },
+            'DSHOT_RPM_TELEMETRY' :   {
+                            'debug[all]':'DSHOT RPM', 
+                            'debug[0]':'DSHOT RPM [1]',
+                            'debug[1]':'DSHOT RPM [2]',
+                            'debug[2]':'DSHOT RPM [3]',
+                            'debug[3]':'DSHOT RPM [4]',
+                        },
             };
     
     function presentFlags(flags, flagNames) {
