@@ -109,14 +109,14 @@ function GraphConfig(graphConfig) {
                         if (logFieldNames[k].match(nameRegex)) {
                             // add special condition for rcCommands as each of the fields requires a different scaling.
                             let forceNewCurve = (nameRoot=='rcCommand') || (nameRoot=='rcCommands');
-                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k]}), colorIndexOffset, forceNewCurve));
+                            newGraph.fields.push(adaptField($.extend({}, field, {name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
                             colorIndexOffset++;
                         }
                     }
                 } else {
                     // Don't add fields if they don't exist in this log
                     if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
-                        newGraph.fields.push(adaptField($.extend({}, field)));
+                        newGraph.fields.push(adaptField($.extend({}, field, {friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(field.name, flightLog.getSysConfig().debug_mode)})));
                     }
                 }
             }

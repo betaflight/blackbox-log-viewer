@@ -34,7 +34,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                 li.append(valueElem);
                 li.append(settingsElem);
 
-                nameElem.text(FlightLogFieldPresenter.fieldNameToFriendly(field.name));
+                nameElem.text(field.friendlyName);
                 settingsElem.text(" ");
                 settingsElem.css('background', field.color);
                 fieldList.append(li);
@@ -72,7 +72,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                selectedFieldIndex    = $(this).attr('field');
 
            if(!e.altKey) {
-               config.selectedFieldName     = FlightLogFieldPresenter.fieldNameToFriendly($(this).attr('name'));
+               config.selectedFieldName     = config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex].friendlyName;
                config.selectedGraphIndex    = selectedGraphIndex;
                config.selectedFieldIndex    = selectedFieldIndex;
                if (onNewSelectionChange) {
