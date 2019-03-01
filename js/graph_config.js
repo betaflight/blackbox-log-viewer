@@ -244,6 +244,45 @@ GraphConfig.load = function(config) {
                             flightLog.rcCommandRawToDegreesPerSecond(500,1) * scale, 
                             flightLog.rcCommandRawToDegreesPerSecond(500,2) * scale);
         }
+        
+        var getCurveForMinMaxFields = function(fieldNames) {
+            // helper to make a curve scale based on the combined min/max of one or more fields
+            
+            var
+                stats = flightLog.getStats(),
+                min = Number.MAX_VALUE,
+                max = Number.MIN_VALUE;
+            
+            if(typeof(fieldNames) == 'string')
+                fieldNames = [fieldNames];
+            
+            for(var i in fieldNames) {
+                var
+                    fieldIndex = flightLog.getMainFieldIndexByName(fieldNames[i]),
+                    fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+                    
+                if (fieldStat) {
+                    min = Math.min(min, fieldStat.min);
+                    max = Math.max(max, fieldStat.max);
+                }
+            }
+
+            if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
+                return {
+                    offset: -(max + min) / 2,
+                    power: 1.0,
+                    inputRange: Math.max((max - min) / 2, 1.0),
+                    outputRange: 1.0
+                };
+            } else {
+                return {
+                    offset: 0,
+                    power: 1.0,
+                    inputRange: 500,
+                    outputRange: 1.0
+                };
+            }
+        }
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
 
@@ -447,31 +486,15 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: 100,
                             outputRange: 1.0
-                        };      
+                        };   
+                    case 'ESC_SENSOR_RPM':
+                    case 'DSHOT_RPM_TELEMETRY':
+                        return getCurveForMinMaxFields(['debug[0]', 'debug[1]', 'debug[2]', 'debug[3]']);
                 }
             }
             // if not found above then
             // Scale and center the field based on the whole-log observed ranges for that field
-            var
-                stats = flightLog.getStats(),
-                fieldIndex = flightLog.getMainFieldIndexByName(fieldName),
-                fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
-
-            if (fieldStat) {
-                return {
-                    offset: -(fieldStat.max + fieldStat.min) / 2,
-                    power: 1.0,
-                    inputRange: Math.max((fieldStat.max - fieldStat.min) / 2, 1.0),
-                    outputRange: 1.0
-                };
-            } else {
-                return {
-                    offset: 0,
-                    power: 1.0,
-                    inputRange: 500,
-                    outputRange: 1.0
-                };
-            }
+            return getCurveForMinMaxFields(fieldName);
         } catch(e) {
             return {
                 offset: 0,
