@@ -1018,7 +1018,7 @@ function BlackboxLogViewer() {
                 if (graphs.length == 0 || graphs[0].fields.length == 0) {
                     hasAnalyser = false;
                 } else { 
-                    activeGraphConfig.selectedFieldName = FlightLogFieldPresenter.fieldNameToFriendly(graphs[0].fields[0].name);
+                    activeGraphConfig.selectedFieldName = graphs[0].fields[0].friendlyName;
                     activeGraphConfig.selectedGraphIndex = 0;
                     activeGraphConfig.selectedFieldIndex = 0;
                     hasAnalyser = true;
@@ -1496,14 +1496,14 @@ function BlackboxLogViewer() {
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].smoothing += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].smoothing = constrain(graphConfig[parseInt(graph)].fields[i].smoothing, range.min, range.max);
-                    changedValue += fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[i].name) + ' ' + (graphConfig[parseInt(graph)].fields[i].smoothing / 100).toFixed(2)+ '%\n';
+                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[i].smoothing / 100).toFixed(2)+ '%\n';
                 }
                 return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing, range.min, range.max);
-                return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing / 100).toFixed(2) + '%\n';
+                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing / 100).toFixed(2) + '%\n';
             }
             return false; // nothing was changed
         }
@@ -1528,14 +1528,14 @@ function BlackboxLogViewer() {
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[i].curve.outputRange, range.min, range.max);
-                    changedValue += fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[i].name) + ' x' + (graphConfig[parseInt(graph)].fields[i].curve.outputRange).toFixed(1)+ '\n';
+                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' x' + (graphConfig[parseInt(graph)].fields[i].curve.outputRange).toFixed(1)+ '\n';
                 }
                 return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange, range.min, range.max);
-                return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' x' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange).toFixed(1) + '\n';;
+                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' x' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange).toFixed(1) + '\n';;
             }
             return false; // nothing was changed
         }
@@ -1560,14 +1560,14 @@ function BlackboxLogViewer() {
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.power += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.power = constrain(graphConfig[parseInt(graph)].fields[i].curve.power, range.min, range.max);
-                    changedValue += fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[i].name) + ' ' + (graphConfig[parseInt(graph)].fields[i].curve.power * 100).toFixed(2)+ '%\n';
+                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[i].curve.power * 100).toFixed(2)+ '%\n';
                 }
                 return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power, range.min, range.max);
-                return changedValue + fieldPresenter.fieldNameToFriendly(graphConfig[parseInt(graph)].fields[parseInt(field)].name) + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100).toFixed(2) + '%\n';;
+                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100).toFixed(2) + '%\n';;
             }
             return false; // nothing was changed
         }
