@@ -245,20 +245,16 @@ GraphConfig.load = function(config) {
                             flightLog.rcCommandRawToDegreesPerSecond(500,2) * scale);
         }
         
-        var getCurveForMinMaxFields = function(fieldNames) {
+        var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
-            
             var
                 stats = flightLog.getStats(),
                 min = Number.MAX_VALUE,
                 max = Number.MIN_VALUE;
             
-            if(typeof(fieldNames) == 'string')
-                fieldNames = [fieldNames];
-            
-            for(var i in fieldNames) {
+            for(var i in arguments) {
                 var
-                    fieldIndex = flightLog.getMainFieldIndexByName(fieldNames[i]),
+                    fieldIndex = flightLog.getMainFieldIndexByName(arguments[i]),
                     fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
                     
                 if (fieldStat) {
@@ -489,7 +485,7 @@ GraphConfig.load = function(config) {
                         };   
                     case 'ESC_SENSOR_RPM':
                     case 'DSHOT_RPM_TELEMETRY':
-                        return getCurveForMinMaxFields(['debug[0]', 'debug[1]', 'debug[2]', 'debug[3]']);
+                        return getCurveForMinMaxFields('debug[0]', 'debug[1]', 'debug[2]', 'debug[3]');
                 }
             }
             // if not found above then
