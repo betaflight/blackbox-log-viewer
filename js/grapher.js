@@ -969,9 +969,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     
     this.destroy = function() {
         $(canvas).off("mousedown", onMouseDown);
-    };
-    
-    this.destroy = function() {
         $(canvas).off("touchstart", onTouchStart);
     };
     
