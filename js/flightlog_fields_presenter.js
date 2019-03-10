@@ -251,6 +251,13 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'DSHOT RPM [3]',
                             'debug[3]':'DSHOT RPM [4]',
                         },
+            'RPM_FILTER' :   {
+                            'debug[all]':'RPM Filter', 
+                            'debug[0]':'RPM Filter [1]',
+                            'debug[1]':'RPM Filter [2]',
+                            'debug[2]':'RPM Filter [3]',
+                            'debug[3]':'RPM Filter [4]',
+                        },
             };
     
     function presentFlags(flags, flagNames) {
@@ -501,6 +508,10 @@ function FlightLogFieldPresenter() {
                     default:
                         return value.toFixed(0) + "Hz";
                     }
+                case 'DSHOT_RPM_TELEMETRY':
+                    return value.toFixed(0) + "erpm";
+                case 'RPM_FILTER':
+                    return value.toFixed(0) + "Hz";
                 default:
 					return value.toFixed(0);
 			}	
