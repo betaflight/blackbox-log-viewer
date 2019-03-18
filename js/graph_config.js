@@ -245,7 +245,7 @@ GraphConfig.load = function(config) {
                             flightLog.rcCommandRawToDegreesPerSecond(500,2) * scale);
         }
         
-        var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
+        var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
                 stats = flightLog.getStats(),
@@ -256,7 +256,7 @@ GraphConfig.load = function(config) {
                 var
                     fieldIndex = flightLog.getMainFieldIndexByName(arguments[i]),
                     fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
-                    
+
                 if (fieldStat) {
                     min = Math.min(min, fieldStat.min);
                     max = Math.max(max, fieldStat.max);
@@ -264,20 +264,32 @@ GraphConfig.load = function(config) {
             }
 
             if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
-                return {
-                    offset: -(max + min) / 2,
-                    power: 1.0,
-                    inputRange: Math.max((max - min) / 2, 1.0),
-                    outputRange: 1.0
-                };
-            } else {
-                return {
-                    offset: 0,
-                    power: 1.0,
-                    inputRange: 500,
-                    outputRange: 1.0
-                };
+                return {min:min, max:max};
             }
+
+            return {min:-500, max:500};
+        }
+
+        var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
+            var mm = getMinMaxForFields.apply(null, arguments);
+
+            return {
+                offset: -(mm.max + mm.min) / 2,
+                power: 1.0,
+                inputRange: Math.max((mm.max - mm.min) / 2, 1.0),
+                outputRange: 1.0
+            };
+        }
+
+        var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
+            var mm = getMinMaxForFields.apply(null, arguments);
+
+            return {
+                offset: 0,
+                power: 1.0,
+                inputRange: Math.max(Math.max(Math.abs(mm.max), Math.abs(mm.min)), 1.0),
+                outputRange: 1.0
+            };
         }
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
@@ -433,28 +445,27 @@ GraphConfig.load = function(config) {
                         }
                     case 'RC_INTERPOLATION':
                         switch (fieldName) {
-                            case 'debug[2]': //Yaw
-                                return {
-                                    offset: 0,
-                                    power: 0.8,
-                                    inputRange: 500,
-                                    outputRange: 1.0
-                                };                            
+                            case 'debug[0]': // Roll RC Command
                             case 'debug[3]': // refresh period
-                                return {
-                                    offset: -15000,
-                                    power: 1.0,
-                                    inputRange: 15000, // 30mS max
-                                    outputRange: 1.0  
-                                }; 
-                            default:
-                                return {
-                                    offset: 0,
-                                    power: 0.8,
-                                    inputRange: 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100,
-                                    outputRange: 1.0
-                                };
+                                return getCurveForMinMaxFieldsZeroOffset(fieldName);
                         }
+                        break;
+                    case 'RC_SMOOTHING':
+                        switch (fieldName) {
+                            case 'debug[0]': // raw RC command
+                                return getCurveForMinMaxFieldsZeroOffset('debug[0]');
+                            case 'debug[1]': // raw RC command derivative
+                            case 'debug[2]': // smoothed RC command derivative
+                                return getCurveForMinMaxFieldsZeroOffset('debug[1]', 'debug[2]');
+                        }
+                        break;
+                    case 'RC_SMOOTHING_RATE':
+                        switch (fieldName) {
+                            case 'debug[0]': // current frame rate [us]
+                            case 'debug[2]': // average frame rate [us]
+                                return getCurveForMinMaxFields('debug[0]', 'debug[2]');
+                        }
+                        break;
                     case 'ANGLERATE':
                         return {
                             offset: 0,
@@ -487,6 +498,23 @@ GraphConfig.load = function(config) {
                     case 'DSHOT_RPM_TELEMETRY':
                     case 'RPM_FILTER':
                         return getCurveForMinMaxFields('debug[0]', 'debug[1]', 'debug[2]', 'debug[3]');
+                    case 'D_MIN':
+                        switch (fieldName) {
+                            case 'debug[0]': // roll gyro factor
+                            case 'debug[1]': // roll setpoint Factor
+                                return getCurveForMinMaxFields('debug[0]', 'debug[1]');
+                            case 'debug[2]': // roll actual D
+                            case 'debug[3]': // pitch actual D
+                                return getCurveForMinMaxFields('debug[2]', 'debug[3]');
+                        }
+                        break;
+                    case 'ITERM_RELAX':
+                        switch (fieldName) {
+                            case 'debug[2]': // roll I relaxed error
+                            case 'debug[3]': // roll absolute control axis error
+                                return getCurveForMinMaxFieldsZeroOffset(fieldName);
+                        }
+                        break;
                 }
             }
             // if not found above then
