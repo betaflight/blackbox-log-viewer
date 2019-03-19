@@ -296,7 +296,7 @@ var
             "RX_SPECTRUM_SPI",
             "DSHOT_RPM_TELEMETRY",
             "RPM_FILTER",
-            "D_CUT",
+            "D_MIN",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([

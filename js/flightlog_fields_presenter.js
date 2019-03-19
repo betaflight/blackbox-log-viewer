@@ -167,13 +167,27 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Gyro Scaled [yaw]',
                             'debug[3]':'Not Used',
                         },
-			'RC_INTERPOLATION' : 	{	
-							'debug[all]':'Debug RC',	
-							'debug[0]':'RC Command Raw [roll]',
-							'debug[1]':'RC Command Raw [pitch]',
-							'debug[2]':'RC Command Raw [yaw]',
-							'debug[3]':'RX Refresh Rate',
-						},
+            'RC_INTERPOLATION' : {
+                            'debug[all]':'Debug RC Interpolation',
+                            'debug[0]':'Raw RC Command [roll]',
+                            'debug[1]':'Current RX Refresh Rate',
+                            'debug[2]':'Interpolation Step Count',
+                            'debug[3]':'RC Setpoint [roll]',
+                        },
+            'RC_SMOOTHING' : {
+                            'debug[all]':'Debug RC Smoothing',
+                            'debug[0]':'Raw RC Command',
+                            'debug[1]':'Raw RC Derivative',
+                            'debug[2]':'Smoothed RC Derivative',
+                            'debug[3]':'RX Refresh Rate',
+                        },
+            'RC_SMOOTHING_RATE' : {
+                            'debug[all]':'Debug RC Smoothing Rate',
+                            'debug[0]':'Current RX Refresh Rate',
+                            'debug[1]':'Training Step Count',
+                            'debug[2]':'Average RX Refresh Rate',
+                            'debug[3]':'Sampling State',
+                        },
 			'DTERM_FILTER' : 	{	
 							'debug[all]':'Debug Filter',	
 							'debug[0]':'DTerm Filter [roll]',
@@ -257,6 +271,20 @@ function FlightLogFieldPresenter() {
                             'debug[1]':'RPM Filter [2]',
                             'debug[2]':'RPM Filter [3]',
                             'debug[3]':'RPM Filter [4]',
+                        },
+            'D_MIN' :   {
+                            'debug[all]':'D_MIN',
+                            'debug[0]':'Gyro Factor [roll]',
+                            'debug[1]':'Setpoint Factor [roll]',
+                            'debug[2]':'Actual D [roll]',
+                            'debug[3]':'Actual D [pitch]',
+                        },
+            'ITERM_RELAX' :   {
+                            'debug[all]':'I-term Relax',
+                            'debug[0]':'Setpoint HPF [roll]',
+                            'debug[1]':'I Relax Factor [roll]',
+                            'debug[2]':'Relaxed I Error [roll]',
+                            'debug[3]':'Axis Error [roll]',
                         },
             };
     
@@ -471,13 +499,27 @@ function FlightLogFieldPresenter() {
 				    return flightLog.accRawToGs(value).toFixed(2) + "g";
 				case 'MIXER':
 					return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
-				case 'RC_INTERPOLATION':
-					switch (fieldName) {
-						case 'debug[3]':
-							return (value / 1000).toFixed(0) + 'mS';
-						default:
-							return value.toFixed(0);
-					}				
+                case 'RC_INTERPOLATION':
+                    switch (fieldName) {
+                        case 'debug[1]': // current RX refresh rate
+                            return value.toFixed(0) + 'ms';
+                        case 'debug[3]': // setpoint [roll]
+                            return value.toFixed(0) + 'deg/s';
+                    }
+                    break;
+                case 'RC_SMOOTHING':
+                    switch (fieldName) {
+                        case 'debug[3]': // rx frame rate [us]
+                            return (value / 1000).toFixed(1) + 'ms';
+                    }
+                    break;
+                case 'RC_SMOOTHING_RATE':
+                    switch (fieldName) {
+                        case 'debug[0]': // current frame rate [us]
+                        case 'debug[2]': // average frame rate [us]
+                            return (value / 1000).toFixed(2) + 'ms';
+                    }
+                    break;
 				case 'DFILTER':
 					return "";
                 case 'ANGLERATE':
@@ -512,9 +554,28 @@ function FlightLogFieldPresenter() {
                     return value.toFixed(0) + "erpm";
                 case 'RPM_FILTER':
                     return value.toFixed(0) + "Hz";
-                default:
-					return value.toFixed(0);
-			}	
+                case 'D_MIN':
+                    switch (fieldName) {
+                        case 'debug[0]': // roll gyro factor
+                        case 'debug[1]': // roll setpoint Factor
+                            return value.toFixed(0) + '%';
+                        case 'debug[2]': // roll actual D
+                        case 'debug[3]': // pitch actual D
+                            return (value / 10).toFixed(0);
+                    }
+                    break;
+                case 'ITERM_RELAX':
+                    switch (fieldName) {
+                        case 'debug[0]': // roll setpoint high-pass filtered
+                            return value.toFixed(0) + 'deg/s';
+                        case 'debug[1]': // roll I-term relax factor
+                            return value.toFixed(0) + '%';
+                        case 'debug[3]': // roll absolute control axis error
+                            return (value / 10).toFixed(1) + 'deg';
+                    }
+                    break;
+            }
+            return value.toFixed(0);
 		}
 		return "";
 	};
