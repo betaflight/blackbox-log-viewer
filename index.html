@@ -1058,6 +1058,24 @@
                                         </thead>
                                         <tbody>
                                             <tr>
+                                                <td name='gyro_soft_dyn_type' colspan="2">
+                                                    <label>Lowpass Dyn Filter<br>Type 1</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td name="gyro_soft_dyn_min_hz">
+                                                    <label>Lowpass Dyn Filter<br>Min Cutoff 1 (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                                <td name="gyro_soft_dyn_max_hz">
+                                                    <label>Lowpass Dyn Filter<br>Max Cutoff 1 (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+
                                                 <td name='gyro_soft_type'>
                                                     <label>Lowpass Filter<br>Type 1</label>
                                                     <select>
@@ -1110,7 +1128,26 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+
                                             <tr>
+                                                <td name='dterm_dyn_type' colspan="2">
+                                                    <label>Lowpass Dyn Filter<br>Type 1</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td name="dterm_lpf_dyn_min_hz">
+                                                    <label>Lowpass Dyn Filter<br>Min Cutoff 1 (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                                <td name="dterm_lpf_dyn_max_hz">
+                                                    <label>Lowpass Dyn Filter<br>Max Cutoff 1 (Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+
                                                 <td name='dterm_filter_type'>
                                                     <label>Lowpass Filter
                                                         <br>Type 1</label>
@@ -1122,6 +1159,13 @@
                                                     <label>Lowpass Filter
                                                         <br>Cutoff 1 (Hz)</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                                <td name='dterm_filter2_type'>
+                                                    <label>Lowpass Filter
+                                                        <br>Type 2</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
                                                 </td>
                                                 <td name="dterm_lpf2_hz">
                                                     <label>Lowpass Filter
