@@ -232,6 +232,7 @@ var FlightLogParser = function(logData) {
             rollPitchItermResetRate:null,           // ITerm Reset rate for Roll and Pitch
             yawItermResetRate:null,                 // ITerm Reset Rate for Yaw
             dterm_lpf_hz:null,                      // DTerm Lowpass Filter Hz
+            dterm_lpf_dyn_hz:[null, null],          // DTerm Lowpass Dynamic Filter Min and Max Hz
             dterm_lpf2_hz:null,                     // DTerm Lowpass Filter Hz 2
             dterm_differentiator:null,              // DTerm Differentiator
             H_sensitivity:null,                     // Horizon Sensitivity
@@ -241,6 +242,7 @@ var FlightLogParser = function(logData) {
             gyro_lpf:null,                          // Gyro lpf setting.
             gyro_32khz_hardware_lpf:null,           // Gyro 32khz hardware lpf setting. (post BF3.4)
             gyro_lowpass_hz:null,                   // Gyro Soft Lowpass Filter Hz
+            gyro_lowpass_dyn_hz:[null, null],       // Gyro Soft Lowpass Dynamic Filter Min and Max Hz
             gyro_lowpass2_hz:null,                  // Gyro Soft Lowpass Filter Hz 2
             gyro_notch_hz:null,                     // Gyro Notch Frequency
             gyro_notch_cutoff:null,                 // Gyro Notch Cutoff
@@ -261,6 +263,7 @@ var FlightLogParser = function(logData) {
             rc_smoothing_rx_average:null,           // RC Smoothing rx average readed in ms
             rc_smoothing_debug_axis:null,           // Axis recorded in the debug mode of rc_smoothing
             dterm_filter_type:null,                 // D term filtering type (PT1, BIQUAD)
+            dterm_filter2_type:null,                // D term 2 filtering type (PT1, BIQUAD)
             pidAtMinThrottle:null,                  // Stabilisation at zero throttle
             itermThrottleGain:null,                 // Betaflight PID
             ptermSetpointWeight:null,               // Betaflight PID
@@ -550,6 +553,7 @@ var FlightLogParser = function(logData) {
             case "vbatref":
             case "acc_1G":
             case "dterm_filter_type":
+            case "dterm_filter2_type":
             case "pidAtMinThrottle":
             case "pidSumLimit":
             case "pidSumLimitYaw":
@@ -654,6 +658,8 @@ var FlightLogParser = function(logData) {
             case "motorOutput":
             case "rc_smoothing_cutoffs":
             case "rc_smoothing_filter_type":
+            case "gyro_lowpass_dyn_hz":
+            case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
             case "magPID":

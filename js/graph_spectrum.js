@@ -246,9 +246,17 @@ try {
 		var offset = 0;
 		if (mouseFrequency !=null) drawMarkerLine(mouseFrequency, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0,255,0,0.50)", 3);
 		offset++; // make some space!
-        if ((flightLog.getSysConfig().gyro_lowpass_hz != null) && (flightLog.getSysConfig().gyro_lowpass_hz > 0)) {
+        // Dynamic gyro lpf 
+        if(flightLog.getSysConfig().gyro_lowpass_dyn_hz[0] != null && flightLog.getSysConfig().gyro_lowpass_dyn_hz[0] > 0 &&
+                flightLog.getSysConfig().gyro_lowpass_dyn_hz[1] > flightLog.getSysConfig().gyro_lowpass_dyn_hz[0]) {
+            drawDoubleMarkerLine(flightLog.getSysConfig().gyro_lowpass_dyn_hz[0], flightLog.getSysConfig().gyro_lowpass_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'GYRO LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
+
+        // Static gyro lpf
+        } else  if ((flightLog.getSysConfig().gyro_lowpass_hz != null) && (flightLog.getSysConfig().gyro_lowpass_hz > 0)) {
             drawMarkerLine(flightLog.getSysConfig().gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,255,128,0.50)");
         }
+
+        // Static gyro lpf 2
         if ((flightLog.getSysConfig().gyro_lowpass2_hz != null) && (flightLog.getSysConfig().gyro_lowpass2_hz > 0)) {
             drawMarkerLine(flightLog.getSysConfig().gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, 'GYRO LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(95,199,95,0.50)");
         }
@@ -280,9 +288,17 @@ try {
 			if(dataBuffer.fieldName.match(/(.*yaw.*)/i)!=null) {
 				if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawMarkerLine(flightLog.getSysConfig().yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
 			} else {
-                if((flightLog.getSysConfig().dterm_lpf_hz != null) && (flightLog.getSysConfig().dterm_lpf_hz > 0)) {
+                // Dynamic dterm lpf 
+                if(flightLog.getSysConfig().dterm_lpf_dyn_hz[0] != null && flightLog.getSysConfig().dterm_lpf_dyn_hz[0] > 0 &&
+                        flightLog.getSysConfig().dterm_lpf_dyn_hz[1] > flightLog.getSysConfig().dterm_lpf_dyn_hz[0]) {
+                    drawDoubleMarkerLine(flightLog.getSysConfig().dterm_lpf_dyn_hz[0], flightLog.getSysConfig().dterm_lpf_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'GYRO LPF Dyn Min cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,128,255,0.50)");
+
+                // Static dterm lpf
+                } else if((flightLog.getSysConfig().dterm_lpf_hz != null) && (flightLog.getSysConfig().dterm_lpf_hz > 0)) {
                     drawMarkerLine(flightLog.getSysConfig().dterm_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(128,128,255,0.50)");
                 }
+
+                // Static dterm lpf 2
                 if((flightLog.getSysConfig().dterm_lpf2_hz != null) && (flightLog.getSysConfig().dterm_lpf2_hz > 0)) {
                     drawMarkerLine(flightLog.getSysConfig().dterm_lpf2_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(90,90,255,0.50)");
                 }
@@ -327,7 +343,26 @@ try {
 		
 		if(label!=null) drawAxisLabel(label + ' ' + (frequency.toFixed(0))+"Hz", (x + 2), OFFSET, 'left');
 		
+        return x;
 	};
+
+	var drawDoubleMarkerLine = function(frequency1, frequency2, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
+        var x1 = drawMarkerLine(frequency1, sampleRate, null, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+        var x2 = drawMarkerLine(frequency2, sampleRate, null, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+
+        canvasCtx.beginPath();
+        canvasCtx.lineWidth = lineWidth || 1;
+        canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
+
+        canvasCtx.moveTo(x1, OFFSET - 10);
+        canvasCtx.lineTo(x2, OFFSET - 10);
+
+        canvasCtx.stroke();
+
+        if(label!=null) {
+            drawAxisLabel(label + ' ' + (frequency1.toFixed(0))+'-'+(frequency2.toFixed(0))+"Hz", (x1 + 2), OFFSET, 'left');
+        }
+    };
 
 	var drawGridLines = function(sampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN) {
 

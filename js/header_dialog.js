@@ -604,6 +604,39 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('pidSumLimit'     			,sysConfig.pidSumLimit,0);
         setParameter('pidSumLimitYaw'			,sysConfig.pidSumLimitYaw,0);
 
+        // Dynamic filters of Betaflight 4.0
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
+                (sysConfig.gyro_lowpass_dyn_hz[0] != null) && (sysConfig.gyro_lowpass_dyn_hz[0] > 0) &&
+                (sysConfig.gyro_lowpass_dyn_hz[1] > sysConfig.gyro_lowpass_dyn_hz[0])) {
+            renderSelect('gyro_soft_dyn_type', sysConfig.gyro_soft_type, FILTER_TYPE);
+            setParameter('gyro_soft_dyn_min_hz', sysConfig.gyro_lowpass_dyn_hz[0], 0);
+            setParameter('gyro_soft_dyn_max_hz', sysConfig.gyro_lowpass_dyn_hz[1], 0);
+            $('.parameter td[name="gyro_soft_dyn_type"]').parent().css('display', '');
+            $('.parameter td[name="gyro_soft_type"]').css('display', 'none');
+            $('.parameter td[name="gyro_lowpass_hz"]').css('display', 'none');
+        } else {
+            $('.parameter td[name="gyro_soft_dyn_type"]').parent().css('display', 'none');
+            $('.parameter td[name="gyro_soft_dyn_min_hz"]').css('display', 'none');
+            $('.parameter td[name="gyro_soft_dyn_max_hz"]').css('display', 'none');
+        }
+
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
+                (sysConfig.dterm_lpf_dyn_hz[0] != null) && (sysConfig.dterm_lpf_dyn_hz[0] > 0) &&
+                (sysConfig.dterm_lpf_dyn_hz[1] > sysConfig.dterm_lpf_dyn_hz[0])) {
+            renderSelect('dterm_filter2_type', sysConfig.dterm_filter2_type, FILTER_TYPE);
+            renderSelect('dterm_dyn_type', sysConfig.dterm_filter_type, FILTER_TYPE);
+            setParameter('dterm_lpf_dyn_min_hz', sysConfig.dterm_lpf_dyn_hz[0], 0);
+            setParameter('dterm_lpf_dyn_max_hz', sysConfig.dterm_lpf_dyn_hz[1], 0);
+            $('.parameter td[name="dterm_dyn_type"]').parent().css('display', '');
+            $('.parameter td[name="dterm_filter_type"]').css('display', 'none');
+            $('.parameter td[name="dterm_lpf_hz"]').css('display', 'none');
+        } else {
+            $('.parameter td[name="dterm_filter2_type"]').css('display', 'none');
+            $('.parameter td[name="dterm_dyn_type"]').parent().css('display', 'none');
+            $('.parameter td[name="dterm_lpf_dyn_min_hz"]').css('display', 'none');
+            $('.parameter td[name="dterm_lpf_dyn_max_hz"]').css('display', 'none');
+        }
+
 		/* Packed Flags */
 
         builtFeaturesList(sysConfig);
