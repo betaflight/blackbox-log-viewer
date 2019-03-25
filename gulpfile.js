@@ -25,6 +25,8 @@ const APPS_DIR = './apps/';
 const DEBUG_DIR = './debug/';
 const RELEASE_DIR = './release/';
 
+const LINUX_INSTALL_DIR = '/opt/betaflight';
+
 var nwBuilderOptions = {
     version: '0.32.4',
     files: './dist/**/*',
@@ -173,7 +175,7 @@ function getRunDebugAppCommand(arch) {
 }
 
 function getReleaseFilename(platform, ext) {
-    return 'betaflight-blackbox-explorer_' + pkg.version + '_' + platform + '.' + ext;
+    return `${pkg.name}_${pkg.version}_${platform}.${ext}`;
 }
 
 function clean_dist() { 
@@ -506,15 +508,16 @@ function release_deb(arch, done) {
              architecture: debArch,
              maintainer: pkg.author,
              description: pkg.description,
-             postinst: ['cp /opt/betaflight/betaflight-blackbox-explorer/mime/betaflight-blackbox-explorer.xml /usr/share/mime/packages/;update-mime-database /usr/share/mime',
-                        'cp /opt/betaflight/betaflight-blackbox-explorer/icon/bf_icon_128.png /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png;gtk-update-icon-cache /usr/share/icons/hicolor -f',
-                        'xdg-desktop-menu install /opt/betaflight/betaflight-blackbox-explorer/betaflight-blackbox-explorer.desktop'],
-             prerm: ['rm /usr/share/mime/packages/betaflight-blackbox-explorer.xml;update-mime-database /usr/share/mime',
-                     'rm /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png;gtk-update-icon-cache /usr/share/icons/hicolor -f',
-                     'xdg-desktop-menu uninstall betaflight-blackbox-explorer.desktop'],
+             preinst: [`rm -rf ${LINUX_INSTALL_DIR}/${pkg.name}`],
+             postinst: [`chown root:root ${LINUX_INSTALL_DIR}`, `chown -R root:root ${LINUX_INSTALL_DIR}/${pkg.name}`, `cp ${LINUX_INSTALL_DIR}/${pkg.name}/mime/${pkg.name}.xml /usr/share/mime/packages/`, 'update-mime-database /usr/share/mime',
+                        `cp ${LINUX_INSTALL_DIR}/${pkg.name}/icon/bf_icon_128.png /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png`, 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
+                        `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${pkg.name}/${pkg.name}.desktop`],
+             prerm: [`rm /usr/share/mime/packages/${pkg.name}.xml`, 'update-mime-database /usr/share/mime',
+                     'rm /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png', 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
+                     `xdg-desktop-menu uninstall ${pkg.name}.desktop`],
              depends: 'libgconf-2-4',
              changelog: [],
-             _target: 'opt/betaflight/betaflight-blackbox-explorer',
+             _target: `${LINUX_INSTALL_DIR}/${pkg.name}`,
              _out: RELEASE_DIR,
              _copyright: 'assets/linux/copyright',
              _clean: true
@@ -545,11 +548,11 @@ function release_rpm(arch, done) {
                  [ { cwd: path.join(APPS_DIR, pkg.name, arch),
                      src: '*',
                      dest: '/opt/betaflight/blackbox-log-viewer' } ],
-             postInstallScript: ['cp /opt/betaflight/betaflight-blackbox-explorer/mime/betaflight-blackbox-explorer.xml /usr/share/mime/packages/;update-mime-database /usr/share/mime',
-                                 'cp /opt/betaflight/betaflight-blackbox-explorer/icon/bf_icon_128.png /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png;gtk-update-icon-cache /usr/share/icons/hicolor -f',
-                                 'xdg-desktop-menu install /opt/betaflight/blackbox-log-viewer/blackbox-log-viewer.desktop'],
-             preUninstallScript: ['rm /usr/share/mime/packages/betaflight-blackbox-explorer.xml;update-mime-database /usr/share/mime',
-                                  'rm /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png;gtk-update-icon-cache /usr/share/icons/hicolor -f',
+             postInstallScript: [`cp ${LINUX_INSTALL_DIR}/${pkg.name}/mime/${pkg.name}.xml /usr/share/mime/packages/`, 'update-mime-database /usr/share/mime',
+                                 `cp ${LINUX_INSTALL_DIR}/${pkg.name}/icon/bf_icon_128.png /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png`, 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
+                                 `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${pkg.name}/blackbox-log-viewer.desktop`],
+             preUninstallScript: [`rm /usr/share/mime/packages/${pkg.name}.xml`, 'update-mime-database /usr/share/mime',
+                                  'rm /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png', 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
                                   'xdg-desktop-menu uninstall blackbox-log-viewer.desktop'],
              tempDir: path.join(RELEASE_DIR,'tmp-rpm-build-' + arch),
              keepTemp: false,
