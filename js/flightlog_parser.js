@@ -199,6 +199,7 @@ var FlightLogParser = function(logData) {
         // standard logger.
 
         defaultSysConfigExtension = {
+            abs_control_gain:null,                  // Aboslute control gain
             anti_gravity_gain:null,                 // Anti gravity gain
             anti_gravity_mode:null,                 // Anti gravity mode
             anti_gravity_threshold:null,            // Anti gravity threshold for step mode
@@ -279,6 +280,7 @@ var FlightLogParser = function(logData) {
             digitalIdleOffset:null,                 // min throttle for d-shot (as a percentage)
             pidSumLimit:null,                       // PID sum limit
             pidSumLimitYaw:null,                    // PID sum limit yaw
+            use_integrated_yaw : null,              // Use integrated yaw
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -568,6 +570,8 @@ var FlightLogParser = function(logData) {
             case "debug_mode":
             case "anti_gravity_mode":
             case "anti_gravity_gain":
+            case "abs_control_gain":
+            case "use_integrated_yaw":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 

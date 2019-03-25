@@ -870,6 +870,14 @@
                                                         <br/>&nbsp;</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>
+                                                <td name="abs_control_gain" class="bf-only">
+                                                    <label>
+                                                        Absolute 
+                                                        <br/>Control 
+                                                        <br/>Gain
+                                                    </label>
+                                                    <input type="number" step="1" min="0" max="999" />
+                                                </td>
                                                 <td name="setpointRelaxRatio" class="bf-only">
                                                     <label>Setpoint Relax
                                                         <br>Ratio
@@ -1016,6 +1024,23 @@
                                                     <span>Stabilisation at zero throttle</span>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <td name="use_integrated_yaw">
+                                                    <label class="option">
+                                                        <input class="ios-switch" type="checkbox" />
+                                                        <div>
+                                                            <div></div>
+                                                        </div>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <label>Use integrated yaw</label>
+                                                </td>
+                                                <td>
+                                                    <span>Changes the yaw PID behaviour</span>
+                                                </td>
+                                            </tr>
+                                            
                                         </tbody>
                                     </table>
                                 </div>
