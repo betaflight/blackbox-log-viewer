@@ -74,6 +74,8 @@ function HeaderDialog(dialog, onSave) {
             {name:'rc_smoothing_filter_type_1'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
             {name:'rc_smoothing_rx_average'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
             {name:'rc_smoothing_debug_axis'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+            {name:'abs_control_gain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+            {name:'use_integrated_yaw'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -161,7 +163,7 @@ function HeaderDialog(dialog, onSave) {
 		} else {
 			nameElem.closest('tr').addClass('missing');
 		}
-		parameterElem.parent().css('display', isParameterValid(name)?('table-cell'):('none'));
+		parameterElem.parent().css('display', isParameterValid(name)?('table-row'):('none'));
 	}
 
 	function populatePID(name, data) {
@@ -576,6 +578,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
         setParameter('feedforward_transition'   ,sysConfig.feedforward_transition,2);
+        setParameter('abs_control_gain'         ,sysConfig.abs_control_gain, 0);
         if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
             setParameterFloat('yawRateAccelLimit', sysConfig.yawRateAccelLimit, 2);
             setParameterFloat('rateAccelLimit'   , sysConfig.rateAccelLimit, 2);
@@ -652,7 +655,8 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('vbat_pid_compensation'		,sysConfig.vbat_pid_compensation);
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
         setCheckbox('pidAtMinThrottle'			,sysConfig.pidAtMinThrottle);
-
+        setCheckbox('use_integrated_yaw'        ,sysConfig.use_integrated_yaw);
+        
         /* Show Unknown Fields */
         renderUnknownHeaders(sysConfig.unknownHeaders);
 
