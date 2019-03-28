@@ -294,6 +294,7 @@ var FlightLogParser = function(logData) {
             d_notch_cut               : "dterm_notch_cutoff", 
             d_setpoint_weight         : "dtermSetpointWeight",
             dterm_lowpass_hz          : "dterm_lpf_hz",
+            dterm_lowpass_dyn_hz      : "dterm_lpf_dyn_hz",
             dterm_lowpass2_hz         : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",  
             digital_idle_value        : "digitalIdleOffset",
