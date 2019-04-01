@@ -281,6 +281,9 @@ var FlightLogParser = function(logData) {
             pidSumLimit:null,                       // PID sum limit
             pidSumLimitYaw:null,                    // PID sum limit yaw
             use_integrated_yaw : null,              // Use integrated yaw
+            d_min : [null, null, null],             // D_Min [P, I, D]
+            d_min_gain : null,                      // D_Min gain
+            d_min_advance : null,                   // D_Min advance
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -573,6 +576,8 @@ var FlightLogParser = function(logData) {
             case "anti_gravity_gain":
             case "abs_control_gain":
             case "use_integrated_yaw":
+            case "d_min_gain":
+            case "d_min_advance":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
@@ -665,6 +670,7 @@ var FlightLogParser = function(logData) {
             case "rc_smoothing_filter_type":
             case "gyro_lowpass_dyn_hz":
             case "dterm_lpf_dyn_hz":
+            case "d_min":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
             case "magPID":
