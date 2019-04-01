@@ -52,7 +52,7 @@ function HeaderDialog(dialog, onSave) {
             {name:'gyro_soft_type'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'gyro_soft2_type'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
             {name:'gyro_lowpass2_hz'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
-            {name:'gyro_32khz_hardware_lpf'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
+            {name:'gyro_32khz_hardware_lpf'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'3.9.9'},
             {name:'debug_mode'					, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
             {name:'gyro_notch_hz_2'				, type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.1', max:'999.9.9'},
             {name:'gyro_notch_cutoff_2'		    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.1', max:'999.9.9'},
