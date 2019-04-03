@@ -571,6 +571,19 @@ function HeaderDialog(dialog, onSave) {
             $('.parameter td[name="rc_smoothing_rx_average"]').css('display', 'none');
             $('.parameter td[name="rc_smoothing_debug_axis"]').css('display', 'none');
         }
+
+        // D_MIN
+        if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
+            setParameter('d_min_roll'   , sysConfig.d_min[0]     , 0);
+            setParameter('d_min_pitch'  , sysConfig.d_min[1]     , 0);
+            setParameter('d_min_yaw'    , sysConfig.d_min[2]     , 0);
+            setParameter('d_min_gain'   , sysConfig.d_min_gain   , 0);
+            setParameter('d_min_advance', sysConfig.d_min_advance, 0);
+            $("#d_min").show();
+        } else {
+            $("#d_min").hide();
+        }
+
     	renderSelect('unsynced_fast_pwm'		,sysConfig.unsynced_fast_pwm, MOTOR_SYNC);
     	renderSelect('fast_pwm_protocol'		,sysConfig.fast_pwm_protocol, FAST_PROTOCOL);
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);
