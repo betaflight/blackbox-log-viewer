@@ -283,9 +283,11 @@ try {
 		}
 		offset++; // make some space!
 		try {
-			if(dataBuffer.fieldName.match(/(.*yaw.*)/i)!=null) {
-				if(flightLog.getSysConfig().yaw_lpf_hz!=null)      		drawLowpassFilter(flightLog.getSysConfig().yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-			} else {
+            if (dataBuffer.fieldName.match(/(.*yaw.*)/i) != null) {
+                if (flightLog.getSysConfig().yaw_lpf_hz != null && flightLog.getSysConfig().yaw_lpf_hz > 0) {
+                    drawLowpassFilter(flightLog.getSysConfig().yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+                }
+            } else {
                 // Dynamic dterm lpf 
                 if(flightLog.getSysConfig().dterm_lpf_dyn_hz[0] != null && flightLog.getSysConfig().dterm_lpf_dyn_hz[0] > 0 &&
                         flightLog.getSysConfig().dterm_lpf_dyn_hz[1] > flightLog.getSysConfig().dterm_lpf_dyn_hz[0]) {
