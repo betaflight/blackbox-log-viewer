@@ -197,7 +197,11 @@ var
 			"XB-B",
 			"XB-B-RJ01",
 			"IBUS",
-			"JETIEXBUS"
+			"JETIEXBUS",
+            "CRSF",
+            "SRXL",
+            "CUSTOM",
+            "FPORT",
     ]),
 
     ANTI_GRAVITY_MODE = makeReadOnly([
