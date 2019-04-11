@@ -76,7 +76,6 @@ var
             'CAMERA3',
             'FLIPOVERAFTERCRASH',
             'PREARM',
-            'CHECKBOX_ITEM_COUNT'
     ]),
 
     FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3 = makeReadOnly([
@@ -125,7 +124,9 @@ var
         'USER3',
         'USER4',
         'PIDAUDIO',
-        'CHECKBOX_ITEM_COUNT'
+        'ACROTRAINER',
+        'VTXCONTROLDISABLE',
+        'LAUNCHCONTROL',
     ]),
 
     FLIGHT_LOG_FEATURES = makeReadOnly([
@@ -180,7 +181,8 @@ var
             "DSHOT150",
             "DSHOT300",
             "DSHOT600",
-            "DSHOT1200"
+            "DSHOT1200",
+            "PROSHOT1000",
     ]),
 
     MOTOR_SYNC = makeReadOnly([
@@ -297,6 +299,8 @@ var
             "DSHOT_RPM_TELEMETRY",
             "RPM_FILTER",
             "D_MIN",
+            "AC_CORRECTION",
+            "AC_ERROR",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
