@@ -251,6 +251,34 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Gyro Raw [Z]',
                             'debug[3]':'Not Used',
                         },
+            'DUAL_GYRO' : {
+                            'debug[all]':'Debug Dual Gyro', 
+                            'debug[0]':'Gyro 1 Filtered [roll]',
+                            'debug[1]':'Gyro 1 Filtered [pitch]',
+                            'debug[2]':'Gyro 2 Filtered [roll]',
+                            'debug[3]':'Gyro 2 Filtered [pitch]',
+            },
+            'DUAL_GYRO_RAW': {
+                            'debug[all]':'Debug Dual Gyro Raw', 
+                            'debug[0]':'Gyro 1 Raw [roll]',
+                            'debug[1]':'Gyro 1 Raw [pitch]',
+                            'debug[2]':'Gyro 2 Raw [roll]',
+                            'debug[3]':'Gyro 2 Raw [pitch]',
+            },
+            'DUAL_GYRO_COMBINED': {
+                            'debug[all]':'Debug Dual Combined', 
+                            'debug[0]':'Not Used',
+                            'debug[1]':'Gyro Filtered [roll]',
+                            'debug[2]':'Gyro Filtered [pitch]',
+                            'debug[3]':'Not Used',
+            },
+            'DUAL_GYRO_DIFF': {
+                            'debug[all]':'Debug Dual Gyro Diff', 
+                            'debug[0]':'Gyro Diff [roll]',
+                            'debug[1]':'Gyro Diff [pitch]',
+                            'debug[2]':'Gyro Diff [yaw]',
+                            'debug[3]':'Not Used',
+            },
             'ESC_SENSOR_RPM' :   {
                             'debug[all]':'ESC RPM', 
                             'debug[0]':'ESC RPM [1]',
@@ -286,7 +314,28 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Relaxed I Error [roll]',
                             'debug[3]':'Axis Error [roll]',
                         },
-            };
+            'DYN_LPF' : {
+                            'debug[all]':'Debug Dyn LPF',
+                            'debug[0]':'Gyro Scaled [roll]',
+                            'debug[1]':'Notch Center [roll]',
+                            'debug[2]':'Lowpass Cutoff [roll]',
+                            'debug[3]':'Gyro Pre-Dyn [roll]',
+            },
+            'AC_CORRECTION' : {
+                            'debug[all]':'AC Correction',
+                            'debug[0]':'AC Correction [roll]',
+                            'debug[1]':'AC Correction [pitch]',
+                            'debug[2]':'AC Correction [yaw]',
+                            'debug[3]':'Not Used',
+            },
+            'AC_ERROR' : {
+                            'debug[all]':'AC Error',
+                            'debug[0]':'AC Error [roll]',
+                            'debug[1]':'AC Error [pitch]',
+                            'debug[2]':'AC Error [yaw]',
+                            'debug[3]':'Not Used',
+            },
+        };
     
     function presentFlags(flags, flagNames) {
         var 
@@ -494,6 +543,10 @@ function FlightLogFieldPresenter() {
                 case 'GYRO_FILTERED':
                 case 'GYRO_SCALED':
                 case 'NOTCH':
+                case 'DUAL_GYRO':
+                case 'DUAL_GYRO_COMBINED':
+                case 'DUAL_GYRO_DIFF':
+                case 'DUAL_GYRO_RAW':
                     return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
 				case 'ACCELEROMETER':
 				    return flightLog.accRawToGs(value).toFixed(2) + "g";
@@ -561,7 +614,7 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + '%';
                         case 'debug[2]': // roll actual D
                         case 'debug[3]': // pitch actual D
-                            return (value / 10).toFixed(0);
+                            return (value / 10).toFixed(1);
                     }
                     break;
                 case 'ITERM_RELAX':
@@ -574,6 +627,19 @@ function FlightLogFieldPresenter() {
                             return (value / 10).toFixed(1) + 'deg';
                     }
                     break;
+                case 'DYN_LPF':
+                    switch (fieldName) {
+                        case 'debug[0]':
+                        case 'debug[3]':
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                        default:
+                            return value.toFixed(0) + "Hz";
+                    }
+                    break;
+                case 'AC_ERROR':
+                    return (value / 10).toFixed(1) + 'deg';
+                case 'AC_CORRECTION':
+                    return (value / 10).toFixed(1) + 'deg/s';
             }
             return value.toFixed(0);
 		}

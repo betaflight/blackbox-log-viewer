@@ -272,7 +272,7 @@ var
             "GYRO_RAW",
             "DUAL_GYRO",
             "DUAL_GYRO_RAW",
-            "DUAL_GYRO_COMBINE",
+            "DUAL_GYRO_COMBINED",
             "DUAL_GYRO_DIFF",
             "MAX7456_SIGNAL",
             "MAX7456_SPICLOCK",

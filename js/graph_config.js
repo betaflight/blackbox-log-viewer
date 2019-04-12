@@ -405,7 +405,13 @@ GraphConfig.load = function(config) {
                     case 'GYRO':
                     case 'GYRO_FILTERED':
                     case 'GYRO_SCALED':
+                    case 'DUAL_GYRO':
+                    case 'DUAL_GYRO_COMBINED':
+                    case 'DUAL_GYRO_DIFF':
+                    case 'DUAL_GYRO_RAW':
                     case 'NOTCH':
+                    case 'AC_CORRECTION':
+                    case 'AC_ERROR':
                         return {
                             offset: 0,
                             power: 0.25,
@@ -474,13 +480,8 @@ GraphConfig.load = function(config) {
                             outputRange: 1.0
                         };
                     case 'FFT':
-                        return {
-                            offset: 0,
-                            power: 0.25,
-                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                            outputRange: 1.0
-                        };
                     case 'FFT_FREQ':
+                    case 'DYN_LPF':
                         return {
                             offset: 0,
                             power: 0.25,
