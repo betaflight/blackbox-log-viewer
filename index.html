@@ -1471,6 +1471,29 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+
+                                        <table id="rate_limits" class="parameter cf">
+                                            <body>
+                                                <tr>
+                                                    <th colspan="5">Rate Limits</th>
+                                                </tr>
+                                                <tr>
+                                                    <td name="rate_limits_roll">
+                                                        <label>Roll</label>
+                                                        <input type="number" step="1" min="0" />
+                                                    </td>
+                                                    <td name="rate_limits_pitch">
+                                                        <label>Pitch</label>
+                                                        <input type="number" step="1" min="0" />
+                                                    </td>
+                                                    <td name="rate_limits_yaw">
+                                                        <label>Yaw</label>
+                                                        <input type="number" step="1" min="0" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
                                         <table class="parameter cf">
 
                                             <body>
@@ -1540,6 +1563,24 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
+                                                    <td name='rc_smoothing_auto_factor'>
+                                                        <label>Auto factor</label>
+                                                        <input type="number" step="1" min="0"/>
+                                                    </td>
+                                                    <td name='rc_smoothing_active_cutoffs_1'>
+                                                        <label>Active Cutoff 1</label>
+                                                        <input type="number" step="1" min="0"/>
+                                                    </td>
+                                                    <td name='rc_smoothing_active_cutoffs_2'>
+                                                        <label>Active Cutoff 2</label>
+                                                        <input type="number" step="1" min="0"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td name="rc_interpolation_channels">
+                                                        <label>Channels</label>
+                                                        <input type="number" step="1" min="0"/>
+                                                    </td>
                                                     <td name='rc_smoothing_debug_axis'>
                                                         <label>Debug Axis</label>
                                                         <select>

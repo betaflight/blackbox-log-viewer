@@ -76,6 +76,10 @@ function HeaderDialog(dialog, onSave) {
             {name:'rc_smoothing_debug_axis'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
             {name:'abs_control_gain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
             {name:'use_integrated_yaw'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+            {name:'rc_smoothing_auto_factor'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+            {name:'rc_smoothing_active_cutoffs_1', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+            {name:'rc_smoothing_active_cutoffs_2', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+            {name:'rc_interpolation_channels'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -557,6 +561,10 @@ function HeaderDialog(dialog, onSave) {
         renderSelect('rc_smoothing_filter_type_1' ,sysConfig.rc_smoothing_filter_type[0], RC_SMOOTHING_INPUT_TYPE);
         renderSelect('rc_smoothing_filter_type_2' ,sysConfig.rc_smoothing_filter_type[1], RC_SMOOTHING_DERIVATIVE_TYPE);
         setParameter('rc_smoothing_rx_average'    ,sysConfig.rc_smoothing_rx_average, 3);
+        setParameter('rc_smoothing_auto_factor'    ,sysConfig.rc_smoothing_auto_factor, 0);
+        setParameter('rc_smoothing_active_cutoffs_1',sysConfig.rc_smoothing_active_cutoffs[0], 0);
+        setParameter('rc_smoothing_active_cutoffs_2',sysConfig.rc_smoothing_active_cutoffs[1], 0);
+        setParameter('rc_interpolation_channels'  ,sysConfig.rc_interpolation_channels, 0);
         renderSelect('rc_smoothing_debug_axis'    ,sysConfig.rc_smoothing_filter_type[1], RC_SMOOTHING_DEBUG_AXIS);
 
         if (sysConfig.rc_smoothing_type === RC_SMOOTHING_TYPE.indexOf('FILTER')) {
@@ -570,9 +578,12 @@ function HeaderDialog(dialog, onSave) {
             $('.parameter td[name="rc_smoothing_filter_type_2"]').css('display', 'none');
             $('.parameter td[name="rc_smoothing_rx_average"]').css('display', 'none');
             $('.parameter td[name="rc_smoothing_debug_axis"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_auto_factor"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_active_cutoffs_1"]').css('display', 'none');
+            $('.parameter td[name="rc_smoothing_active_cutoffs_2"]').css('display', 'none');
         }
 
-        // D_MIN
+        // D_MIN and rate_limits
         if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
             setParameter('d_min_roll'   , sysConfig.d_min[0]     , 0);
             setParameter('d_min_pitch'  , sysConfig.d_min[1]     , 0);
@@ -580,8 +591,14 @@ function HeaderDialog(dialog, onSave) {
             setParameter('d_min_gain'   , sysConfig.d_min_gain   , 0);
             setParameter('d_min_advance', sysConfig.d_min_advance, 0);
             $("#d_min").show();
+
+            setParameter('rate_limits_roll'  , sysConfig.rate_limits[0], 0);
+            setParameter('rate_limits_pitch' , sysConfig.rate_limits[1], 0);
+            setParameter('rate_limits_yaw'   , sysConfig.rate_limits[2], 0);
+            $("rate_limits").show();
         } else {
             $("#d_min").hide();
+            $("rate_limits").hide();
         }
 
     	renderSelect('unsynced_fast_pwm'		,sysConfig.unsynced_fast_pwm, MOTOR_SYNC);
