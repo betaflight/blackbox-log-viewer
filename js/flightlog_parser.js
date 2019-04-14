@@ -210,6 +210,7 @@ var FlightLogParser = function(logData) {
             serialrx_provider:null,                 // name of the serial rx provider
             superExpoFactor:null,                   // Super Expo Factor
             rates:[null, null, null],               // Rates [ROLL, PITCH, YAW]
+            rate_limits:[1998, 1998, 1998],         // Limits [ROLL, PITCH, YAW] with defaults for backward compatibility
             rc_rates:[null, null, null],            // RC Rates [ROLL, PITCH, YAW]
             rc_expo:[null, null, null],             // RC Expo [ROLL, PITCH, YAW]
             looptime:null,                          // Looptime
@@ -662,6 +663,7 @@ var FlightLogParser = function(logData) {
 
             /* CSV packed values */
             case "rates":
+            case "rate_limits":
             case "rollPID":
             case "pitchPID":
             case "yawPID":
