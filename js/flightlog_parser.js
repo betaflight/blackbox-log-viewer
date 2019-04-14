@@ -255,10 +255,14 @@ var FlightLogParser = function(logData) {
             mag_hardware:null,                      // Magnetometer Hardware type
             gyro_cal_on_first_arm:null,             // Gyro Calibrate on first arm
             vbat_pid_compensation:null,             // VBAT PID compensation
+            rate_limits:[null, null, null],         // RC Rate limits
             rc_smoothing:null,                      // RC Control Smoothing
             rc_smoothing_type:null,                 // Type of the RC Smoothing
             rc_interpolation:null,                  // RC Control Interpolation type
+            rc_interpolation_channels:null,         // RC Control Interpotlation channels
             rc_interpolation_interval:null,         // RC Control Interpolation Interval
+            rc_smoothing_active_cutoffs:[null,null],// RC Smoothing active cutoffs
+            rc_smoothing_auto_factor:null,          // RC Smoothing auto factor
             rc_smoothing_cutoffs:[null, null],      // RC Smoothing input and derivative cutoff
             rc_smoothing_filter_type:[null,null],   // RC Smoothing input and derivative type
             rc_smoothing_rx_average:null,           // RC Smoothing rx average readed in ms
@@ -544,6 +548,7 @@ var FlightLogParser = function(logData) {
             case "gyro_cal_on_first_arm":
             case "vbat_pid_compensation":
             case "rc_smoothing":
+            case "rc_smoothing_auto_factor":
             case "rc_smoothing_type":
             case "rc_smoothing_debug_axis":
             case "rc_smoothing_rx_average":
@@ -551,6 +556,7 @@ var FlightLogParser = function(logData) {
             case "features":
             case "dynamic_pid":
             case "rc_interpolation":
+            case "rc_interpolation_channels":
             case "rc_interpolation_interval":
             case "unsynced_fast_pwm":
             case "fast_pwm_protocol":
@@ -666,6 +672,8 @@ var FlightLogParser = function(logData) {
             case "levelPID":
             case "velPID":
             case "motorOutput":
+            case "rate_limits":
+            case "rc_smoothing_active_cutoffs":
             case "rc_smoothing_cutoffs":
             case "rc_smoothing_filter_type":
             case "gyro_lowpass_dyn_hz":
