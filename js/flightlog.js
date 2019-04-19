@@ -1027,7 +1027,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             */
 
             var limit = sysConfig["rate_limits"][axis];
-            if (sysConfig.pidController == 0 /* LEGACY */) {
+            if (sysConfig.pidController == 0 || limit == null) { /* LEGACY */
                 return  constrain(angleRate * 4.1, -8190.0, 8190.0) >> 2; // Rate limit protection
             } else {
                 return  constrain(angleRate, -1.0 * limit, limit); // Rate limit protection (deg/sec)
