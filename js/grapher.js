@@ -869,7 +869,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 var graph = graphs[graphConfig.selectedGraphIndex]; 		
 				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
                 analyser.plotSpectrum(field.index, field.curve, graphConfig.selectedFieldName);
-                } catch(err) {console.log('Cannot plot analyser');}            
+                } catch(err) {console.log('Cannot plot analyser ' + err);}            
             }
 
             //Draw Watermark

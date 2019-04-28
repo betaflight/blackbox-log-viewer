@@ -11,16 +11,6 @@ var
         ANALYSER_LARGE_HEIGHT_PROPORTION  = 0.9, // 90% high
         ANALYSER_LARGE_WIDTH_PROPORTION   = 0.9; // 90% wide
 
-var canvasCtx = analyserCanvas.getContext("2d");
-
-var // inefficient; copied from grapher.js
-
-        DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
-        
-        drawingParams = {
-            fontSizeFrameLabel: null,
-            fontSizeFrameLabelFullscreen: "9"
-        };
 
 var that = this;
 
@@ -34,6 +24,8 @@ var analyserTimeRange  = {
 						   out: MAX_ANALYSER_LENGTH
 };
 var dataReload = false;
+
+GraphSpectrumPlot.initialize(analyserCanvas);
 
 this.setInTime = function(time) {
 	analyserTimeRange.in = time;
@@ -79,7 +71,8 @@ try {
 		fieldIndex: -1,
 		fftLength: 0,
 		fftOutput: 0,
-		maxNoiseIdx: 0
+		maxNoiseIdx: 0,
+		blackBoxRate: 0
 	};
 
 	this.setFullscreen = function(size) {
@@ -111,8 +104,7 @@ try {
    		var newSize = getSize();
 
         // Determine the analyserCanvas location
-        canvasCtx.canvas.height    =  newSize.height; // (canvas.height * getSize().height);
-        canvasCtx.canvas.width     =  newSize.width; // (canvas.width  * getSize().width);
+        GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
 		// Recenter the analyser canvas in the bottom left corner
 		var parentElem = $(analyserCanvas).parent();
@@ -123,316 +115,116 @@ try {
         });
 		// place the sliders.
 		$("input:first-of-type", parentElem).css({
-			left: (canvasCtx.canvas.width - 130) + "px"
+			left: (newSize.width - 130) + "px"
         });
 		$("input:last-of-type", parentElem).css({
-			left: (canvasCtx.canvas.width - 20) + "px"
+			left: (newSize.width - 20) + "px"
 		});
 		$("#analyserResize", parentElem).css({
-			left: (canvasCtx.canvas.width - 28) + "px"
+			left: (newSize.width - 28) + "px"
 		})
 
 	};
-	
-	var dataLoad = function() {
-		//load all samples
-		var logStart = flightLog.getMinTime();
-		var logEnd = ((flightLog.getMaxTime() - logStart)<=MAX_ANALYSER_LENGTH)?flightLog.getMaxTime():(logStart+MAX_ANALYSER_LENGTH);
-		if(analyserTimeRange.in) {
-			logStart = analyserTimeRange.in;
-		}
+
+    var getFlightSamples = function(samples) {
+        //load all samples
+        var logStart = flightLog.getMinTime();
+        var logEnd = ((flightLog.getMaxTime() - logStart) <= MAX_ANALYSER_LENGTH)? flightLog.getMaxTime() : (logStart+MAX_ANALYSER_LENGTH);
+        if(analyserTimeRange.in) {
+            logStart = analyserTimeRange.in;
+        }
         if(analyserTimeRange.out) {
             logEnd = analyserTimeRange.out;
         }
-		var allChunks = flightLog.getChunksInTimeRange(logStart, logEnd); //Max 300 seconds
-		var samples = new Float64Array(MAX_ANALYSER_LENGTH/1000);
+        var allChunks = flightLog.getChunksInTimeRange(logStart, logEnd); //Max 300 seconds
 
         // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
-        fftData.samples	= 0;
-		for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
-			var chunk = allChunks[chunkIndex];
-			for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-				samples[fftData.samples++] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
-			}
-		}
-
-        if(userSettings.analyserHanning) {
-            // apply hanning window function
-            for(var i=0; i<fftData.samples; i++) {
-                samples[i] *= 0.5 * (1-Math.cos((2*Math.PI*i)/(fftData.samples - 1)));
+        var samplesCount = 0;
+        for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
+            var chunk = allChunks[chunkIndex];
+            for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
+                samples[samplesCount++] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
             }
         }
 
+        return samplesCount;
+    };
+
+    var hanningWindow = function(samples, size) {
+
+        if (!size) {
+            size = samples.length;
+        }
+
+        for(var i=0; i < size; i++) {
+            samples[i] *= 0.5 * (1-Math.cos((2*Math.PI*i)/(fftData.samples - 1)));
+        }
+    };
+
+    var fft  = function(samples) {
+
+        var fftLength = samples.length;
+        var fftOutput = new Float64Array(fftLength * 2);
+        var fft = new FFT.complex(fftLength, false);
+
+        fft.simple(fftOutput, samples, 'real');
+
+        return fftOutput;
+    };
+
+    /**
+     * Makes all the values absolute and returns the index of maxFrequency found
+     */
+    var normalizeFft = function(fftOutput, fftLength) {
+
+        if (!fftLength) {
+            fftLength = fftOutput.length;
+        }
+
+        // Make all the values absolute, and calculate some useful values (max noise, etc.)
+        var maxFrequency = (blackBoxRate / 2.0);
+        var noiseLowEndIdx = 100 / maxFrequency * fftLength;
+        var maxNoiseIdx = 0;
+        var maxNoise = 0;
+        
+        for (var i = 0; i < fftLength; i++) {
+            fftOutput[i] = Math.abs(fftOutput[i]);
+            if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
+                maxNoise = fftOutput[i];
+                maxNoiseIdx = i;
+            }
+        }
+
+        maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
+
+        var fftData = {
+            fieldIndex   : dataBuffer.fieldIndex,
+            fftLength    : fftLength,
+            fftOutput    : fftOutput,
+            maxNoiseIdx  : maxNoiseIdx,
+            blackBoxRate : blackBoxRate,
+        };
+
+        return fftData;
+    };
+
+    var dataLoad = function() {
+
+        var samples = new Float64Array(MAX_ANALYSER_LENGTH/1000);
+
+        var samplesCount = getFlightSamples(samples);
+
+        if(userSettings.analyserHanning) {
+            hanningWindow(samples, samplesCount);
+        }
+
         //calculate fft
-		var fftLength = samples.length;
-		var fftOutput = new Float64Array(fftLength * 2);
-		var fft = new FFT.complex(fftLength, false);
-		
-		fft.simple(fftOutput, samples, 'real');
+        var fftOutput = fft(samples);
 
-		//calculate absolute values and find motor noise above 100hz
-		var maxFrequency = (blackBoxRate / 2.0);
-		var noiseLowEndIdx = 100 / maxFrequency * fftLength;
-		var maxNoiseIdx = 0;
-		var maxNoise = 0;
-		
-		for (var i = 0; i < fftLength; i++) {
-			fftOutput[i] = Math.abs(fftOutput[i]);
-			if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
-				maxNoise = fftOutput[i];
-				maxNoiseIdx = i;
-			}
-		}
-
-		maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
-		
-		fftData.fieldIndex = dataBuffer.fieldIndex;
-		fftData.fftLength = fftLength;
-		fftData.fftOutput = fftOutput;
-		fftData.maxNoiseIdx = maxNoiseIdx;
-	};
-
-	/**
-     * Function to actually draw the spectrum analyser overlay
-     * again, need to look at optimisation....
-     **/
-	var draw = function() {
-		canvasCtx.save();
-		canvasCtx.lineWidth = 1;
-		canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
-
-		var MARGIN = 10; // pixels
-		var HEIGHT = canvasCtx.canvas.height - MARGIN;
-		var WIDTH  = canvasCtx.canvas.width;
-		var LEFT   = canvasCtx.canvas.left;
-		var TOP    = canvasCtx.canvas.top;
-
-		var PLOTTED_BUFFER_LENGTH = fftData.fftLength / (analyserZoomX);
-		var PLOTTED_BLACKBOX_RATE = blackBoxRate / (analyserZoomX);
-
-		canvasCtx.translate(LEFT, TOP);
-
-		var backgroundGradient = canvasCtx.createLinearGradient(0,0,0,(HEIGHT+((isFullscreen)?MARGIN:0)));
-		if(isFullscreen) {
-            backgroundGradient.addColorStop(1,   'rgba(0,0,0,0.9)');
-            backgroundGradient.addColorStop(0,   'rgba(0,0,0,0.7)');
-		} else {
-			backgroundGradient.addColorStop(1,   'rgba(255,255,255,0.25)');
-			backgroundGradient.addColorStop(0,   'rgba(255,255,255,0)');
-		}
-		canvasCtx.fillStyle = backgroundGradient; //'rgba(255, 255, 255, .25)'; /* white */
-
-		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT+((isFullscreen)?MARGIN:0));
-
-		var barWidth = (WIDTH / (PLOTTED_BUFFER_LENGTH / 10)) - 1;
-		var barHeight;
-		var x = 0;
-
-		var barGradient = canvasCtx.createLinearGradient(0,HEIGHT,0,0);
-            barGradient.addColorStop(constrain(0/analyserZoomY,0,1),      'rgba(0,255,0,0.2)');
-            barGradient.addColorStop(constrain(0.15/analyserZoomY,0,1),   'rgba(128,255,0,0.2)');
-            barGradient.addColorStop(constrain(0.45/analyserZoomY,0,1),   'rgba(255,0,0,0.5)');
-            barGradient.addColorStop(constrain(1/analyserZoomY, 0, 1),    'rgba(255,128,128,1.0)');
-        canvasCtx.fillStyle = barGradient; //'rgba(0,255,0,0.3)'; //green
-
-        var fftScale = HEIGHT / (analyserZoomY*100);
-		for(var i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
-			barHeight = (fftData.fftOutput[i] * fftScale);
-			canvasCtx.fillRect(x,(HEIGHT-barHeight),barWidth,barHeight);
-			x += barWidth + 1;
-		}
-
-		drawAxisLabel(dataBuffer.fieldName, WIDTH - 4, HEIGHT - 6, 'right');
-		drawGridLines(PLOTTED_BLACKBOX_RATE, LEFT, TOP, WIDTH, HEIGHT, MARGIN);
-
-		var offset = 0;
-        if (mouseFrequency !=null) {
-            drawInterestFrequency(mouseFrequency, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, 15*offset + MARGIN, "rgba(0,255,0,0.50)", 3);
-        }
-
-        offset += 2; // make some space! Includes the space for the mouseFrequency. In this way the other elements don't move in the screen when used
-
-        // Dynamic gyro lpf 
-        if(flightLog.getSysConfig().gyro_lowpass_dyn_hz[0] != null && flightLog.getSysConfig().gyro_lowpass_dyn_hz[0] > 0 &&
-                flightLog.getSysConfig().gyro_lowpass_dyn_hz[1] > flightLog.getSysConfig().gyro_lowpass_dyn_hz[0]) {
-            drawLowpassDynFilter(flightLog.getSysConfig().gyro_lowpass_dyn_hz[0], flightLog.getSysConfig().gyro_lowpass_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'GYRO LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
-
-        // Static gyro lpf
-        } else  if ((flightLog.getSysConfig().gyro_lowpass_hz != null) && (flightLog.getSysConfig().gyro_lowpass_hz > 0)) {
-            drawLowpassFilter(flightLog.getSysConfig().gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
-        }
-
-        // Static gyro lpf 2
-        if ((flightLog.getSysConfig().gyro_lowpass2_hz != null) && (flightLog.getSysConfig().gyro_lowpass2_hz > 0)) {
-            drawLowpassFilter(flightLog.getSysConfig().gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, 'GYRO LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 172, 122, 0.50)");
-        }
-
-         // Notch gyro
-		if(flightLog.getSysConfig().gyro_notch_hz!=null && flightLog.getSysConfig().gyro_notch_cutoff!=null ) {
-			if(flightLog.getSysConfig().gyro_notch_hz.length > 0) { //there are multiple gyro notch filters
-				for(var i=0; i<flightLog.getSysConfig().gyro_notch_hz.length; i++) {
-					if(flightLog.getSysConfig().gyro_notch_hz[i] > 0 && flightLog.getSysConfig().gyro_notch_cutoff[i] > 0) {
-                        drawNotchFilter(flightLog.getSysConfig().gyro_notch_hz[i], flightLog.getSysConfig().gyro_notch_cutoff[i], PLOTTED_BLACKBOX_RATE, 'GYRO notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
-					}
-				}
-			} else { // only a single gyro notch to display
-				if(flightLog.getSysConfig().gyro_notch_hz > 0 && flightLog.getSysConfig().gyro_notch_cutoff > 0) {
-                    drawNotchFilter(flightLog.getSysConfig().gyro_notch_hz, flightLog.getSysConfig().gyro_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'GYRO notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
-				}
-			}
-		}
-		offset++; // make some space!
-		try {
-            if (dataBuffer.fieldName.match(/(.*yaw.*)/i) != null) {
-                if (flightLog.getSysConfig().yaw_lpf_hz != null && flightLog.getSysConfig().yaw_lpf_hz > 0) {
-                    drawLowpassFilter(flightLog.getSysConfig().yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-                }
-            } else {
-                // Dynamic dterm lpf 
-                if(flightLog.getSysConfig().dterm_lpf_dyn_hz[0] != null && flightLog.getSysConfig().dterm_lpf_dyn_hz[0] > 0 &&
-                        flightLog.getSysConfig().dterm_lpf_dyn_hz[1] > flightLog.getSysConfig().dterm_lpf_dyn_hz[0]) {
-                    drawLowpassDynFilter(flightLog.getSysConfig().dterm_lpf_dyn_hz[0], flightLog.getSysConfig().dterm_lpf_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'D-TERM LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 123, 132, 0.50)");
-
-                // Static dterm lpf
-                } else if((flightLog.getSysConfig().dterm_lpf_hz != null) && (flightLog.getSysConfig().dterm_lpf_hz > 0)) {
-                    drawLowpassFilter(flightLog.getSysConfig().dterm_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 123, 132, 0.50)");
-                }
-
-                // Static dterm lpf 2
-                if((flightLog.getSysConfig().dterm_lpf2_hz != null) && (flightLog.getSysConfig().dterm_lpf2_hz > 0)) {
-                    drawLowpassFilter(flightLog.getSysConfig().dterm_lpf2_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(16, 97, 116, 0.50)");
-                }
-
-                // Notch dterm
-				if(flightLog.getSysConfig().dterm_notch_hz!=null && flightLog.getSysConfig().dterm_notch_cutoff!=null ) {
-					if(flightLog.getSysConfig().dterm_notch_hz > 0 && flightLog.getSysConfig().dterm_notch_cutoff > 0) {
-                        drawNotchFilter(flightLog.getSysConfig().dterm_notch_hz, flightLog.getSysConfig().dterm_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'D-TERM notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(47, 72, 88, 0.50)");
-					}
-				}
-			}
-			offset++; // make some space!
-		} catch (e) {
-			console.log('Notch filter fieldName missing');
-		}
-		drawInterestFrequency(fftData.maxNoiseIdx,  PLOTTED_BLACKBOX_RATE, 'Max motor noise', WIDTH, HEIGHT, (15*offset) + MARGIN, "rgba(255,0,0,0.50)", 3);
-
-		canvasCtx.restore();
-	};
-	
-	var drawMarkerLine = function(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth){
-		var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequncy lies
-
-		lineWidth = (lineWidth || DEFAULT_MARK_LINE_WIDTH);
-		if (lineWidth > 5) { // is the linewidth specified as a frequency band
-			lineWidth = WIDTH *  (2 * lineWidth) / (sampleRate / 2);		
-		}
-		if(lineWidth < 1) lineWidth = 1;
-
-		canvasCtx.beginPath();
-		canvasCtx.lineWidth = lineWidth || 1;
-		canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
-
-		canvasCtx.moveTo(x, OFFSET - 10);
-		canvasCtx.lineTo(x, HEIGHT);
-
-		canvasCtx.stroke();
-		
-        if(label != null) {
-            drawAxisLabel(label.trim(), (x + 2), OFFSET + 1, 'left');
-        }
-		
-        return x;
-	};
-	
-    var drawInterestFrequency = function(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
-        var interestLabel = label + ' ' + frequency.toFixed(0) + "Hz";
-        return drawMarkerLine(frequency, sampleRate, interestLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
-    }
-
-    var drawLowpassFilter = function(frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
-        var lpfLabel = label + ' ' + frequency.toFixed(0) + "Hz"
-        return drawMarkerLine(frequency, sampleRate, lpfLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
-    }
-
-    var drawLowpassDynFilter = function(frequency1, frequency2, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
-
-        // frequency2 line
-        var x2 = drawMarkerLine(frequency2, sampleRate, null, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
-
-        // frequency1 line with label
-        var dynFilterLabel = label + ' ' + (frequency1.toFixed(0))+'-'+(frequency2.toFixed(0))+"Hz";
-        var x1 = drawMarkerLine(frequency1, sampleRate, dynFilterLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
-
-        // Join line between frequency1 and frequency2 lines
-        canvasCtx.beginPath();
-        canvasCtx.lineWidth = lineWidth || DEFAULT_MARK_LINE_WIDTH;
-        canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
-
-        canvasCtx.moveTo(x1, OFFSET - 10);
-        canvasCtx.lineTo(x2, OFFSET - 10);
-
-        canvasCtx.stroke();
-    };
-
-    var drawNotchFilter = function(center, cutoff, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
-
-        var cutoffX = WIDTH * cutoff / (sampleRate / 2); 
-        var centerX = WIDTH * center / (sampleRate / 2); 
-
-        canvasCtx.beginPath();
-        canvasCtx.lineWidth = lineWidth || DEFAULT_MARK_LINE_WIDTH;
-        canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
-
-        // center - offset
-        canvasCtx.moveTo(centerX, OFFSET - 10);
-        canvasCtx.lineTo(cutoffX, HEIGHT);
-
-        // center + offset
-        canvasCtx.moveTo(centerX, OFFSET - 10);
-        canvasCtx.lineTo(centerX*2 - cutoffX, HEIGHT);
-
-        canvasCtx.stroke();
-
-        // center with label
-        var labelNotch = label + ' center ' + (center.toFixed(0))+'Hz, cutoff '+(cutoff.toFixed(0))+"Hz";
-        drawMarkerLine(center, sampleRate, labelNotch, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+        // Normalize the result
+        fftData = normalizeFft(fftOutput, samplesCount)
 
     };
-
-	var drawGridLines = function(sampleRate, LEFT, TOP, WIDTH, HEIGHT, MARGIN) {
-
-		var ticks = 5;
-		var frequencyInterval = (sampleRate / ticks) / 2;
-		var frequency = 0;
-
-		for(var i=0; i<=ticks; i++) {
-				canvasCtx.beginPath();
-				canvasCtx.lineWidth = 1;
-				canvasCtx.strokeStyle = "rgba(255,255,255,0.25)";
-
-				canvasCtx.moveTo(i * (WIDTH / ticks), 0);
-				canvasCtx.lineTo(i * (WIDTH / ticks), HEIGHT);
-
-				canvasCtx.stroke();
-				var textAlign = (i==0)?'left':((i==ticks)?'right':'center');
-				drawAxisLabel((frequency.toFixed(0))+"Hz", i * (WIDTH / ticks), HEIGHT + MARGIN, textAlign);
-				frequency += frequencyInterval;
-		}	
-	};
-
-	var drawAxisLabel = function(axisLabel, X, Y, align) {
-			canvasCtx.font = ((isFullscreen)?drawingParams.fontSizeFrameLabelFullscreen:drawingParams.fontSizeFrameLabel) + "pt " + DEFAULT_FONT_FACE;
-			canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
-			if(align) {
-				 canvasCtx.textAlign = align;
-				 } else 
-				 {
-				 canvasCtx.textAlign = 'center';
-				 }
-
-
-			canvasCtx.fillText(axisLabel, X, Y);
-		};
 
 	/* This function is called from the canvas drawing routines within grapher.js
 	   It is only used to record the current curve positions, collect the data and draw the 
@@ -452,7 +244,7 @@ try {
 				dataLoad();				
 			}
 			
-			draw(); // draw the analyser on the canvas....
+			that.draw(); // draw the analyser on the canvas....
 	};
 
     this.destroy = function() {
@@ -461,7 +253,11 @@ try {
     };
 
     this.refresh = function() {
-    	draw();
+    	that.draw();
+    };
+
+    this.draw = function() {
+        GraphSpectrumPlot.drawNoiseGraph(fftData, dataBuffer, flightLog, isFullscreen, analyserZoomX, analyserZoomY, mouseFrequency);
     };
 
     /* Add mouse/touch over event to read the frequency */
