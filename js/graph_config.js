@@ -107,8 +107,8 @@ function GraphConfig(graphConfig) {
                     
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
-                            // add special condition for rcCommands as each of the fields requires a different scaling.
-                            let forceNewCurve = (nameRoot=='rcCommand') || (nameRoot=='rcCommands');
+                            // add special condition for rcCommands and debug as each of the fields requires a different scaling.
+                            let forceNewCurve = (nameRoot=='rcCommand') || (nameRoot=='rcCommands') || (nameRoot=='debug');
                             newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
                             colorIndexOffset++;
                         }
@@ -213,6 +213,10 @@ GraphConfig.load = function(config) {
             {
                 label: "Accelerometers",
                 fields: ["accSmooth[all]"]
+            },
+            {
+                label: "Debug",
+                fields: ["debug[all]"]
             }
         ];
 
