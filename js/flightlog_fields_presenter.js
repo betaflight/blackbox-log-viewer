@@ -224,11 +224,11 @@ function FlightLogFieldPresenter() {
                             'debug[3]':'Stack p',
             },
             'FFT' : {
-    		                'debug[all]':'Debug FFT',
-    		                'debug[0]':'Gyro Raw [roll]',
-    		                'debug[1]':'Gyro Dyn Notch [roll]',
-    		                'debug[2]':'Gyro BPF [roll]',
-    		                'debug[3]':'FFT Center Index [roll]',
+                            'debug[all]':'Debug FFT',
+                            'debug[0]':'Gyro Scaled [dbg-axis]',
+                            'debug[1]':'Gyro Pre-Dyn [dbg-axis]',
+                            'debug[2]':'Gyro Downsampled [roll]',
+                            'debug[3]':'FFT Center Index [roll]',
     		},
             'FFT_TIME' : {
                             'debug[all]':'Debug FFT TIME',
@@ -241,8 +241,8 @@ function FlightLogFieldPresenter() {
                             'debug[all]':'Debug FFT FREQ',
                             'debug[0]':'Center Freq [roll]',
                             'debug[1]':'Center Freq [pitch]',
-                            'debug[2]':'Center Freq [yaw]',
-                            'debug[3]':'Gyro Raw [roll]',
+                            'debug[2]':'Gyro Pre-Dyn [dbg-axis]',
+                            'debug[3]':'Gyro Scaled [dbg-axis]',
             },
             'GYRO_RAW' :   {
                             'debug[all]':'Debug Gyro Raw', 
@@ -316,10 +316,10 @@ function FlightLogFieldPresenter() {
                         },
             'DYN_LPF' : {
                             'debug[all]':'Debug Dyn LPF',
-                            'debug[0]':'Gyro Scaled [roll]',
+                            'debug[0]':'Gyro Scaled [dbg-axis]',
                             'debug[1]':'Notch Center [roll]',
-                            'debug[2]':'Lowpass Cutoff [roll]',
-                            'debug[3]':'Gyro Pre-Dyn [roll]',
+                            'debug[2]':'Lowpass Cutoff',
+                            'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
             },
             'AC_CORRECTION' : {
                             'debug[all]':'AC Correction',
@@ -593,12 +593,26 @@ function FlightLogFieldPresenter() {
                 case 'STACK':
                     return value.toFixed(0);
                 case 'FFT':
-                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                    switch (fieldName) {
+                    case 'debug[0]': // gyro scaled [for selected axis]
+                    case 'debug[1]': // pre-dyn notch gyro [for selected axis]
+                    case 'debug[2]': // pre-dyn notch gyro FFT downsampled [roll]
+                        return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                    case 'debug[3]': // FFT bin mean index
+                        return (value / 100).toFixed(2);
+                    }
+                    break;
                 case 'FFT_TIME':
-                    return value.toFixed(0) + "\u03BCS";
+                    switch (fieldName) {
+                    case 'debug[1]':
+                    case 'debug[2]':
+                        return value.toFixed(0) + "\u03BCs";
+                    }
+                    break;
                 case 'FFT_FREQ':
                     switch (fieldName) {
-                    case 'debug[3]':
+                    case 'debug[2]': // pre-dyn notch gyro [for selected axis]
+                    case 'debug[3]': // raw gyro [for selected axis]
                         return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
                     default:
                         return value.toFixed(0) + "Hz";
@@ -629,8 +643,8 @@ function FlightLogFieldPresenter() {
                     break;
                 case 'DYN_LPF':
                     switch (fieldName) {
-                        case 'debug[0]':
-                        case 'debug[3]':
+                        case 'debug[0]': // gyro scaled [for selected axis]
+                        case 'debug[3]': // pre-dyn notch gyro [for selected axis]
                             return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
                         default:
                             return value.toFixed(0) + "Hz";
