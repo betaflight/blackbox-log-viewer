@@ -154,7 +154,7 @@ try {
         }
 
         for(var i=0; i < size; i++) {
-            samples[i] *= 0.5 * (1-Math.cos((2*Math.PI*i)/(fftData.samples - 1)));
+            samples[i] *= 0.5 * (1-Math.cos((2*Math.PI*i)/(size - 1)));
         }
     };
 
