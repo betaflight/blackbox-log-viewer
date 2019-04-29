@@ -2,15 +2,11 @@
 
 function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
-const DEFAULT_MARK_LINE_WIDTH = 2;
-
 var
-
-        ANALYSER_LARGE_LEFT_PROPORTION    = 0.05, // 5% from left
-        ANALYSER_LARGE_TOP_PROPORTION     = 0.05, // 5% from top
-        ANALYSER_LARGE_HEIGHT_PROPORTION  = 0.9, // 90% high
-        ANALYSER_LARGE_WIDTH_PROPORTION   = 0.9; // 90% wide
-
+        ANALYSER_LARGE_LEFT_MARGIN    = 10,
+        ANALYSER_LARGE_TOP_MARGIN     = 10,
+        ANALYSER_LARGE_HEIGHT_MARGIN  = 20,
+        ANALYSER_LARGE_WIDTH_MARGIN   = 20;
 
 var that = this;
 
@@ -24,8 +20,6 @@ var analyserTimeRange  = {
 						   out: MAX_ANALYSER_LENGTH
 };
 var dataReload = false;
-
-GraphSpectrumPlot.initialize(analyserCanvas);
 
 this.setInTime = function(time) {
 	analyserTimeRange.in = time;
@@ -48,6 +42,8 @@ try {
 	var gyroRate = (1000000/sysConfig['looptime']).toFixed(0);
 	var pidRate = 1000; //default for old logs
     var isFullscreen = false;
+
+    GraphSpectrumPlot.initialize(analyserCanvas, sysConfig);
 
     var analyserZoomXElem = $("#analyserZoomX");
     var analyserZoomYElem = $("#analyserZoomY");
@@ -77,16 +73,17 @@ try {
 
 	this.setFullscreen = function(size) {
 		isFullscreen = (size==true);
+        GraphSpectrumPlot.setFullScreen(isFullscreen);
 		that.resize();
 	};
 
 	var getSize = function () {
 		if (isFullscreen){
 				return {
-					height: canvas.clientHeight - 20, // ANALYSER_LARGE_HEIGHT_PROPORTION,
-					width: canvas.clientWidth - 20,   // ANALYSER_LARGE_WIDTH_PROPORTION,
-					left: '10px',               // ANALYSER_LARGE_LEFT_PROPORTION,
-					top: '10px'                 // ANALYSER_LARGE_TOP_PROPORTION
+                    height: canvas.clientHeight - ANALYSER_LARGE_HEIGHT_MARGIN,
+                    width: canvas.clientWidth - ANALYSER_LARGE_WIDTH_MARGIN,
+                    left: ANALYSER_LARGE_LEFT_MARGIN,
+                    top: ANALYSER_LARGE_TOP_MARGIN
                 }
 			} else {
 				return {
@@ -199,6 +196,7 @@ try {
 
         var fftData = {
             fieldIndex   : dataBuffer.fieldIndex,
+            fieldName    : dataBuffer.fieldName,
             fftLength    : fftLength,
             fftOutput    : fftOutput,
             maxNoiseIdx  : maxNoiseIdx,
@@ -241,7 +239,8 @@ try {
             // Detect change of selected field.... reload and redraw required.
 			if ((fieldIndex != fftData.fieldIndex) || dataReload) {
 				dataReload = false;
-				dataLoad();				
+				dataLoad();			
+                GraphSpectrumPlot.setData(fftData);
 			}
 			
 			that.draw(); // draw the analyser on the canvas....
@@ -257,7 +256,7 @@ try {
     };
 
     this.draw = function() {
-        GraphSpectrumPlot.drawNoiseGraph(fftData, dataBuffer, flightLog, isFullscreen, analyserZoomX, analyserZoomY, mouseFrequency);
+        GraphSpectrumPlot.draw();
     };
 
     /* Add mouse/touch over event to read the frequency */
@@ -272,12 +271,14 @@ try {
     analyserZoomXElem.on('input',
 		function () {
 		analyserZoomX = (analyserZoomXElem.val() / 100);
+        GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
 		that.refresh();
 		}            
 	); analyserZoomXElem.val(100);
     analyserZoomYElem.on('input',
 		function () {
 		analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
+        GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
 		that.refresh();
 		}            
 	); analyserZoomYElem.val(100);
@@ -287,17 +288,20 @@ try {
     }
     // track frequency under mouse
     var lastFrequency;
-	function trackFrequency(e, analyser) {
-		if(e.shiftKey) {
-			var rect = analyserCanvas.getBoundingClientRect();
-			mouseFrequency = ((e.clientX - rect.left) / analyserCanvas.width) * ((blackBoxRate / analyserZoomX) / 2);
-			if(lastFrequency!=mouseFrequency) {
-				lastFrequency = mouseFrequency;
-				if(analyser) analyser.refresh();
-			}
-			e.preventDefault();
-		}
-	}
+    function trackFrequency(e, analyser) {
+        if(e.shiftKey) {
+            var rect = analyserCanvas.getBoundingClientRect();
+            mouseFrequency = ((e.clientX - rect.left) / analyserCanvas.width) * ((blackBoxRate / analyserZoomX) / 2);
+            if(lastFrequency != mouseFrequency) {
+                lastFrequency = mouseFrequency;
+                GraphSpectrumPlot.setMouseFrequency(mouseFrequency);
+                if (analyser) {
+                    analyser.refresh();
+                }
+            }
+            e.preventDefault();
+        }
+    }
 
 }
 
