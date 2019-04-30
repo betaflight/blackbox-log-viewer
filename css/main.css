@@ -534,6 +534,27 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
     position: absolute;
     font-size: 18px;
 }
+
+.analyser:hover #spectrumType {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+}
+
+.analyser #spectrumType {
+    color: #bbb;
+    opacity: 0;
+    left: 5px;
+    float: left;
+    z-index: 9;
+    position: absolute;
+    font-size: 9px;
+}
+
+analyser #spectrumType select {
+    border-radius: 3px;
+    padding: 0px 5px;
+}
+
 .analyser #analyserResize:hover {
     color: white;
     cursor: pointer;
@@ -555,7 +576,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 	top: 30px;
 }
 
-.analyser input {
+.analyser input.onlyFullScreen {
 	display: none;
 	padding: 3px;
 	margin-right: 3px;
