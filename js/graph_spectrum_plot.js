@@ -19,7 +19,10 @@ var GraphSpectrumPlot = GraphSpectrumPlot || {
     _cachedDataCanvas : null,
     _canvasCtx        : null,
     _fftData          : null,
-    _mouseFrequency   : null,
+    _mousePosition    : {
+            x : 0,
+            y : 0,
+    },
     _spectrumType     : null,
     _sysConfig        : null,
     _zoomX : 1.0,
@@ -68,8 +71,9 @@ GraphSpectrumPlot.setData = function(fftData, spectrumType) {
     this._invalidateDataCache();
 };
 
-GraphSpectrumPlot.setMouseFrequency = function(mouseFrequency) {
-    this._mouseFrequency = mouseFrequency;
+GraphSpectrumPlot.setMousePosition = function(x, y) {
+    this._mousePosition.x = x;
+    this._mousePosition.y = y;
 };
 
 GraphSpectrumPlot.draw = function() {
@@ -237,7 +241,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
     var WIDTH  = this._canvasCtx.canvas.width;
     var PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
-    var offset = 2; // make some space! Includes the space for the mouseFrequency. In this way the other elements don't move in the screen when used
+    var offset = 2; // make some space! Includes the space for the mouse frequency. In this way the other elements don't move in the screen when used
 
     // Dynamic gyro lpf 
     if(this._sysConfig.gyro_lowpass_dyn_hz[0] != null && this._sysConfig.gyro_lowpass_dyn_hz[0] > 0 &&
@@ -321,8 +325,8 @@ GraphSpectrumPlot._drawNotCachedElements = function() {
     var PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
     var offset = 0;
-    if (this._mouseFrequency !=null) {
-        this._drawInterestFrequency(canvasCtx, this._mouseFrequency, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, 15*offset + MARGIN, "rgba(0,255,0,0.50)", 3);
+    if (this._mousePosition.x != 0) {
+        this._drawMouseFrequency(canvasCtx, this._mousePosition.x, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, 15*offset + MARGIN, "rgba(0,255,0,0.50)", 3);
     }
 }
 
@@ -459,6 +463,17 @@ GraphSpectrumPlot._drawNotchFilter = function(canvasCtx, center, cutoff, sampleR
     // center with label
     var labelNotch = label + ' center ' + (center.toFixed(0))+'Hz, cutoff '+(cutoff.toFixed(0))+"Hz";
     this._drawMarkerLine(canvasCtx, center, sampleRate, labelNotch, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+
+};
+
+GraphSpectrumPlot._drawMouseFrequency = function(canvasCtx, mouseX, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
+
+    // Calculate frequency at mouse
+    var mouseFrequency = (mouseX / this._canvasCtx.canvas.width) * ((this._fftData.blackBoxRate / this._zoomX) / 2);
+    if (mouseFrequency >= 0 && mouseFrequency <= sampleRate) {
+        this._drawInterestFrequency(canvasCtx, mouseFrequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, "rgba(0,255,0,0.50)", 3);
+    }
+
 
 };
 
