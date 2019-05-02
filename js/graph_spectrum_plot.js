@@ -169,7 +169,7 @@ GraphSpectrumPlot._drawFrequencyVsThrottleGraph = function(canvasCtx) {
 
     var PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
-    var ACTUAL_MARGIN_LEFT = (this._isFullScreen)? MARGIN_LEFT_FULLSCREEN : MARGIN_LEFT;
+    var ACTUAL_MARGIN_LEFT = this._getActualMarginLeft();
     var WIDTH  = canvasCtx.canvas.width - ACTUAL_MARGIN_LEFT;
     var HEIGHT = canvasCtx.canvas.height - MARGIN_BOTTOM;
     var LEFT   = canvasCtx.canvas.offsetLeft + ACTUAL_MARGIN_LEFT;
@@ -232,13 +232,8 @@ GraphSpectrumPlot._drawHeatMap = function() {
 
 GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
 
-    // At this moment we not draw filters or markers for the spectrum vs throttle graph
-    if (this._spectrumType == SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
-        return;
-    }
-
     var HEIGHT = this._canvasCtx.canvas.height - MARGIN;
-    var WIDTH  = this._canvasCtx.canvas.width;
+    var WIDTH  = this._canvasCtx.canvas.width - this._getActualMarginLeft();
     var PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
     var offset = 2; // make some space! Includes the space for the mouse frequency. In this way the other elements don't move in the screen when used
@@ -263,12 +258,12 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
         if (this._sysConfig.gyro_notch_hz.length > 0) { //there are multiple gyro notch filters
             for (var i=0; i < this._sysConfig.gyro_notch_hz.length; i++) {
                 if (this._sysConfig.gyro_notch_hz[i] > 0 && this._sysConfig.gyro_notch_cutoff[i] > 0) {
-                    this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz[i], this._sysConfig.gyro_notch_cutoff[i], PLOTTED_BLACKBOX_RATE, 'GYRO notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
+                    this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz[i], this._sysConfig.gyro_notch_cutoff[i], PLOTTED_BLACKBOX_RATE, 'GYRO Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
                 }
             }
         } else { // only a single gyro notch to display
             if (this._sysConfig.gyro_notch_hz > 0 && this._sysConfig.gyro_notch_cutoff > 0) {
-                this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz, this._sysConfig.gyro_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'GYRO notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
+                this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz, this._sysConfig.gyro_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'GYRO Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
             }
         }
     }
@@ -298,7 +293,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
             // Notch dterm
             if (this._sysConfig.dterm_notch_hz != null && this._sysConfig.dterm_notch_cutoff != null) {
                 if (this._sysConfig.dterm_notch_hz > 0 && this._sysConfig.dterm_notch_cutoff > 0) {
-                    this._drawNotchFilter(canvasCtx, this._sysConfig.dterm_notch_hz, this._sysConfig.dterm_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'D-TERM notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(47, 72, 88, 0.50)");
+                    this._drawNotchFilter(canvasCtx, this._sysConfig.dterm_notch_hz, this._sysConfig.dterm_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'D-TERM Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(47, 72, 88, 0.50)");
                 }
             }
         }
@@ -307,27 +302,33 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
         console.log('Notch filter fieldName missing');
     }
 
-    this._drawInterestFrequency(canvasCtx, this._fftData.maxNoiseIdx,  PLOTTED_BLACKBOX_RATE, 'Max motor noise', WIDTH, HEIGHT, (15*offset) + MARGIN, "rgba(255,0,0,0.50)", 3);
+    if (this._spectrumType == SPECTRUM_TYPE.FREQUENCY) {
+        this._drawInterestFrequency(canvasCtx, this._fftData.maxNoiseIdx,  PLOTTED_BLACKBOX_RATE, 'Max motor noise', WIDTH, HEIGHT, (15*offset) + MARGIN, "rgba(255,0,0,0.50)", 3);
+    }
 
 };
 
 GraphSpectrumPlot._drawNotCachedElements = function() {
 
-    // At this moment we not draw filters or markers for the spectrum vs throttle graph
-    if (this._spectrumType == SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
-        return;
-    }
-
     var canvasCtx = this._canvasCtx; // Not cached canvas
 
-    var HEIGHT = this._canvasCtx.canvas.height - MARGIN;
-    var WIDTH  = this._canvasCtx.canvas.width;
+    canvasCtx.save();
+
     var PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
+    var HEIGHT = canvasCtx.canvas.height - MARGIN_BOTTOM;
+    var WIDTH  = canvasCtx.canvas.width - this._getActualMarginLeft();
+    var LEFT   = canvasCtx.canvas.offsetLeft + this._getActualMarginLeft();
+    var TOP    = canvasCtx.canvas.offsetTop;
+
+    canvasCtx.translate(LEFT, TOP);
+
     var offset = 0;
-    if (this._mousePosition.x != 0) {
-        this._drawMouseFrequency(canvasCtx, this._mousePosition.x, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, 15*offset + MARGIN, "rgba(0,255,0,0.50)", 3);
+    if (this._mousePosition.x > 0 || this._mousePosition.y > 0) {
+        this._drawMouseFrequency(canvasCtx, this._mousePosition.x, this._mousePosition.y, PLOTTED_BLACKBOX_RATE, '', WIDTH, HEIGHT, 15*offset + MARGIN, "rgba(0,255,0,0.50)", 3);
     }
+
+    canvasCtx.restore();
 }
 
 GraphSpectrumPlot._drawAxisLabel = function(canvasCtx, axisLabel, X, Y, align, baseline) {
@@ -386,8 +387,8 @@ GraphSpectrumPlot._drawThrottleLines = function(canvasCtx, LEFT, TOP, WIDTH, HEI
     }   
 };
 
-GraphSpectrumPlot._drawMarkerLine = function(canvasCtx, frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth){
-    var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequncy lies
+GraphSpectrumPlot._drawVerticalMarkerLine = function(canvasCtx, frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth){
+    var x = WIDTH * frequency / (sampleRate / 2); // percentage of range where frequency lies
 
     lineWidth = (lineWidth || DEFAULT_MARK_LINE_WIDTH);
     if (lineWidth > 5) { // is the linewidth specified as a frequency band
@@ -411,32 +412,103 @@ GraphSpectrumPlot._drawMarkerLine = function(canvasCtx, frequency, sampleRate, l
     return x;
 };
 
+GraphSpectrumPlot._drawHorizontalMarkerLine = function(canvasCtx, throttle, throttleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth){
+
+    var y = HEIGHT * (100 - throttle) / throttleRate; // percentage of range where throttle lies
+
+    lineWidth = (lineWidth || DEFAULT_MARK_LINE_WIDTH);
+    if (lineWidth > 5) { // is the linewidth specified as a frequency band
+        lineWidth = WIDTH *  (2 * lineWidth) / (sampleRate / 2);
+    }
+    if(lineWidth < 1) {
+        lineWidth = 1;
+    }
+
+    canvasCtx.beginPath();
+    canvasCtx.lineWidth = lineWidth || 1;
+    canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
+
+    var actualLeftMargin = this._getActualMarginLeft();
+
+    canvasCtx.moveTo(0, y);
+    canvasCtx.lineTo(WIDTH - OFFSET + 10, y);
+
+    canvasCtx.stroke();
+    
+    if(label != null) {
+        this._drawAxisLabel(canvasCtx, label.trim(), (WIDTH - OFFSET + 8), y - 1, 'right');
+    }
+
+    return y;
+};
+
 GraphSpectrumPlot._drawInterestFrequency = function(canvasCtx, frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
     var interestLabel = label + ' ' + frequency.toFixed(0) + "Hz";
-    return this._drawMarkerLine(canvasCtx, frequency, sampleRate, interestLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+    return this._drawVerticalMarkerLine(canvasCtx, frequency, sampleRate, interestLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
 }
 
 GraphSpectrumPlot._drawLowpassFilter = function(canvasCtx, frequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
     var lpfLabel = label + ' ' + frequency.toFixed(0) + "Hz"
-    return this._drawMarkerLine(canvasCtx, frequency, sampleRate, lpfLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+    return this._drawVerticalMarkerLine(canvasCtx, frequency, sampleRate, lpfLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
 }
 
 GraphSpectrumPlot._drawLowpassDynFilter = function(canvasCtx, frequency1, frequency2, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
 
-    // frequency2 line
-    var x2 = this._drawMarkerLine(canvasCtx, frequency2, sampleRate, null, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
-
     // frequency1 line with label
     var dynFilterLabel = label + ' ' + (frequency1.toFixed(0))+'-'+(frequency2.toFixed(0))+"Hz";
-    var x1 = this._drawMarkerLine(canvasCtx, frequency1, sampleRate, dynFilterLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+    var x1 = this._drawVerticalMarkerLine(canvasCtx, frequency1, sampleRate, dynFilterLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+
+    // frequency2 line
+    var offsetByType = (this._spectrumType == SPECTRUM_TYPE.FREQ_VS_THROTTLE)? 0 : OFFSET;
+    var x2 = this._drawVerticalMarkerLine(canvasCtx, frequency2, sampleRate, null, WIDTH, HEIGHT, offsetByType, stroke, lineWidth);
 
     // Join line between frequency1 and frequency2 lines
     canvasCtx.beginPath();
     canvasCtx.lineWidth = lineWidth || DEFAULT_MARK_LINE_WIDTH;
     canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
 
-    canvasCtx.moveTo(x1, OFFSET - 10);
-    canvasCtx.lineTo(x2, OFFSET - 10);
+    if (this._spectrumType == SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+        /* 
+         * It draws a curve: 
+         *      frequency = (throttle - (throttle * throttle * throttle) / 3.0f) * 1.5f;
+         * but need to scale the 1.5f using the max value of the dyn filter
+         */
+        var scale = frequency2 / (sampleRate / 2);
+        const NUMBER_OF_POINTS = this._isFullScreen? 30 : 10;
+
+        var startPlot = false;
+        var points = [];
+        for (var i=1; i <= NUMBER_OF_POINTS; i++) {
+
+            var throttle = 1 / NUMBER_OF_POINTS * i;
+            var y = HEIGHT - HEIGHT * throttle;
+
+            
+            var frequency = (throttle - (throttle * throttle * throttle) / 3) * (1.5 * scale);
+            var x = WIDTH * frequency;
+
+            if (x >= x1) {
+                if (startPlot == false) {
+                    // Interpolate a more or less correct y in the x1 position
+                    points.push({
+                               x: x1, 
+                               y: y + (HEIGHT - y) * (1 - x1 / x)
+                               });
+                }
+                startPlot = true;
+                points.push({
+                    x: x, 
+                    y: y
+                    });
+            }
+        }
+
+        this._drawCurve(canvasCtx, points);
+
+    } else {
+        canvasCtx.moveTo(x1, OFFSET - 10);
+        canvasCtx.lineTo(x2, OFFSET - 10);
+    }
 
     canvasCtx.stroke();
 };
@@ -450,32 +522,92 @@ GraphSpectrumPlot._drawNotchFilter = function(canvasCtx, center, cutoff, sampleR
     canvasCtx.lineWidth = lineWidth || DEFAULT_MARK_LINE_WIDTH;
     canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
 
-    // center - offset
-    canvasCtx.moveTo(centerX, OFFSET - 10);
-    canvasCtx.lineTo(cutoffX, HEIGHT);
+    if (this._spectrumType == SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
 
-    // center + offset
-    canvasCtx.moveTo(centerX, OFFSET - 10);
-    canvasCtx.lineTo(centerX*2 - cutoffX, HEIGHT);
+        canvasCtx.moveTo(cutoffX, 0);
+        canvasCtx.lineTo(centerX*2 - cutoffX, HEIGHT);
+        canvasCtx.lineTo(centerX*2 - cutoffX, 0);
+        canvasCtx.lineTo(cutoffX, HEIGHT);
+        canvasCtx.lineTo(cutoffX, 0);
+
+    } else {
+        // center - offset
+        canvasCtx.moveTo(centerX, OFFSET - 10);
+        canvasCtx.lineTo(cutoffX, HEIGHT);
+    
+        // center + offset
+        canvasCtx.moveTo(centerX, OFFSET - 10);
+        canvasCtx.lineTo(centerX*2 - cutoffX, HEIGHT);
+
+    }
 
     canvasCtx.stroke();
 
     // center with label
     var labelNotch = label + ' center ' + (center.toFixed(0))+'Hz, cutoff '+(cutoff.toFixed(0))+"Hz";
-    this._drawMarkerLine(canvasCtx, center, sampleRate, labelNotch, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+    this._drawVerticalMarkerLine(canvasCtx, center, sampleRate, labelNotch, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
 
 };
 
-GraphSpectrumPlot._drawMouseFrequency = function(canvasCtx, mouseX, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
+GraphSpectrumPlot._drawMouseFrequency = function(canvasCtx, mouseX, mouseY, sampleRate, label, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
 
     // Calculate frequency at mouse
-    var mouseFrequency = (mouseX / this._canvasCtx.canvas.width) * ((this._fftData.blackBoxRate / this._zoomX) / 2);
+    var marginLeft = this._getActualMarginLeft();
+
+    var mouseFrequency = ((mouseX - marginLeft) / WIDTH) * ((this._fftData.blackBoxRate / this._zoomX) / 2);
     if (mouseFrequency >= 0 && mouseFrequency <= sampleRate) {
         this._drawInterestFrequency(canvasCtx, mouseFrequency, sampleRate, label, WIDTH, HEIGHT, OFFSET, "rgba(0,255,0,0.50)", 3);
     }
 
+    if (this._spectrumType == SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+        var mouseThrottle = (1 - (mouseY / HEIGHT)) * 100;
+        if (mouseThrottle >= 0 && mouseThrottle <= 100) {
+            var throttleLabel = label + ' ' + mouseThrottle.toFixed(0) + "%";
+            this._drawHorizontalMarkerLine(canvasCtx, mouseThrottle, 100, throttleLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
+        }
+    }
 
 };
+
+GraphSpectrumPlot._getActualMarginLeft = function() {
+
+    var actualMarginLeft;
+    switch (this._spectrumType) {
+
+    case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
+        actualMarginLeft = (this._isFullScreen)? MARGIN_LEFT_FULLSCREEN : MARGIN_LEFT;
+        break;
+
+    case SPECTRUM_TYPE.FREQUENCY:
+    default:
+        actualMarginLeft = 0;
+    }
+
+    return actualMarginLeft;
+};
+
+GraphSpectrumPlot._drawCurve = function(canvasCtx, points, tension) {
+
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(points[0].x, points[0].y);
+
+    var t = (tension != null) ? tension : 1;
+    for (var i = 0; i < points.length - 1; i++) {
+        var p0 = (i > 0) ? points[i - 1] : points[0];
+        var p1 = points[i];
+        var p2 = points[i + 1];
+        var p3 = (i != points.length - 2) ? points[i + 2] : p2;
+
+        var cp1x = p1.x + (p2.x - p0.x) / 6 * t;
+        var cp1y = p1.y + (p2.y - p0.y) / 6 * t;
+
+        var cp2x = p2.x - (p3.x - p1.x) / 6 * t;
+        var cp2y = p2.y - (p3.y - p1.y) / 6 * t;
+
+        canvasCtx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+    canvasCtx.stroke();
+}
 
 GraphSpectrumPlot._invalidateCache = function() {
     this._cachedCanvas = null;
