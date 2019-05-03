@@ -7,9 +7,8 @@
   "bg-script": "background.js",
   "default_locale": "en",
   "scripts": {
-    "start": "node node_modules/gulp/bin/gulp.js debug",
-    "_postinstall": "node ./node_modules/platform-dependent-modules/cli.js",
-    "postinstall": "npm run _postinstall",
+    "start": "gulp debug",
+    "postinstall": "platform-dependent-modules",
     "gulp": "gulp"
   },
   "window": {
@@ -27,8 +26,8 @@
   },
   "devDependencies": {
     "command-exists": "^1.2.8",
-    "del": "^3.0.0",
-    "gulp": "~4.0.0",
+    "del": "^4.1.1",
+    "gulp": "^4.0.1",
     "gulp-concat": "~2.6.1",
     "gulp-debian": "~0.1.8",
     "gulp-install": "^1.1.0",

@@ -280,7 +280,11 @@ function dist() {
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(DIST_DIR))
         .pipe(install({
-            npm: '--production --ignore-scripts'
+            commands: {
+                'package.json': 'yarn'
+            },
+            production: true,
+            ignoreScripts: true
         }));;
 };
 
