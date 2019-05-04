@@ -2,14 +2,16 @@
 
 function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
-var
+const
         ANALYSER_LARGE_LEFT_MARGIN    = 10,
         ANALYSER_LARGE_TOP_MARGIN     = 10,
         ANALYSER_LARGE_HEIGHT_MARGIN  = 20,
-        ANALYSER_LARGE_WIDTH_MARGIN   = 20;
+        ANALYSER_LARGE_WIDTH_MARGIN   = 20,
+        FIELD_THROTTLE_NAME           = 'rcCommands[3]',
+        FREQ_VS_THR_CHUNK_TIME_MS     = 300,
+        FREQ_VS_THR_WINDOW_DIVISOR    = 6;
 
 var that = this;
-
 var mouseFrequency= null;
 var analyserZoomX = 1.0; /* 100% */
 var analyserZoomY = 1.0; /* 100% */
@@ -47,6 +49,8 @@ try {
 
     var analyserZoomXElem = $("#analyserZoomX");
     var analyserZoomYElem = $("#analyserZoomY");
+
+    var spectrumTypeElem = $("#spectrumTypeSelect");
 
     // Correct the PID rate if we know the pid_process_denom (from log header)
     if (sysConfig.pid_process_denom != null) {
@@ -123,7 +127,7 @@ try {
 
 	};
 
-    var getFlightSamples = function(samples) {
+    var getFlightChunks = function() {
         //load all samples
         var logStart = flightLog.getMinTime();
         var logEnd = ((flightLog.getMaxTime() - logStart) <= MAX_ANALYSER_LENGTH)? flightLog.getMaxTime() : (logStart+MAX_ANALYSER_LENGTH);
@@ -135,16 +139,56 @@ try {
         }
         var allChunks = flightLog.getChunksInTimeRange(logStart, logEnd); //Max 300 seconds
 
+        return allChunks;
+    }
+
+    var getFlightSamplesFreq = function() {
+
+        var allChunks = getFlightChunks();
+
+        var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * blackBoxRate);
+
         // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
         var samplesCount = 0;
         for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
             var chunk = allChunks[chunkIndex];
             for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-                samples[samplesCount++] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
+                samples[samplesCount] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
+                samplesCount++;
             }
         }
 
-        return samplesCount;
+        return {
+                samples  : samples,
+                count    : samplesCount
+               };
+    };
+
+    var getFlightSamplesFreqVsThrottle = function() {
+
+        var allChunks = getFlightChunks();
+
+        var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * blackBoxRate);
+        var throttle = new Uint16Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * blackBoxRate);
+
+        var FIELD_THROTTLE_INDEX = flightLog.getMainFieldIndexByName(FIELD_THROTTLE_NAME);
+
+        // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
+        var samplesCount = 0;
+        for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
+            var chunk = allChunks[chunkIndex];
+            for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
+                samples[samplesCount] = (dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][dataBuffer.fieldIndex]));
+                throttle[samplesCount] = chunk.frames[frameIndex][FIELD_THROTTLE_INDEX]*10;
+                samplesCount++;
+            }
+        }
+
+        return {
+                samples  : samples,
+                throttle : throttle,
+                count    : samplesCount
+               };
     };
 
     var hanningWindow = function(samples, size) {
@@ -206,21 +250,112 @@ try {
         return fftData;
     };
 
-    var dataLoad = function() {
+    var dataLoadFrequency = function() {
 
-        var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * blackBoxRate);
-
-        var samplesCount = getFlightSamples(samples);
+        var flightSamples = getFlightSamplesFreq();
 
         if(userSettings.analyserHanning) {
-            hanningWindow(samples, samplesCount);
+            hanningWindow(flightSamples.samples, flightSamples.count);
         }
 
         //calculate fft
-        var fftOutput = fft(samples);
+        var fftOutput = fft(flightSamples.samples);
 
         // Normalize the result
-        fftData = normalizeFft(fftOutput, samples.length);
+        fftData = normalizeFft(fftOutput, flightSamples.samples.length);
+    }
+
+    var dataLoadFrequencyVsThrottle = function() {
+
+        var flightSamples = getFlightSamplesFreqVsThrottle();
+
+        // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle 
+        // for each chunk. We use a moving window to get more chunks available. 
+        var fftChunkLength = blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
+        var fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
+
+        var matrixFftOutput = new Array(100);  // One for each throttle value, without decimal part
+        var maxNoiseThrottle = 0; // Stores the max noise produced
+        var numberSamplesThrottle = new Uint32Array(100); // Number of samples in each throttle value, used to average them later.
+
+        var fft = new FFT.complex(fftChunkLength, false);
+        for (var fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
+            
+            var fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
+            var fftOutput = new Float64Array(fftChunkLength * 2);
+
+            fft.simple(fftOutput, fftInput, 'real');
+
+            if(userSettings.analyserHanning) {
+                hanningWindow(fftOutput, fftChunkLength * 2);
+            }
+
+            fftOutput = fftOutput.slice(0, fftChunkLength);
+
+            // Use only abs values
+            for (var i = 0; i < fftChunkLength; i++) {
+                fftOutput[i] = Math.abs(fftOutput[i]);
+                if (fftOutput[i] > maxNoiseThrottle) {
+                    maxNoiseThrottle = fftOutput[i];
+                }
+            }
+
+            // Calculate average throttle, removing the decimal part
+            var avgThrottle = 0; 
+            for (var indexThrottle = fftChunkIndex; indexThrottle < fftChunkIndex + fftChunkLength; indexThrottle++) {
+                avgThrottle += flightSamples.throttle[indexThrottle];
+            } 
+            avgThrottle = Math.round(avgThrottle / 10 / fftChunkLength);
+
+            numberSamplesThrottle[avgThrottle]++;
+            if (!matrixFftOutput[avgThrottle]) {
+                matrixFftOutput[avgThrottle] = fftOutput;
+            } else {
+                matrixFftOutput[avgThrottle] = matrixFftOutput[avgThrottle].map(function (num, idx) {
+                    return num + fftOutput[idx];
+                });
+            }
+        }
+
+        // Divide by the number of samples
+        for (var i = 0; i < 100; i++) {
+            if (numberSamplesThrottle[i] > 1) {
+                for (var j = 0; j < matrixFftOutput[i].length; j++) {
+                    matrixFftOutput[i][j] /= numberSamplesThrottle[i]; 
+                }
+            } else if (numberSamplesThrottle[i] == 0) {
+                matrixFftOutput[i] = new Float64Array(fftChunkLength * 2);
+            }
+        }
+
+        // The output data needs to be smoothed, the sampling is not perfect 
+        // but after some tests we let the data as is, an we prefer to apply a 
+        // blur algorithm to the heat map image
+
+        fftData = {
+                fieldIndex   : dataBuffer.fieldIndex,
+                fieldName    : dataBuffer.fieldName,
+                fftLength    : fftChunkLength,
+                fftOutput    : matrixFftOutput,
+                maxNoise     : maxNoiseThrottle,
+                blackBoxRate : blackBoxRate,
+            };
+
+    }
+
+    var dataLoad = function() {
+
+        switch(spectrumType) {
+
+        case SPECTRUM_TYPE.FREQUENCY:
+            dataLoadFrequency();
+            break;
+
+        case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
+            dataLoadFrequencyVsThrottle();
+            break;
+
+        }
 
     };
 
@@ -240,7 +375,7 @@ try {
 			if ((fieldIndex != fftData.fieldIndex) || dataReload) {
 				dataReload = false;
 				dataLoad();			
-                GraphSpectrumPlot.setData(fftData);
+                GraphSpectrumPlot.setData(fftData, spectrumType);
 			}
 			
 			that.draw(); // draw the analyser on the canvas....
@@ -286,6 +421,22 @@ try {
 	}	catch (e) {
 		console.log('Failed to create analyser... error:' + e);
     }
+
+    // Spectrum type to show
+    var spectrumType  = parseInt(spectrumTypeElem.val(), 10);
+
+    spectrumTypeElem.change(function() {
+        var optionSelected = parseInt(spectrumTypeElem.val(), 10);
+
+        if (optionSelected != spectrumType) {
+            spectrumType = optionSelected;
+
+            // Recalculate the data, for the same curve than now, and draw it
+            dataReload = true;
+            that.plotSpectrum(dataBuffer.fieldIndex, dataBuffer.curve, dataBuffer.fieldName);
+        }
+    });
+
     // track frequency under mouse
     var lastFrequency;
     function trackFrequency(e, analyser) {

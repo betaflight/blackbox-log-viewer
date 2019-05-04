@@ -444,15 +444,22 @@
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
                 <div class="analyser">
                     <canvas width="0" height="0" id="analyserCanvas"></canvas>
-                    
+
+                    <div id="spectrumType" data-toggle="tooltip" title="Type of Spectrum">
+                        <select id="spectrumTypeSelect">
+                            <option value="0">Frequency</option>
+                            <option value="1">Freq. vs Throttle</option>
+                        </select>
+                    </div>
+
                     <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
                         <span class="glyphicon glyphicon-resize-full"></span>
                         <span class="glyphicon glyphicon-resize-small"></span>
                     </div>
 
-                    <input id="analyserZoomX" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
+                    <input id="analyserZoomX" class="onlyFullScreen" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
                     />
-                    <input id="analyserZoomY" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
+                    <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
                     />
                     <datalist id="analyserZoomXTicks">
                         <option>100</option>
