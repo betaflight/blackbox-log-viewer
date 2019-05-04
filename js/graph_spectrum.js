@@ -208,7 +208,7 @@ try {
 
     var dataLoad = function() {
 
-        var samples = new Float64Array(MAX_ANALYSER_LENGTH/1000);
+        var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * blackBoxRate);
 
         var samplesCount = getFlightSamples(samples);
 
@@ -220,7 +220,7 @@ try {
         var fftOutput = fft(samples);
 
         // Normalize the result
-        fftData = normalizeFft(fftOutput, samplesCount)
+        fftData = normalizeFft(fftOutput, samples.length);
 
     };
 
