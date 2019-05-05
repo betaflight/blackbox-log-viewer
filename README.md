@@ -75,15 +75,16 @@ This tool is currently in the Beta stage, so a number of key features have yet t
 ### Development
 
 1. Install node.js
-2. Change to project folder and run `npm install`.
-3. Run `npm start` to build & run the debug flavor.
+2. Install yarn: `npm install yarn -g`.
+3. Change to project folder and run `yarn install`.
+4. Run `yarn start` to build & run the debug flavor.
 
 ### App build and release
 
-The tasks are defined in `gulpfile.js` and can be run either via `gulp <task-name>` (if the command is in PATH or via `../node_modules/gulp/bin/gulp.js <task-name>`:
-
-1. Optional, install gulp `npm install --global gulp-cli`.
-2. Run `gulp <taskname> [[platform] [platform] ...]`.
+The tasks are defined in `gulpfile.js` and can be run through yarn:
+```
+yarn gulp <taskname> [[platform] [platform] ...]
+```
 
 List of possible values of `<task-name>`:
 * **dist** copies all the JS and CSS files in the `./dist` folder.
@@ -104,9 +105,9 @@ Open Terminal.app and install or update homebrew:
 ```
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
-install node 8.x and npm, if already installed, agree to update them
+install node 8.x and yarn, if already installed, agree to update them
 ```
-brew install node@8 npm
+brew install node@8 yarn
 ```
 Change Terminal's working directory wherever you put blackbox-log-viewer folder; easiest way is to type 'cd ' in Terminal then drag the blackbox-log-viewer folder from the Finder to the terminal window.  Or use a terminal command like 
 ```
@@ -115,24 +116,24 @@ cd ~/mydirectorypath/blackbox-log-viewer
 
 install dependencies into that folder (ignoring many confusing messages) with:
 ```
-npm i
+yarn install
 ```
 
 finally build the DMG itself, which will end up in blackbox-log-viewer/release/, with:
 ```
-npx gulp release --osx64
+yarn gulp release
 ```
 
 #### Build or release app for one specific platform
 To build or release only for one specific platform you can append the plaform after the `task-name`.
 If no platform is provided, only for the platform you are builing from will be build.
 
-* **MacOS** use `gulp <task-name> --osx64`
-* **Linux** use `gulp <task-name> --linux64`
-* **Windows** use `gulp <task-name> --win32`
-* **ChromeOS** use `gulp <task-name> --chromeos`
+* **MacOS** use `yarn gulp <task-name> --osx64`
+* **Linux** use `yarn gulp <task-name> --linux64`
+* **Windows** use `yarn gulp <task-name> --win32`
+* **ChromeOS** use `yarn gulp <task-name> --chromeos`
 
-You can also use multiple platforms e.g. `gulp <taskname> --osx64 --linux64`.
+You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`.
 
 #### macOS DMG installation background image
 
