@@ -378,6 +378,13 @@ GraphConfig.load = function(config) {
                     inputRange: 200,
                     outputRange: 1.0
                 };
+            } else if (fieldName.match(/^rssi.*/)) {
+                return {
+                    offset: -512,
+                    power: 1.0,
+                    inputRange: 512,
+                    outputRange: 1.0
+                };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
                 var debugModeName = DEBUG_MODE[sysConfig.debug_mode]; 
