@@ -550,7 +550,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
     font-size: 9px;
 }
 
-analyser #spectrumType select {
+.analyser #spectrumType select {
     border-radius: 3px;
     padding: 0px 5px;
 }
