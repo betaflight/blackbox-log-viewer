@@ -94,6 +94,7 @@ function FlightLogFieldPresenter() {
         'failsafePhase': 'Failsafe Phase',
         'rxSignalReceived': 'RX Signal Received',
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
+        'rssi': 'RSSI',
     };
     
     	var DEBUG_FRIENDLY_FIELD_NAMES = { 
@@ -503,6 +504,9 @@ function FlightLogFieldPresenter() {
                 
             case 'features':
                 return presentEnum(value, FLIGHT_LOG_FEATURES); 
+
+            case 'rssi':
+                return (value / 1024 * 100).toFixed(2) + "%";
 
             case 'debug[0]':
             case 'debug[1]':
