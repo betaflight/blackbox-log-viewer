@@ -24,7 +24,9 @@ var
 
     dataReload = false,
 
-    fftData = null;
+    fftData = null,
+
+    prefs = new PrefStorage();
 
     try {
 
@@ -106,14 +108,15 @@ var
 
             GraphSpectrumCalc.setDataBuffer(dataBuffer);
 
-            switch(spectrumType) {
-
-            case SPECTRUM_TYPE.FREQUENCY:
-                fftData = GraphSpectrumCalc.dataLoadFrequency();
-                break;
+            switch(userSettings.spectrumType) {
 
             case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
                 fftData = GraphSpectrumCalc.dataLoadFrequencyVsThrottle();
+                break;
+
+            case SPECTRUM_TYPE.FREQUENCY:
+            default:
+                fftData = GraphSpectrumCalc.dataLoadFrequency();
                 break;
 
             }
@@ -135,7 +138,7 @@ var
             if ((fftData == null) || (fieldIndex != fftData.fieldIndex) || dataReload) {
                 dataReload = false;
                 dataLoad();			
-                GraphSpectrumPlot.setData(fftData, spectrumType);
+                GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
             }
 
             that.draw(); // draw the analyser on the canvas....
@@ -176,13 +179,15 @@ var
         }).val(100);
 
         // Spectrum type to show
-        var spectrumType  = parseInt(spectrumTypeElem.val(), 10);
+        userSettings.spectrumType = userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
+        spectrumTypeElem.val(userSettings.spectrumType);
 
         spectrumTypeElem.change(function() {
             var optionSelected = parseInt(spectrumTypeElem.val(), 10);
 
-            if (optionSelected != spectrumType) {
-                spectrumType = optionSelected;
+            if (optionSelected != userSettings.spectrumType) {
+                userSettings.spectrumType = optionSelected;
+                saveOneUserSetting('spectrumType', userSettings.spectrumType);
 
                 // Recalculate the data, for the same curve than now, and draw it
                 dataReload = true;
@@ -191,14 +196,16 @@ var
         });
 
         // Spectrum overdraw to show
-        var overdrawSpectrumType  = parseInt(overdrawSpectrumTypeElem.val(), 10);
-        GraphSpectrumPlot.setOverdraw(overdrawSpectrumType);
+        userSettings.overdrawSpectrumType = userSettings.overdrawSpectrumType || SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS;
+        overdrawSpectrumTypeElem.val(userSettings.overdrawSpectrumType);
+        GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
         overdrawSpectrumTypeElem.change(function() {
             var optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
 
-            if (optionSelected != overdrawSpectrumType) {
-                overdrawSpectrumType = optionSelected;
+            if (optionSelected != userSettings.overdrawSpectrumType) {
+                userSettings.overdrawSpectrumType = optionSelected;
+                saveOneUserSetting('overdrawSpectrumType', userSettings.overdrawSpectrumType);
 
                 // Refresh the graph
                 GraphSpectrumPlot.setOverdraw(overdrawSpectrumType);
@@ -231,6 +238,13 @@ var
             } else {
                 spectrumToolbarElem.addClass('non-shift');
             }
+        }
+
+        function saveOneUserSetting(name, value) {
+            prefs.get('userSettings', function(data) {
+                data[name] = value;
+                prefs.set('userSettings', data);
+            });
         }
 
     } catch (e) {
