@@ -193,6 +193,11 @@ var
             lastMouseY = 0;
         function trackFrequency(e, analyser) {
             if(e.shiftKey) {
+
+                // Hide the combo and maximize buttons
+                $('#spectrumType').removeClass('non-shift');
+                $('#analyserResize').removeClass('non-shift');
+
                 var rect = analyserCanvas.getBoundingClientRect();
                 var mouseX = e.clientX - rect.left;
                 var mouseY = e.clientY - rect.top;
@@ -205,6 +210,9 @@ var
                     }
                 }
                 e.preventDefault();
+            } else {
+                $('#spectrumType').addClass('non-shift');
+                $('#analyserResize').addClass('non-shift');
             }
         }
     
