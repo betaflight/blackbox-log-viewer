@@ -37,7 +37,9 @@ var
         var analyserZoomXElem = $("#analyserZoomX");
         var analyserZoomYElem = $("#analyserZoomY");
 
+        var spectrumToolbarElem = $('#spectrumToolbar');
         var spectrumTypeElem = $("#spectrumTypeSelect");
+        var overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
 
         this.setFullscreen = function(size) {
             isFullscreen = (size==true);
@@ -188,15 +190,31 @@ var
             }
         });
 
+        // Spectrum overdraw to show
+        var overdrawSpectrumType  = parseInt(overdrawSpectrumTypeElem.val(), 10);
+        GraphSpectrumPlot.setOverdraw(overdrawSpectrumType);
+
+        overdrawSpectrumTypeElem.change(function() {
+            var optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
+
+            if (optionSelected != overdrawSpectrumType) {
+                overdrawSpectrumType = optionSelected;
+
+                // Refresh the graph
+                GraphSpectrumPlot.setOverdraw(overdrawSpectrumType);
+                that.draw();
+            }
+        });
+
         // track frequency under mouse
         var lastMouseX = 0,
             lastMouseY = 0;
+         
         function trackFrequency(e, analyser) {
             if(e.shiftKey) {
 
                 // Hide the combo and maximize buttons
-                $('#spectrumType').removeClass('non-shift');
-                $('#analyserResize').removeClass('non-shift');
+                spectrumToolbarElem.removeClass('non-shift');
 
                 var rect = analyserCanvas.getBoundingClientRect();
                 var mouseX = e.clientX - rect.left;
@@ -211,12 +229,11 @@ var
                 }
                 e.preventDefault();
             } else {
-                $('#spectrumType').addClass('non-shift');
-                $('#analyserResize').addClass('non-shift');
+                spectrumToolbarElem.addClass('non-shift');
             }
         }
-    
-    }   catch (e) {
+
+    } catch (e) {
         console.log('Failed to create analyser... error:' + e);
     }
 }

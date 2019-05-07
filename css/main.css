@@ -524,7 +524,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
     z-index: 10;
 }
 
-.analyser:hover #analyserResize.non-shift{
+.analyser:hover .non-shift #analyserResize {
     opacity: 1;
     height: auto;
     transition: opacity 500ms ease-in;
@@ -542,7 +542,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
     font-size: 18px;
 }
 
-.analyser:hover #spectrumType.non-shift {
+.analyser:hover .non-shift #spectrumType {
     opacity: 1;
     height: auto;
     transition: opacity 500ms ease-in;
@@ -561,6 +561,29 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 }
 
 .analyser #spectrumType select {
+    border-radius: 3px;
+    padding: 0px 5px;
+}
+
+.analyser:hover .non-shift #overdrawSpectrumType {
+    opacity: 1;
+    height: auto;
+    transition: opacity 500ms ease-in;
+}
+
+.analyser #overdrawSpectrumType {
+    color: #bbb;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    left: 120px;
+    float: left;
+    z-index: 9;
+    position: absolute;
+    font-size: 9px;
+}
+
+.analyser #overdrawSpectrumType select {
     border-radius: 3px;
     padding: 0px 5px;
 }
