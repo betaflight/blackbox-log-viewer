@@ -382,6 +382,16 @@ var
         "RX_LOSS_DETECTED",
         "LANDING",
         "LANDED"
+    ]),
+
+    FFT_CALC_STEPS = makeReadOnly([
+        "ARM_CFFT_F32",
+        "BITREVERSAL",
+        "STAGE_RFFT_F32",
+        "ARM_CMPLX_MAG_F32",
+        "CALC_FREQUENCIES",
+        "UPDATE_FILTERS",
+        "HANNING"
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {

@@ -608,6 +608,8 @@ function FlightLogFieldPresenter() {
                     break;
                 case 'FFT_TIME':
                     switch (fieldName) {
+                    case 'debug[0]':
+                        return presentEnum(value, FFT_CALC_STEPS);
                     case 'debug[1]':
                     case 'debug[2]':
                         return value.toFixed(0) + "\u03BCs";
