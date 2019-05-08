@@ -445,17 +445,30 @@
                 <div id="analyser" class="analyser">
                     <canvas width="0" height="0" id="analyserCanvas"></canvas>
 
-                    <div id="spectrumType" data-toggle="tooltip" title="Type of Spectrum">
-                        <select id="spectrumTypeSelect">
-                            <option value="0">Frequency</option>
-                            <option value="1">Freq. vs Throttle</option>
-                        </select>
-                    </div>
+                    <span id="spectrumToolbar">
+                        <div id="spectrumType" data-toggle="tooltip" title="Type of Spectrum">
+                            <select id="spectrumTypeSelect">
+                                <option value="0">Frequency</option>
+                                <option value="1">Freq. vs Throttle</option>
+                            </select>
+                        </div>
 
-                    <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
-                        <span class="glyphicon glyphicon-resize-full"></span>
-                        <span class="glyphicon glyphicon-resize-small"></span>
-                    </div>
+                        <div id="overdrawSpectrumType" data-toggle="tooltip" title="Show Filters">
+                            <select id="overdrawSpectrumTypeSelect">
+                                <option value="0">Show all filters</option>
+                                <option value="1">Show only Gyro filters</option>
+                                <option value="2">Show only D-Term filters</option>
+                                <option value="3">Show only Yaw filters</option>
+                                <option value="4">Hide all filters</option>
+                                <option value="5">Auto</option>
+                            </select>
+                        </div>
+
+                        <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
+                            <span class="glyphicon glyphicon-resize-full"></span>
+                            <span class="glyphicon glyphicon-resize-small"></span>
+                        </div>
+                    </span>
 
                     <input id="analyserZoomX" class="onlyFullScreen" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
                     />

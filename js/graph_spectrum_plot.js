@@ -13,6 +13,15 @@ const SPECTRUM_TYPE = {
         FREQ_VS_THROTTLE : 1,
       };
 
+const SPECTRUM_OVERDRAW_TYPE = {
+        ALL_FILTERS      : 0,
+        GYRO_FILTERS     : 1,
+        DTERM_FILTERS    : 2,
+        YAW_FILTERS      : 3,
+        HIDE_FILTERS     : 4,
+        AUTO             : 5,
+      };
+
 var GraphSpectrumPlot = GraphSpectrumPlot || {
     _isFullScreen     : false,
     _cachedCanvas     : null,
@@ -23,6 +32,7 @@ var GraphSpectrumPlot = GraphSpectrumPlot || {
             x : 0,
             y : 0,
     },
+    _overdrawType     : null,
     _spectrumType     : null,
     _sysConfig        : null,
     _zoomX : 1.0,
@@ -69,6 +79,11 @@ GraphSpectrumPlot.setData = function(fftData, spectrumType) {
     this._spectrumType = spectrumType;
     this._invalidateCache();
     this._invalidateDataCache();
+};
+
+GraphSpectrumPlot.setOverdraw = function(overdrawType) {
+    this._overdrawType = overdrawType;
+    this._invalidateCache();
 };
 
 GraphSpectrumPlot.setMousePosition = function(x, y) {
@@ -238,43 +253,60 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
 
     var offset = 2; // make some space! Includes the space for the mouse frequency. In this way the other elements don't move in the screen when used
 
-    // Dynamic gyro lpf 
-    if(this._sysConfig.gyro_lowpass_dyn_hz[0] != null && this._sysConfig.gyro_lowpass_dyn_hz[0] > 0 &&
-            this._sysConfig.gyro_lowpass_dyn_hz[1] > this._sysConfig.gyro_lowpass_dyn_hz[0]) {
-        this._drawLowpassDynFilter(canvasCtx, this._sysConfig.gyro_lowpass_dyn_hz[0], this._sysConfig.gyro_lowpass_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'GYRO LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
+    // Gyro filters
+    if (this._overdrawType == SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
+        this._overdrawType == SPECTRUM_OVERDRAW_TYPE.GYRO_FILTERS ||
+       (this._overdrawType == SPECTRUM_OVERDRAW_TYPE.AUTO && this._fftData.fieldName.match(/(.*gyro.*)/i) != null)) {
 
-    // Static gyro lpf
-    } else  if ((this._sysConfig.gyro_lowpass_hz != null) && (this._sysConfig.gyro_lowpass_hz > 0)) {
-        this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
-    }
+        // Dynamic gyro lpf 
+        if(this._sysConfig.gyro_lowpass_dyn_hz[0] != null && this._sysConfig.gyro_lowpass_dyn_hz[0] > 0 &&
+                this._sysConfig.gyro_lowpass_dyn_hz[1] > this._sysConfig.gyro_lowpass_dyn_hz[0]) {
+            this._drawLowpassDynFilter(canvasCtx, this._sysConfig.gyro_lowpass_dyn_hz[0], this._sysConfig.gyro_lowpass_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'GYRO LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
 
-    // Static gyro lpf 2
-    if ((this._sysConfig.gyro_lowpass2_hz != null) && (this._sysConfig.gyro_lowpass2_hz > 0)) {
-        this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, 'GYRO LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 172, 122, 0.50)");
-    }
+        // Static gyro lpf
+        } else  if ((this._sysConfig.gyro_lowpass_hz != null) && (this._sysConfig.gyro_lowpass_hz > 0)) {
+            this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
+        }
 
-     // Notch gyro
-    if (this._sysConfig.gyro_notch_hz != null && this._sysConfig.gyro_notch_cutoff != null ) {
-        if (this._sysConfig.gyro_notch_hz.length > 0) { //there are multiple gyro notch filters
-            for (var i=0; i < this._sysConfig.gyro_notch_hz.length; i++) {
-                if (this._sysConfig.gyro_notch_hz[i] > 0 && this._sysConfig.gyro_notch_cutoff[i] > 0) {
-                    this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz[i], this._sysConfig.gyro_notch_cutoff[i], PLOTTED_BLACKBOX_RATE, 'GYRO Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
+        // Static gyro lpf 2
+        if ((this._sysConfig.gyro_lowpass2_hz != null) && (this._sysConfig.gyro_lowpass2_hz > 0)) {
+            this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, 'GYRO LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 172, 122, 0.50)");
+        }
+
+         // Notch gyro
+        if (this._sysConfig.gyro_notch_hz != null && this._sysConfig.gyro_notch_cutoff != null ) {
+            if (this._sysConfig.gyro_notch_hz.length > 0) { //there are multiple gyro notch filters
+                for (var i=0; i < this._sysConfig.gyro_notch_hz.length; i++) {
+                    if (this._sysConfig.gyro_notch_hz[i] > 0 && this._sysConfig.gyro_notch_cutoff[i] > 0) {
+                        this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz[i], this._sysConfig.gyro_notch_cutoff[i], PLOTTED_BLACKBOX_RATE, 'GYRO Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
+                    }
                 }
-            }
-        } else { // only a single gyro notch to display
-            if (this._sysConfig.gyro_notch_hz > 0 && this._sysConfig.gyro_notch_cutoff > 0) {
-                this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz, this._sysConfig.gyro_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'GYRO Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
+            } else { // only a single gyro notch to display
+                if (this._sysConfig.gyro_notch_hz > 0 && this._sysConfig.gyro_notch_cutoff > 0) {
+                    this._drawNotchFilter(canvasCtx, this._sysConfig.gyro_notch_hz, this._sysConfig.gyro_notch_cutoff, PLOTTED_BLACKBOX_RATE, 'GYRO Notch', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 148, 134, 0.50)");
+                }
             }
         }
     }
-
     offset++; // make some space!
+
+    // Yaw filters
+    if (this._overdrawType == SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
+        this._overdrawType == SPECTRUM_OVERDRAW_TYPE.YAW_FILTERS ||
+       (this._overdrawType == SPECTRUM_OVERDRAW_TYPE.AUTO && this._fftData.fieldName.match(/(.*yaw.*)/i) != null)) {
+
+        if (this._sysConfig.yaw_lpf_hz != null && this._sysConfig.yaw_lpf_hz > 0) {
+            this._drawLowpassFilter(canvasCtx, this._sysConfig.yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
+        }
+    }
+
+    // D-TERM filters
     try {
-        if (this._fftData.fieldName.match(/(.*yaw.*)/i) != null) {
-            if (this._sysConfig.yaw_lpf_hz != null && this._sysConfig.yaw_lpf_hz > 0) {
-                this._drawLowpassFilter(canvasCtx, this._sysConfig.yaw_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'YAW LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN);
-            }
-        } else {
+
+        if (this._overdrawType == SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
+            this._overdrawType == SPECTRUM_OVERDRAW_TYPE.DTERM_FILTERS ||
+           (this._overdrawType == SPECTRUM_OVERDRAW_TYPE.AUTO && this._fftData.fieldName.match(/(.*PID D.*)/i) != null)) {
+
             // Dynamic dterm lpf 
             if (this._sysConfig.dterm_lpf_dyn_hz[0] != null && this._sysConfig.dterm_lpf_dyn_hz[0] > 0 &&
                     this._sysConfig.dterm_lpf_dyn_hz[1] > this._sysConfig.dterm_lpf_dyn_hz[0]) {
@@ -427,8 +459,6 @@ GraphSpectrumPlot._drawHorizontalMarkerLine = function(canvasCtx, throttle, thro
     canvasCtx.beginPath();
     canvasCtx.lineWidth = lineWidth || 1;
     canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
-
-    var actualLeftMargin = this._getActualMarginLeft();
 
     canvasCtx.moveTo(0, y);
     canvasCtx.lineTo(WIDTH - OFFSET + 10, y);

@@ -60,6 +60,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log
 		analyserHanning	    : false,  			// use a hanning window on the analyser sample data
 		eraseBackground		: true,           	// Set to false if you want the graph to draw on top of an existing canvas image
+		spectrumType        : 0,                // By default, frequency Spectrum
+		overdrawSpectrumType: 0,                // By default, show all filters
 		craft				: {
 									left  : '15%',	// position from left (as a percentage of width)
 									top   : '25%',  // position from top (as a percentage of height)
