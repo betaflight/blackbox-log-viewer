@@ -16,7 +16,7 @@ const commandExistsSync = require('command-exists').sync;
 
 const gulp = require('gulp');
 const concat = require('gulp-concat');
-const install = require("gulp-install");
+const yarn = require("gulp-yarn");
 const rename = require('gulp-rename');
 const os = require('os');
 
@@ -280,10 +280,7 @@ function dist() {
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(DIST_DIR))
-        .pipe(install({
-            commands: {
-                'package.json': 'yarn'
-            },
+        .pipe(yarn({
             production: true,
             ignoreScripts: true
         }));;
