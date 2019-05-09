@@ -200,15 +200,15 @@ GraphConfig.load = function(config) {
             },             
             {
                 label: "Gyro + PID roll",
-                fields: ["axisP[0]", "axisI[0]", "axisD[0]", "axisF[0]", "gyroADC[0]"]
+                fields: ["axisP[0]", "axisI[0]", "axisD[0]", "axisF[0]", "gyroADC[0]", "rcCommands[0]"]
             },
             {
                 label: "Gyro + PID pitch",
-                fields: ["axisP[1]", "axisI[1]", "axisD[1]", "axisF[1]", "gyroADC[1]"]
+                fields: ["axisP[1]", "axisI[1]", "axisD[1]", "axisF[1]", "gyroADC[1]", "rcCommands[1]"]
             },
             {
                 label: "Gyro + PID yaw",
-                fields: ["axisP[2]", "axisI[2]", "axisD[2]", "axisF[2]", "gyroADC[2]"]
+                fields: ["axisP[2]", "axisI[2]", "axisD[2]", "axisF[2]", "gyroADC[2]", "rcCommands[2]"]
             },
             {
                 label: "Accelerometers",
