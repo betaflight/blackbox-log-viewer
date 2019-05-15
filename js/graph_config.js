@@ -199,15 +199,15 @@ GraphConfig.load = function(config) {
                 fields: ["axisError[all]"]
             },             
             {
-                label: "Gyro + PID roll",
+                label: "Roll Gyro + PID + Setpoint",
                 fields: ["axisP[0]", "axisI[0]", "axisD[0]", "axisF[0]", "gyroADC[0]", "rcCommands[0]"]
             },
             {
-                label: "Gyro + PID pitch",
+                label: "Pitch Gyro + PID + Setpoint",
                 fields: ["axisP[1]", "axisI[1]", "axisD[1]", "axisF[1]", "gyroADC[1]", "rcCommands[1]"]
             },
             {
-                label: "Gyro + PID yaw",
+                label: "Yaw Gyro + PID + Setpoint",
                 fields: ["axisP[2]", "axisI[2]", "axisD[2]", "axisF[2]", "gyroADC[2]", "rcCommands[2]"]
             },
             {
