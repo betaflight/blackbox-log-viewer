@@ -261,16 +261,19 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
         // Dynamic gyro lpf 
         if(this._sysConfig.gyro_lowpass_dyn_hz[0] != null && this._sysConfig.gyro_lowpass_dyn_hz[0] > 0 &&
                 this._sysConfig.gyro_lowpass_dyn_hz[1] > this._sysConfig.gyro_lowpass_dyn_hz[0]) {
-            this._drawLowpassDynFilter(canvasCtx, this._sysConfig.gyro_lowpass_dyn_hz[0], this._sysConfig.gyro_lowpass_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'GYRO LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
+            let label = this._sysConfig.gyro_soft_type != null ? `GYRO LPF (${FILTER_TYPE[this._sysConfig.gyro_soft_type]}) Dyn cutoff` : 'GYRO LPF Dyn cutoff';
+            this._drawLowpassDynFilter(canvasCtx, this._sysConfig.gyro_lowpass_dyn_hz[0], this._sysConfig.gyro_lowpass_dyn_hz[1], PLOTTED_BLACKBOX_RATE, label, WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
 
         // Static gyro lpf
         } else  if ((this._sysConfig.gyro_lowpass_hz != null) && (this._sysConfig.gyro_lowpass_hz > 0)) {
-            this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, 'GYRO LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
+            let label = this._sysConfig.gyro_soft_type != null ? `GYRO LPF (${FILTER_TYPE[this._sysConfig.gyro_soft_type]}) cutoff` : 'GYRO LPF cutoff';
+            this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass_hz,  PLOTTED_BLACKBOX_RATE, label, WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(94, 194, 98, 0.50)");
         }
 
         // Static gyro lpf 2
         if ((this._sysConfig.gyro_lowpass2_hz != null) && (this._sysConfig.gyro_lowpass2_hz > 0)) {
-            this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, 'GYRO LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 172, 122, 0.50)");
+            let label = this._sysConfig.gyro_soft2_type != null ? `GYRO LPF2 (${FILTER_TYPE[this._sysConfig.gyro_soft2_type]}) cutoff` : 'GYRO LPF2 cutoff';
+            this._drawLowpassFilter(canvasCtx, this._sysConfig.gyro_lowpass2_hz, PLOTTED_BLACKBOX_RATE, label, WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 172, 122, 0.50)");
         }
 
          // Notch gyro
@@ -310,16 +313,19 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function(canvasCtx) {
             // Dynamic dterm lpf 
             if (this._sysConfig.dterm_lpf_dyn_hz[0] != null && this._sysConfig.dterm_lpf_dyn_hz[0] > 0 &&
                     this._sysConfig.dterm_lpf_dyn_hz[1] > this._sysConfig.dterm_lpf_dyn_hz[0]) {
-                this._drawLowpassDynFilter(canvasCtx, this._sysConfig.dterm_lpf_dyn_hz[0], this._sysConfig.dterm_lpf_dyn_hz[1], PLOTTED_BLACKBOX_RATE, 'D-TERM LPF Dyn cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 123, 132, 0.50)");
+                let label = this._sysConfig.dterm_filter_type != null ? `D-TERM LPF (${FILTER_TYPE[this._sysConfig.dterm_filter_type]}) Dyn cutoff` : 'D-TERM LPF Dyn cutoff';
+                this._drawLowpassDynFilter(canvasCtx, this._sysConfig.dterm_lpf_dyn_hz[0], this._sysConfig.dterm_lpf_dyn_hz[1], PLOTTED_BLACKBOX_RATE, label, WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 123, 132, 0.50)");
 
             // Static dterm lpf
             } else if ((this._sysConfig.dterm_lpf_hz != null) && (this._sysConfig.dterm_lpf_hz > 0)) {
-                this._drawLowpassFilter(canvasCtx, this._sysConfig.dterm_lpf_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 123, 132, 0.50)");
+                let label = this._sysConfig.dterm_filter_type != null ? `D-TERM LPF (${FILTER_TYPE[this._sysConfig.dterm_filter_type]}) cutoff` : 'D-TERM LPF cutoff';
+                this._drawLowpassFilter(canvasCtx, this._sysConfig.dterm_lpf_hz,  PLOTTED_BLACKBOX_RATE, label, WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(0, 123, 132, 0.50)");
             }
 
             // Static dterm lpf 2
             if ((this._sysConfig.dterm_lpf2_hz != null) && (this._sysConfig.dterm_lpf2_hz > 0)) {
-                this._drawLowpassFilter(canvasCtx, this._sysConfig.dterm_lpf2_hz,  PLOTTED_BLACKBOX_RATE, 'D-TERM LPF2 cutoff', WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(16, 97, 116, 0.50)");
+                let label = this._sysConfig.dterm_filter2_type != null ? `D-TERM LPF2 (${FILTER_TYPE[this._sysConfig.dterm_filter2_type]}) cutoff` : 'D-TERM LPF2 cutoff';
+                this._drawLowpassFilter(canvasCtx, this._sysConfig.dterm_lpf2_hz,  PLOTTED_BLACKBOX_RATE, label, WIDTH, HEIGHT, (15*offset++) + MARGIN, "rgba(16, 97, 116, 0.50)");
             }
 
             // Notch dterm
