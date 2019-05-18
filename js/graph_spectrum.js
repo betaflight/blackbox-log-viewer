@@ -208,7 +208,7 @@ var
                 saveOneUserSetting('overdrawSpectrumType', userSettings.overdrawSpectrumType);
 
                 // Refresh the graph
-                GraphSpectrumPlot.setOverdraw(overdrawSpectrumType);
+                GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
                 that.draw();
             }
         });
