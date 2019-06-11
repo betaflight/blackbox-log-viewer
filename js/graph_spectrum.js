@@ -164,17 +164,22 @@ var
         });
 
         /* add zoom controls */
-        analyserZoomXElem.on('input', $.debounce(100, function () {
+        const DEFAULT_ZOOM = 100;
+        analyserZoomXElem.on('input', $.debounce(100, function() {
             analyserZoomX = (analyserZoomXElem.val() / 100);
             GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
             that.refresh();
-        })).val(100);
+        })).dblclick(function() {
+            $(this).val(DEFAULT_ZOOM).trigger("input");
+        }).val(DEFAULT_ZOOM);;
 
-        analyserZoomYElem.on('input', $.debounce(100, function () {
+        analyserZoomYElem.on('input', $.debounce(100, function() {
             analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
             GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
             that.refresh();
-        })).val(100);
+        })).dblclick(function() {
+            $(this).val(DEFAULT_ZOOM).trigger("input");
+        }).val(DEFAULT_ZOOM);
 
         // Spectrum type to show
         userSettings.spectrumType = userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
