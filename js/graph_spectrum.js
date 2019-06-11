@@ -11,8 +11,6 @@ const
 var 
     that = this,
 
-    mouseFrequency= null,
-
     analyserZoomX = 1.0, /* 100% */
     analyserZoomY = 1.0, /* 100% */
 
@@ -166,17 +164,17 @@ var
         });
 
         /* add zoom controls */
-        analyserZoomXElem.on('input', function () {
+        analyserZoomXElem.on('input', $.debounce(100, function () {
             analyserZoomX = (analyserZoomXElem.val() / 100);
             GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
             that.refresh();
-        }).val(100);
+        })).val(100);
 
-        analyserZoomYElem.on('input', function () {
+        analyserZoomYElem.on('input', $.debounce(100, function () {
             analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
             GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
             that.refresh();
-        }).val(100);
+        })).val(100);
 
         // Spectrum type to show
         userSettings.spectrumType = userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
