@@ -578,11 +578,20 @@ function FlightLog(logData) {
 
                     // Add the Feedforward PID sum (P+I+D+F)
                     for (var axis = 0; axis < 3; axis++) {
-                        destFrame[fieldIndex++] =
+                        let pidSum =
                             (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
                             (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
                             (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0) +
                             (axisPID[axis][3] !== undefined ? srcFrame[axisPID[axis][3]] : 0);
+
+                        // Limit the PID sum by the limits defined in the header
+                        let pidLimit = axis < AXIS.YAW ? sysConfig.pidSumLimit : sysConfig.pidSumLimitYaw;
+                        if (pidLimit) {
+                            pidSum = constrain(pidSum, -pidLimit, pidLimit);
+                        } 
+
+                        // Assign value
+                        destFrame[fieldIndex++] = pidSum; 
                     }
 
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
