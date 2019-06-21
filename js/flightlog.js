@@ -586,7 +586,7 @@ function FlightLog(logData) {
 
                         // Limit the PID sum by the limits defined in the header
                         let pidLimit = axis < AXIS.YAW ? sysConfig.pidSumLimit : sysConfig.pidSumLimitYaw;
-                        if (pidLimit) {
+                        if (pidLimit != null && pidLimit > 0) {
                             pidSum = constrain(pidSum, -pidLimit, pidLimit);
                         } 
 
