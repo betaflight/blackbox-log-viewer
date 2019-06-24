@@ -83,7 +83,7 @@
     color: #7d7d7d;
     text-align: justify;
     position: relative;
-    vertical-align: middle;
+    align-self: center;
     font-size: 11px;
 }
 
