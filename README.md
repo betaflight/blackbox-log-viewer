@@ -12,11 +12,11 @@ be played behind the log. You can export the graphs as a WebM video to share wit
 
 Download the installer from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
 
-### Via Chrome Web Store
+### Via Chrome Web Store (for ChromeOS)
 
-[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/betaflight-blackbox-explo/canpiagfkeefejklcojkhojdijglnghc)
+[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/jhigimciiclphnbhmemimenbpbdclklf)
 
-1. Visit the [Betaflight Blackbox Log Viewer product page in the Chrome web store](https://chrome.google.com/webstore/detail/betaflight-blackbox-explo/canpiagfkeefejklcojkhojdijglnghc)
+1. Visit the [Betaflight Blackbox Log Viewer product page in the Chrome web store](https://chrome.google.com/webstore/detail/jhigimciiclphnbhmemimenbpbdclklf)
 2. Click **+ Add to Chrome**
 
 Please note - the application will automatically update itself when new versions are released.
