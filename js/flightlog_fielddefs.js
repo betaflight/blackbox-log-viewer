@@ -411,6 +411,10 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         if(semver.gte(firmwareVersion, '4.0.0')) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('RX_FRSKY_SPI'), 0, 'GYRO_RAW');
         }
+        if(semver.gte(firmwareVersion, '4.1.0')) {
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('DUAL_GYRO'),          1);
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('DUAL_GYRO_COMBINED'), 1);
+        }
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
         // Flight mode names
