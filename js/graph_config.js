@@ -470,7 +470,12 @@ GraphConfig.load = function(config) {
                     case 'RC_SMOOTHING':
                         switch (fieldName) {
                             case 'debug[0]': // raw RC command
-                                return getCurveForMinMaxFieldsZeroOffset('debug[0]');
+                                return {
+                                    offset: 0,
+                                    power: 0.25,
+                                    inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
+                                    outputRange: 1.0
+                                };
                             case 'debug[1]': // raw RC command derivative
                             case 'debug[2]': // smoothed RC command derivative
                                 return getCurveForMinMaxFieldsZeroOffset('debug[1]', 'debug[2]');
