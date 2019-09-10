@@ -566,6 +566,8 @@ function FlightLogFieldPresenter() {
                     break;
                 case 'RC_SMOOTHING':
                     switch (fieldName) {
+                        case 'debug[0]':
+                            return (value + 1500).toFixed(0) + " us";
                         case 'debug[3]': // rx frame rate [us]
                             return (value / 1000).toFixed(1) + 'ms';
                     }
