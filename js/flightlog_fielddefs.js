@@ -402,7 +402,21 @@ var
         "CALC_FREQUENCIES",
         "UPDATE_FILTERS",
         "HANNING"
+    ]),
+
+    ITERM_RELAX = makeReadOnly([
+        "OFF",
+        "RP",
+        "RPY", 
+        "RP_INC",
+        "RPY_INC", 
+    ]),
+
+    ITERM_RELAX_TYPE = makeReadOnly([
+        "GYRO",
+        "SETPOINT",
     ]);
+
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if((firmwareType == FIRMWARE_TYPE_BETAFLIGHT) && semver.gte(firmwareVersion, '3.3.0')) {

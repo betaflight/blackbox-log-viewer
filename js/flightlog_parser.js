@@ -296,6 +296,9 @@ var FlightLogParser = function(logData) {
             d_min : [null, null, null],             // D_Min [P, I, D]
             d_min_gain : null,                      // D_Min gain
             d_min_advance : null,                   // D_Min advance
+            iterm_relax: null,                      // ITerm Relax mode
+            iterm_relax_type: null,                 // ITerm Relax type
+            iterm_relax_cutoff: null,               // ITerm Relax cutoff
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -599,7 +602,9 @@ var FlightLogParser = function(logData) {
             case "dterm_rpm_notch_harmonics":
             case "dterm_rpm_notch_q":
             case "dterm_rpm_notch_min":
-            
+            case "iterm_relax":
+            case "iterm_relax_type":
+            case "iterm_relax_cutoff":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 
