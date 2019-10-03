@@ -305,6 +305,16 @@ var
             "D_MIN",
             "AC_CORRECTION",
             "AC_ERROR",
+            "DUAL_GYRO_SCALED",
+            "DSHOT_RPM_ERRORS",
+            "CRSF_LINK_STATISTICS_UPLINK",
+            "CRSF_LINK_STATISTICS_PWR",
+            "CRSF_LINK_STATISTICS_DOWN",
+            "BARO",
+            "GPS_RESCUE_THROTTLE_PID",
+            "DYN_IDLE",
+            "FF_LIMIT",
+            "FF_INTERPOLATED",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
@@ -409,7 +419,7 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('NOTCH'),    1, 'GYRO_SCALED');
         }
         if(semver.gte(firmwareVersion, '4.0.0')) {
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('RX_FRSKY_SPI'), 0, 'GYRO_RAW');
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('GYRO_RAW'), 0, 'RX_SFHSS_SPI');
         }
         if(semver.gte(firmwareVersion, '4.1.0')) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('DUAL_GYRO'),          1);
