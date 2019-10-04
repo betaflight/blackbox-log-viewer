@@ -80,6 +80,14 @@ function HeaderDialog(dialog, onSave) {
             {name:'rc_smoothing_active_cutoffs_1', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
             {name:'rc_smoothing_active_cutoffs_2', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
             {name:'rc_interpolation_channels'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+            {name:'gyro_rpm_notch_harmonics'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'gyro_rpm_notch_q'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'gyro_rpm_notch_min'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dterm_rpm_notch_harmonics'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dterm_rpm_notch_q'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dterm_rpm_notch_min'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dshot_bidir'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+
     ];
 
 	function isParameterValid(name) {
@@ -553,6 +561,16 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
 		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
 
+        setParameter('gyro_rpm_notch_harmonics', sysConfig.gyro_rpm_notch_harmonics, 0);
+        setParameter('gyro_rpm_notch_q'        , sysConfig.gyro_rpm_notch_q        , 0);
+        setParameter('gyro_rpm_notch_min'      , sysConfig.gyro_rpm_notch_min      , 0);
+
+        setParameter('dterm_rpm_notch_harmonics', sysConfig.dterm_rpm_notch_harmonics, 0);
+        setParameter('dterm_rpm_notch_q'        , sysConfig.dterm_rpm_notch_q        , 0);
+        setParameter('dterm_rpm_notch_min'      , sysConfig.dterm_rpm_notch_min      , 0);
+
+        $('.dshot_bidir_required').toggle(sysConfig.dshot_bidir == 1);
+
         renderSelect('rc_smoothing_type'          ,sysConfig.rc_smoothing_type, RC_SMOOTHING_TYPE);
         renderSelect('rc_interpolation'           ,sysConfig.rc_interpolation, RC_INTERPOLATION);
         setParameter('rc_interpolation_interval'  ,sysConfig.rc_interpolation_interval,0);
@@ -595,15 +613,17 @@ function HeaderDialog(dialog, onSave) {
             setParameter('rate_limits_roll'  , sysConfig.rate_limits[0], 0);
             setParameter('rate_limits_pitch' , sysConfig.rate_limits[1], 0);
             setParameter('rate_limits_yaw'   , sysConfig.rate_limits[2], 0);
-            $("rate_limits").show();
+            $("#rate_limits").show();
         } else {
             $("#d_min").hide();
-            $("rate_limits").hide();
+            $("#rate_limits").hide();
         }
 
     	renderSelect('unsynced_fast_pwm'		,sysConfig.unsynced_fast_pwm, MOTOR_SYNC);
     	renderSelect('fast_pwm_protocol'		,sysConfig.fast_pwm_protocol, FAST_PROTOCOL);
         setParameter('motor_pwm_rate'		    ,sysConfig.motor_pwm_rate,0);
+        renderSelect('dshot_bidir'              ,sysConfig.dshot_bidir, OFF_ON);
+
         renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
