@@ -415,8 +415,14 @@ var
     ITERM_RELAX_TYPE = makeReadOnly([
         "GYRO",
         "SETPOINT",
-    ]);
+    ]),
 
+    DYN_NOTCH_RANGE = makeReadOnly([
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "AUTO",
+    ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if((firmwareType == FIRMWARE_TYPE_BETAFLIGHT) && semver.gte(firmwareVersion, '3.3.0')) {
