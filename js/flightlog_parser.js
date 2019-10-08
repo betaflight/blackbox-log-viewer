@@ -299,6 +299,10 @@ var FlightLogParser = function(logData) {
             iterm_relax: null,                      // ITerm Relax mode
             iterm_relax_type: null,                 // ITerm Relax type
             iterm_relax_cutoff: null,               // ITerm Relax cutoff
+            dyn_notch_range: null,                  // Dyn Notch Range (LOW, MED, HIGH or AUTO)
+            dyn_notch_width_percent: null,          // Dyn Notch width percent distance between the two notches
+            dyn_notch_q: null,                      // Dyn Notch width of each dynamic filter
+            dyn_notch_min_hz: null,                 // Gyn Notch min limit in Hz for the filter
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -605,6 +609,11 @@ var FlightLogParser = function(logData) {
             case "iterm_relax":
             case "iterm_relax_type":
             case "iterm_relax_cutoff":
+            case "dyn_notch_range":
+            case "dyn_notch_width_percent":
+            case "dyn_notch_q":
+            case "dyn_notch_min_hz":
+
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 

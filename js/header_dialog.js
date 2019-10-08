@@ -90,6 +90,10 @@ function HeaderDialog(dialog, onSave) {
             {name:'iterm_relax'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
             {name:'iterm_relax_type'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
             {name:'iterm_relax_cutoff'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dyn_notch_range'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dyn_notch_width_percent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dyn_notch_q'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'dyn_notch_min_hz'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -562,6 +566,11 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('yaw_lpf_hz'				,sysConfig.yaw_lpf_hz,0);
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
 		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
+
+        renderSelect('dyn_notch_range'         ,sysConfig.dyn_notch_range        , DYN_NOTCH_RANGE);
+        setParameter('dyn_notch_width_percent' ,sysConfig.dyn_notch_width_percent, 0);
+        setParameter('dyn_notch_q'             ,sysConfig.dyn_notch_q            , 0);
+        setParameter('dyn_notch_min_hz'        ,sysConfig.dyn_notch_min_hz       , 0);
 
         setParameter('gyro_rpm_notch_harmonics', sysConfig.gyro_rpm_notch_harmonics, 0);
         setParameter('gyro_rpm_notch_q'        , sysConfig.gyro_rpm_notch_q        , 0);
