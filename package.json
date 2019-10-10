@@ -9,7 +9,8 @@
   "scripts": {
     "start": "gulp debug",
     "postinstall": "platform-dependent-modules",
-    "gulp": "gulp"
+    "gulp": "gulp",
+    "release": "gulp release"
   },
   "window": {
     "show": true,
