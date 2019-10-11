@@ -743,13 +743,9 @@ function FlightLogFieldPresenter() {
                         return value.toFixed(0);
                 case 'RTH':
                     switch(fieldName) {
-                        case 'debug[0]':
-                            return value.toFixed(0);
                         case 'debug[1]':
-                            return (value / 100).toFixed(1);
-                        case 'debug[2]':
-                            return value.toFixed(0);
-                        case 'debug[3]':
+                            return (value / 100).toFixed(1) + 'deg';
+                        default:
                             return value.toFixed(0);
                         }
                         break;
