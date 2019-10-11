@@ -406,6 +406,13 @@ function FlightLogFieldPresenter() {
                             'debug[2]':'Boost Amount Clip [Roll]',
                             'debug[3]':'Clip',
             },
+            'RTH' : {
+                            'debug[all]':'RTH',
+                            'debug[0]':'Rescue Throttle',
+                            'debug[1]':'Rescue Angle',
+                            'debug[2]':'Altitude Adjustment',
+                            'debug[3]':'Rescue State',
+            },
         };
     
     function presentFlags(flags, flagNames) {
@@ -732,6 +739,20 @@ function FlightLogFieldPresenter() {
                     return (value / 10).toFixed(1) + 'deg';
                 case 'AC_CORRECTION':
                     return (value / 10).toFixed(1) + 'deg/s';
+                case 'GPS_RESCUE_THROTTLE_PID':
+                        return value.toFixed(0);
+                case 'RTH':
+                    switch(fieldName) {
+                        case 'debug[0]':
+                            return value.toFixed(0);
+                        case 'debug[1]':
+                            return (value / 100).toFixed(1);
+                        case 'debug[2]':
+                            return value.toFixed(0);
+                        case 'debug[3]':
+                            return value.toFixed(0);
+                        }
+                        break;
             }
             return value.toFixed(0);
 		}
