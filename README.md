@@ -12,6 +12,11 @@ be played behind the log. You can export the graphs as a WebM video to share wit
 
 Download the installer from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
 
+#### Note for MacOS X users
+
+Changes to the security model used in the latest versions of MacOS X 10.14 (Mojave) and 10.15 (Catalina) mean that the operating system will show an error message ('"betaflight-blackbox-explorer.app" is damaged and can’t be opened. You should move it to the Trash.') when trying to install the application. To work around this, run the following command in a terminal before installing: `sudo spctl --master-disable`. Then install Blackbox Log Viewer, and after verifying that the installation has worked, run `sudo spctl --master-enable`.
+
+
 ### Via Chrome Web Store (for ChromeOS)
 
 [![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/jhigimciiclphnbhmemimenbpbdclklf)
@@ -128,7 +133,7 @@ yarn gulp release
 To build or release only for one specific platform you can append the plaform after the `task-name`.
 If no platform is provided, only for the platform you are builing from will be build.
 
-* **MacOS** use `yarn gulp <task-name> --osx64`
+* **MacOS X** use `yarn gulp <task-name> --osx64`
 * **Linux** use `yarn gulp <task-name> --linux64`
 * **Windows** use `yarn gulp <task-name> --win32`
 * **ChromeOS** use `yarn gulp <task-name> --chromeos`

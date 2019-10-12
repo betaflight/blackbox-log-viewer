@@ -233,6 +233,7 @@ var FlightLogParser = function(logData) {
             dterm_average_count:null,               // DTerm Average Count
             rollPitchItermResetRate:null,           // ITerm Reset rate for Roll and Pitch
             yawItermResetRate:null,                 // ITerm Reset Rate for Yaw
+            dshot_bidir:null,                       // DShot bidir protocol enabled
             dterm_lpf_hz:null,                      // DTerm Lowpass Filter Hz
             dterm_lpf_dyn_hz:[null, null],          // DTerm Lowpass Dynamic Filter Min and Max Hz
             dterm_lpf2_hz:null,                     // DTerm Lowpass Filter Hz 2
@@ -248,6 +249,12 @@ var FlightLogParser = function(logData) {
             gyro_lowpass2_hz:null,                  // Gyro Soft Lowpass Filter Hz 2
             gyro_notch_hz:null,                     // Gyro Notch Frequency
             gyro_notch_cutoff:null,                 // Gyro Notch Cutoff
+            gyro_rpm_notch_harmonics:null,          // Number of Harmonics in the gyro rpm filter
+            gyro_rpm_notch_q:null,                  // Value of Q in the gyro rpm filter
+            gyro_rpm_notch_min:null,                // Min Hz for the gyro rpm filter
+            dterm_rpm_notch_harmonics:null,         // Number of Harmonics in the dterm rpm filter
+            dterm_rpm_notch_q:null,                 // Value of Q in the dterm rpm filter
+            dterm_rpm_notch_min:null,               // Min Hz for the dterm rpm filter
             dterm_notch_hz:null,                    // Dterm Notch Frequency
             dterm_notch_cutoff:null,                // Dterm Notch Cutoff
             acc_lpf_hz:null,                        // Accelerometer Lowpass filter Hz
@@ -289,6 +296,13 @@ var FlightLogParser = function(logData) {
             d_min : [null, null, null],             // D_Min [P, I, D]
             d_min_gain : null,                      // D_Min gain
             d_min_advance : null,                   // D_Min advance
+            iterm_relax: null,                      // ITerm Relax mode
+            iterm_relax_type: null,                 // ITerm Relax type
+            iterm_relax_cutoff: null,               // ITerm Relax cutoff
+            dyn_notch_range: null,                  // Dyn Notch Range (LOW, MED, HIGH or AUTO)
+            dyn_notch_width_percent: null,          // Dyn Notch width percent distance between the two notches
+            dyn_notch_q: null,                      // Dyn Notch width of each dynamic filter
+            dyn_notch_min_hz: null,                 // Gyn Notch min limit in Hz for the filter
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -585,6 +599,21 @@ var FlightLogParser = function(logData) {
             case "use_integrated_yaw":
             case "d_min_gain":
             case "d_min_advance":
+            case "dshot_bidir":
+            case "gyro_rpm_notch_harmonics":
+            case "gyro_rpm_notch_q":
+            case "gyro_rpm_notch_min":
+            case "dterm_rpm_notch_harmonics":
+            case "dterm_rpm_notch_q":
+            case "dterm_rpm_notch_min":
+            case "iterm_relax":
+            case "iterm_relax_type":
+            case "iterm_relax_cutoff":
+            case "dyn_notch_range":
+            case "dyn_notch_width_percent":
+            case "dyn_notch_q":
+            case "dyn_notch_min_hz":
+
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
 

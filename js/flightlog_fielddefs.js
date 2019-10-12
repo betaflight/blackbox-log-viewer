@@ -402,6 +402,26 @@ var
         "CALC_FREQUENCIES",
         "UPDATE_FILTERS",
         "HANNING"
+    ]),
+
+    ITERM_RELAX = makeReadOnly([
+        "OFF",
+        "RP",
+        "RPY", 
+        "RP_INC",
+        "RPY_INC", 
+    ]),
+
+    ITERM_RELAX_TYPE = makeReadOnly([
+        "GYRO",
+        "SETPOINT",
+    ]),
+
+    DYN_NOTCH_RANGE = makeReadOnly([
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "AUTO",
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
