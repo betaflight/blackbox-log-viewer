@@ -92,7 +92,7 @@ a.disabled {
 
     div.log-graph-config{
         padding: 1em 0;
-        line-height: 1.1;8
+        line-height: 1.1;
     }
 
     div.log-graph-config h2 {
@@ -831,7 +831,15 @@ html:not(.has-analyser) .view-analyser-fullscreen {
     display:inline-block;
     margin-right: 17px;
     vertical-align: top;
-    height: 80px;
+    /* height: 80px; */
+}
+
+.video-top-controls h4 {
+    font-size: 11px;
+    color: #757575;
+    margin-top: 7px;
+    margin-bottom: 4px;
+    font-weight: bold;
 }
 
 html.has-log .video-top-controls > li.log-view-panel, html.has-log .video-top-controls > li.log-chart-zoom-panel, html.has-log .video-top-controls > li.log-chart-time-panel {
@@ -874,6 +882,50 @@ html.has-log .log-seek-bar {
     bottom: 20px;
     padding-left: 15px;
     padding-right: 15px;
+}
+
+.log-workspace-panel {
+    width: 160px;
+}
+
+.log-workspace-panel button {
+    width: 100%;
+    text-align: left;
+}
+
+.log-workspace-panel .caret {
+    float: right;
+    margin-top: 7px;
+}
+
+.log-workspace-panel .glyphicon {
+    margin-left: 4px;
+    opacity: 0.4;
+    transition: 250ms;
+}
+
+.log-workspace-panel .glyphicon:hover {
+    opacity: 1.0;
+    transition: 0ms;
+}
+
+.log-workspace-panel ul {
+    left: auto;
+}
+
+.log-workspace-panel li>a {
+    padding: 3px 5px 3px 10px;
+}
+
+.log-workspace-panel .index {
+    padding-right: 5px;
+    opacity: 0.4;
+}
+
+.log-workspace-panel input {
+    margin: 3px 10px;
+    width: 130px;
+    height: 20px;
 }
 
 html .graph-time-marker-group > .graph-time-marker {

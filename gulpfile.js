@@ -163,7 +163,7 @@ function getRunDebugAppCommand(arch) {
 
     case 'win32':
     case 'win64':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
+            return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe --remote-debugging-port=9222');
 
         break;
 
@@ -235,6 +235,7 @@ function dist() {
         './js/graph_config.js',
         './js/graph_config_dialog.js',
         './js/graph_legend.js',
+        './js/workspace_selection.js',
         './js/graph_spectrum.js',
         './js/graph_spectrum_calc.js',
         './js/graph_spectrum_plot.js',
