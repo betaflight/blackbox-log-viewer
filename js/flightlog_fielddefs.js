@@ -418,9 +418,9 @@ var
     ]),
 
     DYN_NOTCH_RANGE = makeReadOnly([
-        "LOW",
-        "MEDIUM",
         "HIGH",
+        "MEDIUM",
+        "LOW",
         "AUTO",
     ]);
 
