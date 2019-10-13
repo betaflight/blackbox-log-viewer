@@ -14,7 +14,7 @@ Download the installer from [Releases](https://github.com/betaflight/blackbox-lo
 
 #### Note for MacOS X users
 
-Changes to the security model used in the latest versions of MacOS X 10.14 (Mojave) and 10.15 (Catalina) mean that the operating system will show an error message ('"betaflight-blackbox-explorer.app" is damaged and can’t be opened. You should move it to the Trash.') when trying to install the application. To work around this, run the following command in a terminal before installing: `sudo spctl --master-disable`. Then install Blackbox Log Viewer, and after verifying that the installation has worked, run `sudo spctl --master-enable`.
+Changes to the security model used in the latest versions of MacOS X 10.14 (Mojave) and 10.15 (Catalina) mean that the operating system will show an error message ('"Betaflight\ Blackbox\ Explorer.app" is damaged and can’t be opened. You should move it to the Trash.') when trying to install the application. To work around this, run the following command in a terminal before installing: `sudo xattr -rd com.apple.quarantine /Applications/Betaflight\ Blackbox\ Explorer.app`.
 
 
 ### Via Chrome Web Store (for ChromeOS)
