@@ -2071,6 +2071,14 @@ function BlackboxLogViewer() {
     });
 }
 
+// Close the dropdowns if not clicking a decendant of the dropdown
+$(document).click(function (e) {
+    var p = $(e.target).closest(".dropdown");
+    if (!p.length) {
+        $(".dropdown").removeClass("open");
+    }
+});
+
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');
 
