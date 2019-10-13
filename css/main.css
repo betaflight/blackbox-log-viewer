@@ -903,13 +903,14 @@ html.has-log .log-seek-bar {
 
 .log-workspace-panel .caret {
     float: right;
-    margin-top: 7px;
+    margin-top: 8px;
 }
 
 .log-workspace-panel .glyphicon {
-    margin-left: 4px;
     opacity: 0.4;
     transition: 250ms;
+    vertical-align: middle;
+    top: 0px;
 }
 
 .log-workspace-panel .glyphicon:hover {
@@ -917,27 +918,34 @@ html.has-log .log-seek-bar {
     transition: 0ms;
 }
 
-/* .log-workspace-panel ul {
-    left: auto;
-} */
-
 .log-workspace-panel li>a {
-    padding: 3px 5px 3px 10px;
+    padding: 3px 5px 3px 5px;
 }
 
 .log-workspace-panel .index {
     padding-right: 5px;
+    opacity: 0.9;
+    vertical-align: middle;
+}
+
+.log-workspace-panel .faded {
     opacity: 0.4;
 }
 
 .log-workspace-panel .title {
-    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 94px;
+    display:inline-block;
+    vertical-align:middle;
 }
 
 .log-workspace-panel input {
-    margin: 0;
-    width: 90px;
-    height: 20px;
+    padding-top: 2px;
+    margin-left: -2px;
+    width: 108px;
+    height: 18px;
 }
 
 html .graph-time-marker-group > .graph-time-marker {
