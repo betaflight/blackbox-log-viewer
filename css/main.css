@@ -930,9 +930,13 @@ html.has-log .log-seek-bar {
     opacity: 0.4;
 }
 
+.log-workspace-panel .title {
+    display: inline-block;
+}
+
 .log-workspace-panel input {
-    margin: 3px 15px 3px 10px;
-    width: 125px;
+    margin: 0;
+    width: 90px;
     height: 20px;
 }
 

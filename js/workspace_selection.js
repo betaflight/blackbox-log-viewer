@@ -11,67 +11,99 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
 
     function buildUI() {
         numberSpan = $('<span class="index">');
-        titleSpan = $('<span>');
+        titleSpan = $('<span class="title">');
 
-        buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"><span class="caret"></span></button>');
-
+        buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>');
+        var caretElem = $('<span class="caret"></span>')
         menuElem = $('<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>');
+
+        var editButton = $('<span class="glyphicon glyphicon-pencil" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>');
+        editButton.click(editTitle);
+        editButton.tooltip({ trigger: "hover", placement: "auto bottom" });
 
         targetElem.empty();
         targetElem.addClass("dropdown")
         targetElem.append(buttonElem);
         targetElem.append(menuElem);
-        buttonElem.prepend(titleSpan);
-        buttonElem.prepend(numberSpan);
+        buttonElem.append(numberSpan);
+        buttonElem.append(titleSpan);
+        buttonElem.append(editButton);
+        buttonElem.append(caretElem);
 
         buttonElem.dropdown(); // initialise menus
     }
 
+    function editTitle(e) {
+        buttonElem.dropdown("toggle"); // Hack to undrop
+        var inputElem = $('<input type="text" onkeyup="event.preventDefault()">');
+        inputElem.click((e) => e.stopPropagation()); // Stop click from closing
+        titleSpan.replaceWith(inputElem);
+        inputElem.val(workspaces[activeId].title)
+        inputElem.focus();
+        inputElem.on('focusout', () => {
+            inputElem.replaceWith(titleSpan);
+            onSaveWorkspace(activeId, inputElem.val())
+        });
+
+        e.preventDefault();
+    }
+
     function update() {
         menuElem.empty();
+        // Sort for non-programmers with 1-9 and then 0 last. 
+        for (let index = 1; index < 11; index++) {
+            let id = index % 10
+            let element = workspaces[id % 10];
 
-        workspaces.forEach((element, id) => {
             var item = $('<li></li>');
             var link = $('<a href="#"></a>')
+
+            if (!element) {
+                // item.addClass("disabled");
+            }
+
             var number = $('<span class="index">').text(id);
-            var title = $('<span>').text(element.title);
+            var title = $('<span class="title">')
+
+            if (!element) {
+                title.text("<empty>");
+            }
+            else {
+                title.text(element.title);
+            }
+
             link.click((e) => {
-                buttonElem.dropdown("toggle");
-                onSelectionChange(workspaces, id); 
-                onNewGraphConfig(element.graphConfig)
-                e.preventDefault();
+                if (element) {
+                    buttonElem.dropdown("toggle");
+                    onSelectionChange(workspaces, id);
+                    onNewGraphConfig(element.graphConfig)
+                    e.preventDefault();
+                }
             });
 
             var actionButtons = $('<span class="pull-right workspace-menu-item-actions"></span>');
-            var editButton = $('<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>');
-            editButton.click((e) => {
-                var inputElem = $("<input type='text'>")
-                link.replaceWith(inputElem);
-                inputElem.val(element.title)
-                inputElem.focus();
-                inputElem.on('focusout', () => {
-                    element.title = inputElem.val()
-                    update();
-                });
 
-                e.preventDefault();
-            });
-
-            var saveButton = $('<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>');
+            var saveButton = $('<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>');
             saveButton.click((e) => {
-                onSaveWorkspace(id, element.title);
+                if (!element) {
+                    onSaveWorkspace(id, "Unnamed");
+                }
+                else {
+                    onSaveWorkspace(id, element.title);
+                }
                 e.preventDefault();
             });
+
+            // saveButton.tooltip({ trigger: "hover", placement: "auto bottom" });
 
             item.append(link);
             link.append(number);
             link.append(title);
             link.append(actionButtons);
-            actionButtons.append(editButton);
             actionButtons.append(saveButton);
             item.toggleClass("active", id == activeId)
             menuElem.append(item);
-        });
+        }
 
         if (workspaces[activeId]) {
             numberSpan.text(activeId);
