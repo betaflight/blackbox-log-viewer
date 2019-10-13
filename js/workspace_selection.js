@@ -15,9 +15,10 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
 
         buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"><span class="caret"></span></button>');
 
-        menuElem = $('<ul class="dropdown-menu" role="menu" aria-labelledby="workspace-menu"></ul>');
+        menuElem = $('<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>');
 
         targetElem.empty();
+        targetElem.addClass("dropdown")
         targetElem.append(buttonElem);
         targetElem.append(menuElem);
         buttonElem.prepend(titleSpan);
