@@ -6,20 +6,22 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
         titleSpan = null,
         buttonElem = null,
         menuElem = null,
+        editButton = null,
         workspaces = [],
         activeId = 1
 
     function buildUI() {
+        
+        buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>');
         numberSpan = $('<span class="index">');
         titleSpan = $('<span class="title">');
-
-        buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>');
         var caretElem = $('<span class="caret"></span>')
-        menuElem = $('<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>');
-
-        var editButton = $('<span class="glyphicon glyphicon-pencil" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>');
+        
+        editButton = $('<span class="glyphicon glyphicon-pencil" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>');
         editButton.click(editTitle);
         editButton.tooltip({ trigger: "hover", placement: "auto bottom" });
+        
+        menuElem = $('<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>');
 
         targetElem.empty();
         targetElem.addClass("dropdown")
@@ -35,6 +37,7 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
 
     function editTitle(e) {
         buttonElem.dropdown("toggle"); // Hack to undrop
+        editButton.hide();
         var inputElem = $('<input type="text" onkeyup="event.preventDefault()">');
         inputElem.click((e) => e.stopPropagation()); // Stop click from closing
         titleSpan.replaceWith(inputElem);
@@ -42,6 +45,7 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
         inputElem.focus();
         inputElem.on('focusout', () => {
             inputElem.replaceWith(titleSpan);
+            editButton.show();
             onSaveWorkspace(activeId, inputElem.val())
         });
 
@@ -67,6 +71,7 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
 
             if (!element) {
                 title.text("<empty>");
+                title.addClass("faded");
             }
             else {
                 title.text(element.title);
