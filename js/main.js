@@ -847,15 +847,45 @@ function BlackboxLogViewer() {
 
     }
 
-    function loadWorkspaces(file) {
+    function upgradeWorkspaceFormat(oldFormat) {
+        // Check if upgrade is needed
+        if (!oldFormat.graphConfig) { return oldFormat }
 
+        let newFormat = [];
+
+        oldFormat.graphConfig.forEach((element, id) => {
+            if (element) {
+                let title = "Unnamed";
+                if (element.length > 0) {
+                    title = element[0].label;
+                }
+
+                newFormat[id] = {
+                    title: title,
+                    graphConfig: element
+                }
+            }
+            else {
+                newFormat[id] = null;
+            }
+        });
+
+        return newFormat;
+    }
+
+    function loadWorkspaces(file) {
         var reader = new FileReader();
     
         reader.onload = function(e) {
-
             var data = e.target.result;
-            workspaceGraphConfigs = JSON.parse(data);
+            var tmp = JSON.parse(data);
+            if (tmp.graphConfig) {
+                window.alert('Old Workspace format. Upgrading...');
+                tmp = upgradeWorkspaceFormat(tmp);
+            }
+            workspaceGraphConfigs = tmp;
             onWorkspacesChanged(workspaceGraphConfigs, 1);
+            newGraphConfig(workspaceGraphConfigs[1].graphConfig);
             window.alert('Workspaces Loaded');               
         };
      
@@ -903,12 +933,9 @@ function BlackboxLogViewer() {
     // New workspaces feature; local storage of user configurations
     prefs.get('workspaceGraphConfigs', function(item) {
         if(item) {
-            workspaceGraphConfigs = item;
+            workspaceGraphConfigs = upgradeWorkspaceFormat(item);
         } else {
-            workspaceGraphConfigs = [{
-                titel: "New Workspace",
-                graphConfig: [null, null, null, null, null, null, null, null, null, null]
-            }];
+            workspaceGraphConfigs = [];
         }
 
         onWorkspacesChanged(workspaceGraphConfigs, activeWorkspace);
