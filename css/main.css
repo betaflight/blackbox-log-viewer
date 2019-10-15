@@ -72,7 +72,6 @@ a.disabled {
 /*** toolbar expansion ***/
 
 @media (max-width: 1020px) {
-    /* hide titles when width is 500px or less */
     .video-top-controls * h4 { 
         display: none!important;
     }
@@ -88,9 +87,8 @@ a.disabled {
     }
 }
 
-/* With video */
 
-@media (max-width: 600px) {
+@media (max-width: 675px) {
     .container-fluid.main-pane,
     html.has-log div.log-seek-bar {
         padding-left:0;
@@ -132,6 +130,10 @@ a.disabled {
         height: 30px;
         padding-top: 5px;
     }
+    
+    .video-top-controls li {
+        margin-right: 1px;
+    }
 
     div.graph-row {
         top: 70px!important;
@@ -158,13 +160,23 @@ a.disabled {
     }
 }
 
+/* With video */
+@media (max-width: 920px) {
+    html.has-video .video-top-controls li {
+        margin-right: 1px;
+    }
+    
+    html.has-video button.log-jump-start,
+    html.has-video button.log-jump-back,
+    html.has-video button.log-jump-forward,
+    html.has-video button.log-jump-end {
+        display:none;
+    }
+}
+
 @media (max-width: 1150px) {
     html.has-video .view-buttons-expanded {
         display: none!important;
-    }
-
-    html.has-video .log-workspace-panel {
-        width: 100px;
     }
 }
 
@@ -201,10 +213,6 @@ a.disabled {
 @media (max-width: 886px) {
     html:not(.has-video) .view-buttons-expanded {
         display: none!important;
-    }
-
-    html:not(.has-video) .log-workspace-panel {
-        width: 100px;
     }
 }
 
@@ -918,11 +926,15 @@ html.has-log .log-seek-bar {
     transition: 0ms;
 }
 
+.log-workspace-panel .open .workspace-selector-editButton{
+    display: none;
+}
+
 .log-workspace-panel li>a {
     padding: 3px 5px 3px 5px;
 }
 
-.log-workspace-panel .index {
+.log-workspace-panel .workspace-selector-index {
     padding-right: 5px;
     opacity: 0.9;
     vertical-align: middle;
@@ -932,7 +944,7 @@ html.has-log .log-seek-bar {
     opacity: 0.4;
 }
 
-.log-workspace-panel .title {
+.log-workspace-panel .workspace-selector-title {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

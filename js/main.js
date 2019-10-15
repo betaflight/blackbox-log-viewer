@@ -884,8 +884,7 @@ function BlackboxLogViewer() {
                 tmp = upgradeWorkspaceFormat(tmp);
             }
             workspaceGraphConfigs = tmp;
-            onWorkspacesChanged(workspaceGraphConfigs, 1);
-            newGraphConfig(workspaceGraphConfigs[1].graphConfig);
+            onSwitchWorkspace(workspaceGraphConfigs, 1);
             window.alert('Workspaces Loaded');               
         };
      
@@ -914,20 +913,33 @@ function BlackboxLogViewer() {
         CsvExporter(flightLog, options).dump(onSuccess);
     }
 
-    function onWorkspacesChanged(newWorkspaces, newAciveId) {
-        prefs.set('activeWorkspace', newAciveId);      // Store to local cache
-        prefs.set('workspaceGraphConfigs', newWorkspaces);      // Store to local cache
-        workspaceSelection.setWorkspaces(newWorkspaces)
-        workspaceSelection.setActiveWorkspace(newAciveId)
+    function newGraphConfig(newConfig) {
+        lastGraphConfig = graphConfig; // Remember the last configuration.
+        graphConfig = newConfig;
+
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+
+        prefs.set('graphConfig', graphConfig);
     }
 
+    // Store to local cache and update Workspace Selector control
+    function onSwitchWorkspace(newWorkspaces, newAciveId) {
+        prefs.set('activeWorkspace', newAciveId);      
+        prefs.set('workspaceGraphConfigs', newWorkspaces);
+        workspaceSelection.setWorkspaces(newWorkspaces)
+        workspaceSelection.setActiveWorkspace(newAciveId)
+        if (flightLog && newWorkspaces[newAciveId] && newWorkspaces[newAciveId].graphConfig) {
+           newGraphConfig(newWorkspaces[newAciveId].graphConfig);
+        }
+    }
+
+    // Save current config
     function onSaveWorkspace(id, title){
-        // Save current config
         workspaceGraphConfigs[id] = {
             title: title,
             graphConfig: graphConfig
         };
-        onWorkspacesChanged(workspaceGraphConfigs, id)
+        onSwitchWorkspace(workspaceGraphConfigs, id)
     }
 
     // New workspaces feature; local storage of user configurations
@@ -938,7 +950,7 @@ function BlackboxLogViewer() {
             workspaceGraphConfigs = [];
         }
 
-        onWorkspacesChanged(workspaceGraphConfigs, activeWorkspace);
+        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
     });
 
     prefs.get('activeWorkspace', function (id){
@@ -949,7 +961,7 @@ function BlackboxLogViewer() {
             activeWorkspace = 1
         }
 
-        onWorkspacesChanged(workspaceGraphConfigs, activeWorkspace);
+        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
     });
 
     // Get the offsetCache buffer
@@ -992,8 +1004,8 @@ function BlackboxLogViewer() {
 
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
         
-        workspaceSelection = new WorkspaceSelection($(".log-workspace-selection"), workspaceGraphConfigs, onWorkspacesChanged, onSaveWorkspace, newGraphConfig);
-        onWorkspacesChanged(workspaceGraphConfigs, workspaceSelection);
+        workspaceSelection = new WorkspaceSelection($(".log-workspace-selection"), workspaceGraphConfigs, onSwitchWorkspace, onSaveWorkspace);
+        onSwitchWorkspace(workspaceGraphConfigs, workspaceSelection);
 
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
@@ -1266,15 +1278,6 @@ function BlackboxLogViewer() {
                 invalidateGraph();               
             }
         });
-       
-        function newGraphConfig(newConfig) {
-                lastGraphConfig = graphConfig; // Remember the last configuration.
-                graphConfig = newConfig;
-                
-                activeGraphConfig.adaptGraphs(flightLog, graphConfig);
-                
-                prefs.set('graphConfig', graphConfig);            
-        }
 
         function expandGraphConfig(index) { // Put each of the fields into a seperate graph
 
@@ -1825,8 +1828,7 @@ function BlackboxLogViewer() {
                                 var id = e.which - 48
                         		if (!e.shiftKey) { // retreive graph configuration from workspace
                                     if (workspaceGraphConfigs[id] != null) {
-                                        newGraphConfig(workspaceGraphConfigs[id].graphConfig);
-                                        onWorkspacesChanged(workspaceGraphConfigs, id)
+                                        onSwitchWorkspace(workspaceGraphConfigs, id)
 		                            }
 		                        } else // store configuration to workspace
 		                        {

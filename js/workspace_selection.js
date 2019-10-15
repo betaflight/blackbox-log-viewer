@@ -1,6 +1,6 @@
 "use strict";
 
-function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWorkspace, onNewGraphConfig) {
+function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWorkspace) {
     var
         numberSpan = null,
         titleSpan = null,
@@ -13,11 +13,11 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
     function buildUI() {
         
         buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>');
-        numberSpan = $('<span class="index">');
-        titleSpan = $('<span class="title">');
+        numberSpan = $('<span class="workspace-selector-index">');
+        titleSpan = $('<span class="workspace-selector-title">');
         var caretElem = $('<span class="caret"></span>')
         
-        editButton = $('<span class="glyphicon glyphicon-pencil" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>');
+        editButton = $('<span class="glyphicon glyphicon-pencil workspace-selector-editButton" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>');
         editButton.click(editTitle);
         editButton.tooltip({ trigger: "hover", placement: "auto bottom" });
         
@@ -32,7 +32,7 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
         buttonElem.append(editButton);
         buttonElem.append(caretElem);
 
-        buttonElem.dropdown(); // initialise menus
+        buttonElem.dropdown(); // initialise dropdown
     }
 
     function editTitle(e) {
@@ -66,8 +66,8 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
                 // item.addClass("disabled");
             }
 
-            var number = $('<span class="index">').text(id);
-            var title = $('<span class="title">')
+            var number = $('<span class="workspace-selector-index">').text(id);
+            var title = $('<span class="workspace-selector-title">')
 
             if (!element) {
                 title.text("<empty>");
@@ -81,12 +81,11 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
                 if (element) {
                     buttonElem.dropdown("toggle");
                     onSelectionChange(workspaces, id);
-                    onNewGraphConfig(element.graphConfig)
                     e.preventDefault();
                 }
             });
 
-            var actionButtons = $('<span class="pull-right workspace-menu-item-actions"></span>');
+            var actionButtons = $('<span class="pull-right"></span>');
 
             var saveButton = $('<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>');
             saveButton.click((e) => {
@@ -99,7 +98,7 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
                 e.preventDefault();
             });
 
-            // saveButton.tooltip({ trigger: "hover", placement: "auto bottom" });
+            saveButton.tooltip({ trigger: "hover", placement: "auto bottom" });
 
             item.append(link);
             link.append(number);
@@ -128,6 +127,7 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
         activeId = newId;
         update();
     }
+
     //TODO Should listen to workspace changes
     // config.addListener(buildUI);
 
