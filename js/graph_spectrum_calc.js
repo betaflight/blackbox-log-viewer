@@ -150,6 +150,63 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
 
 };
 
+GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
+
+    // Detect the axis
+    let axisIndex;
+    if (this._dataBuffer.fieldName.indexOf('[roll]') >= 0) {
+        axisIndex = 0;
+    } else if (this._dataBuffer.fieldName.indexOf('[pitch]') >= 0) {
+        axisIndex = 1;
+    } else if (this._dataBuffer.fieldName.indexOf('[yaw]') >= 0) {
+        axisIndex = 2;
+    }
+
+    const flightSamples = this._getFlightSamplesPidErrorVsSetpoint(axisIndex);
+
+    // Add the total error by absolute position
+    const errorBySetpoint =  Array.from({length: flightSamples.maxSetpoint + 1});
+    const numberOfSamplesBySetpoint = Array.from({length: flightSamples.maxSetpoint + 1});
+
+    // Initialize
+    for (let i = 0; i <= flightSamples.maxSetpoint; i++) {
+        errorBySetpoint[i] = 0;
+        numberOfSamplesBySetpoint[i] = 0;
+    }
+
+    // Sum by position
+    for (let i = 0; i < flightSamples.count; i++) {
+
+        const pidErrorValue = Math.abs(flightSamples.piderror[i]);
+        const setpointValue = Math.abs(flightSamples.setpoint[i]);
+
+        errorBySetpoint[setpointValue] += pidErrorValue;
+        numberOfSamplesBySetpoint[setpointValue]++;
+    }
+
+    // Calculate the media and max values
+    let maxErrorBySetpoint = 0;
+    for (let i = 0; i <= flightSamples.maxSetpoint; i++) {
+        if (numberOfSamplesBySetpoint[i] > 0) {
+            errorBySetpoint[i] = errorBySetpoint[i] / numberOfSamplesBySetpoint[i];
+            if (errorBySetpoint[i] > maxErrorBySetpoint) {
+                maxErrorBySetpoint = errorBySetpoint[i];
+            }
+        } else {
+            errorBySetpoint[i] = null;
+        }
+    }
+
+    return {
+        fieldIndex   : this._dataBuffer.fieldIndex,
+        fieldName    : this._dataBuffer.fieldName,
+        axisName     : FlightLogFieldPresenter.fieldNameToFriendly(`axisError[${axisIndex}]`),
+        fftOutput    : errorBySetpoint,
+        fftMaxOutput : maxErrorBySetpoint,
+    };
+
+};
+
 GraphSpectrumCalc._getFlightChunks = function() {
 
     var logStart = 0;
@@ -221,6 +278,40 @@ GraphSpectrumCalc._getFlightSamplesFreqVsThrottle = function() {
             throttle : throttle,
             count    : samplesCount
            };
+};
+
+GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
+
+    const allChunks = this._getFlightChunks();
+
+    // Get the PID Error field
+    const FIELD_PIDERROR_INDEX = this._flightLog.getMainFieldIndexByName(`axisError[${axisIndex}]`);
+    const FIELD_SETPOINT_INDEX = this._flightLog.getMainFieldIndexByName(`setpoint[${axisIndex}]`);
+
+    const piderror = new Int16Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+    const setpoint = new Int16Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+
+    // Loop through all the samples in the chunks and assign them to a sample array.
+    let samplesCount = 0;
+    let maxSetpoint = 0;
+    for (let chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
+        const chunk = allChunks[chunkIndex];
+        for (let frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
+            piderror[samplesCount] = chunk.frames[frameIndex][FIELD_PIDERROR_INDEX];
+            setpoint[samplesCount] = chunk.frames[frameIndex][FIELD_SETPOINT_INDEX];
+            if (setpoint[samplesCount] > maxSetpoint) {
+                maxSetpoint = setpoint[samplesCount];
+            }
+            samplesCount++;
+        }
+    }
+
+    return {
+        piderror,
+        setpoint,
+        maxSetpoint,
+        count: samplesCount,
+    };
 };
 
 GraphSpectrumCalc._hanningWindow = function(samples, size) {
