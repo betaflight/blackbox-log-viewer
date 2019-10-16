@@ -128,8 +128,5 @@ function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWor
         update();
     }
 
-    //TODO Should listen to workspace changes
-    // config.addListener(buildUI);
-
     buildUI();
 }

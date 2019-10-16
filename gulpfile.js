@@ -163,7 +163,7 @@ function getRunDebugAppCommand(arch) {
 
     case 'win32':
     case 'win64':
-            return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe --remote-debugging-port=9222');
+        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
 
         break;
 

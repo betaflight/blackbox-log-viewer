@@ -1824,23 +1824,21 @@ function BlackboxLogViewer() {
                     case "8".charCodeAt(0):
                     case "9".charCodeAt(0):
                         try {
-                        	if(!e.altKey) { // Workspaces feature
-                                var id = e.which - 48
-                        		if (!e.shiftKey) { // retreive graph configuration from workspace
+                            if (!e.altKey) { // Workspaces feature
+                                var id = e.which - 48;
+                                if (!e.shiftKey) { // retreive graph configuration from workspace
                                     if (workspaceGraphConfigs[id] != null) {
                                         onSwitchWorkspace(workspaceGraphConfigs, id)
-		                            }
-		                        } else // store configuration to workspace
-		                        {
-                                    if (workspaceGraphConfigs[id])
-                                    {
+                                    }
+                                } else { // store configuration to workspace
+                                    if (workspaceGraphConfigs[id]) {
                                         onSaveWorkspace(id, workspaceGraphConfigs[id].title);
                                     }
                                     else {
                                         onSaveWorkspace(id, "Unnamed");
                                     }
-		                        }
-                        	} else { // Bookmark Feature
+                                }
+                            } else { // Bookmark Feature
                         		if (!e.shiftKey) { // retrieve time from bookmark
 		                            if (bookmarkTimes[e.which-48] != null) {
 		                                setCurrentBlackboxTime(bookmarkTimes[e.which-48]);
