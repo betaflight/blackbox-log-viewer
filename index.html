@@ -441,7 +441,7 @@
                 <div class="log-workspace-selection"></div>
             </li>
         </ul>
-        <div class="graph-row">
+        <div id="screenshot-frame" class="graph-row">
             <div class="log-graph">
                 <video></video>
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
@@ -2200,6 +2200,13 @@
                                             </span>
                                             <div class="description">Special Case, clear all bookmarks</div>
                                         </li>
+                                        <li>
+                                            <span class="keys">
+                                                <div class="key">Alt</div>
+                                                <div class="key">S</div>
+                                            </span>
+                                            <div class="description">Save current graph to PNG file</div>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -2730,6 +2737,8 @@
         </div>
     </div>
     <!-- Scripts -->
+    <script src="node_modules/html2canvas/dist/html2canvas.min.js"></script>
+    <script src="js/screenshot.js"></script>
     <script src="js/complex.js"></script>
     <script src="js/real.js"></script>
     <script src="js/vendor/jquery-1.11.3.min.js"></script>

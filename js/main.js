@@ -1896,6 +1896,8 @@ function BlackboxLogViewer() {
                             if(!(shifted)) {
                                 toggleOverrideStatus('graphSmoothOverride', 'has-smoothing-override' );
                                 e.preventDefault();
+                            } else if (e.altKey) {
+                                makeScreenshot();
                             }
                         } catch(e) {
                             console.log('Smoothing override toggle feature not functioning');
