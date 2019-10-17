@@ -71,15 +71,24 @@ a.disabled {
 
 /*** toolbar expansion ***/
 
-/* With video */
-
-@media (max-width: 969px) {
-    html.has-video .view-buttons-expanded {
+@media (max-width: 1020px) {
+    .video-top-controls * h4 { 
         display: none!important;
+    }
+
+    .video-top-controls {
+        height: 50px;
+        padding-top: 10px;
+    }
+
+    .graph-row,
+    .log-field-values {
+        top: 86px!important;
     }
 }
 
-@media (max-width: 600px) {
+
+@media (max-width: 675px) {
     .container-fluid.main-pane,
     html.has-log div.log-seek-bar {
         padding-left:0;
@@ -92,7 +101,7 @@ a.disabled {
 
     div.log-graph-config{
         padding: 1em 0;
-        line-height: 1.1;8
+        line-height: 1.1;
     }
 
     div.log-graph-config h2 {
@@ -121,9 +130,13 @@ a.disabled {
         height: 30px;
         padding-top: 5px;
     }
+    
+    .video-top-controls li {
+        margin-right: 1px;
+    }
 
     div.graph-row {
-        top: 10px!important;
+        top: 70px!important;
     }
 
     div.navbar-logo .log-filename {
@@ -147,13 +160,33 @@ a.disabled {
     }
 }
 
-@media (min-width: 970px) {
+/* With video */
+@media (max-width: 920px) {
+    html.has-video .video-top-controls li {
+        margin-right: 1px;
+    }
+    
+    html.has-video button.log-jump-start,
+    html.has-video button.log-jump-back,
+    html.has-video button.log-jump-forward,
+    html.has-video button.log-jump-end {
+        display:none;
+    }
+}
+
+@media (max-width: 1150px) {
+    html.has-video .view-buttons-expanded {
+        display: none!important;
+    }
+}
+
+@media (min-width: 1151px) {
     html.has-video .view-buttons {
         display: none!important;
     }
 }
 
-@media (max-width: 1223px) {
+@media (max-width: 1404px) {
     html.has-video .playback-rate-expanded,
     html.has-video .graph-zoom-expanded,
     html.has-video .log-sync-expanded {
@@ -161,7 +194,7 @@ a.disabled {
     }
 }
 
-@media (min-width: 1224px) {
+@media (min-width: 1405px) {
     html.has-video .playback-rate,
     html.has-video .zoom-menu,
     html.has-video .sync-menu {
@@ -169,7 +202,7 @@ a.disabled {
     }
 }
 
-@media (max-width: 1370px) {
+@media (max-width: 1537px) {
     html.has-video .log-chart-time-panel {
         display: none!important;
     }
@@ -177,36 +210,19 @@ a.disabled {
 
 /* Without video */
 
-@media (max-width: 827px) {
-    /* hide titles when width is 500px or less */
-    .video-top-controls * h4 { 
-        display: none!important;
-    }
-
-    .video-top-controls {
-        height: 50px;
-        padding-top: 10px;
-    }
-
-    .graph-row,
-    .log-field-values {
-        top: 30px!important;
-    }
-}
-
-@media (max-width: 706px) {
+@media (max-width: 886px) {
     html:not(.has-video) .view-buttons-expanded {
         display: none!important;
     }
 }
 
-@media (min-width: 707px) {
+@media (min-width: 887px) {
     html:not(.has-video) .view-buttons {
         display: none!important;
     }
 }
 
-@media (max-width: 827px) {
+@media (max-width: 1020px) {
     html:not(.has-video) .playback-rate-expanded,
     html:not(.has-video) .graph-zoom-expanded,
     html:not(.has-video) .log-sync-expanded {
@@ -214,7 +230,7 @@ a.disabled {
     }
 }
 
-@media (min-width: 828px) {
+@media (min-width: 1021px) {
     html:not(.has-video) .playback-rate,
     html:not(.has-video) .zoom-menu,
     html:not(.has-video) .sync-menu {
@@ -222,7 +238,7 @@ a.disabled {
     }
 }
 
-@media (max-width: 971px) {
+@media (max-width: 1153px) {
     html:not(.has-video) .log-chart-time-panel {
         display: none!important;
     }
@@ -664,7 +680,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input {
 
 html.has-table-overlay .log-field-values {
     position: fixed;
-    top: 134px;
+    top: 110px;
     left: 15px;
     width: calc(100% - 30px);
     display:block;
@@ -702,7 +718,7 @@ html:not(.has-marker) .marker-offset {
 
 html.has-config .configuration-file {
     position: fixed;
-    top: 134px;
+    top: 110px;
     left: 15px;
     width: calc(100% - 30px);
     padding: 9px;
@@ -757,9 +773,9 @@ html.has-log .graph-row {
     display:-webkit-flex;
     display:flex;
     position: fixed;
-    top: 60px;
+    top: 100px;
     width: calc(100% - 30px);
-    bottom: 140px;
+    bottom: 80px;
 }
 
 html.has-video .log-graph {
@@ -831,7 +847,15 @@ html:not(.has-analyser) .view-analyser-fullscreen {
     display:inline-block;
     margin-right: 17px;
     vertical-align: top;
-    height: 80px;
+    /* height: 80px; */
+}
+
+.video-top-controls h4 {
+    font-size: 11px;
+    color: #757575;
+    margin-top: 7px;
+    margin-bottom: 4px;
+    font-weight: bold;
 }
 
 html.has-log .video-top-controls > li.log-view-panel, html.has-log .video-top-controls > li.log-chart-zoom-panel, html.has-log .video-top-controls > li.log-chart-time-panel {
@@ -876,6 +900,66 @@ html.has-log .log-seek-bar {
     padding-right: 15px;
 }
 
+.log-workspace-panel {
+    width: 160px;
+}
+
+.log-workspace-panel button {
+    width: 100%;
+    text-align: left;
+}
+
+.log-workspace-panel .caret {
+    float: right;
+    margin-top: 8px;
+}
+
+.log-workspace-panel .glyphicon {
+    opacity: 0.4;
+    transition: 250ms;
+    vertical-align: middle;
+    top: 0px;
+}
+
+.log-workspace-panel .glyphicon:hover {
+    opacity: 1.0;
+    transition: 0ms;
+}
+
+.log-workspace-panel .open .workspace-selector-editButton{
+    display: none;
+}
+
+.log-workspace-panel li>a {
+    padding: 3px 5px 3px 5px;
+}
+
+.log-workspace-panel .workspace-selector-index {
+    padding-right: 5px;
+    opacity: 0.9;
+    vertical-align: middle;
+}
+
+.log-workspace-panel .faded {
+    opacity: 0.4;
+}
+
+.log-workspace-panel .workspace-selector-title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 94px;
+    display:inline-block;
+    vertical-align:middle;
+}
+
+.log-workspace-panel input {
+    padding-top: 2px;
+    margin-left: -2px;
+    width: 108px;
+    height: 18px;
+}
+
 html .graph-time-marker-group > .graph-time-marker {
     display:none;
 }
@@ -918,14 +1002,6 @@ html.has-log .video-top-controls {
 	width: 100%;
 	min-width: 1390px;
 	white-space: nowrap;
-}
-
-html.has-video .log-graph,
-html.has-log .log-graph,
-html.has-log .log-graph-config,
-html.has-log:not(.has-table-overlay) .log-field-values {
-    position:relative;
-    top: 60px;
 }
 
 .playback-rate-control,
@@ -1118,10 +1194,15 @@ html.isINAV .navbar-logo img {
 
 .navbar-logo span {
 	padding-left: 0;
-	position: relative;
+    position: relative;
 	left: -150px;
 	top: 20px;
 	color: antiquewhite;
+}
+
+html.isBF .navbar-logo span {
+    left: -181px;
+    top: 30px;
 }
 
 html.has-video .navbar-static-top,

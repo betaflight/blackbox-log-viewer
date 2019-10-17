@@ -56,13 +56,15 @@ function BlackboxLogViewer() {
 
         // JSON array of graph configurations for New Workspaces feature
         lastGraphConfig = null,     // Undo feature - go back to last configuration.
-        workspaceGraphConfigs = {}, // Workspaces
+        workspaceGraphConfigs = [], // Workspaces
+        activeWorkspace = 1,        // Active Workspace
         bookmarkTimes	= [],		// Empty array for bookmarks (times)
         
         // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
         activeGraphConfig = new GraphConfig(),
         
         graphLegend = null,
+        workspaceSelection = null,
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
@@ -845,17 +847,45 @@ function BlackboxLogViewer() {
 
     }
 
-    function loadWorkspaces(file) {
+    function upgradeWorkspaceFormat(oldFormat) {
+        // Check if upgrade is needed
+        if (!oldFormat.graphConfig) { return oldFormat }
 
+        let newFormat = [];
+
+        oldFormat.graphConfig.forEach((element, id) => {
+            if (element) {
+                let title = "Unnamed";
+                if (element.length > 0) {
+                    title = element[0].label;
+                }
+
+                newFormat[id] = {
+                    title: title,
+                    graphConfig: element
+                }
+            }
+            else {
+                newFormat[id] = null;
+            }
+        });
+
+        return newFormat;
+    }
+
+    function loadWorkspaces(file) {
         var reader = new FileReader();
     
         reader.onload = function(e) {
-
             var data = e.target.result;
-            workspaceGraphConfigs = JSON.parse(data);
-            prefs.set('workspaceGraphConfigs', workspaceGraphConfigs);      // Store to local cache
- 
-            window.alert('Workspaces Loaded')                       
+            var tmp = JSON.parse(data);
+            if (tmp.graphConfig) {
+                window.alert('Old Workspace format. Upgrading...');
+                tmp = upgradeWorkspaceFormat(tmp);
+            }
+            workspaceGraphConfigs = tmp;
+            onSwitchWorkspace(workspaceGraphConfigs, 1);
+            window.alert('Workspaces Loaded');               
         };
      
         reader.readAsText(file);
@@ -883,15 +913,55 @@ function BlackboxLogViewer() {
         CsvExporter(flightLog, options).dump(onSuccess);
     }
 
+    function newGraphConfig(newConfig) {
+        lastGraphConfig = graphConfig; // Remember the last configuration.
+        graphConfig = newConfig;
+
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+
+        prefs.set('graphConfig', graphConfig);
+    }
+
+    // Store to local cache and update Workspace Selector control
+    function onSwitchWorkspace(newWorkspaces, newAciveId) {
+        prefs.set('activeWorkspace', newAciveId);      
+        prefs.set('workspaceGraphConfigs', newWorkspaces);
+        workspaceSelection.setWorkspaces(newWorkspaces)
+        workspaceSelection.setActiveWorkspace(newAciveId)
+        if (flightLog && newWorkspaces[newAciveId] && newWorkspaces[newAciveId].graphConfig) {
+           newGraphConfig(newWorkspaces[newAciveId].graphConfig);
+        }
+    }
+
+    // Save current config
+    function onSaveWorkspace(id, title){
+        workspaceGraphConfigs[id] = {
+            title: title,
+            graphConfig: graphConfig
+        };
+        onSwitchWorkspace(workspaceGraphConfigs, id)
+    }
+
     // New workspaces feature; local storage of user configurations
     prefs.get('workspaceGraphConfigs', function(item) {
         if(item) {
-            workspaceGraphConfigs = item;
-            } else {
-            workspaceGraphConfigs = {graphConfig : [
-                                    null,null,null,null,null,null,null,null,null,null
-                                    ]};
-            }
+            workspaceGraphConfigs = upgradeWorkspaceFormat(item);
+        } else {
+            workspaceGraphConfigs = [];
+        }
+
+        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
+    });
+
+    prefs.get('activeWorkspace', function (id){
+        if (id) {
+            activeWorkspace = id
+        }
+        else {
+            activeWorkspace = 1
+        }
+
+        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
     });
 
     // Get the offsetCache buffer
@@ -934,6 +1004,9 @@ function BlackboxLogViewer() {
 
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
         
+        workspaceSelection = new WorkspaceSelection($(".log-workspace-selection"), workspaceGraphConfigs, onSwitchWorkspace, onSaveWorkspace);
+        onSwitchWorkspace(workspaceGraphConfigs, workspaceSelection);
+
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
                 graphLegend.hide();
@@ -1205,15 +1278,6 @@ function BlackboxLogViewer() {
                 invalidateGraph();               
             }
         });
-       
-        function newGraphConfig(newConfig) {
-                lastGraphConfig = graphConfig; // Remember the last configuration.
-                graphConfig = newConfig;
-                
-                activeGraphConfig.adaptGraphs(flightLog, graphConfig);
-                
-                prefs.set('graphConfig', graphConfig);            
-        }
 
         function expandGraphConfig(index) { // Put each of the fields into a seperate graph
 
@@ -1760,17 +1824,21 @@ function BlackboxLogViewer() {
                     case "8".charCodeAt(0):
                     case "9".charCodeAt(0):
                         try {
-                        	if(!e.altKey) { // Workspaces feature
-                        		if (!e.shiftKey) { // retreive graph configuration from workspace
-		                            if (workspaceGraphConfigs.graphConfig[e.which-48] != null) {
-		                                newGraphConfig(workspaceGraphConfigs.graphConfig[e.which-48]);
-		                            }
-		                        } else // store configuration to workspace
-		                        {
-		                            workspaceGraphConfigs.graphConfig[e.which-48] = graphConfig; // Save current config
-		                            prefs.set('workspaceGraphConfigs', workspaceGraphConfigs);      // Store to local cache
-		                        }
-                        	} else { // Bookmark Feature
+                            if (!e.altKey) { // Workspaces feature
+                                var id = e.which - 48;
+                                if (!e.shiftKey) { // retreive graph configuration from workspace
+                                    if (workspaceGraphConfigs[id] != null) {
+                                        onSwitchWorkspace(workspaceGraphConfigs, id)
+                                    }
+                                } else { // store configuration to workspace
+                                    if (workspaceGraphConfigs[id]) {
+                                        onSaveWorkspace(id, workspaceGraphConfigs[id].title);
+                                    }
+                                    else {
+                                        onSaveWorkspace(id, "Unnamed");
+                                    }
+                                }
+                            } else { // Bookmark Feature
                         		if (!e.shiftKey) { // retrieve time from bookmark
 		                            if (bookmarkTimes[e.which-48] != null) {
 		                                setCurrentBlackboxTime(bookmarkTimes[e.which-48]);
@@ -2029,6 +2097,14 @@ function BlackboxLogViewer() {
 
     });
 }
+
+// Close the dropdowns if not clicking a decendant of the dropdown
+$(document).click(function (e) {
+    var p = $(e.target).closest(".dropdown");
+    if (!p.length) {
+        $(".dropdown").removeClass("open");
+    }
+});
 
 // Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');

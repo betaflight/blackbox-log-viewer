@@ -235,6 +235,7 @@ function dist() {
         './js/graph_config.js',
         './js/graph_config_dialog.js',
         './js/graph_legend.js',
+        './js/workspace_selection.js',
         './js/graph_spectrum.js',
         './js/graph_spectrum_calc.js',
         './js/graph_spectrum_plot.js',
