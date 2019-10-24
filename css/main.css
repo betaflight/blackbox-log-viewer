@@ -67,7 +67,26 @@ a.disabled {
     .welcome-pane .panel-body {
         min-height: 100px;
     }
+    /* #373  begin -----------*/
+    .log-workspace-panel {
+        width: 200px;
+    }
+    .dropdown-menu{
+        width:200px;
+    }
+    .workspace-selector-title {
+        width: 130px   
+    }
+    /* #373 end---------------*/
 }
+
+ /* #373  begin -----------*/
+@media (max-width: 768px) {
+    .workspace-selector-title {
+        width: 94px   
+    }
+}
+/* #373 end---------------*/
 
 /*** toolbar expansion ***/
 
@@ -948,7 +967,7 @@ html.has-log .log-seek-bar {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    width: 94px;
+    /* width: 94px;  #373 - value set noww  in @media */
     display:inline-block;
     vertical-align:middle;
 }
