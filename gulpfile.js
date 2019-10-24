@@ -365,11 +365,11 @@ function post_build(arch, folder, done) {
 
     if (arch == 'osx64') {
         // Determine the WebKit version distributed in nw.js
-        var pathToVersions = path.join(folder, pkg.name, 'osx64', pkg.name + '.app', 'Contents', 'Versions');
+        var pathToVersions = path.join(folder, pkg.name, 'osx64', pkg.name + '.app', 'Contents', 'Frameworks', 'nwjs Framework.framework', 'Versions');
         var files = fs.readdirSync(pathToVersions);
         if (files.length >= 1) {
             var webKitVersion = files[0];
-            console.log('Found Webkit version: ' + webKitVersion)
+            console.log('Found nwjs version: ' + webKitVersion)
             // Copy ffmpeg codec library into macOS app
             var libSrc = './library/osx64/libffmpeg.dylib'
             var libDest = path.join(pathToVersions, webKitVersion) + '/';
