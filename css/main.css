@@ -67,6 +67,23 @@ a.disabled {
     .welcome-pane .panel-body {
         min-height: 100px;
     }
+
+    .log-workspace-panel {
+        width: 200px;
+    }
+    .dropdown-menu{
+        width:200px;
+    }
+    .workspace-selector-title {
+        width: 130px   
+    }
+
+}
+
+@media (max-width: 768px) {
+    .workspace-selector-title {
+        width: 94px   
+    }
 }
 
 /*** toolbar expansion ***/
@@ -948,7 +965,6 @@ html.has-log .log-seek-bar {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    width: 94px;
     display:inline-block;
     vertical-align:middle;
 }
