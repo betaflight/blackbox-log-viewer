@@ -930,6 +930,7 @@ function BlackboxLogViewer() {
         workspaceSelection.setActiveWorkspace(newAciveId)
         if (flightLog && newWorkspaces[newAciveId] && newWorkspaces[newAciveId].graphConfig) {
            newGraphConfig(newWorkspaces[newAciveId].graphConfig);
+           document.getElementById("legend_title").textContent = newWorkspaces[newAciveId].title
         }
     }
 
