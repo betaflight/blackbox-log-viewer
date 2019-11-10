@@ -1,5 +1,7 @@
 # Betaflight Blackbox Explorer
 
+[![Build Status](https://travis-ci.com/betaflight/blackbox-log-viewer.svg?branch=master)](https://travis-ci.com/betaflight/blackbox-log-viewer) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer) [![Build Status](https://dev.azure.com/Betaflight/Betaflight%20Nightlies/_apis/build/status/betaflight.blackbox-log-viewer?branchName=master)](https://dev.azure.com/Betaflight/Betaflight%20Nightlies/_build/latest?definitionId=2&branchName=master)
+
 ![Main explorer interface](screenshots/main-interface.jpg)
 
 This tool allows you to open logs recorded by Betaflight's Blackbox feature in your web browser. You can seek through
@@ -37,6 +39,12 @@ Please note - the application will automatically update itself when new versions
 7. Check the Developer Mode checkbox.
 8. Click on load unpacked extension.
 9. Point it to the folder you extracted the zip to.
+
+### Unstable Testing Versions
+
+Unstable testing versions of the lates builds of the Betaflight Blackbox Explorer for most platforms can be downloaded from [here](https://github.com/betaflight/blackbox-log-viewer-nightlies/releases).
+
+**Be aware that these versions are intended for testing / feedback only, and may be buggy or broken.**
 
 ## Usage
 Click the "Open log file/video" button at the top right and select your log file and your flight video (if you recorded one).
