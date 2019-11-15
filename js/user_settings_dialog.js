@@ -54,6 +54,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawAnalyser		: true,             // add an analyser option
 		drawWatermark		: false,			// Show Watermark on display?
 		drawLapTimer		: false,			// Show Laptimer on display?
+		drawGradient		: false,			// Show Gradient on display?
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         graphGridOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
@@ -136,6 +137,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 					   	   left: $('.laptimer-settings input[name="laptimer-left"]').val() + '%',
 					   	   transparency: $('.laptimer-settings input[name="laptimer-transparency"]').val() + '%', },
 				drawLapTimer: ($(".laptimer").is(":checked")),
+				drawGradient: ($(".gradient").is(":checked")),
     	});
     	return settings;
     }
@@ -414,6 +416,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		$('.laptimer-settings input[name="laptimer-top"]').val(parseInt(currentSettings.laptimer.top));
     		$('.laptimer-settings input[name="laptimer-left"]').val(parseInt(currentSettings.laptimer.left));
     		$('.laptimer-settings input[name="laptimer-transparency"]').val(parseInt(currentSettings.laptimer.transparency));
+
+			if (currentSettings.drawGradient != null) {
+				// set the toggle switch
+				$(".gradient").prop('checked', currentSettings.drawGradient);
+			}
 
             dialog.modal('show');
 
