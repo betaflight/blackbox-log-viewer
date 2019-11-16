@@ -118,7 +118,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                             for(var i=0; i<newOrder.length; i++) {
                                 newGraphs[i] = oldGraphs[newOrder[i]];
                             }
-                            config.setGraphs(newGraphs);
+                            onNewGraphConfig(newGraphs);
                       },
                 cursor: "move",
             }
