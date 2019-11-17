@@ -11,8 +11,14 @@
 #     "owner" - The owner of the repository to release to e.g. betaflight
 #     "repoName" - The name of the repository to release to e.g. blackbox-log-viewer-nightlies
 
+name: $(Date:yyyyMMdd).$(BuildID)
+
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
+pr: none
 
 stages:
 - stage: Build
