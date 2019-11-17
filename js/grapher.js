@@ -793,7 +793,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         };
                     }
 
-                    if(graphs.length > 1) // only draw the background if more than one graph set.
+                    if (options.drawGradient && graphs.length > 1) // only draw the background if more than one graph set.
                         drawAxisBackground(canvas.height * graph.height);
                     
                     for (j = 0; j < graph.fields.length; j++) {
