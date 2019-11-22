@@ -112,11 +112,14 @@ var
                 fftData = GraphSpectrumCalc.dataLoadFrequencyVsThrottle();
                 break;
 
+            case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
+                fftData = GraphSpectrumCalc.dataLoadPidErrorVsSetpoint();
+                break;
+
             case SPECTRUM_TYPE.FREQUENCY:
             default:
                 fftData = GraphSpectrumCalc.dataLoadFrequency();
                 break;
-
             }
 
         };
@@ -196,7 +199,12 @@ var
                 dataReload = true;
                 that.plotSpectrum(dataBuffer.fieldIndex, dataBuffer.curve, dataBuffer.fieldName);
             }
-        });
+
+            // Hide overdraw and zoomY if needed
+            const pidErrorVsSetpointSelected = optionSelected === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT;
+            overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
+            analyserZoomYElem.toggleClass('onlyFullScreenException', pidErrorVsSetpointSelected);
+        }).change();
 
         // Spectrum overdraw to show
         userSettings.overdrawSpectrumType = userSettings.overdrawSpectrumType || SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS;

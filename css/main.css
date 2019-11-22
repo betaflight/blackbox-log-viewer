@@ -549,7 +549,7 @@ html.has-sticks #stickCanvas {
 	display:block;
 }
 
-html.has-analyser-fullscreen.has-analyser .analyser input {
+html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenException) {
 	display:block;
 }
 
