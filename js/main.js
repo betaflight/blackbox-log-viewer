@@ -1346,14 +1346,13 @@ function BlackboxLogViewer() {
 
             userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), 
             function(defaultSettings) { // onLoad
-    
-            prefs.get('userSettings', function(item) {
-                if(item) {
-                            userSettings = item;
-                         } else {
-                             userSettings = defaultSettings;
-                         }
-                });                
+                prefs.get('userSettings', function(item) {
+                    if(item) {
+                        userSettings = $.extend({}, defaultSettings, item);
+                    } else {
+                        userSettings = defaultSettings;
+                    }
+                });
             },
 
             function(newSettings) { // onSave

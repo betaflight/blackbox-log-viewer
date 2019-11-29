@@ -812,7 +812,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             }
             
             //Draw a bar highlighting the current time if we are drawing any graphs
-            if (options.drawGradient && graphs.length) {
+            if (options.drawVerticalBar && graphs.length) {
                 var 
                     centerX = canvas.width / 2;
 
