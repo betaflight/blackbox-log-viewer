@@ -415,42 +415,45 @@ html.has-log .log-graph-config {
 .config-graph-field {
     margin-bottom: 0.5em;
     margin-top: 0.2em;
+    font-size: 12px;
+}
+
+.config-graph-field-list {
+    margin-top: 8px;
+    margin-bottom: 5px;
+}
+
+.config-graph-field .form-control {
+    font-size: 12px;
+    height: 30px;
 }
 
 .config-graph-field-header {
     margin-bottom: 0;
+    font-size: 12px;
 }
 
-.config-graph-field select {
-    margin-right:4px;
+.config-graph-field-list td,
+.config-graph-field-list th {
+    padding: 2px 2px;
 }
 
-.config-graph-field input[name=smoothing] {
-    margin-right:4px;
-    max-width: 56px;
+.config-graph-field input {
+    margin-right: 4px;
     padding: 5px 5px;
     text-align: right;
-}
-
-.config-graph-field input[name=power] {
-    margin-right:4px;
     max-width: 50px;
-    padding: 5px 5px;
-    text-align: right;
 }
 
-.config-graph-field input[name=scale] {
-    margin-right:4px;
-    max-width: 50px;
-    padding: 5px 5px;
-    text-align: right;
+.config-graph-field select.form-control {
+    max-width: 150px;
+    padding-left: 2px;
 }
 
-.config-graph-field input[name=linewidth] {
-    margin-right:4px;
+.config-graph-field input[name=linewidth],
+.config-graph-field select.color-picker {
+    height:30px;
     max-width: 30px;
-    padding: 5px 5px;
-    text-align: center;
 }
 
 .config-graph h4 button {
@@ -458,58 +461,7 @@ html.has-log .log-graph-config {
 }
 
 .config-graph table tr{
-    margin:0.5em 0;
-    width: 100%;    
     line-height: 10px;
-}
-
-.config-graph tr[name="field-header"] {
-    position: static;
-}
-
-.config-graph th[name=field] {
-    /* margin-right:4px; */
-    /* width: 325px; */
-    position: relative;
-    left: 100px;
-}
-
-.config-graph th[name=color] {
-    position: relative;
-    left: 280px;
-}
-
-.config-graph th[name=smoothing] {
-    /* margin-right:4px; */
-    /* width: 66px; */
-    position: relative;
-    left: 214px;
-}
-
-.config-graph th[name=expo] {
-    /* margin-right:4px; */
-    /* width: 49px; */
-    /* text-align: center; */
-    position: relative;
-    left: 234px;
-}
-
-.config-graph th[name=zoom] {
-    /* margin-right:4px; */
-    /* width: 65px; */
-    position: relative;
-    left: 256px;
-}
-
-.config-graph th[name=line] {
-	/* margin-right:4px; */
-	position: relative;
-	left: 271px;
-}
-
-.color-picker {
-    height:30px;
-    max-width: 30px;
 }
 
 .setup-parameters {
