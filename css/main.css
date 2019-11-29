@@ -439,21 +439,23 @@ html.has-log .log-graph-config {
 }
 
 .config-graph-field input {
-    margin-right: 4px;
+    margin-right: 2px;
     padding: 5px 5px;
     text-align: right;
     max-width: 50px;
 }
 
 .config-graph-field select.form-control {
-    max-width: 150px;
+    margin-right: 2px;
     padding-left: 2px;
+    max-width: 150px;
 }
 
 .config-graph-field input[name=linewidth],
 .config-graph-field select.color-picker {
     height:30px;
     max-width: 30px;
+    border-radius: 4px;
 }
 
 .config-graph h4 button {
