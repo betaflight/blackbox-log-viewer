@@ -54,7 +54,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawAnalyser		: true,             // add an analyser option
 		drawWatermark		: false,			// Show Watermark on display?
 		drawLapTimer		: false,			// Show Laptimer on display?
-		drawGradient		: false,			// Show Gradient on display?
+		drawGradient		: true,			// Show Gradient and vertical timebar on display?
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         graphGridOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
