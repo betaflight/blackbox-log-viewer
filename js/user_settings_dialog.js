@@ -323,7 +323,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 	// Initialise the userSettings
 
 	onLoad(defaultSettings);
-	
+
 	// Public variables
 
 	this.resetToDefaults = function() {
