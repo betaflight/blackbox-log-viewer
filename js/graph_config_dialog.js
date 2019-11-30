@@ -109,8 +109,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="scale" class="form-control" type="text"/></td>'
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
+                    + '<td><input name="grid" type="checkbox"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
-                    + '<td><div id="grid" value=""/></td>'
                 + '</tr>'
             ),
             select = $('select.form-control', elem),
@@ -128,7 +128,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('input[name=linewidth]',elem).val((field.lineWidth)?field.lineWidth:1);
 
         // Set the grid state
-        $('div#grid',elem).attr("value", (field.grid)?field.grid:false);
+        $('input[name=grid]',elem).attr("checked", (field.grid)?field.grid:false);
 
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
@@ -186,6 +186,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="zoom">Zoom</th>'
                                                     + '<th name="line">Line</th>'
                                                     + '<th name="color">Color</th>'
+                                                    + '<th name="grid">Grid</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
@@ -323,7 +324,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
-                    grid: (($('div#grid', this).attr("value")==="true")?true:false)
+                    grid: (($('input[name=grid]', this).is(':checked')))
                 };
                 
                 if (field.name.length > 0) {
