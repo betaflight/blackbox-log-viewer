@@ -439,14 +439,16 @@ html.has-log .log-graph-config {
 }
 
 .config-graph-field input {
-    margin-right: 2px;
     padding: 5px 5px;
     text-align: right;
-    max-width: 50px;
+    max-width: 45px;
+}
+
+.config-graph-field input[name=grid] {
+    width: 25px;
 }
 
 .config-graph-field select.form-control {
-    margin-right: 2px;
     padding-left: 2px;
     max-width: 150px;
 }
@@ -1269,7 +1271,7 @@ html:not(.has-config) #status-bar .configuration-file-name {
 
 ***/
 
-input[type="checkbox"] { 
+input[type="checkbox"].ios-switch { 
 	position: absolute;
 	opacity: 0;
 }
