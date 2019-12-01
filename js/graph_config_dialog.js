@@ -324,7 +324,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
-                    grid: (($('input[name=grid]', this).is(':checked')))
+                    grid: $('input[name=grid]', this).is(':checked'),
                 };
                 
                 if (field.name.length > 0) {
