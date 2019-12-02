@@ -55,6 +55,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawWatermark		: false,			// Show Watermark on display?
 		drawLapTimer		: false,			// Show Laptimer on display?
 		drawGradient		: false,			// Show Gradient on display?
+		drawVerticalBar		: true,				// Show vertical timebar on display?
 		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
         graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
         graphGridOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
@@ -138,6 +139,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 					   	   transparency: $('.laptimer-settings input[name="laptimer-transparency"]').val() + '%', },
 				drawLapTimer: ($(".laptimer").is(":checked")),
 				drawGradient: ($(".gradient").is(":checked")),
+				drawVerticalBar: ($(".verticalBar").is(":checked")),
     	});
     	return settings;
     }
@@ -420,6 +422,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 			if (currentSettings.drawGradient != null) {
 				// set the toggle switch
 				$(".gradient").prop('checked', currentSettings.drawGradient);
+			}
+
+			if (currentSettings.drawVerticalBar != null) {
+				// set the toggle switch
+				$(".verticalBar").prop('checked', currentSettings.drawVerticalBar);
 			}
 
             dialog.modal('show');
