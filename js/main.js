@@ -1347,7 +1347,7 @@ function BlackboxLogViewer() {
             userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), 
             function(defaultSettings) { // onLoad
                 prefs.get('userSettings', function(item) {
-                    if(item) {
+                    if (item) {
                         userSettings = $.extend({}, defaultSettings, item);
                     } else {
                         userSettings = defaultSettings;
