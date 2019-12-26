@@ -459,7 +459,7 @@ function FlightLogFieldPresenter() {
         return eventState;
     }
     
-    function presentEnum(value, enumNames) {
+    FlightLogFieldPresenter.presentEnum = function presentEnum(value, enumNames) {
         if (enumNames[value] === undefined)
             return value;
         
@@ -577,10 +577,10 @@ function FlightLogFieldPresenter() {
                 return presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
                 
             case 'failsafePhase':
-                return presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
+                return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
                 
             case 'features':
-                return presentEnum(value, FLIGHT_LOG_FEATURES); 
+                return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FEATURES); 
 
             case 'rssi':
                 return (value / 1024 * 100).toFixed(2) + "%";
@@ -688,7 +688,7 @@ function FlightLogFieldPresenter() {
                 case 'FFT_TIME':
                     switch (fieldName) {
                     case 'debug[0]':
-                        return presentEnum(value, FFT_CALC_STEPS);
+                        return FlightLogFieldPresenter.presentEnum(value, FFT_CALC_STEPS);
                     case 'debug[1]':
                     case 'debug[2]':
                         return value.toFixed(0) + "\u03BCs";

@@ -19,9 +19,10 @@ var
         AUTOTUNE_TARGETS: 12,
         INFLIGHT_ADJUSTMENT: 13,
         LOGGING_RESUME: 14,
+        DISARM: 15,
         
         GTUNE_CYCLE_RESULT: 20,
-        FLIGHT_MODE: 30, // New Event type
+        FLIGHT_MODE: 30,
         TWITCH_TEST: 40, // Feature for latency testing
         
         CUSTOM : 250, // Virtual Event Code - Never part of Log File.
@@ -422,6 +423,19 @@ var
         "MEDIUM",
         "LOW",
         "AUTO",
+    ]),
+    
+    FLIGHT_LOG_DISARM_REASON = makeReadOnly([
+        "SYSTEM",
+        "ARMING_DISABLED",
+        "FAILSAFE",
+        "THROTTLE_TIMEOUT",
+        "STICKS",
+        "SWITCH",
+        "CRASH_PROTECTION",
+        "RUNAWAY_TAKEOFF",
+        "GPS_RESCUE",
+        "SERIAL_IO",
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
