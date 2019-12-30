@@ -424,7 +424,7 @@ var
         "LOW",
         "AUTO",
     ]),
-    
+
     FLIGHT_LOG_DISARM_REASON = makeReadOnly([
         "SYSTEM",
         "ARMING_DISABLED",

@@ -464,7 +464,7 @@ function FlightLogFieldPresenter() {
             return value;
         
         return enumNames[value];
-    }
+    };
 
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
