@@ -426,7 +426,6 @@ var
     ]),
 
     FLIGHT_LOG_DISARM_REASON = makeReadOnly([
-        "SYSTEM",
         "ARMING_DISABLED",
         "FAILSAFE",
         "THROTTLE_TIMEOUT",
