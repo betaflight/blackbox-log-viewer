@@ -546,7 +546,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 drawEventLine(x, labelY, "Flight Mode Change" + FlightLogFieldPresenter.presentChangeEvent(event.data.newFlags, event.data.lastFlags, FLIGHT_LOG_FLIGHT_MODE_NAME), "rgba(0,0,255,0.75)", 3);
             break;
             case FlightLogEvent.DISARM:
-                drawEventLine(x, labelY, "Disarm: " + FlightLogFieldPresenter.presentEnum(event.data.reason, FLIGHT_LOG_DISARM_REASON), "rgba(128,0,255,0.75)", 3);
+                drawEventLine(x, labelY, `Disarm: ${FlightLogFieldPresenter.presentEnum(event.data.reason, FLIGHT_LOG_DISARM_REASON)}`, "rgba(128,0,255,0.75)", 3);
             break;
             case FlightLogEvent.CUSTOM: // Virtual Events shown in RED
                 drawEventLine(x, labelY, (event.label)?event.label:'EVENT', "rgba(255,0,0,0.75)", 3, null, event.align);
