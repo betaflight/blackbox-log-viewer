@@ -1332,6 +1332,9 @@ var FlightLogParser = function(logData) {
                 lastEvent.data.newFlags = stream.readUnsignedVB();
                 lastEvent.data.lastFlags = stream.readUnsignedVB();
             break;
+            case FlightLogEvent.DISARM:
+                lastEvent.data.reason = stream.readUnsignedVB();
+            break;
             case FlightLogEvent.AUTOTUNE_CYCLE_START:
                 lastEvent.data.phase = stream.readByte();
 
