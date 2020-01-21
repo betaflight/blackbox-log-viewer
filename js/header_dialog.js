@@ -411,13 +411,14 @@ function HeaderDialog(dialog, onSave) {
 
     function renderSysConfig(sysConfig) {
 
-		activeSysConfig = sysConfig; // Store the current system configuration
+      activeSysConfig = sysConfig; // Store the current system configuration
 
-    	// Update the log header
+      // Update the log header
 
-    	$('h5.modal-title-revision').text( ((sysConfig['Firmware revision']!=null)?(' Rev : '  + sysConfig['Firmware revision']):''));
-    	$('h5.modal-title-date').text(     ((sysConfig['Firmware date']!=null)    ?(' Date : ' + sysConfig['Firmware date']    ):''));
-    	$('h5.modal-title-craft').text(    ((sysConfig['Craft name']!=null)       ?(' Name : ' + sysConfig['Craft name']    ):''));
+      $('h5.modal-title-revision').text((sysConfig['Firmware revision'] != null) ? ` Rev : ${sysConfig['Firmware revision']}` : '');
+      $('h5.modal-title-board-info').text((sysConfig['Board information'] != null) ? ` Board : ${sysConfig['Board information']}` : '');
+      $('h5.modal-title-date').text((sysConfig['Firmware date'] != null) ? ` Date : ${sysConfig['Firmware date']}` : '');
+      $('h5.modal-title-craft').text((sysConfig['Craft name'] != null) ? ` Name : ${sysConfig['Craft name']}` : '');
 
 		switch(sysConfig.firmwareType) {
 			case FIRMWARE_TYPE_BETAFLIGHT:
@@ -448,7 +449,7 @@ function HeaderDialog(dialog, onSave) {
 
 		if((sysConfig.firmware >= 3.0 && sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) ||
 		   (sysConfig.firmware >= 2.0 && sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT)) {
-		   
+
 			PID_CONTROLLER_TYPE = ([
 					'LEGACY',
 					'BETAFLIGHT'
@@ -458,7 +459,7 @@ function HeaderDialog(dialog, onSave) {
 					'UNUSED',
 					'MWREWRITE',
 					'LUXFLOAT'
-				]) 
+				])
 		}
 
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
@@ -535,7 +536,7 @@ function HeaderDialog(dialog, onSave) {
 
         if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
             renderSelect('gyro_hardware_lpf'       ,sysConfig.gyro_lpf, GYRO_HARDWARE_LPF);
-            
+
         } else {
             renderSelect('gyro_hardware_lpf'       ,sysConfig.gyro_lpf, GYRO_LPF);
         }
@@ -721,7 +722,7 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
         setCheckbox('pidAtMinThrottle'			,sysConfig.pidAtMinThrottle);
         setCheckbox('use_integrated_yaw'        ,sysConfig.use_integrated_yaw);
-        
+
         /* Show Unknown Fields */
         renderUnknownHeaders(sysConfig.unknownHeaders);
 

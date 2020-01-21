@@ -313,12 +313,12 @@ var FlightLogParser = function(logData) {
             acc_limit                 : "rateAccelLimit",
             anti_gravity_thresh       : "anti_gravity_threshold",
             currentSensor             : "currentMeter",
-            d_notch_cut               : "dterm_notch_cutoff", 
+            d_notch_cut               : "dterm_notch_cutoff",
             d_setpoint_weight         : "dtermSetpointWeight",
             dterm_lowpass_hz          : "dterm_lpf_hz",
             dterm_lowpass_dyn_hz      : "dterm_lpf_dyn_hz",
             dterm_lowpass2_hz         : "dterm_lpf2_hz",
-            dterm_setpoint_weight     : "dtermSetpointWeight",  
+            dterm_setpoint_weight     : "dtermSetpointWeight",
             digital_idle_value        : "digitalIdleOffset",
             dshot_idle_value          : "digitalIdleOffset",
             gyro_hardware_lpf         : "gyro_lpf",
@@ -428,19 +428,19 @@ var FlightLogParser = function(logData) {
 
     /**
      * Translates the name of a field to the parameter in sysConfig object equivalent
-     * 
+     *
      * fieldName Name of the field to translate
      * returns The equivalent in the sysConfig object or the fieldName if not found
      */
     function translateFieldName(fieldName) {
-        var translation = translationValues[fieldName]; 
+        var translation = translationValues[fieldName];
         if (typeof translation !== 'undefined') {
         	return translation;
         } else {
         	return fieldName;
         }
     }
-    
+
     function parseHeaderLine() {
         var
             COLON = ":".charCodeAt(0),
@@ -475,9 +475,9 @@ var FlightLogParser = function(logData) {
         fieldValue = asciiArrayToString(stream.data.subarray(separatorPos + 1, lineEnd));
 
         // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
-        // In this way is easier to maintain the code        
+        // In this way is easier to maintain the code
         fieldName = translateFieldName(fieldName);
-        
+
         switch (fieldName) {
             case "I interval":
                 that.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
@@ -635,7 +635,7 @@ var FlightLogParser = function(logData) {
 
 
             case "yawRateAccelLimit":
-            case "rateAccelLimit":            
+            case "rateAccelLimit":
                 if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10)/1000;
@@ -715,7 +715,7 @@ var FlightLogParser = function(logData) {
             case "magPID":
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
             break;
-            
+
             case "feedforward_weight":
                 // Add it to the end of the rollPID, pitchPID and yawPID
                 var ffValues = parseCommaSeparatedString(fieldValue);
@@ -803,6 +803,7 @@ var FlightLogParser = function(logData) {
             case "Product":
             case "Blackbox version":
             case "Firmware date":
+            case "Board information":
             case "Craft name":
             case "Log start datetime":
                 // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
@@ -1499,7 +1500,7 @@ var FlightLogParser = function(logData) {
         }
 
         adjustFieldDefsList(that.sysConfig.firmwareType, that.sysConfig.firmwareVersion);
-        
+
         if (!isFrameDefComplete(this.frameDefs.I)) {
             throw "Log is missing required definitions for I frames, header may be corrupt";
         }
