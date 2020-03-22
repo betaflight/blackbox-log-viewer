@@ -8,9 +8,11 @@
 # ${VERSION} - Version to generate (x.y.z)
 # ${PLATFORM} - Platform to generate (win32 or win64)
 # ${DEST_FOLDER} - Destination folder for the installer files
+# ${SOURCE_FOLDER} - Source folder for the application files
+￼
 
 # Some definitions
-!define SOURCE_FILES          "..\..\apps\betaflight-blackbox-explorer\${PLATFORM}\*"
+!define SOURCE_FILES          "..\..\${SOURCE_FOLDER}\betaflight-blackbox-explorer\${PLATFORM}\*"
 !define APP_NAME              "Betaflight Blackbox Explorer"
 !define COMPANY_NAME          "Betaflight Team"
 !define GROUP_NAME            "Betaflight"
