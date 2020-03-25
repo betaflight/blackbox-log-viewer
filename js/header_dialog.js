@@ -824,7 +824,7 @@ function HeaderDialog(dialog, onSave) {
             $('#dlgHeaderDialog input').prop('disabled', 'disabled');
             $('#dlgHeaderDialog select').prop('disabled', 'disabled');
         });
-        
+
         dialog.modal('toggle');
 
     }
