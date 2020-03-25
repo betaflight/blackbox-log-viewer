@@ -23,6 +23,7 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
+    "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
     "lodash": "^4.17.13"
   },
