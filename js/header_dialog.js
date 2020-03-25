@@ -810,13 +810,23 @@ function HeaderDialog(dialog, onSave) {
 	// Public variables
 
     this.show = function(sysConfig) {
-        dialog.modal('toggle');
-        if (dialog.data('bs.modal').isShown) {
+
+        // Workaround to pressing the shortcut key multiple times
+        // The modal-backdrop isn't removed
+        // Remove it manually
+        dialog.one('hidden.bs.modal', function() {
+            $('.modal-backdrop').remove();
+        });
+
+        dialog.one('show.bs.modal', function() {
             renderSysConfig(sysConfig);
             // Disable changing input and dropdowns
             $('#dlgHeaderDialog input').prop('disabled', 'disabled');
             $('#dlgHeaderDialog select').prop('disabled', 'disabled');
-        }
+        });
+        
+        dialog.modal('toggle');
+
     }
 
  	// Buttons
