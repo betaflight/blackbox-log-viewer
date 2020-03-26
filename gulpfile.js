@@ -32,7 +32,7 @@ var nwBuilderOptions = {
     files: './dist/**/*',
     macIcns: './images/bf_icon.icns',
     macPlist: { 'CFBundleDisplayName': 'Betaflight Blackbox Explorer'},
-    winIco: './images/bf_icon.ico'
+    winIco: './images/bf_icon.ico',
 };
 
 //-----------------
@@ -208,12 +208,6 @@ function clean_cache() {
 function dist() {
     var distSources = [
         // CSS files
-        './css/bootstrap-theme.css',
-        './css/bootstrap-theme.css.map',
-        './css/bootstrap-theme.min.css',
-        './css/bootstrap.css',
-        './css/bootstrap.css.map',
-        './css/bootstrap.min.css',
         './css/header_dialog.css',
         './css/jquery.nouislider.min.css',
         './css/keys_dialog.css',
@@ -263,14 +257,11 @@ function dist() {
         './js/csv-exporter.js',
         './js/webworkers/csv-export-worker.js',
         './js/vendor/FileSaver.js',
-        './js/vendor/bootstrap.js',
-        './js/vendor/bootstrap.min.js',
         './js/vendor/jquery-1.11.3.min.js',
         './js/vendor/jquery-ui-1.11.4.min.js',
         './js/vendor/jquery.ba-throttle-debounce.js',
         './js/vendor/jquery.nouislider.all.min.js',
         './js/vendor/modernizr-2.6.2-respond-1.1.0.min.js',
-        './js/vendor/npm.js',
         './js/vendor/semver.js',
         './js/vendor/three.js',
         './js/vendor/three.min.js',
@@ -283,7 +274,6 @@ function dist() {
         './*.html',
         './images/**/*',
         './_locales/**/*',
-        './fonts/*',
     ];
     return gulp.src(distSources, { base: '.' })
         .pipe(gulp.dest(DIST_DIR))
