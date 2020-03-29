@@ -9,7 +9,6 @@
 # ${PLATFORM} - Platform to generate (win32 or win64)
 # ${DEST_FOLDER} - Destination folder for the installer files
 # ${SOURCE_FOLDER} - Source folder for the application files
-￼
 
 # Some definitions
 !define SOURCE_FILES          "..\..\${SOURCE_FOLDER}\betaflight-blackbox-explorer\${PLATFORM}\*"
