@@ -429,8 +429,7 @@ function start_debug(done) {
 // Create installer package for windows platforms
 function release_win(arch, appDirectory, done) {
     if (!commandExistsSync('makensis')) {
-        console.warn(`makensis command not found, not generating win package for ${arch}`);
-        done();
+        throw new Error(`makensis command not found, not generating win package for ${arch}`);
     }
 
     // The makensis does not generate the folder correctly, manually
@@ -450,7 +449,7 @@ function release_win(arch, appDirectory, done) {
     var output = makensis.compileSync('./assets/windows/installer.nsi', options);
 
     if (output.status !== 0) {
-        console.error('Installer for platform ' + arch + ' finished with error ' + output.status + ': ' + output.stderr);
+        throw new Error(`Installer for platform ${arch} finished with error ${output.status}: ${output.stderr}`);
     }
 
     done();
