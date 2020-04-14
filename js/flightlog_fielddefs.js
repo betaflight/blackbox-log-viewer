@@ -435,6 +435,14 @@ var
         "RUNAWAY_TAKEOFF",
         "GPS_RESCUE",
         "SERIAL_IO",
+    ]),
+
+    RATES_TYPE = makeReadOnly([
+        "BETAFLIGHT",
+        "RACEFLIGHT",
+        "KISS",
+        "ACTUAL",
+        "QUICK",
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {

@@ -303,6 +303,7 @@ var FlightLogParser = function(logData) {
             dyn_notch_width_percent: null,          // Dyn Notch width percent distance between the two notches
             dyn_notch_q: null,                      // Dyn Notch width of each dynamic filter
             dyn_notch_min_hz: null,                 // Gyn Notch min limit in Hz for the filter
+            rates_type: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -613,10 +614,9 @@ var FlightLogParser = function(logData) {
             case "dyn_notch_width_percent":
             case "dyn_notch_q":
             case "dyn_notch_min_hz":
-
+            case "rates_type":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
-
             case "rc_expo":
             case "rc_rates":
                 if(stringHasComma(fieldValue)) {
