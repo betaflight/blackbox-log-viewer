@@ -94,6 +94,7 @@ function HeaderDialog(dialog, onSave) {
             {name:'dyn_notch_width_percent'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
             {name:'dyn_notch_q'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
             {name:'dyn_notch_min_hz'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+            {name:'rates_type'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.2.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -705,6 +706,8 @@ function HeaderDialog(dialog, onSave) {
             $('.parameter td[name="dterm_lpf_dyn_min_hz"]').css('display', 'none');
             $('.parameter td[name="dterm_lpf_dyn_max_hz"]').css('display', 'none');
         }
+
+        renderSelect('rates_type' , sysConfig.rates_type, RATES_TYPE);
 
 		/* Packed Flags */
 
