@@ -37,7 +37,6 @@
     "gulp-yarn": "^2.0.0",
     "gulp-zip": "^5.0.0",
     "inflection": "1.12.0",
-    "jquery-ui-npm": "1.12.0",
     "makensis": "^0.20.3",
     "nw-builder": "^3.5.7",
     "os": "^0.1.1",
