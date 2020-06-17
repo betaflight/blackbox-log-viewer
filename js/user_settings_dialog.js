@@ -56,9 +56,9 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawLapTimer		: false,			// Show Laptimer on display?
 		drawGradient		: false,			// Show Gradient on display?
 		drawVerticalBar		: true,				// Show vertical timebar on display?
-		graphSmoothOverride : false, 			// Ability to toggle smoothing off=normal/ on=force 0%
-        graphExpoOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
-        graphGridOverride   : false, 			// Ability to toggle Expo off=normal/ on=force 100%
+        graphSmoothOverride : true,             // Ability to toggle Smoothing off=normal/ on=force 0%
+        graphExpoOverride   : true,             // Ability to toggle Expo off=normal/ on=force 100%
+        graphGridOverride   : true,             // Ability to toggle Grid off=normal/ on=force disabled
 		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log
 		analyserHanning	    : false,  			// use a hanning window on the analyser sample data
 		eraseBackground		: true,           	// Set to false if you want the graph to draw on top of an existing canvas image
