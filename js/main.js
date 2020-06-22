@@ -5,8 +5,9 @@ var userSettings = {};
 
 var VIEWER_VERSION = getManifestVersion(); // Current version
 
-var INNER_BOUNDS_WIDTH  = 1340,
-    INNER_BOUNDS_HEIGHT = 900;
+const INNER_BOUNDS_WIDTH  = 1340;
+const INNER_BOUNDS_HEIGHT = 900;
+const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
     function supportsRequiredAPIs() {
@@ -109,19 +110,34 @@ function BlackboxLogViewer() {
 
         function createNewBlackboxWindow(fileToOpen) {
             var timestampId = Date.now();
-            chrome.app.window.create('index.html', 
-            {
-                'id': "main" + timestampId,
-                'innerBounds' : {
-                    'width'  : INNER_BOUNDS_WIDTH,
-                    'height' : INNER_BOUNDS_HEIGHT
-                }
-            },
-            function (createdWindow) {
-                if (fileToOpen !== undefined) {
-                    createdWindow.contentWindow.argv = fileToOpen;
-                }
-            });
+            if (isNW()) {
+                const gui = require('nw.gui');
+                gui.Window.open(INITIAL_APP_PAGE,
+                {
+                    'min_width'  : INNER_BOUNDS_WIDTH,
+                    'min_height' : INNER_BOUNDS_HEIGHT,
+                },
+                function (createdWindow) {
+                    if (fileToOpen !== undefined) {
+                        createdWindow.window.argv = fileToOpen;
+                    }
+                });
+
+            } else {
+                chrome.app.window.create(INITIAL_APP_PAGE,
+                {
+                    'id': "main" + timestampId,
+                    'innerBounds' : {
+                        'width'  : INNER_BOUNDS_WIDTH,
+                        'height' : INNER_BOUNDS_HEIGHT,
+                    },
+                },
+                function (createdWindow) {
+                    if (fileToOpen !== undefined) {
+                        createdWindow.contentWindow.argv = fileToOpen;
+                    }
+                });
+            }
         }
 
     function blackboxTimeFromVideoTime() {
@@ -1029,15 +1045,10 @@ function BlackboxLogViewer() {
         hasAnalyser = false;
         html.toggleClass("has-analyser", hasAnalyser);
 
-        $(".btn-new-window").click(function(e) {            
-            chrome.app.window.create('index.html', {
-                'innerBounds' : {
-                    'width'  : INNER_BOUNDS_WIDTH,
-                    'height' : INNER_BOUNDS_HEIGHT
-                }
-            });            
+        $(".btn-new-window").click(function(e) {
+            createNewBlackboxWindow();
         });
-        
+
         $(".file-open").change(function(e) {
             var 
                 files = e.target.files;
@@ -2033,44 +2044,54 @@ function BlackboxLogViewer() {
             
             e.preventDefault();
         });
-        
+
         seekBar.onSeek = setCurrentBlackboxTime;
 
-        var checkIfFileAsParameter = function() {
+        function checkIfFileAsParameter() {
+            let fullPath = null;
+            // Chrome or opening a file association
             if ((typeof argv !== 'undefined') && (argv.length > 0)) {
-                var fullPath = argv[0];
-                var filename = fullPath.replace(/^.*[\\\/]/, '')
-                var file = new File(fullPath, filename);
+                fullPath = argv[0];
+            } else if (isNW()) {
+                const gui = require('nw.gui');
+                if (gui.App.argv.length > 0) {
+                    fullPath = gui.App.argv[0];
+                }
+            }
+            if (fullPath != null) {
+                const filename = fullPath.replace(/^.*[\\\/]/, '');
+                const file = new File(fullPath, filename);
                 loadFiles([file]);
-            }    
+            }
         }
         checkIfFileAsParameter();
 
         // File extension association
         var onOpenFileAssociation = function() {
-            try {
-                var gui = require('nw.gui');
+
+            if (isNW()) {
+                const gui = require('nw.gui');
                 gui.App.on('open', function(path) {
 
                     // All the windows opened try to open the new blackbox,
                     // so we limit it to one of them, the first in the list for example
-                    var windows = chrome.app.window.getAll();
-                    var firstWindow = windows[0];
-                    var currentWindowId = chrome.app.window.current().id;
+                    gui.Window.getAll(function(windows) {
 
-                    if (currentWindowId == firstWindow.id) {
-                        var filePathToOpenExpression = /.*"([^"]*)"$/;
-                        var fileToOpen = path.match(filePathToOpenExpression);
+                        const firstWindow = windows[0];
+                        const currentWindow = gui.Window.get();
 
-                        if (fileToOpen.length > 1) {
-                            var fullPathFile = fileToOpen[1];
-                            createNewBlackboxWindow([fullPathFile]);
+                        if (currentWindow.window === firstWindow.window) {
+                            const filePathToOpenExpression = /.*"([^"]*)"$/;
+                            const fileToOpen = path.match(filePathToOpenExpression);
+
+                            if (fileToOpen.length > 1) {
+                                const fullPathFile = fileToOpen[1];
+                                createNewBlackboxWindow([fullPathFile]);
+                            }
                         }
-                    }
+                    });
 
                 });
-            } catch (e) {
-                // Require not supported, chrome app
             }
         }
         onOpenFileAssociation();
