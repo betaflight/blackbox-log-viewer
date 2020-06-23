@@ -478,6 +478,9 @@ GraphSpectrumPlot._drawNotCachedElements = function() {
 };
 
 GraphSpectrumPlot._drawAxisLabel = function(canvasCtx, axisLabel, X, Y, align, baseline) {
+
+    canvasCtx.save();
+
     canvasCtx.font = `${((this._isFullScreen)? this._drawingParams.fontSizeFrameLabelFullscreen : this._drawingParams.fontSizeFrameLabel)}pt ${DEFAULT_FONT_FACE}`;
     canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
     if(align) {
@@ -490,7 +493,13 @@ GraphSpectrumPlot._drawAxisLabel = function(canvasCtx, axisLabel, X, Y, align, b
     } else {
         canvasCtx.textBaseline = 'alphabetic';
     }
+    canvasCtx.shadowColor = 'black';
+    canvasCtx.strokeStyle = 'black';
+    canvasCtx.shadowBlur = 3;
+    canvasCtx.strokeText(axisLabel, X, Y);
     canvasCtx.fillText(axisLabel, X, Y);
+
+    canvasCtx.restore();
 };
 
 GraphSpectrumPlot._drawHorizontalGridLines = function(canvasCtx, maxValue, LEFT, TOP, WIDTH, HEIGHT, MARGIN_UP_LABEL, unitsLabel) {
