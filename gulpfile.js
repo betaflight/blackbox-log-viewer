@@ -8,8 +8,8 @@ const path = require('path');
 
 const zip = require('gulp-zip');
 const del = require('del');
+const innoSetup = require('@quanle94/innosetup');
 const NwBuilder = require('nw-builder');
-const makensis = require('makensis');
 const deb = require('gulp-debian');
 const buildRpm = require('rpm-builder')
 const commandExistsSync = require('command-exists').sync;
@@ -428,31 +428,33 @@ function start_debug(done) {
 
 // Create installer package for windows platforms
 function release_win(arch, appDirectory, done) {
-    if (!commandExistsSync('makensis')) {
-        throw new Error(`makensis command not found, not generating win package for ${arch}`);
-    }
-
-    // The makensis does not generate the folder correctly, manually
-    createDirIfNotExists(RELEASE_DIR);
 
     // Parameters passed to the installer script
-    const options = {
-            verbose: 2,
-            define: {
-                'VERSION': pkg.version,
-                'PLATFORM': arch,
-                'DEST_FOLDER': RELEASE_DIR,
-                'SOURCE_FOLDER': appDirectory,
-            }
+    const parameters = [];
+
+    // Extra parameters to replace inside the iss file
+    parameters.push(`/Dversion=${pkg.version}`);
+    parameters.push(`/DarchName=${arch}`);
+    parameters.push(`/DarchAllowed=${(arch === 'win32') ? 'x86 x64' : 'x64'}`);
+    parameters.push(`/DarchInstallIn64bit=${(arch === 'win32') ? '' : 'x64'}`);
+    parameters.push(`/DsourceFolder=${appDirectory}`);
+    parameters.push(`/DtargetFolder=${RELEASE_DIR}`);
+
+    // Show only errors in console
+    parameters.push(`/Q`);
+
+    // Script file to execute
+    parameters.push("assets/windows/installer.iss");
+
+    innoSetup(parameters, {},
+    function(error) {
+        if (error != null) {
+            console.error(`Installer for platform ${arch} finished with error ${error}`);
+        } else {
+            console.log(`Installer for platform ${arch} finished`);
         }
-
-    var output = makensis.compileSync('./assets/windows/installer.nsi', options);
-
-    if (output.status !== 0) {
-        throw new Error(`Installer for platform ${arch} finished with error ${output.status}: ${output.stderr}`);
-    }
-
-    done();
+        done();
+    });
 }
 
 // Create distribution package (zip) for windows and linux platforms
