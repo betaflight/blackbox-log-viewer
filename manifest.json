@@ -6,7 +6,7 @@
   "default_locale": "en",
   "app": {
     "background": {
-      "scripts": ["background.js"]
+      "scripts": ["chromeBackground.js"]
     }
   },
   "permissions": [

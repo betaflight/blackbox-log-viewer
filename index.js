@@ -3,8 +3,8 @@ openLinksInExternalBrowserByDefault();
 
 $(document).ready(function () {
     // translate to user-selected language
-    if (isNW()) { 
-        localize(); 
+    if (isNW()) {
+        localize();
     }
 });
 
@@ -55,24 +55,24 @@ function notifyOutdatedVersion(releaseData) {
     });
 }
 
-if (isNW()) { 
-    checkForConfiguratorUpdates(); 
+if (isNW()) {
+    checkForConfiguratorUpdates();
 }
 
 function openLinksInExternalBrowserByDefault() {
-    try {
-        var gui = require('nw.gui');
+
+    if (isNW()) {
+        const gui = require('nw.gui');
 
         //Get the current window
-        var win = gui.Window.get();
+        const win = gui.Window.get();
 
-        //Listen to the new window event
-        win.on('new-win-policy', function (frame, url, policy) {
-          gui.Shell.openExternal(url);
-          policy.ignore();
+        win.on('new-win-policy', function(frame, url, policy) {
+            // do not open the window
+            policy.ignore();
+            // and open it in external browser
+            gui.Shell.openExternal(url);
         });
-    } catch (ex) {
-        console.log("require does not exist, maybe inside chrome");
     }
 }
 

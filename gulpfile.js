@@ -215,7 +215,7 @@ function dist() {
         './css/user_settings_dialog.css',
 
         // JavaScript
-        './background.js',
+        './chromeBackground.js',
         './index.js',
         './js/cache.js',
         './js/complex.js',
