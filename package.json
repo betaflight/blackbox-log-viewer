@@ -12,6 +12,7 @@
     "release": "gulp release"
   },
   "window": {
+    "id": "main",
     "show": true,
     "icon": "images/bf_icon_128.png",    
     "min_width": 1340,
