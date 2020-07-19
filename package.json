@@ -27,7 +27,7 @@
   "dependencies": {
     "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
-    "lodash": "^4.17.13"
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "@quanle94/innosetup": "^6.0.2",
