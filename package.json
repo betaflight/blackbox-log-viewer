@@ -4,6 +4,7 @@
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
   "version": "3.5.0",
   "main": "index.html",
+  "chromium-args": "--disable-features=nw2",
   "default_locale": "en",
   "scripts": {
     "start": "gulp debug",
