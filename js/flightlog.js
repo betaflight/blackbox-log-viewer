@@ -209,8 +209,6 @@ function FlightLog(logData) {
     };
 
     function buildFieldNames() {
-        const disabledFields=that.getSysConfig().fields_disabled_mask;
-
         // Make an independent copy
         fieldNames = parser.frameDefs.I.name.slice(0);
 
@@ -222,16 +220,16 @@ function FlightLog(logData) {
         }
 
         // Add names for our ADDITIONAL_COMPUTED_FIELDS
-        if (!(disabledFields & 1<<7)) { //if GYRO disabled
+        if (!that.isFieldDisabled().GYRO) {
             fieldNames.push("heading[0]", "heading[1]", "heading[2]");
         }
-        if (!(disabledFields & 1<<0)) {//if PID disabled
+        if (!that.isFieldDisabled().PID) {
             fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
         }
-        if (!(disabledFields & 1<<2)) {//if setpoint disabled
+        if (!that.isFieldDisabled().SETPOINT) {
             fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
         }
-        if (!((disabledFields & 1<<7) || (disabledFields & 1<<0))) {//if GYRO or PID disabled
+        if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
             fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
         }
 
@@ -1252,5 +1250,23 @@ FlightLog.prototype.getFeatures = function(enabledFeatures) {
             AIRMODE             : (enabledFeatures & (1 << 22))!=0,
             SUPEREXPO_RATES     : (enabledFeatures & (1 << 23))!=0,
             ANTI_GRAVITY        : (enabledFeatures & (1 << 24))!=0,
+        };
+};
+
+FlightLog.prototype.isFieldDisabled = function() {
+    const disabledFields=this.getSysConfig().fields_disabled_mask;
+        return {
+            PID           : (disabledFields & (1 << 0))!==0,
+            RC_COMMANDS   : (disabledFields & (1 << 1))!==0,
+            SETPOINT      : (disabledFields & (1 << 2))!==0,
+            BATTERY       : (disabledFields & (1 << 3))!==0,
+            MAGNETOMETER  : (disabledFields & (1 << 4))!==0,
+            ALTITUDE      : (disabledFields & (1 << 5))!==0,
+            RSSI          : (disabledFields & (1 << 6))!==0,
+            GYRO          : (disabledFields & (1 << 7))!==0,
+            ACC           : (disabledFields & (1 << 8))!==0,
+            DEBUG         : (disabledFields & (1 << 9))!==0,
+            MOTORS        : (disabledFields & (1 << 10))!==0,
+            GPS           : (disabledFields & (1 << 11))!==0,
         };
 };

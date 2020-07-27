@@ -412,21 +412,14 @@ function HeaderDialog(dialog, onSave) {
         const fieldsList_e = $('.fields_list');
 
         for (let i = 0; i < fields.length; i++) {
-            let row_e;
+            const row_e = $(`<tr><td><label class="option"><input class="field ${i}
+                          ios-switch" name="${fields[i].name}
+                          " title="field ${((value & 1<<i)?'':'-')} ${fields[i].name}
+                          " type="checkbox" /><div><div></div></div></label></td><td><label for="field-
+                          ${i}">${fields[i].name}</label></td><td><span>
+                          ${fields[i].description}</span></td></tr>`);
 
-            row_e = $('<tr><td><label class="option"><input class="field '
-                    + i
-                    + ' ios-switch" name="'
-                    + fields[i].name
-                    + '" title="field ' + ((value & 1<<i)?'':'-')
-                    + fields[i].name
-                    + '" type="checkbox" /><div><div></div></div></label></td><td><label for="field-'
-                    + i
-                    + '">'
-                    + fields[i].name
-                    + '</label></td><td><span>' + fields[i].description + '</span></td></tr>');
-
-            let field_e = row_e.find('input.field');
+            const field_e = row_e.find('input.field');
 
             field_e.prop('checked', (value & 1<<i));
             field_e.data('bit', i);
@@ -778,7 +771,7 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('use_integrated_yaw'        ,sysConfig.use_integrated_yaw);
 
         /* Selected Fields */
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+        if(activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
             builtSelectedFieldsList(sysConfig);
             $(".disabled_fields").css("display","table-header-group");
         } else {

@@ -551,34 +551,33 @@ GraphConfig.load = function(config) {
             result = [],
             i, j;
 
-        const disabledFields=flightLog.getSysConfig().fields_disabled_mask;
-        let EXAMPLE_GRAPHS = [];
-
-        if (!(disabledFields & 1<<10)) {
+        const EXAMPLE_GRAPHS = [];
+        
+        if (!flightLog.isFieldDisabled().MOTORS) {
             EXAMPLE_GRAPHS.push({label: "Motors",fields: ["motor[all]", "servo[5]"]});
         }
-        if (!(disabledFields & 1<<7)) {
+        if (!flightLog.isFieldDisabled().GYRO) {
             EXAMPLE_GRAPHS.push({label: "Gyros",fields: ["gyroADC[all]"]});
         }
-        if (!(disabledFields & 1<<2)) {
+        if (!flightLog.isFieldDisabled().SETPOINT) {
             EXAMPLE_GRAPHS.push({label: "RC Rates",fields: ["rcCommands[all]"]});
         }
-        if (!(disabledFields & 1<<1)) {
+        if (!flightLog.isFieldDisabled().RC_COMMANDS) {
             EXAMPLE_GRAPHS.push({label: "RC Command",fields: ["rcCommand[all]"]});
         }
-        if (!(disabledFields & 1<<0)) {
+        if (!flightLog.isFieldDisabled().PID) {
             EXAMPLE_GRAPHS.push({label: "PIDs",fields: ["axisSum[all]"]});
         }
-        if (!((disabledFields & 1<<7) || (disabledFields & 1<<0))) {
+        if (!(flightLog.isFieldDisabled().GYRO || flightLog.isFieldDisabled().PID)) {
             EXAMPLE_GRAPHS.push({label: "PID Error",fields: ["axisError[all]"]},
                                 {label: "Gyro + PID roll",fields: ["axisP[0]", "axisI[0]", "axisD[0]", "axisF[0]", "gyroADC[0]"]},
                                 {label: "Gyro + PID pitch",fields: ["axisP[1]", "axisI[1]", "axisD[1]", "axisF[1]", "gyroADC[1]"]},
                                 {label: "Gyro + PID yaw",fields: ["axisP[2]", "axisI[2]", "axisD[2]", "axisF[2]", "gyroADC[2]"]});
         }
-        if (!(disabledFields & 1<<8)) {
+        if (!flightLog.isFieldDisabled().ACC) {
             EXAMPLE_GRAPHS.push({label: "Accelerometers",fields: ["accSmooth[all]"]});
         }
-        if (!(disabledFields & 1<<9)) {
+        if (!flightLog.isFieldDisabled().DEBUG) {
             EXAMPLE_GRAPHS.push({label: "Debug",fields: ["debug[all]"]});
         }
 
