@@ -209,27 +209,32 @@ function FlightLog(logData) {
     };
 
     function buildFieldNames() {
-        var
-            i;
-
         // Make an independent copy
         fieldNames = parser.frameDefs.I.name.slice(0);
 
         // Add names of slow fields which we'll merge into the main stream
         if (parser.frameDefs.S) {
-            for (i = 0; i < parser.frameDefs.S.name.length; i++) {
+            for (let i = 0; i < parser.frameDefs.S.name.length; i++) {
                 fieldNames.push(parser.frameDefs.S.name[i]);
             }
         }
 
         // Add names for our ADDITIONAL_COMPUTED_FIELDS
-        fieldNames.push("heading[0]", "heading[1]", "heading[2]");
-        fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
-        fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
-        fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
+        if (!that.isFieldDisabled().GYRO) {
+            fieldNames.push("heading[0]", "heading[1]", "heading[2]");
+        }
+        if (!that.isFieldDisabled().PID) {
+            fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
+        }
+        if (!that.isFieldDisabled().SETPOINT) {
+            fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
+        }
+        if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
+            fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
+        }
 
         fieldNameToIndex = {};
-        for (i = 0; i < fieldNames.length; i++) {
+        for (let i = 0; i < fieldNames.length; i++) {
             fieldNameToIndex[fieldNames[i]] = i;
         }
     }
@@ -537,6 +542,26 @@ function FlightLog(logData) {
             magADC = false;
         }
 
+        if (!gyroADC[0]) {
+            gyroADC = false;
+        }
+
+        if (!accSmooth[0]) {
+            accSmooth = false;
+        }
+
+        if (!rcCommand[0]) {
+            rcCommand = false;
+        }
+
+        if (!setpoint[0]) {
+            setpoint = false;
+        }
+
+        if (!axisPID[0]) {
+            axisPID = false;
+        }
+
         sysConfig = that.getSysConfig();
 
         sourceChunkIndex = 0;
@@ -564,34 +589,38 @@ function FlightLog(logData) {
                         destFrame = destChunk.frames[i],
                         fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
-                    attitude = chunkIMU.updateEstimatedAttitude(
-                        [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
-                        [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
-                        srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-                        sysConfig.acc_1G,
-                        sysConfig.gyroScale,
-                        magADC ? [srcFrame[magADC[0]], srcFrame[magADC[1]], srcFrame[magADC[2]]] : false);
+                    if (gyroADC) { //don't calculate attitude if no gyro data
+                        attitude = chunkIMU.updateEstimatedAttitude(
+                            [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
+                            [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
+                            srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
+                            sysConfig.acc_1G,
+                            sysConfig.gyroScale,
+                            magADC);
 
-                    destFrame[fieldIndex++] = attitude.roll;
-                    destFrame[fieldIndex++] = attitude.pitch;
-                    destFrame[fieldIndex++] = attitude.heading;
+                        destFrame[fieldIndex++] = attitude.roll;
+                        destFrame[fieldIndex++] = attitude.pitch;
+                        destFrame[fieldIndex++] = attitude.heading;
+                    }
 
                     // Add the Feedforward PID sum (P+I+D+F)
-                    for (var axis = 0; axis < 3; axis++) {
-                        let pidSum =
-                            (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
-                            (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
-                            (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0) +
-                            (axisPID[axis][3] !== undefined ? srcFrame[axisPID[axis][3]] : 0);
+                    if (axisPID) {
+                        for (var axis = 0; axis < 3; axis++) {
+                            let pidSum =
+                                (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
+                                (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
+                                (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0) +
+                                (axisPID[axis][3] !== undefined ? srcFrame[axisPID[axis][3]] : 0);
 
-                        // Limit the PID sum by the limits defined in the header
-                        let pidLimit = axis < AXIS.YAW ? sysConfig.pidSumLimit : sysConfig.pidSumLimitYaw;
-                        if (pidLimit != null && pidLimit > 0) {
-                            pidSum = constrain(pidSum, -pidLimit, pidLimit);
-                        } 
+                            // Limit the PID sum by the limits defined in the header
+                            let pidLimit = axis < AXIS.YAW ? sysConfig.pidSumLimit : sysConfig.pidSumLimitYaw;
+                            if (pidLimit != null && pidLimit > 0) {
+                                pidSum = constrain(pidSum, -pidLimit, pidLimit);
+                            }
 
-                        // Assign value
-                        destFrame[fieldIndex++] = pidSum; 
+                            // Assign value
+                            destFrame[fieldIndex++] = pidSum; 
+                        }
                     }
 
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
@@ -622,9 +651,11 @@ function FlightLog(logData) {
                     }
 
                     // Calculate the PID Error
-                    for (var axis = 0; axis < 3; axis++) {
-                        let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
-                        destFrame[fieldIndex++] = gyroADCdegrees - destFrame[fieldIndexRcCommands + axis];
+                    if (axisPID && gyroADC) {
+                        for (var axis = 0; axis < 3; axis++) {
+                            let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
+                            destFrame[fieldIndex++] = gyroADCdegrees - destFrame[fieldIndexRcCommands + axis];
+                        }
                     }
 
                 }
@@ -1219,5 +1250,23 @@ FlightLog.prototype.getFeatures = function(enabledFeatures) {
             AIRMODE             : (enabledFeatures & (1 << 22))!=0,
             SUPEREXPO_RATES     : (enabledFeatures & (1 << 23))!=0,
             ANTI_GRAVITY        : (enabledFeatures & (1 << 24))!=0,
+        };
+};
+
+FlightLog.prototype.isFieldDisabled = function() {
+    const disabledFields=this.getSysConfig().fields_disabled_mask;
+        return {
+            PID           : (disabledFields & (1 << 0))!==0,
+            RC_COMMANDS   : (disabledFields & (1 << 1))!==0,
+            SETPOINT      : (disabledFields & (1 << 2))!==0,
+            BATTERY       : (disabledFields & (1 << 3))!==0,
+            MAGNETOMETER  : (disabledFields & (1 << 4))!==0,
+            ALTITUDE      : (disabledFields & (1 << 5))!==0,
+            RSSI          : (disabledFields & (1 << 6))!==0,
+            GYRO          : (disabledFields & (1 << 7))!==0,
+            ACC           : (disabledFields & (1 << 8))!==0,
+            DEBUG         : (disabledFields & (1 << 9))!==0,
+            MOTORS        : (disabledFields & (1 << 10))!==0,
+            GPS           : (disabledFields & (1 << 11))!==0,
         };
 };
