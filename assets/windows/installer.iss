@@ -35,15 +35,14 @@ Name: "{group}\Uninstall {#ApplicationName}"; Filename: "{uninstallexe}"; Check:
 
 [Registry]
 ; File associations
-Root: HKA; Subkey: "Software\Classes\.bbl"; ValueType: string; ValueName: ""; ValueData: "BetaflightBblFile"; Flags: uninsdeletevalue
-Root: HKA; Subkey: "Software\Classes\BetaflightBblFile"; ValueType: string; ValueName: ""; ValueData: "Betaflight Blackbox Explorer log file"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\Classes\BetaflightBblFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#ExecutableFileName}"
-Root: HKA; Subkey: "Software\Classes\BetaflightBblFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#ExecutableFileName}"" ""%1"""
+Root: HKA; Subkey: "Software\Classes\.bbl"; ValueType: string; ValueName: ""; ValueData: "BetaflightBlackboxFile"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.bfl"; ValueType: string; ValueName: ""; ValueData: "BetaflightBlackboxFile"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\BetaflightBlackboxFile"; ValueType: string; ValueName: ""; ValueData: "Betaflight Blackbox Explorer log file"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\BetaflightBlackboxFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#ExecutableFileName}"
+Root: HKA; Subkey: "Software\Classes\BetaflightBlackboxFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#ExecutableFileName}"" ""%1"""
 
-Root: HKA; Subkey: "Software\Classes\.bfl"; ValueType: string; ValueName: ""; ValueData: "BetaflightBflFile"; Flags: uninsdeletevalue
-Root: HKA; Subkey: "Software\Classes\BetaflightBflFile"; ValueType: string; ValueName: ""; ValueData: "Blackbox Explorer log file"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\Classes\BetaflightBflFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#ExecutableFileName}"
-Root: HKA; Subkey: "Software\Classes\BetaflightBflFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#ExecutableFileName}"" ""%1"""
+; App registration
+Root: HKA; Subkey: "Software\Classes\Applications\{#ExecutableFileName}"; ValueType: string; ValueName: "FriendlyAppName"; ValueData: "{#ApplicationName}"; Flags: uninsdeletekey
 
 [Run]
 ; Add a checkbox to start the app after installed
