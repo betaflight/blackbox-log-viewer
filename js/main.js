@@ -2075,22 +2075,21 @@ function BlackboxLogViewer() {
 
                     // All the windows opened try to open the new blackbox,
                     // so we limit it to one of them, the first in the list for example
-                    gui.Window.getAll(function(windows) {
+                    const windows = chrome.app.window.getAll();
 
-                        const firstWindow = windows[0];
-                        const currentWindow = gui.Window.get();
+                    const firstWindowId = windows[0].id;
+                    const currentWindowId = chrome.app.window.current().id;
 
-                        if (currentWindow.window === firstWindow.window) {
-                            const filePathToOpenExpression = /.*"([^"]*)"$/;
-                            const fileToOpen = path.match(filePathToOpenExpression);
+                    if (currentWindowId === firstWindowId) {
 
-                            if (fileToOpen.length > 1) {
-                                const fullPathFile = fileToOpen[1];
-                                createNewBlackboxWindow([fullPathFile]);
-                            }
+                        const filePathToOpenExpression = /.*"([^"]*)"$/;
+                        const fileToOpen = path.match(filePathToOpenExpression);
+
+                        if (fileToOpen.length > 1) {
+                            const fullPathFile = fileToOpen[1];
+                            createNewBlackboxWindow([fullPathFile]);
                         }
-                    });
-
+                    }
                 });
             }
         }
