@@ -3933,6 +3933,11 @@ vinyl@^2.0.0, vinyl@^2.1.0:
     remove-trailing-separator "^1.0.1"
     replace-ext "^1.0.0"
 
+webm-writer@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/webm-writer/-/webm-writer-0.3.0.tgz#aa35fbf4b06139798b1c258ddb3901221cf28561"
+  integrity sha512-p6gKhj0lI/hSJCte0lcNpzPXhLqXCnzoBAuVUlCz7LYwLMqeWTax1g4NNz3VWqkA0y/AYwJQAaZFn8qPzlBI4A==
+
 which-module@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/which-module/-/which-module-1.0.0.tgz#bba63ca861948994ff307736089e3b96026c2a4f"

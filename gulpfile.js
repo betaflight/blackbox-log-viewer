@@ -265,7 +265,6 @@ function dist() {
         './js/vendor/semver.js',
         './js/vendor/three.js',
         './js/vendor/three.min.js',
-        './js/vendor/webm-writer-0.1.1.js',
         './js/screenshot.js',
 
         // everything else
