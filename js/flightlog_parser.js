@@ -306,6 +306,7 @@ var FlightLogParser = function(logData) {
             dyn_notch_max_hz: null,                 // Dyn Notch max limit in Hz for the filter
             rates_type: null,
             fields_disabled_mask: null,
+            vbat_sag_compensation: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -618,6 +619,7 @@ var FlightLogParser = function(logData) {
             case "dyn_notch_min_hz":
             case "dyn_notch_max_hz":
             case "rates_type":
+            case "vbat_sag_compensation":
             case "fields_disabled_mask":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;

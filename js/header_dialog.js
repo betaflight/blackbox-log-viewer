@@ -98,6 +98,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'dyn_notch_max_hz'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.2.0', max:'999.9.9'},
         {name:'rates_type'                   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.2.0', max:'999.9.9'},
         {name:'fields_disabled_mask'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'vbat_sag_compensation'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -718,6 +719,8 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('setpointRelaxRatio'		,sysConfig.setpointRelaxRatio,2);
 		setParameter('pidSumLimit'     			,sysConfig.pidSumLimit,0);
         setParameter('pidSumLimitYaw'			,sysConfig.pidSumLimitYaw,0);
+
+        setParameter('vbat_sag_compensation'    ,sysConfig.vbat_sag_compensation,0);
 
         // Dynamic filters of Betaflight 4.0
         if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
