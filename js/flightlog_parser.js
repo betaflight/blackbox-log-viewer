@@ -621,6 +621,7 @@ var FlightLogParser = function(logData) {
             case "rates_type":
             case "vbat_sag_compensation":
             case "fields_disabled_mask":
+            case "motor_pwm_protocol":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
             case "rc_expo":

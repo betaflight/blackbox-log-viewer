@@ -4,7 +4,7 @@ function FlightLogFieldPresenter() {
 }
 
 (function() {
-    var FRIENDLY_FIELD_NAMES = {
+    const FRIENDLY_FIELD_NAMES = {
 
         'axisP[all]': 'PID P',
         'axisP[0]': 'PID P [roll]',
@@ -58,14 +58,24 @@ function FlightLogFieldPresenter() {
 
         //End-users prefer 1-based indexing
         'motor[all]': 'Motors',
-        'motor[0]': 'Motor [1]', 
-        'motor[1]': 'Motor [2]', 
-        'motor[2]': 'Motor [3]', 
+        'motor[0]': 'Motor [1]',
+        'motor[1]': 'Motor [2]',
+        'motor[2]': 'Motor [3]',
         'motor[3]': 'Motor [4]',
-        'motor[4]': 'Motor [5]', 
-        'motor[5]': 'Motor [6]', 
-        'motor[6]': 'Motor [7]', 
+        'motor[4]': 'Motor [5]',
+        'motor[5]': 'Motor [6]',
+        'motor[6]': 'Motor [7]',
         'motor[7]': 'Motor [8]',
+
+        'motorLegacy[all]': 'Motors (Legacy)',
+        'motorLegacy[0]': 'Motor (Legacy) [1]',
+        'motorLegacy[1]': 'Motor (Legacy) [2]',
+        'motorLegacy[2]': 'Motor (Legacy) [3]',
+        'motorLegacy[3]': 'Motor (Legacy) [4]',
+        'motorLegacy[4]': 'Motor (Legacy) [5]',
+        'motorLegacy[5]': 'Motor (Legacy) [6]',
+        'motorLegacy[6]': 'Motor (Legacy) [7]',
+        'motorLegacy[7]': 'Motor (Legacy) [8]',
 
         'servo[all]': 'Servos',
         'servo[5]': 'Servo Tail',
@@ -96,7 +106,7 @@ function FlightLogFieldPresenter() {
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
     };
-    
+
     	var DEBUG_FRIENDLY_FIELD_NAMES = { 
 			'NONE' : 	{
 							'debug[all]':'Debug [all]',	
@@ -502,16 +512,26 @@ function FlightLogFieldPresenter() {
                 return (value + 1500).toFixed(0) + " us";
             case 'rcCommand[3]':
                 return value.toFixed(0) + " us";
-                
+
             case 'motor[0]':
-            case 'motor[1]':            
-            case 'motor[2]':            
-            case 'motor[3]':            
-            case 'motor[4]':            
-            case 'motor[5]':            
-            case 'motor[6]':            
-            case 'motor[7]':            
-                return Math.round(flightLog.rcMotorRawToPct(value)) + " %";
+            case 'motor[1]':
+            case 'motor[2]':
+            case 'motor[3]':
+            case 'motor[4]':
+            case 'motor[5]':
+            case 'motor[6]':
+            case 'motor[7]':
+                return `${flightLog.rcMotorRawToPctPhysical(value).toFixed(2)} %`;
+
+            case 'motorLegacy[0]':
+            case 'motorLegacy[1]':
+            case 'motorLegacy[2]':
+            case 'motorLegacy[3]':
+            case 'motorLegacy[4]':
+            case 'motorLegacy[5]':
+            case 'motorLegacy[6]':
+            case 'motorLegacy[7]':
+                return `${flightLog.rcMotorRawToPctEffective(value).toFixed(2)} % (${value})`;
 
             case 'rcCommands[0]':
             case 'rcCommands[1]':

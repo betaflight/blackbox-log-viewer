@@ -174,7 +174,7 @@ GraphConfig.load = function(config) {
 (function() {
     GraphConfig.getDefaultSmoothingForField = function(flightLog, fieldName) {
         try{
-            if (fieldName.match(/^motor\[/)) {
+            if (fieldName.match(/^motor(Raw)?\[/)) {
                 return 5000;
             } else if (fieldName.match(/^servo\[/)) {
                 return 5000;
@@ -261,10 +261,19 @@ GraphConfig.load = function(config) {
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
+                    offset: flightLog.isDigitalProtocol() ?
+                        -(DSHOT_MIN_VALUE + DSHOT_RANGE / 2) : -(sysConfig.minthrottle + (sysConfig.maxthrottle - sysConfig.minthrottle) / 2),
+                    power: 1.0,
+                    inputRange: flightLog.isDigitalProtocol() ?
+                        DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
+                    outputRange: 1.0,
+                };
+            } else if (fieldName.match(/^motorLegacy\[/)) {
+                return {
                     offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
                     power: 1.0,
                     inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
-                    outputRange: 1.0
+                    outputRange: 1.0,
                 };
             } else if (fieldName.match(/^servo\[/)) {
                 return {
