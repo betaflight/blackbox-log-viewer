@@ -119,7 +119,7 @@ function getInputPlatforms() {
 
 // Gets the default platform to be used
 function getDefaultPlatform() {
-    var defaultPlatform;
+    let defaultPlatform;
     switch (os.platform()) {
     case 'darwin':
         defaultPlatform = 'osx64';
@@ -133,10 +133,10 @@ function getDefaultPlatform() {
         defaultPlatform = 'win32';
 
         break;
-        
+
     default:
         defaultPlatform = '';
-    
+
         break;
     }
     return defaultPlatform;
@@ -147,36 +147,42 @@ function getPlatforms() {
 }
 
 function removeItem(platforms, item) {
-    var index = platforms.indexOf(item);
+    const index = platforms.indexOf(item);
     if (index >= 0) {
         platforms.splice(index, 1);
     }
 }
 
 function getRunDebugAppCommand(arch) {
+
+    let command;
+
     switch (arch) {
     case 'osx64':
-        return 'open ' + path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.app');
+        const pkgName = `${pkg.name}.app`;
+        command = `open ${path.join(DEBUG_DIR, pkg.name, arch, pkgName)}`;
 
         break;
 
     case 'linux64':
     case 'linux32':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
 
         break;
 
     case 'win32':
     case 'win64':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
 
         break;
 
     default:
-        return '';
+        command = '';
 
         break;
     }
+
+    return command;
 }
 
 function getReleaseFilename(platform, ext) {
