@@ -81,10 +81,10 @@ gulp.task('default', debugBuild);
 
 // Get platform from commandline args
 // #
-// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32, --win64, or --chromeos)
+// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32 or --win64)
 // # 
 function getInputPlatforms() {
-    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64', 'chromeos'];
+    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64'];
     var platforms = [];
     var regEx = /--(\w+)/;
     for (var i = 3; i < process.argv.length; i++) {
@@ -215,7 +215,6 @@ function dist() {
         './css/user_settings_dialog.css',
 
         // JavaScript
-        './chromeBackground.js',
         './index.js',
         './js/cache.js',
         './js/complex.js',
@@ -269,7 +268,6 @@ function dist() {
 
         // everything else
         './package.json', // For NW.js
-        './manifest.json', // For Chrome app
         './*.html',
         './images/**/*',
         './_locales/**/*',
@@ -285,7 +283,6 @@ function dist() {
 // Create runable app directories in ./apps
 function apps(done) {
     var platforms = getPlatforms();
-    removeItem(platforms, 'chromeos');
 
     buildNWApps(platforms, 'normal', APPS_DIR, done);
 };
@@ -381,7 +378,6 @@ function post_build(arch, folder, done) {
 // Create debug app directories in ./debug
 function debug(done) {
     var platforms = getPlatforms();
-    removeItem(platforms, 'chromeos');
 
     buildNWApps(platforms, 'sdk', DEBUG_DIR, done);
 }
@@ -463,15 +459,6 @@ function release_zip(arch, appDirectory) {
     const base = path.join(appDirectory, pkg.name, arch);
 
     return compressFiles(src, base, output, 'Betaflight Blackbox Explorer');
-}
-
-// Create distribution package for chromeos platform
-function release_chromeos() {
-    var src = path.join(DIST_DIR, '**');
-    var output = getReleaseFilename('chromeos', 'zip');
-    var base = DIST_DIR;
-
-    return compressFiles(src, base, output, '.');
 }
 
 // Compress files from srcPath, using basePath, to outputFile in the RELEASE_DIR
@@ -647,10 +634,6 @@ function listReleaseTasks(appDirectory) {
     var platforms = getPlatforms();
 
     var releaseTasks = [];
-
-    if (platforms.indexOf('chromeos') !== -1) {
-        releaseTasks.push(release_chromeos);
-    }
 
     if (platforms.indexOf('linux64') !== -1) {
         releaseTasks.push(function release_linux64_zip(){

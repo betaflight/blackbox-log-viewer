@@ -109,35 +109,19 @@ function BlackboxLogViewer() {
         lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
 
         function createNewBlackboxWindow(fileToOpen) {
-            var timestampId = Date.now();
-            if (isNW()) {
-                const gui = require('nw.gui');
-                gui.Window.open(INITIAL_APP_PAGE,
-                {
-                    'min_width'  : INNER_BOUNDS_WIDTH,
-                    'min_height' : INNER_BOUNDS_HEIGHT,
-                },
-                function (createdWindow) {
-                    if (fileToOpen !== undefined) {
-                        createdWindow.window.argv = fileToOpen;
-                    }
-                });
 
-            } else {
-                chrome.app.window.create(INITIAL_APP_PAGE,
-                {
-                    'id': "main" + timestampId,
-                    'innerBounds' : {
-                        'width'  : INNER_BOUNDS_WIDTH,
-                        'height' : INNER_BOUNDS_HEIGHT,
-                    },
-                },
-                function (createdWindow) {
-                    if (fileToOpen !== undefined) {
-                        createdWindow.contentWindow.argv = fileToOpen;
-                    }
-                });
-            }
+            const gui = require('nw.gui');
+            gui.Window.open(INITIAL_APP_PAGE,
+            {
+                'min_width'  : INNER_BOUNDS_WIDTH,
+                'min_height' : INNER_BOUNDS_HEIGHT,
+            },
+            function (createdWindow) {
+                if (fileToOpen !== undefined) {
+                    createdWindow.window.argv = fileToOpen;
+                }
+            });
+
         }
 
     function blackboxTimeFromVideoTime() {
@@ -2052,7 +2036,7 @@ function BlackboxLogViewer() {
             // Chrome or opening a file association
             if ((typeof argv !== 'undefined') && (argv.length > 0)) {
                 fullPath = argv[0];
-            } else if (isNW()) {
+            } else {
                 const gui = require('nw.gui');
                 if (gui.App.argv.length > 0) {
                     fullPath = gui.App.argv[0];
@@ -2067,31 +2051,30 @@ function BlackboxLogViewer() {
         checkIfFileAsParameter();
 
         // File extension association
-        var onOpenFileAssociation = function() {
+        function onOpenFileAssociation() {
 
-            if (isNW()) {
-                const gui = require('nw.gui');
-                gui.App.on('open', function(path) {
+            const gui = require('nw.gui');
+            gui.App.on('open', function(path) {
 
-                    // All the windows opened try to open the new blackbox,
-                    // so we limit it to one of them, the first in the list for example
-                    const windows = chrome.app.window.getAll();
+                // All the windows opened try to open the new blackbox,
+                // so we limit it to one of them, the first in the list for example
+                const windows = chrome.app.window.getAll();
 
-                    const firstWindowId = windows[0].id;
-                    const currentWindowId = chrome.app.window.current().id;
+                const firstWindowId = windows[0].id;
+                const currentWindowId = chrome.app.window.current().id;
 
-                    if (currentWindowId === firstWindowId) {
+                if (currentWindowId === firstWindowId) {
 
-                        const filePathToOpenExpression = /.*"([^"]*)"$/;
-                        const fileToOpen = path.match(filePathToOpenExpression);
+                    const filePathToOpenExpression = /.*"([^"]*)"$/;
+                    const fileToOpen = path.match(filePathToOpenExpression);
 
-                        if (fileToOpen.length > 1) {
-                            const fullPathFile = fileToOpen[1];
-                            createNewBlackboxWindow([fullPathFile]);
-                        }
+                    if (fileToOpen.length > 1) {
+                        const fullPathFile = fileToOpen[1];
+                        createNewBlackboxWindow([fullPathFile]);
                     }
-                });
-            }
+                }
+            });
+
         }
         onOpenFileAssociation();
 
