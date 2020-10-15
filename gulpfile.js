@@ -81,10 +81,10 @@ gulp.task('default', debugBuild);
 
 // Get platform from commandline args
 // #
-// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32, --win64, or --chromeos)
+// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32 or --win64)
 // # 
 function getInputPlatforms() {
-    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64', 'chromeos'];
+    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64'];
     var platforms = [];
     var regEx = /--(\w+)/;
     for (var i = 3; i < process.argv.length; i++) {
@@ -119,7 +119,7 @@ function getInputPlatforms() {
 
 // Gets the default platform to be used
 function getDefaultPlatform() {
-    var defaultPlatform;
+    let defaultPlatform;
     switch (os.platform()) {
     case 'darwin':
         defaultPlatform = 'osx64';
@@ -133,10 +133,10 @@ function getDefaultPlatform() {
         defaultPlatform = 'win32';
 
         break;
-        
+
     default:
         defaultPlatform = '';
-    
+
         break;
     }
     return defaultPlatform;
@@ -147,36 +147,42 @@ function getPlatforms() {
 }
 
 function removeItem(platforms, item) {
-    var index = platforms.indexOf(item);
+    const index = platforms.indexOf(item);
     if (index >= 0) {
         platforms.splice(index, 1);
     }
 }
 
 function getRunDebugAppCommand(arch) {
+
+    let command;
+
     switch (arch) {
     case 'osx64':
-        return 'open ' + path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.app');
+        const pkgName = `${pkg.name}.app`;
+        command = `open ${path.join(DEBUG_DIR, pkg.name, arch, pkgName)}`;
 
         break;
 
     case 'linux64':
     case 'linux32':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
 
         break;
 
     case 'win32':
     case 'win64':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
 
         break;
 
     default:
-        return '';
+        command = '';
 
         break;
     }
+
+    return command;
 }
 
 function getReleaseFilename(platform, ext) {
@@ -215,7 +221,6 @@ function dist() {
         './css/user_settings_dialog.css',
 
         // JavaScript
-        './chromeBackground.js',
         './index.js',
         './js/cache.js',
         './js/complex.js',
@@ -269,7 +274,6 @@ function dist() {
 
         // everything else
         './package.json', // For NW.js
-        './manifest.json', // For Chrome app
         './*.html',
         './images/**/*',
         './_locales/**/*',
@@ -285,7 +289,6 @@ function dist() {
 // Create runable app directories in ./apps
 function apps(done) {
     var platforms = getPlatforms();
-    removeItem(platforms, 'chromeos');
 
     buildNWApps(platforms, 'normal', APPS_DIR, done);
 };
@@ -381,7 +384,6 @@ function post_build(arch, folder, done) {
 // Create debug app directories in ./debug
 function debug(done) {
     var platforms = getPlatforms();
-    removeItem(platforms, 'chromeos');
 
     buildNWApps(platforms, 'sdk', DEBUG_DIR, done);
 }
@@ -463,15 +465,6 @@ function release_zip(arch, appDirectory) {
     const base = path.join(appDirectory, pkg.name, arch);
 
     return compressFiles(src, base, output, 'Betaflight Blackbox Explorer');
-}
-
-// Create distribution package for chromeos platform
-function release_chromeos() {
-    var src = path.join(DIST_DIR, '**');
-    var output = getReleaseFilename('chromeos', 'zip');
-    var base = DIST_DIR;
-
-    return compressFiles(src, base, output, '.');
 }
 
 // Compress files from srcPath, using basePath, to outputFile in the RELEASE_DIR
@@ -647,10 +640,6 @@ function listReleaseTasks(appDirectory) {
     var platforms = getPlatforms();
 
     var releaseTasks = [];
-
-    if (platforms.indexOf('chromeos') !== -1) {
-        releaseTasks.push(release_chromeos);
-    }
 
     if (platforms.indexOf('linux64') !== -1) {
         releaseTasks.push(function release_linux64_zip(){

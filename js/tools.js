@@ -449,14 +449,6 @@ function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
     }
 }
 
-function isNW() {
-    try {
-        return (typeof require('nw.gui') !== "undefined");
-    } catch (error) {
-        return false;
-    }
-}
-
 function getManifestVersion(manifest) {
     try {
         if (!manifest) {

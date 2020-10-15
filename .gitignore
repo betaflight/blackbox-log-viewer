@@ -1,7 +1,6 @@
 /.settings/
 /.project
 .DS_Store
-/blackbox-chrome-app.zip
 .idea/workspace.xml
 .idea/tasks.xml
 /.idea/
