@@ -1137,8 +1137,10 @@ html.isCF .navbar-logo img {
 }
 
 html.isBF .navbar-logo img {
-	content: url(".././images/bf_logo_white.svg");
-	width: auto;
+    content: url(".././images/light-wide-2.svg");
+    width: 282px;
+    height: 50px;
+    margin-left: 0 !important;
 }
 
 html.isINAV .navbar-logo img {
@@ -1159,8 +1161,8 @@ html.isINAV .navbar-logo img {
 .navbar-logo a {
     padding: 0;
     position: absolute;
-    top: 44%;
-    left: 68%;
+    top: 32%;
+    left: 75%;
     width: 100%;
 }
 
