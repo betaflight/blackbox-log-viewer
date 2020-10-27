@@ -14,7 +14,13 @@ be played behind the log. You can export the graphs as a WebM video to share wit
 
 Download the installer from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
 
-#### Note for MacOS X users
+### Notes
+
+#### Windows users
+
+The minimum required version of Windows is Windows 8.
+
+#### MacOS X users
 
 Changes to the security model used in the latest versions of MacOS X 10.14 (Mojave) and 10.15 (Catalina) mean that the operating system will show an error message ('"Betaflight\ Blackbox\ Explorer.app" is damaged and can’t be opened. You should move it to the Trash.') when trying to install the application. To work around this, run the following command in a terminal before installing: `sudo xattr -rd com.apple.quarantine /Applications/Betaflight\ Blackbox\ Explorer.app`.
 
