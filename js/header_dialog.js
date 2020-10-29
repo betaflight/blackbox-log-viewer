@@ -99,6 +99,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'rates_type'                   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.2.0', max:'999.9.9'},
         {name:'fields_disabled_mask'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'vbat_sag_compensation'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'gyro_to_use'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -766,6 +767,7 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('acc_hardware'		    	,sysConfig.acc_hardware, ACC_HARDWARE);
     	renderSelect('baro_hardware'		    ,sysConfig.baro_hardware, BARO_HARDWARE);
     	renderSelect('mag_hardware'		    	,sysConfig.mag_hardware, MAG_HARDWARE);
+    	renderSelect('gyro_to_use'		    	,sysConfig.gyro_to_use, GYRO_TO_USE);
 
 		/* Booleans */
         setCheckbox('gyro_cal_on_first_arm'		,sysConfig.gyro_cal_on_first_arm);

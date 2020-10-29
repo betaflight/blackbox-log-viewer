@@ -451,6 +451,12 @@ var
         "KISS",
         "ACTUAL",
         "QUICK",
+    ]),
+
+    GYRO_TO_USE = makeReadOnly([
+        "FIRST",
+        "SECOND",
+        "BOTH",
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
