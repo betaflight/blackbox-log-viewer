@@ -10,6 +10,14 @@ function makeReadOnly(x) {
     return x;
 }
 
+// Some constants used at different places
+const MAX_MOTOR_NUMBER = 8;
+const DSHOT_MIN_VALUE = 48;
+const DSHOT_MAX_VALUE = 2047;
+const DSHOT_RANGE = DSHOT_MAX_VALUE - DSHOT_MIN_VALUE;
+const ANALOG_MIN_VALUE = 1000;
+
+// Fields definitions for lists
 var 
     FlightLogEvent = makeReadOnly({
         SYNC_BEEP: 0,
