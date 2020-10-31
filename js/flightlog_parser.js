@@ -307,6 +307,7 @@ var FlightLogParser = function(logData) {
             rates_type: null,
             fields_disabled_mask: null,
             vbat_sag_compensation: null,
+            gyro_to_use: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -622,6 +623,7 @@ var FlightLogParser = function(logData) {
             case "vbat_sag_compensation":
             case "fields_disabled_mask":
             case "motor_pwm_protocol":
+            case "gyro_to_use":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
             case "rc_expo":
