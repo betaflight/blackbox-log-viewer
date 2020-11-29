@@ -1171,9 +1171,9 @@ FlightLog.prototype.rcCommandRawToThrottle = function(value) {
 };
 
 FlightLog.prototype.rcMotorRawToPctEffective = function(value) {
-
     // Motor displayed as percentage
-    return Math.min(Math.max(((value - this.getSysConfig().motorOutput[0]) / (this.getSysConfig().motorOutput[1] - this.getSysConfig().motorOutput[0])) * 100.0, 0.0),100.0);
+    const minValue = (this.isDigitalProtocol() && this.getSysConfig().dynamic_idle_min_rpm > 0) ? this.getSysConfig().digitalIdleOffset : this.getSysConfig().motorOutput[0];
+    return Math.min((value - minValue) / (this.getSysConfig().motorOutput[1] - minValue) * 100.0, 100.0);
 
 };
 
