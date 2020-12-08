@@ -564,6 +564,7 @@ GraphConfig.load = function(config) {
         
         if (!flightLog.isFieldDisabled().MOTORS) {
             EXAMPLE_GRAPHS.push({label: "Motors",fields: ["motor[all]", "servo[5]"]});
+            EXAMPLE_GRAPHS.push({label: "Motors (Legacy)",fields: ["motorLegacy[all]", "servo[5]"]});
         }
         if (!flightLog.isFieldDisabled().GYRO) {
             EXAMPLE_GRAPHS.push({label: "Gyros",fields: ["gyroADC[all]"]});
