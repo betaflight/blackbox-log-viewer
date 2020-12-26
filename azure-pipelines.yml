@@ -29,7 +29,14 @@ trigger:
   branches:
     include:
     - master
-pr: none
+    - "*-maintenance"
+
+pr:
+  drafts: false
+  branches:
+    include:
+    - master
+    - "*-maintenance"
 
 stages:
 - stage: Build
