@@ -60,7 +60,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
         graphExpoOverride   : true,             // Ability to toggle Expo off=normal/ on=force 100%
         graphGridOverride   : true,             // Ability to toggle Grid off=normal/ on=force disabled
 		analyserSampleRate	: 2000/*Hz*/,  		// the loop time for the log
-		analyserHanning	    : false,  			// use a hanning window on the analyser sample data
+		analyserHanning	    : true,  			// use a hanning window on the analyser sample data
 		eraseBackground		: true,           	// Set to false if you want the graph to draw on top of an existing canvas image
 		spectrumType        : 0,                // By default, frequency Spectrum
 		overdrawSpectrumType: 0,                // By default, show all filters
