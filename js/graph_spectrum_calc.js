@@ -87,12 +87,13 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
         
         var fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
         var fftOutput = new Float64Array(fftChunkLength * 2);
+        
+        // Hanning window applied to input data
+        if(userSettings.analyserHanning) {
+            this._hanningWindow(fftInput, fftChunkLength);
+        }
 
         fft.simple(fftOutput, fftInput, 'real');
-
-        if(userSettings.analyserHanning) {
-            this._hanningWindow(fftOutput, fftChunkLength * 2);
-        }
 
         fftOutput = fftOutput.slice(0, fftChunkLength);
 
