@@ -669,7 +669,7 @@ function FlightLog(logData) {
                     if (axisPID && gyroADC) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
-                            destFrame[fieldIndex++] = gyroADCdegrees - destFrame[fieldIndexRcCommands + axis];
+                            destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
                         }
                     }
 
