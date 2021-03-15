@@ -16,8 +16,8 @@
     "id": "main",
     "show": true,
     "icon": "images/bf_icon_128.png",
-    "min_width": 1340,
-    "min_height": 920
+    "min_width": 740,
+    "min_height": 480
   },
   "repository": {
     "type": "git",
