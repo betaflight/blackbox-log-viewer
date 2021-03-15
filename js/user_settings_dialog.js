@@ -45,10 +45,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		stickInvertYaw		: false,			// Invert yaw in stick display?
         legendUnits			: true,	            // Show units on legend?
 		gapless				: false,
-        drawCraft           : "3D", 
+        drawCraft           : false, 
         hasCraft            : true,
 		drawPidTable		: true, 
-        drawSticks          : true, 
+        drawSticks          : false, 
 		drawTime			: true,
 		drawEvents			: true,
 		drawAnalyser		: true,             // add an analyser option
