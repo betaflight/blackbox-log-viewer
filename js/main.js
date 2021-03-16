@@ -5,8 +5,16 @@ var userSettings = {};
 
 var VIEWER_VERSION = getManifestVersion(); // Current version
 
-const INNER_BOUNDS_WIDTH  = 1340;
-const INNER_BOUNDS_HEIGHT = 900;
+// these values set the initial dimensions of a secondary window
+// which always opens at the centre of the user's screen
+const NEW_WINDOW_WIDTH  = 1000;
+const NEW_WINDOW_HEIGHT  = 760;
+
+// these values set the minimum resize dimensions of a secondary window
+// minimum resize dimensions of the initial window are set in package.json
+const INNER_BOUNDS_WIDTH  = 740;
+const INNER_BOUNDS_HEIGHT = 480;
+
 const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
@@ -113,6 +121,8 @@ function BlackboxLogViewer() {
             const gui = require('nw.gui');
             gui.Window.open(INITIAL_APP_PAGE,
             {
+                'width'  : NEW_WINDOW_WIDTH,
+                'height' : NEW_WINDOW_HEIGHT,
                 'min_width'  : INNER_BOUNDS_WIDTH,
                 'min_height' : INNER_BOUNDS_HEIGHT,
             },
