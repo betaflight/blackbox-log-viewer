@@ -111,9 +111,9 @@ If no platform is provided, only for the platform you are builing from will be b
 
 * **MacOS X** use `yarn gulp <task-name> --osx64`
 * **Linux** use `yarn gulp <task-name> --linux64`
-* **Windows** use `yarn gulp <task-name> --win32`
+* **Windows** use `yarn gulp <task-name> --win64`
 
-You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`. Other platforms like `--win64` and `--linux32` can be used too, but they are not officially supported, so use them at your own risk.
+You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`. Other platforms like `--win32` and `--linux32` can be used too, but they are not officially supported, so use them at your own risk.
 
 #### macOS DMG installation background image
 

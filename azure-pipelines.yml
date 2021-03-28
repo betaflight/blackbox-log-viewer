@@ -53,11 +53,11 @@ stages:
       displayName: 'Install Node.js 10.16.3'
     - script: yarn install
       displayName: 'Run yarn install'
-    - script: yarn gulp release --win32
-      displayName: 'Run yarn release for win32'
+    - script: yarn gulp release --win64
+      displayName: 'Run yarn release for win64'
       condition: and(succeeded(), eq('${{ parameters.releaseBuild }}', true))
-    - script: yarn gulp debug-release --win32
-      displayName: 'Run yarn debug release for win32'
+    - script: yarn gulp debug-release --win64
+      displayName: 'Run yarn debug release for win64'
       condition: and(succeeded(), eq('${{ parameters.releaseBuild }}', false))
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Windows release'
