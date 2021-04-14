@@ -411,10 +411,10 @@ function FlightLogFieldPresenter() {
             },
             'FF_INTERPOLATED' : {
                             'debug[all]':'FF Interpolated', 
-                            'debug[0]':'Setpoint Delta Impl [Roll]',
-                            'debug[1]':'Boost Amount',
-                            'debug[2]':'Boost Amount Clip [Roll]',
-                            'debug[3]':'Clip',
+                            'debug[0]':'Raw FF Derivative [Roll]',
+                            'debug[1]':'Cleaned FF Derivative ',
+                            'debug[2]':'Cleaned Boost Amount [Roll]',
+                            'debug[3]':'Duplicate Marker',
             },
             'RTH' : {
                             'debug[all]':'RTH',
