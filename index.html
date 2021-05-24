@@ -915,17 +915,47 @@
                                     </table>
 
                                     <table class="parameter cf">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="5">Feedforward</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td name="feedforwardTransition" class="bf-only">
+                                                    <label>Transition
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0.01" min="0" max="999" />
+                                                </td>
+                                                <td name="feedforwardAveraging" class="bf-only">
+                                                    <label>Averaging
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                                <td name="feedforwardSmoothing" class="bf-only">
+                                                    <label>Smoothing
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                                <td name="feedforwardJitter" class="bf-only">
+                                                    <label>Jitter
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                                <td name="feedforwardBoost" class="bf-only">
+                                                    <label>Boost
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
                                         <tbody>
                                             <tr>
                                                 <td name="ptermSRateWeight" class="bf-only">
                                                     <label>P-Term
                                                         <br>&nbsp;
-                                                        <br/>&nbsp;</label>
-                                                    <input type="number" step="0.01" min="0" max="999" />
-                                                </td>
-                                                <td name="feedforward_transition" class="bf-only">
-                                                    <label>Feedforward
-                                                        <br>Transition
                                                         <br/>&nbsp;</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>

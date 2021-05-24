@@ -220,7 +220,7 @@ var FlightLogParser = function(logData) {
             rollPID:[null, null, null],             // Roll [P, I, D]
             pitchPID:[null, null, null],            // Pitch[P, I, D]
             yawPID:[null, null, null],              // Yaw  [P, I, D]
-            feedforward_transition:null,            // Feedforward transition
+            feedforward_transition:null,            // Feedforward transition old
             altPID:[null, null, null],              // Altitude Hold [P, I, D]
             posPID:[null, null, null],              // Position Hold [P, I, D]
             posrPID:[null, null, null],             // Position Rate [P, I, D]
@@ -309,6 +309,12 @@ var FlightLogParser = function(logData) {
             vbat_sag_compensation: null,
             gyro_to_use: null,
             dynamic_idle_min_rpm: null,
+            ff_transition: null,
+            ff_averaging: null,
+            ff_smooth_factor: null,
+            ff_jitter_factor: null,
+            ff_boost: null,
+
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -595,6 +601,11 @@ var FlightLogParser = function(logData) {
             case "ptermSRateWeight":
             case "setpointRelaxRatio":
             case "feedforward_transition":
+            case "ff_transition":
+            case "ff_averaging":
+            case "ff_smooth_factor":
+            case "ff_jitter_factor":
+            case "ff_boost":
             case "dtermSetpointWeight":
             case "gyro_soft_type":
             case "gyro_soft2_type":
@@ -727,6 +738,13 @@ var FlightLogParser = function(logData) {
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
             break;
 
+            case "ff_weight":
+                // Add it to the end of the rollPID, pitchPID and yawPID
+                var ffValues = parseCommaSeparatedString(fieldValue);
+                that.sysConfig["rollPID"].push(ffValues[0]);
+                that.sysConfig["pitchPID"].push(ffValues[1]);
+                that.sysConfig["yawPID"].push(ffValues[2]);
+            break;
             case "feedforward_weight":
                 // Add it to the end of the rollPID, pitchPID and yawPID
                 var ffValues = parseCommaSeparatedString(fieldValue);
@@ -734,6 +752,7 @@ var FlightLogParser = function(logData) {
                 that.sysConfig["pitchPID"].push(ffValues[1]);
                 that.sysConfig["yawPID"].push(ffValues[2]);
             break;
+
             /* End of CSV packed values */
 
             case "vbatcellvoltage":

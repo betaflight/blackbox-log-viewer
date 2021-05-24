@@ -67,7 +67,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'pidSumLimit'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
         {name:'pidSumLimitYaw'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
         {name:'rc_smoothing_type'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
-        {name:'feedforward_transition'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+        {name:'feedforward_transition'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'4.2.999'},
         {name:'antiGravityMode'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
         {name:'rc_smoothing_cutoffs_1'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
         {name:'rc_smoothing_cutoffs_2'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
@@ -101,6 +101,11 @@ function HeaderDialog(dialog, onSave) {
         {name:'vbat_sag_compensation'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'gyro_to_use'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dynamic_idle_min_rpm'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_transition'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_averaging'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_smooth_factor'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_jitter_factor'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_boost'                     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -692,7 +697,20 @@ function HeaderDialog(dialog, onSave) {
         renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
-        setParameter('feedforward_transition'   ,sysConfig.feedforward_transition,2);
+
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+            setParameter('feedforwardTransition' ,sysConfig.ff_transition,2);
+            setParameter('feedforwardAveraging'  ,sysConfig.ff_averaging,0);
+            setParameter('feedforwardSmoothing'  ,sysConfig.ff_smooth_factor,0);
+            setParameter('feedforwardJitter'     ,sysConfig.ff_jitter_factor,0);
+        } else {
+            setParameter('feedforwardTransition' ,sysConfig.feedforward_transition,2);
+            setParameter('feedforwardAveraging'  ,"0",0);
+            setParameter('feedforwardSmoothing'  ,"0",0);
+            setParameter('feedforwardJitter'     ,"0",0);
+        }
+        setParameter('feedforwardBoost'      ,sysConfig.ff_boost,0);
+
         setParameter('abs_control_gain'         ,sysConfig.abs_control_gain, 0);
         if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
             setParameterFloat('yawRateAccelLimit', sysConfig.yawRateAccelLimit, 2);
