@@ -309,6 +309,8 @@ var FlightLogParser = function(logData) {
             vbat_sag_compensation: null,
             gyro_to_use: null,
             dynamic_idle_min_rpm: null,
+            dyn_notch_count: null,                  // Number of dynamic notches 4.3
+            dyn_notch_bandwidth_hz: null,           // Width of each notch filter in Hz 4.3
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -618,6 +620,8 @@ var FlightLogParser = function(logData) {
             case "dyn_notch_range":
             case "dyn_notch_width_percent":
             case "dyn_notch_q":
+            case "dyn_notch_count":
+            case "dyn_notch_bandwidth_hz":
             case "dyn_notch_min_hz":
             case "dyn_notch_max_hz":
             case "rates_type":

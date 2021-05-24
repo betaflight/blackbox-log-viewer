@@ -426,13 +426,6 @@ var
         "SETPOINT",
     ]),
 
-    DYN_NOTCH_RANGE = makeReadOnly([
-        "HIGH",
-        "MEDIUM",
-        "LOW",
-        "AUTO",
-    ]),
-
     FLIGHT_LOG_DISARM_REASON = makeReadOnly([
         "ARMING_DISABLED",
         "FAILSAFE",
