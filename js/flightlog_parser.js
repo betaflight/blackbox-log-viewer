@@ -1511,6 +1511,7 @@ var FlightLogParser = function(logData) {
         }
 
         adjustFieldDefsList(that.sysConfig.firmwareType, that.sysConfig.firmwareVersion);
+        FlightLogFieldPresenter.adjustDebugDefsList(that.sysConfig.firmwareType, that.sysConfig.firmwareVersion);
 
         if (!isFrameDefComplete(this.frameDefs.I)) {
             throw "Log is missing required definitions for I frames, header may be corrupt";
