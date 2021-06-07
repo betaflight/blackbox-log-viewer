@@ -106,326 +106,342 @@ function FlightLogFieldPresenter() {
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
     };
-
-    	var DEBUG_FRIENDLY_FIELD_NAMES = { 
-			'NONE' : 	{
-							'debug[all]':'Debug [all]',	
-							'debug[0]':'Debug [0]',
-							'debug[1]':'Debug [1]',
-							'debug[2]':'Debug [2]',
-							'debug[3]':'Debug [3]',
-						},
-			'CYCLETIME' : 	{	
-							'debug[all]':'Debug Cycle Time',	
-							'debug[0]':'Cycle Time',
-							'debug[1]':'CPU Load',
-							'debug[2]':'Motor Update',
-							'debug[3]':'Motor Deviation',
-						},
-			'BATTERY' : 	{	
-							'debug[all]':'Debug Battery',	
-							'debug[0]':'Battery Volt. ADC',
-							'debug[1]':'Battery Volt.',
-							'debug[2]':'Not Used',
-							'debug[3]':'Not Used',
-						},
-			'GYRO' : 	{	
-							'debug[all]':'Debug Gyro',	
-							'debug[0]':'Gyro Raw [X]',
-							'debug[1]':'Gyro Raw [Y]',
-							'debug[2]':'Gyro Raw [Z]',
-							'debug[3]':'Not Used',
-						},
-            'GYRO_FILTERED' : {
-                            'debug[all]':'Debug Gyro Filtered',  
-                            'debug[0]':'Gyro Filtered [X]',
-                            'debug[1]':'Gyro Filtered [Y]',
-                            'debug[2]':'Gyro Filtered [Z]',
-                            'debug[3]':'Not Used',
-                        },
-			'ACCELEROMETER' : 	{	
-							'debug[all]':'Debug Accel.',	
-							'debug[0]':'Accel. Raw [X]',
-							'debug[1]':'Accel. Raw [Y]',
-							'debug[2]':'Accel. Raw [Z]',
-							'debug[3]':'Not Used',
-						},
-			'MIXER' : 	{	
-							'debug[all]':'Debug Mixer',	
-							'debug[0]':'Roll-Pitch-Yaw Mix [0]',
-							'debug[1]':'Roll-Pitch-Yaw Mix [1]',
-							'debug[2]':'Roll-Pitch-Yaw Mix [2]',
-							'debug[3]':'Roll-Pitch-Yaw Mix [3]',
-						},
-			'PIDLOOP' : 	{	
-							'debug[all]':'Debug PID',	
-							'debug[0]':'Wait Time',
-							'debug[1]':'Sub Update Time',
-							'debug[2]':'PID Update Time',
-							'debug[3]':'Motor Update Time',
-						},
-			'NOTCH' : 	{	
-							'debug[all]':'Debug Notch',	
-							'debug[0]':'Gyro Pre-Notch [roll]',
-							'debug[1]':'Gyro Pre-Notch [pitch]',
-							'debug[2]':'Gyro Pre-Notch [yaw]',
-							'debug[3]':'Not Used',
-						},
-            'GYRO_SCALED' : {
-                            'debug[all]':'Debug Gyro Scaled', 
-                            'debug[0]':'Gyro Scaled [roll]',
-                            'debug[1]':'Gyro Scaled [pitch]',
-                            'debug[2]':'Gyro Scaled [yaw]',
-                            'debug[3]':'Not Used',
-                        },
-            'RC_INTERPOLATION' : {
-                            'debug[all]':'Debug RC Interpolation',
-                            'debug[0]':'Raw RC Command [roll]',
-                            'debug[1]':'Current RX Refresh Rate',
-                            'debug[2]':'Interpolation Step Count',
-                            'debug[3]':'RC Setpoint [roll]',
-                        },
-            'RC_SMOOTHING' : {
-                            'debug[all]':'Debug RC Smoothing',
-                            'debug[0]':'Raw RC Command',
-                            'debug[1]':'Raw RC Derivative',
-                            'debug[2]':'Smoothed RC Derivative',
-                            'debug[3]':'RX Refresh Rate',
-                        },
-            'RC_SMOOTHING_RATE' : {
-                            'debug[all]':'Debug RC Smoothing Rate',
-                            'debug[0]':'Current RX Refresh Rate',
-                            'debug[1]':'Training Step Count',
-                            'debug[2]':'Average RX Refresh Rate',
-                            'debug[3]':'Sampling State',
-                        },
-			'DTERM_FILTER' : 	{	
-							'debug[all]':'Debug Filter',	
-							'debug[0]':'DTerm Filter [roll]',
-							'debug[1]':'DTerm Filter [pitch]',
-							'debug[2]':'Not Used',
-							'debug[3]':'Not Used',
-						},
-			'ANGLERATE' : 	{	
-							'debug[all]':'Debug Angle Rate',	
-							'debug[0]':'Angle Rate[roll]',
-							'debug[1]':'Angle Rate[pitch]',
-							'debug[2]':'Angle Rate[yaw]',
-							'debug[3]':'Not Used',
-						},						
-            'ESC_SENSOR' : 	{
-                            'debug[all]':'ESC Sensor',
-                            'debug[0]':'Motor Index',
-                            'debug[1]':'Timeouts',
-                            'debug[2]':'CNC errors',
-                            'debug[3]':'Data age',
-            },
-            'SCHEDULER' : 	{
-                            'debug[all]':'Scheduler',
-                            'debug[0]':'Not Used',
-                            'debug[1]':'Not Used',
-                            'debug[2]':'Schedule Time',
-                            'debug[3]':'Function Exec Time',
-            },
-            'STACK' : 	{
-                            'debug[all]':'Stack',
-                            'debug[0]':'Stack High Mem',
-                            'debug[1]':'Stack Low Mem',
-                            'debug[2]':'Stack Current',
-                            'debug[3]':'Stack p',
-            },
-            'FFT' : {
-                            'debug[all]':'Debug FFT',
-                            'debug[0]':'Gyro Scaled [dbg-axis]',
-                            'debug[1]':'Gyro Pre-Dyn [dbg-axis]',
-                            'debug[2]':'Gyro Downsampled [roll]',
-                            'debug[3]':'FFT Center Index [roll]',
-    		},
-            'FFT_TIME' : {
-                            'debug[all]':'Debug FFT TIME',
-                            'debug[0]':'Active calc step',
-                            'debug[1]':'Step duration',
-                            'debug[2]':'Additional steps',
-                            'debug[3]':'Not used',
-            },
-            'FFT_FREQ' : {
-                            'debug[all]':'Debug FFT FREQ',
-                            'debug[0]':'Center Freq [roll]',
-                            'debug[1]':'Center Freq [pitch]',
-                            'debug[2]':'Gyro Pre-Dyn [dbg-axis]',
-                            'debug[3]':'Gyro Scaled [dbg-axis]',
-            },
-            'GYRO_RAW' :   {
-                            'debug[all]':'Debug Gyro Raw', 
-                            'debug[0]':'Gyro Raw [X]',
-                            'debug[1]':'Gyro Raw [Y]',
-                            'debug[2]':'Gyro Raw [Z]',
-                            'debug[3]':'Not Used',
-                        },
-            'DUAL_GYRO' : {
-                            'debug[all]':'Debug Dual Gyro', 
-                            'debug[0]':'Gyro 1 Filtered [roll]',
-                            'debug[1]':'Gyro 1 Filtered [pitch]',
-                            'debug[2]':'Gyro 2 Filtered [roll]',
-                            'debug[3]':'Gyro 2 Filtered [pitch]',
-            },
-            'DUAL_GYRO_RAW': {
-                            'debug[all]':'Debug Dual Gyro Raw', 
-                            'debug[0]':'Gyro 1 Raw [roll]',
-                            'debug[1]':'Gyro 1 Raw [pitch]',
-                            'debug[2]':'Gyro 2 Raw [roll]',
-                            'debug[3]':'Gyro 2 Raw [pitch]',
-            },
-            'DUAL_GYRO_COMBINED': {
-                            'debug[all]':'Debug Dual Combined', 
-                            'debug[0]':'Not Used',
-                            'debug[1]':'Gyro Filtered [roll]',
-                            'debug[2]':'Gyro Filtered [pitch]',
-                            'debug[3]':'Not Used',
-            },
-            'DUAL_GYRO_DIFF': {
-                            'debug[all]':'Debug Dual Gyro Diff', 
-                            'debug[0]':'Gyro Diff [roll]',
-                            'debug[1]':'Gyro Diff [pitch]',
-                            'debug[2]':'Gyro Diff [yaw]',
-                            'debug[3]':'Not Used',
-            },
-            'ESC_SENSOR_RPM' :   {
-                            'debug[all]':'ESC RPM', 
-                            'debug[0]':'ESC RPM [1]',
-                            'debug[1]':'ESC RPM [2]',
-                            'debug[2]':'ESC RPM [3]',
-                            'debug[3]':'ESC RPM [4]',
-                        },
-            'DSHOT_RPM_TELEMETRY' :   {
-                            'debug[all]':'DSHOT RPM', 
-                            'debug[0]':'DSHOT RPM [1]',
-                            'debug[1]':'DSHOT RPM [2]',
-                            'debug[2]':'DSHOT RPM [3]',
-                            'debug[3]':'DSHOT RPM [4]',
-                        },
-            'RPM_FILTER' :   {
-                            'debug[all]':'RPM Filter', 
-                            'debug[0]':'RPM Filter [1]',
-                            'debug[1]':'RPM Filter [2]',
-                            'debug[2]':'RPM Filter [3]',
-                            'debug[3]':'RPM Filter [4]',
-                        },
-            'D_MIN' :   {
-                            'debug[all]':'D_MIN',
-                            'debug[0]':'Gyro Factor [roll]',
-                            'debug[1]':'Setpoint Factor [roll]',
-                            'debug[2]':'Actual D [roll]',
-                            'debug[3]':'Actual D [pitch]',
-                        },
-            'ITERM_RELAX' :   {
-                            'debug[all]':'I-term Relax',
-                            'debug[0]':'Setpoint HPF [roll]',
-                            'debug[1]':'I Relax Factor [roll]',
-                            'debug[2]':'Relaxed I Error [roll]',
-                            'debug[3]':'Axis Error [roll]',
-                        },
-            'DYN_LPF' : {
-                            'debug[all]':'Debug Dyn LPF',
-                            'debug[0]':'Gyro Scaled [dbg-axis]',
-                            'debug[1]':'Notch Center [roll]',
-                            'debug[2]':'Lowpass Cutoff',
-                            'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
-            },
-            'AC_CORRECTION' : {
-                            'debug[all]':'AC Correction',
-                            'debug[0]':'AC Correction [roll]',
-                            'debug[1]':'AC Correction [pitch]',
-                            'debug[2]':'AC Correction [yaw]',
-                            'debug[3]':'Not Used',
-            },
-            'AC_ERROR' : {
-                            'debug[all]':'AC Error',
-                            'debug[0]':'AC Error [roll]',
-                            'debug[1]':'AC Error [pitch]',
-                            'debug[2]':'AC Error [yaw]',
-                            'debug[3]':'Not Used',
-            },
-            'DUAL_GYRO_SCALED' : {
-                            'debug[all]':'Dual Gyro Scaled',
-                            'debug[0]':'Gyro 1 [roll]',
-                            'debug[1]':'Gyro 1 [pitch]',
-                            'debug[2]':'Gyro 2 [roll]',
-                            'debug[3]':'Gyro 2 [pitch]',
-            },
-            'DSHOT_RPM_ERRORS' : {
-                            'debug[all]':'DSHOT RPM Error', 
-                            'debug[0]':'DSHOT RPM Error [1]',
-                            'debug[1]':'DSHOT RPM Error [2]',
-                            'debug[2]':'DSHOT RPM Error [3]',
-                            'debug[3]':'DSHOT RPM Error [4]',
-            },
-            'CRSF_LINK_STATISTICS_UPLINK' : {
-                            'debug[all]':'CRSF Stats Uplink', 
-                            'debug[0]':'Uplink RSSI 1',
-                            'debug[1]':'Uplink RSSI 2',
-                            'debug[2]':'Uplink Link Quality',
-                            'debug[3]':'RF Mode',
-            },
-            'CRSF_LINK_STATISTICS_PWR' : {
-                            'debug[all]':'CRSF Stats Power', 
-                            'debug[0]':'Antenna',
-                            'debug[1]':'SNR',
-                            'debug[2]':'TX Power',
-                            'debug[3]':'Not Used',
-            },
-            'CRSF_LINK_STATISTICS_DOWN' : {
-                            'debug[all]':'CRSF Stats Downlink', 
-                            'debug[0]':'Downlink RSSI',
-                            'debug[1]':'Downlink Link Quality',
-                            'debug[2]':'Downlink SNR',
-                            'debug[3]':'Not Used',
-            },
-            'BARO' : {
-                            'debug[all]':'Debug Barometer', 
-                            'debug[0]':'Baro State',
-                            'debug[1]':'Baro Temperature',
-                            'debug[2]':'Baro Pressure',
-                            'debug[3]':'Baro Pressure Sum',
-            },
-            'GPS_RESCUE_THROTTLE_PID' : {
-                            'debug[all]':'GPS Rescue Throttle PID', 
-                            'debug[0]':'Throttle P',
-                            'debug[1]':'Throttle I',
-                            'debug[2]':'Throttle D',
-                            'debug[3]':'Z Velocity',
-            },
-            'DYN_IDLE' : {
-                            'debug[all]':'Dyn Idle', 
-                            'debug[0]':'Motor Range Min Inc',
-                            'debug[1]':'Target RPS Change Rate',
-                            'debug[2]':'Error',
-                            'debug[3]':'Min RPS',
-            },
-            'FF_LIMIT' : {
-                            'debug[all]':'FF Limit', 
-                            'debug[0]':'FF [Roll]',
-                            'debug[1]':'FF [Pitch]',
-                            'debug[2]':'FF Final [Roll]',
-                            'debug[3]':'Not Used',
-            },
-            'FF_INTERPOLATED' : {
-                            'debug[all]':'FF Interpolated', 
-                            'debug[0]':'Setpoint Delta Impl [Roll]',
-                            'debug[1]':'Boost Amount',
-                            'debug[2]':'Boost Amount Clip [Roll]',
-                            'debug[3]':'Clip',
-            },
-            'RTH' : {
-                            'debug[all]':'RTH',
-                            'debug[0]':'Rescue Throttle',
-                            'debug[1]':'Rescue Angle',
-                            'debug[2]':'Altitude Adjustment',
-                            'debug[3]':'Rescue State',
-            },
-        };
     
-    function presentFlags(flags, flagNames) {
+    const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
+        'NONE' : {
+            'debug[all]':'Debug [all]',
+            'debug[0]':'Debug [0]',
+            'debug[1]':'Debug [1]',
+            'debug[2]':'Debug [2]',
+            'debug[3]':'Debug [3]',
+        },
+        'CYCLETIME' : {
+            'debug[all]':'Debug Cycle Time',
+            'debug[0]':'Cycle Time',
+            'debug[1]':'CPU Load',
+            'debug[2]':'Motor Update',
+            'debug[3]':'Motor Deviation',
+        },
+        'BATTERY' : {
+            'debug[all]':'Debug Battery',
+            'debug[0]':'Battery Volt. ADC',
+            'debug[1]':'Battery Volt.',
+            'debug[2]':'Not Used',
+            'debug[3]':'Not Used',
+        },
+        'GYRO' : {
+            'debug[all]':'Debug Gyro',
+            'debug[0]':'Gyro Raw [X]',
+            'debug[1]':'Gyro Raw [Y]',
+            'debug[2]':'Gyro Raw [Z]',
+            'debug[3]':'Not Used',
+        },
+        'GYRO_FILTERED' : {
+            'debug[all]':'Debug Gyro Filtered',  
+            'debug[0]':'Gyro Filtered [X]',
+            'debug[1]':'Gyro Filtered [Y]',
+            'debug[2]':'Gyro Filtered [Z]',
+            'debug[3]':'Not Used',
+        },
+        'ACCELEROMETER' : {
+            'debug[all]':'Debug Accel.',
+            'debug[0]':'Accel. Raw [X]',
+            'debug[1]':'Accel. Raw [Y]',
+            'debug[2]':'Accel. Raw [Z]',
+            'debug[3]':'Not Used',
+        },
+        'MIXER' : {
+            'debug[all]':'Debug Mixer',
+            'debug[0]':'Roll-Pitch-Yaw Mix [0]',
+            'debug[1]':'Roll-Pitch-Yaw Mix [1]',
+            'debug[2]':'Roll-Pitch-Yaw Mix [2]',
+            'debug[3]':'Roll-Pitch-Yaw Mix [3]',
+        },
+        'PIDLOOP' : {
+            'debug[all]':'Debug PID',
+            'debug[0]':'Wait Time',
+            'debug[1]':'Sub Update Time',
+            'debug[2]':'PID Update Time',
+            'debug[3]':'Motor Update Time',
+        },
+        'NOTCH' : {
+            'debug[all]':'Debug Notch',
+            'debug[0]':'Gyro Pre-Notch [roll]',
+            'debug[1]':'Gyro Pre-Notch [pitch]',
+            'debug[2]':'Gyro Pre-Notch [yaw]',
+            'debug[3]':'Not Used',
+        },
+        'GYRO_SCALED' : {
+            'debug[all]':'Debug Gyro Scaled', 
+            'debug[0]':'Gyro Scaled [roll]',
+            'debug[1]':'Gyro Scaled [pitch]',
+            'debug[2]':'Gyro Scaled [yaw]',
+            'debug[3]':'Not Used',
+        },
+        'RC_INTERPOLATION' : {
+            'debug[all]':'Debug RC Interpolation',
+            'debug[0]':'Raw RC Command [roll]',
+            'debug[1]':'Current RX Refresh Rate',
+            'debug[2]':'Interpolation Step Count',
+            'debug[3]':'RC Setpoint [roll]',
+        },
+        'RC_SMOOTHING' : {
+            'debug[all]':'Debug RC Smoothing',
+            'debug[0]':'Raw RC Command',
+            'debug[1]':'Raw RC Derivative',
+            'debug[2]':'Smoothed RC Derivative',
+            'debug[3]':'RX Refresh Rate',
+        },
+        'RC_SMOOTHING_RATE' : {
+            'debug[all]':'Debug RC Smoothing Rate',
+            'debug[0]':'Current RX Refresh Rate',
+            'debug[1]':'Training Step Count',
+            'debug[2]':'Average RX Refresh Rate',
+            'debug[3]':'Sampling State',
+        },
+        'DTERM_FILTER' : {
+            'debug[all]':'Debug Filter',
+            'debug[0]':'DTerm Filter [roll]',
+            'debug[1]':'DTerm Filter [pitch]',
+            'debug[2]':'Not Used',
+            'debug[3]':'Not Used',
+        },
+        'ANGLERATE' : {
+            'debug[all]':'Debug Angle Rate',
+            'debug[0]':'Angle Rate[roll]',
+            'debug[1]':'Angle Rate[pitch]',
+            'debug[2]':'Angle Rate[yaw]',
+            'debug[3]':'Not Used',
+        },
+        'ESC_SENSOR' : {
+            'debug[all]':'ESC Sensor',
+            'debug[0]':'Motor Index',
+            'debug[1]':'Timeouts',
+            'debug[2]':'CNC errors',
+            'debug[3]':'Data age',
+        },
+        'SCHEDULER' : {
+            'debug[all]':'Scheduler',
+            'debug[0]':'Not Used',
+            'debug[1]':'Not Used',
+            'debug[2]':'Schedule Time',
+            'debug[3]':'Function Exec Time',
+        },
+        'STACK' : {
+            'debug[all]':'Stack',
+            'debug[0]':'Stack High Mem',
+            'debug[1]':'Stack Low Mem',
+            'debug[2]':'Stack Current',
+            'debug[3]':'Stack p',
+        },
+        'FFT' : {
+            'debug[all]':'Debug FFT',
+            'debug[0]':'Gyro Scaled [dbg-axis]',
+            'debug[1]':'Gyro Pre-Dyn [dbg-axis]',
+            'debug[2]':'Gyro Downsampled [roll]',
+            'debug[3]':'FFT Center Index [roll]',
+        },
+        'FFT_TIME' : {
+            'debug[all]':'Debug FFT TIME',
+            'debug[0]':'Active calc step',
+            'debug[1]':'Step duration',
+            'debug[2]':'Additional steps',
+            'debug[3]':'Not used',
+        },
+        'FFT_FREQ' : {
+            'debug[all]':'Debug FFT FREQ',
+            'debug[0]':'Center Freq [roll]',
+            'debug[1]':'Center Freq [pitch]',
+            'debug[2]':'Gyro Pre-Dyn [dbg-axis]',
+            'debug[3]':'Gyro Scaled [dbg-axis]',
+        },
+        'GYRO_RAW' : {
+            'debug[all]':'Debug Gyro Raw', 
+            'debug[0]':'Gyro Raw [X]',
+            'debug[1]':'Gyro Raw [Y]',
+            'debug[2]':'Gyro Raw [Z]',
+            'debug[3]':'Not Used',
+        },
+        'DUAL_GYRO' : {
+            'debug[all]':'Debug Dual Gyro', 
+            'debug[0]':'Gyro 1 Filtered [roll]',
+            'debug[1]':'Gyro 1 Filtered [pitch]',
+            'debug[2]':'Gyro 2 Filtered [roll]',
+            'debug[3]':'Gyro 2 Filtered [pitch]',
+        },
+        'DUAL_GYRO_RAW': {
+            'debug[all]':'Debug Dual Gyro Raw', 
+            'debug[0]':'Gyro 1 Raw [roll]',
+            'debug[1]':'Gyro 1 Raw [pitch]',
+            'debug[2]':'Gyro 2 Raw [roll]',
+            'debug[3]':'Gyro 2 Raw [pitch]',
+        },
+        'DUAL_GYRO_COMBINED': {
+            'debug[all]':'Debug Dual Combined', 
+            'debug[0]':'Not Used',
+            'debug[1]':'Gyro Filtered [roll]',
+            'debug[2]':'Gyro Filtered [pitch]',
+            'debug[3]':'Not Used',
+        },
+        'DUAL_GYRO_DIFF': {
+            'debug[all]':'Debug Dual Gyro Diff', 
+            'debug[0]':'Gyro Diff [roll]',
+            'debug[1]':'Gyro Diff [pitch]',
+            'debug[2]':'Gyro Diff [yaw]',
+            'debug[3]':'Not Used',
+        },
+        'ESC_SENSOR_RPM' : {
+            'debug[all]':'ESC RPM', 
+            'debug[0]':'ESC RPM [1]',
+            'debug[1]':'ESC RPM [2]',
+            'debug[2]':'ESC RPM [3]',
+            'debug[3]':'ESC RPM [4]',
+        },
+        'DSHOT_RPM_TELEMETRY' : {
+            'debug[all]':'DSHOT RPM', 
+            'debug[0]':'DSHOT RPM [1]',
+            'debug[1]':'DSHOT RPM [2]',
+            'debug[2]':'DSHOT RPM [3]',
+            'debug[3]':'DSHOT RPM [4]',
+        },
+        'RPM_FILTER' : {
+            'debug[all]':'RPM Filter', 
+            'debug[0]':'RPM Filter [1]',
+            'debug[1]':'RPM Filter [2]',
+            'debug[2]':'RPM Filter [3]',
+            'debug[3]':'RPM Filter [4]',
+        },
+        'D_MIN' : {
+            'debug[all]':'D_MIN',
+            'debug[0]':'Gyro Factor [roll]',
+            'debug[1]':'Setpoint Factor [roll]',
+            'debug[2]':'Actual D [roll]',
+            'debug[3]':'Actual D [pitch]',
+        },
+        'ITERM_RELAX' : {
+            'debug[all]':'I-term Relax',
+            'debug[0]':'Setpoint HPF [roll]',
+            'debug[1]':'I Relax Factor [roll]',
+            'debug[2]':'Relaxed I Error [roll]',
+            'debug[3]':'Axis Error [roll]',
+        },
+        'DYN_LPF' : {
+            'debug[all]':'Debug Dyn LPF',
+            'debug[0]':'Gyro Scaled [dbg-axis]',
+            'debug[1]':'Notch Center [roll]',
+            'debug[2]':'Lowpass Cutoff',
+            'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
+        },
+        'AC_CORRECTION' : {
+            'debug[all]':'AC Correction',
+            'debug[0]':'AC Correction [roll]',
+            'debug[1]':'AC Correction [pitch]',
+            'debug[2]':'AC Correction [yaw]',
+            'debug[3]':'Not Used',
+        },
+        'AC_ERROR' : {
+            'debug[all]':'AC Error',
+            'debug[0]':'AC Error [roll]',
+            'debug[1]':'AC Error [pitch]',
+            'debug[2]':'AC Error [yaw]',
+            'debug[3]':'Not Used',
+        },
+        'DUAL_GYRO_SCALED' : {
+            'debug[all]':'Dual Gyro Scaled',
+            'debug[0]':'Gyro 1 [roll]',
+            'debug[1]':'Gyro 1 [pitch]',
+            'debug[2]':'Gyro 2 [roll]',
+            'debug[3]':'Gyro 2 [pitch]',
+        },
+        'DSHOT_RPM_ERRORS' : {
+            'debug[all]':'DSHOT RPM Error', 
+            'debug[0]':'DSHOT RPM Error [1]',
+            'debug[1]':'DSHOT RPM Error [2]',
+            'debug[2]':'DSHOT RPM Error [3]',
+            'debug[3]':'DSHOT RPM Error [4]',
+        },
+        'CRSF_LINK_STATISTICS_UPLINK' : {
+            'debug[all]':'CRSF Stats Uplink', 
+            'debug[0]':'Uplink RSSI 1',
+            'debug[1]':'Uplink RSSI 2',
+            'debug[2]':'Uplink Link Quality',
+            'debug[3]':'RF Mode',
+        },
+        'CRSF_LINK_STATISTICS_PWR' : {
+            'debug[all]':'CRSF Stats Power', 
+            'debug[0]':'Antenna',
+            'debug[1]':'SNR',
+            'debug[2]':'TX Power',
+            'debug[3]':'Not Used',
+        },
+        'CRSF_LINK_STATISTICS_DOWN' : {
+            'debug[all]':'CRSF Stats Downlink', 
+            'debug[0]':'Downlink RSSI',
+            'debug[1]':'Downlink Link Quality',
+            'debug[2]':'Downlink SNR',
+            'debug[3]':'Not Used',
+        },
+        'BARO' : {
+            'debug[all]':'Debug Barometer', 
+            'debug[0]':'Baro State',
+            'debug[1]':'Baro Temperature',
+            'debug[2]':'Baro Pressure',
+            'debug[3]':'Baro Pressure Sum',
+        },
+        'GPS_RESCUE_THROTTLE_PID' : {
+            'debug[all]':'GPS Rescue Throttle PID', 
+            'debug[0]':'Throttle P',
+            'debug[1]':'Throttle I',
+            'debug[2]':'Throttle D',
+            'debug[3]':'Z Velocity',
+        },
+        'DYN_IDLE' : {
+            'debug[all]':'Dyn Idle', 
+            'debug[0]':'Motor Range Min Inc',
+            'debug[1]':'Target RPS Change Rate',
+            'debug[2]':'Error',
+            'debug[3]':'Min RPS',
+        },
+        'FF_LIMIT' : {
+            'debug[all]':'FF Limit', 
+            'debug[0]':'FF [Roll]',
+            'debug[1]':'FF [Pitch]',
+            'debug[2]':'FF Final [Roll]',
+            'debug[3]':'Not Used',
+        },
+        'FF_INTERPOLATED' : {
+            'debug[all]':'FF Interpolated', 
+            'debug[0]':'Setpoint Delta Impl [Roll]',
+            'debug[1]':'Boost Amount',
+            'debug[2]':'Boost Amount Clip [Roll]',
+            'debug[3]':'Clip',
+        },
+        'RTH' : {
+            'debug[all]':'RTH',
+            'debug[0]':'Rescue Throttle',
+            'debug[1]':'Rescue Angle',
+            'debug[2]':'Altitude Adjustment',
+            'debug[3]':'Rescue State',
+        },
+    };
+
+    let DEBUG_FRIENDLY_FIELD_NAMES = null;
+
+    FlightLogFieldPresenter.adjustDebugDefsList = function(firmwareType, firmwareVersion) {
+
+        DEBUG_FRIENDLY_FIELD_NAMES = {...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL};
+
+        if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(firmwareVersion, '4.3.0')) {
+            DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                'debug[0]':'Raw FF Derivative [Roll]',
+                'debug[1]':'Cleaned FF Derivative ',
+                'debug[2]':'Cleaned Boost Amount [Roll]',
+                'debug[3]':'Duplicate Marker',
+            };
+        }
+    };
+        
+    FlightLogFieldPresenter.presentFlags = function(flags, flagNames) {
         var 
             printedFlag = false,
             i,
@@ -440,7 +456,7 @@ function FlightLogFieldPresenter() {
                 } else {
                     printedFlag = true;
                 }
-                
+
                 result += flagNames[i];
             }
             
@@ -453,7 +469,7 @@ function FlightLogFieldPresenter() {
         } else {
             return "0"; //No flags set
         }
-    }
+    };
 
     // Only list events that have changed, flag with eirer go ON or OFF.
     FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(flags, lastFlags, flagNames) {
@@ -467,7 +483,7 @@ function FlightLogFieldPresenter() {
         }
         if(!found) {eventState += ' | ACRO';} // Catch the state when all flags are off, which is ACRO of course
         return eventState;
-    }
+    };
     
     FlightLogFieldPresenter.presentEnum = function presentEnum(value, enumNames) {
         if (enumNames[value] === undefined)
@@ -591,10 +607,10 @@ function FlightLogFieldPresenter() {
                 return (value / 100).toFixed(1) + "m";
             
             case 'flightModeFlags':
-                return presentFlags(value, FLIGHT_LOG_FLIGHT_MODE_NAME);
+                return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_MODE_NAME);
                 
             case 'stateFlags':
-                return presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
+                return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
                 
             case 'failsafePhase':
                 return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
@@ -609,7 +625,7 @@ function FlightLogFieldPresenter() {
             case 'debug[1]':
             case 'debug[2]':
             case 'debug[3]':
-            	return FlightLogFieldPresenter.decodeDebugFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
+                return FlightLogFieldPresenter.decodeDebugFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
 
             default:
                 return "";
@@ -617,29 +633,29 @@ function FlightLogFieldPresenter() {
     };
     
     FlightLogFieldPresenter.decodeDebugFieldToFriendly = function(flightLog, fieldName, value, currentFlightMode) {
-		if(flightLog) {
-			var debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
-			switch (debugModeName) {
-				case 'NONE':
-				case 'AIRMODE':
-				case 'VELOCITY':
-					return "";
-				case 'CYCLETIME':
-					switch (fieldName) {
-						case 'debug[1]':
-							return value.toFixed(0) + "%";
-						default:
-							return value.toFixed(0) + "\u03BCS";
-					}				
-				case 'PIDLOOP': 
-					return value.toFixed(0) + "\u03BCS";
-				case 'BATTERY':
-					switch (fieldName) {
-						case 'debug[0]':
-							return value.toFixed(0);
-						default:
-							return (value/10).toFixed(1) + "V"
-					}	
+        if (flightLog) {
+            const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
+            switch (debugModeName) {
+                case 'NONE':
+                case 'AIRMODE':
+                case 'VELOCITY':
+                    return "";
+                case 'CYCLETIME':
+                    switch (fieldName) {
+                        case 'debug[1]':
+                            return value.toFixed(0) + "%";
+                        default:
+                            return value.toFixed(0) + "\u03BCS";
+                    }                
+                case 'PIDLOOP': 
+                    return value.toFixed(0) + "\u03BCS";
+                case 'BATTERY':
+                    switch (fieldName) {
+                        case 'debug[0]':
+                            return value.toFixed(0);
+                        default:
+                            return (value/10).toFixed(1) + "V"
+                    }    
                 case 'GYRO':
                 case 'GYRO_FILTERED':
                 case 'GYRO_SCALED':
@@ -649,10 +665,10 @@ function FlightLogFieldPresenter() {
                 case 'DUAL_GYRO_DIFF':
                 case 'DUAL_GYRO_RAW':
                     return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
-				case 'ACCELEROMETER':
-				    return flightLog.accRawToGs(value).toFixed(2) + "g";
-				case 'MIXER':
-					return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
+                case 'ACCELEROMETER':
+                    return flightLog.accRawToGs(value).toFixed(2) + "g";
+                case 'MIXER':
+                    return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
                 case 'RC_INTERPOLATION':
                     switch (fieldName) {
                         case 'debug[1]': // current RX refresh rate
@@ -676,8 +692,8 @@ function FlightLogFieldPresenter() {
                             return (value / 1000).toFixed(2) + 'ms';
                     }
                     break;
-				case 'DFILTER':
-					return "";
+                case 'DFILTER':
+                    return "";
                 case 'ANGLERATE':
                     return value.toFixed(0) + "deg/s";
                 case 'ESC_SENSOR':
@@ -771,17 +787,17 @@ function FlightLogFieldPresenter() {
                         break;
             }
             return value.toFixed(0);
-		}
-		return "";
-	};
+        }
+        return "";
+    };
         
     FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
         if (debugMode) {
-			if(fieldName.includes('debug')) {
+            if (fieldName.includes('debug')) {
                 var debugModeName = DEBUG_MODE[debugMode];
                 var debugFields;
                 if (debugModeName) {
-				    debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugModeName];
+                    debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugModeName];
                 }
 
                 if (!debugFields) {
@@ -791,9 +807,9 @@ function FlightLogFieldPresenter() {
                     debugFields = DEBUG_FRIENDLY_FIELD_NAMES[DEBUG_MODE[0]];
                 }
 
-				return debugFields[fieldName];
-			}			
-    	}
+                return debugFields[fieldName];
+            }            
+        }
         if (FRIENDLY_FIELD_NAMES[fieldName]) {
             return FRIENDLY_FIELD_NAMES[fieldName];
         }
