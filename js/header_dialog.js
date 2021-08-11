@@ -101,6 +101,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'vbat_sag_compensation'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'gyro_to_use'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dynamic_idle_min_rpm'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'motor_poles'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -771,6 +772,7 @@ function HeaderDialog(dialog, onSave) {
     	renderSelect('baro_hardware'		    ,sysConfig.baro_hardware, BARO_HARDWARE);
     	renderSelect('mag_hardware'		    	,sysConfig.mag_hardware, MAG_HARDWARE);
     	renderSelect('gyro_to_use'		    	,sysConfig.gyro_to_use, GYRO_TO_USE);
+    	setParameter('motor_poles'		    	,sysConfig.motor_poles, 0);
 
 		/* Booleans */
         setCheckbox('gyro_cal_on_first_arm'		,sysConfig.gyro_cal_on_first_arm);
