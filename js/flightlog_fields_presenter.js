@@ -739,7 +739,7 @@ function FlightLogFieldPresenter() {
                         return value.toFixed(0) + "Hz";
                     }
                 case 'DSHOT_RPM_TELEMETRY':
-                    return value.toFixed(0) + "erpm";
+                    return (value * 50 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + "RPM";
                 case 'RPM_FILTER':
                     return value.toFixed(0) + "Hz";
                 case 'D_MIN':
