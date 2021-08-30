@@ -34,8 +34,8 @@ function HeaderDialog(dialog, onSave) {
         {name:'dterm_lpf2_hz'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
         {name:'dterm_notch_hz'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'dterm_notch_cutoff'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
-        {name:'rc_interpolation'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
-        {name:'rc_interpolation_interval'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
+        {name:'rc_interpolation'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'4.2.999'},
+        {name:'rc_interpolation_interval'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'4.2.999'},
         {name:'gyro_sync_denom'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'pid_process_denom'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'unsynced_fast_pwm'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
@@ -66,24 +66,17 @@ function HeaderDialog(dialog, onSave) {
         {name:'itermWindupPointPercent'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
         {name:'pidSumLimit'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
         {name:'pidSumLimitYaw'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
-        {name:'rc_smoothing_type'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'999.9.9'},
-        {name:'feedforward_transition'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+        {name:'rc_smoothing_type'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.4.0', max:'4.2.999'},
         {name:'antiGravityMode'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
-        {name:'rc_smoothing_cutoffs_1'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
-        {name:'rc_smoothing_cutoffs_2'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
-        {name:'rc_smoothing_filter_type_1'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
-        {name:'rc_smoothing_filter_type_1'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
         {name:'rc_smoothing_rx_average'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
         {name:'rc_smoothing_debug_axis'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
         {name:'abs_control_gain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
         {name:'use_integrated_yaw'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
-        {name:'rc_smoothing_auto_factor'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
-        {name:'rc_smoothing_active_cutoffs_1', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
-        {name:'rc_smoothing_active_cutoffs_2', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
-        {name:'rc_interpolation_channels'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'999.9.9'},
+        {name:'rc_interpolation_channels'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.0.0', max:'4.2.999'},
         {name:'gyro_rpm_notch_harmonics'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
         {name:'gyro_rpm_notch_q'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
         {name:'gyro_rpm_notch_min'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+        {name:'rpm_notch_lpf'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.2.0', max:'999.9.9'},
         {name:'dterm_rpm_notch_harmonics'    , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'4.2.999'},
         {name:'dterm_rpm_notch_q'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'4.2.999'},
         {name:'dterm_rpm_notch_min'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'4.2.999'},
@@ -92,7 +85,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'iterm_relax_type'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
         {name:'iterm_relax_cutoff'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
         {name:'dyn_notch_range'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'4.1.7'},
-        {name:'dyn_notch_width_percent'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
+        {name:'dyn_notch_width_percent'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'4.2.999'},
         {name:'dyn_notch_q'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
         {name:'dyn_notch_min_hz'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.1.0', max:'999.9.9'},
         {name:'dyn_notch_max_hz'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.2.0', max:'999.9.9'},
@@ -102,6 +95,21 @@ function HeaderDialog(dialog, onSave) {
         {name:'gyro_to_use'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dynamic_idle_min_rpm'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'motor_poles'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_transition'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.5.0', max:'999.9.9'},
+        {name:'ff_averaging'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_smooth_factor'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_jitter_factor'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_boost'                     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'ff_max_rate_limit'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_mode'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_feedforward_hz'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_setpoint_hz'     , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_auto_factor_setpoint', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_auto_factor_throttle', type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_active_cutoffs_ff',    type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_active_cutoffs_sp',    type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rc_smoothing_active_cutoffs_thr',   type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_notch_count'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -617,15 +625,19 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
 		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
 
-        renderSelect('dyn_notch_range'         ,sysConfig.dyn_notch_range        , DYN_NOTCH_RANGE);
-        setParameter('dyn_notch_width_percent' ,sysConfig.dyn_notch_width_percent, 0);
-        setParameter('dyn_notch_q'             ,sysConfig.dyn_notch_q            , 0);
-        setParameter('dyn_notch_min_hz'        ,sysConfig.dyn_notch_min_hz       , 0);
-        setParameter('dyn_notch_max_hz'        ,sysConfig.dyn_notch_max_hz       , 0);
+        if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+            setParameter('dynNotchCount'           ,sysConfig.dyn_notch_count        , 0);
+        } else {
+            setParameter('dynNotchCount'           ,sysConfig.dyn_notch_width_percent, 0);
+        }
+        setParameter('dynNotchQ'                   ,sysConfig.dyn_notch_q            , 0);
+        setParameter('dynNotchMinHz'               ,sysConfig.dyn_notch_min_hz       , 0);
+        setParameter('dynNotchMaxHz'               ,sysConfig.dyn_notch_max_hz       , 0);
 
-        setParameter('gyro_rpm_notch_harmonics', sysConfig.gyro_rpm_notch_harmonics, 0);
-        setParameter('gyro_rpm_notch_q'        , sysConfig.gyro_rpm_notch_q        , 0);
-        setParameter('gyro_rpm_notch_min'      , sysConfig.gyro_rpm_notch_min      , 0);
+        setParameter('gyro_rpm_notch_harmonics', sysConfig.gyro_rpm_notch_harmonics  , 0);
+        setParameter('gyro_rpm_notch_q'        , sysConfig.gyro_rpm_notch_q          , 0);
+        setParameter('gyro_rpm_notch_min'      , sysConfig.gyro_rpm_notch_min        , 0);
+        setParameter('rpm_notch_lpf'           , sysConfig.rpm_notch_lpf             , 0);
 
         setParameter('dterm_rpm_notch_harmonics', sysConfig.dterm_rpm_notch_harmonics, 0);
         setParameter('dterm_rpm_notch_q'        , sysConfig.dterm_rpm_notch_q        , 0);
@@ -633,35 +645,40 @@ function HeaderDialog(dialog, onSave) {
 
         $('.dshot_bidir_required').toggle(sysConfig.dshot_bidir == 1);
 
-        renderSelect('rc_smoothing_type'          ,sysConfig.rc_smoothing_type, RC_SMOOTHING_TYPE);
-        renderSelect('rc_interpolation'           ,sysConfig.rc_interpolation, RC_INTERPOLATION);
-        setParameter('rc_interpolation_interval'  ,sysConfig.rc_interpolation_interval,0);
-        setParameter('rc_smoothing_cutoffs_1'     ,sysConfig.rc_smoothing_cutoffs[0], 0);
-        setParameter('rc_smoothing_cutoffs_2'     ,sysConfig.rc_smoothing_cutoffs[1], 0);
-        renderSelect('rc_smoothing_filter_type_1' ,sysConfig.rc_smoothing_filter_type[0], RC_SMOOTHING_INPUT_TYPE);
-        renderSelect('rc_smoothing_filter_type_2' ,sysConfig.rc_smoothing_filter_type[1], RC_SMOOTHING_DERIVATIVE_TYPE);
-        setParameter('rc_smoothing_rx_average'    ,sysConfig.rc_smoothing_rx_average, 3);
-        setParameter('rc_smoothing_auto_factor'    ,sysConfig.rc_smoothing_auto_factor, 0);
-        setParameter('rc_smoothing_active_cutoffs_1',sysConfig.rc_smoothing_active_cutoffs[0], 0);
-        setParameter('rc_smoothing_active_cutoffs_2',sysConfig.rc_smoothing_active_cutoffs[1], 0);
-        setParameter('rc_interpolation_channels'  ,sysConfig.rc_interpolation_channels, 0);
-        renderSelect('rc_smoothing_debug_axis'    ,sysConfig.rc_smoothing_filter_type[1], RC_SMOOTHING_DEBUG_AXIS);
+        setParameter('rcSmoothingRxAverage'         ,sysConfig.rc_smoothing_rx_average, 3);
+        renderSelect('rcSmoothingDebugAxis'         ,sysConfig.rc_smoothing_debug_axis, RC_SMOOTHING_DEBUG_AXIS);
 
-        if (sysConfig.rc_smoothing_type === RC_SMOOTHING_TYPE.indexOf('FILTER')) {
-            $('.parameter td[name="rc_interpolation"]').css('display', 'none');
-            $('.parameter td[name="rc_interpolation_interval"]').css('display', 'none');
+        if (activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+            renderSelect('rcSmoothingMode'              ,sysConfig.rc_smoothing_mode, RC_SMOOTHING_MODE);
+            setParameter('rcSmoothingFeedforwardHz'     ,sysConfig.rc_smoothing_feedforward_hz, 0);
+            setParameter('rcSmoothingSetpointHz'        ,sysConfig.rc_smoothing_setpoint_hz, 0);
+            setParameter('rcSmoothingAutoFactorSetpoint',sysConfig.rc_smoothing_auto_factor_setpoint, 0)
+            setParameter('rcSmoothingThrottleHz'        ,sysConfig.rc_smoothing_throttle_hz, 0);
+            setParameter('rcSmoothingAutoFactorThrottle',sysConfig.rc_smoothing_auto_factor_throttle, 0);
+            setParameter('rcSmoothingActiveCutoffsFf'   ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
+            setParameter('rcSmoothingActiveCutoffsSp'   ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1], 0);
+            setParameter('rcSmoothingActiveCutoffsThr'  ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[2], 0);
+        } else if (activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
+            renderSelect('rcSmoothingMode'              ,sysConfig.rc_smoothing_mode, RC_SMOOTHING_TYPE);
+            setParameter('rcSmoothingFeedforwardHz'     ,sysConfig.rc_smoothing_cutoffs[0], 0);
+            setParameter('rcSmoothingSetpointHz'        ,sysConfig.rc_smoothing_cutoffs[1], 0);
+            setParameter('rcSmoothingAutoFactorSetpoint',sysConfig.rc_smoothing_auto_factor_setpoint, 0);
+            setParameter('rcSmoothingThrottleHz'        ,sysConfig.rc_smoothing_cutoffs[1], 0);
+            setParameter('rcSmoothingAutoFactorThrottle',sysConfig.rc_smoothing_auto_factor_setpoint, 0);
+            setParameter('rcSmoothingActiveCutoffsFf'   ,sysConfig.rc_smoothing_active_cutoffs[0], 0);
+            setParameter('rcSmoothingActiveCutoffsSp'   ,sysConfig.rc_smoothing_active_cutoffs[1], 0);
+            setParameter('rcSmoothingActiveCutoffsThr'  ,sysConfig.rc_smoothing_active_cutoffs[1], 0);
         } else {
-            $('.parameter td[name="rc_smoothing_type"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_cutoffs_1"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_cutoffs_2"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_filter_type_1"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_filter_type_2"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_rx_average"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_debug_axis"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_auto_factor"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_active_cutoffs_1"]').css('display', 'none');
-            $('.parameter td[name="rc_smoothing_active_cutoffs_2"]').css('display', 'none');
-        }
+            renderSelect('rcSmoothingMode'              ,"0", 0);
+            setParameter('rcSmoothingFeedforwardHz'     ,"0", 0);
+            setParameter('rcSmoothingSetpointHz'        ,"0", 0);
+            setParameter('rcSmoothingAutoFactorSetpoint',"0", 0);
+            setParameter('rcSmoothingThrottleHz'        ,"0", 0);
+            setParameter('rcSmoothingAutoFactorThrottle',"0", 0);
+            setParameter('rcSmoothingActiveCutoffsFf'   ,"0", 0);
+            setParameter('rcSmoothingActiveCutoffsSp'   ,"0", 0);
+            setParameter('rcSmoothingActiveCutoffsThr'  ,"0", 0);
+       }
 
         // D_MIN and rate_limits
         if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
@@ -693,7 +710,21 @@ function HeaderDialog(dialog, onSave) {
         renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
-        setParameter('feedforward_transition'   ,sysConfig.feedforward_transition,2);
+
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+            renderSelect('feedforwardAveraging'  ,sysConfig.ff_averaging, FF_AVERAGING);
+            setParameter('feedforwardSmoothing'  ,sysConfig.ff_smooth_factor,0);
+            setParameter('feedforwardJitter'     ,sysConfig.ff_jitter_factor,0);
+            setParameter('feedforwardMaxRate'    ,sysConfig.ff_max_rate_limit,0);
+        } else {
+            setParameter('feedforwardAveraging'  ,"0",0);
+            setParameter('feedforwardSmoothing'  ,"0",0);
+            setParameter('feedforwardJitter'     ,"0",0);
+            setParameter('feedforwardMaxRate'    ,"0",0);
+        }
+        setParameter('feedforwardTransition'            ,sysConfig.ff_transition,2);
+        setParameter('feedforwardBoost'         ,sysConfig.ff_boost,0);
+
         setParameter('abs_control_gain'         ,sysConfig.abs_control_gain, 0);
         if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
             setParameterFloat('yawRateAccelLimit', sysConfig.yawRateAccelLimit, 2);
