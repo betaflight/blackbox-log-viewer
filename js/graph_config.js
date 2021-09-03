@@ -389,6 +389,7 @@ GraphConfig.load = function(config) {
                     case 'DUAL_GYRO_COMBINED':
                     case 'DUAL_GYRO_DIFF':
                     case 'DUAL_GYRO_RAW':
+                    case 'DUAL_GYRO_SCALED':
                     case 'NOTCH':
                     case 'AC_CORRECTION':
                     case 'AC_ERROR':
