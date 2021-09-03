@@ -110,6 +110,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'rc_smoothing_active_cutoffs_sp',    type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'rc_smoothing_active_cutoffs_thr',   type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dyn_notch_count'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rpm_filter_fade_range_hz'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -637,6 +638,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('gyro_rpm_notch_harmonics', sysConfig.gyro_rpm_notch_harmonics  , 0);
         setParameter('gyro_rpm_notch_q'        , sysConfig.gyro_rpm_notch_q          , 0);
         setParameter('gyro_rpm_notch_min'      , sysConfig.gyro_rpm_notch_min        , 0);
+        setParameter('rpm_filter_fade_range_hz', sysConfig.rpm_filter_fade_range_hz  , 0); 
         setParameter('rpm_notch_lpf'           , sysConfig.rpm_notch_lpf             , 0);
 
         setParameter('dterm_rpm_notch_harmonics', sysConfig.dterm_rpm_notch_harmonics, 0);

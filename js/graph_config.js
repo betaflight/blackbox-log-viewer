@@ -48,14 +48,14 @@ function GraphConfig(graphConfig) {
                 newGraph = $.extend(
                     // Default values for missing properties:
                     {
-                        height: 1
+                        height: 1,
                     }, 
                     // The old graph
                     graph, 
                     // New fields to replace the old ones:
                     {
-                        fields:[]
-                    }
+                        fields:[],
+                    },
                 ),
                 colorIndex = 0;
             
@@ -536,7 +536,81 @@ GraphConfig.load = function(config) {
                                 return getCurveForMinMaxFieldsZeroOffset(fieldName);
                         }
                         break;
-                }
+                    case 'FF_INTERPOLATED':
+                        switch (fieldName) {
+                            case 'debug[0]': // setpoint Delta
+                            case 'debug[1]': // AccelerationModified
+                            case 'debug[2]': // Acceleration
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Clip or Count
+                                return {
+                                    offset: -10,
+                                    power: 1.0,
+                                    inputRange: 10,
+                                    outputRange: 1.0,
+                                };
+                        }
+                        break;
+                    case 'FEEDFORWARD': // replaces FF_INTERPOLATED in 4.3
+                        switch (fieldName) {
+                            case 'debug[0]': // in 4.3 is interpolated setpoint
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: maxDegreesSecond(gyroScaleMargin),
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // feedforward delta element
+                            case 'debug[2]': // feedforward boost element
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // rcCommand delta
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10000,
+                                    outputRange: 1.0,
+                                };
+                        }
+                        break;
+                    case 'FF_LIMIT':
+                    case 'FEEDFORWARD_LIMIT':
+                        return {
+                            offset: 0,
+                            power: 1.0,
+                            inputRange: 300,
+                            outputRange: 1.0,
+                        };
+                    case 'DYN_IDLE':
+                        switch (fieldName) {
+                            case 'debug[0]': // in 4.3 is dyn idle P
+                            case 'debug[1]': // in 4.3 is dyn idle I
+                            case 'debug[2]': // in 4.3 is dyn idle D
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // in 4.3 and 4.2 is minRPS
+                                return {
+                                    offset: -1000,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                        }
+                        break;
+                 }
             }
             // if not found above then
             // Scale and center the field based on the whole-log observed ranges for that field

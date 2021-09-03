@@ -400,21 +400,21 @@ function FlightLogFieldPresenter() {
             'debug[0]':'Motor Range Min Inc',
             'debug[1]':'Target RPS Change Rate',
             'debug[2]':'Error',
-            'debug[3]':'Min RPS',
+            'debug[3]':'Min RPM',
         },
         'FF_LIMIT' : {
             'debug[all]':'FF Limit', 
-            'debug[0]':'FF [Roll]',
-            'debug[1]':'FF [Pitch]',
-            'debug[2]':'FF Final [Roll]',
+            'debug[0]':'FF input [roll]',
+            'debug[1]':'FF input [pitch]',
+            'debug[2]':'FF limited [roll]',
             'debug[3]':'Not Used',
         },
         'FF_INTERPOLATED' : {
-            'debug[all]':'FF Interpolated', 
-            'debug[0]':'Setpoint Delta Impl [Roll]',
-            'debug[1]':'Boost Amount',
-            'debug[2]':'Boost Amount Clip [Roll]',
-            'debug[3]':'Clip',
+            'debug[all]':'FF Interpolated [roll]', 
+            'debug[0]':'Setpoint Delta Impl [roll]',
+            'debug[1]':'Boost amount [roll]',
+            'debug[2]':'Boost amount, clipped [roll]',
+            'debug[3]':'Clip amount [roll]',
         },
         'RTH' : {
             'debug[all]':'RTH',
@@ -431,16 +431,63 @@ function FlightLogFieldPresenter() {
 
         DEBUG_FRIENDLY_FIELD_NAMES = {...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL};
 
-        if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(firmwareVersion, '4.3.0')) {
-            DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
-                'debug[0]':'Raw FF Derivative [Roll]',
-                'debug[1]':'Cleaned FF Derivative ',
-                'debug[2]':'Cleaned Boost Amount [Roll]',
-                'debug[3]':'Duplicate Marker',
-            };
+        if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
+            if (semver.gte(firmwareVersion, '4.3.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
+                    'debug[all]':'Feedforward [roll]',
+                    'debug[0]':'Setpoint, interpolated [roll]',
+                    'debug[1]':'Delta, smoothed [roll]',
+                    'debug[2]':'Boost, smoothed [roll]',
+                    'debug[3]':'rcCommand Delta [roll]',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD_LIMIT = {
+                    'debug[all]':'Feedforward Limit [roll]',
+                    'debug[0]':'Feedforward input [roll]',
+                    'debug[1]':'Feedforward input [pitch]',
+                    'debug[2]':'Feedforward limited [roll]',
+                    'debug[3]':'Not Used',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.DYN_IDLE = {
+                    'debug[all]':'Dyn Idle',
+                    'debug[0]':'Dyn Idle P [roll]',
+                    'debug[1]':'Dyn Idle I [roll]',
+                    'debug[2]':'Dyn Idle D [roll]',
+                    'debug[3]':'Min RPM',
+                };
+            } else if (semver.gte(firmwareVersion, '4.2.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                    'debug[all]':'Feedforward [roll]',
+                    'debug[0]':'Setpoint Delta [roll]',
+                    'debug[1]':'Acceleration [roll]',
+                    'debug[2]':'Acceleration, clipped [roll]',
+                    'debug[3]':'Duplicate Counter [roll]',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
+                    'debug[all]':'Feedforward Limit [roll]',
+                    'debug[0]':'FF limit input [roll]',
+                    'debug[1]':'FF limit input [pitch]',
+                    'debug[2]':'FF limited [roll]',
+                    'debug[3]':'Not Used',
+                };
+            } else if (semver.gte(firmwareVersion, '4.1.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                    'debug[all]':'Feedforward [roll]',
+                    'debug[0]':'Setpoint Delta [roll]',
+                    'debug[1]':'Boost [roll]',
+                    'debug[2]':'Boost, clipped [roll]',
+                    'debug[3]':'Duplicate Counter [roll]',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
+                    'debug[all]':'Feedforward Limit [roll]',
+                    'debug[0]':'FF limit input [roll]',
+                    'debug[1]':'FF limit input [pitch]',
+                    'debug[2]':'FF limited [roll]',
+                    'debug[3]':'Not Used',
+                };
+            }
         }
     };
-        
+
     FlightLogFieldPresenter.presentFlags = function(flags, flagNames) {
         var 
             printedFlag = false,
@@ -486,8 +533,9 @@ function FlightLogFieldPresenter() {
     };
     
     FlightLogFieldPresenter.presentEnum = function presentEnum(value, enumNames) {
-        if (enumNames[value] === undefined)
+        if (enumNames[value] === undefined) {
             return value;
+        }
         
         return enumNames[value];
     };
@@ -500,8 +548,9 @@ function FlightLogFieldPresenter() {
      * @param value Value of the field
      */
     FlightLogFieldPresenter.decodeFieldToFriendly = function(flightLog, fieldName, value, currentFlightMode) {
-        if (value === undefined)
+        if (value === undefined) {
             return "";
+        }
         
         switch (fieldName) {
             case 'time':
@@ -771,6 +820,13 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + "Hz";
                     }
                     break;
+                case 'DYN_IDLE':
+                    switch (fieldName) {
+                        case 'debug[3]': // minRPS best shown as rpm, since commanded value is rpm
+                            return (value * 6);
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'AC_ERROR':
                     return (value / 10).toFixed(1) + 'deg';
                 case 'AC_CORRECTION':

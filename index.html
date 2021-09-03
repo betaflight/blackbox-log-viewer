@@ -885,7 +885,7 @@
                                     <table id="d_min" class="parameter cf">
                                         <thead>
                                             <tr>
-                                                <th colspan="5">D Min</th>
+                                                <th colspan="2">D Min</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -917,7 +917,7 @@
                                     <table class="parameter cf">
                                         <thead>
                                             <tr>
-                                                <th scope="row" colspan="6">Feedforward</th>
+                                                <th scope="row" colspan="2">Feedforward</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -963,39 +963,31 @@
                                             <tr>
                                                 <td name="ptermSRateWeight" class="bf-only">
                                                     <label>P-Term
-                                                        <br>&nbsp;
-                                                        <br/>&nbsp;</label>
+                                                        <br>&nbsp;</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>
                                                 <td name="abs_control_gain" class="bf-only">
-                                                    <label>
-                                                        Absolute
-                                                        <br/>Control
-                                                        <br/>Gain
-                                                    </label>
+                                                    <label>Absolute Control
+                                                    <br/>&nbsp;</label>
                                                     <input type="number" step="1" min="0" max="999" />
                                                 </td>
                                                 <td name="setpointRelaxRatio" class="bf-only">
                                                     <label>Setpoint Relax
-                                                        <br>Ratio
-                                                        <br/>&nbsp;</label>
+                                                        <br>Ratio</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>
                                                 <td name="dtermSetpointWeight" class="bf-only">
-                                                    <label>D-Term Setpoint
-                                                        <br>Weight
-                                                        <br/>&nbsp;</label>
+                                                    <label>D Setpoint
+                                                        <br>Weight</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>
                                                 <td name="rateAccelLimit" class="bf-only">
-                                                    <label>Roll/Pitch Rate
-                                                        <br>Acceleration
+                                                    <label>R/P Accel
                                                         <br>Limit</label>
                                                     <input type="number" step="1" min="0" max="999" />
                                                 </td>
                                                 <td name="yawRateAccelLimit" class="bf-only">
-                                                    <label>Yaw Rate
-                                                        <br>Acceleration
+                                                    <label>Yaw Accel
                                                         <br>Limit</label>
                                                     <input type="number" step="1" min="0" max="999" />
                                                 </td>
@@ -1139,10 +1131,10 @@
                                                     </label>
                                                 </td>
                                                 <td>
-                                                    <label>PID controller active at min-throttle</label>
+                                                    <label>PIDs active at min-throttle</label>
                                                 </td>
                                                 <td>
-                                                    <span>Stabilisation at zero throttle</span>
+                                                    <span>Zero throttle stability</span>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -1155,10 +1147,10 @@
                                                     </label>
                                                 </td>
                                                 <td>
-                                                    <label>Use integrated yaw</label>
+                                                    <label>Integrated yaw</label>
                                                 </td>
                                                 <td>
-                                                    <span>Changes the yaw PID behaviour</span>
+                                                    <span>Adds roll to yaw</span>
                                                 </td>
                                             </tr>
 
@@ -1173,11 +1165,6 @@
                                 <div class="spacer_box">
 
                                     <table class="parameter cf">
-                                        <thead>
-                                               <tr>
-                                                   <th colspan="4">Gyro Hardware Lowpass Filters</th>
-                                               </tr>
-                                           </thead>
                                         <tbody>
                                             <tr>
                                                 <td name='gyro_hardware_lpf' colspan="2">
@@ -1199,69 +1186,92 @@
                                     <table class="parameter cf">
                                         <thead>
                                             <tr>
-                                                <th colspan="4">Gyro Software Filters</th>
+                                                <th colspan="5">Gyro Software Filters</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="2">Lowpass filters</th>
+                                               </tr>
+                                           </thead>
+
                                             <tr>
-                                                <td name='gyro_soft_dyn_type' colspan="2">
-                                                    <label>Lowpass Dyn Filter<br>Type 1</label>
+                                                <td name='gyro_soft_dyn_type'>
+                                                    <label>Dyn 1<br>Type</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
-                                            </tr>
 
-                                            <tr>
                                                 <td name="gyro_soft_dyn_min_hz">
-                                                    <label>Lowpass Dyn Filter<br>Min Cutoff 1 (Hz)</label>
-                                                    <input type="number" step="0.01" min="0" max="999.00" />
-                                                </td>
-                                                <td name="gyro_soft_dyn_max_hz">
-                                                    <label>Lowpass Dyn Filter<br>Max Cutoff 1 (Hz)</label>
+                                                    <label>Dyn 1 Min<br>
+                                                        Cutoff Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
 
-                                                <td name='gyro_soft_type'>
-                                                    <label>Lowpass Filter<br>Type 1</label>
-                                                    <select>
-                                                        <!-- list generated here -->
-                                                    </select>
-                                                </td>
-                                                <td name="gyro_lowpass_hz">
-                                                    <label>Lowpass Filter<br>Cutoff 1 (Hz)</label>
-                                                    <input type="number" step="0.01" min="0" max="999.00" />
-                                                </td>
-                                                <td name='gyro_soft2_type'>
-                                                    <label>Lowpass Filter<br>Type 2</label>
-                                                    <select>
-                                                        <!-- list generated here -->
-                                                    </select>
-                                                </td>
-                                                <td name="gyro_lowpass2_hz">
-                                                    <label>Lowpass Filter<br>Cutoff 2 (Hz)</label>
+                                                <td name="gyro_soft_dyn_max_hz">
+                                                    <label>Dyn 1 Max
+                                                        <br>Cutoff Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                             </tr>
+
                                             <tr>
+                                                <td name='gyro_soft_type'>
+                                                    <label>Static 1
+                                                        <br>Filter type</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+
+                                                <td name="gyro_lowpass_hz">
+                                                    <label>Static 1
+                                                        <br>Cutoff 1 Hz</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+
+                                                <td name='gyro_soft2_type'>
+                                                    <label>Static 2
+                                                        <br> Filter type</label>
+                                                    <select>
+                                                        <!-- list generated here -->
+                                                    </select>
+                                                </td>
+
+                                                <td name="gyro_lowpass2_hz">
+                                                    <label>Static 2
+                                                        <br>Cutoff Hz</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="2">Static notch filters</th>
+                                               </tr>
+                                           </thead>
                                                 <td name='gyro_notch_hz'>
                                                     <label>Notch 1
-                                                        <br>(Hz)</label>
+                                                        <br>Center Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name="gyro_notch_cutoff">
-                                                    <label>Notch
-                                                        <br>Cutoff 1 (Hz)</label>
+                                                    <label>Notch 1 
+                                                        <br>Cutoff Hz</label>
                                                     <input type="number" step="0.1" min="0" max="999.00" />
                                                 </td>
                                                 <td name='gyro_notch_hz_2'>
                                                     <label>Notch 2
-                                                        <br>(Hz)</label>
+                                                        <br>Center Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name="gyro_notch_cutoff_2">
-                                                    <label>Notch
-                                                        <br>Cutoff 2 (Hz)</label>
+                                                    <label>Notch 2
+                                                        <br>Cutoff Hz</label>
                                                     <input type="number" step="0.1" min="0" max="999.00" />
                                                 </td>
                                             </tr>
@@ -1269,7 +1279,7 @@
                                             <tr class="dyn_filter_required">
                                             <thead>
                                                <tr>
-                                                <th scope="row" colspan="4">Dynamic notch filters</th>
+                                                <th scope="row" colspan="2">Dynamic notch filters</th>
                                                </tr>
                                            </thead>
                                                 <td name='dynNotchCount'>
@@ -1291,24 +1301,29 @@
                                             </tr>
 
                                             <tr class='dshot_bidir_required'>
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="2">RPM filters</th>
+                                               </tr>
+                                           </thead>
                                                 <td name='gyro_rpm_notch_harmonics'>
-                                                    <label>RPM Notch
-                                                           <br>Harmonics</label>
+                                                    <label>Harmonics</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name="gyro_rpm_notch_q">
-                                                    <label>RPM Notch
-                                                        <br>Q</label>
+                                                    <label>Q</label>
                                                     <input type="number" step="0.1" min="0" max="999.00" />
                                                 </td>
                                                 <td name='gyro_rpm_notch_min'>
-                                                    <label>RPM Notch
-                                                        <br>Min(Hz)</label>
+                                                    <label>Min(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                                <td name='rpm_filter_fade_range_hz'>
+                                                    <label>FadeRng</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name='rpm_notch_lpf'>
-                                                    <label>RPM Notch
-                                                        <br>Lpf</label>
+                                                    <label>Lpf</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                             </tr>
@@ -1318,52 +1333,55 @@
                                     <table class="parameter cf">
                                         <thead>
                                             <tr>
-                                                <th colspan="4">D-Term Filters</th>
+                                                <th colspan="5">D-Term Filters</th>
                                             </tr>
                                         </thead>
                                         <tbody>
 
                                             <tr>
-                                                <td name='dterm_dyn_type' colspan="2">
-                                                    <label>Lowpass Dyn Filter<br>Type 1</label>
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="2">Lowpass filters</th>
+                                               </tr>
+                                           </thead>
+
+                                                <td name='dterm_dyn_type'>
+                                                    <label>Dyn 1<br>Type</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
-                                            </tr>
-
-                                            <tr>
                                                 <td name="dterm_lpf_dyn_min_hz">
-                                                    <label>Lowpass Dyn Filter<br>Min Cutoff 1 (Hz)</label>
+                                                    <label>Dyn 1 Min<br>Cutoff Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name="dterm_lpf_dyn_max_hz">
-                                                    <label>Lowpass Dyn Filter<br>Max Cutoff 1 (Hz)</label>
+                                                    <label>Dyn 1 Max<br>Cutoff Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
 
                                                 <td name='dterm_filter_type'>
-                                                    <label>Lowpass Filter
-                                                        <br>Type 1</label>
+                                                    <label>Static 1
+                                                        <br>Type</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
                                                 <td name="dterm_lpf_hz">
-                                                    <label>Lowpass Filter
-                                                        <br>Cutoff 1 (Hz)</label>
+                                                    <label>Static 1
+                                                        <br>Cutoff Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name='dterm_filter2_type'>
-                                                    <label>Lowpass Filter
-                                                        <br>Type 2</label>
+                                                    <label>Static 2
+                                                        <br>Type</label>
                                                     <select>
                                                         <!-- list generated here -->
                                                     </select>
                                                 </td>
                                                 <td name="dterm_lpf2_hz">
-                                                    <label>Lowpass Filter
-                                                        <br>Cutoff 2 (Hz)</label>
+                                                    <label>Static 2
+                                                        <br>Cutoff Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name="dterm_average_count" class="bf-only">
@@ -1371,33 +1389,41 @@
                                                     <input type="number" step="1" min="0" max="12" />
                                                 </td>
                                             </tr>
+
                                             <tr>
-                                                <td name='dterm_notch_hz' colspan="2">
-                                                    <label>Notch
-                                                        <br>(Hz)</label>
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="2">Static notch filter</th>
+                                               </tr>
+                                           </thead>
+
+                                                <td name="dterm_notch_hz">
+                                                    <label>Center Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
-                                                <td name="dterm_notch_cutoff" colspan="2">
-                                                    <label>Notch Cutoff
-                                                        <br>(Hz)</label>
+                                                <td name="dterm_notch_cutoff">
+                                                    <label>Cutoff Hz</label>
                                                     <input type="number" step="0.1" min="0" max="999.00" />
                                                 </td>
                                             </tr>
 
                                             <tr class='dshot_bidir_required'>
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="2">D_Term RPM filters</th>
+                                               </tr>
+                                           </thead>
+
                                                 <td name='dterm_rpm_notch_harmonics'>
-                                                    <label>RPM Notch
-                                                           <br>Harmonics</label>
+                                                    <label>Harmonics</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                                 <td name="dterm_rpm_notch_q">
-                                                    <label>RPM Notch
-                                                        <br>Q</label>
+                                                    <label>Q</label>
                                                     <input type="number" step="0.1" min="0" max="999.00" />
                                                 </td>
                                                 <td name='dterm_rpm_notch_min'>
-                                                    <label>RPM Notch
-                                                        <br>Min(Hz)</label>
+                                                    <label>Min Hz</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                             </tr>
@@ -1407,7 +1433,7 @@
                                     <table class="parameter cf">
                                         <thead>
                                             <tr>
-                                                <th colspan="4">Other Filters</th>
+                                                <th colspan="1">Other Filters</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1602,7 +1628,7 @@
                                         <table class="parameter cf">
                                             <tbody>
                                                 <tr>
-                                                    <th colspan="3">ROLL</th>
+                                                    <th colspan="1">Roll rates</th>
                                                 </tr>
                                                 <tr>
                                                     <td name="rcRollRate" class="no-inav">
@@ -1619,7 +1645,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th colspan="3">PITCH</th>
+                                                    <th colspan="1">Pitch rates</th>
                                                 </tr>
                                                 <tr>
                                                     <td name="rcPitchRate" class="no-inav">
@@ -1636,7 +1662,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th colspan="3">YAW</th>
+                                                    <th colspan="1">Yaw rates</th>
                                                 </tr>
                                                 <tr>
                                                     <td name="rcYawRate" class="no-inav">
@@ -1678,7 +1704,7 @@
                                         <table id="rate_limits" class="parameter cf">
                                             <body>
                                                 <tr>
-                                                    <th colspan="5">Rate Limits</th>
+                                                    <th colspan="1">Rate Limits</th>
                                                 </tr>
                                                 <tr>
                                                     <td name="rate_limits_roll">
@@ -1701,7 +1727,7 @@
 
                                             <body>
                                                 <tr>
-                                                    <th colspan="5">Deadband</th>
+                                                    <th colspan="1">Deadband</th>
                                                 </tr>
                                                 <tr>
                                                     <td name="deadband">
@@ -1719,7 +1745,7 @@
                                         <table class="parameter cf">
                                             <tbody>
                                                 <tr>
-                                                    <th colspan="5">RC Smoothing</th>
+                                                    <th colspan="3">RC SMOOTHING</th>
                                                 </tr>
                                                 <tr>
                                                     <td name='rcSmoothingMode'>
@@ -1749,30 +1775,36 @@
                                                         <input type="number" step="1" min="0" max="250" />
                                                     </td>
                                                 </tr>
+                                                    <tr>
+                                                        <th scope="row" colspan="1">Manual Cutoffs</th>
+                                                    </tr>
                                                 <tr>
                                                     <td name="rcSmoothingSetpointHz">
-                                                        <label>Setpoint cutoff Hz</label>
+                                                        <label>Setpoint Hz</label>
                                                         <input type="number" step="1" min="0" max="255" />
                                                     </td>
                                                     <td name="rcSmoothingFeedforwardHz">
-                                                        <label>Feedforward cutoff Hz</label>
+                                                        <label>Feedforward Hz</label>
                                                         <input type="number" step="1" min="0" max="255" />
                                                     </td>
                                                     <td name="rcSmoothingThrottleHz">
-                                                        <label>Throttle cutoff Hz</label>
+                                                        <label>Throttle Hz</label>
                                                         <input type="number" step="1" min="0" max="255" />
                                                 </tr>
+                                                    <tr>
+                                                        <th scope="row" colspan="1">Active Values</th>
+                                                    </tr>
                                                 <tr>
                                                     <td name='rcSmoothingActiveCutoffsSp'>
-                                                        <label>Active Cutoff Setpoint</label>
+                                                        <label>Setpoint</label>
                                                         <input type="number" step="1" min="0"/>
                                                     </td>
                                                     <td name='rcSmoothingActiveCutoffsFf'>
-                                                        <label>Active Cutoff FF</label>
+                                                        <label>Feedforward</label>
                                                         <input type="number" step="1" min="0"/>
                                                     </td>
                                                     <td name='rcSmoothingActiveCutoffsThr'>
-                                                        <label>Active Cutoff Throttle</label>
+                                                        <label>Throttle</label>
                                                         <input type="number" step="1" min="0"/>
                                                     </td>
                                                 </tr>
@@ -1801,7 +1833,7 @@
                                         <table class="parameter cf">
                                             <thead>
                                                 <tr>
-                                                    <th colspan="5">Motors</th>
+                                                    <th colspan="3">MOTORS</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
