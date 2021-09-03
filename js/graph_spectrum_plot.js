@@ -274,12 +274,12 @@ GraphSpectrumPlot._drawPidErrorVsSetpointGraph = function(canvasCtx) {
 
 GraphSpectrumPlot._drawPidErrorVsSetpointGraphProcessData = function() {
 
-    const totalDrawMaxSetpoint = Math.floor((this._fftData.fftOutput.length + (MAX_SETPOINT_DEFAULT - 1)) / MAX_SETPOINT_DEFAULT) * MAX_SETPOINT_DEFAULT;
-    const currentDrawMaxSetpoint = MAX_SETPOINT_DEFAULT + ((totalDrawMaxSetpoint - MAX_SETPOINT_DEFAULT) / (ZOOM_X_MAX - 1)) * (this._zoomX - 1);
+    const totalDrawMaxSetpoint = Math.trunc((this._fftData.fftOutput.length + (MAX_SETPOINT_DEFAULT - 1)) / MAX_SETPOINT_DEFAULT) * MAX_SETPOINT_DEFAULT;
+    const currentDrawMaxSetpoint = MAX_SETPOINT_DEFAULT + Math.trunc((totalDrawMaxSetpoint - MAX_SETPOINT_DEFAULT) / (ZOOM_X_MAX - 1)) * (this._zoomX - 1);
     const currentDataMaxSetpoint = Math.min(currentDrawMaxSetpoint, this._fftData.fftOutput.length - 1);
     const pidErrorArray = this._fftData.fftOutput.slice(0, currentDataMaxSetpoint + 1);
     const maxPidError = Math.max(...pidErrorArray);
-    const currentDrawMaxPidError = Math.floor((maxPidError / PID_ERROR_VERTICAL_CHUNK) + 1) * PID_ERROR_VERTICAL_CHUNK;
+    const currentDrawMaxPidError = Math.trunc((maxPidError / PID_ERROR_VERTICAL_CHUNK) + 1) * PID_ERROR_VERTICAL_CHUNK;
 
     return {
         currentDataMaxSetpoint,
