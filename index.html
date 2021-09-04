@@ -915,17 +915,55 @@
                                     </table>
 
                                     <table class="parameter cf">
+                                        <thead>
+                                            <tr>
+                                                <th scope="row" colspan="6">Feedforward</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td name="feedforwardTransition" class="bf-only">
+                                                    <label>Transition
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0.01" min="0" max="999" />
+                                                </td>
+                                                <td name="feedforwardAveraging" class="bf-only">
+                                                    <label>Averaging
+                                                        <br/>&nbsp;</label>
+                                                    <select>
+                                                        <!~~ list generated here ~~>
+                                                    </select>
+                                                </td>
+                                                <td name="feedforwardSmoothing" class="bf-only">
+                                                    <label>Smoothing
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                                <td name="feedforwardJitter" class="bf-only">
+                                                    <label>Jitter
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                                <td name="feedforwardBoost" class="bf-only">
+                                                    <label>Boost
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                                <td name="feedforwardMaxRate" class="bf-only">
+                                                    <label>MaxRate
+                                                        <br/>&nbsp;</label>
+                                                    <input type="number" step="0" min="0" max="100" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="parameter cf">
+                                        <caption>Misc</caption>
                                         <tbody>
                                             <tr>
                                                 <td name="ptermSRateWeight" class="bf-only">
                                                     <label>P-Term
                                                         <br>&nbsp;
-                                                        <br/>&nbsp;</label>
-                                                    <input type="number" step="0.01" min="0" max="999" />
-                                                </td>
-                                                <td name="feedforward_transition" class="bf-only">
-                                                    <label>Feedforward
-                                                        <br>Transition
                                                         <br/>&nbsp;</label>
                                                     <input type="number" step="0.01" min="0" max="999" />
                                                 </td>
@@ -1229,32 +1267,26 @@
                                             </tr>
 
                                             <tr class="dyn_filter_required">
-                                                <td name='dyn_notch_range'>
-                                                    <label>Dyn Notch
-                                                        <br>Range</label>
-                                                    <select>
-                                                        <!-- list generated here -->
-                                                    </select>
+                                            <thead>
+                                               <tr>
+                                                <th scope="row" colspan="4">Dynamic notch filters</th>
+                                               </tr>
+                                           </thead>
+                                                <td name='dynNotchCount'>
+                                                    <label>Count/Width</label>
+                                                    <input type="number" step="1" min="0" max="10" />
                                                 </td>
-                                                <td name="dyn_notch_width_percent">
-                                                    <label>Dyn Notch
-                                                        <br>Width (percent)</label>
-                                                    <input type="number" step="0.1" min="0" max="999.00" />
+                                                <td name="dynNotchQ">
+                                                    <label>Q factor</label>
+                                                    <input type="number" step="1" min="0" max="999.00" />
                                                 </td>
-                                                <td name='dyn_notch_q'>
-                                                    <label>Dyn Notch
-                                                        <br>Q</label>
-                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                <td name="dynNotchMinHz">
+                                                    <label>Min (Hz)</label>
+                                                    <input type="number" step="1" min="0" max="999.00" />
                                                 </td>
-                                                <td name="dyn_notch_min_hz">
-                                                    <label>Dyn Notch
-                                                        <br>Min (Hz)</label>
-                                                    <input type="number" step="0.1" min="0" max="999.00" />
-                                                </td>
-                                                <td name="dyn_notch_max_hz">
-                                                    <label>Dyn Notch
-                                                        <br>Max (Hz)</label>
-                                                    <input type="number" step="0.1" min="0" max="999.00" />
+                                                <td name="dynNotchMaxHz">
+                                                    <label>>Max (Hz)</label>
+                                                    <input type="number" step="1" min="0" max="999.00" />
                                                 </td>
                                             </tr>
 
@@ -1272,6 +1304,11 @@
                                                 <td name='gyro_rpm_notch_min'>
                                                     <label>RPM Notch
                                                         <br>Min(Hz)</label>
+                                                    <input type="number" step="0.01" min="0" max="999.00" />
+                                                </td>
+                                                <td name='rpm_notch_lpf'>
+                                                    <label>RPM Notch
+                                                        <br>Lpf</label>
                                                     <input type="number" step="0.01" min="0" max="999.00" />
                                                 </td>
                                             </tr>
@@ -1685,73 +1722,58 @@
                                                     <th colspan="5">RC Smoothing</th>
                                                 </tr>
                                                 <tr>
-                                                    <td name='rc_smoothing_type'>
-                                                        <label>Type</label>
+                                                    <td name='rcSmoothingMode'>
+                                                        <label>On/Off</label>
                                                         <select>
                                                             <!-- list generated here -->
                                                         </select>
                                                     </td>
-                                                    <td name='rc_interpolation'>
-                                                        <label>Interpolation</label>
-                                                        <select>
-                                                            <!-- list generated here -->
-                                                        </select>
-                                                    </td>
-                                                    <td name="rc_interpolation_interval">
-                                                        <label>Interval (ms)</label>
-                                                        <input type="number" step="0.01" min="0" max="999.00" />
-                                                    </td>
-                                                    <td name="rc_smoothing_cutoffs_1">
-                                                        <label>Input Hz</label>
-                                                        <input type="number" step="1" min="0" max="255" />
-                                                    </td>
-                                                    <td name="rc_smoothing_cutoffs_2">
-                                                        <label>Derivative Hz</label>
-                                                        <input type="number" step="1" min="0" max="255" />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td name="rc_smoothing_rx_average">
+                                                    <td name="rcSmoothingRxAverage">
                                                         <label>RX Average (ms)</label>
                                                         <input type="number" step="0.1" min="0"/>
                                                     </td>
-                                                    <td name='rc_smoothing_filter_type_1'>
-                                                        <label>Input Type</label>
-                                                        <select>
-                                                            <!-- list generated here -->
-                                                        </select>
-                                                    </td>
-                                                    <td name='rc_smoothing_filter_type_2'>
-                                                        <label>Derivative Type</label>
-                                                        <select>
-                                                            <!-- list generated here -->
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td name='rc_smoothing_auto_factor'>
-                                                        <label>Auto factor</label>
-                                                        <input type="number" step="1" min="0"/>
-                                                    </td>
-                                                    <td name='rc_smoothing_active_cutoffs_1'>
-                                                        <label>Active Cutoff 1</label>
-                                                        <input type="number" step="1" min="0"/>
-                                                    </td>
-                                                    <td name='rc_smoothing_active_cutoffs_2'>
-                                                        <label>Active Cutoff 2</label>
-                                                        <input type="number" step="1" min="0"/>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td name="rc_interpolation_channels">
-                                                        <label>Channels</label>
-                                                        <input type="number" step="1" min="0"/>
-                                                    </td>
-                                                    <td name='rc_smoothing_debug_axis'>
+                                                    <td name='rcSmoothingDebugAxis'>
                                                         <label>Debug Axis</label>
                                                         <select>
                                                             <!-- list generated here -->
                                                         </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" name='rcSmoothingAutoFactorSetpoint'>
+                                                        <label>Setpoint auto fact</label>
+                                                        <input type="number" step="1" min="0" max="250" />
+                                                    </td>
+                                                    <td name="rcSmoothingAutoFactorThrottle">
+                                                        <label>Throttle auto fact</label>
+                                                        <input type="number" step="1" min="0" max="250" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td name="rcSmoothingSetpointHz">
+                                                        <label>Setpoint cutoff Hz</label>
+                                                        <input type="number" step="1" min="0" max="255" />
+                                                    </td>
+                                                    <td name="rcSmoothingFeedforwardHz">
+                                                        <label>Feedforward cutoff Hz</label>
+                                                        <input type="number" step="1" min="0" max="255" />
+                                                    </td>
+                                                    <td name="rcSmoothingThrottleHz">
+                                                        <label>Throttle cutoff Hz</label>
+                                                        <input type="number" step="1" min="0" max="255" />
+                                                </tr>
+                                                <tr>
+                                                    <td name='rcSmoothingActiveCutoffsSp'>
+                                                        <label>Active Cutoff Setpoint</label>
+                                                        <input type="number" step="1" min="0"/>
+                                                    </td>
+                                                    <td name='rcSmoothingActiveCutoffsFf'>
+                                                        <label>Active Cutoff FF</label>
+                                                        <input type="number" step="1" min="0"/>
+                                                    </td>
+                                                    <td name='rcSmoothingActiveCutoffsThr'>
+                                                        <label>Active Cutoff Throttle</label>
+                                                        <input type="number" step="1" min="0"/>
                                                     </td>
                                                 </tr>
                                             </tbody>
