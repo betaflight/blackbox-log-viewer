@@ -195,8 +195,9 @@ var FlightLogParser = function(logData) {
             deviceUID: null
         },
 
-        // These are now part of the blackbox log header, but they are in addition to the standard logger.
-        // each name should match a field in blackbox.c of the current firmware
+        // Blackbox log header parameter names.
+        // each name should exist in the blackbox log of the current firmware, or
+        // be an older name which is translated into a current name in the table below
 
         defaultSysConfigExtension = {
             abs_control_gain:null,                  // Aboslute control gain
@@ -252,6 +253,7 @@ var FlightLogParser = function(logData) {
             gyro_rpm_notch_q:null,                  // Value of Q in the gyro rpm filter
             gyro_rpm_notch_min:null,                // Min Hz for the gyro rpm filter
             rpm_notch_lpf:null,                     // Cutoff for smoothing rpm filter data
+            rpm_filter_fade_range_hz:null,          // RPM filter fade range in hz above the min hz
             dterm_rpm_notch_harmonics:null,         // Number of Harmonics in the dterm rpm filter
             dterm_rpm_notch_q:null,                 // Value of Q in the dterm rpm filter
             dterm_rpm_notch_min:null,               // Min Hz for the dterm rpm filter
@@ -326,8 +328,8 @@ var FlightLogParser = function(logData) {
         },
 
         // Translation of the field values name to the sysConfig var where it must be stored
-        // on the left are field names from older versions of blackbox.c
-        // on the right are names from the list above
+        // on the left are field names from the latest versions of blackbox.c
+        // on the right are older field names that must exist in the list above
 
         translationValues = {
             acc_limit_yaw             : "yawRateAccelLimit",
@@ -373,7 +375,11 @@ var FlightLogParser = function(logData) {
             feedforward_transition    : "ff_transition",
             feedforward_weight        : "ff_weight",
             rc_smoothing_auto_factor  : "rc_smoothing_auto_factor_setpoint",
-            rc_smoothing_type         : "rc_smoothing_mode"
+            rc_smoothing_type         : "rc_smoothing_mode",
+            rpm_filter_harmonics      : "gyro_rpm_notch_harmonics",
+            rpm_filter_q              : "gyro_rpm_notch_q",
+            rpm_filter_min_hz         : "gyro_rpm_notch_min",
+            rpm_filter_lpf_hz         : "rpm_notch_lpf"
         },
 
         frameTypes,
@@ -641,6 +647,7 @@ var FlightLogParser = function(logData) {
             case "gyro_rpm_notch_q":
             case "gyro_rpm_notch_min":
             case "rpm_notch_lpf":
+            case "rpm_filter_fade_range_hz":
             case "dterm_rpm_notch_harmonics":
             case "dterm_rpm_notch_q":
             case "dterm_rpm_notch_min":

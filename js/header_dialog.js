@@ -110,6 +110,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'rc_smoothing_active_cutoffs_sp',    type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'rc_smoothing_active_cutoffs_thr',   type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dyn_notch_count'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'rpm_filter_fade_range_hz'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'}
     ];
 
 	function isParameterValid(name) {
@@ -626,22 +627,26 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
 
         if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
-            setParameter('dynNotchCount'           ,sysConfig.dyn_notch_count        , 0);
+            setParameter('dynNotchCount'        ,sysConfig.dyn_notch_count,0);
         } else {
-            setParameter('dynNotchCount'           ,sysConfig.dyn_notch_width_percent, 0);
+            setParameter('dynNotchCount'        ,sysConfig.dyn_notch_width_percent,0);
         }
-        setParameter('dynNotchQ'                   ,sysConfig.dyn_notch_q            , 0);
-        setParameter('dynNotchMinHz'               ,sysConfig.dyn_notch_min_hz       , 0);
-        setParameter('dynNotchMaxHz'               ,sysConfig.dyn_notch_max_hz       , 0);
+        setParameter('dynNotchQ'                ,sysConfig.dyn_notch_q,0);
+        setParameter('dynNotchMinHz'            ,sysConfig.dyn_notch_min_hz,0);
+        setParameter('dynNotchMaxHz'            ,sysConfig.dyn_notch_max_hz, 0);
 
-        setParameter('gyro_rpm_notch_harmonics', sysConfig.gyro_rpm_notch_harmonics  , 0);
-        setParameter('gyro_rpm_notch_q'        , sysConfig.gyro_rpm_notch_q          , 0);
-        setParameter('gyro_rpm_notch_min'      , sysConfig.gyro_rpm_notch_min        , 0);
-        setParameter('rpm_notch_lpf'           , sysConfig.rpm_notch_lpf             , 0);
-
-        setParameter('dterm_rpm_notch_harmonics', sysConfig.dterm_rpm_notch_harmonics, 0);
-        setParameter('dterm_rpm_notch_q'        , sysConfig.dterm_rpm_notch_q        , 0);
-        setParameter('dterm_rpm_notch_min'      , sysConfig.dterm_rpm_notch_min      , 0);
+        setParameter('gyro_rpm_notch_harmonics' ,sysConfig.gyro_rpm_notch_harmonics,0);
+        setParameter('gyro_rpm_notch_q'         ,sysConfig.gyro_rpm_notch_q,0);
+        setParameter('gyro_rpm_notch_min'       ,sysConfig.gyro_rpm_notch_min,0);
+        setParameter('rpm_notch_lpf'            ,sysConfig.rpm_notch_lpf,0);
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+            setParameter('rpm_filter_fade_range_hz' ,sysConfig.rpm_filter_fade_range_hz ,0);
+        } else {
+            setParameter('rpm_filter_fade_range_hz'  ,"0",0);
+        }
+        setParameter('dterm_rpm_notch_harmonics',sysConfig.dterm_rpm_notch_harmonics,0);
+        setParameter('dterm_rpm_notch_q'        ,sysConfig.dterm_rpm_notch_q,0);
+        setParameter('dterm_rpm_notch_min'      ,sysConfig.dterm_rpm_notch_min,0);
 
         $('.dshot_bidir_required').toggle(sysConfig.dshot_bidir == 1);
 
