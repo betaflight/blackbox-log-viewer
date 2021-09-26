@@ -195,8 +195,9 @@ var FlightLogParser = function(logData) {
             deviceUID: null
         },
 
-        // These are now part of the blackbox log header, but they are in addition to the standard logger.
-        // each name should match a field in blackbox.c of the current firmware
+        // Blackbox log header parameter names.
+        // each name should exist in the blackbox log of the current firmware, or
+        // be an older name which is translated into a current name in the table below
 
         defaultSysConfigExtension = {
             abs_control_gain:null,                  // Aboslute control gain
@@ -326,8 +327,8 @@ var FlightLogParser = function(logData) {
         },
 
         // Translation of the field values name to the sysConfig var where it must be stored
-        // on the left are field names from older versions of blackbox.c
-        // on the right are names from the list above
+        // on the left are field names from the latest versions of blackbox.c
+        // on the right are older field names that must exist in the list above
 
         translationValues = {
             acc_limit_yaw             : "yawRateAccelLimit",
@@ -340,6 +341,11 @@ var FlightLogParser = function(logData) {
             dterm_lowpass_hz          : "dterm_lpf_hz",
             dterm_lowpass_dyn_hz      : "dterm_lpf_dyn_hz",
             dterm_lowpass2_hz         : "dterm_lpf2_hz",
+            dterm_lpf1_type           : "dterm_filter_type",
+            dterm_lpf1_static_hz      : "dterm_lpf_hz",
+            dterm_lpf1_dyn_hz         : "dterm_lpf_dyn_hz",
+            dterm_lpf2_type           : "dterm_filter2_type",
+            dterm_lpf2_static_hz      : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",
             digital_idle_value        : "digitalIdleOffset",
             dshot_idle_value          : "digitalIdleOffset",
@@ -347,6 +353,11 @@ var FlightLogParser = function(logData) {
             gyro_lowpass              : "gyro_lowpass_hz",
             gyro_lowpass_type         : "gyro_soft_type",
             gyro_lowpass2_type        : "gyro_soft2_type",
+            gyro_lpf1_type            : "gyro_soft_type",
+            gyro_lpf1_static_hz       : "gyro_lowpass_hz",
+            gyro_lpf1_dyn_hz          : "gyro_lowpass_dyn_hz",
+            gyro_lpf2_type            : "gyro_soft2_type",
+            gyro_lpf2_static_hz       : "gyro_lowpass2_hz",
             "gyro.scale"              : "gyro_scale",
             iterm_windup              : "itermWindupPointPercent",
             motor_pwm_protocol        : "fast_pwm_protocol",
