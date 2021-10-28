@@ -521,6 +521,11 @@ function HeaderDialog(dialog, onSave) {
 		}
 
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
+    	
+        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
+            $('.parameter td[name="pidController"]').css('display', 'none');
+        }
+
 
         // Populate the ROLL Pid Faceplate
         populatePID('rollPID'					, sysConfig.rollPID);
@@ -537,8 +542,11 @@ function HeaderDialog(dialog, onSave) {
             populatePID('navrPID'               , sysConfig.navrPID);
         } else {
             $('#pid_baro').hide();
+            $('#pid_baro_header').hide();
             $('#pid_mag').hide();
+            $('#pid_mag_header').hide();
             $('#pid_gps').hide();
+            $('#pid_gps_header').hide();
         }
 
         populatePID('levelPID'					, sysConfig.levelPID);
