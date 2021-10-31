@@ -324,6 +324,28 @@ var FlightLogParser = function(logData) {
             rc_smoothing_active_cutoffs_ff_sp_thr:[null,null,null],// RC Smoothing active cutoffs feedforward, setpoint, throttle
             dyn_notch_count: null,                  // Number of dynamic notches 4.3
             rpm_filter_fade_range_hz: null,         // Fade range for RPM notch filters in Hz
+            dyn_idle_p_gain: null,
+            dyn_idle_i_gain: null,
+            dyn_idle_d_gain: null,
+            dyn_idle_max_increase: null,
+            simplified_pids_mode: null,             // Simplified / slider PIDS
+            simplified_pi_gain: null,
+            simplified_i_gain: null,
+            simplified_d_gain: null,
+            simplified_dmin_ratio: null,
+            simplified_feedforward_gain: null,
+            simplified_roll_pitch_ratio: null,
+            simplified_pitch_pi_gain: null,
+            simplified_master_multiplier: null,
+            simplified_dterm_filter: null,
+            simplified_dterm_filter_multiplier: null,
+            simplified_gyro_filter: null,
+            simplified_gyro_filter_multiplier: null,
+            motor_output_limit: null,                // motor output limit
+            throttle_limit_type: null,               // throttle limit
+            throttle_limit_percent: null,
+            throttle_boost: null,                    // throttle boost
+            throttle_boost_cutoff: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -389,7 +411,39 @@ var FlightLogParser = function(logData) {
             rpm_filter_harmonics      : "gyro_rpm_notch_harmonics",
             rpm_filter_q              : "gyro_rpm_notch_q",
             rpm_filter_min_hz         : "gyro_rpm_notch_min",
-            rpm_filter_lpf_hz         : "rpm_notch_lpf"
+            rpm_filter_lpf_hz         : "rpm_notch_lpf",
+            rc_sm_md                  : "rc_smoothing_mode",
+            rc_sm_ff_hz               : "rc_smoothing_feedforward_hz",
+            rc_sm_sp_hz               : "rc_smoothing_setpoint_hz",
+            rc_sm_af_sp               : "rc_smoothing_auto_factor_setpoint",
+            rc_sm_thr_hz              : "rc_smoothing_throttle_hz",
+            rc_sm_af_thr              : "rc_smoothing_auto_factor_throttle",
+            rc_sm_dbg_ax              : "rc_smoothing_debug_axis",
+            rc_sm_act_cuts            : "rc_smoothing_active_cutoffs_ff_sp_thr",
+            rc_sm_rx_av               : "rc_smoothing_rx_average",
+            vbat_s_comp               : "vbat_sag_compensation",
+            d_idl_m_r                 : "dynamic_idle_min_rpm",
+            d_idl_p                   : "dyn_idle_p_gain",
+            d_idl_i                   : "dyn_idle_i_gain",
+            d_idl_d                   : "dyn_idle_d_gain",
+            d_idl_max                 : "dyn_idle_max_increase",
+            simpl_mode                : "simplified_pids_mode",
+            simpl_mast                : "simplified_master_multiplier",
+            simpl_pi                  : "simplified_pi_gain",
+            simpl_i                   : "simplified_i_gain",
+            simpl_d                   : "simplified_d_gain",
+            simpl_dmr                 : "simplified_dmin_ratio",
+            simpl_ff                  : "simplified_feedforward_gain",
+            simpl_rpr                 : "simplified_roll_pitch_ratio",
+            simpl_d_f                 : "simplified_dterm_filter",
+            simpl_d_f_m               : "simplified_dterm_filter_multiplier",
+            simpl_g_f                 : "simplified_gyro_filter",
+            simpl_g_f_m               : "simplified_gyro_filter_multiplier",
+            m_out_lim                 : "motor_output_limit",
+            thr_lim_t                 : "throttle_limit_type",
+            thr_lim_p                 : "throttle_limit_percent",
+            thr_bst                   : "throttle_boost",
+            thr_bst_cut               : "throttle_boost_cutoff"
         },
 
         frameTypes,
@@ -676,6 +730,31 @@ var FlightLogParser = function(logData) {
             case "motor_pwm_protocol":
             case "gyro_to_use":
             case "dynamic_idle_min_rpm":
+            case "dyn_idle_p_gain":
+            case "dyn_idle_i_gain":
+            case "dyn_idle_d_gain":
+            case "dyn_idle_max_increase":
+            case "simplified_pids_mode":
+            case "simplified_pi_gain":
+            case "simplified_i_gain":
+            case "simplified_d_gain":
+            case "simplified_dmin_ratio":
+            case "simplified_feedforward_gain":
+            case "simplified_roll_pitch_ratio":
+            case "simplified_pitch_pi_gain":
+            case "simplified_master_multiplier":
+
+            case "simplified_dterm_filter":
+            case "simplified_dterm_filter_multiplier":
+            case "simplified_gyro_filter":
+            case "simplified_gyro_filter_multiplier":
+
+            case "motor_output_limit":
+            case "throttle_limit_type":
+            case "throttle_limit_percent":
+            case "throttle_boost":
+            case "throttle_boost_cutoff":
+
             case "motor_poles":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;

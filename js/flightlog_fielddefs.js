@@ -469,6 +469,18 @@ var
         "2_POINT",
         "3_POINT",
         "4_POINT",
+    ]),
+
+    SIMPLIFIED_PIDS_MODE = makeReadOnly([
+        "OFF",
+        "ON - RP",
+        "ON - RPY",
+    ]),
+
+    THROTTLE_LIMIT_TYPE = makeReadOnly([
+        "OFF",
+        "SCALE",
+        "CLIP",
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {

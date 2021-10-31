@@ -53,10 +53,16 @@
 
 /* Default Parameter Entry Field */
 input[type="number"]::-webkit-inner-spin-button {
-    opacity: 1; /* required for chromium 33+ beta */
-    margin-left: 5px;
-    margin-right: 5px;
+    opacity: 0; /* 1 is required for chromium 33+ beta  to show the arrows / spinners */
+/*    margin-left: 5px;*/
 }
+
+/* Hide select dropdown arrow 
+select {
+    appearance: none;
+    padding-left: 5px;
+}
+*/
 
 .clear-both {
     clear: both;
@@ -159,8 +165,7 @@ input[type="number"]::-webkit-inner-spin-button {
     font-weight: normal;
     font-size: 13px;
     color: #505050;
-    text-align: center;
-    width:100%;
+                                text-align: center;
 }
 
 /* Parameter box other rows */
@@ -194,22 +199,26 @@ input[type="number"]::-webkit-inner-spin-button {
     border-top-right-radius: 3px;
 }
 
-/* Box holding text inputs */
+/* Box holding numeric inputs */
 .header-dialog .cf input {
     width: calc(100% - 10px);
     border: 1px solid silver;
     border-radius: 3px;
-    margin-left:5px;
+    margin-left: 2px;
+    text-align: center;
 }
 
-/* Box holding drop down elements*/
+/* Box holding text down elements */
 .header-dialog .cf select {
+    appearance: none; /* hide arrow at right*/
     width: calc(100% - 10px);
     border: 1px solid silver;
     background-color: #FFFFFF;
     color: black;
-    padding-top: 2px;
-    padding-bottom: 1px;
+    padding-top: 1px;
+    padding-left: 2px;
+    text-align: center;
+    text-align-last: center;
 }
 
 .header-dialog .parameter th:nth-child(2) {
@@ -295,7 +304,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .header-dialog table input {
     display: block;
     width: calc(100% - 4px);
-    text-align: right;
+    text-align: center;
     border: 0 solid #ccc;
     border-radius: 0;
     background-color: #F5F5F5;
@@ -496,7 +505,6 @@ html:not(.isBF28) .bf-only {
     border-bottom: 1px solid #ddd;
     width: 100%;
     float: left;
-
 }
 
 .header-dialog .number:last-child {
@@ -507,12 +515,11 @@ html:not(.isBF28) .bf-only {
 .header-dialog .number input {
     width: 50px;
     padding-left: 3px;
-    text-align: left;
+    text-align: center;
     border: 1px solid silver;
     border-radius: 3px;
     margin-right: 11px;
     font-weight: normal;
-
 }
 
 .header-dialog .other  table td,
@@ -551,7 +558,7 @@ html:not(.isBF28) .bf-only {
     margin-right: 11px;
     font-weight: normal;
     font-size: 11px;
-    }
+}
 
 .header-dialog .gui_box span {
     font-style: normal;
@@ -562,7 +569,7 @@ html:not(.isBF28) .bf-only {
 }
 
 .noline {
-	border:0;
+    border:0;
 }
 
 .header-dialog .resetbt {

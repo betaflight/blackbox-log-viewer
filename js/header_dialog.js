@@ -43,6 +43,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'motor_pwm_rate'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'serialrx_provider'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'dterm_filter_type'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
+        {name:'dterm_filter2_type'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'pidAtMinThrottle'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'itermThrottleGain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.0.1'},
         {name:'ptermSRateWeight'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.0.0'},
@@ -111,6 +112,28 @@ function HeaderDialog(dialog, onSave) {
         {name:'rc_smoothing_active_cutoffs_thr',   type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dyn_notch_count'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'rpm_filter_fade_range_hz'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_p_gain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_i_gain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_d_gain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_max_increase'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_pids_mode'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_pi_gain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_i_gain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_d_gain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_dmin_ratio'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_feedforward_gain'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_roll_pitch_ratio'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_pitch_pi_gain'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_master_multiplier'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_dterm_filter'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_dterm_filter_multiplier' , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_gyro_filter'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_gyro_filter_multiplier'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'motor_output_limit'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'throttle_limit_type'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'throttle_limit_percent'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'throttle_boost'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'throttle_boost_cutoff'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
     ];
 
 	function isParameterValid(name) {
@@ -718,6 +741,7 @@ function HeaderDialog(dialog, onSave) {
         renderSelect('dshot_bidir'              ,sysConfig.dshot_bidir, OFF_ON);
 
         renderSelect('dterm_filter_type'		,sysConfig.dterm_filter_type, FILTER_TYPE);
+        renderSelect('dterm_filter2_type'		,sysConfig.dterm_filter2_type, FILTER_TYPE);
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
 
@@ -767,6 +791,34 @@ function HeaderDialog(dialog, onSave) {
         setParameter('vbat_sag_compensation'    ,sysConfig.vbat_sag_compensation,0);
 
         setParameter('dynamic_idle_min_rpm'     , sysConfig.dynamic_idle_min_rpm, 0);
+        setParameter('dyn_idle_p_gain'          , sysConfig.dyn_idle_p_gain, 0);
+        setParameter('dyn_idle_i_gain'          , sysConfig.dyn_idle_i_gain, 0);
+        setParameter('dyn_idle_d_gain'          , sysConfig.dyn_idle_d_gain, 0);
+        setParameter('dyn_idle_max_increase'    , sysConfig.dyn_idle_max_increase, 0);
+        renderSelect('simplified_pids_mode'         , sysConfig.simplified_pids_mode, SIMPLIFIED_PIDS_MODE);
+        setParameter('simplified_pi_gain'           , sysConfig.simplified_pi_gain, 0);
+        setParameter('simplified_i_gain'            , sysConfig.simplified_i_gain, 0);
+        setParameter('simplified_d_gain'            , sysConfig.simplified_d_gain, 0);
+        setParameter('simplified_dmin_ratio'        , sysConfig.simplified_dmin_ratio, 0);
+        setParameter('simplified_feedforward_gain'  , sysConfig.simplified_feedforward_gain, 0);
+        setParameter('simplified_roll_pitch_ratio'  , sysConfig.simplified_roll_pitch_ratio, 0);
+        setParameter('simplified_pitch_pi_gain'     , sysConfig.simplified_pitch_pi_gain, 0);
+        setParameter('simplified_master_multiplier' , sysConfig.simplified_master_multiplier, 0);
+
+        renderSelect('simplified_dterm_filter'            , sysConfig.simplified_dterm_filter, OFF_ON);
+        setParameter('simplified_dterm_filter_multiplier' , sysConfig.simplified_dterm_filter_multiplier, 0);
+        renderSelect('simplified_gyro_filter'             , sysConfig.simplified_gyro_filter, OFF_ON);
+        setParameter('simplified_gyro_filter_multiplier'  , sysConfig.simplified_gyro_filter_multiplier, 0);
+
+        setParameter('motor_output_limit'        , sysConfig.motor_output_limit, 0);
+        renderSelect('throttle_limit_type'       , sysConfig.throttle_limit_type, THROTTLE_LIMIT_TYPE);
+        setParameter('throttle_limit_percent'    , sysConfig.throttle_limit_percent, 0);
+        setParameter('throttle_boost'            , sysConfig.throttle_boost, 0);
+        setParameter('throttle_boost_cutoff'     , sysConfig.throttle_boost_cutoff, 0);
+
+        renderSelect('pidAtMinThrottle'         ,sysConfig.pidAtMinThrottle, OFF_ON);
+        renderSelect('use_integrated_yaw'       ,sysConfig.use_integrated_yaw, OFF_ON);
+
 
         // Dynamic filters of Betaflight 4.0
         if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
@@ -775,11 +827,10 @@ function HeaderDialog(dialog, onSave) {
             renderSelect('gyro_soft_dyn_type', sysConfig.gyro_soft_type, FILTER_TYPE);
             setParameter('gyro_soft_dyn_min_hz', sysConfig.gyro_lowpass_dyn_hz[0], 0);
             setParameter('gyro_soft_dyn_max_hz', sysConfig.gyro_lowpass_dyn_hz[1], 0);
-            $('.parameter td[name="gyro_soft_dyn_type"]').parent().css('display', '');
             $('.parameter td[name="gyro_soft_type"]').css('display', 'none');
             $('.parameter td[name="gyro_lowpass_hz"]').css('display', 'none');
         } else {
-            $('.parameter td[name="gyro_soft_dyn_type"]').parent().css('display', 'none');
+            $('.parameter td[name="gyro_soft_dyn_type"]').css('display', 'none');
             $('.parameter td[name="gyro_soft_dyn_min_hz"]').css('display', 'none');
             $('.parameter td[name="gyro_soft_dyn_max_hz"]').css('display', 'none');
         }
@@ -787,16 +838,14 @@ function HeaderDialog(dialog, onSave) {
         if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
                 (sysConfig.dterm_lpf_dyn_hz[0] != null) && (sysConfig.dterm_lpf_dyn_hz[0] > 0) &&
                 (sysConfig.dterm_lpf_dyn_hz[1] > sysConfig.dterm_lpf_dyn_hz[0])) {
-            renderSelect('dterm_filter2_type', sysConfig.dterm_filter2_type, FILTER_TYPE);
             renderSelect('dterm_dyn_type', sysConfig.dterm_filter_type, FILTER_TYPE);
             setParameter('dterm_lpf_dyn_min_hz', sysConfig.dterm_lpf_dyn_hz[0], 0);
             setParameter('dterm_lpf_dyn_max_hz', sysConfig.dterm_lpf_dyn_hz[1], 0);
-            $('.parameter td[name="dterm_dyn_type"]').parent().css('display', '');
             $('.parameter td[name="dterm_filter_type"]').css('display', 'none');
             $('.parameter td[name="dterm_lpf_hz"]').css('display', 'none');
         } else {
-            $('.parameter td[name="dterm_filter2_type"]').css('display', 'none');
-            $('.parameter td[name="dterm_dyn_type"]').parent().css('display', 'none');
+//            $('.parameter td[name="dterm_dyn_type"]').parent().css('display', 'none');
+            $('.parameter td[name="dterm_dyn_type"]').css('display', 'none');
             $('.parameter td[name="dterm_lpf_dyn_min_hz"]').css('display', 'none');
             $('.parameter td[name="dterm_lpf_dyn_max_hz"]').css('display', 'none');
         }
@@ -819,8 +868,6 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('gyro_cal_on_first_arm'		,sysConfig.gyro_cal_on_first_arm);
         setCheckbox('vbat_pid_compensation'		,sysConfig.vbat_pid_compensation);
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
-        setCheckbox('pidAtMinThrottle'			,sysConfig.pidAtMinThrottle);
-        setCheckbox('use_integrated_yaw'        ,sysConfig.use_integrated_yaw);
 
         /* Selected Fields */
         if(activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
