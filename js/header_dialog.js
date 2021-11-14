@@ -112,17 +112,17 @@ function HeaderDialog(dialog, onSave) {
         {name:'rc_smoothing_active_cutoffs_thr',   type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dyn_notch_count'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'rpm_filter_fade_range_hz'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
-        {name:'dyn_idle_p_gain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
-        {name:'dyn_idle_i_gain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
-        {name:'dyn_idle_d_gain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
-        {name:'dyn_idle_max_increase'        , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_p_gain'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_i_gain'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_d_gain'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_max_increase'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_pids_mode'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_pi_gain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_i_gain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_d_gain'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
-        {name:'simplified_dmin_ratio'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_dmax_gain'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_feedforward_gain'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
-        {name:'simplified_roll_pitch_ratio'   , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'simplified_pitch_d_gain'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_pitch_pi_gain'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_master_multiplier'  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_dterm_filter'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
@@ -799,9 +799,9 @@ function HeaderDialog(dialog, onSave) {
         setParameter('simplified_pi_gain'           , sysConfig.simplified_pi_gain, 0);
         setParameter('simplified_i_gain'            , sysConfig.simplified_i_gain, 0);
         setParameter('simplified_d_gain'            , sysConfig.simplified_d_gain, 0);
-        setParameter('simplified_dmin_ratio'        , sysConfig.simplified_dmin_ratio, 0);
+        setParameter('simplified_dmax_gain'         , sysConfig.simplified_dmax_gain, 0);
         setParameter('simplified_feedforward_gain'  , sysConfig.simplified_feedforward_gain, 0);
-        setParameter('simplified_roll_pitch_ratio'  , sysConfig.simplified_roll_pitch_ratio, 0);
+        setParameter('simplified_pitch_d_gain'      , sysConfig.simplified_pitch_d_gain, 0);
         setParameter('simplified_pitch_pi_gain'     , sysConfig.simplified_pitch_pi_gain, 0);
         setParameter('simplified_master_multiplier' , sysConfig.simplified_master_multiplier, 0);
 
