@@ -195,8 +195,9 @@ var FlightLogParser = function(logData) {
             deviceUID: null
         },
 
-        // These are now part of the blackbox log header, but they are in addition to the standard logger.
-        // each name should match a field in blackbox.c of the current firmware
+        // Blackbox log header parameter names.
+        // each name should exist in the blackbox log of the current firmware, or
+        // be an older name which is translated into a current name in the table below
 
         defaultSysConfigExtension = {
             abs_control_gain:null,                  // Aboslute control gain
@@ -322,12 +323,35 @@ var FlightLogParser = function(logData) {
             rc_smoothing_auto_factor_throttle:null, // RC Smoothing cutoff for throttle
             rc_smoothing_active_cutoffs_ff_sp_thr:[null,null,null],// RC Smoothing active cutoffs feedforward, setpoint, throttle
             dyn_notch_count: null,                  // Number of dynamic notches 4.3
+            rpm_filter_fade_range_hz: null,         // Fade range for RPM notch filters in Hz
+            dyn_idle_p_gain: null,
+            dyn_idle_i_gain: null,
+            dyn_idle_d_gain: null,
+            dyn_idle_max_increase: null,
+            simplified_pids_mode: null,             // Simplified / slider PIDS
+            simplified_pi_gain: null,
+            simplified_i_gain: null,
+            simplified_d_gain: null,
+            simplified_dmax_gain: null,
+            simplified_feedforward_gain: null,
+            simplified_pitch_d_gain: null,
+            simplified_pitch_pi_gain: null,
+            simplified_master_multiplier: null,
+            simplified_dterm_filter: null,
+            simplified_dterm_filter_multiplier: null,
+            simplified_gyro_filter: null,
+            simplified_gyro_filter_multiplier: null,
+            motor_output_limit: null,                // motor output limit
+            throttle_limit_type: null,               // throttle limit
+            throttle_limit_percent: null,
+            throttle_boost: null,                    // throttle boost
+            throttle_boost_cutoff: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
         // Translation of the field values name to the sysConfig var where it must be stored
-        // on the left are field names from older versions of blackbox.c
-        // on the right are names from the list above
+        // on the left are field names from the latest versions of blackbox.c
+        // on the right are older field names that must exist in the list above
 
         translationValues = {
             acc_limit_yaw             : "yawRateAccelLimit",
@@ -340,6 +364,11 @@ var FlightLogParser = function(logData) {
             dterm_lowpass_hz          : "dterm_lpf_hz",
             dterm_lowpass_dyn_hz      : "dterm_lpf_dyn_hz",
             dterm_lowpass2_hz         : "dterm_lpf2_hz",
+            dterm_lpf1_type           : "dterm_filter_type",
+            dterm_lpf1_static_hz      : "dterm_lpf_hz",
+            dterm_lpf1_dyn_hz         : "dterm_lpf_dyn_hz",
+            dterm_lpf2_type           : "dterm_filter2_type",
+            dterm_lpf2_static_hz      : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",
             digital_idle_value        : "digitalIdleOffset",
             dshot_idle_value          : "digitalIdleOffset",
@@ -347,6 +376,11 @@ var FlightLogParser = function(logData) {
             gyro_lowpass              : "gyro_lowpass_hz",
             gyro_lowpass_type         : "gyro_soft_type",
             gyro_lowpass2_type        : "gyro_soft2_type",
+            gyro_lpf1_type            : "gyro_soft_type",
+            gyro_lpf1_static_hz       : "gyro_lowpass_hz",
+            gyro_lpf1_dyn_hz          : "gyro_lowpass_dyn_hz",
+            gyro_lpf2_type            : "gyro_soft2_type",
+            gyro_lpf2_static_hz       : "gyro_lowpass2_hz",
             "gyro.scale"              : "gyro_scale",
             iterm_windup              : "itermWindupPointPercent",
             motor_pwm_protocol        : "fast_pwm_protocol",
@@ -373,7 +407,13 @@ var FlightLogParser = function(logData) {
             feedforward_transition    : "ff_transition",
             feedforward_weight        : "ff_weight",
             rc_smoothing_auto_factor  : "rc_smoothing_auto_factor_setpoint",
-            rc_smoothing_type         : "rc_smoothing_mode"
+            rc_smoothing_type         : "rc_smoothing_mode",
+            rpm_filter_harmonics      : "gyro_rpm_notch_harmonics",
+            rpm_filter_q              : "gyro_rpm_notch_q",
+            rpm_filter_min_hz         : "gyro_rpm_notch_min",
+            rpm_filter_lpf_hz         : "rpm_notch_lpf",
+            rc_smoothing              : "rc_smoothing_mode",
+            dyn_idle_min_rpm          : "dynamic_idle_min_rpm",
         },
 
         frameTypes,
@@ -640,6 +680,7 @@ var FlightLogParser = function(logData) {
             case "gyro_rpm_notch_harmonics":
             case "gyro_rpm_notch_q":
             case "gyro_rpm_notch_min":
+            case "rpm_filter_fade_range_hz":
             case "rpm_notch_lpf":
             case "dterm_rpm_notch_harmonics":
             case "dterm_rpm_notch_q":
@@ -659,6 +700,31 @@ var FlightLogParser = function(logData) {
             case "motor_pwm_protocol":
             case "gyro_to_use":
             case "dynamic_idle_min_rpm":
+            case "dyn_idle_p_gain":
+            case "dyn_idle_i_gain":
+            case "dyn_idle_d_gain":
+            case "dyn_idle_max_increase":
+            case "simplified_pids_mode":
+            case "simplified_pi_gain":
+            case "simplified_i_gain":
+            case "simplified_d_gain":
+            case "simplified_dmax_gain":
+            case "simplified_feedforward_gain":
+            case "simplified_pitch_d_gain":
+            case "simplified_pitch_pi_gain":
+            case "simplified_master_multiplier":
+
+            case "simplified_dterm_filter":
+            case "simplified_dterm_filter_multiplier":
+            case "simplified_gyro_filter":
+            case "simplified_gyro_filter_multiplier":
+
+            case "motor_output_limit":
+            case "throttle_limit_type":
+            case "throttle_limit_percent":
+            case "throttle_boost":
+            case "throttle_boost_cutoff":
+
             case "motor_poles":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
