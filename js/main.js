@@ -35,10 +35,10 @@ function BlackboxLogViewer() {
         PLAYBACK_MAX_RATE = 300,
         PLAYBACK_DEFAULT_RATE = 100,
         PLAYBACK_RATE_STEP = 5,
-        GRAPH_MIN_ZOOM = 10,
+        GRAPH_MIN_ZOOM = 1,
         GRAPH_MAX_ZOOM = 1000,
         GRAPH_DEFAULT_ZOOM = 100,
-        GRAPH_ZOOM_STEP = 10;
+        GRAPH_ZOOM_STEP = 1;
     
     var
         graphState = GRAPH_STATE_PAUSED,
