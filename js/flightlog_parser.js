@@ -293,8 +293,8 @@ var FlightLogParser = function(logData) {
             pidSumLimitYaw:null,                    // PID sum limit yaw
             use_integrated_yaw : null,              // Use integrated yaw
             d_min : [null, null, null],             // D_Min [P, I, D]
-            d_min_gain : null,                      // D_Min gain
-            d_min_advance : null,                   // D_Min advance
+            d_min_gain : null,                      // D_Min gain - D_Max in 4.3
+            d_min_advance : null,                   // D_Min advance - D_Max in 4.3
             iterm_relax: null,                      // ITerm Relax mode
             iterm_relax_type: null,                 // ITerm Relax type
             iterm_relax_cutoff: null,               // ITerm Relax cutoff
@@ -371,7 +371,17 @@ var FlightLogParser = function(logData) {
             dterm_lpf2_static_hz      : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",
             digital_idle_value        : "digitalIdleOffset",
+            d_max_gain                : "d_min_gain",
+            d_max_advance             : "d_min_advance",
             dshot_idle_value          : "digitalIdleOffset",
+            dyn_idle_min_rpm          : "dynamic_idle_min_rpm",
+            feedforward_transition    : "ff_transition",
+            feedforward_averaging     : "ff_averaging",
+            feedforward_smooth_factor : "ff_smooth_factor",
+            feedforward_jitter_factor : "ff_jitter_factor",
+            feedforward_boost         : "ff_boost",
+            feedforward_max_rate_limit : "ff_max_rate_limit",
+            feedforward_weight        : "dtermSetpointWeight",
             gyro_hardware_lpf         : "gyro_lpf",
             gyro_lowpass              : "gyro_lowpass_hz",
             gyro_lowpass_type         : "gyro_soft_type",
@@ -384,6 +394,7 @@ var FlightLogParser = function(logData) {
             "gyro.scale"              : "gyro_scale",
             iterm_windup              : "itermWindupPointPercent",
             motor_pwm_protocol        : "fast_pwm_protocol",
+            pid_at_min_throttle       : "pidAtMinThrottle",
             pidsum_limit              : "pidSumLimit",
             pidsum_limit_yaw          : "pidSumLimitYaw",
             rc_expo_yaw               : "rcYawExpo",
@@ -391,9 +402,19 @@ var FlightLogParser = function(logData) {
             rc_interp_int             : "rc_interpolation_interval",
             rc_rate                   : "rc_rates",
             rc_rate_yaw               : "rcYawRate",
+            rc_smoothing              : "rc_smoothing_mode",
+            rc_smoothing_auto_factor  : "rc_smoothing_auto_factor_setpoint",
+            rc_smoothing_feedforward_cutoff : "rc_smoothing_feedforward_hz",
+            rc_smoothing_setpoint_cutoff : "rc_smoothing_setpoint_hz",
+            rc_smoothing_throttle_cutoff : "rc_smoothing_throttle_hz",
+            rc_smoothing_type         : "rc_smoothing_mode",
             rc_yaw_expo               : "rcYawExpo",
             rcExpo                    : "rc_expo",
             rcRate                    : "rc_rates",
+            rpm_filter_harmonics      : "gyro_rpm_notch_harmonics",
+            rpm_filter_q              : "gyro_rpm_notch_q",
+            rpm_filter_min_hz         : "gyro_rpm_notch_min",
+            rpm_filter_lpf_hz         : "rpm_notch_lpf",
             setpoint_relax_ratio      : "setpointRelaxRatio",
             setpoint_relaxation_ratio : "setpointRelaxRatio",
             thr_expo                  : "thrExpo",
@@ -404,16 +425,6 @@ var FlightLogParser = function(logData) {
             vbat_pid_gain             : "vbat_pid_compensation",
             yaw_accel_limit           : "yawRateAccelLimit",
             yaw_lowpass_hz            : "yaw_lpf_hz",
-            feedforward_transition    : "ff_transition",
-            feedforward_weight        : "ff_weight",
-            rc_smoothing_auto_factor  : "rc_smoothing_auto_factor_setpoint",
-            rc_smoothing_type         : "rc_smoothing_mode",
-            rpm_filter_harmonics      : "gyro_rpm_notch_harmonics",
-            rpm_filter_q              : "gyro_rpm_notch_q",
-            rpm_filter_min_hz         : "gyro_rpm_notch_min",
-            rpm_filter_lpf_hz         : "rpm_notch_lpf",
-            rc_smoothing              : "rc_smoothing_mode",
-            dyn_idle_min_rpm          : "dynamic_idle_min_rpm",
         },
 
         frameTypes,
