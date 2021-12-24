@@ -435,8 +435,9 @@ GraphConfig.load = function(config) {
                             case 'debug[0]': // Roll RC Command
                             case 'debug[3]': // refresh period
                                 return getCurveForMinMaxFieldsZeroOffset(fieldName);
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'RC_SMOOTHING':
                         switch (fieldName) {
                             case 'debug[0]': // raw RC command
@@ -449,15 +450,17 @@ GraphConfig.load = function(config) {
                             case 'debug[1]': // raw RC command derivative
                             case 'debug[2]': // smoothed RC command derivative
                                 return getCurveForMinMaxFieldsZeroOffset('debug[1]', 'debug[2]');
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'RC_SMOOTHING_RATE':
                         switch (fieldName) {
                             case 'debug[0]': // current frame rate [us]
                             case 'debug[2]': // average frame rate [us]
                                 return getCurveForMinMaxFields('debug[0]', 'debug[2]');
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'ANGLERATE':
                         return {
                             offset: 0,
@@ -476,8 +479,9 @@ GraphConfig.load = function(config) {
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0
                                 };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'FFT_FREQ':
                         switch (fieldName) {
                             case 'debug[0]': // roll center freq
@@ -491,8 +495,9 @@ GraphConfig.load = function(config) {
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0
                                 };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'DYN_LPF':
                         switch (fieldName) {
                             case 'debug[1]': // Notch center
@@ -506,8 +511,9 @@ GraphConfig.load = function(config) {
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0
                                 };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'FFT_TIME':
                         return {
                             offset: 0,
@@ -527,15 +533,17 @@ GraphConfig.load = function(config) {
                             case 'debug[2]': // roll actual D
                             case 'debug[3]': // pitch actual D
                                 return getCurveForMinMaxFields('debug[2]', 'debug[3]');
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'ITERM_RELAX':
                         switch (fieldName) {
                             case 'debug[2]': // roll I relaxed error
                             case 'debug[3]': // roll absolute control axis error
                                 return getCurveForMinMaxFieldsZeroOffset(fieldName);
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'FF_INTERPOLATED':
                         switch (fieldName) {
                             case 'debug[0]': // setpoint Delta
@@ -554,8 +562,9 @@ GraphConfig.load = function(config) {
                                     inputRange: 10,
                                     outputRange: 1.0,
                                 };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'FEEDFORWARD': // replaces FF_INTERPOLATED in 4.3
                         switch (fieldName) {
                             case 'debug[0]': // in 4.3 is interpolated setpoint
@@ -580,8 +589,9 @@ GraphConfig.load = function(config) {
                                     inputRange: 10000,
                                     outputRange: 1.0,
                                 };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
                         }
-                        break;
                     case 'FF_LIMIT':
                     case 'FEEDFORWARD_LIMIT':
                         return {
@@ -608,9 +618,125 @@ GraphConfig.load = function(config) {
                                     inputRange: 1000,
                                     outputRange: 1.0,
                                 };
-                        }
-                        break;
-                 }
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'RX_TIMING':
+                        switch (fieldName) {
+                            case 'debug[0]': // CRC 0 to max int16_t
+                                return {  // start at bottom, scale up to 20ms
+                                    offset: -1000,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            // debug 1 is Count of Unknown Frames
+                            // debug 2 and 3 not used
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'GHST':
+                        switch (fieldName) {
+                            case 'debug[0]': // CRC 0 to max int16_t
+                            case 'debug[1]': // Count of Unknown Frames
+                                return getCurveForMinMaxFieldsZeroOffset(fieldName);
+                            case 'debug[2]': // RSSI
+                                return {
+                                    offset: 128,
+                                    power: 1.0,
+                                    inputRange: 128,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // LQ percent
+                                return {
+                                    offset: -50,
+                                    power: 1.0,
+                                    inputRange: 50,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'SCHEDULER_DETERMINISM':
+                        switch (fieldName) {
+                            case 'debug[0]': // Gyro task cycle us * 10 so 1250 = 125us
+                                return {
+                                    offset: -5000,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // ID of late task
+                            case 'debug[2]': // task delay time 100us in middle
+                                return {
+                                    offset: -1000,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // gyro skew 100 = 10us
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                           }
+                    case 'TIMING_ACCURACY':
+                        switch (fieldName) {
+                            case 'debug[0]': // % CPU Busy
+                            case 'debug[1]': // late tasks per second
+                                return {
+                                    offset: -50,
+                                    power: 1.0,
+                                    inputRange: 50,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // total delay in last second 
+                                return {
+                                    offset: -500,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // total tasks per second
+                                return {
+                                    offset: -5000,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'RX_EXPRESSLRS_SPI':
+                        switch (fieldName) {
+                            case 'debug[2]': // Uplink LQ
+                                return {
+                                    offset: -50,
+                                    power: 1.0,
+                                    inputRange: 50,
+                                    outputRange: 1.0,
+                                };
+                            // debug 0 = Lost connection count
+                            // debug 1 = RSSI
+                            // debug 3 = SNR
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'RX_EXPRESSLRS_PHASELOCK':
+                        switch (fieldName) {
+                            case 'debug[2]': // Frequency offset in ticks
+                                return getCurveForMinMaxFieldsZeroOffset(fieldName);
+                            // debug 0 = Phase offset us
+                            // debug 1 = Filtered phase offset us
+                            // debug 3 = Phase shift in us
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    }
             }
             // if not found above then
             // Scale and center the field based on the whole-log observed ranges for that field
