@@ -329,6 +329,16 @@ var
             "DYN_IDLE",
             "FF_LIMIT",
             "FF_INTERPOLATED",
+            "BLACKBOX_OUTPUT",
+            "GYRO_SAMPLE",
+            "RX_TIMING",
+            "D_LPF",
+            "VTX_TRAMP",
+            "GHST",
+            "SCHEDULER_DETERMINISM",
+            "TIMING_ACCURACY",
+            "RX_EXPRESSLRS_SPI",
+            "RX_EXPRESSLRS_PHASELOCK",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([

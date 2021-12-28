@@ -124,8 +124,8 @@ function FlightLogFieldPresenter() {
         },
         'BATTERY' : {
             'debug[all]':'Debug Battery',
-            'debug[0]':'Battery Volt. ADC',
-            'debug[1]':'Battery Volt.',
+            'debug[0]':'Battery Volt ADC',
+            'debug[1]':'Battery Volt',
             'debug[2]':'Not Used',
             'debug[3]':'Not Used',
         },
@@ -185,20 +185,6 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Interpolation Step Count',
             'debug[3]':'RC Setpoint [roll]',
         },
-        'RC_SMOOTHING' : {
-            'debug[all]':'Debug RC Smoothing',
-            'debug[0]':'Raw RC Command',
-            'debug[1]':'Raw RC Derivative',
-            'debug[2]':'Smoothed RC Derivative',
-            'debug[3]':'RX Refresh Rate',
-        },
-        'RC_SMOOTHING_RATE' : {
-            'debug[all]':'Debug RC Smoothing Rate',
-            'debug[0]':'Current RX Refresh Rate',
-            'debug[1]':'Training Step Count',
-            'debug[2]':'Average RX Refresh Rate',
-            'debug[3]':'Sampling State',
-        },
         'DTERM_FILTER' : {
             'debug[all]':'Debug Filter',
             'debug[0]':'DTerm Filter [roll]',
@@ -234,6 +220,27 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Stack Current',
             'debug[3]':'Stack p',
         },
+        'ESC_SENSOR_RPM' : {
+            'debug[all]':'ESC Sensor RPM',
+            'debug[0]':'Motor 1',
+            'debug[1]':'Motor 2',
+            'debug[2]':'Motor 3',
+            'debug[3]':'Motor 4',
+        },
+        'ESC_SENSOR_TMP' : {
+            'debug[all]':'ESC Sensor Temp',
+            'debug[0]':'Motor 1',
+            'debug[1]':'Motor 2',
+            'debug[2]':'Motor 3',
+            'debug[3]':'Motor 4',
+        },
+        'ALTITUDE' : {
+            'debug[all]':'Altitude',
+            'debug[0]':'GPS Trust * 100',
+            'debug[1]':'Baro Altitude',
+            'debug[2]':'GPS Altitude',
+            'debug[3]':'Vario',
+        },
         'FFT' : {
             'debug[all]':'Debug FFT',
             'debug[0]':'Gyro Scaled [dbg-axis]',
@@ -254,6 +261,20 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Center Freq [pitch]',
             'debug[2]':'Gyro Pre-Dyn [dbg-axis]',
             'debug[3]':'Gyro Scaled [dbg-axis]',
+        },
+        'RX_FRSKY_SPI' : {
+            'debug[all]':'FrSky SPI Rx',
+            'debug[0]':'Looptime',
+            'debug[1]':'Packet',
+            'debug[2]':'Missing Packets',
+            'debug[3]':'State',
+        },
+        'RX_SFHSS_SPI' : {
+            'debug[all]':'SFHSS SPI Rx',
+            'debug[0]':'State',
+            'debug[1]':'Missing Frame',
+            'debug[2]':'Offset Max',
+            'debug[3]':'Offset Min',
         },
         'GYRO_RAW' : {
             'debug[all]':'Debug Gyro Raw', 
@@ -290,12 +311,145 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Gyro Diff [yaw]',
             'debug[3]':'Not Used',
         },
-        'ESC_SENSOR_RPM' : {
-            'debug[all]':'ESC RPM', 
-            'debug[0]':'ESC RPM [1]',
-            'debug[1]':'ESC RPM [2]',
-            'debug[2]':'ESC RPM [3]',
-            'debug[3]':'ESC RPM [4]',
+        'MAX7456_SIGNAL' : {
+            'debug[all]':'Max7456 Signal',
+            'debug[0]':'Mode Reg',
+            'debug[1]':'Sense',
+            'debug[2]':'ReInit',
+            'debug[3]':'Rows',
+        },
+        'MAX7456_SPICLOCK' : {
+            'debug[all]':'Max7456 SPI Clock',
+            'debug[0]':'Overclock',
+            'debug[1]':'DevType',
+            'debug[2]':'Divisor',
+            'debug[3]':'not used',
+        },
+        'SBUS' : {
+            'debug[all]':'SBus Rx',
+            'debug[0]':'Frame Flags',
+            'debug[1]':'State Flags',
+            'debug[2]':'Frame Time',
+            'debug[3]':'not used',
+        },
+        'FPORT' : {
+            'debug[all]':'FPort Rx',
+            'debug[0]':'Frame Interval',
+            'debug[1]':'Frame Errors',
+            'debug[2]':'Last Error',
+            'debug[3]':'Telemetry Interval',
+        },
+        'RANGEFINDER' : {
+            'debug[all]':'Rangefinder',
+            'debug[0]':'not used',
+            'debug[1]':'Raw Altitude',
+            'debug[2]':'Calc Altituded',
+            'debug[3]':'SNR',
+        },
+        'RANGEFINDER_QUALITY' : {
+            'debug[all]':'Rangefinder Quality',
+            'debug[0]':'Raw Altitude',
+            'debug[1]':'SNR Threshold Reached',
+            'debug[2]':'Dyn Distance Threshold',
+            'debug[3]':'Is Surface Altitude Valid',
+        },
+        'LIDAR_TF' : {
+            'debug[all]':'Lidar TF',
+            'debug[0]':'Distance',
+            'debug[1]':'Strength',
+            'debug[2]':'TF Frame (4)',
+            'debug[3]':'TF Frame (5)',
+        },
+        'ADC_INTERNAL' : {
+            'debug[all]':'ADC Internal',
+            'debug[0]':'Core Temp',
+            'debug[1]':'VRef Internal Sample',
+            'debug[2]':'Temp Sensor Sample',
+            'debug[3]':'Vref mV',
+        },
+        'RUNAWAY_TAKEOFF' : {
+            'debug[all]':'Runaway Takeoff',
+            'debug[0]':'Enabled',
+            'debug[1]':'Activating Delay',
+            'debug[2]':'Deactivating Delay',
+            'debug[3]':'Deactivating Time',
+        },
+        'CURRENT_SENSOR' : {
+            'debug[all]':'Current Sensor',
+            'debug[0]':'milliVolts',
+            'debug[1]':'centiAmps',
+            'debug[2]':'Amps Latest',
+            'debug[3]':'mAh Drawn',
+        },
+        'USB' : {
+            'debug[all]':'USB',
+            'debug[0]':'Cable In',
+            'debug[1]':'VCP Connected',
+            'debug[2]':'not used',
+            'debug[3]':'not used',
+        },
+        'SMART AUDIO' : {
+            'debug[all]':'Smart Audio VTx',
+            'debug[0]':'Device + Version',
+            'debug[1]':'Channel',
+            'debug[2]':'Frequency',
+            'debug[3]':'Power',
+        },
+        'RTH' : {
+            'debug[all]':'RTH',
+            'debug[0]':'Rescue Throttle',
+            'debug[1]':'Rescue Angle',
+            'debug[2]':'Altitude Adjustment',
+            'debug[3]':'Rescue State',
+        },
+        'ITERM_RELAX' : {
+            'debug[all]':'I-term Relax',
+            'debug[0]':'Setpoint HPF [roll]',
+            'debug[1]':'I Relax Factor [roll]',
+            'debug[2]':'Relaxed I Error [roll]',
+            'debug[3]':'Axis Error [roll]',
+        },
+        'ACRO_TRAINER' : {
+            'debug[all]':'Acro Trainer (a_t_axis)',
+            'debug[0]':'Current Angle * 10 [deg]',
+            'debug[1]':'Axis State',
+            'debug[2]':'Correction amount',
+            'debug[3]':'Projected Angle * 10 [deg]',
+        },
+        'RC_SMOOTHING' : {
+            'debug[all]':'Debug RC Smoothing',
+            'debug[0]':'Raw RC Command',
+            'debug[1]':'Raw RC Derivative',
+            'debug[2]':'Smoothed RC Derivative',
+            'debug[3]':'RX Refresh Rate',
+        },
+        'RX_SIGNAL_LOSS' : {
+            'debug[all]':'Rx Signal Loss',
+            'debug[0]':'Signal Received',
+            'debug[1]':'Failsafe',
+            'debug[2]':'Not used',
+            'debug[3]':'Throttle',
+        },
+        'RC_SMOOTHING_RATE' : {
+            'debug[all]':'Debug RC Smoothing Rate',
+            'debug[0]':'Current RX Refresh Rate',
+            'debug[1]':'Training Step Count',
+            'debug[2]':'Average RX Refresh Rate',
+            'debug[3]':'Sampling State',
+        },
+        'ANTI_GRAVITY' : {
+            'debug[all]':'I-term Relax',
+            'debug[0]':'Base I gain * 1000',
+            'debug[1]':'Final I gain * 1000',
+            'debug[2]':'P gain [roll] * 1000',
+            'debug[3]':'P gain [pitch] * 1000',
+        },
+        'DYN_LPF' : {
+            'debug[all]':'Debug Dyn LPF',
+            'debug[0]':'Gyro Scaled [dbg-axis]',
+            'debug[1]':'Notch Center [roll]',
+            'debug[2]':'Lowpass Cutoff',
+            'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
         },
         'DSHOT_RPM_TELEMETRY' : {
             'debug[all]':'DShot Telemetry RPM', 
@@ -317,20 +471,6 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Setpoint Factor [roll]',
             'debug[2]':'Actual D [roll]',
             'debug[3]':'Actual D [pitch]',
-        },
-        'ITERM_RELAX' : {
-            'debug[all]':'I-term Relax',
-            'debug[0]':'Setpoint HPF [roll]',
-            'debug[1]':'I Relax Factor [roll]',
-            'debug[2]':'Relaxed I Error [roll]',
-            'debug[3]':'Axis Error [roll]',
-        },
-        'DYN_LPF' : {
-            'debug[all]':'Debug Dyn LPF',
-            'debug[0]':'Gyro Scaled [dbg-axis]',
-            'debug[1]':'Notch Center [roll]',
-            'debug[2]':'Lowpass Cutoff',
-            'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
         },
         'AC_CORRECTION' : {
             'debug[all]':'AC Correction',
@@ -416,12 +556,75 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Boost amount, clipped [roll]',
             'debug[3]':'Clip amount [roll]',
         },
-        'RTH' : {
-            'debug[all]':'RTH',
-            'debug[0]':'Rescue Throttle',
-            'debug[1]':'Rescue Angle',
-            'debug[2]':'Altitude Adjustment',
-            'debug[3]':'Rescue State',
+        'BLACKBOX_OUTPUT' : {
+            'debug[all]':'Blackbox Output',
+            'debug[0]':'Blackbox Rate',
+            'debug[1]':'Blackbox Max Rate',
+            'debug[2]':'Dropouts',
+            'debug[3]':'Tx Bytes Free',
+        },
+        'GYRO_SAMPLE' : {
+            'debug[all]':'Gyro Sample',
+            'debug[0]':'Before downsampling',
+            'debug[1]':'After downsampling',
+            'debug[2]':'After RPM',
+            'debug[3]':'After all but Dyn Notch',
+        },
+        'RX_TIMING' : {
+            'debug[all]':'Receiver Timing (us)',
+            'debug[0]':'Frame Delta',
+            'debug[1]':'Frame Age',
+            'debug[2]':'not used',
+            'debug[3]':'not used',
+        },
+        'D_LPF' : {
+            'debug[all]':'D-Term [D_LPF]',
+            'debug[0]':'Unfiltered D [roll]',
+            'debug[1]':'Unfiltered D [pitch]',
+            'debug[2]':'Filtered, with DMax [roll]',
+            'debug[3]':'Filtered, with DMax [pitch]',
+        },
+        'VTX_TRAMP' : {
+            'debug[all]':'Tramp VTx',
+            'debug[0]':'Status',
+            'debug[1]':'Reply Code',
+            'debug[2]':'Pit Mode',
+            'debug[3]':'Retry Count',
+        },
+        'GHST' : {
+            'debug[all]':'Ghost Rx',
+            'debug[0]':'CRC Error Count',
+            'debug[1]':'Unknown Frame Count',
+            'debug[2]':'RSSI',
+            'debug[3]':'Link Quality',
+        },
+        'SCHEDULER_DETERMINISM' : {
+            'debug[all]':'Scheduler Determinism',
+            'debug[0]':'Cycle Start time',
+            'debug[1]':'ID of Late Task',
+            'debug[2]':'Task Delay Time',
+            'debug[3]':'Gyro Clock Skew',
+        },
+        'TIMING_ACCURACY' : {
+            'debug[all]':'Timing Accuracy',
+            'debug[0]':'CPU Busy',
+            'debug[1]':'Late Tasks per second',
+            'debug[2]':'Total delay in last second',
+            'debug[3]':'Total Tasks per second',
+        },
+        'RX_EXPRESSLRS_SPI' : {
+            'debug[all]':'ExpressLRS SPI Rx',
+            'debug[0]':'Lost Connection Count',
+            'debug[1]':'RSSI',
+            'debug[2]':'SNR',
+            'debug[3]':'Uplink LQ',
+        },
+        'RX_EXPRESSLRS_PHASELOCK' : {
+            'debug[all]':'ExpressLRS SPI Phaselock',
+            'debug[0]':'Phase offset',
+            'debug[1]':'Filtered phase offset',
+            'debug[2]':'Frequency Offset',
+            'debug[3]':'Phase Shift',
         },
     };
 
@@ -688,6 +891,7 @@ function FlightLogFieldPresenter() {
                 case 'NONE':
                 case 'AIRMODE':
                 case 'VELOCITY':
+                case 'DFILTER':
                     return "";
                 case 'CYCLETIME':
                     switch (fieldName) {
@@ -695,54 +899,38 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + "%";
                         default:
                             return value.toFixed(0) + "\u03BCS";
-                    }                
-                case 'PIDLOOP': 
-                    return value.toFixed(0) + "\u03BCS";
+                    }
                 case 'BATTERY':
                     switch (fieldName) {
                         case 'debug[0]':
                             return value.toFixed(0);
                         default:
-                            return (value/10).toFixed(1) + "V"
-                    }    
-                case 'GYRO':
-                case 'GYRO_FILTERED':
-                case 'GYRO_SCALED':
-                case 'NOTCH':
-                case 'DUAL_GYRO':
-                case 'DUAL_GYRO_COMBINED':
-                case 'DUAL_GYRO_DIFF':
-                case 'DUAL_GYRO_RAW':
-                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                            return (value/10).toFixed(1) + "V";
+                    }
                 case 'ACCELEROMETER':
                     return flightLog.accRawToGs(value).toFixed(2) + "g";
                 case 'MIXER':
                     return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
+                case 'PIDLOOP': 
+                    return value.toFixed(0) + "\u03BCS";
                 case 'RC_INTERPOLATION':
                     switch (fieldName) {
                         case 'debug[1]': // current RX refresh rate
                             return value.toFixed(0) + 'ms';
                         case 'debug[3]': // setpoint [roll]
                             return value.toFixed(0) + 'deg/s';
+                        default:
+                            return value.toFixed(0);
                     }
-                    break;
-                case 'RC_SMOOTHING':
-                    switch (fieldName) {
-                        case 'debug[0]':
-                            return (value + 1500).toFixed(0) + " us";
-                        case 'debug[3]': // rx frame rate [us]
-                            return (value / 1000).toFixed(1) + 'ms';
-                    }
-                    break;
-                case 'RC_SMOOTHING_RATE':
-                    switch (fieldName) {
-                        case 'debug[0]': // current frame rate [us]
-                        case 'debug[2]': // average frame rate [us]
-                            return (value / 1000).toFixed(2) + 'ms';
-                    }
-                    break;
-                case 'DFILTER':
-                    return "";
+                case 'GYRO':
+                case 'GYRO_FILTERED':
+                case 'GYRO_SCALED':
+                case 'DUAL_GYRO':
+                case 'DUAL_GYRO_COMBINED':
+                case 'DUAL_GYRO_DIFF':
+                case 'DUAL_GYRO_RAW':
+                case 'NOTCH':
+                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
                 case 'ANGLERATE':
                     return value.toFixed(0) + "deg/s";
                 case 'ESC_SENSOR':
@@ -750,57 +938,50 @@ function FlightLogFieldPresenter() {
                         case 'debug[3]':
                             return value.toFixed(0) + "\u03BCS";
                         default:
-                            return value.toFixed(0) + "";
+                            return value.toFixed(0);
                     }
-                case 'ESC_SENSOR_RPM':
-                    return value.toFixed(0) + "rpm";
-                case 'ESC_SENSOR_TMP':
-                    return value.toFixed(0) + "°C";
                 case 'SCHEDULER':
                     return value.toFixed(0) + "\u03BCS";
                 case 'STACK':
                     return value.toFixed(0);
+                case 'ESC_SENSOR_RPM':
+                    return value.toFixed(0) + "rpm";
+                case 'ESC_SENSOR_TMP':
+                    return value.toFixed(0) + "°C";
                 case 'FFT':
                     switch (fieldName) {
-                    case 'debug[0]': // gyro scaled [for selected axis]
-                    case 'debug[1]': // pre-dyn notch gyro [for selected axis]
-                    case 'debug[2]': // pre-dyn notch gyro FFT downsampled [roll]
-                        return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
-                    case 'debug[3]': // FFT bin mean index
-                        return (value / 100).toFixed(2);
+                        case 'debug[0]': // gyro pre-notch [for selected axis]
+                        case 'debug[1]': // gyro post-notch [for selected axis]
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                    // debug 2 = sample average
+                    // debug 3 = not used
+                        default:
+                            return value.toFixed(0);
                     }
-                    break;
                 case 'FFT_TIME':
                     switch (fieldName) {
-                    case 'debug[0]':
-                        return FlightLogFieldPresenter.presentEnum(value, FFT_CALC_STEPS);
-                    case 'debug[1]':
-                    case 'debug[2]':
-                        return value.toFixed(0) + "\u03BCs";
+                        case 'debug[0]':
+                            return FlightLogFieldPresenter.presentEnum(value, FFT_CALC_STEPS);
+                        case 'debug[1]':
+                        case 'debug[2]':
+                            return value.toFixed(0) + "\u03BCs";
+                        default:
+                            return value.toFixed(0);
                     }
-                    break;
                 case 'FFT_FREQ':
                     switch (fieldName) {
-                    case 'debug[2]': // pre-dyn notch gyro [for selected axis]
-                    case 'debug[3]': // raw gyro [for selected axis]
-                        return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
-                    default:
-                        return value.toFixed(0) + "Hz";
+                        case 'debug[3]': // raw gyro [for debug axis]
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                        default:
+                            return value.toFixed(0) + "Hz";
                     }
-                case 'DSHOT_RPM_TELEMETRY':
-                    return (value * 200 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + " rpm";
-                case 'RPM_FILTER':
-                    return value.toFixed(0) + "Hz";
-                case 'D_MIN':
-                    switch (fieldName) {
-                        case 'debug[0]': // roll gyro factor
-                        case 'debug[1]': // roll setpoint Factor
-                            return value.toFixed(0) + '%';
-                        case 'debug[2]': // roll actual D
-                        case 'debug[3]': // pitch actual D
-                            return (value / 10).toFixed(1);
+                case 'RTH':
+                    switch(fieldName) {
+                        case 'debug[1]':
+                            return (value / 100).toFixed(1) + 'deg';
+                        default:
+                            return value.toFixed(0);
                     }
-                    break;
                 case 'ITERM_RELAX':
                     switch (fieldName) {
                         case 'debug[0]': // roll setpoint high-pass filtered
@@ -809,8 +990,41 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + '%';
                         case 'debug[3]': // roll absolute control axis error
                             return (value / 10).toFixed(1) + 'deg';
+                        default:
+                            return value.toFixed(0);
                     }
-                    break;
+                case 'RC_SMOOTHING':
+                    switch (fieldName) {
+                        case 'debug[0]':
+                            return (value + 1500).toFixed(0) + " us";
+                        case 'debug[3]': // rx frame rate [us]
+                            return (value / 1000).toFixed(1) + 'ms';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'RC_SMOOTHING_RATE':
+                    switch (fieldName) {
+                        case 'debug[0]': // current frame rate [us]
+                        case 'debug[2]': // average frame rate [us]
+                            return (value / 1000).toFixed(2) + 'ms';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'DSHOT_RPM_TELEMETRY':
+                    return (value * 200 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + "rpm / " + (value * 3.333 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + 'hz';
+                case 'RPM_FILTER':
+                    return (value * 60).toFixed(0) + "rpm / " + value.toFixed(0) + "Hz";
+                case 'D_MIN':
+                    switch (fieldName) {
+                        case 'debug[0]': // roll gyro factor
+                        case 'debug[1]': // roll setpoint Factor
+                            return value.toFixed(0) + '%';
+                        case 'debug[2]': // roll actual D
+                        case 'debug[3]': // pitch actual D
+                            return (value / 10).toFixed(1);
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'DYN_LPF':
                     switch (fieldName) {
                         case 'debug[0]': // gyro scaled [for selected axis]
@@ -819,28 +1033,76 @@ function FlightLogFieldPresenter() {
                         default:
                             return value.toFixed(0) + "Hz";
                     }
-                    break;
+                case 'GPS_RESCUE_THROTTLE_PID':
+                        return value.toFixed(0);
                 case 'DYN_IDLE':
                     switch (fieldName) {
-                        case 'debug[3]': // minRPS best shown as rpm, since commanded value is rpm
-                            return (value * 6);
+                        case 'debug[3]': // minRPS
+                            return (value * 6) + 'rpm / ' + (value / 10).toFixed(0) +'hz';
                         default:
                             return value.toFixed(0);
                     }
-                case 'AC_ERROR':
-                    return (value / 10).toFixed(1) + 'deg';
                 case 'AC_CORRECTION':
                     return (value / 10).toFixed(1) + 'deg/s';
-                case 'GPS_RESCUE_THROTTLE_PID':
-                        return value.toFixed(0);
-                case 'RTH':
-                    switch(fieldName) {
-                        case 'debug[1]':
-                            return (value / 100).toFixed(1) + 'deg';
+                case 'AC_ERROR':
+                    return (value / 10).toFixed(1) + 'deg';
+                case 'RX_TIMING':
+                    switch (fieldName) {
+                        case 'debug[0]': // Frame delta us/10
+                        case 'debug[1]': // Frame age us/10
+                            return (value / 100).toFixed(2) + 'ms';
                         default:
                             return value.toFixed(0);
-                        }
-                        break;
+                    }
+                case 'GHST':
+                    switch (fieldName) {
+                        // debug 0 is CRC error count 0 to int16_t
+                        // debug 1 is unknown frame count 0 to int16_t
+                        // debug 2 is RSSI 0 to -128 -> 0 to 128
+                        case 'debug[3]': // LQ 0-100
+                            return value.toFixed(0) + '%';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'SCHEDULER_DETERMINISM':
+                    switch (fieldName) {
+                        case 'debug[0]': // cycle time in us*10
+                        case 'debug[2]': // task delay time in us*10
+                        case 'debug[3]': // task delay time in us*10
+                             return (value / 10).toFixed(1) + 'us';
+                        // debug 1 is task ID of late task
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'TIMING_ACCURACY':
+                    switch (fieldName) {
+                        case 'debug[0]': // CPU Busy %
+                            return value.toFixed(1) + '%';
+                        case 'debug[2]': // task delay time in us*10
+                            return (value / 10).toFixed(1) + 'us';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'RX_EXPRESSLRS_SPI':
+                    switch (fieldName) {
+                        case 'debug[3]': // uplink LQ %
+                            return value.toFixed(1) + '%';
+                        // debug 0 = Lost connection count
+                        // debug 1 = RSSI
+                        // debug 2 = SNR
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'RX_EXPRESSLRS_PHASELOCK':
+                    switch (fieldName) {
+                        case 'debug[2]': // Frequency offset in ticks
+                            return value.toFixed(0) + 'ticks';
+                        // debug 0 = Phase offset us
+                        // debug 1 = Filtered phase offset us
+                        // debug 3 = Pphase shift in us
+                        default:
+                            return value.toFixed(0) + 'us';
+                    }
             }
             return value.toFixed(0);
         }
