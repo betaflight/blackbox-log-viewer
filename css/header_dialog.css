@@ -290,7 +290,7 @@ select {
 .header-dialog table td,
 .header-dialog .pid_titlebar th {
     padding: 1px;
-    width: 20%;
+    width: 15%;
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
 }

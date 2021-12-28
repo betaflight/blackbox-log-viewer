@@ -695,6 +695,9 @@
                                                 <th name="Integral">
                                                     <label>Integral</label>
                                                 </th>
+                                                <th name="D_Max">
+                                                    <label>D_Max</label>
+                                                </th>
                                                 <th name="Derivative">
                                                     <label>Derivative</label>
                                                 </th>
@@ -715,6 +718,9 @@
                                                     <input type="text" name="d" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
+                                                    <input type="text" name="d_min_roll" step="1" min="0" max="255" />
+                                                </td>
+                                                <td>
                                                     <input type="text" name="f" step="1" min="0" max="255" />
                                                 </td>
                                             </tr>
@@ -729,6 +735,9 @@
                                                 </td>
                                                 <td>
                                                     <input type="text" name="d" step="1" min="0" max="255" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="d_min_pitch" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
                                                     <input type="text" name="f" step="1" min="0" max="255" />
@@ -747,6 +756,9 @@
                                                     <input type="text" name="d" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
+                                                    <input type="text" name="d_min_yaw" step="1" min="0" max="255" />
+                                                </td>
+                                                <td>
                                                     <input type="text" name="f" step="1" min="0" max="255" />
                                                 </td>
                                             </tr>
@@ -759,6 +771,7 @@
                                                 </tr>
                                             </thead>
                                         </table>
+
                                         <table id="pid_baro" class="pid_tuning">
                                             <tr class="altPID">
                                                 <!-- 3 -->
@@ -774,6 +787,7 @@
                                                 </td>
                                                 <td></td>
                                             </tr>
+
                                             <tr class="velPID">
                                                 <!-- 9 -->
                                                 <td>VEL</td>
@@ -860,38 +874,6 @@
                                             </tr>
                                         </table>
 
-                                        <table id="d_min" class="parameter cf">
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="5">D Min</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td name="d_min_roll" class="bf-only">
-                                                        <label>Roll</label>
-                                                        <input type="text" step="1" min="0" max="100" />
-                                                    </td>
-                                                    <td name="d_min_pitch" class="bf-only">
-                                                        <label>Pitch</label>
-                                                        <input type="text" step="1" min="0" max="100" />
-                                                    </td>
-                                                    <td name="d_min_yaw" class="bf-only">
-                                                        <label>Yaw</label>
-                                                        <input type="text" step="1" min="0" max="100" />
-                                                    </td>
-                                                    <td name="d_min_gain" class="bf-only">
-                                                        <label>Gain</label>
-                                                        <input type="text" step="1" min="0" max="100" />
-                                                    </td>
-                                                    <td name="d_min_advance" class="bf-only">
-                                                        <label>Advance</label>
-                                                        <input type="text" step="1" min="0" max="200" />
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
                                         <table class="parameter cf">
                                             <thead>
                                                 <tr>
@@ -949,30 +931,6 @@
                                         <table class="parameter cf">
                                             <thead>
                                                 <tr>
-                                                    <th colspan="5">TPA and Airmode</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td name="dynThrPID">
-                                                        <label>TPA amount</label>
-                                                        <input type="text" step="0.01" min="0" max="1.00" />
-                                                    </td>
-                                                    <td name="tpa-breakpoint">
-                                                        <label>TPA Breakpoint</label>
-                                                        <input type="text" step="10" min="1000" max="2000" />
-                                                    </td>
-                                                    <td name="airmode_activate_throttle" class="bf-only">
-                                                        <label>Airmode Activate</label>
-                                                        <input type="text" step="10" min="1000" max="2000" />
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <table class="parameter cf">
-                                            <thead>
-                                                <tr>
                                                     <th scope="row" colspan="6">Feedforward</th>
                                                 </tr>
                                             </thead>
@@ -1003,6 +961,50 @@
                                                     <td name="feedforwardMaxRate" class="bf-only">
                                                         <label>MaxRate</label>
                                                         <input type="text" step="0" min="0" max="100" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table id="d_min" class="parameter cf">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="5">D Min</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td name="d_min_gain" class="bf-only">
+                                                        <label>Gain</label>
+                                                        <input type="text" step="1" min="0" max="100" />
+                                                    </td>
+                                                    <td name="d_min_advance" class="bf-only">
+                                                        <label>Advance</label>
+                                                        <input type="text" step="1" min="0" max="200" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="parameter cf">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="5">TPA and Airmode</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td name="dynThrPID">
+                                                        <label>TPA amount</label>
+                                                        <input type="text" step="0.01" min="0" max="1.00" />
+                                                    </td>
+                                                    <td name="tpa-breakpoint">
+                                                        <label>TPA Breakpoint</label>
+                                                        <input type="text" step="10" min="1000" max="2000" />
+                                                    </td>
+                                                    <td name="airmode_activate_throttle" class="bf-only">
+                                                        <label>Airmode Activate</label>
+                                                        <input type="text" step="10" min="1000" max="2000" />
                                                     </td>
                                                 </tr>
                                             </tbody>

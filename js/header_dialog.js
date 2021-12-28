@@ -235,7 +235,7 @@ function HeaderDialog(dialog, onSave) {
 					case 0:
 						if(data[i]!=null) {
 								$(this).val((data[i]).toFixed(0));
-								$(this).attr('decPl', 1);
+								$(this).attr('decPl', 0);
 								$(this).removeClass('missing');
 							} else {
 								$(this).addClass('missing');
@@ -245,7 +245,7 @@ function HeaderDialog(dialog, onSave) {
 					case 1:
 						if(data[i]!=null) {
 								$(this).val((data[i]).toFixed(0));
-								$(this).attr('decPl', 3);
+								$(this).attr('decPl', 0);
 								$(this).removeClass('missing');
 							} else {
 								$(this).addClass('missing');
@@ -265,7 +265,18 @@ function HeaderDialog(dialog, onSave) {
                     case 3:
                         if(data[i]!=null) {
                             $(this).val(data[i].toFixed(0));
-                            $(this).attr('decPl', 2);
+                            $(this).attr('decPl', 0);
+                            $(this).removeClass('missing');
+                        } else {
+                            $(this).val('');
+                            $(this).addClass('missing');
+                        }
+                        i++;
+                        break;
+                    case 4:
+                        if(data[i]!=null) {
+                            $(this).val(data[i].toFixed(0));
+                            $(this).attr('decPl', 0);
                             $(this).removeClass('missing');
                         } else {
                             $(this).val('');
