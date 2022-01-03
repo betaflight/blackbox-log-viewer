@@ -12,8 +12,8 @@ be played behind the log. You can export the graphs as a WebM video to share wit
 
 ### Standalone
 
-Download the installer from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
-
+Betaflight 4.3 users should use the [latest nightly release](https://github.com/betaflight/blackbox-log-viewer-nightlies).
+Users of earlier Betaflight firmware should first try the nightly release, but if some fields don't render properly, try an earlier version from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
 ### Notes
 
 #### Windows users
@@ -104,6 +104,15 @@ finally build the DMG itself, which will end up in blackbox-log-viewer/release/,
 ```
 yarn gulp release
 ```
+or just:
+```
+gulp release
+```
+For a build with debugging capabilities (use F12 to open the debug console):
+```
+yarn start```
+
+
 
 #### Build or release app for one specific platform
 To build or release only for one specific platform you can append the plaform after the `task-name`.
@@ -113,7 +122,7 @@ If no platform is provided, only for the platform you are builing from will be b
 * **Linux** use `yarn gulp <task-name> --linux64`
 * **Windows** use `yarn gulp <task-name> --win64`
 
-You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`. Other platforms like `--win32` and `--linux32` can be used too, but they are not officially supported, so use them at your own risk.
+`<task-name>` would typically be `release`.  You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`. Other platforms like `--win32` and `--linux32` can be used too, but they are not officially supported, so use them at your own risk.
 
 #### macOS DMG installation background image
 
