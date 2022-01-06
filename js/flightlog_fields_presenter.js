@@ -638,7 +638,7 @@ function FlightLogFieldPresenter() {
             if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
                     'debug[all]':'Feedforward [roll]',
-                    'debug[0]':'Setpoint, interpolated [roll]',
+                    'debug[0]':'Setpoint, un-smoothed [roll]',
                     'debug[1]':'Delta, smoothed [roll]',
                     'debug[2]':'Boost, smoothed [roll]',
                     'debug[3]':'rcCommand Delta [roll]',
