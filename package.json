@@ -28,8 +28,7 @@
   "dependencies": {
     "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
-    "lodash": "^4.17.21",
-    "webm-writer": "^0.3.0"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@quanle94/innosetup": "^6.0.2",
