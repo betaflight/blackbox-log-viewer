@@ -89,10 +89,7 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
     }
     
     function supportsFileWriter() {
-        // FIXME: a bug in the WebM library does not detect the FileWriter correctly. I keep the code and only comment it waiting for a fix...
-        // More info here: https://github.com/betaflight/blackbox-log-viewer/issues/492 and https://github.com/thenickdude/webm-writer-js/issues/31
-        return false;
-        //return !!(chrome && chrome.fileSystem);
+        return !!(chrome && chrome.fileSystem);
     }
     
     /**
