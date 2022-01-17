@@ -195,12 +195,14 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             stickIndex,
             rcCommand = [], rcCommandLabels = [];
 
+        const highResolutionScale = flightLog.getSysConfig().blackbox_high_resolution > 0 ? 10 : 1;
+
         for (stickIndex = 0; stickIndex < 4; stickIndex++) {
             //Check that stick data is present to be drawn:
             if (rcCommandFields[stickIndex] === undefined)
                 return;
 
-            rcCommand[stickIndex] = frame[rcCommandFields[stickIndex]];
+            rcCommand[stickIndex] = frame[rcCommandFields[stickIndex]] / highResolutionScale;
             if (stickLabel != null) {
                 rcCommandLabels[stickIndex] = (rcCommand[stickIndex] * ((stickIndex == 2) ? -1 : 1)) + ""; // correct the value for Yaw being inverted
                 if (userSettings.stickUnits != null) {

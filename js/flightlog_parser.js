@@ -204,6 +204,7 @@ var FlightLogParser = function(logData) {
             anti_gravity_gain:null,                 // Anti gravity gain
             anti_gravity_mode:null,                 // Anti gravity mode
             anti_gravity_threshold:null,            // Anti gravity threshold for step mode
+            blackbox_high_resolution:null,          // Blackbox high resolution mode
             thrMid:null,                            // Throttle Mid Position
             thrExpo:null,                           // Throttle Expo
             tpa_breakpoint:null,                    // TPA Breakpoint
@@ -737,6 +738,8 @@ var FlightLogParser = function(logData) {
             case "throttle_boost_cutoff":
 
             case "motor_poles":
+
+            case "blackbox_high_resolution":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
             case "rc_expo":

@@ -257,6 +257,7 @@ GraphConfig.load = function(config) {
         }
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
+        const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
 
         try {
             if (fieldName.match(/^motor\[/)) {
@@ -302,7 +303,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.25, /* Make this 1.0 to scale linearly */
-                    inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20% 
+                    inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20% 
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
@@ -314,16 +315,16 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle
                 return {
-                    offset: -1500,
+                    offset: -1500 * highResolutionScale,
                     power: 1.0,
-                    inputRange: 500, 
+                    inputRange: 500 * highResolutionScale,
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
                     offset: 0,
                     power: 0.25,
-                    inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
+                    inputRange: 500 * highResolutionScale * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
                     outputRange: 1.0
                 };
             } else if (fieldName == "heading[2]") {
@@ -771,7 +772,7 @@ GraphConfig.load = function(config) {
             EXAMPLE_GRAPHS.push({label: "Gyros",fields: ["gyroADC[all]"]});
         }
         if (!flightLog.isFieldDisabled().SETPOINT) {
-            EXAMPLE_GRAPHS.push({label: "RC Rates",fields: ["rcCommands[all]"]});
+            EXAMPLE_GRAPHS.push({label: "Setpoint",fields: ["rcCommands[all]"]});
         }
         if (!flightLog.isFieldDisabled().RC_COMMANDS) {
             EXAMPLE_GRAPHS.push({label: "RC Command",fields: ["rcCommand[all]"]});

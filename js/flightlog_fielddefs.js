@@ -213,6 +213,8 @@ var
             "SRXL",
             "CUSTOM",
             "FPORT",
+            "SRXL2",
+            "GHST"
     ]),
 
     ANTI_GRAVITY_MODE = makeReadOnly([
