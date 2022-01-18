@@ -470,12 +470,12 @@ GraphConfig.load = function(config) {
                         };
                     case 'FFT':
                         switch (fieldName) {
-                            case 'debug[0]': // gyro scaled [for selected axis]
-                            case 'debug[1]': // pre-dyn notch gyro [for selected axis]
-                            case 'debug[2]': // pre-dyn notch gyro FFT downsampled [roll]
+                            case 'debug[0]': // pre-dyn notch gyro [for gyro debug axis]
+                            case 'debug[1]': // post-dyn notch gyro [for gyro debug axis]
+                            case 'debug[2]': // pre-dyn notch gyro downsampled for FFT [for gyro debug axis]
                                 return {
                                     offset: 0,
-                                    power: 0.25,
+                                    power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0
                                 };
@@ -484,14 +484,14 @@ GraphConfig.load = function(config) {
                         }
                     case 'FFT_FREQ':
                         switch (fieldName) {
-                            case 'debug[0]': // roll center freq
-                            case 'debug[1]': // pitch center freq
-                                return getCurveForMinMaxFields('debug[0]', 'debug[1]');
-                            case 'debug[2]': // pre-dyn notch gyro [for selected axis]
-                            case 'debug[3]': // raw gyro [for selected axis]
+                            case 'debug[0]': // notch 1 center freq [for gyro debug axis]
+                            case 'debug[1]': // notch 2 center freq [for gyro debug axis]
+                            case 'debug[2]': // notch 3 center freq [for gyro debug axis]
+                                return getCurveForMinMaxFields('debug[0]', 'debug[1]', 'debug[2]');
+                            case 'debug[3]': // pre-dyn notch gyro [for gyro debug axis]
                                 return {
                                     offset: 0,
-                                    power: 0.25,
+                                    power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0
                                 };

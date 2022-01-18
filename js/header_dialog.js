@@ -362,8 +362,12 @@ function HeaderDialog(dialog, onSave) {
 			features.push(
 				{bit: 27, group: 'other', name: 'ESC_SENSOR', description: 'Use KISS ESC 24A telemetry as sensor'},
 				{bit: 28, group: 'other', name: 'ANTI_GRAVITY', description: 'Temporary boost I-Term on high throttle changes'},
-				{bit: 29, group: 'other', name: 'DYNAMIC_FILTER', description: 'Dynamic gyro notch filtering'}
-			)
+			);
+            if (semver.lt(sysConfig.firmwareVersion, "4.3.0")) {
+                features.push(
+                    {bit: 29, group: 'other', name: 'DYNAMIC_FILTER', description: 'Dynamic gyro notch filtering'},
+                );
+            }
 		}
 
         var radioGroups = [];

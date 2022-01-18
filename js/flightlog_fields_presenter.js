@@ -657,6 +657,27 @@ function FlightLogFieldPresenter() {
                     'debug[2]':'Dyn Idle D [roll]',
                     'debug[3]':'Min RPM',
                 };
+                DEBUG_FRIENDLY_FIELD_NAMES.FFT = {
+                    'debug[all]':'Debug FFT',
+                    'debug[0]':'Gyro Pre Dyn Notch [dbg-axis]',
+                    'debug[1]':'Gyro Post Dyn Notch [dbg-axis]',
+                    'debug[2]':'Gyro Downsampled [dbg-axis]',
+                    'debug[3]':'Not used',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.FFT_TIME = {
+                    'debug[all]':'Debug FFT TIME',
+                    'debug[0]':'Active calc step',
+                    'debug[1]':'Step duration',
+                    'debug[2]':'Not used',
+                    'debug[3]':'Not used',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
+                    'debug[all]':'Debug FFT FREQ',
+                    'debug[0]':'Notch 1 Center Freq [dbg-axis]',
+                    'debug[1]':'Notch 2 Center Freq [dbg-axis]',
+                    'debug[2]':'Notch 3 Center Freq [dbg-axis]',
+                    'debug[3]':'Gyro Pre Dyn Notch [dbg-axis]',
+                };
             } else if (semver.gte(firmwareVersion, '4.2.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
                     'debug[all]':'Feedforward [roll]',
@@ -950,11 +971,11 @@ function FlightLogFieldPresenter() {
                     return value.toFixed(0) + "°C";
                 case 'FFT':
                     switch (fieldName) {
-                        case 'debug[0]': // gyro pre-notch [for selected axis]
-                        case 'debug[1]': // gyro post-notch [for selected axis]
-                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
-                    // debug 2 = sample average
-                    // debug 3 = not used
+                        case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
+                        case 'debug[1]': // gyro post dyn notch [for gyro debug axis]
+                        case 'debug[2]': // gyro pre dyn notch, downsampled for FFT [for gyro debug axis]
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
+                        // debug 3 = not used
                         default:
                             return value.toFixed(0);
                     }
@@ -963,17 +984,18 @@ function FlightLogFieldPresenter() {
                         case 'debug[0]':
                             return FlightLogFieldPresenter.presentEnum(value, FFT_CALC_STEPS);
                         case 'debug[1]':
-                        case 'debug[2]':
-                            return value.toFixed(0) + "\u03BCs";
+                            return value.toFixed(0) + " \u03BCs";
+                        // debug 2 = not used
+                        // debug 3 = not used
                         default:
                             return value.toFixed(0);
                     }
                 case 'FFT_FREQ':
                     switch (fieldName) {
-                        case 'debug[3]': // raw gyro [for debug axis]
-                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                        case 'debug[3]': // gyro pre dyn notch [for gyro debug axis]
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
                         default:
-                            return value.toFixed(0) + "Hz";
+                            return value.toFixed(0) + " Hz";
                     }
                 case 'RTH':
                     switch(fieldName) {
