@@ -1,0 +1,52 @@
+name: Bug Report
+description: Create a report to help us fix bugs in Betaflight Blackbox Explorer.
+labels: ["Template: Bug"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        # Please fill all the fields with the required information
+
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        # Setup
+
+  - type: input
+    attributes:
+      label: Betaflight Blackbox Explorer version
+      description: Specify the version of the Betaflight Blackbox Explorer (as displayed in the app).
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        # Other information
+
+  - type: textarea
+    attributes:
+      label: Add any other context about the problem that you think might be relevant here
+      description: If this bug is related to a blackbox log please post it here too.
