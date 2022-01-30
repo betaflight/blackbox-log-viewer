@@ -17,7 +17,7 @@ git:
 language: node_js
 
 node_js:
-  - 8.11.2
+  - 14.8.2
 
 before_install:
   - npm i -g npm@6.0.1
