@@ -183,8 +183,8 @@ function getRunDebugAppCommand(arch) {
     return command;
 }
 
-function getReleaseFilename(platform, ext) {
-    return `${pkg.name}_${pkg.version}_${platform}.${ext}`;
+function getReleaseFilename(platform, ext, portable = false) {
+    return `${pkg.name}_${pkg.version}_${platform}${portable ? "-portable" : ""}.${ext}`;
 }
 
 function clean_dist() { 
@@ -407,7 +407,7 @@ function release_win(arch, appDirectory, done) {
 // Create distribution package (zip) for windows and linux platforms
 function release_zip(arch, appDirectory) {
     const src = path.join(appDirectory, pkg.name, arch, '**');
-    const output = getReleaseFilename(arch, 'zip');
+    const output = getReleaseFilename(arch, 'zip', true);
     const base = path.join(appDirectory, pkg.name, arch);
 
     return compressFiles(src, base, output, 'Betaflight Blackbox Explorer');
@@ -618,12 +618,18 @@ function listReleaseTasks(appDirectory) {
     }
 
     if (platforms.indexOf('win32') !== -1) {
+        releaseTasks.push(function release_win32_zip() {
+            return release_zip('win32', appDirectory);
+        });
         releaseTasks.push(function release_win32(done) {
             return release_win('win32', appDirectory, done);
         });
     }
 
     if (platforms.indexOf('win64') !== -1) {
+        releaseTasks.push(function release_win64_zip() {
+            return release_zip('win64', appDirectory);
+        });
         releaseTasks.push(function release_win64(done) {
             return release_win('win64', appDirectory, done);
         });

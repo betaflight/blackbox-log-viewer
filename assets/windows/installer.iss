@@ -15,6 +15,7 @@
 #define ExecutableFileName "betaflight-blackbox-explorer.exe"
 #define GroupName "Betaflight"
 #define InstallerFileName "betaflight-blackbox-explorer-installer_" + version + "_" + archName
+#define InstallerFileName "betaflight-blackbox-explorer_" + version + "_" + archName + "-installer"
 #define SourcePath "..\..\" + sourceFolder + "\betaflight-blackbox-explorer\" + archName
 #define TargetFolderName "Betaflight-Blackbox-Explorer"
 #define UpdatesUrl "https://github.com/betaflight/blackbox-log-viewer/releases/"
