@@ -2,7 +2,6 @@
 
 const pkg = require('./package.json');
 
-const child_process = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,7 +14,6 @@ const buildRpm = require('rpm-builder')
 const commandExistsSync = require('command-exists').sync;
 
 const gulp = require('gulp');
-const concat = require('gulp-concat');
 const yarn = require("gulp-yarn");
 const rename = require('gulp-rename');
 const os = require('os');
@@ -517,7 +515,7 @@ function release_rpm(arch, appDirectory, done) {
 
 // Create distribution package for macOS platform
 function release_osx64(appDirectory) {
-    var appdmg = require('gulp-appdmg');
+    var appdmg = require('./gulp-appdmg');
 
     // The appdmg does not generate the folder correctly, manually
     createDirIfNotExists(RELEASE_DIR);
