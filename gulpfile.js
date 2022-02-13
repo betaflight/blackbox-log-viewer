@@ -26,7 +26,7 @@ const RELEASE_DIR = './release/';
 const LINUX_INSTALL_DIR = '/opt/betaflight';
 
 var nwBuilderOptions = {
-    version: '0.54.1',
+    version: '0.60.0',
     files: './dist/**/*',
     macIcns: './images/bf_icon.icns',
     macPlist: { 'CFBundleDisplayName': 'Betaflight Blackbox Explorer'},
