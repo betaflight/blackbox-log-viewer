@@ -100,6 +100,11 @@ select {
     font-family: 'open_sanssemibold', Arial, serif;
 }
 
+.h5 {
+    color: red;
+    margin: 0;
+}
+
 /* Spacers */
 .spacer {
     padding-left: 7px;
@@ -125,14 +130,14 @@ select {
 
 /* space around each div*/
 .spacer_left {
-    padding-left: 15px;
+    padding-left: 0px;
     float: left;
-    width: calc(100% - 15px);
+    width: calc(100%);
 }
 
 .spacer_right {
-    padding-right: 15px;
-    width: calc(100% - 15px);
+    padding-right: 5px;
+    width: calc(100% - 5px);
     float: left;
 }
 
@@ -176,7 +181,7 @@ select {
 
 .header-dialog .modal-dialog {
     width:75%;
-    min-width:954px;
+    min-width:850px;
 }
 
 .header-dialog .cf th {

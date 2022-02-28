@@ -627,7 +627,7 @@
                     </button>
                     <h4 class="modal-title">Configure graphs</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" padding-left:5px;>
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary dropdown-toggle config-graphs-add" data-toggle="dropdown" aria-expanded="false">
                             <span class="glyphicon glyphicon-plus"></span> Add graph
@@ -655,14 +655,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" title="Close without saving changes">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="tooltip" title="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title">Log Header Information</h4>
-                    <h5 class="modal-title-revision"></h5>
-                    <h5 class="modal-title-board-info"></h5>
-                    <h5 class="modal-title-date"></h5>
                     <h5 class="modal-title-craft"></h5>
+                    <h5 class="modal-title-revision"></h5>
                 </div>
                 <div class="modal-body">
                     <form name="header-information" id="pid-tuning">
@@ -690,19 +687,19 @@
                                                     <label>&nbsp</label>
                                                 </th>
                                                 <th name="Proportional">
-                                                    <label>Proportional</label>
+                                                    <label>P</label>
                                                 </th>
                                                 <th name="Integral">
-                                                    <label>Integral</label>
+                                                    <label>I</label>
                                                 </th>
                                                 <th name="D_Max">
                                                     <label>D_Max</label>
                                                 </th>
                                                 <th name="Derivative">
-                                                    <label>Derivative</label>
+                                                    <label>D</label>
                                                 </th>
                                                 <th name="Feedforward">
-                                                    <label>Feedforward</label>
+                                                    <label>FF</label>
                                                 </th>
                                             </tr>
                                             <tr class="rollPID">
@@ -941,7 +938,7 @@
                                                         <input type="text" step="0.01" min="0" max="999" />
                                                     </td>
                                                     <td name="feedforwardAveraging" class="bf-only">
-                                                        <label>Averaging</label>
+                                                        <label>Avgerage</label>
                                                         <select>
                                                             <!~~ list generated here ~~>
                                                         </select>
@@ -1634,7 +1631,7 @@
                                                         <input type="text" step="0.01" min="0" max="999.00" />
                                                     </td>
                                                     <td name="gyro_notch_cutoff">
-                                                        <label>Notch 1 Cutoff</label>
+                                                        <label>Notch1 Cutoff</label>
                                                         <input type="text" step="0.1" min="0" max="999.00" />
                                                     </td>
                                                     <td name='gyro_notch_hz_2'>
