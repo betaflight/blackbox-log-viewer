@@ -511,10 +511,10 @@ function HeaderDialog(dialog, onSave) {
 
       // Update the log header
 
-      $('h5.modal-title-revision').text((sysConfig['Firmware revision'] != null) ? ` Rev : ${sysConfig['Firmware revision']}` : '');
+      $('h5.modal-title-craft').text((sysConfig['Craft name'] != null) ? ` ${sysConfig['Craft name']}` : '');
+//      $('h5.modal-title-date').text((sysConfig['Firmware date'] != null) ? ` ${sysConfig['Firmware date']}` : '');
+      $('h5.modal-title-revision').text(((sysConfig['Firmware revision'] != null) ? ` ${sysConfig['Firmware revision']}` : '')  + ' - ' + ((sysConfig['Firmware date'] != null) ? ` ${sysConfig['Firmware date']}` : ''));
       $('h5.modal-title-board-info').text((sysConfig['Board information'] != null) ? ` Board : ${sysConfig['Board information']}` : '');
-      $('h5.modal-title-date').text((sysConfig['Firmware date'] != null) ? ` Date : ${sysConfig['Firmware date']}` : '');
-      $('h5.modal-title-craft').text((sysConfig['Craft name'] != null) ? ` Name : ${sysConfig['Craft name']}` : '');
 
 		switch(sysConfig.firmwareType) {
 			case FIRMWARE_TYPE_BETAFLIGHT:
