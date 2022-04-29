@@ -736,6 +736,129 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'GPS_RESCUE_THROTTLE_PID':
+                        switch (fieldName) {
+                            case 'debug[0]': // Throttle P uS added
+                            case 'debug[1]': // Throttle D uS added
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 300,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // Altitude
+                            case 'debug[3]': // Target Altitude
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'GPS_RESCUE_VELOCITY':
+                        switch (fieldName) {
+                            case 'debug[0]': // Pitch P deg * 100
+                            case 'debug[1]': // Pitch D deg * 100
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 2000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // Velocity in cm/s
+                            case 'debug[3]': // Velocity to home in cm/s
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'GPS_RESCUE_HEADING':
+                        switch (fieldName) {
+                            case 'debug[0]': // Rescue yaw rate deg/s * 10 up to +/- 90 
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // Rescue roll deg * 10 up to +/- 20 deg
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // Yaw attitude * 10
+                            case 'debug[3]': // Angle to home * 10
+                                return {
+                                    offset: -1800,
+                                    power: 1.0,
+                                    inputRange: 1800,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'RTH':
+                        switch (fieldName) {
+                            case 'debug[0]': // Rescue throttle 1000-2000 us
+                                return {
+                                    offset: -1500,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // Altitude adjustment or positive of negative
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]':  // rescue pitch angle
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Failure counters coded
+                                return {
+                                    offset: -1000,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
+                    case 'GPS_RESCUE_TRACKING':
+                        switch (fieldName) {
+                            case 'debug[0]': // velocity to home cm/s
+                            case 'debug[1]': // target velocity cm/s
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // altitude m
+                            case 'debug[3]': // Target altitude m
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     }
             }
             // if not found above then

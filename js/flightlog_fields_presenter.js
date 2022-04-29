@@ -398,8 +398,8 @@ function FlightLogFieldPresenter() {
         'RTH' : {
             'debug[all]':'RTH',
             'debug[0]':'Rescue Throttle',
-            'debug[1]':'Rescue Angle',
-            'debug[2]':'Altitude Adjustment',
+            'debug[1]':'Rescue Pitch Angle',
+            'debug[2]':'Throttle adjustment',
             'debug[3]':'Rescue State',
         },
         'ITERM_RELAX' : {
@@ -626,6 +626,27 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Frequency Offset',
             'debug[3]':'Phase Shift',
         },
+        'GPS_RESCUE_VELOCITY' : {
+            'debug[all]':'GPS Rescue Velocity',
+            'debug[0]':'Velocity P',
+            'debug[1]':'Velocity D',
+            'debug[2]':'Velocity to Home',
+            'debug[3]':'Target Velocity',
+        },
+        'GPS_RESCUE_HEADING' : {
+            'debug[all]':'GPS Rescue Heading',
+            'debug[0]':'Rescue Yaw',
+            'debug[1]':'Rescue Roll',
+            'debug[2]':'Attitude',
+            'debug[3]':'Angle to home',
+        },
+        'GPS_RESCUE_TRACKING' : {
+            'debug[all]':'GPS Rescue Tracking',
+            'debug[0]':'Velocity to home',
+            'debug[1]':'Target velocity',
+            'debug[2]':'Altitude',
+            'debug[3]':'Target altitude',
+        },
     };
 
     let DEBUG_FRIENDLY_FIELD_NAMES = null;
@@ -677,6 +698,13 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Notch 2 Center Freq [dbg-axis]',
                     'debug[2]':'Notch 3 Center Freq [dbg-axis]',
                     'debug[3]':'Gyro Pre Dyn Notch [dbg-axis]',
+                };
+                DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+                    'debug[all]':'GPS Rescue Altitude',
+                    'debug[0]':'Throttle P',
+                    'debug[1]':'Throttle D',
+                    'debug[2]':'Altitude',
+                    'debug[3]':'Target Altitude',
                 };
             } else if (semver.gte(firmwareVersion, '4.2.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
@@ -999,10 +1027,14 @@ function FlightLogFieldPresenter() {
                     }
                 case 'RTH':
                     switch(fieldName) {
+                        case 'debug[0]':
+                            return value.toFixed(0) + 'us'; // rescue throttle 1000-2000
                         case 'debug[1]':
-                            return (value / 100).toFixed(1) + 'deg';
+                            return (value / 100).toFixed(1) + 'deg'; // rescue pitch angle
+                        case 'debug[2]':
+                            return value.toFixed(0) + 'us'; // altitude adjustment min to max throttle
                         default:
-                            return value.toFixed(0);
+                            return value.toFixed(0); // coded values to 2000
                     }
                 case 'ITERM_RELAX':
                     switch (fieldName) {
@@ -1056,7 +1088,16 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + "Hz";
                     }
                 case 'GPS_RESCUE_THROTTLE_PID':
-                        return value.toFixed(0);
+                    switch (fieldName) {
+                        case 'debug[0]': // Throttle P added uS
+                        case 'debug[1]': // Throttle D added * uS
+                            return value.toFixed(0) + 'uS';
+                        case 'debug[2]': // current altitude in m
+                        case 'debug[3]': // TARGET altitude in m
+                            return (value / 100).toFixed(1) + 'm';
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'DYN_IDLE':
                     switch (fieldName) {
                         case 'debug[3]': // minRPS
@@ -1124,6 +1165,36 @@ function FlightLogFieldPresenter() {
                         // debug 3 = Pphase shift in us
                         default:
                             return value.toFixed(0) + 'us';
+                    }
+                case 'GPS_RESCUE_VELOCITY':
+                    switch (fieldName) {
+                        case 'debug[0]': // Pitch P degrees * 100
+                        case 'debug[1]': // Pitch D degrees * 100
+                            return (value / 100).toFixed(1) + 'deg';
+                        case 'debug[2]': // velocity to home cm/s
+                        case 'debug[3]': // velocity target cm/s
+                            return (value / 100).toFixed(1) + 'm/s';
+                    }
+                case 'GPS_RESCUE_HEADING':
+                    switch (fieldName) {
+                        case 'debug[0]': // Rescue yaw rate deg/s * 10 up to +/- 90 
+                            return (value / 10).toFixed(1) + 'deg/s';
+                        case 'debug[1]': // Rescue roll deg * 100 up to +/- 20 deg
+                            return (value / 100).toFixed(1) + 'deg';
+                        case 'debug[2]': // Attitude in degrees * 10
+                        case 'debug[3]': // Angle to home in degrees * 10
+                            return (value / 10).toFixed(1) + 'deg';
+                    }
+                case 'GPS_RESCUE_TRACKING':
+                    switch (fieldName) {
+                        case 'debug[0]': // velocity to home cm/s
+                        case 'debug[1]': // velocity target cm/s
+                            return (value / 100).toFixed(1) + 'm/s';
+                        case 'debug[2]': // altitude cm
+                        case 'debug[3]': // altitude target cm
+                            return (value / 100).toFixed(1) + 'm';
+                        default:
+                            return value.toFixed(0);
                     }
             }
             return value.toFixed(0);
