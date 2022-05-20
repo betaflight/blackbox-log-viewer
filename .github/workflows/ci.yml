@@ -1,0 +1,58 @@
+# Builds Betaflight Blackbox Explorer on Windows, Linux and macOS platforms.
+#
+# After building, artifacts are released to a separate repository.
+
+env:
+  debugBuild: true
+
+name: CI
+
+on: workflow_call
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-20.04
+            releaseArgs: --linux64
+
+          - name: macOS
+            os: macos-11
+            releaseArgs: --osx64
+
+          - name: Windows
+            os: windows-2022
+            releaseArgs: --win64
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache NW.js
+        uses: actions/cache@v2
+        with:
+          path: cache/
+          key: ${{ runner.os }}-${{ hashFiles('gulpfile.js') }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: '.nvmrc'
+          cache: yarn
+
+      - run: yarn install --immutable --immutable-cache --check-cache
+
+      - run: yarn gulp release ${{ matrix.releaseArgs }}
+        if: ${{ !env.debugBuild }}
+
+      - run: yarn gulp debug-release ${{ matrix.releaseArgs }}
+        if: ${{ env.debugBuild }}
+
+      - name: Publish build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Betaflight-Blackbox-Explorer${{ env.debugBuild == 'true' && '-Debug' || '' }}-${{ matrix.name }}
+          path: release/
+          retention-days: 90
