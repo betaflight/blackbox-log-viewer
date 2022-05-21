@@ -1089,9 +1089,9 @@ function FlightLogFieldPresenter() {
                     }
                 case 'GPS_RESCUE_THROTTLE_PID':
                     switch (fieldName) {
-                        case 'debug[0]': // Throttle P added uS
-                        case 'debug[1]': // Throttle D added * uS
-                            return value.toFixed(0) + 'uS';
+                        case 'debug[0]': // Throttle P added us
+                        case 'debug[1]': // Throttle D added * us
+                            return value.toFixed(0) + 'us';
                         case 'debug[2]': // current altitude in m
                         case 'debug[3]': // TARGET altitude in m
                             return (value / 100).toFixed(1) + 'm';
@@ -1119,12 +1119,12 @@ function FlightLogFieldPresenter() {
                     }
                 case 'GHST':
                     switch (fieldName) {
-                        // debug 0 is CRC error count 0 to int16_t
-                        // debug 1 is unknown frame count 0 to int16_t
-                        // debug 2 is RSSI 0 to -128 -> 0 to 128
                         case 'debug[3]': // LQ 0-100
                             return value.toFixed(0) + '%';
                         default:
+                            // debug 0 is CRC error count 0 to int16_t
+                            // debug 1 is unknown frame count 0 to int16_t
+                            // debug 2 is RSSI 0 to -128 -> 0 to 128
                             return value.toFixed(0);
                     }
                 case 'SCHEDULER_DETERMINISM':
@@ -1133,8 +1133,8 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // task delay time in us*10
                         case 'debug[3]': // task delay time in us*10
                              return (value / 10).toFixed(1) + 'us';
-                        // debug 1 is task ID of late task
                         default:
+                            // debug 1 is task ID of late task
                             return value.toFixed(0);
                     }
                 case 'TIMING_ACCURACY':
@@ -1150,20 +1150,20 @@ function FlightLogFieldPresenter() {
                     switch (fieldName) {
                         case 'debug[3]': // uplink LQ %
                             return value.toFixed(1) + '%';
-                        // debug 0 = Lost connection count
-                        // debug 1 = RSSI
-                        // debug 2 = SNR
                         default:
+                            // debug 0 = Lost connection count
+                            // debug 1 = RSSI
+                            // debug 2 = SNR
                             return value.toFixed(0);
                     }
                 case 'RX_EXPRESSLRS_PHASELOCK':
                     switch (fieldName) {
                         case 'debug[2]': // Frequency offset in ticks
                             return value.toFixed(0) + 'ticks';
-                        // debug 0 = Phase offset us
-                        // debug 1 = Filtered phase offset us
-                        // debug 3 = Pphase shift in us
                         default:
+                            // debug 0 = Phase offset us
+                            // debug 1 = Filtered phase offset us
+                            // debug 3 = Pphase shift in us
                             return value.toFixed(0) + 'us';
                     }
                 case 'GPS_RESCUE_VELOCITY':
@@ -1177,7 +1177,7 @@ function FlightLogFieldPresenter() {
                     }
                 case 'GPS_RESCUE_HEADING':
                     switch (fieldName) {
-                        case 'debug[0]': // Rescue yaw rate deg/s * 10 up to +/- 90 
+                        case 'debug[0]': // Rescue yaw rate deg/s * 10 up to +/- 90
                             return (value / 10).toFixed(1) + 'deg/s';
                         case 'debug[1]': // Rescue roll deg * 100 up to +/- 20 deg
                             return (value / 100).toFixed(1) + 'deg';

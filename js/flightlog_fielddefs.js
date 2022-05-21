@@ -342,7 +342,7 @@ var
             "DEBUG_RX_STATE_TIME",
             "GPS_RESCUE_VELOCITY",
             "GPS_RESCUE_HEADING",
-            "GPS_RESCUE_TRACKING"
+            "GPS_RESCUE_TRACKING",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
