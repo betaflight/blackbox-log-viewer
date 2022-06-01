@@ -1027,12 +1027,11 @@ function FlightLogFieldPresenter() {
                     }
                 case 'RTH':
                     switch(fieldName) {
-                        case 'debug[0]':
-                            return value.toFixed(0) + 'us'; // rescue throttle 1000-2000
+                        case 'debug[0]': // rescue throttle 1000-2000
+                        case 'debug[2]': // altitude adjustment min to max throttle
+                            return value.toFixed(0) + 'us';
                         case 'debug[1]':
                             return (value / 100).toFixed(1) + 'deg'; // rescue pitch angle
-                        case 'debug[2]':
-                            return value.toFixed(0) + 'us'; // altitude adjustment min to max throttle
                         default:
                             return value.toFixed(0); // coded values to 2000
                     }
