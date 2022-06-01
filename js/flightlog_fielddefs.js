@@ -5,7 +5,7 @@ function makeReadOnly(x) {
     if (Object.freeze) {
         return Object.freeze(x);
     }
-    
+
     // Otherwise a no-op
     return x;
 }
@@ -18,21 +18,21 @@ const DSHOT_RANGE = DSHOT_MAX_VALUE - DSHOT_MIN_VALUE;
 const ANALOG_MIN_VALUE = 1000;
 
 // Fields definitions for lists
-var 
+var
     FlightLogEvent = makeReadOnly({
         SYNC_BEEP: 0,
-        
+
         AUTOTUNE_CYCLE_START: 10,
         AUTOTUNE_CYCLE_RESULT: 11,
         AUTOTUNE_TARGETS: 12,
         INFLIGHT_ADJUSTMENT: 13,
         LOGGING_RESUME: 14,
         DISARM: 15,
-        
+
         GTUNE_CYCLE_RESULT: 20,
         FLIGHT_MODE: 30,
         TWITCH_TEST: 40, // Feature for latency testing
-        
+
         CUSTOM : 250, // Virtual Event Code - Never part of Log File.
         CUSTOM_BLANK : 251, // Virtual Event Code - Never part of Log File. - No line shown
         LOG_END: 255
@@ -46,7 +46,7 @@ var
     }),
 
     FLIGHT_LOG_FLIGHT_MODE_NAME = [],
-    
+
     FLIGHT_LOG_FLIGHT_MODE_NAME_PRE_3_3 = makeReadOnly([
             'ARM',
             'ANGLE',
@@ -184,7 +184,7 @@ var
     FAST_PROTOCOL = makeReadOnly([
             "PWM",
             "ONESHOT125",
-            "ONESHOT42", 
+            "ONESHOT42",
             "MULTISHOT",
             "BRUSHED",
             "DSHOT150",
@@ -196,7 +196,7 @@ var
 
     MOTOR_SYNC = makeReadOnly([
             "SYNCED",
-            "UNSYNCED" 
+            "UNSYNCED"
     ]),
 
     SERIALRX_PROVIDER = makeReadOnly([
@@ -221,29 +221,29 @@ var
     ]),
 
     RC_SMOOTHING_TYPE = makeReadOnly([
-        "INTERPOLATION", 
+        "INTERPOLATION",
         "FILTER"
     ]),
 
     RC_SMOOTHING_INPUT_TYPE = makeReadOnly([
-        "PT1", 
+        "PT1",
         "BIQUAD"
     ]),
 
     RC_SMOOTHING_DERIVATIVE_TYPE = makeReadOnly([
-        "PT1", 
+        "PT1",
         "BIQUAD"
     ]),
 
     RC_SMOOTHING_MODE = makeReadOnly([
-        "OFF", 
+        "OFF",
         "ON"
     ]),
 
     RC_SMOOTHING_DEBUG_AXIS = makeReadOnly([
-        "ROLL", 
-        "PITCH", 
-        "YAW", 
+        "ROLL",
+        "PITCH",
+        "YAW",
         "THROTTLE"
     ]),
 
@@ -251,7 +251,7 @@ var
             "OFF",
             "DEFAULT",
             "AUTO",
-            "MANUAL"             
+            "MANUAL"
     ]),
 
     FILTER_TYPE = makeReadOnly([
@@ -414,7 +414,7 @@ var
         "SMALL_ANGLE",
         "FIXED_WING"
     ]),
-    
+
     FLIGHT_LOG_FAILSAFE_PHASE_NAME = makeReadOnly([
         "IDLE",
         "RX_LOSS_DETECTED",
@@ -435,9 +435,9 @@ var
     ITERM_RELAX = makeReadOnly([
         "OFF",
         "RP",
-        "RPY", 
+        "RPY",
         "RP_INC",
-        "RPY_INC", 
+        "RPY_INC",
     ]),
 
     ITERM_RELAX_TYPE = makeReadOnly([
@@ -506,7 +506,7 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('AIRMODE'),      1);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('VELOCITY'),     1);
         DEBUG_MODE.splice(DEBUG_MODE.indexOf('DTERM_FILTER'), 1);
-        
+
         if(semver.gte(firmwareVersion, '3.4.0')) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('GYRO'),     1, 'GYRO_FILTERED');
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('NOTCH'),    1, 'GYRO_SCALED');
