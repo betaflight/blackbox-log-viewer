@@ -182,9 +182,9 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
             renderFrame = function() {
                 graph.render(frameTime);
                 
-                if(logParameters.hasSticks) canvasContext.drawImage(stickCanvas, stickCanvasLeft, stickCanvasTop);
-                if(logParameters.hasCraft) canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
-                if(logParameters.hasAnalyser) canvasContext.drawImage(analyserCanvas, analyserCanvasLeft, analyserCanvasTop);
+                if (logParameters.hasSticks && parseInt(userSettings.sticks.size) > 0) canvasContext.drawImage(stickCanvas, stickCanvasLeft, stickCanvasTop);
+                if (logParameters.hasCraft && parseInt(userSettings.craft.size) > 0) canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
+                if (logParameters.hasAnalyser && parseInt(userSettings.analyser.size) > 0) canvasContext.drawImage(analyserCanvas, analyserCanvasLeft, analyserCanvasTop);
                 
                 videoWriter.addFrame(canvas);
                 
