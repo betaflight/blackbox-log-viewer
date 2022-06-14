@@ -1,13 +1,17 @@
 # Builds Betaflight Blackbox Explorer on Windows, Linux and macOS platforms.
 #
-# After building, artifacts are released to a separate repository.
-
-env:
-  debugBuild: true
+# After building, artifacts are released to a seperate repository.
 
 name: CI
 
-on: workflow_call
+on: 
+  workflow_call:
+    inputs:
+      debug_build:
+        description: 'Specifies if it is a debug build or a release build'
+        default: true
+        required: false
+        type: boolean
 
 jobs:
   build:
@@ -45,14 +49,14 @@ jobs:
       - run: yarn install --immutable --immutable-cache --check-cache
 
       - run: yarn gulp release ${{ matrix.releaseArgs }}
-        if: ${{ !env.debugBuild }}
+        if: ${{ !inputs.debug_build }}
 
       - run: yarn gulp debug-release ${{ matrix.releaseArgs }}
-        if: ${{ env.debugBuild }}
+        if: ${{ inputs.debug_build }}
 
       - name: Publish build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Betaflight-Blackbox-Explorer${{ env.debugBuild == 'true' && '-Debug' || '' }}-${{ matrix.name }}
+          name: Betaflight-Blackbox-Explorer${{ inputs.debug_build == 'true' && '-Debug' || '' }}-${{ matrix.name }}
           path: release/
           retention-days: 90
