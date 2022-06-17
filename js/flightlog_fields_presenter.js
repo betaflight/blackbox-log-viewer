@@ -776,6 +776,9 @@ function FlightLogFieldPresenter() {
             return "";
         }
         
+        const highResolutionScale = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 10 : 1;
+        const highResolutionAddPrecision = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 1 : 0;
+
         switch (fieldName) {
             case 'time':
                 return formatTime(value / 1000, true);
@@ -783,7 +786,7 @@ function FlightLogFieldPresenter() {
             case 'gyroADC[0]':
             case 'gyroADC[1]':
             case 'gyroADC[2]':
-                return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
+                return flightLog.gyroRawToDegreesPerSecond(value / highResolutionScale).toFixed(highResolutionAddPrecision) + " deg/s";
                 
             case 'gyroADCs[0]':
             case 'gyroADCs[1]':
@@ -793,14 +796,14 @@ function FlightLogFieldPresenter() {
             case 'axisError[0]':
             case 'axisError[1]':
             case 'axisError[2]':
-                return Math.round(value) + " deg/s";
+                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " deg/s";
 
             case 'rcCommand[0]':
             case 'rcCommand[1]':
             case 'rcCommand[2]':
-                return (value + 1500).toFixed(0) + " us";
+                return (value / highResolutionScale + 1500).toFixed(highResolutionAddPrecision) + " us";
             case 'rcCommand[3]':
-                return value.toFixed(0) + " us";
+                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " us";
 
             case 'motor[0]':
             case 'motor[1]':
@@ -825,7 +828,7 @@ function FlightLogFieldPresenter() {
             case 'rcCommands[0]':
             case 'rcCommands[1]':
             case 'rcCommands[2]':
-                return value.toFixed(0) + " deg/s";
+                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " deg/s";
             case 'rcCommands[3]':
                 return value.toFixed(1) + "%";
 
@@ -849,7 +852,7 @@ function FlightLogFieldPresenter() {
             case 'accSmooth[0]':
             case 'accSmooth[1]':
             case 'accSmooth[2]':
-                return flightLog.accRawToGs(value).toFixed(2) + "g";
+                return flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision) + "g";
             
             case 'vbatLatest':
                 if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
@@ -926,7 +929,7 @@ function FlightLogFieldPresenter() {
                         case 'debug[0]':
                             return value.toFixed(0);
                         default:
-                            return (value/10).toFixed(1) + "V";
+                            return (value / 10).toFixed(1) + "V";
                     }
                 case 'ACCELEROMETER':
                     return flightLog.accRawToGs(value).toFixed(2) + "g";
