@@ -110,7 +110,8 @@ gulp release
 ```
 For a build with debugging capabilities (use F12 to open the debug console):
 ```
-yarn start```
+yarn start
+```
 
 
 
