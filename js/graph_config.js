@@ -764,6 +764,27 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'BARO':
+                        switch (fieldName) {
+                            case 'debug[0]': // Baro state 0-10
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 20,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // Baro Temp
+                            case 'debug[2]': // Baro Raw
+                            case 'debug[3]': // Baro smoothed
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 2000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     }
             }
             // if not found above then
