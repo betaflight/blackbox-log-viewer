@@ -737,6 +737,33 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'ALTITUDE':
+                        switch (fieldName) {
+                            case 'debug[0]': // GPS Trust
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // Baro Alt
+                            case 'debug[2]': // GPS Alt
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Vario
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     }
             }
             // if not found above then
