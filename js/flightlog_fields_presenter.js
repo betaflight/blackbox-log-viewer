@@ -664,6 +664,13 @@ function FlightLogFieldPresenter() {
                     'debug[2]':'Failure code',
                     'debug[3]':'Failure timers',
                 };
+                DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+                    'debug[all]':'GPS Rescue throttle PIDs',
+                    'debug[0]':'Throttle P',
+                    'debug[1]':'Throttle D',
+                    'debug[2]':'Altitude',
+                    'debug[3]':'Target altitude',
+                };
             } else if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
                     'debug[all]':'Feedforward [roll]',
@@ -1181,6 +1188,8 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // velocity to home cm/s
                         case 'debug[3]': // velocity target cm/s
                             return (value / 100).toFixed(1) + 'm/s';
+                        default:
+                            return value.toFixed(0);
                     }
                 case 'GPS_RESCUE_HEADING':
                     switch (fieldName) {
@@ -1191,6 +1200,8 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // Attitude in degrees * 10
                         case 'debug[3]': // Angle to home in degrees * 10
                             return (value / 10).toFixed(1) + 'deg';
+                        default:
+                            return value.toFixed(0);
                     }
                 case 'GPS_RESCUE_TRACKING':
                     switch (fieldName) {
