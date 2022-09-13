@@ -598,6 +598,13 @@ function FlightLogFieldPresenter() {
             'debug[2]':'RSSI',
             'debug[3]':'Link Quality',
         },
+        'GHST_MSP' : {
+            'debug[all]':'Ghost MSP',
+            'debug[0]':'MSP Frame Count',
+            'debug[1]':'MSP Frame Counter',
+            'debug[2]':'Not used',
+            'debug[3]':'Not used',
+        },
         'SCHEDULER_DETERMINISM' : {
             'debug[all]':'Scheduler Determinism',
             'debug[0]':'Cycle Start time',
@@ -626,6 +633,13 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Frequency Offset',
             'debug[3]':'Phase Shift',
         },
+        'RX_STATE_TIME' : {
+            'debug[all]':'Rx State Time',
+            'debug[0]':'Time 0',
+            'debug[1]':'Time 1',
+            'debug[2]':'Time 2',
+            'debug[3]':'Time 3',
+        },
         'GPS_RESCUE_VELOCITY' : {
             'debug[all]':'GPS Rescue Velocity',
             'debug[0]':'Velocity P',
@@ -635,9 +649,9 @@ function FlightLogFieldPresenter() {
         },
         'GPS_RESCUE_HEADING' : {
             'debug[all]':'GPS Rescue Heading',
-            'debug[0]':'Rescue Yaw',
-            'debug[1]':'Rescue Roll',
-            'debug[2]':'Attitude',
+            'debug[0]':'Ground speed',
+            'debug[1]':'GPS Heading',
+            'debug[2]':'IMU Attitude',
             'debug[3]':'Angle to home',
         },
         'GPS_RESCUE_TRACKING' : {
@@ -646,6 +660,13 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Target velocity',
             'debug[2]':'Altitude',
             'debug[3]':'Target altitude',
+        },
+        'ATTITUDE' : {
+            'debug[all]':'Attitude',
+            'debug[0]':'accADC X',
+            'debug[1]':'accADC Y',
+            'debug[2]':'Setpoint Roll',
+            'debug[3]':'Setpoint Pitch',
         },
     };
 
@@ -1130,6 +1151,14 @@ function FlightLogFieldPresenter() {
                         default:
                             return value.toFixed(0);
                     }
+                case 'GHST_MSP':
+                    switch (fieldName) {
+                        // debug 0 is msp frame count
+                        // debug 1 is msp frame count
+                        // debug 2 and 3 not used
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'SCHEDULER_DETERMINISM':
                     switch (fieldName) {
                         case 'debug[0]': // cycle time in us*10
@@ -1193,10 +1222,9 @@ function FlightLogFieldPresenter() {
                     }
                 case 'GPS_RESCUE_HEADING':
                     switch (fieldName) {
-                        case 'debug[0]': // Rescue yaw rate deg/s * 10 up to +/- 90 
-                            return (value / 10).toFixed(1) + 'deg/s';
-                        case 'debug[1]': // Rescue roll deg * 100 up to +/- 20 deg
-                            return (value / 100).toFixed(1) + 'deg';
+                        case 'debug[0]': // Ground speed cm/s 
+                            return (value / 100).toFixed(2) + 'm/s';
+                        case 'debug[1]': // GPS Ground course degrees * 10
                         case 'debug[2]': // Attitude in degrees * 10
                         case 'debug[3]': // Angle to home in degrees * 10
                             return (value / 10).toFixed(1) + 'deg';
@@ -1211,6 +1239,15 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // altitude cm
                         case 'debug[3]': // altitude target cm
                             return (value / 100).toFixed(1) + 'm';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'ATTITUDE:
+                    switch (fieldName) {
+                        case 'debug[0]': // accADC X
+                        case 'debug[1]': // accADC Y
+                        case 'debug[2]': // setpoint Roll
+                        case 'debug[3]': // setpoint Pitch
                         default:
                             return value.toFixed(0);
                     }

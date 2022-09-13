@@ -781,20 +781,14 @@ GraphConfig.load = function(config) {
                             }
                     case 'GPS_RESCUE_HEADING':
                         switch (fieldName) {
-                            case 'debug[0]': // Rescue yaw rate deg/s * 10 up to +/- 90 
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
-                                };
-                            case 'debug[1]': // Rescue roll deg * 100 up to +/- 20 deg
+                            case 'debug[0]': // Groundspeed cm/s
                                 return {
                                     offset: 0,
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
                                 };
+                            case 'debug[1]': // GPS GroundCourse 
                             case 'debug[2]': // Yaw attitude * 10
                             case 'debug[3]': // Angle to home * 10
                                 return {
@@ -840,7 +834,7 @@ GraphConfig.load = function(config) {
                                 return {
                                     offset: 0,
                                     power: 1.0,
-                                    inputRange: 500,
+                                    inputRange: 1000,
                                     outputRange: 1.0,
                                 };
                             case 'debug[2]': // altitude m
