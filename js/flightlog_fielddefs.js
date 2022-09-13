@@ -337,10 +337,16 @@ var
             "D_LPF",
             "VTX_TRAMP",
             "GHST",
+            "GHST_MSP",
             "SCHEDULER_DETERMINISM",
             "TIMING_ACCURACY",
             "RX_EXPRESSLRS_SPI",
             "RX_EXPRESSLRS_PHASELOCK",
+            "RX_STATE_TIME",
+            "GPS_RESCUE_VELOCITY",
+            "GPS_RESCUE_HEADING",
+            "GPS_RESCUE_TRACKING",
+            "ATTITUDE",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
