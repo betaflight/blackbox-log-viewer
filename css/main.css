@@ -978,7 +978,7 @@ html.has-log .video-top-controls {
 
 .playback-rate-control,
 .graph-zoom-control  {
-    width: 130px;
+    width: 200px;
     margin-right: 13px;
     margin-top: 6px;
 }
