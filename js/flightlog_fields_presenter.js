@@ -1242,7 +1242,7 @@ function FlightLogFieldPresenter() {
                         default:
                             return value.toFixed(0);
                     }
-                case 'ATTITUDE:
+                case 'ATTITUDE':
                     switch (fieldName) {
                         case 'debug[0]': // accADC X
                         case 'debug[1]': // accADC Y
