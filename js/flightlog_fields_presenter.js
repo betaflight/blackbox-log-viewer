@@ -1,6 +1,7 @@
 "use strict";
 
 function FlightLogFieldPresenter() {
+    // this is intentional
 }
 
 (function() {
@@ -777,7 +778,7 @@ function FlightLogFieldPresenter() {
     };
 
     FlightLogFieldPresenter.presentFlags = function(flags, flagNames) {
-        var 
+        let
             printedFlag = false,
             i,
             result = "";
@@ -808,15 +809,16 @@ function FlightLogFieldPresenter() {
 
     // Only list events that have changed, flag with eirer go ON or OFF.
     FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(flags, lastFlags, flagNames) {
-        var eventState = '';
-        var found = false;        
-        for(var i = 0; i < flagNames.length; i++) {
-           if((1<<i) & (flags ^ lastFlags)) { // State Changed
-               eventState += '|' + flagNames[i] + ' ' + (((1<<i) & flags)?'ON':'OFF')
+        let eventState = '';
+        let found = false;
+
+        for (let i = 0; i < flagNames.length; i++) {
+           if ((1 << i) & (flags ^ lastFlags)) { // State Changed
+               eventState += '|' + flagNames[i] + ' ' + (((1 << i) & flags) ? 'ON' : 'OFF');
                found = true;
            } 
         }
-        if(!found) {eventState += ' | ACRO';} // Catch the state when all flags are off, which is ACRO of course
+        if (!found) { eventState += ' | ACRO'; } // Catch the state when all flags are off, which is ACRO of course
         return eventState;
     };
     
@@ -824,7 +826,7 @@ function FlightLogFieldPresenter() {
         if (enumNames[value] === undefined) {
             return value;
         }
-        
+
         return enumNames[value];
     };
 
@@ -919,20 +921,20 @@ function FlightLogFieldPresenter() {
                 return flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision) + "g";
             
             case 'vbatLatest':
-                if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
+                if (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
                     return (value / 100).toFixed(2) + "V" + ", " + (value / 100 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
-                } else if((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
-                   (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
+                } else if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
+                   (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
                     return (value / 10).toFixed(2) + "V" + ", " + (value / 10 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
                 } else {
                     return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
                 }
 
             case 'amperageLatest':
-                if((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
+                if ((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
                    (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
                        return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
-                } else if(flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                } else if (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
                     return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
                 } else {
                     return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
@@ -1065,7 +1067,7 @@ function FlightLogFieldPresenter() {
                             return value.toFixed(0) + " Hz";
                     }
                 case 'RTH':
-                    switch(fieldName) {
+                    switch (fieldName) {
                         case 'debug[0]': // pitch angle +/-4000 means +/- 40 deg
                             return (value / 100).toFixed(1) + 'deg';
                         default:
@@ -1260,8 +1262,9 @@ function FlightLogFieldPresenter() {
     FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
         if (debugMode) {
             if (fieldName.includes('debug')) {
-                var debugModeName = DEBUG_MODE[debugMode];
-                var debugFields;
+                let debugModeName = DEBUG_MODE[debugMode];
+                let debugFields;
+
                 if (debugModeName) {
                     debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugModeName];
                 }
