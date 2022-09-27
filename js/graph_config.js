@@ -5,13 +5,13 @@ function GraphConfig(graphConfig) {
         graphs = graphConfig ? graphConfig : [],
         listeners = [],
         that = this;
-    
+
     function notifyListeners() {
         for (var i = 0; i < listeners.length; i++) {
             listeners[i](that);
         }
     }
-    
+
     this.selectedFieldName  = null;
     this.selectedGraphIndex = 0;
     this.selectedFieldIndex = 0;
@@ -22,62 +22,61 @@ function GraphConfig(graphConfig) {
     this.getGraphs = function() {
         return graphs;
     };
-    
+
     /**
      * newGraphs is an array of objects like {label: "graph label", height:, fields:[{name: curve:{offset:, power:, inputRange:, outputRange:, steps:}, color:, }, ...]}
      */
     this.setGraphs = function(newGraphs) {
         graphs = newGraphs;
-        
+
         notifyListeners();
     };
-    
+
     /**
      * Convert the given graph configs to make them appropriate for the given flight log.
      */
     this.adaptGraphs = function(flightLog, graphs) {
-        var 
+        var
             logFieldNames = flightLog.getMainFieldNames(),
-            
+
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
-                    
+
         for (var i = 0; i < graphs.length; i++) {
-            var 
+            var
                 graph = graphs[i],
                 newGraph = $.extend(
                     // Default values for missing properties:
                     {
                         height: 1,
-                    }, 
+                    },
                     // The old graph
-                    graph, 
+                    graph,
                     // New fields to replace the old ones:
                     {
                         fields:[],
                     },
                 ),
                 colorIndex = 0;
-            
+
             for (var j = 0; j < graph.fields.length; j++) {
                 var
                     field = graph.fields[j],
                     matches;
-                
+
                 var adaptField = function(field, colorIndexOffset, forceNewCurve) {
                     const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
-                    
 
                     if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
                     } else {
-                        /* The curve may have been originally created for a craft with different endpoints, so use the 
+                        /* The curve may have been originally created for a craft with different endpoints, so use the
                          * recommended offset and input range instead of the provided one.
                          */
                         field.curve.offset = defaultCurve.offset;
                         field.curve.inputRange = defaultCurve.inputRange;
                     }
-                    
+
                     if(colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
                         var index;
                         for(index=0; index < GraphConfig.PALETTE.length; index++)
@@ -91,20 +90,20 @@ function GraphConfig(graphConfig) {
                         field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
                         colorIndex++;
                     }
-                    
+
                     if (field.smoothing === undefined) {
                         field.smoothing = GraphConfig.getDefaultSmoothingForField(flightLog, field.name);
                     }
-                    
+
                     return field;
                 };
-                
+
                 if ((matches = field.name.match(/^(.+)\[all\]$/))) {
-                    var 
+                    var
                         nameRoot = matches[1],
                         nameRegex = new RegExp("^" + nameRoot + "\[[0-9]+\]$"),
                         colorIndexOffset = 0;
-                    
+
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
                             // add special condition for rcCommands and debug as each of the fields requires a different scaling.
@@ -120,13 +119,13 @@ function GraphConfig(graphConfig) {
                     }
                 }
             }
-            
+
             newGraphs.push(newGraph);
         }
-        
+
         this.setGraphs(newGraphs);
     };
-    
+
     this.addListener = function(listener) {
         listeners.push(listener);
     };
@@ -153,12 +152,12 @@ GraphConfig.load = function(config) {
     if (config) {
         for (var i = 0; i < config.length; i++) {
             var graph = config[i];
-            
+
             for (var j = 0; j < graph.fields.length; j++) {
-                var 
+                var
                     field = graph.fields[j],
                     matches;
-                
+
                 if ((matches = field.name.match(/^gyroData(.+)$/))) {
                     field.name = "gyroADC" + matches[1];
                 }
@@ -167,7 +166,7 @@ GraphConfig.load = function(config) {
     } else {
         config = false;
     }
-    
+
     return config;
 };
 
@@ -189,7 +188,6 @@ GraphConfig.load = function(config) {
             }
         } catch (e) { return 0;}
     };
-    
 
     GraphConfig.getDefaultCurveForField = function(flightLog, fieldName) {
         var
@@ -203,19 +201,19 @@ GraphConfig.load = function(config) {
                                     sysConfig["rates"][1] * 10.0 * scale,
                                     sysConfig["rates"][2] * 10.0 * scale);
                 default:
-                    return Math.max(flightLog.rcCommandRawToDegreesPerSecond(500,0) * scale, 
-                                    flightLog.rcCommandRawToDegreesPerSecond(500,1) * scale, 
+                    return Math.max(flightLog.rcCommandRawToDegreesPerSecond(500,0) * scale,
+                                    flightLog.rcCommandRawToDegreesPerSecond(500,1) * scale,
                                     flightLog.rcCommandRawToDegreesPerSecond(500,2) * scale);
             }
         }
-        
+
         var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
                 stats = flightLog.getStats(),
                 min = Number.MAX_VALUE,
                 max = Number.MIN_VALUE;
-            
+
             for(var i in arguments) {
                 var
                     fieldIndex = flightLog.getMainFieldIndexByName(arguments[i]),
@@ -303,7 +301,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.25, /* Make this 1.0 to scale linearly */
-                    inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20% 
+                    inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
@@ -324,7 +322,7 @@ GraphConfig.load = function(config) {
                 return {
                     offset: 0,
                     power: 0.25,
-                    inputRange: 500 * highResolutionScale * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
+                    inputRange: 500 * highResolutionScale * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
                     outputRange: 1.0
                 };
             } else if (fieldName == "heading[2]") {
@@ -357,7 +355,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
-                var debugModeName = DEBUG_MODE[sysConfig.debug_mode]; 
+                var debugModeName = DEBUG_MODE[sysConfig.debug_mode];
                 switch (debugModeName) {
                     case 'CYCLETIME':
                         switch (fieldName) {
@@ -367,7 +365,7 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     inputRange: 50,
                                     outputRange: 1.0
-                                };                            
+                                };
                             default:
                                 return {
                                     offset: -1000,    // zero offset
@@ -376,13 +374,13 @@ GraphConfig.load = function(config) {
                                     outputRange: 1.0
                                 };
                         }
-                    case 'PIDLOOP': 
+                    case 'PIDLOOP':
                             return {
                                 offset: -250,    // zero offset
                                 power: 1.0,
                                 inputRange: 250, //  0-500uS
                                 outputRange: 1.0
-                            };       
+                            };
                     case 'GYRO':
                     case 'GYRO_FILTERED':
                     case 'GYRO_SCALED':
@@ -422,7 +420,7 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     inputRange: 2048,
                                     outputRange: 1.0
-                                };                            
+                                };
                             default:
                                 return {
                                     offset: -130,
@@ -445,7 +443,7 @@ GraphConfig.load = function(config) {
                                 return {
                                     offset: 0,
                                     power: 0.25,
-                                    inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
+                                    inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
                                     outputRange: 1.0
                                 };
                             case 'debug[1]': // raw RC command derivative
@@ -521,7 +519,7 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: 100,
                             outputRange: 1.0
-                        };   
+                        };
                     case 'ESC_SENSOR_RPM':
                     case 'DSHOT_RPM_TELEMETRY':
                     case 'RPM_FILTER':
@@ -695,7 +693,7 @@ GraphConfig.load = function(config) {
                                     inputRange: 50,
                                     outputRange: 1.0,
                                 };
-                            case 'debug[2]': // total delay in last second 
+                            case 'debug[2]': // total delay in last second
                                 return {
                                     offset: -500,
                                     power: 1.0,
@@ -788,7 +786,7 @@ GraphConfig.load = function(config) {
                                     inputRange: 10000,
                                     outputRange: 1.0,
                                 };
-                            case 'debug[1]': // GPS GroundCourse 
+                            case 'debug[1]': // GPS GroundCourse
                             case 'debug[2]': // Yaw attitude * 10
                             case 'debug[3]': // Angle to home * 10
                                 return {
@@ -910,10 +908,10 @@ GraphConfig.load = function(config) {
             };
         }
     };
-    
+
     /**
      * Get an array of suggested graph configurations will be usable for the fields available in the given flightlog.
-     * 
+     *
      * Supply an array of strings `graphNames` to only fetch the graph with the given names.
      */
     GraphConfig.getExampleGraphConfigs = function(flightLog, graphNames) {

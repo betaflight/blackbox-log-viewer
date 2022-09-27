@@ -107,7 +107,7 @@ function FlightLogFieldPresenter() {
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
     };
-    
+
     const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
         'NONE' : {
             'debug[all]':'Debug [all]',
@@ -138,7 +138,7 @@ function FlightLogFieldPresenter() {
             'debug[3]':'Not Used',
         },
         'GYRO_FILTERED' : {
-            'debug[all]':'Debug Gyro Filtered',  
+            'debug[all]':'Debug Gyro Filtered',
             'debug[0]':'Gyro Filtered [X]',
             'debug[1]':'Gyro Filtered [Y]',
             'debug[2]':'Gyro Filtered [Z]',
@@ -173,7 +173,7 @@ function FlightLogFieldPresenter() {
             'debug[3]':'Not Used',
         },
         'GYRO_SCALED' : {
-            'debug[all]':'Debug Gyro Scaled', 
+            'debug[all]':'Debug Gyro Scaled',
             'debug[0]':'Gyro Scaled [roll]',
             'debug[1]':'Gyro Scaled [pitch]',
             'debug[2]':'Gyro Scaled [yaw]',
@@ -278,35 +278,35 @@ function FlightLogFieldPresenter() {
             'debug[3]':'Offset Min',
         },
         'GYRO_RAW' : {
-            'debug[all]':'Debug Gyro Raw', 
+            'debug[all]':'Debug Gyro Raw',
             'debug[0]':'Gyro Raw [X]',
             'debug[1]':'Gyro Raw [Y]',
             'debug[2]':'Gyro Raw [Z]',
             'debug[3]':'Not Used',
         },
         'DUAL_GYRO' : {
-            'debug[all]':'Debug Dual Gyro', 
+            'debug[all]':'Debug Dual Gyro',
             'debug[0]':'Gyro 1 Filtered [roll]',
             'debug[1]':'Gyro 1 Filtered [pitch]',
             'debug[2]':'Gyro 2 Filtered [roll]',
             'debug[3]':'Gyro 2 Filtered [pitch]',
         },
         'DUAL_GYRO_RAW': {
-            'debug[all]':'Debug Dual Gyro Raw', 
+            'debug[all]':'Debug Dual Gyro Raw',
             'debug[0]':'Gyro 1 Raw [roll]',
             'debug[1]':'Gyro 1 Raw [pitch]',
             'debug[2]':'Gyro 2 Raw [roll]',
             'debug[3]':'Gyro 2 Raw [pitch]',
         },
         'DUAL_GYRO_COMBINED': {
-            'debug[all]':'Debug Dual Combined', 
+            'debug[all]':'Debug Dual Combined',
             'debug[0]':'Not Used',
             'debug[1]':'Gyro Filtered [roll]',
             'debug[2]':'Gyro Filtered [pitch]',
             'debug[3]':'Not Used',
         },
         'DUAL_GYRO_DIFF': {
-            'debug[all]':'Debug Dual Gyro Diff', 
+            'debug[all]':'Debug Dual Gyro Diff',
             'debug[0]':'Gyro Diff [roll]',
             'debug[1]':'Gyro Diff [pitch]',
             'debug[2]':'Gyro Diff [yaw]',
@@ -453,14 +453,14 @@ function FlightLogFieldPresenter() {
             'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
         },
         'DSHOT_RPM_TELEMETRY' : {
-            'debug[all]':'DShot Telemetry RPM', 
+            'debug[all]':'DShot Telemetry RPM',
             'debug[0]':'Motor 1 - DShot',
             'debug[1]':'Motor 2 - DShot',
             'debug[2]':'Motor 3 - DShot',
             'debug[3]':'Motor 4 - DShot',
         },
         'RPM_FILTER' : {
-            'debug[all]':'RPM Filter', 
+            'debug[all]':'RPM Filter',
             'debug[0]':'Motor 1 - rpmFilter',
             'debug[1]':'Motor 2 - rpmFilter',
             'debug[2]':'Motor 3 - rpmFilter',
@@ -495,63 +495,63 @@ function FlightLogFieldPresenter() {
             'debug[3]':'Gyro 2 [pitch]',
         },
         'DSHOT_RPM_ERRORS' : {
-            'debug[all]':'DSHOT RPM Error', 
+            'debug[all]':'DSHOT RPM Error',
             'debug[0]':'DSHOT RPM Error [1]',
             'debug[1]':'DSHOT RPM Error [2]',
             'debug[2]':'DSHOT RPM Error [3]',
             'debug[3]':'DSHOT RPM Error [4]',
         },
         'CRSF_LINK_STATISTICS_UPLINK' : {
-            'debug[all]':'CRSF Stats Uplink', 
+            'debug[all]':'CRSF Stats Uplink',
             'debug[0]':'Uplink RSSI 1',
             'debug[1]':'Uplink RSSI 2',
             'debug[2]':'Uplink Link Quality',
             'debug[3]':'RF Mode',
         },
         'CRSF_LINK_STATISTICS_PWR' : {
-            'debug[all]':'CRSF Stats Power', 
+            'debug[all]':'CRSF Stats Power',
             'debug[0]':'Antenna',
             'debug[1]':'SNR',
             'debug[2]':'TX Power',
             'debug[3]':'Not Used',
         },
         'CRSF_LINK_STATISTICS_DOWN' : {
-            'debug[all]':'CRSF Stats Downlink', 
+            'debug[all]':'CRSF Stats Downlink',
             'debug[0]':'Downlink RSSI',
             'debug[1]':'Downlink Link Quality',
             'debug[2]':'Downlink SNR',
             'debug[3]':'Not Used',
         },
         'BARO' : {
-            'debug[all]':'Debug Barometer', 
+            'debug[all]':'Debug Barometer',
             'debug[0]':'Baro State',
             'debug[1]':'Baro Temperature',
             'debug[2]':'Baro Pressure',
             'debug[3]':'Baro Pressure Sum',
         },
         'GPS_RESCUE_THROTTLE_PID' : {
-            'debug[all]':'GPS Rescue Throttle PID', 
+            'debug[all]':'GPS Rescue Throttle PID',
             'debug[0]':'Throttle P',
             'debug[1]':'Throttle I',
             'debug[2]':'Throttle D',
             'debug[3]':'Z Velocity',
         },
         'DYN_IDLE' : {
-            'debug[all]':'Dyn Idle', 
+            'debug[all]':'Dyn Idle',
             'debug[0]':'Motor Range Min Inc',
             'debug[1]':'Target RPS Change Rate',
             'debug[2]':'Error',
             'debug[3]':'Min RPM',
         },
         'FF_LIMIT' : {
-            'debug[all]':'FF Limit', 
+            'debug[all]':'FF Limit',
             'debug[0]':'FF input [roll]',
             'debug[1]':'FF input [pitch]',
             'debug[2]':'FF limited [roll]',
             'debug[3]':'Not Used',
         },
         'FF_INTERPOLATED' : {
-            'debug[all]':'FF Interpolated [roll]', 
+            'debug[all]':'FF Interpolated [roll]',
             'debug[0]':'Setpoint Delta Impl [roll]',
             'debug[1]':'Boost amount [roll]',
             'debug[2]':'Boost amount, clipped [roll]',
@@ -650,7 +650,7 @@ function FlightLogFieldPresenter() {
         },
         'GPS_RESCUE_HEADING' : {
             'debug[all]':'GPS Rescue Heading',
-            'debug[0]':'Ground speed',
+            'debug[0]':'Ground Speed',
             'debug[1]':'GPS Heading',
             'debug[2]':'IMU Attitude',
             'debug[3]':'Angle to home',
@@ -782,9 +782,9 @@ function FlightLogFieldPresenter() {
             printedFlag = false,
             i,
             result = "";
-        
+
         i = 0;
-        
+
         while (flags > 0) {
             if ((flags & 1) != 0) {
                 if (printedFlag) {
@@ -795,11 +795,11 @@ function FlightLogFieldPresenter() {
 
                 result += flagNames[i];
             }
-            
+
             flags >>= 1;
             i++;
         }
-        
+
         if (printedFlag) {
             return result;
         } else {
@@ -816,12 +816,12 @@ function FlightLogFieldPresenter() {
            if ((1 << i) & (flags ^ lastFlags)) { // State Changed
                eventState += '|' + flagNames[i] + ' ' + (((1 << i) & flags) ? 'ON' : 'OFF');
                found = true;
-           } 
+           }
         }
         if (!found) { eventState += ' | ACRO'; } // Catch the state when all flags are off, which is ACRO of course
         return eventState;
     };
-    
+
     FlightLogFieldPresenter.presentEnum = function presentEnum(value, enumNames) {
         if (enumNames[value] === undefined) {
             return value;
@@ -833,7 +833,7 @@ function FlightLogFieldPresenter() {
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
      * no better representation is available.
-     * 
+     *
      * @param fieldName Name of the field
      * @param value Value of the field
      */
@@ -841,28 +841,28 @@ function FlightLogFieldPresenter() {
         if (value === undefined) {
             return "";
         }
-        
+
         const highResolutionScale = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 10 : 1;
         const highResolutionAddPrecision = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 1 : 0;
 
         switch (fieldName) {
             case 'time':
                 return formatTime(value / 1000, true);
-            
+
             case 'gyroADC[0]':
             case 'gyroADC[1]':
             case 'gyroADC[2]':
-                return flightLog.gyroRawToDegreesPerSecond(value / highResolutionScale).toFixed(highResolutionAddPrecision) + " deg/s";
-                
+                return flightLog.gyroRawToDegreesPerSecond(value / highResolutionScale).toFixed(highResolutionAddPrecision) + " °/s";
+
             case 'gyroADCs[0]':
             case 'gyroADCs[1]':
             case 'gyroADCs[2]':
-                return value.toFixed(0) + " deg/s";
+                return value.toFixed(0) + " °/s";
 
             case 'axisError[0]':
             case 'axisError[1]':
             case 'axisError[2]':
-                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " deg/s";
+                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " °/s";
 
             case 'rcCommand[0]':
             case 'rcCommand[1]':
@@ -894,7 +894,7 @@ function FlightLogFieldPresenter() {
             case 'rcCommands[0]':
             case 'rcCommands[1]':
             case 'rcCommands[2]':
-                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " deg/s";
+                return (value / highResolutionScale).toFixed(highResolutionAddPrecision) + " °/s";
             case 'rcCommands[3]':
                 return value.toFixed(1) + "%";
 
@@ -913,55 +913,55 @@ function FlightLogFieldPresenter() {
             case 'axisF[0]':
             case 'axisF[1]':
             case 'axisF[2]':
-                return flightLog.getPIDPercentage(value).toFixed(1) + "%";
+                return flightLog.getPIDPercentage(value).toFixed(1) + " %";
 
             case 'accSmooth[0]':
             case 'accSmooth[1]':
             case 'accSmooth[2]':
-                return flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision) + "g";
-            
+                return flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision) + " g";
+
             case 'vbatLatest':
                 if (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
-                    return (value / 100).toFixed(2) + "V" + ", " + (value / 100 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+                    return (value / 100).toFixed(2) + "V" + ", " + (value / 100 / flightLog.getNumCellsEstimate()).toFixed(2) + " V/cell";
                 } else if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
                    (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
-                    return (value / 10).toFixed(2) + "V" + ", " + (value / 10 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+                    return (value / 10).toFixed(2) + "V" + ", " + (value / 10 / flightLog.getNumCellsEstimate()).toFixed(2) + " V/cell";
                 } else {
-                    return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + "V/cell";
+                    return (flightLog.vbatADCToMillivolts(value) / 1000).toFixed(2) + "V" + ", " + (flightLog.vbatADCToMillivolts(value) / 1000 / flightLog.getNumCellsEstimate()).toFixed(2) + " V/cell";
                 }
 
             case 'amperageLatest':
                 if ((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
                    (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
-                       return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+                       return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + " A/motor";
                 } else if (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
-                    return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+                    return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + " A/motor";
                 } else {
-                    return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + "A/motor";
+                    return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + " A/motor";
                 }
 
             case 'heading[0]':
             case 'heading[1]':
             case 'heading[2]':
                 return (value / Math.PI * 180).toFixed(1) + "°";
-            
+
             case 'BaroAlt':
-                return (value / 100).toFixed(1) + "m";
-            
+                return (value / 100).toFixed(1) + " m";
+
             case 'flightModeFlags':
                 return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_MODE_NAME);
-                
+
             case 'stateFlags':
                 return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
-                
+
             case 'failsafePhase':
                 return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
-                
+
             case 'features':
-                return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FEATURES); 
+                return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FEATURES);
 
             case 'rssi':
-                return (value / 1024 * 100).toFixed(2) + "%";
+                return (value / 1024 * 100).toFixed(2) + " %";
 
             case 'debug[0]':
             case 'debug[1]':
@@ -973,7 +973,7 @@ function FlightLogFieldPresenter() {
                 return "";
         }
     };
-    
+
     FlightLogFieldPresenter.decodeDebugFieldToFriendly = function(flightLog, fieldName, value, currentFlightMode) {
         if (flightLog) {
             const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
@@ -986,7 +986,7 @@ function FlightLogFieldPresenter() {
                 case 'CYCLETIME':
                     switch (fieldName) {
                         case 'debug[1]':
-                            return value.toFixed(0) + "%";
+                            return value.toFixed(0) + " %";
                         default:
                             return value.toFixed(0) + "\u03BCS";
                     }
@@ -995,20 +995,20 @@ function FlightLogFieldPresenter() {
                         case 'debug[0]':
                             return value.toFixed(0);
                         default:
-                            return (value / 10).toFixed(1) + "V";
+                            return (value / 10).toFixed(1) + " V";
                     }
                 case 'ACCELEROMETER':
-                    return flightLog.accRawToGs(value).toFixed(2) + "g";
+                    return flightLog.accRawToGs(value).toFixed(2) + " g";
                 case 'MIXER':
                     return Math.round(flightLog.rcCommandRawToThrottle(value)) + " %";
-                case 'PIDLOOP': 
-                    return value.toFixed(0) + "\u03BCS";
+                case 'PIDLOOP':
+                    return value.toFixed(0) + " \u03BCS";
                 case 'RC_INTERPOLATION':
                     switch (fieldName) {
                         case 'debug[1]': // current RX refresh rate
-                            return value.toFixed(0) + 'ms';
+                            return value.toFixed(0) + ' ms';
                         case 'debug[3]': // setpoint [roll]
-                            return value.toFixed(0) + 'deg/s';
+                            return value.toFixed(0) + " °/s";
                         default:
                             return value.toFixed(0);
                     }
@@ -1020,30 +1020,41 @@ function FlightLogFieldPresenter() {
                 case 'DUAL_GYRO_DIFF':
                 case 'DUAL_GYRO_RAW':
                 case 'NOTCH':
-                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                    return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
                 case 'ANGLERATE':
-                    return value.toFixed(0) + "deg/s";
+                    return value.toFixed(0) + " °/s";
                 case 'ESC_SENSOR':
                     switch (fieldName) {
                         case 'debug[3]':
-                            return value.toFixed(0) + "\u03BCS";
+                            return value.toFixed(0) + " \u03BCS";
                         default:
                             return value.toFixed(0);
                     }
                 case 'SCHEDULER':
-                    return value.toFixed(0) + "\u03BCS";
+                    return value.toFixed(0) + " \u03BCS";
                 case 'STACK':
                     return value.toFixed(0);
                 case 'ESC_SENSOR_RPM':
-                    return value.toFixed(0) + "rpm";
+                    return value.toFixed(0) + " rpm";
                 case 'ESC_SENSOR_TMP':
-                    return value.toFixed(0) + "°C";
+                    return value.toFixed(0) + " °C";
+                case 'ALTITUDE':
+                    switch (fieldName) {
+                        case 'debug[0]': // GPS Trust * 100
+                            return value.toFixed(0);
+                        case 'debug[1]': // GPS Altitude cm
+                        case 'debug[2]': // OSD Altitude cm
+                        case 'debug[3]': // Control Altitude
+                            return (value / 100).toFixed(2) + ' m';
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'FFT':
                     switch (fieldName) {
                         case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
                         case 'debug[1]': // gyro post dyn notch [for gyro debug axis]
                         case 'debug[2]': // gyro pre dyn notch, downsampled for FFT [for gyro debug axis]
-                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
                         // debug 3 = not used
                         default:
                             return value.toFixed(0);
@@ -1062,25 +1073,26 @@ function FlightLogFieldPresenter() {
                 case 'FFT_FREQ':
                     switch (fieldName) {
                         case 'debug[3]': // gyro pre dyn notch [for gyro debug axis]
-                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " deg/s";
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
                         default:
                             return value.toFixed(0) + " Hz";
                     }
                 case 'RTH':
                     switch (fieldName) {
-                        case 'debug[0]': // pitch angle +/-4000 means +/- 40 deg
-                            return (value / 100).toFixed(1) + 'deg';
+// temporarily, perhaps
+//                        case 'debug[0]': // pitch angle +/-4000 means +/- 40 deg
+//                            return (value / 100).toFixed(1) + " °";
                         default:
                             return value.toFixed(0);
                     }
                 case 'ITERM_RELAX':
                     switch (fieldName) {
                         case 'debug[0]': // roll setpoint high-pass filtered
-                            return value.toFixed(0) + 'deg/s';
+                            return value.toFixed(0) + " °/s";
                         case 'debug[1]': // roll I-term relax factor
-                            return value.toFixed(0) + '%';
+                            return value.toFixed(0) + ' %';
                         case 'debug[3]': // roll absolute control axis error
-                            return (value / 10).toFixed(1) + 'deg';
+                            return (value / 10).toFixed(1) + " °";
                         default:
                             return value.toFixed(0);
                     }
@@ -1089,7 +1101,7 @@ function FlightLogFieldPresenter() {
                         case 'debug[0]':
                             return (value + 1500).toFixed(0) + " us";
                         case 'debug[3]': // rx frame rate [us]
-                            return (value / 1000).toFixed(1) + 'ms';
+                            return (value / 1000).toFixed(1) + ' ms';
                         default:
                             return value.toFixed(0);
                     }
@@ -1097,19 +1109,19 @@ function FlightLogFieldPresenter() {
                     switch (fieldName) {
                         case 'debug[0]': // current frame rate [us]
                         case 'debug[2]': // average frame rate [us]
-                            return (value / 1000).toFixed(2) + 'ms';
+                            return (value / 1000).toFixed(2) + ' ms';
                         default:
                             return value.toFixed(0);
                     }
                 case 'DSHOT_RPM_TELEMETRY':
-                    return (value * 200 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + "rpm / " + (value * 3.333 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + 'hz';
+                    return (value * 200 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + " rpm / " + (value * 3.333 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + ' hz';
                 case 'RPM_FILTER':
-                    return (value * 60).toFixed(0) + "rpm / " + value.toFixed(0) + "Hz";
+                    return (value * 60).toFixed(0) + "rpm / " + value.toFixed(0) + " Hz";
                 case 'D_MIN':
                     switch (fieldName) {
                         case 'debug[0]': // roll gyro factor
                         case 'debug[1]': // roll setpoint Factor
-                            return value.toFixed(0) + '%';
+                            return value.toFixed(0) + ' %';
                         case 'debug[2]': // roll actual D
                         case 'debug[3]': // pitch actual D
                             return (value / 10).toFixed(1);
@@ -1120,26 +1132,26 @@ function FlightLogFieldPresenter() {
                     switch (fieldName) {
                         case 'debug[0]': // gyro scaled [for selected axis]
                         case 'debug[3]': // pre-dyn notch gyro [for selected axis]
-                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + "deg/s";
+                            return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
                         default:
-                            return value.toFixed(0) + "Hz";
+                            return value.toFixed(0) + " Hz";
                     }
                 case 'DYN_IDLE':
                     switch (fieldName) {
                         case 'debug[3]': // minRPS
-                            return (value * 6) + 'rpm / ' + (value / 10).toFixed(0) +'hz';
+                            return (value * 6) + ' rpm / ' + (value / 10).toFixed(0) +' hz';
                         default:
                             return value.toFixed(0);
                     }
                 case 'AC_CORRECTION':
-                    return (value / 10).toFixed(1) + 'deg/s';
+                    return (value / 10).toFixed(1) + " °/s";
                 case 'AC_ERROR':
-                    return (value / 10).toFixed(1) + 'deg';
+                    return (value / 10).toFixed(1) + " °";
                 case 'RX_TIMING':
                     switch (fieldName) {
                         case 'debug[0]': // Frame delta us/10
                         case 'debug[1]': // Frame age us/10
-                            return (value / 100).toFixed(2) + 'ms';
+                            return (value / 100).toFixed(2) + ' ms';
                         default:
                             return value.toFixed(0);
                     }
@@ -1149,7 +1161,7 @@ function FlightLogFieldPresenter() {
                         // debug 1 is unknown frame count 0 to int16_t
                         // debug 2 is RSSI 0 to -128 -> 0 to 128
                         case 'debug[3]': // LQ 0-100
-                            return value.toFixed(0) + '%';
+                            return value.toFixed(0) + ' %';
                         default:
                             return value.toFixed(0);
                     }
@@ -1166,7 +1178,7 @@ function FlightLogFieldPresenter() {
                         case 'debug[0]': // cycle time in us*10
                         case 'debug[2]': // task delay time in us*10
                         case 'debug[3]': // task delay time in us*10
-                             return (value / 10).toFixed(1) + 'us';
+                             return (value / 10).toFixed(1) + ' us';
                         // debug 1 is task ID of late task
                         default:
                             return value.toFixed(0);
@@ -1174,16 +1186,16 @@ function FlightLogFieldPresenter() {
                 case 'TIMING_ACCURACY':
                     switch (fieldName) {
                         case 'debug[0]': // CPU Busy %
-                            return value.toFixed(1) + '%';
+                            return value.toFixed(1) + ' %';
                         case 'debug[2]': // task delay time in us*10
-                            return (value / 10).toFixed(1) + 'us';
+                            return (value / 10).toFixed(1) + ' us';
                         default:
                             return value.toFixed(0);
                     }
                 case 'RX_EXPRESSLRS_SPI':
                     switch (fieldName) {
                         case 'debug[3]': // uplink LQ %
-                            return value.toFixed(1) + '%';
+                            return value.toFixed(1) + ' %';
                         // debug 0 = Lost connection count
                         // debug 1 = RSSI
                         // debug 2 = SNR
@@ -1193,21 +1205,21 @@ function FlightLogFieldPresenter() {
                 case 'RX_EXPRESSLRS_PHASELOCK':
                     switch (fieldName) {
                         case 'debug[2]': // Frequency offset in ticks
-                            return value.toFixed(0) + 'ticks';
+                            return value.toFixed(0) + ' ticks';
                         // debug 0 = Phase offset us
                         // debug 1 = Filtered phase offset us
                         // debug 3 = Pphase shift in us
                         default:
-                            return value.toFixed(0) + 'us';
+                            return value.toFixed(0) + ' us';
                     }
                 case 'GPS_RESCUE_THROTTLE_PID':
                     switch (fieldName) {
                         case 'debug[0]': // Throttle P added uS
                         case 'debug[1]': // Throttle D added * uS
-                            return value.toFixed(0) + 'uS';
+                            return value.toFixed(0) + ' uS';
                         case 'debug[2]': // current altitude in m
                         case 'debug[3]': // TARGET altitude in m
-                            return (value / 100).toFixed(1) + 'm';
+                            return (value / 100).toFixed(1) + ' m';
                         default:
                             return value.toFixed(0);
                     }
@@ -1215,21 +1227,21 @@ function FlightLogFieldPresenter() {
                     switch (fieldName) {
                         case 'debug[0]': // Pitch P degrees * 100
                         case 'debug[1]': // Pitch D degrees * 100
-                            return (value / 100).toFixed(1) + 'deg';
+                            return (value / 100).toFixed(1) + " °";
                         case 'debug[2]': // velocity to home cm/s
                         case 'debug[3]': // velocity target cm/s
-                            return (value / 100).toFixed(1) + 'm/s';
+                            return (value / 100).toFixed(1) + ' m/s';
                         default:
                             return value.toFixed(0);
                     }
                 case 'GPS_RESCUE_HEADING':
                     switch (fieldName) {
-                        case 'debug[0]': // Ground speed cm/s 
-                            return (value / 100).toFixed(2) + 'm/s';
+                        case 'debug[0]': // Ground speed cm/s
+                            return (value / 100).toFixed(2) + ' m/s';
                         case 'debug[1]': // GPS Ground course degrees * 10
                         case 'debug[2]': // Attitude in degrees * 10
                         case 'debug[3]': // Angle to home in degrees * 10
-                            return (value / 10).toFixed(1) + 'deg';
+                            return (value / 10).toFixed(1) + " °";
                         default:
                             return value.toFixed(0);
                     }
@@ -1237,10 +1249,10 @@ function FlightLogFieldPresenter() {
                     switch (fieldName) {
                         case 'debug[0]': // velocity to home cm/s
                         case 'debug[1]': // velocity target cm/s
-                            return (value / 100).toFixed(1) + 'm/s';
+                            return (value / 100).toFixed(1) + ' m/s';
                         case 'debug[2]': // altitude cm
                         case 'debug[3]': // altitude target cm
-                            return (value / 100).toFixed(1) + 'm';
+                            return (value / 100).toFixed(1) + ' m';
                         default:
                             return value.toFixed(0);
                     }
@@ -1258,7 +1270,7 @@ function FlightLogFieldPresenter() {
         }
         return "";
     };
-        
+
     FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
         if (debugMode) {
             if (fieldName.includes('debug')) {
@@ -1277,12 +1289,12 @@ function FlightLogFieldPresenter() {
                 }
 
                 return debugFields[fieldName];
-            }            
+            }
         }
         if (FRIENDLY_FIELD_NAMES[fieldName]) {
             return FRIENDLY_FIELD_NAMES[fieldName];
         }
-        
+
         return fieldName;
     };
 })();
