@@ -1041,7 +1041,7 @@ function FlightLogFieldPresenter() {
                 case 'ALTITUDE':
                     switch (fieldName) {
                         case 'debug[0]': // GPS Trust * 100
-                            value.toFixed(0);
+                            return value.toFixed(0);
                         case 'debug[1]': // GPS Altitude cm
                         case 'debug[2]': // OSD Altitude cm
                         case 'debug[3]': // Control Altitude
