@@ -693,6 +693,13 @@ function FlightLogFieldPresenter() {
                     'debug[2]':'Altitude',
                     'debug[3]':'Target altitude',
                 };
+                DEBUG_FRIENDLY_FIELD_NAMES.VTX_MSP = {
+                    'debug[all]': 'VTX MSP',
+                    'debug[0]': 'packetCounter',
+                    'debug[1]': 'isCrsfPortConfig',
+                    'debug[2]': 'isLowPowerDisarmed',
+                    'debug[3]': 'mspTelemetryDescriptor',
+                };
             } else if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
                     'debug[all]':'Feedforward [roll]',
@@ -1262,6 +1269,15 @@ function FlightLogFieldPresenter() {
                         case 'debug[1]': // accADC Y
                         case 'debug[2]': // setpoint Roll
                         case 'debug[3]': // setpoint Pitch
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'VTX_MSP':
+                    switch (fieldName) {
+                        case 'debug[0]': // packetCounter
+                        case 'debug[1]': // isCrsfPortConfig
+                        case 'debug[2]': // isLowPowerDisarmed
+                        case 'debug[3]': // mspTelemetryDescriptor
                         default:
                             return value.toFixed(0);
                     }
