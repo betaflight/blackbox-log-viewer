@@ -758,13 +758,6 @@ function FlightLogFieldPresenter() {
                     'debug[2]':'Acceleration, clipped [roll]',
                     'debug[3]':'Duplicate Counter [roll]',
                 };
-                DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
-                    'debug[all]':'Feedforward Limit [roll]',
-                    'debug[0]':'FF limit input [roll]',
-                    'debug[1]':'FF limit input [pitch]',
-                    'debug[2]':'FF limited [roll]',
-                    'debug[3]':'Not Used',
-                };
             } else if (semver.gte(firmwareVersion, '4.1.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
                     'debug[all]':'Feedforward [roll]',
@@ -981,7 +974,7 @@ function FlightLogFieldPresenter() {
         }
     };
 
-    FlightLogFieldPresenter.decodeDebugFieldToFriendly = function(flightLog, fieldName, value, currentFlightMode) {
+    FlightLogFieldPresenter.decodeDebugFieldToFriendly = function(flightLog, fieldName, value) {
         if (flightLog) {
             const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
             switch (debugModeName) {
