@@ -693,6 +693,13 @@ function FlightLogFieldPresenter() {
                     'debug[2]':'Altitude',
                     'debug[3]':'Target altitude',
                 };
+                DEBUG_FRIENDLY_FIELD_NAMES.VTX_MSP = {
+                    'debug[all]': 'VTX MSP',
+                    'debug[0]': 'packetCounter',
+                    'debug[1]': 'isCrsfPortConfig',
+                    'debug[2]': 'isLowPowerDisarmed',
+                    'debug[3]': 'mspTelemetryDescriptor',
+                };
             } else if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
                     'debug[all]':'Feedforward [roll]',
@@ -750,13 +757,6 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Acceleration [roll]',
                     'debug[2]':'Acceleration, clipped [roll]',
                     'debug[3]':'Duplicate Counter [roll]',
-                };
-                DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
-                    'debug[all]':'Feedforward Limit [roll]',
-                    'debug[0]':'FF limit input [roll]',
-                    'debug[1]':'FF limit input [pitch]',
-                    'debug[2]':'FF limited [roll]',
-                    'debug[3]':'Not Used',
                 };
             } else if (semver.gte(firmwareVersion, '4.1.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
@@ -974,7 +974,7 @@ function FlightLogFieldPresenter() {
         }
     };
 
-    FlightLogFieldPresenter.decodeDebugFieldToFriendly = function(flightLog, fieldName, value, currentFlightMode) {
+    FlightLogFieldPresenter.decodeDebugFieldToFriendly = function(flightLog, fieldName, value) {
         if (flightLog) {
             const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
             switch (debugModeName) {
@@ -1262,6 +1262,15 @@ function FlightLogFieldPresenter() {
                         case 'debug[1]': // accADC Y
                         case 'debug[2]': // setpoint Roll
                         case 'debug[3]': // setpoint Pitch
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'VTX_MSP':
+                    switch (fieldName) {
+                        case 'debug[0]': // packetCounter
+                        case 'debug[1]': // isCrsfPortConfig
+                        case 'debug[2]': // isLowPowerDisarmed
+                        case 'debug[3]': // mspTelemetryDescriptor
                         default:
                             return value.toFixed(0);
                     }
