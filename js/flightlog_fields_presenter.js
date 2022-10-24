@@ -700,6 +700,13 @@ function FlightLogFieldPresenter() {
                     'debug[2]': 'isLowPowerDisarmed',
                     'debug[3]': 'mspTelemetryDescriptor',
                 };
+                DEBUG_FRIENDLY_FIELD_NAMES.GPS_DOP = {
+                    'debug[all]': 'GPS Dilution of Precision',
+                    'debug[0]': 'Number of Satellites',
+                    'debug[1]': 'pDOP (positional - 3D)',
+                    'debug[2]': 'hDOP (horizontal - 2D)',
+                    'debug[3]': 'vDOP (vertical - 1D)',
+                };
             } else if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
                     'debug[all]':'Feedforward [roll]',
@@ -1273,6 +1280,16 @@ function FlightLogFieldPresenter() {
                         case 'debug[3]': // mspTelemetryDescriptor
                         default:
                             return value.toFixed(0);
+                    }
+                case 'GPS_DOP':
+                    switch (fieldName) {
+                        case 'debug[0]': // Number of Satellites
+                            return value.toFixed(0);
+                        case 'debug[1]': // pDOP (positional - 3D)
+                        case 'debug[2]': // hDOP (horizontal - 2D)
+                        case 'debug[3]': // vDOP (vertical - 1D)
+                        default:
+                            return (value / 100).toFixed(1);
                     }
             }
             return value.toFixed(0);
