@@ -83,7 +83,7 @@ function FlightLogFieldPresenter() {
 
         'vbatLatest': 'Battery volt.',
         'amperageLatest': 'Amperage',
-        'BaroAlt': 'Barometer',
+        'baroAlt': 'Barometer',
 
         'heading[all]': 'Heading',
         'heading[0]': 'Heading [roll]',
@@ -679,6 +679,13 @@ function FlightLogFieldPresenter() {
 
         if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
             if (semver.gte(firmwareVersion, '4.4.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.BARO = {
+                    'debug[all]':'Debug Barometer',
+                    'debug[0]':'Baro State',
+                    'debug[1]':'Baro Pressure',
+                    'debug[2]':'Baro Temperature',
+                    'debug[3]':'Baro Altitude',
+                };
                 DEBUG_FRIENDLY_FIELD_NAMES.RTH = {
                     'debug[all]':'RTH Rescue codes',
                     'debug[0]':'Pitch angle, deg',
@@ -945,7 +952,7 @@ function FlightLogFieldPresenter() {
             case 'heading[2]':
                 return (value / Math.PI * 180).toFixed(1) + "°";
 
-            case 'BaroAlt':
+            case 'baroAlt':
                 return (value / 100).toFixed(1) + " m";
 
             case 'flightModeFlags':
@@ -980,6 +987,17 @@ function FlightLogFieldPresenter() {
             switch (debugModeName) {
                 case 'NONE':
                 case 'AIRMODE':
+                case 'BARO':
+                    switch (fieldName) {
+                        case 'debug[1]':
+                            return `${value.toFixed(0)} hPa`;
+                        case 'debug[2]':
+                            return `${(value / 100).toFixed(2)} °C`;
+                        case 'debug[3]':
+                            return `${(value / 100).toFixed(2)} m`;
+                        default:
+                            return `${value.toFixed(0)}`;
+                    }
                 case 'VELOCITY':
                 case 'DFILTER':
                     return "";
