@@ -110,9 +110,9 @@ function FlightLogFieldPresenter() {
 
         'lastGPS[all]': 'GPS Data',
         'lastGPS[0]': "GPS timeframe",
-        'lastGPS[1]': "GPS Latitude",
-        'lastGPS[2]': "GPS Longitude",
-        'lastGPS[3]': "GPS NumSat",
+        'lastGPS[1]': "GPS NumSat",
+        'lastGPS[2]': "GPS Latitude",
+        'lastGPS[3]': "GPS Longitude",
         'lastGPS[4]': "GPS Altitude",
         'lastGPS[5]': "GPS Speed",
         'lastGPS[6]': "GPS Ground course",
