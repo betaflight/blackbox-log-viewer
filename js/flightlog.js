@@ -375,7 +375,8 @@ function FlightLog(logData) {
                 var
                     mainFrameIndex = 0,
                     slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
-                    lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [];
+                    lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [],
+                    lastGPS = parser.frameDefs.G ? iframeDirectory.initialGPS[chunkIndex].slice(0) : [];
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                     var
@@ -450,6 +451,11 @@ function FlightLog(logData) {
                                 // TODO pending to do something with GPS frames
                                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
                                 // But other data from the G frame can be valid (time, num sats)
+
+                                //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+                                for (let i = 0; i < frame.length; i++) {
+                                    lastGPS[i] = frame[i];
+                                }
                             break;
                         }
                     } else {

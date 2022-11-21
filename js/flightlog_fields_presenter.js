@@ -106,6 +106,16 @@ function FlightLogFieldPresenter() {
         'rxSignalReceived': 'RX Signal Received',
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
+
+
+        'lastGPS[all]': 'GPS Data',
+        'lastGPS[0]': "GPS timeframe",
+        'lastGPS[1]': "GPS Latitude",
+        'lastGPS[2]': "GPS Longitude",
+        'lastGPS[3]': "GPS NumSat",
+        'lastGPS[4]': "GPS Altitude",
+        'lastGPS[5]': "GPS Speed",
+        'lastGPS[6]': "GPS Ground course",
     };
 
     const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -859,6 +869,9 @@ function FlightLogFieldPresenter() {
         const highResolutionScale = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 10 : 1;
         const highResolutionAddPrecision = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 1 : 0;
 
+        //if (fieldName.toUpperCase().includes("GPS")) 
+        console.log(fieldName);
+
         switch (fieldName) {
             case 'time':
                 return formatTime(value / 1000, true);
@@ -976,6 +989,22 @@ function FlightLogFieldPresenter() {
 
             case 'rssi':
                 return (value / 1024 * 100).toFixed(2) + " %";
+
+            //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+            case 'lastGPS[0]':
+            case 'lastGPS[1]':
+                return `${value}`;
+            case 'lastGPS[2]':
+                return `${(value/1000000).toFixed(2)}`;
+            case 'lastGPS[3]':
+                return `${(value/10000000).toFixed(2)}`;
+            case 'lastGPS[4]':
+                return `${(value/10).toFixed(2)}`;
+            case 'lastGPS[5]':
+                return `${(value/100).toFixed(2)}`;
+            case 'lastGPS[6]':
+                return `${(value/10).toFixed(2)}`;
+
 
             case 'debug[0]':
             case 'debug[1]':

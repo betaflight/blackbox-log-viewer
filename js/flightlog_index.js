@@ -46,6 +46,7 @@ function FlightLogIndex(logData) {
                     initialIMU: [],
                     initialSlow: [],
                     initialGPSHome: [],
+                    initialGPS: [],
                     hasEvent: [],
                     minTime: false,
                     maxTime: false
@@ -83,7 +84,8 @@ function FlightLogIndex(logData) {
                     magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
                     
                     lastSlow = [],
-                    lastGPSHome = [];
+                    lastGPSHome = [],
+                    lastGPS = [mainFrameDef.nameToIndex["lastGPS[0]"],mainFrameDef.nameToIndex["lastGPS[1]"], mainFrameDef.nameToIndex["lastGPS[2]"], mainFrameDef.nameToIndex["lastGPS[3]"], mainFrameDef.nameToIndex["lastGPS[4]"], mainFrameDef.nameToIndex["lastGPS[5]"], mainFrameDef.nameToIndex["lastGPS[6]"]];
                 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {
@@ -139,6 +141,7 @@ function FlightLogIndex(logData) {
                                     intraIndex.initialIMU.push(new IMU(imu));
                                     intraIndex.initialSlow.push(lastSlow);
                                     intraIndex.initialGPSHome.push(lastGPSHome);
+                                    intraIndex.initialGPS.push(lastGPS);
                                 }
                                 
                                 iframeCount++;
@@ -152,6 +155,9 @@ function FlightLogIndex(logData) {
                                 sysConfig.gyroScale, 
                                 magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
                             );
+                        break;
+                        case 'G':
+                            lastGPS = frame.slice(0);
                         break;
                         case 'H':
                             lastGPSHome = frame.slice(0);
