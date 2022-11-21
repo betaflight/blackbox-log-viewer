@@ -207,7 +207,7 @@ function FlightLog(logData) {
         } else
             return false;
     };
-
+    
     function buildFieldNames() {
         // Make an independent copy
         fieldNames = parser.frameDefs.I.name.slice(0);
@@ -218,10 +218,12 @@ function FlightLog(logData) {
                 fieldNames.push(parser.frameDefs.S.name[i]);
             }
         }
-        // Add names of gps fields which we'll merfe into the main stream
+        // Add names of gps fields which we'll merge into the main stream
+        
         if (parser.frameDefs.G) {
             for (let i = 0; i < parser.frameDefs.G.name.length; i++) {
                 fieldNames.push(parser.frameDefs.G.name[i]);
+                console.log("Adding GPS field: ", parser.frameDefs.G.name[i], " Index: ", fieldNames.length - 1);
             }
         }
 
@@ -429,7 +431,7 @@ function FlightLog(logData) {
                                 // Also merge last seen gps-frame data
                                 console.log(lastGPS)
                                 for (var i = 0; i < lastGPSLength; i++) {
-                                    destFrame[i + frame.length] = lastGPS[i] === undefined ? null : lastGPS[i];
+                                    destFrame[i + frame.length + slowFrameLength] = lastGPS[i] === undefined ? null : lastGPS[i];
                                 }
 
                                 for (var i = 0; i < eventNeedsTimestamp.length; i++) {
@@ -466,7 +468,7 @@ function FlightLog(logData) {
                             case 'H':
                                 // TODO
                                 // contains coordinates only
-                                // should be handles separately
+                                // should be handled separately
                             case 'G':
                                 // TODO pending to do something with GPS frames
                                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
