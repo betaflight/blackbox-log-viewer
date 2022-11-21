@@ -418,12 +418,12 @@ function FlightLog(logData) {
                                 }
 
                                 // Then merge in the last seen slow-frame data
-                                for (var i = 0; i < slowFrameLength; i++) {
-                                    destFrame[i + frame.length] = lastSlow[i] === undefined ? null : lastSlow[i];
+                                for (let slowFrameIndex = 0; slowFrameIndex < slowFrameLength; slowFrameIndex++) {
+                                    destFrame[slowFrameIndex + frame.length] = lastSlow[slowFrameIndex] === undefined ? null : lastSlow[slowFrameIndex];
                                 }
                                 // Also merge last seen gps-frame data
-                                for (var i = 0; i < lastGPSLength; i++) {
-                                    destFrame[i + frame.length + slowFrameLength] = lastGPS[i] === undefined ? null : lastGPS[i];
+                                for (let gpsFrameIndex = 0; gpsFrameIndex < lastGPSLength; gpsFrameIndex++) {
+                                    destFrame[gpsFrameIndex + frame.length + slowFrameLength] = lastGPS[gpsFrameIndex] === undefined ? null : lastGPS[gpsFrameIndex];
                                 }
 
                                 for (var i = 0; i < eventNeedsTimestamp.length; i++) {

@@ -107,15 +107,15 @@ function FlightLogFieldPresenter() {
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
 
-
         'lastGPS[all]': 'GPS Data',
-        'lastGPS[0]': "GPS timeframe",
-        'lastGPS[1]': "GPS NumSat",
-        'lastGPS[2]': "GPS Latitude",
-        'lastGPS[3]': "GPS Longitude",
-        'lastGPS[4]': "GPS Altitude",
-        'lastGPS[5]': "GPS Speed",
-        'lastGPS[6]': "GPS Ground course",
+        //'time': "GPS timeframe", can't change this one since
+        //it shares a name with the normal time field.
+        'GPS_numSat': "GPS NumSat",
+        'GPS_coord[0]': "GPS Latitude",
+        'GPS_coord[1]': "GPS Longitude",
+        'GPS_altitude': "GPS Altitude",
+        'GPS_speed': "GPS Speed",
+        'GPS_ground_course': "GPS Ground course",
     };
 
     const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -994,15 +994,15 @@ function FlightLogFieldPresenter() {
             case 'lastGPS[1]': // GPS_numSat
                 return `${value}`;
             case 'lastGPS[2]': // GPS_coord[0]
-                return `${(value/1000000).toFixed(2)}`;
+                return `${value}`;
             case 'lastGPS[3]': // GPS_coord[1]
-                return `${(value/10000000).toFixed(2)}`;
+                return `${value}`;
             case 'lastGPS[4]': // GPS_altitude
-                return `${(value/10).toFixed(2)}`;
+                return `${value}`;
             case 'lastGPS[5]': // GPS_speed
-                return `${(value/100).toFixed(2)}`;
+                return `${value}`;
             case 'lastGPS[6]': // GPS_ground_course
-                return `${(value/10).toFixed(2)}`;
+                return `${value}`;
 
 
             case 'debug[0]':
