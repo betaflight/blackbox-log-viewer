@@ -957,7 +957,7 @@ GraphConfig.load = function(config) {
         }
 
         if (!flightLog.isFieldDisabled().GPS) {
-            EXAMPLE_GRAPHS.push({label: "GPS",fields: ["lastGPS[all]"]});
+            EXAMPLE_GRAPHS.push({label: "GPS",fields: ["GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course", "GPS_coord[all]"]});
         }
 
         for (i = 0; i < EXAMPLE_GRAPHS.length; i++) {

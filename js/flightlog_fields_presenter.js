@@ -107,7 +107,6 @@ function FlightLogFieldPresenter() {
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
 
-        'lastGPS[all]': 'GPS Data',
         //'time': "GPS timeframe", can't change this one since
         //it shares a name with the normal time field.
         'GPS_numSat': "GPS NumSat",
@@ -988,18 +987,16 @@ function FlightLogFieldPresenter() {
                 return (value / 1024 * 100).toFixed(2) + " %";
 
             //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
-            case 'lastGPS[0]':
-            case 'lastGPS[1]': // GPS_numSat
+            case 'GPS_numSat': // GPS_numSat
                 return `${value}`;
-            case 'lastGPS[2]': // GPS_coord[0]
-                return `${value}`;
-            case 'lastGPS[3]': // GPS_coord[1]
-                return `${value}`;
-            case 'lastGPS[4]': // GPS_altitude
-                return `${value}`;
-            case 'lastGPS[5]': // GPS_speed
-                return `${value}`;
-            case 'lastGPS[6]': // GPS_ground_course
+            case 'GPS_coord[0]': // GPS_coord[0]
+            case 'GPS_coord[1]': // GPS_coord[1]
+                return `${(value/10000000).toFixed(5)}`;
+            case 'GPS_altitude': // GPS_altitude
+                return `${(value/1000).toFixed(1)} m`;
+            case 'GPS_speed': // GPS_speed
+                return `${(value/100).toFixed(2)} m/s`;
+            case 'GPS_ground_course': // GPS_ground_course
                 return `${value}`;
 
 
