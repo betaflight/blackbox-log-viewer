@@ -78,7 +78,8 @@ function FlightLogIndex(logData) {
                 var 
                     sysConfig = parser.sysConfig,
                     mainFrameDef = parser.frameDefs.I,
-                    
+
+                                        
                     gyroADC = [mainFrameDef.nameToIndex["gyroADC[0]"], mainFrameDef.nameToIndex["gyroADC[1]"], mainFrameDef.nameToIndex["gyroADC[2]"]],
                     accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]],
                     magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
@@ -88,18 +89,21 @@ function FlightLogIndex(logData) {
                     lastGPS = []
 
                     // is this needed? 
-                    // gpsFrameDef = parser.frameDefs.G,
-                    // lastGPS = [
-                    //     gpsFrameDef.nameToIndex["time"],
-                    //     gpsFrameDef.nameToIndex["GPS_numSat"],
-                    //     gpsFrameDef.nameToIndex["GPS_coord[0]"],
-                    //     gpsFrameDef.nameToIndex["GPS_coord[1]"],
-                    //     gpsFrameDef.nameToIndex["GPS_altitude"],
-                    //     gpsFrameDef.nameToIndex["GPS_speed"],
-                    //     gpsFrameDef.nameToIndex["GPS_ground_course"]
-                    //     ]
+                    //gpsFrameDef = parser.frameDefs.G,
+                    /*lastGPS = [
+                         gpsFrameDef.nameToIndex["time"],
+                         gpsFrameDef.nameToIndex["GPS_numSat"],
+                         gpsFrameDef.nameToIndex["GPS_coord[0]"],
+                         gpsFrameDef.nameToIndex["GPS_coord[1]"],
+                         gpsFrameDef.nameToIndex["GPS_altitude"],
+                         gpsFrameDef.nameToIndex["GPS_speed"],
+                         gpsFrameDef.nameToIndex["GPS_ground_course"]
+                         ]*/
                         
                     ;
+
+                console.log("mainFrameDef: ", mainFrameDef);
+
 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {

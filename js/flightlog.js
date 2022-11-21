@@ -218,6 +218,16 @@ function FlightLog(logData) {
                 fieldNames.push(parser.frameDefs.S.name[i]);
             }
         }
+        // Add names of gps fields which we'll merfe into the main stream
+        if (parser.frameDefs.G) {
+            for (let i = 0; i < parser.frameDefs.G.name.length; i++) {
+                fieldNames.push(parser.frameDefs.G.name[i]);
+            }
+        }
+
+        /*if (!that.isFieldDisabled().GPS) {
+            fieldNames.push("lastGPS[0]", "lastGPS[1]", "lastGPS[2]", "lastGPS[3]", "lastGPS[4]", "lastGPS[5]", "lastGPS[6]");
+        }*/
 
         // Add names for our ADDITIONAL_COMPUTED_FIELDS
         if (!that.isFieldDisabled().GYRO) {
@@ -240,9 +250,6 @@ function FlightLog(logData) {
                     break;
                 }
             }
-        }
-        if (!that.isFieldDisabled().GPS) {
-            fieldNames.push("lastGPS[0]", "lastGPS[1]", "lastGPS[2]", "lastGPS[3]", "lastGPS[4]", "lastGPS[5]", "lastGPS[6]");
         }
 
         fieldNameToIndex = {};
@@ -379,7 +386,7 @@ function FlightLog(logData) {
                     mainFrameIndex = 0,
                     slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
                     lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [],
-                    lastGPSLength = 0, //parser.frameDefs.G ? parser.frameDefs.G.count : 0, //Should I expand the outputFields?
+                    lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count : 0, //Should I expand the outputFields?
                     lastGPS = parser.frameDefs.G ? iframeDirectory.initialGPS[chunkIndex].slice(0) : [];
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
@@ -415,8 +422,14 @@ function FlightLog(logData) {
                                 }
 
                                 // Then merge in the last seen slow-frame data
+                                console.log(lastSlow)
                                 for (var i = 0; i < slowFrameLength; i++) {
                                     destFrame[i + frame.length] = lastSlow[i] === undefined ? null : lastSlow[i];
+                                }
+                                // Also merge last seen gps-frame data
+                                console.log(lastGPS)
+                                for (var i = 0; i < lastGPSLength; i++) {
+                                    destFrame[i + frame.length] = lastGPS[i] === undefined ? null : lastGPS[i];
                                 }
 
                                 for (var i = 0; i < eventNeedsTimestamp.length; i++) {
@@ -451,6 +464,9 @@ function FlightLog(logData) {
                                 }
                             break;
                             case 'H':
+                                // TODO
+                                // contains coordinates only
+                                // should be handles separately
                             case 'G':
                                 // TODO pending to do something with GPS frames
                                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
@@ -480,6 +496,7 @@ function FlightLog(logData) {
                             break;
                         }
                             // Logs gps values, but out of sync for some reason
+                        /*
                             console.log("local frames", chunk.frames[chunk.frames.length - 1]);
                             chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[0]')] = lastGPS[0];
                             chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[1]')] = lastGPS[1];
@@ -487,6 +504,7 @@ function FlightLog(logData) {
                             chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[3]')] = lastGPS[3];
                             chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[4]')] = lastGPS[4];
                             chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[5]')] = lastGPS[5];
+                        */
                     } else {
                         chunk.gapStartsHere[mainFrameIndex - 1] = true;
                     }
@@ -578,8 +596,8 @@ function FlightLog(logData) {
                        fieldNameToIndex["motor[4]"], fieldNameToIndex["motor[5]"], fieldNameToIndex["motor[6]"], fieldNameToIndex["motor[7]"]];
 
 
-        let gps = [fieldNameToIndex["lastGPS[0]"], fieldNameToIndex["lastGPS[1]"], fieldNameToIndex["lastGPS[2]"], fieldNameToIndex["lastGPS[3]"], fieldNameToIndex["lastGPS[4]"], fieldNameToIndex["lastGPS[5]"], fieldNameToIndex["lastGPS[6]"]];
-        console.log("gps",gps)
+        //TODO let gps = [fieldNameToIndex["lastGPS[0]"], fieldNameToIndex["lastGPS[1]"], fieldNameToIndex["lastGPS[2]"], fieldNameToIndex["lastGPS[3]"], fieldNameToIndex["lastGPS[4]"], fieldNameToIndex["lastGPS[5]"], fieldNameToIndex["lastGPS[6]"]];
+        //console.log("gps",gps)
 
         let sourceChunkIndex;
         let destChunkIndex;
@@ -620,9 +638,9 @@ function FlightLog(logData) {
             motor = false;
         }
 
-        if (!gps[0]) {
+        /*if (!gps[0]) {
             gps = false;
-        }
+        }*/
 
         sourceChunkIndex = 0;
         destChunkIndex = 0;
@@ -725,7 +743,7 @@ function FlightLog(logData) {
                         }
                     }
 
-                    if(gps) {
+                    /*if(gps) {
                         console.log("GPS");
                         console.log("destFrame", destFrame);
                         console.log("srcFrame", srcFrame);
@@ -739,7 +757,7 @@ function FlightLog(logData) {
                         destFrame[fieldIndex++] = srcFrame[gps[6]];
                         console.log("destFrame", destFrame);
                         console.log("srcFrame", srcFrame);
-                    }
+                    }*/
                     // Remove empty fields at the end
                     destFrame.splice(fieldIndex);
 
