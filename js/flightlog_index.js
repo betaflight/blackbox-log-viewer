@@ -85,8 +85,22 @@ function FlightLogIndex(logData) {
                     
                     lastSlow = [],
                     lastGPSHome = [],
-                    lastGPS = [mainFrameDef.nameToIndex["lastGPS[0]"],mainFrameDef.nameToIndex["lastGPS[1]"], mainFrameDef.nameToIndex["lastGPS[2]"], mainFrameDef.nameToIndex["lastGPS[3]"], mainFrameDef.nameToIndex["lastGPS[4]"], mainFrameDef.nameToIndex["lastGPS[5]"], mainFrameDef.nameToIndex["lastGPS[6]"]];
-                
+                    lastGPS = []
+
+                    // is this needed? 
+                    // gpsFrameDef = parser.frameDefs.G,
+                    // lastGPS = [
+                    //     gpsFrameDef.nameToIndex["time"],
+                    //     gpsFrameDef.nameToIndex["GPS_numSat"],
+                    //     gpsFrameDef.nameToIndex["GPS_coord[0]"],
+                    //     gpsFrameDef.nameToIndex["GPS_coord[1]"],
+                    //     gpsFrameDef.nameToIndex["GPS_altitude"],
+                    //     gpsFrameDef.nameToIndex["GPS_speed"],
+                    //     gpsFrameDef.nameToIndex["GPS_ground_course"]
+                    //     ]
+                        
+                    ;
+
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {
                     if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {

@@ -241,6 +241,9 @@ function FlightLog(logData) {
                 }
             }
         }
+        if (!that.isFieldDisabled().GPS) {
+            fieldNames.push("lastGPS[0]", "lastGPS[1]", "lastGPS[2]", "lastGPS[3]", "lastGPS[4]", "lastGPS[5]", "lastGPS[6]");
+        }
 
         fieldNameToIndex = {};
         for (let i = 0; i < fieldNames.length; i++) {
@@ -376,6 +379,7 @@ function FlightLog(logData) {
                     mainFrameIndex = 0,
                     slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
                     lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [],
+                    lastGPSLength = 0,//parser.frameDefs.G ? parser.frameDefs.G.count : 0, Should I expand the outputFields?
                     lastGPS = parser.frameDefs.G ? iframeDirectory.initialGPS[chunkIndex].slice(0) : [];
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
@@ -393,7 +397,7 @@ function FlightLog(logData) {
                                 //The parser re-uses the "frame" array so we must copy that data somewhere else
 
                                 var
-                                    numOutputFields = frame.length + slowFrameLength + ADDITIONAL_COMPUTED_FIELD_COUNT;
+                                    numOutputFields = frame.length + slowFrameLength + lastGPSLength + ADDITIONAL_COMPUTED_FIELD_COUNT;
 
                                 //Do we have a recycled chunk to copy on top of?
                                 if (chunk.frames[mainFrameIndex]) {
@@ -478,6 +482,8 @@ function FlightLog(logData) {
                 chunkCache.add(chunkIndex, chunk);
             }
 
+            console.log("chunk",chunk)
+
             resultChunks.push(chunk);
         }
 
@@ -546,6 +552,10 @@ function FlightLog(logData) {
         let motor = [fieldNameToIndex["motor[0]"], fieldNameToIndex["motor[1]"], fieldNameToIndex["motor[2]"], fieldNameToIndex["motor[3]"],
                        fieldNameToIndex["motor[4]"], fieldNameToIndex["motor[5]"], fieldNameToIndex["motor[6]"], fieldNameToIndex["motor[7]"]];
 
+
+        let gps = [fieldNameToIndex["lastGPS[0]"], fieldNameToIndex["lastGPS[1]"], fieldNameToIndex["lastGPS[2]"], fieldNameToIndex["lastGPS[3]"], fieldNameToIndex["lastGPS[4]"], fieldNameToIndex["lastGPS[5]"], fieldNameToIndex["lastGPS[6]"]];
+        console.log("gps",gps)
+
         let sourceChunkIndex;
         let destChunkIndex;
         let attitude;
@@ -583,6 +593,10 @@ function FlightLog(logData) {
 
         if (!motor[0]) {
             motor = false;
+        }
+
+        if (!gps[0]) {
+            gps = false;
         }
 
         sourceChunkIndex = 0;
@@ -686,6 +700,15 @@ function FlightLog(logData) {
                         }
                     }
 
+                    if(gps) {
+                        destFrame[fieldIndex++] = srcFrame[gps[0]];
+                        destFrame[fieldIndex++] = srcFrame[gps[1]];
+                        destFrame[fieldIndex++] = srcFrame[gps[2]];
+                        destFrame[fieldIndex++] = srcFrame[gps[3]];
+                        destFrame[fieldIndex++] = srcFrame[gps[4]];
+                        destFrame[fieldIndex++] = srcFrame[gps[5]];
+                        destFrame[fieldIndex++] = srcFrame[gps[6]];
+                    }
                     // Remove empty fields at the end
                     destFrame.splice(fieldIndex);
 
