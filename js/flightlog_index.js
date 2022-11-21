@@ -78,7 +78,6 @@ function FlightLogIndex(logData) {
                 var 
                     sysConfig = parser.sysConfig,
                     mainFrameDef = parser.frameDefs.I,
-
                                         
                     gyroADC = [mainFrameDef.nameToIndex["gyroADC[0]"], mainFrameDef.nameToIndex["gyroADC[1]"], mainFrameDef.nameToIndex["gyroADC[2]"]],
                     accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]],
@@ -86,9 +85,7 @@ function FlightLogIndex(logData) {
                     
                     lastSlow = [],
                     lastGPSHome = [],
-                    lastGPS = []
-                    ;
-
+                    lastGPS = [];
 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {

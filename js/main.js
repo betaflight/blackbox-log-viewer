@@ -167,10 +167,6 @@ function BlackboxLogViewer() {
         if (value === null)
             return "(absent)";
 
-        if (typeof value == 'undefined') {
-            return "undefined";
-        }
-    
         return value.toFixed(2);
     }
     
