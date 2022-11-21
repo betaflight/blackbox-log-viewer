@@ -560,6 +560,7 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('VTX_MSP'), 1);
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_DOP'), 1);
         }
+
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
         // Flight mode names
