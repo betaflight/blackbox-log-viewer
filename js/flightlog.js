@@ -219,17 +219,11 @@ function FlightLog(logData) {
             }
         }
         // Add names of gps fields which we'll merge into the main stream
-        
         if (parser.frameDefs.G) {
             for (let i = 0; i < parser.frameDefs.G.name.length; i++) {
                 fieldNames.push(parser.frameDefs.G.name[i]);
-                console.log("Adding GPS field: ", parser.frameDefs.G.name[i], " Index: ", fieldNames.length - 1);
             }
         }
-
-        /*if (!that.isFieldDisabled().GPS) {
-            fieldNames.push("lastGPS[0]", "lastGPS[1]", "lastGPS[2]", "lastGPS[3]", "lastGPS[4]", "lastGPS[5]", "lastGPS[6]");
-        }*/
 
         // Add names for our ADDITIONAL_COMPUTED_FIELDS
         if (!that.isFieldDisabled().GYRO) {
@@ -424,12 +418,10 @@ function FlightLog(logData) {
                                 }
 
                                 // Then merge in the last seen slow-frame data
-                                console.log(lastSlow)
                                 for (var i = 0; i < slowFrameLength; i++) {
                                     destFrame[i + frame.length] = lastSlow[i] === undefined ? null : lastSlow[i];
                                 }
                                 // Also merge last seen gps-frame data
-                                console.log(lastGPS)
                                 for (var i = 0; i < lastGPSLength; i++) {
                                     destFrame[i + frame.length + slowFrameLength] = lastGPS[i] === undefined ? null : lastGPS[i];
                                 }
@@ -470,7 +462,6 @@ function FlightLog(logData) {
                                 // contains coordinates only
                                 // should be handled separately
                             case 'G':
-                                // TODO pending to do something with GPS frames
                                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
                                 // But other data from the G frame can be valid (time, num sats)
 
@@ -478,35 +469,8 @@ function FlightLog(logData) {
                                 for (let i = 0; i < frame.length; i++) {
                                     lastGPS[i] = frame[i];
                                 }
-                                console.log("frameValid: " + frameValid);
-                                console.log("frame: " + frame);
-                                console.log("frameType: " + frameType);
-                                console.log("frameOffset: " + frameOffset);
-                                console.log("frameSize: " + frameSize);
-
-                                    //parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-//                                console.log("local frames", chunk.frames[chunk.frames.length - 1]);
-//                                chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[0]')] = lastGPS[0];
-//                                chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[1]')] = lastGPS[1];
-//                                chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[2]')] = lastGPS[2];
-//                                chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[3]')] = lastGPS[3];
-//                                chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[4]')] = lastGPS[4];
-//                                chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[5]')] = lastGPS[5];
-                                //chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[6]')] = lastGPS[6];
-
-                                //getMainFieldIndexByName
                             break;
                         }
-                            // Logs gps values, but out of sync for some reason
-                        /*
-                            console.log("local frames", chunk.frames[chunk.frames.length - 1]);
-                            chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[0]')] = lastGPS[0];
-                            chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[1]')] = lastGPS[1];
-                            chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[2]')] = lastGPS[2];
-                            chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[3]')] = lastGPS[3];
-                            chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[4]')] = lastGPS[4];
-                            chunk.frames[chunk.frames.length - 1][that.getMainFieldIndexByName('lastGPS[5]')] = lastGPS[5];
-                        */
                     } else {
                         chunk.gapStartsHere[mainFrameIndex - 1] = true;
                     }
@@ -526,8 +490,6 @@ function FlightLog(logData) {
 
                 chunkCache.add(chunkIndex, chunk);
             }
-
-            console.log("chunk",chunk)
 
             resultChunks.push(chunk);
         }
@@ -597,10 +559,6 @@ function FlightLog(logData) {
         let motor = [fieldNameToIndex["motor[0]"], fieldNameToIndex["motor[1]"], fieldNameToIndex["motor[2]"], fieldNameToIndex["motor[3]"],
                        fieldNameToIndex["motor[4]"], fieldNameToIndex["motor[5]"], fieldNameToIndex["motor[6]"], fieldNameToIndex["motor[7]"]];
 
-
-        //TODO let gps = [fieldNameToIndex["lastGPS[0]"], fieldNameToIndex["lastGPS[1]"], fieldNameToIndex["lastGPS[2]"], fieldNameToIndex["lastGPS[3]"], fieldNameToIndex["lastGPS[4]"], fieldNameToIndex["lastGPS[5]"], fieldNameToIndex["lastGPS[6]"]];
-        //console.log("gps",gps)
-
         let sourceChunkIndex;
         let destChunkIndex;
         let attitude;
@@ -639,10 +597,6 @@ function FlightLog(logData) {
         if (!motor[0]) {
             motor = false;
         }
-
-        /*if (!gps[0]) {
-            gps = false;
-        }*/
 
         sourceChunkIndex = 0;
         destChunkIndex = 0;
@@ -745,21 +699,6 @@ function FlightLog(logData) {
                         }
                     }
 
-                    /*if(gps) {
-                        console.log("GPS");
-                        console.log("destFrame", destFrame);
-                        console.log("srcFrame", srcFrame);
-                        destFrame[fieldIndex++] = srcFrame[gps[0]];
-                        //destFrame[fieldIndex++] = 42069;
-                        destFrame[fieldIndex++] = srcFrame[gps[1]];
-                        destFrame[fieldIndex++] = srcFrame[gps[2]];
-                        destFrame[fieldIndex++] = srcFrame[gps[3]];
-                        destFrame[fieldIndex++] = srcFrame[gps[4]];
-                        destFrame[fieldIndex++] = srcFrame[gps[5]];
-                        destFrame[fieldIndex++] = srcFrame[gps[6]];
-                        console.log("destFrame", destFrame);
-                        console.log("srcFrame", srcFrame);
-                    }*/
                     // Remove empty fields at the end
                     destFrame.splice(fieldIndex);
 

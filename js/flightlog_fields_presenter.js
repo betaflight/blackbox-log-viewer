@@ -991,17 +991,17 @@ function FlightLogFieldPresenter() {
 
             //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
             case 'lastGPS[0]':
-            case 'lastGPS[1]':
+            case 'lastGPS[1]': // GPS_numSat
                 return `${value}`;
-            case 'lastGPS[2]':
+            case 'lastGPS[2]': // GPS_coord[0]
                 return `${(value/1000000).toFixed(2)}`;
-            case 'lastGPS[3]':
+            case 'lastGPS[3]': // GPS_coord[1]
                 return `${(value/10000000).toFixed(2)}`;
-            case 'lastGPS[4]':
+            case 'lastGPS[4]': // GPS_altitude
                 return `${(value/10).toFixed(2)}`;
-            case 'lastGPS[5]':
+            case 'lastGPS[5]': // GPS_speed
                 return `${(value/100).toFixed(2)}`;
-            case 'lastGPS[6]':
+            case 'lastGPS[6]': // GPS_ground_course
                 return `${(value/10).toFixed(2)}`;
 
 

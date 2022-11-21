@@ -246,7 +246,6 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     break;
                     default:
                         idents.miscFields.push(fieldIndex);
-                        console.log("miscFields", idents.miscFields);
                 }
             }
         }
