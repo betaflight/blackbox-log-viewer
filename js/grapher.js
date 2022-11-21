@@ -179,19 +179,27 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             numCells:-1,
             baroField:-1,
 
+            gpsFields:[],
+
             miscFields:[],
 
             //Synthetic fields:
             roll:-1,
             pitch:-1,
             heading:-1,
-            axisPIDSum:[]
+            axisPIDSum:[],
+            GPS_numSat:80,
+            GPS_altitude:70,
+            GPS_speed:60,
+            GPS_ground_course:50,
         };
         
         for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
             var 
                 fieldName = fieldNames[fieldIndex],
                 matches;
+
+                console.log("fieldName",fieldName)
 
             if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
                 var motorIndex = matches[1];
@@ -226,7 +234,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
                 idents.numServos++;
                 idents.servoFields[servoIndex] = fieldIndex;
-            } else {
+            // } else if ((matches = fieldName.match(/^GPS_coord\[(\d+)]$/))) {
+            //     console.log("MATCHES GPS")
+            //     var axisIndex = matches[1];
+
+            //     idents.gpsFields[axisIndex] = fieldIndex;
+            }else {
                 switch (fieldName) {
                     case "vbatLatest":
                         idents.vbatField = fieldIndex;
@@ -244,6 +257,22 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     case "heading":
                         idents.heading = fieldIndex;
                     break;
+
+                    case "GPS_numSat":
+                        idents.GPS_numSat = fieldIndex;
+                    break;
+                    case "GPS_altitude":
+                        idents.GPS_altitude = fieldIndex;
+                    break;
+                    case "GPS_speed":
+                        idents.GPS_speed = fieldIndex;
+                    break;
+                    case "GPS_ground_course":
+                        idents.GPS_ground_course = fieldIndex;
+                    break;
+
+
+
                     default:
                         idents.miscFields.push(fieldIndex);
                 }

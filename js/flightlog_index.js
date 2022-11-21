@@ -83,7 +83,13 @@ function FlightLogIndex(logData) {
                     magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
                     
                     lastSlow = [],
-                    lastGPSHome = [];
+                    lastGPSHome = [],
+
+                    lastGPScoord = [],
+                    lastGPSnumSat,
+                    lastGPSaltitude,
+                    lastGPSspeed,
+                    lastGPSgroundCourse;
                 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {
@@ -165,6 +171,23 @@ function FlightLogIndex(logData) {
                             if (frame.event == FlightLogEvent.LOG_END) {
                                 sawEndMarker = true;
                             }
+                        break;
+                        case 'G':
+                            var frameTime = frame[0];
+                            //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+                            lastGPSnumSat = frame[1];
+                            lastGPScoord[0] = frame[2];
+                            lastGPScoord[1] = frame[3];
+                            lastGPSaltitude = frame[4];
+                            lastGPSspeed = frame[5];
+                            lastGPSgroundCourse = frame[6];
+                            // console.log(`full frame: ${frame}`);
+                            // console.log(`frameTime ${frameTime} 
+                            //     lastGPSnumSat ${lastGPSnumSat} 
+                            //     lastGPScoord[all] ${lastGPScoord} (lastGPScoord[0] ${lastGPScoord[0]} / lastGPScoord[1] ${lastGPScoord[1]}) 
+                            //     lastGPSaltitude ${lastGPSaltitude} 
+                            //     lastGPSspeed ${lastGPSspeed} 
+                            //     lastGPSgroundCourse ${lastGPSgroundCourse}`);
                         break;
                         case 'S':
                             lastSlow = frame.slice(0);

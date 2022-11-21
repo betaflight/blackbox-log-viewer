@@ -210,10 +210,12 @@ function FlightLog(logData) {
 
     function buildFieldNames() {
         // Make an independent copy
+        console.log("parser.frameDefs.I.name",parser.frameDefs.I.name)
         fieldNames = parser.frameDefs.I.name.slice(0);
 
         // Add names of slow fields which we'll merge into the main stream
         if (parser.frameDefs.S) {
+            console.log("parser.frameDefs.S.name",parser.frameDefs.S.name)
             for (let i = 0; i < parser.frameDefs.S.name.length; i++) {
                 fieldNames.push(parser.frameDefs.S.name[i]);
             }
@@ -240,6 +242,10 @@ function FlightLog(logData) {
                     break;
                 }
             }
+        }
+        //maybe GPS
+        if (!that.isFieldDisabled().GPS) {
+            fieldNames.push("GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course");
         }
 
         fieldNameToIndex = {};
@@ -450,6 +456,27 @@ function FlightLog(logData) {
                                 // TODO pending to do something with GPS frames
                                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
                                 // But other data from the G frame can be valid (time, num sats)
+
+                                //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+                                for (var i = 0; i < frame.length; i++) {
+                                    //console.log(`G frame[${i}] ${frame[i]}`);
+
+                                }
+                                // document.getElementById('gps-table').innerText = frame[2] +" | "+ frame[3]
+
+
+///
+                                if (!frame.time) {
+                                    eventNeedsTimestamp.push(frame);
+                                }
+                                chunk.events.push(frame);
+   /////                             
+
+
+
+
+
+
                             break;
                         }
                     } else {
@@ -540,6 +567,11 @@ function FlightLog(logData) {
         let motor = [fieldNameToIndex["motor[0]"], fieldNameToIndex["motor[1]"], fieldNameToIndex["motor[2]"], fieldNameToIndex["motor[3]"],
                        fieldNameToIndex["motor[4]"], fieldNameToIndex["motor[5]"], fieldNameToIndex["motor[6]"], fieldNameToIndex["motor[7]"]];
 
+
+
+         let gps = [fieldNameToIndex["GPS_numSat"], fieldNameToIndex["GPS_altitude"], fieldNameToIndex["GPS_speed"], fieldNameToIndex["GPS_ground_course"]];
+         console.log("gps",gps)
+
         let sourceChunkIndex;
         let destChunkIndex;
         let attitude;
@@ -577,6 +609,10 @@ function FlightLog(logData) {
 
         if (!motor[0]) {
             motor = false;
+        }
+
+        if (!gps[0]) {
+            gps = false;
         }
 
         sourceChunkIndex = 0;
@@ -679,6 +715,30 @@ function FlightLog(logData) {
                             destFrame[fieldIndex++] = srcFrame[motor[motorNumber]];
                         }
                     }
+
+                    // GPS maybe "GPS_numSat"], fieldNameToIndex["GPS_altitude"], fieldNameToIndex["GPS_speed"], fieldNameToIndex["GPS_ground_course"]];
+                    if(gps){
+
+console.log("srcFrame",srcFrame)
+console.log("[gps[0]",gps[0])
+console.log("srcFrame[gps[0]",srcFrame[gps[0]])
+
+
+
+
+destFrame[fieldIndex++] = srcFrame[gps[0]];
+destFrame[fieldIndex++] = srcFrame[gps[1]];
+destFrame[fieldIndex++] = srcFrame[gps[2]];
+destFrame[fieldIndex++] = srcFrame[gps[3]];
+
+// destFrame[fieldIndex++] = 10;
+// destFrame[fieldIndex++] = 20;
+// destFrame[fieldIndex++] = 30;
+// destFrame[fieldIndex++] = 40;
+                    }
+
+
+
 
                     // Remove empty fields at the end
                     destFrame.splice(fieldIndex);

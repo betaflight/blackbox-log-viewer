@@ -956,6 +956,10 @@ GraphConfig.load = function(config) {
             EXAMPLE_GRAPHS.push({label: "Debug",fields: ["debug[all]"]});
         }
 
+        if (!flightLog.isFieldDisabled().GPS) {
+            EXAMPLE_GRAPHS.push({label: "GPS",fields: ["GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course"]});
+        }
+
         for (i = 0; i < EXAMPLE_GRAPHS.length; i++) {
             var
                 srcGraph = EXAMPLE_GRAPHS[i],

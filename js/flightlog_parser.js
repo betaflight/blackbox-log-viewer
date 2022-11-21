@@ -1402,6 +1402,7 @@ var FlightLogParser = function(logData) {
     function parseGPSFrame(raw) {
         // Only parse a GPS frame if we have GPS header definitions
         if (that.frameDefs.G) {
+            console.log("that.frameDefs.G",that.frameDefs.G)
             parseFrame(that.frameDefs.G, lastGPS, null, null, 0, raw);
         }
     }

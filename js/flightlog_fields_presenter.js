@@ -106,6 +106,20 @@ function FlightLogFieldPresenter() {
         'rxSignalReceived': 'RX Signal Received',
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
+
+        // no clue how to process these, and HOME is likely a duplicate
+        'GPS_home[all]': 'GPS_home[all]',
+        'GPS_home[0]': 'GPS_home[0]',
+        'GPS_home[1]': 'GPS_home[1]',
+        'GPS_coord[all]': 'GPS_coord[all]',
+        'GPS_coord[0]': 'GPS_coord[0]',
+        'GPS_coord[1]': 'GPS_coord[0]',
+        'GPS_numSat': 'GPS_numSat',
+        'GPS_altitude': 'GPS_altitude',
+        'GPS_speed': 'GPS_speed',
+        'GPS_ground_course': 'GPS_ground_course',
+
+
     };
 
     const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -976,6 +990,22 @@ function FlightLogFieldPresenter() {
 
             case 'rssi':
                 return (value / 1024 * 100).toFixed(2) + " %";
+
+            //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+            case 'GPSHOME[0]':
+            case 'GPSHOME[1]':
+            case 'GPS_HOME[0]':  //duplicate variable
+            case 'GPS_HOME[1]':  //duplicate variable
+            case 'GPS_coord[0]':
+            case 'GPS_coord[1]':
+                return value/1000000;
+            case 'GPS_numSat':
+            case 'GPS_altitude':
+                return value;
+            case 'GPS_speed':
+                return value/100;
+            case 'GPS_ground_course':
+                return value/10;
 
             case 'debug[0]':
             case 'debug[1]':
