@@ -107,8 +107,6 @@ function FlightLogFieldPresenter() {
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
 
-        //'time': "GPS timeframe", can't change this one since
-        //it shares a name with the normal time field.
         'GPS_numSat': "GPS Sat Count",
         'GPS_coord[0]': "GPS Latitude",
         'GPS_coord[1]': "GPS Longitude",
@@ -998,7 +996,6 @@ function FlightLogFieldPresenter() {
                 return `${(value/100).toFixed(2)} m/s`;
             case 'GPS_ground_course':
                 return `${(value/10).toFixed(1)} °`;
-
 
             case 'debug[0]':
             case 'debug[1]':
