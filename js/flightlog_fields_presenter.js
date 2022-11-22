@@ -110,7 +110,7 @@ function FlightLogFieldPresenter() {
         'GPS_numSat': "GPS Sat Count",
         'GPS_coord[0]': "GPS Latitude",
         'GPS_coord[1]': "GPS Longitude",
-        'GPS_altitude': "GPS Altitude",
+        'GPS_altitude': "GPS Reported Altitude",
         'GPS_speed': "GPS Speed",
         'GPS_ground_course': "GPS Heading",
     };
