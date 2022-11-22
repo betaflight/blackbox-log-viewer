@@ -220,8 +220,8 @@ function FlightLog(logData) {
         }
         // Add names of gps fields which we'll merge into the main stream
         if (parser.frameDefs.G) {
-            for (let i = 0; i < parser.frameDefs.G.name.length; i++) {
-                fieldNames.push(parser.frameDefs.G.name[i]);
+            for (const name of parser.frameDefs.G.name) {
+                fieldNames.push(name);
             }
         }
 
