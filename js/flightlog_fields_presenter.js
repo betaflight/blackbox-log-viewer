@@ -109,12 +109,12 @@ function FlightLogFieldPresenter() {
 
         //'time': "GPS timeframe", can't change this one since
         //it shares a name with the normal time field.
-        'GPS_numSat': "GPS NumSat",
+        'GPS_numSat': "GPS Sat Count",
         'GPS_coord[0]': "GPS Latitude",
         'GPS_coord[1]': "GPS Longitude",
         'GPS_altitude': "GPS Altitude",
         'GPS_speed': "GPS Speed",
-        'GPS_ground_course': "GPS Ground course",
+        'GPS_ground_course': "GPS Heading",
     };
 
     const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -987,17 +987,17 @@ function FlightLogFieldPresenter() {
                 return (value / 1024 * 100).toFixed(2) + " %";
 
             //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
-            case 'GPS_numSat': // GPS_numSat
+            case 'GPS_numSat':
                 return `${value}`;
-            case 'GPS_coord[0]': // GPS_coord[0]
-            case 'GPS_coord[1]': // GPS_coord[1]
+            case 'GPS_coord[0]':
+            case 'GPS_coord[1]':
                 return `${(value/10000000).toFixed(5)}`;
-            case 'GPS_altitude': // GPS_altitude
+            case 'GPS_altitude':
                 return `${(value/1000).toFixed(1)} m`;
-            case 'GPS_speed': // GPS_speed
+            case 'GPS_speed':
                 return `${(value/100).toFixed(2)} m/s`;
-            case 'GPS_ground_course': // GPS_ground_course
-                return `${value}`;
+            case 'GPS_ground_course':
+                return `${(value/10).toFixed(1)} °`;
 
 
             case 'debug[0]':

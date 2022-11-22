@@ -353,6 +353,13 @@ GraphConfig.load = function(config) {
                     inputRange: 512,
                     outputRange: 1.0
                 };
+            } else if (fieldName == 'GPS_ground_course') {
+                return {
+                    offset: -1800,
+                    power: 1.0,
+                    inputRange: 1800,
+                    outputRange: 1.0
+                };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
                 var debugModeName = DEBUG_MODE[sysConfig.debug_mode];
