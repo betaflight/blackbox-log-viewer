@@ -387,7 +387,8 @@ function FlightLog(logData) {
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                     var
-                        destFrame;
+                        destFrame,
+                        destFrame_currentIndex;
 
                     // The G frames need to be processed always. They are "invalid" if not H (Home) has been detected 
                     // before, but if not processed the viewer shows cuts and gaps. This happens if the quad takes off before 
@@ -417,14 +418,18 @@ function FlightLog(logData) {
                                     destFrame[i] = frame[i];
                                 }
 
+                                destFrame_currentIndex = frame.length; // Keeps track of where to place direct data in the destFrame.
                                 // Then merge in the last seen slow-frame data
                                 for (let slowFrameIndex = 0; slowFrameIndex < slowFrameLength; slowFrameIndex++) {
-                                    destFrame[slowFrameIndex + frame.length] = lastSlow[slowFrameIndex] === undefined ? null : lastSlow[slowFrameIndex];
+                                    destFrame[slowFrameIndex + destFrame_currentIndex] = lastSlow[slowFrameIndex] === undefined ? null : lastSlow[slowFrameIndex];
                                 }
+                                destFrame_currentIndex += slowFrameLength;
+                                
                                 // Also merge last seen gps-frame data
                                 for (let gpsFrameIndex = 0; gpsFrameIndex < lastGPSLength; gpsFrameIndex++) {
-                                    destFrame[gpsFrameIndex + frame.length + slowFrameLength] = lastGPS[gpsFrameIndex] === undefined ? null : lastGPS[gpsFrameIndex];
+                                    destFrame[gpsFrameIndex + destFrame_currentIndex] = lastGPS[gpsFrameIndex] === undefined ? null : lastGPS[gpsFrameIndex];
                                 }
+                                destFrame_currentIndex += lastGPSLength;
 
                                 for (var i = 0; i < eventNeedsTimestamp.length; i++) {
                                     eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
