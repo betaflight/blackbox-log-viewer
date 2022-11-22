@@ -214,14 +214,16 @@ function FlightLog(logData) {
 
         // Add names of slow fields which we'll merge into the main stream
         if (parser.frameDefs.S) {
-            for (let i = 0; i < parser.frameDefs.S.name.length; i++) {
-                fieldNames.push(parser.frameDefs.S.name[i]);
+            for (const name of parser.frameDefs.S.name) {
+                fieldNames.push(name);
             }
         }
         // Add names of gps fields which we'll merge into the main stream
         if (parser.frameDefs.G) {
             for (const name of parser.frameDefs.G.name) {
-                fieldNames.push(name);
+                if (name !== 'time') { // remove duplicate time field
+                    fieldNames.push(name);
+                }
             }
         }
 
@@ -382,7 +384,7 @@ function FlightLog(logData) {
                     mainFrameIndex = 0,
                     slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
                     lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [],
-                    lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count : 0, //Should I expand the outputFields?
+                    lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count-1 : 0, // -1 since we exclude the time field
                     lastGPS = parser.frameDefs.G ? iframeDirectory.initialGPS[chunkIndex].slice(0) : [];
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
@@ -429,7 +431,7 @@ function FlightLog(logData) {
                                 for (let gpsFrameIndex = 0; gpsFrameIndex < lastGPSLength; gpsFrameIndex++) {
                                     destFrame[gpsFrameIndex + destFrame_currentIndex] = lastGPS[gpsFrameIndex] === undefined ? null : lastGPS[gpsFrameIndex];
                                 }
-                                destFrame_currentIndex += lastGPSLength;
+                                // destFrame_currentIndex += lastGPSLength; Add this line if you wish to add more fields.
 
                                 for (var i = 0; i < eventNeedsTimestamp.length; i++) {
                                     eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
@@ -471,6 +473,7 @@ function FlightLog(logData) {
                                 // But other data from the G frame can be valid (time, num sats)
 
                                 //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+                                frame.shift(); // remove time
                                 for (let i = 0; i < frame.length; i++) {
                                     lastGPS[i] = frame[i];
                                 }

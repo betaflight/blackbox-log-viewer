@@ -158,6 +158,7 @@ function FlightLogIndex(logData) {
                         break;
                         case 'G':
                             lastGPS = frame.slice(0);
+                            lastGPS.shift(); // Remove the time field
                         break;
                         case 'H':
                             lastGPSHome = frame.slice(0);
