@@ -360,6 +360,20 @@ GraphConfig.load = function(config) {
                     inputRange: 1800,
                     outputRange: 1.0
                 };
+            } else if (fieldName == 'GPS_numSat') {
+                return {
+                    offset: -20,
+                    power: 1.0,
+                    inputRange: 20,
+                    outputRange: 1.0
+                };
+            } else if (fieldName == 'GPS_speed') {
+                return {
+                    offset: 0,
+                    power: 1.0,
+                    inputRange: 1000,
+                    outputRange: 1.0
+                };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
                 var debugModeName = DEBUG_MODE[sysConfig.debug_mode];
