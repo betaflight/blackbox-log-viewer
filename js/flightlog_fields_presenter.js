@@ -110,7 +110,7 @@ function FlightLogFieldPresenter() {
         'GPS_numSat': "GPS Sat Count",
         'GPS_coord[0]': "GPS Latitude",
         'GPS_coord[1]': "GPS Longitude",
-        'GPS_altitude': "GPS Reported Altitude",
+        'GPS_altitude': "GPS Altitude ASL",
         'GPS_speed': "GPS Speed",
         'GPS_ground_course': "GPS Heading",
     };
@@ -991,7 +991,7 @@ function FlightLogFieldPresenter() {
             case 'GPS_coord[1]':
                 return `${(value/10000000).toFixed(5)}`;
             case 'GPS_altitude':
-                return `${(value/1000).toFixed(1)} m`;
+                return `${(value/10).toFixed(2)} m`;
             case 'GPS_speed':
                 return `${(value/100).toFixed(2)} m/s`;
             case 'GPS_ground_course':
