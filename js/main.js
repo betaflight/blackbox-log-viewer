@@ -166,7 +166,7 @@ function BlackboxLogViewer() {
     
         if (value === null)
             return "(absent)";
-        
+
         return value.toFixed(2);
     }
     

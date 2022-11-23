@@ -106,6 +106,13 @@ function FlightLogFieldPresenter() {
         'rxSignalReceived': 'RX Signal Received',
         'rxFlightChannelsValid': 'RX Flight Ch. Valid',
         'rssi': 'RSSI',
+
+        'GPS_numSat': "GPS Sat Count",
+        'GPS_coord[0]': "GPS Latitude",
+        'GPS_coord[1]': "GPS Longitude",
+        'GPS_altitude': "GPS Altitude ASL",
+        'GPS_speed': "GPS Speed",
+        'GPS_ground_course': "GPS Heading",
     };
 
     const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -976,6 +983,19 @@ function FlightLogFieldPresenter() {
 
             case 'rssi':
                 return (value / 1024 * 100).toFixed(2) + " %";
+
+            //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+            case 'GPS_numSat':
+                return `${value}`;
+            case 'GPS_coord[0]':
+            case 'GPS_coord[1]':
+                return `${(value/10000000).toFixed(5)}`;
+            case 'GPS_altitude':
+                return `${(value/10).toFixed(2)} m`;
+            case 'GPS_speed':
+                return `${(value/100).toFixed(2)} m/s`;
+            case 'GPS_ground_course':
+                return `${(value/10).toFixed(1)} °`;
 
             case 'debug[0]':
             case 'debug[1]':

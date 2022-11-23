@@ -46,6 +46,7 @@ function FlightLogIndex(logData) {
                     initialIMU: [],
                     initialSlow: [],
                     initialGPSHome: [],
+                    initialGPS: [],
                     hasEvent: [],
                     minTime: false,
                     maxTime: false
@@ -77,14 +78,15 @@ function FlightLogIndex(logData) {
                 var 
                     sysConfig = parser.sysConfig,
                     mainFrameDef = parser.frameDefs.I,
-                    
+                                        
                     gyroADC = [mainFrameDef.nameToIndex["gyroADC[0]"], mainFrameDef.nameToIndex["gyroADC[1]"], mainFrameDef.nameToIndex["gyroADC[2]"]],
                     accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]],
                     magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
                     
                     lastSlow = [],
-                    lastGPSHome = [];
-                
+                    lastGPSHome = [],
+                    lastGPS = [];
+
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (var j = 0; j < 8; j++) {
                     if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {
@@ -139,6 +141,7 @@ function FlightLogIndex(logData) {
                                     intraIndex.initialIMU.push(new IMU(imu));
                                     intraIndex.initialSlow.push(lastSlow);
                                     intraIndex.initialGPSHome.push(lastGPSHome);
+                                    intraIndex.initialGPS.push(lastGPS);
                                 }
                                 
                                 iframeCount++;
@@ -152,6 +155,10 @@ function FlightLogIndex(logData) {
                                 sysConfig.gyroScale, 
                                 magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
                             );
+                        break;
+                        case 'G':
+                            lastGPS = frame.slice(0);
+                            lastGPS.shift(); // Remove the time field
                         break;
                         case 'H':
                             lastGPSHome = frame.slice(0);

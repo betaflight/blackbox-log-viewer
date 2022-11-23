@@ -353,6 +353,27 @@ GraphConfig.load = function(config) {
                     inputRange: 512,
                     outputRange: 1.0
                 };
+            } else if (fieldName == 'GPS_ground_course') {
+                return {
+                    offset: -1800,
+                    power: 1.0,
+                    inputRange: 1800,
+                    outputRange: 1.0
+                };
+            } else if (fieldName == 'GPS_numSat') {
+                return {
+                    offset: -20,
+                    power: 1.0,
+                    inputRange: 20,
+                    outputRange: 1.0
+                };
+            } else if (fieldName == 'GPS_speed') {
+                return {
+                    offset: 0,
+                    power: 1.0,
+                    inputRange: 1000,
+                    outputRange: 1.0
+                };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
                 var debugModeName = DEBUG_MODE[sysConfig.debug_mode];
@@ -954,6 +975,10 @@ GraphConfig.load = function(config) {
         }
         if (!flightLog.isFieldDisabled().DEBUG) {
             EXAMPLE_GRAPHS.push({label: "Debug",fields: ["debug[all]"]});
+        }
+
+        if (!flightLog.isFieldDisabled().GPS) {
+            EXAMPLE_GRAPHS.push({label: "GPS",fields: ["GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course", "GPS_coord[all]"]});
         }
 
         for (i = 0; i < EXAMPLE_GRAPHS.length; i++) {
