@@ -669,6 +669,20 @@ function FlightLogFieldPresenter() {
             'debug[2]':'Setpoint Roll',
             'debug[3]':'Setpoint Pitch',
         },
+        'VTX_MSP' : {
+            'debug[all]': 'VTX MSP',
+            'debug[0]': 'packetCounter',
+            'debug[1]': 'isCrsfPortConfig',
+            'debug[2]': 'isLowPowerDisarmed',
+            'debug[3]': 'mspTelemetryDescriptor',
+        },
+        'GPS_DOP' : {
+            'debug[all]': 'GPS Dilution of Precision',
+            'debug[0]': 'Number of Satellites',
+            'debug[1]': 'pDOP (positional - 3D)',
+            'debug[2]': 'hDOP (horizontal - 2D)',
+            'debug[3]': 'vDOP (vertical - 1D)',
+        },
     };
 
     let DEBUG_FRIENDLY_FIELD_NAMES = null;
@@ -699,20 +713,6 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Throttle D',
                     'debug[2]':'Altitude',
                     'debug[3]':'Target altitude',
-                };
-                DEBUG_FRIENDLY_FIELD_NAMES.VTX_MSP = {
-                    'debug[all]': 'VTX MSP',
-                    'debug[0]': 'packetCounter',
-                    'debug[1]': 'isCrsfPortConfig',
-                    'debug[2]': 'isLowPowerDisarmed',
-                    'debug[3]': 'mspTelemetryDescriptor',
-                };
-                DEBUG_FRIENDLY_FIELD_NAMES.GPS_DOP = {
-                    'debug[all]': 'GPS Dilution of Precision',
-                    'debug[0]': 'Number of Satellites',
-                    'debug[1]': 'pDOP (positional - 3D)',
-                    'debug[2]': 'hDOP (horizontal - 2D)',
-                    'debug[3]': 'vDOP (vertical - 1D)',
                 };
             } else if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
@@ -1307,7 +1307,7 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // hDOP (horizontal - 2D)
                         case 'debug[3]': // vDOP (vertical - 1D)
                         default:
-                            return (value / 100).toFixed(1);
+                            return (value / 100).toFixed(2);
                     }
             }
             return value.toFixed(0);

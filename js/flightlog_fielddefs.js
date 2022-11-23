@@ -348,6 +348,7 @@ let
         "GPS_RESCUE_TRACKING",
         "ATTITUDE",
         "VTX_MSP",
+        "GPS_DOP",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
@@ -545,20 +546,7 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
             DEBUG_MODE.splice(DEBUG_MODE.indexOf('FF_INTERPOLATED'), 1);
         }
         if (semver.gte(firmwareVersion, '4.3.0')) {
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('FF_INTERPOLATED'), 1, 'FEEDFORWARD');
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('FF_LIMIT'),        1, 'FEEDFORWARD_LIMIT');
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('DYN_IDLE'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('FFT'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('FFT_TIME'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('FFT_FREQ'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1);
-        }
-        if (semver.gte(firmwareVersion, '4.4.0')) {
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('BARO'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('RTH'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('VTX_MSP'), 1);
-            DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_DOP'), 1);
+            DEBUG_MODE.splice(DEBUG_MODE.indexOf('FF_LIMIT'),        1, 'FEEDFORWARD_LIMIT', 'FEEDFORWARD');
         }
 
         DEBUG_MODE = makeReadOnly(DEBUG_MODE);

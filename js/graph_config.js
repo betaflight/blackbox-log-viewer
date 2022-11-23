@@ -894,6 +894,21 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'GPS_DOP':
+                        switch (fieldName) {
+                            case 'debug[0]': // Number of Satellites (now this is in normal GPS data, maybe gpsTrust?)
+                            case 'debug[1]': // pDOP
+                            case 'debug[2]': // hDOP
+                            case 'debug[3]': // vDOP
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200 ,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     }
             }
             // if not found above then
