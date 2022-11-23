@@ -893,7 +893,23 @@ GraphConfig.load = function(config) {
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
-                            }
+                        }
+                    case 'GPS_DOP':
+                        switch (fieldName) {
+                            case 'debug[0]': // Number of Satellites (now this is in normal GPS data, maybe gpsTrust?)
+                            case 'debug[1]': // pDOP
+                            case 'debug[2]': // hDOP
+                            case 'debug[3]': // vDOP
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+    
                     case 'BARO':
                         switch (fieldName) {
                             case 'debug[0]': // Baro state 0-10
@@ -941,7 +957,7 @@ GraphConfig.load = function(config) {
             i, j;
 
         const EXAMPLE_GRAPHS = [];
-        
+
         if (!flightLog.isFieldDisabled().MOTORS) {
             EXAMPLE_GRAPHS.push({label: "Motors",fields: ["motor[all]", "servo[5]"]});
             EXAMPLE_GRAPHS.push({label: "Motors (Legacy)",fields: ["motorLegacy[all]", "servo[5]"]});
@@ -990,7 +1006,7 @@ GraphConfig.load = function(config) {
                     height: srcGraph.height || 1
                 },
                 found;
-            
+
             if (graphNames !== undefined) {
                 found = false;
                 for (j = 0; j < graphNames.length; j++) {
@@ -999,12 +1015,12 @@ GraphConfig.load = function(config) {
                         break;
                     }
                 }
-                
+
                 if (!found) {
                     continue;
                 }
             }
-            
+
             for (j = 0; j < srcGraph.fields.length; j++) {
                 var 
                     srcFieldName = srcGraph.fields[j],
@@ -1014,10 +1030,10 @@ GraphConfig.load = function(config) {
                 
                 destGraph.fields.push(destField);
             }
-            
+
             result.push(destGraph);
         }
-        
+
         return result;
     };
 })();
