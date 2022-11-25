@@ -145,7 +145,7 @@ var ArrayDataStream;
     
     /**
      * Search for the string 'needle' beginning from the current stream position up
-     * to the end position. Return the offset of the first occurance found.
+     * to the end position. Return the offset of the first occurrence found.
      * 
      * @param needle
      *            String to search for
