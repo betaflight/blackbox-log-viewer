@@ -729,7 +729,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             craft3D.resize(craftSize, craftSize);
         }
 
-        // Positon the craft canvas according to options
+        // Position the craft canvas according to options
         $(craftCanvas).css({
             left:Math.max(((canvas.width * parseInt(options.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
             top: Math.max(((canvas.height * parseInt(options.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",

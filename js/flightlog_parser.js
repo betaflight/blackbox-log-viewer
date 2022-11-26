@@ -200,7 +200,7 @@ var FlightLogParser = function(logData) {
         // be an older name which is translated into a current name in the table below
 
         defaultSysConfigExtension = {
-            abs_control_gain:null,                  // Aboslute control gain
+            abs_control_gain:null,                  // Absolute control gain
             anti_gravity_gain:null,                 // Anti gravity gain
             anti_gravity_mode:null,                 // Anti gravity mode
             anti_gravity_threshold:null,            // Anti gravity threshold for step mode
@@ -273,7 +273,7 @@ var FlightLogParser = function(logData) {
             rc_smoothing_active_cutoffs:[null,null],// RC Smoothing active cutoffs
             rc_smoothing_cutoffs:[null, null],      // RC Smoothing input and derivative cutoff
             rc_smoothing_filter_type:[null,null],   // RC Smoothing input and derivative type
-            rc_smoothing_rx_average:null,           // RC Smoothing rx average readed in ms
+            rc_smoothing_rx_average:null,           // RC Smoothing rx average read in ms
             rc_smoothing_debug_axis:null,           // Axis recorded in the debug mode of rc_smoothing
             dterm_filter_type:null,                 // D term filtering type (PT1, BIQUAD, PT2, PT3)
             dterm_filter2_type:null,                // D term 2 filtering type (PT1, BIQUAD, PT2, PT3)

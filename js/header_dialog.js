@@ -317,7 +317,7 @@ function HeaderDialog(dialog, onSave) {
             {bit: 13, group: 'rxMode', mode: 'group', name: 'RX_PARALLEL_PWM', description: 'PWM receiver selected'},
             {bit: 14, group: 'rxMode', mode: 'group', name: 'RX_MSP', description: 'Controller over MSP'},
             {bit: 15, group: 'other', name: 'RSSI_ADC', description: 'ADC RSSI Monitoring'},
-            {bit: 16, group: 'other', name: 'LED_STRIP', description: 'Addressible RGB LED strip support'},
+            {bit: 16, group: 'other', name: 'LED_STRIP', description: 'Addressable RGB LED strip support'},
 			{bit: 17, group: 'other', name: 'DISPLAY', description: 'OLED Screen Display'},
             {bit: 20, group: 'other', name: 'CHANNEL_FORWARDING', description: 'Forward aux channels to servo outputs'},
             {bit: 21, group: 'other', name: 'TRANSPONDER', description: 'Race Transponder'},
