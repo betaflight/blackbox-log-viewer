@@ -26,7 +26,7 @@ Changes to the security model used in the latest versions of MacOS X 10.14 (Moja
 
 ### Unstable Testing Versions
 
-Unstable testing versions of the lates builds of the Betaflight Blackbox Explorer for most platforms can be downloaded from [here](https://github.com/betaflight/blackbox-log-viewer-nightlies/releases).
+Unstable testing versions of the latest builds of the Betaflight Blackbox Explorer for most platforms can be downloaded from [here](https://github.com/betaflight/blackbox-log-viewer-nightlies/releases).
 
 **Be aware that these versions are intended for testing / feedback only, and may be buggy or broken.**
 
@@ -116,8 +116,8 @@ yarn start
 
 
 #### Build or release app for one specific platform
-To build or release only for one specific platform you can append the plaform after the `task-name`.
-If no platform is provided, only for the platform you are builing from will be build.
+To build or release only for one specific platform you can append the platform after the `task-name`.
+If no platform is provided, only for the platform you are building from will be build.
 
 * **MacOS X** use `yarn gulp <task-name> --osx64`
 * **Linux** use `yarn gulp <task-name> --linux64`
@@ -128,7 +128,7 @@ If no platform is provided, only for the platform you are builing from will be b
 #### macOS DMG installation background image
 
 The release distribution for macOS uses a DMG file to install the application.
-The PSD source for the DMG backgound image can be found in the root (`dmg-background.png`). After changing the source, export the image to PNG format in folder `./images/`.
+The PSD source for the DMG background image can be found in the root (`dmg-background.png`). After changing the source, export the image to PNG format in folder `./images/`.
 
 ## Flight video won't load, or jumpy flight video upon export
 

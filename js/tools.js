@@ -343,7 +343,7 @@ var mouseNotification = {
         /**
          target 			is the target element that triggered the mouse notification
          x,y				are the mouse coordinates (if required)
-         message 		is the text to display (supports html endcoding)
+         message 		is the text to display (supports html encoding)
          delay 			is how long the message will remain before auto clearing
          messageClass 	is the css class that should be used to draw the box, null for default
          align 			is the position to put the popup to, null means at the mouse position, 'top-left' etc,
