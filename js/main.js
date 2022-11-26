@@ -58,6 +58,9 @@ function BlackboxLogViewer() {
         
         // JSON graph configuration:
         graphConfig = {},
+
+        // User's map config
+        mapConfig = {}, //FIXME I may not need this
         
 
         offsetCache = [], // Storage for the offset cache (last 20 files)
@@ -77,7 +80,7 @@ function BlackboxLogViewer() {
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
-        hasTable = true, hasAnalyser, hasAnalyserFullscreen,
+        hasTable = true, hasAnalyser, hasMap, hasAnalyserFullscreen,
         hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false, hadTable,
         hasConfig = false, hasConfigOverlay = false,
 
@@ -86,6 +89,7 @@ function BlackboxLogViewer() {
         video = $(".log-graph video")[0],
         canvas = $("#graphCanvas")[0],
         analyserCanvas = $("#analyserCanvas")[0],
+        mapContainer = $("#mapContainer"),
         stickCanvas = $("#stickCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
         statusBar = $('#status-bar'),
@@ -112,9 +116,12 @@ function BlackboxLogViewer() {
         animationFrameIsQueued = false,
         
         playbackRate = PLAYBACK_DEFAULT_RATE,
-
+        
         graphZoom = GRAPH_DEFAULT_ZOOM,
-        lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
+        lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
+        
+        mapGrapher = new MapGrapher();
+        
 
         function createNewBlackboxWindow(fileToOpen) {
 
@@ -269,6 +276,8 @@ function BlackboxLogViewer() {
         seekBar.setCurrentTime(currentBlackboxTime);
         seekBar.setWindow(graph.getWindowWidthTime());
 
+        mapGrapher.setCurrentTime(currentBlackboxTime);
+
         updateValuesChartRateLimited();
         
         if (graphState == GRAPH_STATE_PLAY) {
@@ -300,6 +309,7 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.resize(width, height);
             seekBar.resize(canvas.offsetWidth, 50);
+            mapGrapher.resize(width, height);
             
             invalidateGraph();
         }
@@ -408,6 +418,10 @@ function BlackboxLogViewer() {
         seekBar.setActivity(activity.times, activity.avgThrottle, activity.hasEvent);
         
         seekBar.repaint();
+
+        // Add flightLog to map
+        mapGrapher.setFlightLog(flightLog);
+
     }
     
     function setGraphState(newState) {
@@ -1108,6 +1122,13 @@ function BlackboxLogViewer() {
             html.toggleClass("has-analyser", hasAnalyser);       
             prefs.set('hasAnalyser', hasAnalyser);
             invalidateGraph();
+        });
+
+        $(".view-map").click(function() {
+            hasMap = !hasMap;
+            html.toggleClass("has-map", hasMap);       
+            prefs.set('hasMap', hasMap);
+            mapGrapher.init(userSettings);
         });
 
         $(".view-analyser-fullscreen").click(function() {

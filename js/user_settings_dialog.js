@@ -79,6 +79,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 									top   : '60%',  // position from top (as a percentage of height)
 									size  : '35%'   // size (as a percentage of width)
 							  },
+		map			: {
+									left  : '2%',	// position from left (as a percentage of width)
+									top   : '4%',  // position from top (as a percentage of height)
+									size  : '35%'   // size (as a percentage of width)
+							  },
 	    watermark			: {
 									left  : '3%',	// position from left (as a percentage of width)
 									top   : '90%',  // position from top (as a percentage of height)
@@ -125,9 +130,12 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     			craft:     {top: $('.craft-settings input[name="craft-top"]').val() + '%',
     					   left: $('.craft-settings input[name="craft-left"]').val() + '%',
     					   size: $('.craft-settings input[name="craft-size"]').val() + '%', },
-    			analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
+				analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
     					   left: $('.analyser-settings input[name="analyser-left"]').val() + '%',
     					   size: $('.analyser-settings input[name="analyser-size"]').val() + '%', },
+				map:  	   {top: $('.map-settings input[name="map-top"]').val() + '%',
+    					   left: $('.map-settings input[name="map-left"]').val() + '%',
+    					   size: $('.map-settings input[name="map-size"]').val() + '%', },
     			watermark: {top: $('.watermark-settings input[name="watermark-top"]').val() + '%',
 					   	   left: $('.watermark-settings input[name="watermark-left"]').val() + '%',
 					   	   size: $('.watermark-settings input[name="watermark-size"]').val() + '%', 
@@ -390,6 +398,9 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		$('.analyser-settings input[name="analyser-top"]').val(parseInt(currentSettings.analyser.top));
     		$('.analyser-settings input[name="analyser-left"]').val(parseInt(currentSettings.analyser.left));
     		$('.analyser-settings input[name="analyser-size"]').val(parseInt(currentSettings.analyser.size));
+    		$('.map-settings input[name="map-top"]').val(parseInt(currentSettings.map.top));
+    		$('.map-settings input[name="map-left"]').val(parseInt(currentSettings.map.left));
+    		$('.map-settings input[name="map-size"]').val(parseInt(currentSettings.map.size));
 
     		if(currentSettings.drawWatermark!=null) {
     			// set the toggle switch
