@@ -940,6 +940,28 @@ function BlackboxLogViewer() {
         CsvExporter(flightLog, options).dump(onSuccess);
     }
 
+    function exportGpx(file) {
+
+        function onSuccess(data) {
+            console.debug("Gpx export finished in", (performance.now() - startTime) / 1000, "secs");
+            if (!data) {
+                console.debug("Empty data, nothing to save");
+                return;
+            }
+            let blob = new Blob([data], {type: 'GPX File'}),
+                e    = document.createEvent('MouseEvents'),
+                a    = document.createElement('a');
+            a.download = file || $(".log-filename").text() + ".gpx";
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl =  ['GPX File', a.download, a.href].join(':');
+            e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
+
+        let startTime = performance.now();
+        GpxExporter(flightLog).dump(onSuccess);
+    }
+
     function newGraphConfig(newConfig) {
         lastGraphConfig = graphConfig; // Remember the last configuration.
         graphConfig = newConfig;
@@ -1468,6 +1490,11 @@ function BlackboxLogViewer() {
         $(".btn-csv-export").click(function(e) {
             setGraphState(GRAPH_STATE_PAUSED);
             exportCsv();
+            e.preventDefault();
+        });
+        $(".btn-gpx-export").click(function(e) {
+            setGraphState(GRAPH_STATE_PAUSED);
+            exportGpx();
             e.preventDefault();
         });
                 
