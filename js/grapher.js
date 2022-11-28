@@ -232,7 +232,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         idents.vbatField = fieldIndex;
                         idents.numCells = flightLog.getNumCellsEstimate();
                     break;
-                    case "baroAlt":
+                    case "BaroAlt":
                         idents.baroField = fieldIndex;
                     break;
                     case "roll":

@@ -83,7 +83,7 @@ function FlightLogFieldPresenter() {
 
         'vbatLatest': 'Battery volt.',
         'amperageLatest': 'Amperage',
-        'baroAlt': 'Barometer',
+        'BaroAlt': 'Barometer',
 
         'heading[all]': 'Heading',
         'heading[0]': 'Heading [roll]',
@@ -984,7 +984,7 @@ function FlightLogFieldPresenter() {
             case 'heading[2]':
                 return (value / Math.PI * 180).toFixed(1) + "°";
 
-            case 'baroAlt':
+            case 'BaroAlt':
                 return FlightLogFieldPresenter.decodeCorrectAltitude((value/100), userSettings.altitudeUnits);
 
             case 'flightModeFlags':
