@@ -1224,7 +1224,8 @@ html:not(.has-log) #status-bar {
 }
 
 html:not(.has-gps) .view-map,
-html:not(.has-gps) .map-container {
+html:not(.has-gps) .map-container,
+html:not(.has-gps) .btn-gpx-export {
 	display: none !important;
 }
 

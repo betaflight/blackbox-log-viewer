@@ -111,12 +111,12 @@ function BlackboxLogViewer() {
         animationFrameIsQueued = false,
         
         playbackRate = PLAYBACK_DEFAULT_RATE,
-        
+
         graphZoom = GRAPH_DEFAULT_ZOOM,
         lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
-        
+
         mapGrapher = new MapGrapher();
-        
+
 
         function createNewBlackboxWindow(fileToOpen) {
 
@@ -309,7 +309,7 @@ function BlackboxLogViewer() {
             if(flightLog.hasGpsData()) {
                 mapGrapher.resize(width, height);
             }
-            
+
             invalidateGraph();
         }
     }
@@ -1151,7 +1151,7 @@ function BlackboxLogViewer() {
 
         $(".view-map").click(function() {
             hasMap = !hasMap;
-            html.toggleClass("has-map", hasMap);       
+            html.toggleClass("has-map", hasMap);
             prefs.set('hasMap', hasMap);
             if(flightLog.hasGpsData()) {
                 mapGrapher.initialize(userSettings);

@@ -1,18 +1,19 @@
 importScripts("/node_modules/lodash/lodash.min.js");
 
 onmessage = function (event) {
-  const header = `<?xml version="1.0" encoding="UTF-8"?>
-    <gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/gpx_style/0/2 http://www.topografix.com/GPX/gpx_style/0/2/gpx_style.xsd" xmlns:gpx_style="http://www.topografix.com/GPX/gpx_style/0/2" 
-    version="1.1" 
-    creator="https://github.com/betaflight/blackbox-log-viewer">
-    <metadata>
-        <author>
-            <name>Betaflight Blackbox Explorer</name>
-            <link href="https://github.com/betaflight/blackbox-log-viewer"></link>
-        </author>
-    </metadata>`;
+  const header = `
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/gpx_style/0/2 http://www.topografix.com/GPX/gpx_style/0/2/gpx_style.xsd" xmlns:gpx_style="http://www.topografix.com/GPX/gpx_style/0/2" 
+  version="1.1" 
+  creator="https://github.com/betaflight/blackbox-log-viewer">
+  <metadata>
+    <author>
+      <name>Betaflight Blackbox Explorer</name>
+      <link href="https://github.com/betaflight/blackbox-log-viewer"></link>
+    </author>
+  </metadata>`;
 
-  const footer = "</gpx>";
+  const footer = `</gpx>`;
 
   const timeIndex = event.data.fieldNames.indexOf("time");
   const latIndex = event.data.fieldNames.indexOf("GPS_coord[0]");
@@ -49,12 +50,11 @@ onmessage = function (event) {
     }
   }
 
-  let trk = 
-  `<trk>
-    <name>new</name>
-    <type>Flight</type>
+  let trk = `
+  <trk>
     <trkseg>${trkpts}</trkseg>
-   </trk>`;
+  </trk>
+`;
 
   postMessage(header + "\n" + trk + "\n" + footer);
 };
