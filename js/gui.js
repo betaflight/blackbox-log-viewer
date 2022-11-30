@@ -11,7 +11,7 @@ var GUI_control = function () {
 
 // name = string
 // code = function reference (code to be executed)
-// interval = time interval in miliseconds
+// interval = time interval in milliseconds
 // first = true/false if code should be ran initially before next timer interval hits
 GUI_control.prototype.interval_add = function (name, code, interval, first) {
     var data = {'name': name, 'timer': null, 'code': code, 'interval': interval, 'fired': 0, 'paused': false};
@@ -113,7 +113,7 @@ GUI_control.prototype.interval_kill_all = function (keep_array) {
 
 // name = string
 // code = function reference (code to be executed)
-// timeout = timeout in miliseconds
+// timeout = timeout in milliseconds
 GUI_control.prototype.timeout_add = function (name, code, timeout) {
     var self = this;
     var data = {'name': name, 'timer': null, 'timeout': timeout};
@@ -147,7 +147,7 @@ GUI_control.prototype.timeout_remove = function (name) {
     return false;
 };
 
-// no input paremeters
+// no input parameters
 // return = returns timers killed in last call
 GUI_control.prototype.timeout_kill_all = function () {
     var timers_killed = 0;

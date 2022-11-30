@@ -706,7 +706,7 @@ function BlackboxLogViewer() {
             try {
                 flightLog = new FlightLog(flightLogDataArray);
             } catch (err) {
-                alert("Sorry, an error occured while trying to open this log:\n\n" + err);
+                alert("Sorry, an error occurred while trying to open this log:\n\n" + err);
                 return;
             }
             
@@ -951,14 +951,14 @@ function BlackboxLogViewer() {
     }
 
     // Store to local cache and update Workspace Selector control
-    function onSwitchWorkspace(newWorkspaces, newAciveId) {
-        prefs.set('activeWorkspace', newAciveId);      
+    function onSwitchWorkspace(newWorkspaces, newActiveId) {
+        prefs.set('activeWorkspace', newActiveId);      
         prefs.set('workspaceGraphConfigs', newWorkspaces);
         workspaceSelection.setWorkspaces(newWorkspaces)
-        workspaceSelection.setActiveWorkspace(newAciveId)
-        if (flightLog && newWorkspaces[newAciveId] && newWorkspaces[newAciveId].graphConfig) {
-           newGraphConfig(newWorkspaces[newAciveId].graphConfig);
-           document.getElementById("legend_title").textContent = newWorkspaces[newAciveId].title
+        workspaceSelection.setActiveWorkspace(newActiveId)
+        if (flightLog && newWorkspaces[newActiveId] && newWorkspaces[newActiveId].graphConfig) {
+           newGraphConfig(newWorkspaces[newActiveId].graphConfig);
+           document.getElementById("legend_title").textContent = newWorkspaces[newActiveId].title
         }
     }
 
@@ -1310,7 +1310,7 @@ function BlackboxLogViewer() {
             }
         });
 
-        function expandGraphConfig(index) { // Put each of the fields into a seperate graph
+        function expandGraphConfig(index) { // Put each of the fields into a separate graph
 
             var expandedGraphConfig = [];
 
@@ -1517,7 +1517,7 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
-            if(graph!=null && field==null) { // save ALL pens withing group
+            if(graph!=null && field==null) { // save ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     if(graphConfig[parseInt(graph)].fields[i].default==null) {
                         graphConfig[parseInt(graph)].fields[i].default = [];
@@ -1550,7 +1550,7 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
-            if(graph!=null && field==null) { // restore ALL pens withing group
+            if(graph!=null && field==null) { // restore ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     if(graphConfig[parseInt(graph)].fields[i].default!=null) {
                         graphConfig[parseInt(graph)].fields[i].smoothing         = graphConfig[parseInt(graph)].fields[i].default.smoothing;
@@ -1587,7 +1587,7 @@ function BlackboxLogViewer() {
             savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Smoothing</h4>';
-            if(graph!=null && field==null) { // change ALL pens withing group
+            if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].smoothing += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].smoothing = constrain(graphConfig[parseInt(graph)].fields[i].smoothing, range.min, range.max);
@@ -1619,7 +1619,7 @@ function BlackboxLogViewer() {
             savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Zoom</h4>';
-            if(graph!=null && field==null) { // change ALL pens withing group
+            if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[i].curve.outputRange, range.min, range.max);
@@ -1651,7 +1651,7 @@ function BlackboxLogViewer() {
             savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Expo</h4>';
-            if(graph!=null && field==null) { // change ALL pens withing group
+            if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.power += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.power = constrain(graphConfig[parseInt(graph)].fields[i].curve.power, range.min, range.max);
@@ -1857,7 +1857,7 @@ function BlackboxLogViewer() {
                         try {
                             if (!e.altKey) { // Workspaces feature
                                 var id = e.which - 48;
-                                if (!e.shiftKey) { // retreive graph configuration from workspace
+                                if (!e.shiftKey) { // retrieve graph configuration from workspace
                                     if (workspaceGraphConfigs[id] != null) {
                                         onSwitchWorkspace(workspaceGraphConfigs, id)
                                     }
@@ -2139,7 +2139,7 @@ function BlackboxLogViewer() {
     });
 }
 
-// Close the dropdowns if not clicking a decendant of the dropdown
+// Close the dropdowns if not clicking a descendant of the dropdown
 $(document).click(function (e) {
     var p = $(e.target).closest(".dropdown");
     if (!p.length) {
@@ -2147,7 +2147,7 @@ $(document).click(function (e) {
     }
 });
 
-// Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
+// Bootstrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');
 
 window.blackboxLogViewer = new BlackboxLogViewer();
