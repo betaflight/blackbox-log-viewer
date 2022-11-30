@@ -500,17 +500,6 @@ html.has-log .log-graph-config {
     display:none;
 }
 
-/* FIXME this should not be necessary when resizing is implemented */
-#mapContainer {
-    z-index: 100;
-    bottom:0 !important;
-    display:none;
-    height: 300px;
-    width: 500px;
-}
-
-
-
 html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas,
 html.has-map #mapContainer,
@@ -1232,6 +1221,11 @@ html.has-log .navbar-static-top {
 
 html:not(.has-log) #status-bar {
     display: none;
+}
+
+html:not(.has-gps) .view-map,
+html:not(.has-gps) .map-container {
+	display: none !important;
 }
 
 #status-bar .bookmark-1,

@@ -276,7 +276,7 @@ function BlackboxLogViewer() {
         seekBar.setCurrentTime(currentBlackboxTime);
         seekBar.setWindow(graph.getWindowWidthTime());
 
-        mapGrapher.setCurrentTime(currentBlackboxTime);
+        if (flightLog.hasGpsData()) mapGrapher.setCurrentTime(currentBlackboxTime);
 
         updateValuesChartRateLimited();
         
@@ -309,7 +309,7 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.resize(width, height);
             seekBar.resize(canvas.offsetWidth, 50);
-            mapGrapher.resize(width, height);
+            if(flightLog.hasGpsData()) mapGrapher.resize(width, height);
             
             invalidateGraph();
         }
@@ -420,7 +420,11 @@ function BlackboxLogViewer() {
         seekBar.repaint();
 
         // Add flightLog to map
-        mapGrapher.setFlightLog(flightLog);
+        html.toggleClass("has-gps", flightLog.hasGpsData());
+        if(flightLog.hasGpsData()) {
+            mapGrapher.setUserSettings(userSettings);
+            mapGrapher.setFlightLog(flightLog);
+        }
 
     }
     
@@ -1128,7 +1132,7 @@ function BlackboxLogViewer() {
             hasMap = !hasMap;
             html.toggleClass("has-map", hasMap);       
             prefs.set('hasMap', hasMap);
-            mapGrapher.init(userSettings);
+            if(flightLog.hasGpsData()) mapGrapher.initialize(userSettings);
         });
 
         $(".view-analyser-fullscreen").click(function() {
@@ -1391,6 +1395,7 @@ function BlackboxLogViewer() {
 	                graph.refreshOptions(newSettings);
 	                graph.refreshLogo();
 	                graph.initializeCraftModel();
+                    if(flightLog.hasGpsData()) mapGrapher.setUserSettings(newSettings);
 	                updateCanvasSize();
 	            }
 

@@ -1059,6 +1059,10 @@ function FlightLog(logData) {
 
         return true;
     };
+
+    this.hasGpsData = function() {
+        return this.getStats()?.frame?.G ? true : false;;
+    };
 }
 
 FlightLog.prototype.accRawToGs = function(value) {

@@ -66,7 +66,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		overdrawSpectrumType: 0,                // By default, show all filters
 		craft				: {
 									left  : '15%',	// position from left (as a percentage of width)
-									top   : '25%',  // position from top (as a percentage of height)
+									top   : '48%',  // position from top (as a percentage of height)
 									size  : '40%'   // size (as a percentage of width)
 							  },
 		sticks				: {
@@ -75,13 +75,13 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 									size  : '30%'   // size (as a percentage of width)
 							  },
 		analyser			: {
-									left  : '5%',	// position from left (as a percentage of width)
+									left  : '2%',	// position from left (as a percentage of width)
 									top   : '60%',  // position from top (as a percentage of height)
 									size  : '35%'   // size (as a percentage of width)
 							  },
 		map			: {
 									left  : '2%',	// position from left (as a percentage of width)
-									top   : '4%',  // position from top (as a percentage of height)
+									top   : '5%',  // position from top (as a percentage of height)
 									size  : '35%'   // size (as a percentage of width)
 							  },
 	    watermark			: {
@@ -306,6 +306,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		currentSettings.analyserHanning = $(this).is(":checked");
 	});
 
+	$(".map-trail-altitude-colored").click(function() {
+		currentSettings.mapTrailAltitudeColored = $(this).is(":checked");
+	});
+
     $(".legend-units").click(function() {
         currentSettings.legendUnits = $(this).is(":checked");
     });
@@ -374,6 +378,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 			if(currentSettings.analyserHanning!=null) {
 				// set the toggle switch
 				$(".analyser-hanning").prop('checked', currentSettings.analyserHanning);
+			}
+
+			if(currentSettings.mapTrailAltitudeColored!=null) {
+				// set the toggle switch
+				$(".map-trail-altitude-colored").prop('checked', currentSettings.mapTrailAltitudeColored);
 			}
 
 			if(currentSettings.legendUnits!=null) {

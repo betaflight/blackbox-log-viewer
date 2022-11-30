@@ -25,6 +25,7 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
+    "Leaflet.MultiOptionsPolyline": "hgoebl/Leaflet.MultiOptionsPolyline",
     "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
     "leaflet": "^1.9.3",
