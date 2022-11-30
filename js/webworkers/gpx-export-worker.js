@@ -1,8 +1,7 @@
 importScripts("/node_modules/lodash/lodash.min.js");
 
 onmessage = function (event) {
-  const header = `
-<?xml version="1.0" encoding="UTF-8"?>
+  const header = `<?xml version="1.0" encoding="UTF-8"?>
 <gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/gpx_style/0/2 http://www.topografix.com/GPX/gpx_style/0/2/gpx_style.xsd" xmlns:gpx_style="http://www.topografix.com/GPX/gpx_style/0/2" 
   version="1.1" 
   creator="https://github.com/betaflight/blackbox-log-viewer">
@@ -41,20 +40,20 @@ onmessage = function (event) {
       let trkpt = `<trkpt lat="${lat}" lon="${lng}">`;
       trkpt += `<ele>${altitude}</ele>`;
       trkpt += `<time>${date.toISOString()}</time>`;
-      trkpt += `<speed>${speed}</speed>`;
-      trkpt += `<degreesType>${groundCourse}</degreesType>`;
-      trkpt += `<sat>${numSat}</sat>`;
+      // trkpt += `<speed>${speed}</speed>`;
+      // trkpt += `<degreesType>${groundCourse}</degreesType>`;
+      // trkpt += `<sat>${numSat}</sat>`;
       trkpt += `</trkpt>\n`;
 
       trkpts += trkpt;
     }
   }
 
-  let trk = `
-  <trk>
-    <trkseg>${trkpts}</trkseg>
-  </trk>
-`;
+  let trk = `  <trk>
+    <trkseg>
+      ${trkpts}
+    </trkseg>
+  </trk>`;
 
   postMessage(header + "\n" + trk + "\n" + footer);
 };

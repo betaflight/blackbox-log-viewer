@@ -918,47 +918,32 @@ function BlackboxLogViewer() {
         reader.readAsText(file);
     }
 
-    function exportCsv(file, options={}) {
-
-        function onSuccess(data) {
-            console.debug("CSV export finished in", (performance.now() - startTime) / 1000, "secs");
+    function createExportCallback(fileExtension, fileType, file, startTime) {
+        const callback = function(data) {
+            console.debug(`${fileExtension.toUpperCase()} export finished in ${(performance.now() - startTime) / 1000} secs`);
             if (!data) {
                 console.debug("Empty data, nothing to save");
                 return;
             }
-            let blob = new Blob([data], {type: 'text/csv'}),
+            let blob = new Blob([data], {type: fileType}),
                 e    = document.createEvent('MouseEvents'),
                 a    = document.createElement('a');
-            a.download = file || $(".log-filename").text() + ".csv";
+            a.download = file || $(".log-filename").text() + "." + fileExtension;
             a.href = window.URL.createObjectURL(blob);
-            a.dataset.downloadurl =  ['text/csv', a.download, a.href].join(':');
+            a.dataset.downloadurl =  [fileType, a.download, a.href].join(':');
             e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             a.dispatchEvent(e);
-        }
+          }
+          return callback;
+    }
 
-        let startTime = performance.now();
+    function exportCsv(file, options={}) {
+        const onSuccess = createExportCallback('csv', 'text/csv', file, performance.now());
         CsvExporter(flightLog, options).dump(onSuccess);
     }
 
     function exportGpx(file) {
-
-        function onSuccess(data) {
-            console.debug("Gpx export finished in", (performance.now() - startTime) / 1000, "secs");
-            if (!data) {
-                console.debug("Empty data, nothing to save");
-                return;
-            }
-            let blob = new Blob([data], {type: 'GPX File'}),
-                e    = document.createEvent('MouseEvents'),
-                a    = document.createElement('a');
-            a.download = file || $(".log-filename").text() + ".gpx";
-            a.href = window.URL.createObjectURL(blob);
-            a.dataset.downloadurl =  ['GPX File', a.download, a.href].join(':');
-            e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            a.dispatchEvent(e);
-        }
-
-        let startTime = performance.now();
+        const onSuccess = createExportCallback('gpx', 'GPX File', file, performance.now());
         GpxExporter(flightLog).dump(onSuccess);
     }
 
