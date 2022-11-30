@@ -59,10 +59,6 @@ function BlackboxLogViewer() {
         // JSON graph configuration:
         graphConfig = {},
 
-        // User's map config
-        mapConfig = {}, //FIXME I may not need this
-        
-
         offsetCache = [], // Storage for the offset cache (last 20 files)
         currentOffsetCache = {log:null, index:null, video:null, offset:null},
 
