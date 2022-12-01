@@ -44,6 +44,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		stickTrails			: false,			// Show stick trails?
 		stickInvertYaw		: false,			// Invert yaw in stick display?
         legendUnits			: true,	            // Show units on legend?
+        speedUnits          : 1,                // Default speed mode = m/s
+        altitudeUnits       : 1,                // Default altitude mode = meters
 		gapless				: false,
         drawCraft           : "3D", 
         hasCraft            : true,
@@ -314,6 +316,14 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
         currentSettings.legendUnits = $(this).is(":checked");
     });
 
+    $('input[type=radio][name=speed-mode]').change(function() {
+        currentSettings.speedUnits = parseInt($(this).val());
+    });
+
+    $('input[type=radio][name=altitude-mode]').change(function() {
+        currentSettings.altitudeUnits = parseInt($(this).val());
+    });
+
     // Load Custom Logo
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -390,13 +400,15 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 				$(".legend-units").prop('checked', currentSettings.legendUnits);
 			}
 
-
         mixerListSelection(currentSettings.mixerConfiguration); // select current mixer configuration
     		stickModeSelection(currentSettings.stickMode);
 
     		// setup the stick mode and dropdowns;
     		$('select.mixerList').val(currentSettings.mixerConfiguration);
     		$('input:radio[name="stick-mode"]').filter('[value="' + currentSettings.stickMode + '"]').attr('checked', true);
+
+    		$('input:radio[name="speed-mode"]').filter('[value="' + currentSettings.speedUnits + '"]').attr('checked', true);
+    		$('input:radio[name="altitude-mode"]').filter('[value="' + currentSettings.altitudeUnits + '"]').attr('checked', true);
 
     		$('.stick-mode-group input[name="stick-top"]').val(parseInt(currentSettings.sticks.top));
     		$('.stick-mode-group input[name="stick-left"]').val(parseInt(currentSettings.sticks.left));
