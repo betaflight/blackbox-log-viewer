@@ -857,7 +857,7 @@ function FlightLogFieldPresenter() {
      * @param altitude String: Altitude in meters.
      * @param altitudeUnits Integer: 1 for meters, 2 for feet.
      * 
-     * @returns meters in selected unit.
+     * @returns String: readable meters in selected unit.
      */
 
     FlightLogFieldPresenter.decodeCorrectAltitude = function(altitude, altitudeUnits) {
@@ -985,7 +985,6 @@ function FlightLogFieldPresenter() {
                 return (value / Math.PI * 180).toFixed(1) + "°";
 
             case 'baroAlt':
-                //return (value / 100).toFixed(1) + " m";
                 return FlightLogFieldPresenter.decodeCorrectAltitude((value/100), userSettings.altitudeUnits);
 
             case 'flightModeFlags':
@@ -994,7 +993,7 @@ function FlightLogFieldPresenter() {
             case 'stateFlags':
                 return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
 
-            case 'failsafePhase':
+            case 'failsafePhase':fork
                 return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
 
             case 'features':
@@ -1010,7 +1009,6 @@ function FlightLogFieldPresenter() {
             case 'GPS_coord[1]':
                 return `${(value/10000000).toFixed(5)}`;
             case 'GPS_altitude':
-                //return `${(value/10).toFixed(2)} m`;
                 return FlightLogFieldPresenter.decodeCorrectAltitude((value/10), userSettings.altitudeUnits);
             case 'GPS_speed':
                 switch (userSettings.speedUnits) {
