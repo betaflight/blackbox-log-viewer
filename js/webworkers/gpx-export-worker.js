@@ -22,7 +22,9 @@ onmessage = function (event) {
   let trkpts = "";
   for (const chunk of event.data.frames) {
     for (const frame of chunk) {
-      if (!frame[latIndex] || !frame[lngIndex]) continue;
+      if (!frame[latIndex] || !frame[lngIndex]) {
+        continue;
+      }
       const timeMillis = Math.floor(frame[timeIndex] / 1000);
       const lat = frame[latIndex] / 10000000;
       const lng = frame[lngIndex] / 10000000;
