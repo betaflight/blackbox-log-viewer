@@ -23,8 +23,8 @@ onmessage = function (event) {
   const numSatIndex = event.data.fieldNames.indexOf("GPS_numSat");
 
   let trkpts = "";
-  for (var chunk of event.data.frames) {
-    for (var frame of chunk) {
+  for (const chunk of event.data.frames) {
+    for (const frame of chunk) {
       if (!frame[latIndex] || !frame[lngIndex]) continue;
       const timeMillis = Math.floor(frame[timeIndex] / 1000);
       const lat = frame[latIndex] / 10000000;
