@@ -993,7 +993,7 @@ function FlightLogFieldPresenter() {
             case 'stateFlags':
                 return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_STATE_NAME);
 
-            case 'failsafePhase':fork
+            case 'failsafePhase':
                 return FlightLogFieldPresenter.presentEnum(value, FLIGHT_LOG_FAILSAFE_PHASE_NAME);
 
             case 'features':
