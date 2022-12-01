@@ -1,9 +1,8 @@
 "use strict";
 
 function MapGrapher() {
-  var userSettings,
+  let userSettings,
     myMap,
-    that = this,
     currentLogStartDateTime,
     currentTime,
     craftPosition,
@@ -70,7 +69,9 @@ function MapGrapher() {
   };
 
   this.initialize = function () {
-    if (myMap) return;
+    if (myMap) {
+      return;
+    }
 
     myMap = L.map("mapContainer", mapOptions);
 
@@ -110,26 +111,43 @@ function MapGrapher() {
       currentLogStartDateTime = newLogStartDateTime;
     }
 
+    const logIndex = flightLog.getLogIndex();
+
+    // if this log is already proccesed its skipped
+    if (trailLayers.has(logIndex)) return;
+
+    this.setFlightLogIndexs();
+
+    let { latlngs, maxAlt, minAlt } = this.getPolylinesData();
+
+    const polyline = L.polyline(latlngs, polylineOptions);
+
+    const polylineC = this.createAltitudeColoredPolyline(latlngs, maxAlt, minAlt);
+
+    trailLayers.set(logIndex, { polyline, polylineC });
+
+    if (latlngs.length > 0) {
+      homePosition = this.getHomeCoordinatesFromFlightLog(flightLog);
+    }
+  };
+
+  this.setFlightLogIndexs = function () {
     latIndexAtFrame = flightLog.getMainFieldIndexByName("GPS_coord[0]");
     lngIndexAtFrame = flightLog.getMainFieldIndexByName("GPS_coord[1]");
     altitudeIndexAtFrame = flightLog.getMainFieldIndexByName("GPS_altitude");
     groundCourseIndexAtFrame =
       flightLog.getMainFieldIndexByName("GPS_ground_course");
+  };
 
-    const logIndex = flightLog.getLogIndex();
+  this.getPolylinesData = function () {
+    let latlngs = [];
+    let maxAlt = Number.MIN_VALUE;
+    let minAlt = Number.MAX_VALUE;
 
     const chunks = flightLog.getChunksInTimeRange(
       flightLog.getMinTime(),
       flightLog.getMaxTime()
     );
-
-    let latlngs = [];
-
-    // if this log is already proccesed its skipped
-    if (trailLayers.has(logIndex)) return;
-
-    let maxAlt = Number.MIN_VALUE;
-    let minAlt = Number.MAX_VALUE;
 
     for (const chunk of chunks) {
       for (const fi in chunk.frames) {
@@ -142,23 +160,27 @@ function MapGrapher() {
         );
 
         // if there are no coordinates the frame is skipped
-        if (!coordinates) continue;
+        if (!coordinates) {
+          continue;
+        }
 
+        // Altitude max and min values can be obtained from the stats but fixing the index at 4 doesn't seem safe
+        // const maxAlt = flightLog.getStats().frame.G.field[4].max / altitudeDivider;
+        // const minAlt = flightLog.getStats().frame.G.field[4].min / altitudeDivider;
         maxAlt = coordinates.alt > maxAlt ? coordinates.alt : maxAlt;
         minAlt = coordinates.alt < minAlt ? coordinates.alt : minAlt;
 
         // 1/4 of the dots is enough to draw the line
-        if (fi % 4 == 0) latlngs.push(coordinates);
+        if (fi % 4 == 0) {
+          latlngs.push(coordinates);
+        }
       }
     }
+    return { latlngs, maxAlt, minAlt };
+  };
 
-    const polyline = L.polyline(latlngs, polylineOptions);
-
+  this.createAltitudeColoredPolyline = function (latlngs, maxAlt, minAlt) {
     const divider = colorTrailGradient.length - 1;
-
-    // FIXME altitude max and min values can be obtained from the stats but fixing the index at 4 doesn't seem safe
-    // const maxAlt2 = flightLog.getStats().frame.G.field[4].max / altitudeDivider; //197
-    // const minAlt2 = flightLog.getStats().frame.G.field[4].min / altitudeDivider; //54
 
     const delta = maxAlt - minAlt;
 
@@ -172,7 +194,7 @@ function MapGrapher() {
       altThresholds.push(threshold);
     }
 
-    const polylineC = L.multiOptionsPolyline(latlngs, {
+    return L.multiOptionsPolyline(latlngs, {
       multiOptions: {
         optionIdxFn: function (latLng) {
           for (const i in altThresholds) {
@@ -189,11 +211,6 @@ function MapGrapher() {
       opacity: 1,
       smoothFactor: 1,
     });
-
-    trailLayers.set(logIndex, { polyline, polylineC });
-
-    if (latlngs.length > 0)
-      homePosition = this.getHomeCoordinatesFromFlightLog(flightLog);
   };
 
   this.updateCurrentPosition = function () {
@@ -216,10 +233,17 @@ function MapGrapher() {
     userSettings = newUserSettings;
   };
 
-  this.redraw = function () {
-    if (trailLayers.size <= 0) return;
-    if (!myMap) return;
+  this.redrawAll = function () {
+    if (trailLayers.size <= 0 || !myMap) {
+      return;
+    }
 
+    this.redrawFlightTrail();
+    this.redrawHomeMarker();
+    this.redrawCraftMarker();
+  };
+
+  this.redrawFlightTrail = function () {
     // If flightLog has changed redraw flight trail
     const currentLogIndex = flightLog.getLogIndex();
     if (previousLogIndex != currentLogIndex) {
@@ -234,14 +258,17 @@ function MapGrapher() {
 
       previousLogIndex = currentLogIndex;
     }
+  };
 
-    // home
+  this.redrawHomeMarker = function () {
     if (homePosition) {
       if (homeMarker) {
         homeMarker.icon.setLatLng(homePosition).addTo(myMap);
 
         // debug circle
-        if (debugCircle) homeMarker.circle.setLatLng(homePosition).addTo(myMap);
+        if (debugCircle) {
+          homeMarker.circle.setLatLng(homePosition).addTo(myMap);
+        }
       } else {
         homeMarker = {};
 
@@ -250,21 +277,24 @@ function MapGrapher() {
         }).addTo(myMap);
 
         // debug circle
-        if (debugCircle)
+        if (debugCircle) {
           homeMarker.circle = L.circle(homePosition, debugCircleOptions).addTo(
             myMap
           );
+        }
       }
     }
+  };
 
-    // aircraft
+  this.redrawCraftMarker = function () {
     if (craftPosition) {
       if (craftMarker) {
         craftMarker.icon.setLatLng(craftPosition);
         craftMarker.icon.setRotationAngle(groundCourse).addTo(myMap);
         // debug circle
-        if (debugCircle)
+        if (debugCircle) {
           homeMarker.circle.setLatLng(craftPosition).addTo(myMap);
+        }
       } else {
         craftMarker = {};
         craftMarker.icon = L.rotatedMarker(craftPosition, {
@@ -274,11 +304,12 @@ function MapGrapher() {
         }).addTo(myMap);
 
         // debug circle
-        if (debugCircle)
+        if (debugCircle) {
           craftMarker.circle = L.circle(
             craftPosition,
             debugCircleOptions
           ).addTo(myMap);
+        }
       }
     }
   };
@@ -287,23 +318,35 @@ function MapGrapher() {
     if (trailLayers.has(index)) {
       const p = trailLayers.get(index).polyline;
       const pc = trailLayers.get(index).polylineC;
-      if (p) myMap.removeLayer(p);
-      if (pc) myMap.removeLayer(pc);
+      if (p) {
+        myMap.removeLayer(p);
+      }
+      if (pc) {
+        myMap.removeLayer(pc);
+      }
     }
     if (homeMarker) {
-      if (myMap.hasLayer(homeMarker.icon)) myMap.removeLayer(homeMarker.icon);
-      if (debugCircle && myMap.hasLayer(homeMarker.circle))
+      if (myMap.hasLayer(homeMarker.icon)) {
+        myMap.removeLayer(homeMarker.icon);
+      }
+      if (debugCircle && myMap.hasLayer(homeMarker.circle)) {
         myMap.removeLayer(homeMarker.circle);
+      }
     }
     if (craftMarker) {
-      if (myMap.hasLayer(craftMarker.icon)) myMap.removeLayer(craftMarker.icon);
-      if (debugCircle && myMap.hasLayer(craftMarker.circle))
+      if (myMap.hasLayer(craftMarker.icon)) {
+        myMap.removeLayer(craftMarker.icon);
+      }
+      if (debugCircle && myMap.hasLayer(craftMarker.circle)) {
         myMap.removeLayer(craftMarker.circle);
+      }
     }
   };
 
   this.resize = function (width, height) {
-    if (!userSettings) return;
+    if (!userSettings) {
+      return;
+    }
     const containerstyle = {
       height: (height * parseInt(userSettings.map.size)) / 100.0,
       width: (width * parseInt(userSettings.map.size)) / 100.0,
@@ -345,6 +388,6 @@ function MapGrapher() {
   this.setCurrentTime = function (newTime) {
     currentTime = newTime;
     this.updateCurrentPosition();
-    this.redraw();
+    this.redrawAll();
   };
 }
