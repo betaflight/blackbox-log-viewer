@@ -867,7 +867,7 @@ function FlightLogFieldPresenter() {
             case 2: // Translate it into feet.
                 return (altitude * 3.28).toFixed(2) + " ft";
         }
-    }
+    };
 
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
