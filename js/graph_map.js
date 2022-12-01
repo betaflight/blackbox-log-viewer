@@ -205,7 +205,6 @@ function MapGrapher() {
     return L.multiOptionsPolyline(latlngs, {
       multiOptions: {
         optionIdxFn: function (latLng) {
-          // for (const i in altThresholds) {
           for (let i = 0; i < altThresholds.length; i++) {
             if (latLng.alt <= altThresholds[i]) {
               return i;

@@ -85,7 +85,6 @@ function BlackboxLogViewer() {
         video = $(".log-graph video")[0],
         canvas = $("#graphCanvas")[0],
         analyserCanvas = $("#analyserCanvas")[0],
-        mapContainer = $("#mapContainer"),
         stickCanvas = $("#stickCanvas")[0],
         craftCanvas = $("#craftCanvas")[0],
         statusBar = $('#status-bar'),
@@ -272,7 +271,9 @@ function BlackboxLogViewer() {
         seekBar.setCurrentTime(currentBlackboxTime);
         seekBar.setWindow(graph.getWindowWidthTime());
 
-        if (flightLog.hasGpsData()) mapGrapher.setCurrentTime(currentBlackboxTime);
+        if (flightLog.hasGpsData()) {
+            mapGrapher.setCurrentTime(currentBlackboxTime);
+        }
 
         updateValuesChartRateLimited();
         
@@ -305,7 +306,9 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.resize(width, height);
             seekBar.resize(canvas.offsetWidth, 50);
-            if(flightLog.hasGpsData()) mapGrapher.resize(width, height);
+            if(flightLog.hasGpsData()) {
+                mapGrapher.resize(width, height);
+            }
             
             invalidateGraph();
         }
@@ -1128,7 +1131,9 @@ function BlackboxLogViewer() {
             hasMap = !hasMap;
             html.toggleClass("has-map", hasMap);       
             prefs.set('hasMap', hasMap);
-            if(flightLog.hasGpsData()) mapGrapher.initialize(userSettings);
+            if(flightLog.hasGpsData()) {
+                mapGrapher.initialize(userSettings);
+            }
         });
 
         $(".view-analyser-fullscreen").click(function() {
@@ -1391,7 +1396,9 @@ function BlackboxLogViewer() {
 	                graph.refreshOptions(newSettings);
 	                graph.refreshLogo();
 	                graph.initializeCraftModel();
-                    if(flightLog.hasGpsData()) mapGrapher.setUserSettings(newSettings);
+                    if(flightLog.hasGpsData()) {
+                        mapGrapher.setUserSettings(newSettings);
+                    }
 	                updateCanvasSize();
 	            }
 
