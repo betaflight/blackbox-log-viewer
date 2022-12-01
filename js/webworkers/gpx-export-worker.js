@@ -18,9 +18,6 @@ onmessage = function (event) {
   const latIndex = event.data.fieldNames.indexOf("GPS_coord[0]");
   const lngIndex = event.data.fieldNames.indexOf("GPS_coord[1]");
   const altitudeIndex = event.data.fieldNames.indexOf("GPS_altitude");
-  const speedIndex = event.data.fieldNames.indexOf("GPS_speed");
-  const groundCourseIndex = event.data.fieldNames.indexOf("GPS_ground_course");
-  const numSatIndex = event.data.fieldNames.indexOf("GPS_numSat");
 
   let trkpts = "";
   for (const chunk of event.data.frames) {
@@ -30,9 +27,6 @@ onmessage = function (event) {
       const lat = frame[latIndex] / 10000000;
       const lng = frame[lngIndex] / 10000000;
       const altitude = frame[altitudeIndex] / 10;
-      const speed = frame[speedIndex] / 100;
-      const groundCourse = frame[groundCourseIndex] / 10;
-      const numSat = frame[numSatIndex];
 
       let date = new Date(event.data.sysConfig["Log start datetime"]);
       date.setTime(date.getTime() + timeMillis);
@@ -40,9 +34,6 @@ onmessage = function (event) {
       let trkpt = `<trkpt lat="${lat}" lon="${lng}">`;
       trkpt += `<ele>${altitude}</ele>`;
       trkpt += `<time>${date.toISOString()}</time>`;
-      // trkpt += `<speed>${speed}</speed>`;
-      // trkpt += `<degreesType>${groundCourse}</degreesType>`;
-      // trkpt += `<sat>${numSat}</sat>`;
       trkpt += `</trkpt>\n`;
 
       trkpts += trkpt;
