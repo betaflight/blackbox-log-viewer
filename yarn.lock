@@ -72,6 +72,10 @@
   dependencies:
     "@types/node" "*"
 
+Leaflet.MultiOptionsPolyline@hgoebl/Leaflet.MultiOptionsPolyline:
+  version "1.0.0"
+  resolved "https://codeload.github.com/hgoebl/Leaflet.MultiOptionsPolyline/tar.gz/ebd929f3f3c9f0eca9ef13d46ff04533aa1d3116"
+
 aggregate-error@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/aggregate-error/-/aggregate-error-3.1.0.tgz#92670ff50f5359bdb7a3e0d40d0ec30c5737687a"
@@ -2493,6 +2497,16 @@ lead@^1.0.0:
   integrity sha1-bxT5mje+Op3XhPVJVpDlkDRm7kI=
   dependencies:
     flush-write-stream "^1.0.2"
+
+leaflet-marker-rotation@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/leaflet-marker-rotation/-/leaflet-marker-rotation-0.4.0.tgz#c375db65e8e8f0ef7449c5d7ffb9d96d475e41de"
+  integrity sha512-7I+l/Ky3mP7LQ+nfVA+Gzjl5NOb02mph3v9SD2dPoCEQ/vV3zuZp+7Sewm2Pgk2zH9Aa4+mPqNTSSSLe3D7lmg==
+
+leaflet@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.3.tgz#52ec436954964e2d3d39e0d433da4b2500d74414"
+  integrity sha512-iB2cR9vAkDOu5l3HAay2obcUHZ7xwUBBjph8+PGtmW/2lYhbLizWtG7nTeYht36WfOslixQF9D/uSIzhZgGMfQ==
 
 liftoff@^3.1.0:
   version "3.1.0"

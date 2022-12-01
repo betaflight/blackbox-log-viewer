@@ -16,8 +16,13 @@
     <link rel="stylesheet" href="css/header_dialog.css">
     <link rel="stylesheet" href="css/keys_dialog.css">
     <link rel="stylesheet" href="css/user_settings_dialog.css">
+    <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
 
     <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    <script src="node_modules/leaflet/dist/leaflet.js"></script>
+    <script src="node_modules/leaflet-marker-rotation/src/rotatedMarker.js" type="module"></script>
+    <script src="node_modules/Leaflet.MultiOptionsPolyline/Leaflet.MultiOptionsPolyline.js"></script>
+    
 </head>
 
 <body>
@@ -252,6 +257,11 @@
                                 <span class="pull-right">A</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="#" id="auto-hide-menu" class="view-map auto-hide-menu" data-toggle="tooltip" title="View/hide map">
+                                <span class="glyphicon glyphicon-map-marker"></span> Map
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="btn-group view-buttons-expanded" role="group">
@@ -284,6 +294,9 @@
                         </button>
                         <button type="button" class="btn btn-default view-analyser" data-toggle="tooltip" title="View/hide analyser display">
                             <span class="glyphicon glyphicon-equalizer"></span>
+                        </button>
+                        <button type="button" class="btn btn-default view-map" data-toggle="tooltip" title="View/hide map">
+                            <span class="glyphicon glyphicon-map-marker"></span>
                         </button>
                     </div>
                 </div>
@@ -490,6 +503,7 @@
                         <option>100</option>
                     </datalist>
                 </div>
+                <div id="mapContainer" class="map-container"></div>
                 <canvas width="0" height="0" id="stickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
             </div>
@@ -2893,6 +2907,44 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="gui_box grey top-spacer map-settings">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">Map Settings</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <div>
+                                        <label class="option">ACT
+                                            <input class="map-trail-altitude-colored ios-switch" type="checkbox" />
+                                            <div>
+                                                <div></div>
+                                            </div>
+                                            <span>Use Altitude Colored Trail (slower at loading/changing logs)</span>
+                                        </label>
+                                    </div>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <label>Position</label>
+                                            </td>
+                                            <td class="position">
+                                                <label>Top</label>
+                                                <input name="map-top" type="number" step="1" min="0" max="100" />
+                                                <p>%</p>
+                                            </td>
+                                            <td class="position">
+                                                <label>Left</label>
+                                                <input name="map-left" type="number" step="1" min="0" max="100" />
+                                                <p>%</p>
+                                            </td>
+                                            <td class="position">
+                                                <label>Size</label>
+                                                <input name="map-size" type="number" step="1" min="0" max="100" />
+                                                <p>%</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                             <div class="gui_box grey top-spacer watermark-settings">
                                 <div class="gui_box_titlebar">
                                     <div class="spacer_box_title">Watermark Settings</div>
@@ -3112,6 +3164,7 @@
     <script src="js/configuration.js"></script>
     <script src="js/laptimer.js"></script>
     <script src="js/localization.js"></script>
+    <script src="js/graph_map.js"></script>
     <script src="js/main.js"></script>
     <script src="index.js"></script>
 

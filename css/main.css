@@ -491,6 +491,7 @@ html.has-log .log-graph-config {
 
 #craftCanvas,
 #analyserCanvas,
+#mapContainer,
 #stickCanvas {
     position:absolute;
     top:0;
@@ -501,6 +502,7 @@ html.has-log .log-graph-config {
 
 html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas,
+html.has-map #mapContainer,
 html.has-sticks #stickCanvas {
 	display:block;
 }
@@ -511,6 +513,19 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 
 #analyser {
     z-index: 10;
+}
+
+/* This filters change the color of a black png image. For new colors check: https://codepen.io/sosuke/pen/Pjoqqp */
+.isBF #mapContainer .icon {
+    filter: invert(36%) sepia(28%) saturate(3957%) hue-rotate(28deg) brightness(93%) contrast(103%);
+}
+
+.isCF #mapContainer .icon {
+    filter: invert(28%) sepia(100%) saturate(2050%) hue-rotate(134deg) brightness(100%) contrast(104%);
+}
+
+.isINAV #mapContainer .icon {
+    filter: invert(14%) sepia(100%) saturate(4698%) hue-rotate(244deg) brightness(64%) contrast(130%);
 }
 
 .analyser:hover .non-shift #analyserResize {
@@ -606,7 +621,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 	position: absolute;
 }
 
-.analyser {
+.analyser, .map-container {
 	position: absolute;
 }
 
@@ -774,6 +789,7 @@ html .view-analyser-fullscreen {
 
 html.has-analyser-sticks.isBF .view-analyser-sticks,
 html.has-analyser.isBF .view-analyser,
+html.has-map.isBF .view-map,
 html.has-table.isBF .view-table,
 html.has-sticks.isBF .view-sticks,
 html.has-craft.isBF .view-craft,
@@ -783,6 +799,7 @@ html:not(.video-hidden).isBF .view-video {
 
 html.has-analyser-sticks.isCF .view-analyser-sticks,
 html.has-analyser.isCF .view-analyser,
+html.has-map.isCF .view-map,
 html.has-table.isCF .view-table,
 html.has-sticks.isCF .view-sticks,
 html.has-craft.isCF .view-craft,
@@ -792,6 +809,7 @@ html:not(.video-hidden).isCF .view-video {
 
 html.has-analyser-sticks.isINAV .view-analyser-sticks,
 html.has-analyser.isINAV .view-analyser,
+html.has-map.isINAV .view-map,
 html.has-table.isINAV .view-table,
 html.has-sticks.isINAV .view-sticks,
 html.has-craft.isINAV .view-craft,
@@ -1203,6 +1221,11 @@ html.has-log .navbar-static-top {
 
 html:not(.has-log) #status-bar {
     display: none;
+}
+
+html:not(.has-gps) .view-map,
+html:not(.has-gps) .map-container {
+	display: none !important;
 }
 
 #status-bar .bookmark-1,

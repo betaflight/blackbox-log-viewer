@@ -14,3 +14,6 @@ release/
 
 # artefacts for Visual Studio Code
 /.vscode/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

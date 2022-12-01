@@ -66,7 +66,7 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		overdrawSpectrumType: 0,                // By default, show all filters
 		craft				: {
 									left  : '15%',	// position from left (as a percentage of width)
-									top   : '25%',  // position from top (as a percentage of height)
+									top   : '48%',  // position from top (as a percentage of height)
 									size  : '40%'   // size (as a percentage of width)
 							  },
 		sticks				: {
@@ -75,8 +75,13 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 									size  : '30%'   // size (as a percentage of width)
 							  },
 		analyser			: {
-									left  : '5%',	// position from left (as a percentage of width)
+									left  : '2%',	// position from left (as a percentage of width)
 									top   : '60%',  // position from top (as a percentage of height)
+									size  : '35%'   // size (as a percentage of width)
+							  },
+		map			: {
+									left  : '2%',	// position from left (as a percentage of width)
+									top   : '5%',  // position from top (as a percentage of height)
 									size  : '35%'   // size (as a percentage of width)
 							  },
 	    watermark			: {
@@ -125,9 +130,12 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     			craft:     {top: $('.craft-settings input[name="craft-top"]').val() + '%',
     					   left: $('.craft-settings input[name="craft-left"]').val() + '%',
     					   size: $('.craft-settings input[name="craft-size"]').val() + '%', },
-    			analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
+				analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
     					   left: $('.analyser-settings input[name="analyser-left"]').val() + '%',
     					   size: $('.analyser-settings input[name="analyser-size"]').val() + '%', },
+				map:  	   {top: $('.map-settings input[name="map-top"]').val() + '%',
+    					   left: $('.map-settings input[name="map-left"]').val() + '%',
+    					   size: $('.map-settings input[name="map-size"]').val() + '%', },
     			watermark: {top: $('.watermark-settings input[name="watermark-top"]').val() + '%',
 					   	   left: $('.watermark-settings input[name="watermark-left"]').val() + '%',
 					   	   size: $('.watermark-settings input[name="watermark-size"]').val() + '%', 
@@ -298,6 +306,10 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		currentSettings.analyserHanning = $(this).is(":checked");
 	});
 
+	$(".map-trail-altitude-colored").click(function() {
+		currentSettings.mapTrailAltitudeColored = $(this).is(":checked");
+	});
+
     $(".legend-units").click(function() {
         currentSettings.legendUnits = $(this).is(":checked");
     });
@@ -368,6 +380,11 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 				$(".analyser-hanning").prop('checked', currentSettings.analyserHanning);
 			}
 
+			if(currentSettings.mapTrailAltitudeColored!=null) {
+				// set the toggle switch
+				$(".map-trail-altitude-colored").prop('checked', currentSettings.mapTrailAltitudeColored);
+			}
+
 			if(currentSettings.legendUnits!=null) {
 				// set the toggle switch
 				$(".legend-units").prop('checked', currentSettings.legendUnits);
@@ -390,6 +407,9 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
     		$('.analyser-settings input[name="analyser-top"]').val(parseInt(currentSettings.analyser.top));
     		$('.analyser-settings input[name="analyser-left"]').val(parseInt(currentSettings.analyser.left));
     		$('.analyser-settings input[name="analyser-size"]').val(parseInt(currentSettings.analyser.size));
+    		$('.map-settings input[name="map-top"]').val(parseInt(currentSettings.map.top));
+    		$('.map-settings input[name="map-left"]').val(parseInt(currentSettings.map.left));
+    		$('.map-settings input[name="map-size"]').val(parseInt(currentSettings.map.size));
 
     		if(currentSettings.drawWatermark!=null) {
     			// set the toggle switch
