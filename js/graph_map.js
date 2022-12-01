@@ -84,7 +84,9 @@ function MapGrapher() {
   };
 
   this.reset = function () {
-    if (!myMap) return;
+    if (!myMap) {
+      return;
+    }
     this.clearMap(previousLogIndex);
     previousLogIndex = null;
     currentTime = null;
@@ -114,7 +116,9 @@ function MapGrapher() {
     const logIndex = flightLog.getLogIndex();
 
     // if this log is already proccesed its skipped
-    if (trailLayers.has(logIndex)) return;
+    if (trailLayers.has(logIndex)) {
+      return;
+    }
 
     this.setFlightLogIndexs();
 
@@ -122,7 +126,11 @@ function MapGrapher() {
 
     const polyline = L.polyline(latlngs, polylineOptions);
 
-    const polylineC = this.createAltitudeColoredPolyline(latlngs, maxAlt, minAlt);
+    const polylineC = this.createAltitudeColoredPolyline(
+      latlngs,
+      maxAlt,
+      minAlt
+    );
 
     trailLayers.set(logIndex, { polyline, polylineC });
 
@@ -197,7 +205,8 @@ function MapGrapher() {
     return L.multiOptionsPolyline(latlngs, {
       multiOptions: {
         optionIdxFn: function (latLng) {
-          for (const i in altThresholds) {
+          // for (const i in altThresholds) {
+          for (let i = 0; i < altThresholds.length; i++) {
             if (latLng.alt <= altThresholds[i]) {
               return i;
             }
@@ -314,10 +323,15 @@ function MapGrapher() {
     }
   };
 
-  this.clearMap = function (index) {
-    if (trailLayers.has(index)) {
-      const p = trailLayers.get(index).polyline;
-      const pc = trailLayers.get(index).polylineC;
+  this.clearMap = function (trailIndex) {
+    this.clearMapFlightTrails(trailIndex);
+    this.clearMapMarkers();
+  };
+
+  this.clearMapFlightTrails = function (trailIndex) {
+    if (trailLayers.has(trailIndex)) {
+      const p = trailLayers.get(trailIndex).polyline;
+      const pc = trailLayers.get(trailIndex).polylineC;
       if (p) {
         myMap.removeLayer(p);
       }
@@ -325,6 +339,9 @@ function MapGrapher() {
         myMap.removeLayer(pc);
       }
     }
+  };
+
+  this.clearMapMarkers = function () {
     if (homeMarker) {
       if (myMap.hasLayer(homeMarker.icon)) {
         myMap.removeLayer(homeMarker.icon);
