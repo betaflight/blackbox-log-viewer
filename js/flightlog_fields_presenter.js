@@ -852,6 +852,24 @@ function FlightLogFieldPresenter() {
     };
 
     /**
+     * Function to translate altitudes from the default meters
+     * to the user selected measurement unit.
+     * @param altitude String: Altitude in meters.
+     * @param altitudeUnits Integer: 1 for meters, 2 for feet.
+     * 
+     * @returns String: readable meters in selected unit.
+     */
+
+    FlightLogFieldPresenter.decodeCorrectAltitude = function(altitude, altitudeUnits) {
+        switch (altitudeUnits) {
+            case 1: // Keep it in meters.
+                return (altitude).toFixed(2) + " m";
+            case 2: // Translate it into feet.
+                return (altitude * 3.28).toFixed(2) + " ft";
+        }
+    };
+
+    /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
      * no better representation is available.
      *
@@ -967,7 +985,7 @@ function FlightLogFieldPresenter() {
                 return (value / Math.PI * 180).toFixed(1) + "°";
 
             case 'baroAlt':
-                return (value / 100).toFixed(1) + " m";
+                return FlightLogFieldPresenter.decodeCorrectAltitude((value/100), userSettings.altitudeUnits);
 
             case 'flightModeFlags':
                 return FlightLogFieldPresenter.presentFlags(value, FLIGHT_LOG_FLIGHT_MODE_NAME);
@@ -991,9 +1009,16 @@ function FlightLogFieldPresenter() {
             case 'GPS_coord[1]':
                 return `${(value/10000000).toFixed(5)}`;
             case 'GPS_altitude':
-                return `${(value/10).toFixed(2)} m`;
+                return FlightLogFieldPresenter.decodeCorrectAltitude((value/10), userSettings.altitudeUnits);
             case 'GPS_speed':
-                return `${(value/100).toFixed(2)} m/s`;
+                switch (userSettings.speedUnits) {
+                    case 1:
+                        return `${(value/100).toFixed(2)} m/s`;
+                    case 2:
+                        return `${((value/100) * 3.6).toFixed(2)} kph`;
+                    case 3:
+                        return `${((value/100) * 2.2369).toFixed(2)} mph`;
+                }
             case 'GPS_ground_course':
                 return `${(value/10).toFixed(1)} °`;
 
