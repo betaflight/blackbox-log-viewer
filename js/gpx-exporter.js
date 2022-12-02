@@ -1,24 +1,10 @@
 "use strict";
 
 /**
- * @typedef {object} ExportOptions
- * @property {string} columnDelimiter
- * @property {string} stringDelimiter
- * @property {boolean} quoteStrings
- */
-
-/**
  * @constructor
  * @param {FlightLog} flightLog 
- * @param {ExportOptions} [opts={}]
  */
-let CsvExporter = function(flightLog, opts={}) {
-
-    var opts = _.merge({
-        columnDelimiter: ",",
-        stringDelimiter: "\"",
-        quoteStrings: true,
-    }, opts);
+let GpxExporter = function(flightLog) {
 
     /** 
      * @param {function} success is a callback triggered when export is done
@@ -26,7 +12,7 @@ let CsvExporter = function(flightLog, opts={}) {
     function dump(success) {
         let frames = _(flightLog.getChunksInTimeRange(flightLog.getMinTime(), flightLog.getMaxTime()))
                 .map(chunk => chunk.frames).value(),
-            worker = new Worker("/js/webworkers/csv-export-worker.js");
+            worker = new Worker("/js/webworkers/gpx-export-worker.js");
 
         worker.onmessage = event => {
             success(event.data);
@@ -36,7 +22,6 @@ let CsvExporter = function(flightLog, opts={}) {
             sysConfig: flightLog.getSysConfig(),
             fieldNames: flightLog.getMainFieldNames(),
             frames: frames,
-            opts: opts,
         });
     }
 
