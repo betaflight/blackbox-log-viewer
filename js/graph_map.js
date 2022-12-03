@@ -121,22 +121,27 @@ function MapGrapher() {
     }
 
     this.setFlightLogIndexs();
-
     let { latlngs, maxAlt, minAlt } = this.getPolylinesData();
 
-    const polyline = L.polyline(latlngs, polylineOptions);
+    const hasGpsData = latlngs.length > 0;
 
-    const polylineC = this.createAltitudeColoredPolyline(
-      latlngs,
-      maxAlt,
-      minAlt
-    );
+    if (hasGpsData) {
+      const polyline = L.polyline(latlngs, polylineOptions);
 
-    trailLayers.set(logIndex, { polyline, polylineC });
+      const polylineC = this.createAltitudeColoredPolyline(
+        latlngs,
+        maxAlt,
+        minAlt
+      );
 
-    if (latlngs.length > 0) {
+      trailLayers.set(logIndex, { polyline, polylineC });
+
       homePosition = this.getHomeCoordinatesFromFlightLog(flightLog);
+    } else {
+      console.debug("FlightLog has no gps data.");
     }
+
+    $("#mapContainer").toggleClass("no-gps-data", !hasGpsData);
   };
 
   this.setFlightLogIndexs = function () {
@@ -382,13 +387,17 @@ function MapGrapher() {
     const lng = frame[lngIndex];
     const alt = frame[altitudeIndex];
 
-    return typeof lat == "number" || typeof lng == "number"
+    return this.isNumber(lat) && this.isNumber(lng)
       ? L.latLng(
           lat / coordinateDivider,
           lng / coordinateDivider,
           alt / altitudeDivider
         )
       : null;
+  };
+
+  this.isNumber = function (n) {
+    return typeof n === "number" && !isNaN(n);
   };
 
   this.getGroundCourseFromFrame = function (frame, groundCourseIndex) {
