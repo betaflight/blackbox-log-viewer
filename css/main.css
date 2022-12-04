@@ -507,6 +507,32 @@ html.has-sticks #stickCanvas {
 	display:block;
 }
 
+#mapContainer.no-gps-data:before {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+    content: "";
+    background-color: gray;
+    opacity: .5;
+}
+
+#mapContainer.no-gps-data:after {
+    position: absolute;
+    display: block;
+    top: calc(30%);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10001;
+    content: "No GPS Data";
+    text-align: center;
+    font-size: 3vw;
+}
+
 html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenException) {
 	display:block;
 }
