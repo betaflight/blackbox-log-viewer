@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Fetch build artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: release-assets/
 
@@ -39,14 +39,14 @@ jobs:
         id: notes
         run: |
           set -- release-assets/Betaflight-Blackbox-Explorer-Debug-*
-          echo "::set-output name=notes::$(test -e "$1" && echo '${{ env.debugReleaseNotes }}' || echo '${{ env.releaseNotes }}')"
+          echo "notes=$(test -e "$1" && echo '${{ env.debugReleaseNotes }}' || echo '${{ env.releaseNotes }}')" >> $GITHUB_OUTPUT
 
       - name: Get current date
         id: date
-        run: echo "::set-output name=today::$(date '+%Y%m%d')"
+        run: echo "today=$(date '+%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Release
-        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 # v0.1.14
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
         with:
           token: ${{ secrets.REPO_TOKEN }}
           repository: ${{ env.repoNightly }}
