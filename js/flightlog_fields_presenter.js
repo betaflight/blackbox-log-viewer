@@ -671,10 +671,10 @@ function FlightLogFieldPresenter() {
         },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
-            'debug[0]':'accADC X',
-            'debug[1]':'accADC Y',
-            'debug[2]':'Setpoint Roll',
-            'debug[3]':'Setpoint Pitch',
+            'debug[0]':'IMU Gain',
+            'debug[1]':'EZ_EF',
+            'debug[2]':'GroundSpeedError',
+            'debug[3]':'VelocityFactor',
         },
         'VTX_MSP' : {
             'debug[all]': 'VTX MSP',
@@ -689,6 +689,13 @@ function FlightLogFieldPresenter() {
             'debug[1]': 'pDOP (positional - 3D)',
             'debug[2]': 'hDOP (horizontal - 2D)',
             'debug[3]': 'vDOP (vertical - 1D)',
+        },
+        'ANGLE_MODE' : {
+            'debug[all]': 'Angle Mode',
+            'debug[0]': 'Target angle',
+            'debug[1]': 'Error P correction',
+            'debug[2]': 'Feedforward correction',
+            'debug[3]': 'Angle achieved',
         },
     };
 
@@ -1353,6 +1360,16 @@ function FlightLogFieldPresenter() {
                         case 'debug[3]': // vDOP (vertical - 1D)
                         default:
                             return (value / 100).toFixed(2);
+                    }
+                case 'ANGLE_MODE':
+                    switch (fieldName) {
+                        case 'debug[0]': // target angle
+                        case 'debug[1]': // angle error
+                        case 'debug[2]': // angle feedforward
+                        case 'debug[3]': // angle achieved
+                            return (value / 10).toFixed(1) + " °";
+                        default:
+                            return value.toFixed(0);
                     }
             }
             return value.toFixed(0);

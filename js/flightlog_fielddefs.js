@@ -349,6 +349,7 @@ let
         "ATTITUDE",
         "VTX_MSP",
         "GPS_DOP",
+        "ANGLE_MODE",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([

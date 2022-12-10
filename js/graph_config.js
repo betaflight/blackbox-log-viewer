@@ -931,6 +931,47 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'ATTITUDE':
+                        switch (fieldName) {
+                            case 'debug[0]': // 
+                            case 'debug[1]': // 
+                            case 'debug[2]': // 
+                            case 'debug[3]': // 
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            }
+                    case 'ANGLE_MODE':
+                        switch (fieldName) {
+                            case 'debug[0]': // angle target
+                            case 'debug[3]': // angle achieved
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // angle error correction
+                            case 'debug[2]':  // angle feedforward
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     }
             }
             // if not found above then
