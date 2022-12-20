@@ -1,6 +1,6 @@
 # Betaflight Blackbox Explorer
 
-[![Latest version](https://img.shields.io/github/v/release/betaflight/blackbox-log-viewer)](https://github.com/betaflight/blackbox-log-viewer/releases) [![Build](https://img.shields.io/github/workflow/status/betaflight/blackbox-log-viewer/Nightly)](https://github.com/betaflight/blackbox-log-viewer/actions/workflows/nightly.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Latest version](https://img.shields.io/github/v/release/betaflight/blackbox-log-viewer)](https://github.com/betaflight/blackbox-log-viewer/releases) [![Build](https://img.shields.io/github/actions/workflow/status/betaflight/blackbox-log-viewer/nightly.yml?branch=master)](https://github.com/betaflight/blackbox-log-viewer/actions/workflows/nightly.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ![Main explorer interface](screenshots/main-interface.jpg)
 
