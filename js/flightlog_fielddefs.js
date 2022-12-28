@@ -418,6 +418,7 @@ let
         "QMP6988",
         "BMP388",
         "DPS310",
+        "2SMPB_02B",
     ]),
 
     MAG_HARDWARE = makeReadOnly([
