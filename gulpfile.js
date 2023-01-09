@@ -465,6 +465,7 @@ function release_deb(arch, appDirectory, done) {
              prerm: [`rm /usr/share/mime/packages/${pkg.name}.xml`, 'update-mime-database /usr/share/mime',
                      'rm /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png', 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
                      `xdg-desktop-menu uninstall ${pkg.name}.desktop`],
+             conffiles: './test/configs/opt/etc/dummy.cfg',
              depends: 'libgconf-2-4',
              changelog: [],
              _target: `${LINUX_INSTALL_DIR}/${pkg.name}`,

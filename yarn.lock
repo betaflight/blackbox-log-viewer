@@ -1373,6 +1373,13 @@ find-up@^1.0.0:
     path-exists "^2.0.0"
     pinkie-promise "^2.0.0"
 
+find@^0.2.8:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/find/-/find-0.2.9.tgz#4b73f1ff9e56ad91b76e716407fe5ffe6554bb8c"
+  integrity sha512-7a4/LCiInB9xYMnAUEjLilL9FKclwbwK7VlXw+h5jMvT2TDFeYFCHM24O1XdnC/on/hx8mxVO3FTQkyHZnOghQ==
+  dependencies:
+    traverse-chain "~0.1.0"
+
 findup-sync@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-2.0.0.tgz#9326b1488c22d1a6088650a86901b2d9a90a2cbc"
@@ -1784,11 +1791,12 @@ gulp-cli@^2.2.0:
     v8flags "^3.2.0"
     yargs "^7.1.0"
 
-gulp-debian@~0.1.8:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/gulp-debian/-/gulp-debian-0.1.9.tgz#80e4a8cfc0f0904312f07e66a06ca3c024edc153"
-  integrity sha512-hY16Lj5IdxY213L9Sl6SlEgpCvf8/ny3SQ4S9dyG8MHqRx0fPpui5CRodhQK5lA2oScxP8qi4wfK4fIDr5xF3g==
+gulp-debian@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/gulp-debian/-/gulp-debian-0.3.2.tgz#0b5a32366ae0a159529b9b7285e31bb73998da9d"
+  integrity sha512-P9zqKFQ9xRG1wvcJUYiBxUEypoPcDsFJxmxyJ6PSyfF2iOcsIk1mPTp47Qs0Q36bdWvrauvGTvJxscFIhK1U3A==
   dependencies:
+    find "^0.2.8"
     fs-extra "^5.0.0"
     gulp-util "^3.0.8"
     through2 "^2.0.1"
@@ -4098,6 +4106,11 @@ tough-cookie@~2.5.0:
   dependencies:
     psl "^1.1.28"
     punycode "^2.1.1"
+
+traverse-chain@~0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/traverse-chain/-/traverse-chain-0.1.0.tgz#61dbc2d53b69ff6091a12a168fd7d433107e40f1"
+  integrity sha512-up6Yvai4PYKhpNp5PkYtx50m3KbwQrqDwbuZP/ItyL64YEWHAvH6Md83LFLV/GRSk/BoUVwwgUzX6SOQSbsfAg==
 
 tunnel-agent@^0.6.0:
   version "0.6.0"
