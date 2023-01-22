@@ -996,6 +996,7 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
+                        
                     case 'GPS_DOP':
                         switch (fieldName) {
                             case 'debug[0]': // Number of Satellites (now this is in normal GPS data, maybe gpsTrust?)
@@ -1135,7 +1136,33 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
-                }
+                    case 'DSHOT_STATUS_N_TEMPERATURE':
+                    case 'DSHOT_STATUS_N_CURRENT':
+                    case 'DSHOT_STATUS_N_DEBUG1':
+                    case 'DSHOT_STATUS_N_DEBUG2':
+                    case 'DSHOT_STATUS_N_STRESS_LVL':
+                        return {
+                            offset: 0,
+                            power: 1.0,
+                            inputRange: 400,
+                            outputRange: 1.0,
+                        };
+                    case 'DSHOT_STATUS_N_VOLTAGE':
+                        return {
+                            offset: 0,
+                            power: 1.0,
+                            inputRange: 255,
+                            outputRange: 1.0,
+                        };
+                    case 'DSHOT_STATUS_N_ERPM_FRACTION_18':
+                        return {
+                            offset: 0,
+                            power: 1.0,
+                            inputRange: 4000,
+                            outputRange: 1.0,
+                        };
+
+                    }
             }
             // if not found above then
             // Scale and center the field based on the whole-log observed ranges for that field

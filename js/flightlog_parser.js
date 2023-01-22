@@ -58,18 +58,23 @@ var FlightLogParser = function(logData) {
         //Predict that this field is minthrottle
         FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR       = 11,
 
+        //Predict that this field is dshot status and other data
+        FLIGHT_LOG_FIELD_PREDICTOR_DSHOT_STATUS_N_VOLTAGE           = 12,
+        FLIGHT_LOG_FIELD_PREDICTOR_DSHOT_STATUS_N_ERPM_FRACTION_18  = 13,
+
         //Home coord predictors appear in pairs (two copies of FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD). Rewrite the second
         //one we see to this to make parsing easier
         FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1   = 256,
 
-        FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB       = 0, // Signed variable-byte
-        FLIGHT_LOG_FIELD_ENCODING_UNSIGNED_VB     = 1, // Unsigned variable-byte
-        FLIGHT_LOG_FIELD_ENCODING_NEG_14BIT       = 3, // Unsigned variable-byte but we negate the value before storing, value is 14 bits
-        FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB       = 6,
-        FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32       = 7,
-        FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16       = 8,
-        FLIGHT_LOG_FIELD_ENCODING_NULL            = 9, // Nothing is written to the file, take value to be zero
-        FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE = 10,
+        FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB                 = 0, // Signed variable-byte
+        FLIGHT_LOG_FIELD_ENCODING_UNSIGNED_VB               = 1, // Unsigned variable-byte
+        FLIGHT_LOG_FIELD_ENCODING_NEG_14BIT                 = 3, // Unsigned variable-byte but we negate the value before storing, value is 14 bits
+        FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB                 = 6,
+        FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32                 = 7,
+        FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16                 = 8,
+        FLIGHT_LOG_FIELD_ENCODING_NULL                      = 9, // Nothing is written to the file, take value to be zero
+        FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE           = 10,
+        FLIGHT_LOG_FIELD_ENCODING_PACK_1F_1F_1F_1G_4U_8U    = 11, // 1 flagBit, 1 flagBit, 1 flagBit, 1 gapBit, 4 unsignedIntBit, 8 unsignedIntBit
 
         FLIGHT_LOG_EVENT_LOG_END = 255,
 
@@ -530,9 +535,9 @@ var FlightLogParser = function(logData) {
     function translateFieldName(fieldName) {
         var translation = translationValues[fieldName];
         if (typeof translation !== 'undefined') {
-        	return translation;
+            return translation;
         } else {
-        	return fieldName;
+            return fieldName;
         }
     }
 
@@ -602,14 +607,14 @@ var FlightLogParser = function(logData) {
                     case "Cleanflight":
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
                         $('html').removeClass('isBaseF');
-    					$('html').addClass('isCF');
+                        $('html').addClass('isCF');
                         $('html').removeClass('isBF');
                         $('html').removeClass('isINAV');
                     break;
                     default:
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
                         $('html').addClass('isBaseF');
-    					$('html').removeClass('isCF');
+                        $('html').removeClass('isCF');
                         $('html').removeClass('isBF');
                         $('html').removeClass('isINAV');
                 }
@@ -946,7 +951,7 @@ var FlightLogParser = function(logData) {
                         $('html').addClass('isINAV');
                     } else {
 
-                    	// Cleanflight 1.x and others
+                        // Cleanflight 1.x and others
                         that.sysConfig.firmwareVersion = '0.0.0';
                         that.sysConfig.firmware        = 0.0;
                         that.sysConfig.firmwarePatch   = 0;
@@ -1110,6 +1115,34 @@ var FlightLogParser = function(logData) {
     }
 
     /**
+     * Debug data interpretation depends on the chosen debug mode encodings and other parameters could need to be fixed  
+     */
+    function assimilateDebugMode(sysConfig, frameDef) {
+        console.log("Debug mode is " + DEBUG_MODE[sysConfig.debug_mode] + ":" + sysConfig.debug_mode);
+        
+        if (DEBUG_MODE[sysConfig.debug_mode].startsWith("DSHOT_STATUS_N_")) {
+            for (let k = 0; k < frameDef.name.length; k++) {
+                if (frameDef.name[k].startsWith("debug")) {
+                    // Assimilate encoding depending on debug mode
+                    frameDef.encoding[k] = FLIGHT_LOG_FIELD_ENCODING_PACK_1F_1F_1F_1G_4U_8U;
+                    
+                    // Assimilate predictor depending on debug mode
+                    switch (DEBUG_MODE[sysConfig.debug_mode]) {
+                    case "DSHOT_STATUS_N_VOLTAGE":
+                        frameDef.predictor[k] = FLIGHT_LOG_FIELD_PREDICTOR_DSHOT_STATUS_N_VOLTAGE;
+                        break;
+                    case "DSHOT_STATUS_N_ERPM_FRACTION_18":
+                        frameDef.predictor[k] = FLIGHT_LOG_FIELD_PREDICTOR_DSHOT_STATUS_N_ERPM_FRACTION_18;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Attempt to parse the frame of into the supplied `current` buffer using the encoding/predictor
      * definitions from `frameDefs`. The previous frame values are used for predictions.
      *
@@ -1123,8 +1156,8 @@ var FlightLogParser = function(logData) {
             predictor = frameDef.predictor,
             encoding = frameDef.encoding,
             values = new Array(8),
-            i, j, groupCount;
-
+            i, j, groupCount, updateCurrent;
+        
         i = 0;
         while (i < frameDef.count) {
             var
@@ -1138,6 +1171,10 @@ var FlightLogParser = function(logData) {
 
                 i++;
             } else {
+                // Update current by default
+                updateCurrent = true;
+                
+                // Decode
                 switch (encoding[i]) {
                     case FLIGHT_LOG_FIELD_ENCODING_SIGNED_VB:
                         value = stream.readSignedVB();
@@ -1158,7 +1195,7 @@ var FlightLogParser = function(logData) {
                         for (j = 0; j < 4; j++, i++)
                             current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
 
-                        continue;
+                        updateCurrent = false;
                     break;
                     case FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32:
                         stream.readTag2_3S32(values);
@@ -1167,7 +1204,7 @@ var FlightLogParser = function(logData) {
                         for (j = 0; j < 3; j++, i++)
                             current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
 
-                        continue;
+                        updateCurrent = false;
                     break;
                     case FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE:
                         stream.readTag2_3SVariable(values);
@@ -1176,7 +1213,7 @@ var FlightLogParser = function(logData) {
                         for (j = 0; j < 3; j++, i++)
                             current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
 
-                        continue;
+                        updateCurrent = false;
                     break;
                     case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
                         //How many fields are in this encoded group? Check the subsequent field encodings:
@@ -1191,7 +1228,20 @@ var FlightLogParser = function(logData) {
                         for (j = 0; j < groupCount; j++, i++)
                             current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], values[j], current, previous, previous2);
 
-                        continue;
+                        updateCurrent = false;
+                    break;
+                    case FLIGHT_LOG_FIELD_ENCODING_PACK_1F_1F_1F_1G_4U_8U:
+                        value = stream.readSignedVB();
+
+                        current[i] = new Array(5);
+                        current[i][0] = ((value & 0x8000) != 0) ? 1 : 0;
+                        current[i][1] = ((value & 0x4000) != 0) ? 1 : 0;
+                        current[i][2] = ((value & 0x2000) != 0) ? 1 : 0;
+                        current[i][3] = (value >> 8) & 0x000F;
+                        current[i][4] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], value & 0x00FF, current, previous, previous2);
+                        i++;
+
+                        updateCurrent = false;
                     break;
                     case FLIGHT_LOG_FIELD_ENCODING_NULL:
                         //Nothing to read
@@ -1204,8 +1254,11 @@ var FlightLogParser = function(logData) {
                             throw "Unsupported field encoding " + encoding[i];
                 }
 
-                current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], value, current, previous, previous2);
-                i++;
+                // Updates current when it is not updated by the decoder path`
+                if (updateCurrent) {
+                    current[i] = applyPrediction(i, raw ? FLIGHT_LOG_FIELD_PREDICTOR_0 : predictor[i], value, current, previous, previous2);
+                    i++;
+                }
             }
         }
     }
@@ -1365,6 +1418,12 @@ var FlightLogParser = function(logData) {
             case FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME:
                 if (mainHistory[1])
                     value += mainHistory[1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_DSHOT_STATUS_N_VOLTAGE:
+                value /= 4;
+            break;
+            case FLIGHT_LOG_FIELD_PREDICTOR_DSHOT_STATUS_N_ERPM_FRACTION_18:
+                value *= 18;
             break;
             default:
                 throw "Unsupported field predictor " + predictor;
@@ -1703,6 +1762,8 @@ var FlightLogParser = function(logData) {
         } else {
             lastSlow = [];
         }
+
+        assimilateDebugMode(that.sysConfig, this.frameDefs.I);
     };
 
     /**
