@@ -207,6 +207,7 @@ var FlightLogParser = function(logData) {
             blackbox_high_resolution:null,          // Blackbox high resolution mode
             thrMid:null,                            // Throttle Mid Position
             thrExpo:null,                           // Throttle Expo
+            tpa_mode:null,                          // TPA Mode
             tpa_breakpoint:null,                    // TPA Breakpoint
             airmode_activate_throttle:null,         // airmode activation level
             serialrx_provider:null,                 // name of the serial rx provider
@@ -610,7 +611,8 @@ var FlightLogParser = function(logData) {
             case "rcRate":
             case "thrMid":
             case "thrExpo":
-            case "dynThrPID":
+            case "tpa_rate":
+            case "tpa_mode":
             case "tpa_breakpoint":
             case "airmode_activate_throttle":
             case "serialrx_provider":
@@ -987,9 +989,11 @@ var FlightLogParser = function(logData) {
                             console.log("Saw unsupported field header \"" + fieldName + "\"");
                     }
                 } else {
-                    console.log("Ignoring unsupported header \"" + fieldName + "\"");
-                    if(that.sysConfig.unknownHeaders==null) that.sysConfig.unknownHeaders = new Array();
-                    that.sysConfig.unknownHeaders.push({ name: fieldName, value: fieldValue });// Save the unknown headers
+                    console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
+                    if (that.sysConfig.unknownHeaders === null) {
+                        that.sysConfig.unknownHeaders = new Array();
+                    }
+                    that.sysConfig.unknownHeaders.push({ name: fieldName, value: fieldValue }); // Save the unknown headers
                 }
             break;
         }
