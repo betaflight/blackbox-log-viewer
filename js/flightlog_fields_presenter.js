@@ -122,6 +122,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Debug [1]',
             'debug[2]':'Debug [2]',
             'debug[3]':'Debug [3]',
+            'debug[4]':'Debug [4]',
+            'debug[5]':'Debug [5]',
+            'debug[6]':'Debug [6]',
+            'debug[7]':'Debug [7]',
         },
         'CYCLETIME' : {
             'debug[all]':'Debug Cycle Time',
@@ -129,6 +133,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'CPU Load',
             'debug[2]':'Motor Update',
             'debug[3]':'Motor Deviation',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'BATTERY' : {
             'debug[all]':'Debug Battery',
@@ -136,6 +144,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Battery Volt',
             'debug[2]':'Not Used',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GYRO' : {
             'debug[all]':'Debug Gyro',
@@ -143,6 +155,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Raw [Y]',
             'debug[2]':'Gyro Raw [Z]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GYRO_FILTERED' : {
             'debug[all]':'Debug Gyro Filtered',
@@ -150,6 +166,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Filtered [Y]',
             'debug[2]':'Gyro Filtered [Z]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ACCELEROMETER' : {
             'debug[all]':'Debug Accel.',
@@ -157,6 +177,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Accel. Raw [Y]',
             'debug[2]':'Accel. Raw [Z]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'MIXER' : {
             'debug[all]':'Debug Mixer',
@@ -164,6 +188,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Roll-Pitch-Yaw Mix [1]',
             'debug[2]':'Roll-Pitch-Yaw Mix [2]',
             'debug[3]':'Roll-Pitch-Yaw Mix [3]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'PIDLOOP' : {
             'debug[all]':'Debug PID',
@@ -171,6 +199,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Sub Update Time',
             'debug[2]':'PID Update Time',
             'debug[3]':'Motor Update Time',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'NOTCH' : {
             'debug[all]':'Debug Notch',
@@ -178,6 +210,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Pre-Notch [pitch]',
             'debug[2]':'Gyro Pre-Notch [yaw]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GYRO_SCALED' : {
             'debug[all]':'Debug Gyro Scaled',
@@ -185,6 +221,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Scaled [pitch]',
             'debug[2]':'Gyro Scaled [yaw]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RC_INTERPOLATION' : {
             'debug[all]':'Debug RC Interpolation',
@@ -192,6 +232,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Current RX Refresh Rate',
             'debug[2]':'Interpolation Step Count',
             'debug[3]':'RC Setpoint [roll]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DTERM_FILTER' : {
             'debug[all]':'Debug Filter',
@@ -199,6 +243,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'DTerm Filter [pitch]',
             'debug[2]':'Not Used',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ANGLERATE' : {
             'debug[all]':'Debug Angle Rate',
@@ -206,6 +254,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Angle Rate[pitch]',
             'debug[2]':'Angle Rate[yaw]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ESC_SENSOR' : {
             'debug[all]':'ESC Sensor',
@@ -213,6 +265,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Timeouts',
             'debug[2]':'CNC errors',
             'debug[3]':'Data age',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'SCHEDULER' : {
             'debug[all]':'Scheduler',
@@ -220,6 +276,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Not Used',
             'debug[2]':'Schedule Time',
             'debug[3]':'Function Exec Time',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'STACK' : {
             'debug[all]':'Stack',
@@ -227,6 +287,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Stack Low Mem',
             'debug[2]':'Stack Current',
             'debug[3]':'Stack p',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ESC_SENSOR_RPM' : {
             'debug[all]':'ESC Sensor RPM',
@@ -234,6 +298,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Motor 2',
             'debug[2]':'Motor 3',
             'debug[3]':'Motor 4',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ESC_SENSOR_TMP' : {
             'debug[all]':'ESC Sensor Temp',
@@ -241,6 +309,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Motor 2',
             'debug[2]':'Motor 3',
             'debug[3]':'Motor 4',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ALTITUDE' : {
             'debug[all]':'Altitude',
@@ -248,6 +320,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Baro Altitude',
             'debug[2]':'GPS Altitude',
             'debug[3]':'Vario',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'FFT' : {
             'debug[all]':'Debug FFT',
@@ -255,6 +331,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Pre-Dyn [dbg-axis]',
             'debug[2]':'Gyro Downsampled [roll]',
             'debug[3]':'FFT Center Index [roll]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'FFT_TIME' : {
             'debug[all]':'Debug FFT TIME',
@@ -262,6 +342,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Step duration',
             'debug[2]':'Additional steps',
             'debug[3]':'Not used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'FFT_FREQ' : {
             'debug[all]':'Debug FFT FREQ',
@@ -269,6 +353,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Center Freq [pitch]',
             'debug[2]':'Gyro Pre-Dyn [dbg-axis]',
             'debug[3]':'Gyro Scaled [dbg-axis]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_FRSKY_SPI' : {
             'debug[all]':'FrSky SPI Rx',
@@ -276,6 +364,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Packet',
             'debug[2]':'Missing Packets',
             'debug[3]':'State',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_SFHSS_SPI' : {
             'debug[all]':'SFHSS SPI Rx',
@@ -283,6 +375,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Missing Frame',
             'debug[2]':'Offset Max',
             'debug[3]':'Offset Min',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GYRO_RAW' : {
             'debug[all]':'Debug Gyro Raw',
@@ -290,6 +386,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Raw [Y]',
             'debug[2]':'Gyro Raw [Z]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DUAL_GYRO' : {
             'debug[all]':'Debug Dual Gyro',
@@ -297,6 +397,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro 1 Filtered [pitch]',
             'debug[2]':'Gyro 2 Filtered [roll]',
             'debug[3]':'Gyro 2 Filtered [pitch]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DUAL_GYRO_RAW': {
             'debug[all]':'Debug Dual Gyro Raw',
@@ -304,6 +408,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro 1 Raw [pitch]',
             'debug[2]':'Gyro 2 Raw [roll]',
             'debug[3]':'Gyro 2 Raw [pitch]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DUAL_GYRO_COMBINED': {
             'debug[all]':'Debug Dual Combined',
@@ -311,6 +419,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Filtered [roll]',
             'debug[2]':'Gyro Filtered [pitch]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DUAL_GYRO_DIFF': {
             'debug[all]':'Debug Dual Gyro Diff',
@@ -318,6 +430,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro Diff [pitch]',
             'debug[2]':'Gyro Diff [yaw]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'MAX7456_SIGNAL' : {
             'debug[all]':'Max7456 Signal',
@@ -325,6 +441,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Sense',
             'debug[2]':'ReInit',
             'debug[3]':'Rows',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'MAX7456_SPICLOCK' : {
             'debug[all]':'Max7456 SPI Clock',
@@ -332,6 +452,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'DevType',
             'debug[2]':'Divisor',
             'debug[3]':'not used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'SBUS' : {
             'debug[all]':'SBus Rx',
@@ -339,6 +463,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'State Flags',
             'debug[2]':'Frame Time',
             'debug[3]':'not used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'FPORT' : {
             'debug[all]':'FPort Rx',
@@ -346,6 +474,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Frame Errors',
             'debug[2]':'Last Error',
             'debug[3]':'Telemetry Interval',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RANGEFINDER' : {
             'debug[all]':'Rangefinder',
@@ -353,6 +485,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Raw Altitude',
             'debug[2]':'Calc Altituded',
             'debug[3]':'SNR',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RANGEFINDER_QUALITY' : {
             'debug[all]':'Rangefinder Quality',
@@ -360,6 +496,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'SNR Threshold Reached',
             'debug[2]':'Dyn Distance Threshold',
             'debug[3]':'Is Surface Altitude Valid',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'LIDAR_TF' : {
             'debug[all]':'Lidar TF',
@@ -367,6 +507,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Strength',
             'debug[2]':'TF Frame (4)',
             'debug[3]':'TF Frame (5)',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ADC_INTERNAL' : {
             'debug[all]':'ADC Internal',
@@ -374,6 +518,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'VRef Internal Sample',
             'debug[2]':'Temp Sensor Sample',
             'debug[3]':'Vref mV',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RUNAWAY_TAKEOFF' : {
             'debug[all]':'Runaway Takeoff',
@@ -381,6 +529,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Activating Delay',
             'debug[2]':'Deactivating Delay',
             'debug[3]':'Deactivating Time',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'CURRENT_SENSOR' : {
             'debug[all]':'Current Sensor',
@@ -388,6 +540,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'centiAmps',
             'debug[2]':'Amps Latest',
             'debug[3]':'mAh Drawn',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'USB' : {
             'debug[all]':'USB',
@@ -395,6 +551,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'VCP Connected',
             'debug[2]':'not used',
             'debug[3]':'not used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'SMART AUDIO' : {
             'debug[all]':'Smart Audio VTx',
@@ -402,6 +562,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Channel',
             'debug[2]':'Frequency',
             'debug[3]':'Power',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RTH' : {
             'debug[all]':'RTH',
@@ -409,6 +573,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Rescue Angle',
             'debug[2]':'Altitude Adjustment',
             'debug[3]':'Rescue State',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ITERM_RELAX' : {
             'debug[all]':'I-term Relax',
@@ -416,6 +584,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'I Relax Factor [roll]',
             'debug[2]':'Relaxed I Error [roll]',
             'debug[3]':'Axis Error [roll]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ACRO_TRAINER' : {
             'debug[all]':'Acro Trainer (a_t_axis)',
@@ -423,6 +595,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Axis State',
             'debug[2]':'Correction amount',
             'debug[3]':'Projected Angle * 10 [deg]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RC_SMOOTHING' : {
             'debug[all]':'Debug RC Smoothing',
@@ -430,6 +606,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Raw RC Derivative',
             'debug[2]':'Smoothed RC Derivative',
             'debug[3]':'RX Refresh Rate',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_SIGNAL_LOSS' : {
             'debug[all]':'Rx Signal Loss',
@@ -437,6 +617,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Failsafe',
             'debug[2]':'Not used',
             'debug[3]':'Throttle',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RC_SMOOTHING_RATE' : {
             'debug[all]':'Debug RC Smoothing Rate',
@@ -444,6 +628,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Training Step Count',
             'debug[2]':'Average RX Refresh Rate',
             'debug[3]':'Sampling State',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ANTI_GRAVITY' : {
             'debug[all]':'I-term Relax',
@@ -451,6 +639,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Final I gain * 1000',
             'debug[2]':'P gain [roll] * 1000',
             'debug[3]':'P gain [pitch] * 1000',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DYN_LPF' : {
             'debug[all]':'Debug Dyn LPF',
@@ -458,6 +650,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Notch Center [roll]',
             'debug[2]':'Lowpass Cutoff',
             'debug[3]':'Gyro Pre-Dyn [dbg-axis]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DSHOT_RPM_TELEMETRY' : {
             'debug[all]':'DShot Telemetry RPM',
@@ -465,6 +661,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Motor 2 - DShot',
             'debug[2]':'Motor 3 - DShot',
             'debug[3]':'Motor 4 - DShot',
+            'debug[4]':'Motor 5 - DShot',
+            'debug[5]':'Motor 6 - DShot',
+            'debug[6]':'Motor 7 - DShot',
+            'debug[7]':'Motor 8 - DShot',
         },
         'RPM_FILTER' : {
             'debug[all]':'RPM Filter',
@@ -472,6 +672,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Motor 2 - rpmFilter',
             'debug[2]':'Motor 3 - rpmFilter',
             'debug[3]':'Motor 4 - rpmFilter',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'D_MIN' : {
             'debug[all]':'D_MIN',
@@ -479,6 +683,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Setpoint Factor [roll]',
             'debug[2]':'Actual D [roll]',
             'debug[3]':'Actual D [pitch]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'AC_CORRECTION' : {
             'debug[all]':'AC Correction',
@@ -486,6 +694,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'AC Correction [pitch]',
             'debug[2]':'AC Correction [yaw]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'AC_ERROR' : {
             'debug[all]':'AC Error',
@@ -493,6 +705,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'AC Error [pitch]',
             'debug[2]':'AC Error [yaw]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DUAL_GYRO_SCALED' : {
             'debug[all]':'Dual Gyro Scaled',
@@ -500,6 +716,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Gyro 1 [pitch]',
             'debug[2]':'Gyro 2 [roll]',
             'debug[3]':'Gyro 2 [pitch]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DSHOT_RPM_ERRORS' : {
             'debug[all]':'DSHOT RPM Error',
@@ -507,6 +727,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'DSHOT RPM Error [2]',
             'debug[2]':'DSHOT RPM Error [3]',
             'debug[3]':'DSHOT RPM Error [4]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'CRSF_LINK_STATISTICS_UPLINK' : {
             'debug[all]':'CRSF Stats Uplink',
@@ -514,6 +738,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Uplink RSSI 2',
             'debug[2]':'Uplink Link Quality',
             'debug[3]':'RF Mode',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'CRSF_LINK_STATISTICS_PWR' : {
             'debug[all]':'CRSF Stats Power',
@@ -521,6 +749,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'SNR',
             'debug[2]':'TX Power',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'CRSF_LINK_STATISTICS_DOWN' : {
             'debug[all]':'CRSF Stats Downlink',
@@ -528,6 +760,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Downlink Link Quality',
             'debug[2]':'Downlink SNR',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'BARO' : {
             'debug[all]':'Debug Barometer',
@@ -535,6 +771,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Baro Temperature',
             'debug[2]':'Baro Pressure',
             'debug[3]':'Baro Pressure Sum',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GPS_RESCUE_THROTTLE_PID' : {
             'debug[all]':'GPS Rescue Throttle PID',
@@ -542,6 +782,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Throttle I',
             'debug[2]':'Throttle D',
             'debug[3]':'Z Velocity',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'DYN_IDLE' : {
             'debug[all]':'Dyn Idle',
@@ -549,6 +793,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Target RPS Change Rate',
             'debug[2]':'Error',
             'debug[3]':'Min RPM',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'FF_LIMIT' : {
             'debug[all]':'FF Limit',
@@ -556,6 +804,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'FF input [pitch]',
             'debug[2]':'FF limited [roll]',
             'debug[3]':'Not Used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'FF_INTERPOLATED' : {
             'debug[all]':'FF Interpolated [roll]',
@@ -563,6 +815,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Boost amount [roll]',
             'debug[2]':'Boost amount, clipped [roll]',
             'debug[3]':'Clip amount [roll]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'BLACKBOX_OUTPUT' : {
             'debug[all]':'Blackbox Output',
@@ -570,6 +826,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Blackbox Max Rate',
             'debug[2]':'Dropouts',
             'debug[3]':'Tx Bytes Free',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GYRO_SAMPLE' : {
             'debug[all]':'Gyro Sample',
@@ -577,6 +837,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'After downsampling',
             'debug[2]':'After RPM',
             'debug[3]':'After all but Dyn Notch',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_TIMING' : {
             'debug[all]':'Receiver Timing (us)',
@@ -584,6 +848,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Frame Age',
             'debug[2]':'not used',
             'debug[3]':'not used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'D_LPF' : {
             'debug[all]':'D-Term [D_LPF]',
@@ -591,6 +859,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Unfiltered D [pitch]',
             'debug[2]':'Filtered, with DMax [roll]',
             'debug[3]':'Filtered, with DMax [pitch]',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'VTX_TRAMP' : {
             'debug[all]':'Tramp VTx',
@@ -598,6 +870,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Reply Code',
             'debug[2]':'Pit Mode',
             'debug[3]':'Retry Count',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GHST' : {
             'debug[all]':'Ghost Rx',
@@ -605,6 +881,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Unknown Frame Count',
             'debug[2]':'RSSI',
             'debug[3]':'Link Quality',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GHST_MSP' : {
             'debug[all]':'Ghost MSP',
@@ -612,6 +892,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'MSP Frame Counter',
             'debug[2]':'Not used',
             'debug[3]':'Not used',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'SCHEDULER_DETERMINISM' : {
             'debug[all]':'Scheduler Determinism',
@@ -619,6 +903,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'ID of Late Task',
             'debug[2]':'Task Delay Time',
             'debug[3]':'Gyro Clock Skew',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'TIMING_ACCURACY' : {
             'debug[all]':'Timing Accuracy',
@@ -626,6 +914,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Late Tasks per second',
             'debug[2]':'Total delay in last second',
             'debug[3]':'Total Tasks per second',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_EXPRESSLRS_SPI' : {
             'debug[all]':'ExpressLRS SPI Rx',
@@ -633,6 +925,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'RSSI',
             'debug[2]':'SNR',
             'debug[3]':'Uplink LQ',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_EXPRESSLRS_PHASELOCK' : {
             'debug[all]':'ExpressLRS SPI Phaselock',
@@ -640,6 +936,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Filtered phase offset',
             'debug[2]':'Frequency Offset',
             'debug[3]':'Phase Shift',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'RX_STATE_TIME' : {
             'debug[all]':'Rx State Time',
@@ -647,6 +947,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Time 1',
             'debug[2]':'Time 2',
             'debug[3]':'Time 3',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GPS_RESCUE_VELOCITY' : {
             'debug[all]':'GPS Rescue Velocity',
@@ -654,6 +958,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Velocity D',
             'debug[2]':'Velocity to Home',
             'debug[3]':'Target Velocity',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GPS_RESCUE_HEADING' : {
             'debug[all]':'GPS Rescue Heading',
@@ -661,6 +969,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'GPS Heading',
             'debug[2]':'IMU Attitude',
             'debug[3]':'Angle to home',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GPS_RESCUE_TRACKING' : {
             'debug[all]':'GPS Rescue Tracking',
@@ -668,6 +980,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'Target velocity',
             'debug[2]':'Altitude',
             'debug[3]':'Target altitude',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
@@ -675,6 +991,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'accADC Y',
             'debug[2]':'Setpoint Roll',
             'debug[3]':'Setpoint Pitch',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'VTX_MSP' : {
             'debug[all]': 'VTX MSP',
@@ -682,6 +1002,10 @@ function FlightLogFieldPresenter() {
             'debug[1]': 'isCrsfPortConfig',
             'debug[2]': 'isLowPowerDisarmed',
             'debug[3]': 'mspTelemetryDescriptor',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
         'GPS_DOP' : {
             'debug[all]': 'GPS Dilution of Precision',
@@ -689,6 +1013,10 @@ function FlightLogFieldPresenter() {
             'debug[1]': 'pDOP (positional - 3D)',
             'debug[2]': 'hDOP (horizontal - 2D)',
             'debug[3]': 'vDOP (vertical - 1D)',
+            'debug[4]':'Not Used',
+            'debug[5]':'Not Used',
+            'debug[6]':'Not Used',
+            'debug[7]':'Not Used',
         },
     };
 
@@ -706,6 +1034,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Baro Pressure',
                     'debug[2]':'Baro Temperature',
                     'debug[3]':'Baro Altitude',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.RTH = {
                     'debug[all]':'RTH Rescue codes',
@@ -713,6 +1045,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Rescue Phase',
                     'debug[2]':'Failure code',
                     'debug[3]':'Failure timers',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
                     'debug[all]':'GPS Rescue throttle PIDs',
@@ -720,6 +1056,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Throttle D',
                     'debug[2]':'Altitude',
                     'debug[3]':'Target altitude',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
             } else if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
@@ -728,6 +1068,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Delta, smoothed [roll]',
                     'debug[2]':'Boost, smoothed [roll]',
                     'debug[3]':'rcCommand Delta [roll]',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD_LIMIT = {
                     'debug[all]':'Feedforward Limit [roll]',
@@ -735,6 +1079,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Feedforward input [pitch]',
                     'debug[2]':'Feedforward limited [roll]',
                     'debug[3]':'Not Used',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.DYN_IDLE = {
                     'debug[all]':'Dyn Idle',
@@ -742,6 +1090,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Dyn Idle I [roll]',
                     'debug[2]':'Dyn Idle D [roll]',
                     'debug[3]':'Min RPM',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.FFT = {
                     'debug[all]':'Debug FFT',
@@ -749,6 +1101,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Gyro Post Dyn Notch [dbg-axis]',
                     'debug[2]':'Gyro Downsampled [dbg-axis]',
                     'debug[3]':'Not used',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.FFT_TIME = {
                     'debug[all]':'Debug FFT TIME',
@@ -756,6 +1112,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Step duration',
                     'debug[2]':'Not used',
                     'debug[3]':'Not used',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
                     'debug[all]':'Debug FFT FREQ',
@@ -763,6 +1123,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Notch 2 Center Freq [dbg-axis]',
                     'debug[2]':'Notch 3 Center Freq [dbg-axis]',
                     'debug[3]':'Gyro Pre Dyn Notch [dbg-axis]',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
                     'debug[all]':'GPS Rescue Altitude',
@@ -770,6 +1134,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Throttle D',
                     'debug[2]':'Altitude',
                     'debug[3]':'Target Altitude',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
             } else if (semver.gte(firmwareVersion, '4.2.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
@@ -778,6 +1146,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Acceleration [roll]',
                     'debug[2]':'Acceleration, clipped [roll]',
                     'debug[3]':'Duplicate Counter [roll]',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
             } else if (semver.gte(firmwareVersion, '4.1.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
@@ -786,6 +1158,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'Boost [roll]',
                     'debug[2]':'Boost, clipped [roll]',
                     'debug[3]':'Duplicate Counter [roll]',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
                 DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
                     'debug[all]':'Feedforward Limit [roll]',
@@ -793,6 +1169,10 @@ function FlightLogFieldPresenter() {
                     'debug[1]':'FF limit input [pitch]',
                     'debug[2]':'FF limited [roll]',
                     'debug[3]':'Not Used',
+                    'debug[4]':'Not Used',
+                    'debug[5]':'Not Used',
+                    'debug[6]':'Not Used',
+                    'debug[7]':'Not Used',
                 };
             }
         }
@@ -856,7 +1236,7 @@ function FlightLogFieldPresenter() {
      * to the user selected measurement unit.
      * @param altitude String: Altitude in meters.
      * @param altitudeUnits Integer: 1 for meters, 2 for feet.
-     * 
+     *
      * @returns String: readable meters in selected unit.
      */
 
@@ -1026,6 +1406,10 @@ function FlightLogFieldPresenter() {
             case 'debug[1]':
             case 'debug[2]':
             case 'debug[3]':
+            case 'debug[4]':
+            case 'debug[5]':
+            case 'debug[6]':
+            case 'debug[7]':
                 return FlightLogFieldPresenter.decodeDebugFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
 
             default:
