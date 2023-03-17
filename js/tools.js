@@ -449,18 +449,17 @@ function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
     }
 }
 
-function getManifestVersion(manifest) {
+function getManifestVersion() {
     try {
-        if (!manifest) {
-            manifest = chrome.runtime.getManifest();
+        const manifest = chrome.runtime.getManifest();
+        const version = manifest.version;
+        const gitRevision = manifest.gitRevision;
+
+        if (gitRevision === undefined) {
+            return version;
         }
 
-        var version = manifest.version_name;
-        if (!version) {
-            version = manifest.version;
-        }
-
-        return version;
+        return `${version}-${gitRevision}`;
 
     } catch (error) {
         console.log("manifest does not exist, probably not running nw.js");

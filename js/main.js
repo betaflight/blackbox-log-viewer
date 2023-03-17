@@ -1051,17 +1051,16 @@ function BlackboxLogViewer() {
         $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
         $(".viewer-version", statusBar).text('v'+VIEWER_VERSION);
         try {
-            $.getJSON('https://api.github.com/repos/betaflight/blackbox-log-viewer/releases/latest',{},function(data){
+            $.getJSON('https://api.github.com/repos/betaflight/blackbox-log-viewer/releases/latest', {}, function(data) {
                 latestVersion = data;
-                if(latestVersion) {
+                if (latestVersion) {
                     $(".btn-viewer-download").text(latestVersion.tag_name);
                     $(".viewer-download").show();
                 } else {
                     $(".viewer-download").hide();
                 }
-                });
-        } catch (e) 
-        {
+            });
+        } catch (e) {
             console.log('Cannot get latest version information');
             $(".viewer-download").hide();
         }
