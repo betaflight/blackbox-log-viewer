@@ -68,6 +68,16 @@ function FlightLogFieldPresenter() {
         'motor[6]': 'Motor [7]',
         'motor[7]': 'Motor [8]',
 
+        'RPM[all]': 'RPM',
+        'RPM[0]': 'RPM [1]',
+        'RPM[1]': 'RPM [2]',
+        'RPM[2]': 'RPM [3]',
+        'RPM[3]': 'RPM [4]',
+        'RPM[4]': 'RPM [5]',
+        'RPM[5]': 'RPM [6]',
+        'RPM[6]': 'RPM [7]',
+        'RPM[7]': 'RPM [8]',
+
         'servo[all]': 'Servos',
         'servo[5]': 'Servo Tail',
 
@@ -1289,6 +1299,16 @@ function FlightLogFieldPresenter() {
             case 'motor[6]':
             case 'motor[7]':
                 return `${flightLog.rcMotorRawToPctPhysical(value).toFixed(2)} %`;
+
+            case 'RPM[0]':
+            case 'RPM[1]':
+            case 'RPM[2]':
+            case 'RPM[3]':
+            case 'RPM[4]':
+            case 'RPM[5]':
+            case 'RPM[6]':
+            case 'RPM[7]':
+                return (value * 200 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + " rpm / " + (value * 3.333 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + ' hz';
 
             case 'rcCommands[0]':
             case 'rcCommands[1]':
