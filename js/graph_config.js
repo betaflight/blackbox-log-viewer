@@ -268,7 +268,17 @@ GraphConfig.load = function(config) {
                     outputRange: 1.0,
                 };
             } else if (fieldName.match(/^RPM\[/)) {
-                return getCurveForMinMaxFields('RPM[0]', 'RPM[1]', 'RPM[2]', 'RPM[3]', 'RPM[4]', 'RPM[5]', 'RPM[6]', 'RPM[7]');
+                let mm = getMinMaxForFields.apply(null, ['eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]']);
+                let toSecPerRound = flightLog.getSysConfig()['motor_poles'] * 1e-6 / 2;
+                let rpmMax = 60 / (mm.min * toSecPerRound);
+                return {
+                    offset: -rpmMax / 2,
+                    power: 1.0,
+                    inputRange: Math.max(rpmMax / 2, 5000.0),
+                    outputRange: 1.0
+                };
+            } else if (fieldName.match(/^eInterval\[/)) {
+                return getCurveForMinMaxFields('eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]');
             } else if (fieldName.match(/^servo\[/)) {
                 return {
                     offset: -1500,

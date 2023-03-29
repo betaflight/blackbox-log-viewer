@@ -68,6 +68,17 @@ function FlightLogFieldPresenter() {
         'motor[6]': 'Motor [7]',
         'motor[7]': 'Motor [8]',
 
+        'eInterval[all]': 'Motor rotation Interval',
+        'eInterval[0]': 'Rotation Interval [1]',
+        'eInterval[1]': 'Rotation Interval [2]',
+        'eInterval[2]': 'Rotation Interval [3]',
+        'eInterval[3]': 'Rotation Interval [4]',
+        'eInterval[4]': 'Rotation Interval [5]',
+        'eInterval[5]': 'Rotation Interval [6]',
+        'eInterval[6]': 'Rotation Interval [7]',
+        'eInterval[7]': 'Rotation Interval [8]',
+
+        //Virtual field
         'RPM[all]': 'RPM',
         'RPM[0]': 'RPM [1]',
         'RPM[1]': 'RPM [2]',
@@ -1300,6 +1311,16 @@ function FlightLogFieldPresenter() {
             case 'motor[7]':
                 return `${flightLog.rcMotorRawToPctPhysical(value).toFixed(2)} %`;
 
+            case 'eInterval[0]':
+            case 'eInterval[1]':
+            case 'eInterval[2]':
+            case 'eInterval[3]':
+            case 'eInterval[4]':
+            case 'eInterval[5]':
+            case 'eInterval[6]':
+            case 'eInterval[7]':
+                return (value * flightLog.getSysConfig()['motor_poles'] / 2000).toFixed(3) + " ms";
+
             case 'RPM[0]':
             case 'RPM[1]':
             case 'RPM[2]':
@@ -1308,7 +1329,7 @@ function FlightLogFieldPresenter() {
             case 'RPM[5]':
             case 'RPM[6]':
             case 'RPM[7]':
-                return (value * 200 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + " rpm / " + (value * 3.333 / flightLog.getSysConfig()['motor_poles']).toFixed(0) + ' hz';
+                return (value).toFixed(0) + " rpm / " + (value / 60).toFixed(1) + " hz";
 
             case 'rcCommands[0]':
             case 'rcCommands[1]':

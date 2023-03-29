@@ -11,8 +11,7 @@
  */
 function FlightLog(logData) {
     var
-        ADDITIONAL_COMPUTED_FIELD_COUNT = 15, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/
-
+        ADDITIONAL_COMPUTED_FIELD_COUNT = 23, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + RPM **/
         that = this,
         logIndex = false,
         logIndexes = new FlightLogIndex(logData),
@@ -241,6 +240,15 @@ function FlightLog(logData) {
         }
         if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
             fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
+        }
+        if (!that.isFieldDisabled().RPM) {
+            for (let i = 0; i < MAX_MOTOR_NUMBER; i++) {
+                if (fieldNames.find(element => element === `eInterval[${i}]`)) {
+                    fieldNames.push(`RPM[${i}]`);
+                } else {
+                    break;
+                }
+            }
         }
 
         fieldNameToIndex = {};
@@ -557,6 +565,9 @@ function FlightLog(logData) {
                          [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"]],
                          [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"]]];
 
+        let rpm = [fieldNameToIndex["eInterval[0]"], fieldNameToIndex["eInterval[1]"], fieldNameToIndex["eInterval[2]"], fieldNameToIndex["eInterval[3]"],
+                     fieldNameToIndex["eInterval[4]"], fieldNameToIndex["eInterval[5]"], fieldNameToIndex["eInterval[6]"], fieldNameToIndex["eInterval[7]"]]
+
         let sourceChunkIndex;
         let destChunkIndex;
         let attitude;
@@ -590,6 +601,10 @@ function FlightLog(logData) {
 
         if (!axisPID[0]) {
             axisPID = false;
+        }
+
+        if (!rpm[0]) {
+            rpm = false;
         }
 
         sourceChunkIndex = 0;
@@ -683,6 +698,15 @@ function FlightLog(logData) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
                             destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
+                        }
+                    }
+
+                    // Convert electrical intervals into RPM values for the RPM field
+                    if (rpm) {
+                        let polePairs = sysConfig['motor_poles'] / 2;
+                        let toSecPerRound = polePairs * 1e-6;
+                        for (let motorNumber = 0; motorNumber < numMotors; motorNumber++) {
+                            destFrame[fieldIndex++] = 60 / (srcFrame[rpm[motorNumber]] * toSecPerRound);
                         }
                     }
 
