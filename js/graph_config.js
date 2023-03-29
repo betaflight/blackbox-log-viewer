@@ -267,6 +267,8 @@ GraphConfig.load = function(config) {
                         DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                     outputRange: 1.0,
                 };
+            } else if (fieldName.match(/^RPM\[/)) {
+                return getCurveForMinMaxFields('RPM[0]', 'RPM[1]', 'RPM[2]', 'RPM[3]', 'RPM[4]', 'RPM[5]', 'RPM[6]', 'RPM[7]');
             } else if (fieldName.match(/^servo\[/)) {
                 return {
                     offset: -1500,
