@@ -43,6 +43,8 @@ function FlightLogIndex(logData) {
                     times: [],
                     offsets: [],
                     avgThrottle: [],
+                    maxRC: [],
+                    maxMotorDiff: [],
                     initialIMU: [],
                     initialSlow: [],
                     initialGPSHome: [],
@@ -57,8 +59,12 @@ function FlightLogIndex(logData) {
                 
                 iframeCount = 0,
                 motorFields = [],
+                maxRCFields = [],
                 matches,
                 throttleTotal,
+                rcTotal,
+                maxMotor,
+                minMotor,
                 eventInThisChunk = null,
                 parsedHeader,
                 sawEndMarker = false;
@@ -91,6 +97,14 @@ function FlightLogIndex(logData) {
                 for (var j = 0; j < 8; j++) {
                     if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {
                         motorFields.push(mainFrameDef.nameToIndex["motor[" + j + "]"]);
+                    }
+                }
+
+                for (var j = 0; j < 3; j++) {
+                    if (mainFrameDef.nameToIndex["rcCommand[" + j + "]"] !== undefined) {
+                        maxRCFields.push(mainFrameDef.nameToIndex["rcCommand[" + j + "]"]);
+                    } else {
+                        console.log("RCField not found");
                     }
                 }
                 
@@ -127,11 +141,24 @@ function FlightLogIndex(logData) {
                                     
                                     if (motorFields.length) {
                                         throttleTotal = 0;
+                                        maxMotor = 0;
+                                        minMotor = 2000;
                                         for (var j = 0; j < motorFields.length; j++) {
+                                            maxMotor = Math.max(frame[motorFields[j]], maxMotor);
+                                            minMotor = Math.min(frame[motorFields[j]], minMotor);
                                             throttleTotal += frame[motorFields[j]];
                                         }
                                         
+                                        intraIndex.maxMotorDiff.push(maxMotor - minMotor);
                                         intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
+                                    }
+                                    if (maxRCFields.length) {
+                                        rcTotal = 0;
+                                        for (var j = 0; j < maxRCFields.length; j++) {
+                                            rcTotal += Math.max(rcTotal,Math.abs(frame[maxRCFields[j]]));
+                                        }
+
+                                        intraIndex.maxRC.push(rcTotal);
                                     }
                                     
                                     /* To enable seeking to an arbitrary point in the log without re-reading anything
@@ -234,7 +261,9 @@ function FlightLogIndex(logData) {
                     offsets: new Array(sourceIndex.offsets.length),
                     minTime: sourceIndex.minTime,
                     maxTime: sourceIndex.maxTime,
-                    avgThrottle: new Array(sourceIndex.avgThrottle.length)
+                    avgThrottle: new Array(sourceIndex.avgThrottle.length),
+                    maxRC: new Array(sourceIndex.maxRC.length),
+                    maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length)
                 };
             
             if (sourceIndex.times.length > 0) {
@@ -261,7 +290,16 @@ function FlightLogIndex(logData) {
                     resultIndex.avgThrottle[j] = sourceIndex.avgThrottle[j] - 1000;
                 }
             }
-            
+            if (sourceIndex.maxRC.length > 0) {
+                for (j = 0; j < sourceIndex.maxRC.length; j++) {
+                    resultIndex.maxRC[j] = sourceIndex.maxRC[j] * 20 - 1000;
+                }
+            }
+            if (sourceIndex.maxMotorDiff.length > 0) {
+                for (j = 0; j < sourceIndex.maxRC.length; j++) {
+                    resultIndex.maxMotorDiff[j] = sourceIndex.maxMotorDiff[j] * 20 - 1000;
+                }
+            }            
             resultIndexes[i] = resultIndex;
         }
         
