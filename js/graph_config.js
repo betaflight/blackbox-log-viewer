@@ -275,7 +275,7 @@ GraphConfig.load = function(config) {
                     offset: -rpmMax / 2,
                     power: 1.0,
                     inputRange: Math.max(rpmMax / 2, 5000.0),
-                    outputRange: 1.0
+                    outputRange: 1.0,
                 };
             } else if (fieldName.match(/^eInterval\[/)) {
                 let fieldSettings = getCurveForMinMaxFieldsZeroOffset('eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]');

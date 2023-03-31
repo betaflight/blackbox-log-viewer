@@ -566,7 +566,7 @@ function FlightLog(logData) {
                          [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"]]];
 
         let rpm = [fieldNameToIndex["eInterval[0]"], fieldNameToIndex["eInterval[1]"], fieldNameToIndex["eInterval[2]"], fieldNameToIndex["eInterval[3]"],
-                     fieldNameToIndex["eInterval[4]"], fieldNameToIndex["eInterval[5]"], fieldNameToIndex["eInterval[6]"], fieldNameToIndex["eInterval[7]"]]
+             fieldNameToIndex["eInterval[4]"], fieldNameToIndex["eInterval[5]"], fieldNameToIndex["eInterval[6]"], fieldNameToIndex["eInterval[7]"]];
 
         let sourceChunkIndex;
         let destChunkIndex;
