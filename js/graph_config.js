@@ -268,7 +268,7 @@ GraphConfig.load = function(config) {
                     outputRange: 1.0,
                 };
             } else if (fieldName.match(/^RPM\[/)) {
-                let mm = getMinMaxForFields.apply(null, ['eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]']);
+                let mm = getMinMaxForFields('eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]');
                 let toSecPerRound = flightLog.getSysConfig()['motor_poles'] * 1e-6 / 2;
                 let rpmMax = 60 / (mm.min * toSecPerRound);
                 return {
@@ -278,7 +278,9 @@ GraphConfig.load = function(config) {
                     outputRange: 1.0
                 };
             } else if (fieldName.match(/^eInterval\[/)) {
-                return getCurveForMinMaxFields('eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]');
+                let fieldSettings = getCurveForMinMaxFieldsZeroOffset('eInterval[0]', 'eInterval[1]', 'eInterval[2]', 'eInterval[3]', 'eInterval[4]', 'eInterval[5]', 'eInterval[6]', 'eInterval[7]');
+                fieldSettings.power = 0.01;
+                return fieldSettings;
             } else if (fieldName.match(/^servo\[/)) {
                 return {
                     offset: -1500,
