@@ -100,7 +100,7 @@ function FlightLogIndex(logData) {
                     }
                 }
 
-                for (var j = 0; j < 3; j++) {
+                for (let j = 0; j < 3; j++) {
                     if (mainFrameDef.nameToIndex["rcCommand[" + j + "]"] !== undefined) {
                         maxRCFields.push(mainFrameDef.nameToIndex["rcCommand[" + j + "]"]);
                     } else {
@@ -143,7 +143,7 @@ function FlightLogIndex(logData) {
                                         throttleTotal = 0;
                                         maxMotor = 0;
                                         minMotor = 2000;
-                                        for (var j = 0; j < motorFields.length; j++) {
+                                        for (let j = 0; j < motorFields.length; j++) {
                                             maxMotor = Math.max(frame[motorFields[j]], maxMotor);
                                             minMotor = Math.min(frame[motorFields[j]], minMotor);
                                             throttleTotal += frame[motorFields[j]];
@@ -154,7 +154,7 @@ function FlightLogIndex(logData) {
                                     }
                                     if (maxRCFields.length) {
                                         rcTotal = 0;
-                                        for (var j = 0; j < maxRCFields.length; j++) {
+                                        for (let j = 0; j < maxRCFields.length; j++) {
                                             rcTotal += Math.max(rcTotal,Math.abs(frame[maxRCFields[j]]));
                                         }
 
@@ -286,17 +286,17 @@ function FlightLogIndex(logData) {
             }
             
             if (sourceIndex.avgThrottle.length > 0) {
-                for (j = 0; j < sourceIndex.avgThrottle.length; j++) {
+                for (let j = 0; j < sourceIndex.avgThrottle.length; j++) {
                     resultIndex.avgThrottle[j] = sourceIndex.avgThrottle[j] - 1000;
                 }
             }
             if (sourceIndex.maxRC.length > 0) {
-                for (j = 0; j < sourceIndex.maxRC.length; j++) {
+                for (letj = 0; j < sourceIndex.maxRC.length; j++) {
                     resultIndex.maxRC[j] = sourceIndex.maxRC[j] * 20 - 1000;
                 }
             }
             if (sourceIndex.maxMotorDiff.length > 0) {
-                for (j = 0; j < sourceIndex.maxMotorDiff.length; j++) {
+                for (let j = 0; j < sourceIndex.maxMotorDiff.length; j++) {
                     resultIndex.maxMotorDiff[j] = sourceIndex.maxMotorDiff[j] * 20 - 1000;
                 }
             }            

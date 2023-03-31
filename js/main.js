@@ -335,7 +335,7 @@ function BlackboxLogViewer() {
             seekBar.setActivity(activity.times, activity[displayItem], activity.hasEvent);
             seekBar.repaint();
         });
-        for (var item = 0; item < seekBarItems.length; item++ ) {
+        for (let item = 0; item < seekBarItems.length; item++ ) {
             var
                 logLabel,
                 option, holder;
