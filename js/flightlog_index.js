@@ -296,7 +296,7 @@ function FlightLogIndex(logData) {
                 }
             }
             if (sourceIndex.maxMotorDiff.length > 0) {
-                for (j = 0; j < sourceIndex.maxRC.length; j++) {
+                for (j = 0; j < sourceIndex.maxMotorDiff.length; j++) {
                     resultIndex.maxMotorDiff[j] = sourceIndex.maxMotorDiff[j] * 20 - 1000;
                 }
             }            
