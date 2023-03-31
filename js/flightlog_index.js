@@ -291,7 +291,7 @@ function FlightLogIndex(logData) {
                 }
             }
             if (sourceIndex.maxRC.length > 0) {
-                for (letj = 0; j < sourceIndex.maxRC.length; j++) {
+                for (let j = 0; j < sourceIndex.maxRC.length; j++) {
                     resultIndex.maxRC[j] = sourceIndex.maxRC[j] * 20 - 1000;
                 }
             }
