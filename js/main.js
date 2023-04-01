@@ -322,7 +322,7 @@ function BlackboxLogViewer() {
             seekBarItems = [
                 ["avgThrottle", "Average motor throttle"],
                 ["maxRC", "Maximum stick input"],
-                ["maxMotorDiff", "Maximum motor differential"]
+                ["maxMotorDiff", "Maximum motor differential"],
             ];
         seekBarContainer.empty();
         seekBarPicker = $('<select class="seekBar-index form-control no-wheel">');
@@ -334,11 +334,11 @@ function BlackboxLogViewer() {
             seekBar.setActivity(activity.times, activity[displayItem], activity.hasEvent);
             seekBar.repaint();
         });
-        for (let item = 0; item < seekBarItems.length; item++ ) {
+        for (let item of seekBarItems) {
             let option;
             option = $("<option></option>");
-            option.text(seekBarItems[item][1]);
-            option.attr("value", seekBarItems[item][0]);
+            option.text(item[1]);
+            option.attr("value", item[0]);
             seekBarPicker.append(option);
         }
         seekBarContainer.append(seekBarPicker);

@@ -143,10 +143,10 @@ function FlightLogIndex(logData) {
                                         throttleTotal = 0;
                                         maxMotor = 0;
                                         minMotor = 2000;
-                                        for (let j = 0; j < motorFields.length; j++) {
-                                            maxMotor = Math.max(frame[motorFields[j]], maxMotor);
-                                            minMotor = Math.min(frame[motorFields[j]], minMotor);
-                                            throttleTotal += frame[motorFields[j]];
+                                        for (let mofo of motorFields) {
+                                            maxMotor = Math.max(frame[mofo], maxMotor);
+                                            minMotor = Math.min(frame[mofo], minMotor);
+                                            throttleTotal += frame[mofo];
                                         }
                                         
                                         intraIndex.maxMotorDiff.push(maxMotor - minMotor);
@@ -154,8 +154,8 @@ function FlightLogIndex(logData) {
                                     }
                                     if (maxRCFields.length) {
                                         rcTotal = 0;
-                                        for (let j = 0; j < maxRCFields.length; j++) {
-                                            rcTotal += Math.max(rcTotal,Math.abs(frame[maxRCFields[j]]));
+                                        for (let rcfo of maxRCFields) {
+                                            rcTotal += Math.max(rcTotal,Math.abs(frame[rcfo]));
                                         }
 
                                         intraIndex.maxRC.push(rcTotal);
