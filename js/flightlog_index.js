@@ -286,20 +286,14 @@ function FlightLogIndex(logData) {
             }
             
             if (sourceIndex.avgThrottle.length > 0) {
+                // Assuming that avgThrottle, maxRC and maxMotorDiff Arrays are the same length
+                // since they are build in the same loop. Just to get rid of a codesmell on Sonarcloud
                 for (let j = 0; j < sourceIndex.avgThrottle.length; j++) {
                     resultIndex.avgThrottle[j] = sourceIndex.avgThrottle[j] - 1000;
-                }
-            }
-            if (sourceIndex.maxRC.length > 0) {
-                for (let j = 0; j < sourceIndex.maxRC.length; j++) {
                     resultIndex.maxRC[j] = sourceIndex.maxRC[j] * 20 - 1000;
-                }
-            }
-            if (sourceIndex.maxMotorDiff.length > 0) {
-                for (let j = 0; j < sourceIndex.maxMotorDiff.length; j++) {
                     resultIndex.maxMotorDiff[j] = sourceIndex.maxMotorDiff[j] * 20 - 1000;
                 }
-            }            
+            }           
             resultIndexes[i] = resultIndex;
         }
         
