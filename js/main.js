@@ -319,7 +319,6 @@ function BlackboxLogViewer() {
         var
             seekBarContainer = $(".seekBar-selection"),
             seekBarPicker,
-            item,
             seekBarItems = [
                 ["avgThrottle", "Average motor throttle"],
                 ["maxRC", "Maximum stick input"],
@@ -328,7 +327,7 @@ function BlackboxLogViewer() {
         seekBarContainer.empty();
         seekBarPicker = $('<select class="seekBar-index form-control no-wheel">');
         seekBarPicker.change(function() {
-            var 
+            let 
                 activity = flightLog.getActivitySummary(),
                 displayItem = $(this).val();
             seekBarMode = displayItem;
@@ -336,9 +335,7 @@ function BlackboxLogViewer() {
             seekBar.repaint();
         });
         for (let item = 0; item < seekBarItems.length; item++ ) {
-            var
-                logLabel,
-                option, holder;
+            var option;
             option = $("<option></option>");
             option.text(seekBarItems[item][1]);
             option.attr("value", seekBarItems[item][0]);
@@ -372,7 +369,7 @@ function BlackboxLogViewer() {
         }
         
         for (index = 0; index < logCount; index++) {
-            var
+            let
                 logLabel,
                 option, holder,
                 error;

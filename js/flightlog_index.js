@@ -94,7 +94,7 @@ function FlightLogIndex(logData) {
                     lastGPS = [];
 
                 // Identify motor fields so they can be used to show the activity summary bar
-                for (var j = 0; j < 8; j++) {
+                for (let j = 0; j < 8; j++) {
                     if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {
                         motorFields.push(mainFrameDef.nameToIndex["motor[" + j + "]"]);
                     }
