@@ -263,7 +263,7 @@ function FlightLogIndex(logData) {
                     maxTime: sourceIndex.maxTime,
                     avgThrottle: new Array(sourceIndex.avgThrottle.length),
                     maxRC: new Array(sourceIndex.maxRC.length),
-                    maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length)
+                    maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length),
                 };
             
             if (sourceIndex.times.length > 0) {

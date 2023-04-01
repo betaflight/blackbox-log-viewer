@@ -335,7 +335,7 @@ function BlackboxLogViewer() {
             seekBar.repaint();
         });
         for (let item = 0; item < seekBarItems.length; item++ ) {
-            var option;
+            let option;
             option = $("<option></option>");
             option.text(seekBarItems[item][1]);
             option.attr("value", seekBarItems[item][0]);
@@ -2125,7 +2125,7 @@ function BlackboxLogViewer() {
                 }
             }
             if (fullPath != null) {
-                const filename = fullPath.replace(/^.*[\\\/]/, '');
+                const filename = fullPath.replace(/^.*[\\/]/, '');
                 const file = new File(fullPath, filename);
                 loadFiles([file]);
             }
