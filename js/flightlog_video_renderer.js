@@ -99,7 +99,7 @@ function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) 
     function openFileForWrite(suggestedName, onComplete) {
         return new Promise(function(resolve, reject) {
             chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: suggestedName, 
-                    accepts: [{extensions: ['webm']}]}, function(fileEntry) {
+                    accepts: [{extensions: ['webm'], description: "WebM video"}]}, function(fileEntry) {
                 var 
                     error = chrome.runtime.lastError;
                 
