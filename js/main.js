@@ -129,9 +129,7 @@ function BlackboxLogViewer() {
                 'min_height' : INNER_BOUNDS_HEIGHT,
             },
             function (createdWindow) {
-                if (fileToOpen !== undefined) {
-                    createdWindow.window.argv = fileToOpen;
-                }
+                createdWindow.window.argv = fileToOpen;
             });
 
         }
@@ -2111,10 +2109,10 @@ function BlackboxLogViewer() {
                 // so we limit it to one of them, the first in the list for example
                 const windows = chrome.app.window.getAll();
 
-                const firstWindowId = windows[0].id;
-                const currentWindowId = chrome.app.window.current().id;
+                const firstWindow = windows[0];
+                const currentWindow = chrome.app.window.current();
 
-                if (currentWindowId === firstWindowId) {
+                if (currentWindow === firstWindow) {
 
                     const filePathToOpenExpression = /.*"([^"]*)"$/;
                     const fileToOpen = path.match(filePathToOpenExpression);
