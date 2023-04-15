@@ -68,16 +68,6 @@ function FlightLogFieldPresenter() {
         'motor[6]': 'Motor [7]',
         'motor[7]': 'Motor [8]',
 
-        'motorLegacy[all]': 'Motors (Legacy)',
-        'motorLegacy[0]': 'Motor (Legacy) [1]',
-        'motorLegacy[1]': 'Motor (Legacy) [2]',
-        'motorLegacy[2]': 'Motor (Legacy) [3]',
-        'motorLegacy[3]': 'Motor (Legacy) [4]',
-        'motorLegacy[4]': 'Motor (Legacy) [5]',
-        'motorLegacy[5]': 'Motor (Legacy) [6]',
-        'motorLegacy[6]': 'Motor (Legacy) [7]',
-        'motorLegacy[7]': 'Motor (Legacy) [8]',
-
         'servo[all]': 'Servos',
         'servo[5]': 'Servo Tail',
 
@@ -1299,16 +1289,6 @@ function FlightLogFieldPresenter() {
             case 'motor[6]':
             case 'motor[7]':
                 return `${flightLog.rcMotorRawToPctPhysical(value).toFixed(2)} %`;
-
-            case 'motorLegacy[0]':
-            case 'motorLegacy[1]':
-            case 'motorLegacy[2]':
-            case 'motorLegacy[3]':
-            case 'motorLegacy[4]':
-            case 'motorLegacy[5]':
-            case 'motorLegacy[6]':
-            case 'motorLegacy[7]':
-                return `${flightLog.rcMotorRawToPctEffective(value).toFixed(2)} % (${value})`;
 
             case 'rcCommands[0]':
             case 'rcCommands[1]':

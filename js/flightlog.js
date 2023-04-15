@@ -11,7 +11,7 @@
  */
 function FlightLog(logData) {
     var
-        ADDITIONAL_COMPUTED_FIELD_COUNT = 23, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + MOTOR_LEGACY **/
+        ADDITIONAL_COMPUTED_FIELD_COUNT = 15, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/
 
         that = this,
         logIndex = false,
@@ -239,15 +239,6 @@ function FlightLog(logData) {
         }
         if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
             fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
-        }
-        if (!that.isFieldDisabled().MOTORS) {
-            for (let i = 0; i < MAX_MOTOR_NUMBER; i++) {
-                if (fieldNames.find(element => element === `motor[${i}]`)) {
-                    fieldNames.push(`motorLegacy[${i}]`);
-                } else {
-                    break;
-                }
-            }
         }
 
         fieldNameToIndex = {};
@@ -564,9 +555,6 @@ function FlightLog(logData) {
                          [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"]],
                          [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"]]];
 
-        let motor = [fieldNameToIndex["motor[0]"], fieldNameToIndex["motor[1]"], fieldNameToIndex["motor[2]"], fieldNameToIndex["motor[3]"],
-                       fieldNameToIndex["motor[4]"], fieldNameToIndex["motor[5]"], fieldNameToIndex["motor[6]"], fieldNameToIndex["motor[7]"]];
-
         let sourceChunkIndex;
         let destChunkIndex;
         let attitude;
@@ -600,10 +588,6 @@ function FlightLog(logData) {
 
         if (!axisPID[0]) {
             axisPID = false;
-        }
-
-        if (!motor[0]) {
-            motor = false;
         }
 
         sourceChunkIndex = 0;
@@ -697,13 +681,6 @@ function FlightLog(logData) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
                             destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
-                        }
-                    }
-
-                    // Duplicate the motor field to show the motor legacy values
-                    if (motor) {
-                        for (let motorNumber = 0; motorNumber < numMotors; motorNumber++) {
-                            destFrame[fieldIndex++] = srcFrame[motor[motorNumber]];
                         }
                     }
 
@@ -1199,13 +1176,6 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 FlightLog.prototype.rcCommandRawToThrottle = function(value) {
     // Throttle displayed as percentage
     return Math.min(Math.max(((value - this.getSysConfig().minthrottle) / (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) * 100.0, 0.0),100.0);
-};
-
-FlightLog.prototype.rcMotorRawToPctEffective = function(value) {
-    // Motor displayed as percentage
-    const minValue = (this.isDigitalProtocol() && this.getSysConfig().dynamic_idle_min_rpm > 0) ? this.getSysConfig().digitalIdleOffset : this.getSysConfig().motorOutput[0];
-    return Math.min((value - minValue) / (this.getSysConfig().motorOutput[1] - minValue) * 100.0, 100.0);
-
 };
 
 FlightLog.prototype.rcMotorRawToPctPhysical = function(value) {

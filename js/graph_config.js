@@ -267,13 +267,6 @@ GraphConfig.load = function(config) {
                         DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                     outputRange: 1.0,
                 };
-            } else if (fieldName.match(/^motorLegacy\[/)) {
-                return {
-                    offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
-                    power: 1.0,
-                    inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
-                    outputRange: 1.0,
-                };
             } else if (fieldName.match(/^servo\[/)) {
                 return {
                     offset: -1500,
