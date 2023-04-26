@@ -537,7 +537,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 	display:block;
 }
 
-#analyser {
+#analyser ,#log-seek-bar {
     z-index: 10;
 }
 
@@ -647,8 +647,40 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 	position: absolute;
 }
 
-.analyser, .map-container {
+.analyser, .map-container, .log-seek-bar {
 	position: absolute;
+}
+
+#log-seek-bar {
+    width: 100%;
+}
+
+.log-seek-bar:hover .non-shift #seekbarTypeSelect {
+    opacity: 1;
+    height: auto;
+    transition: opacity 500ms ease-in;
+}
+
+#seekbarToolbar {
+    position: absolute;
+    top: 8px;
+    left: 20px;
+}
+.log-seek-bar #seekbarTypeSelect {
+    color: #bbb;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    left: 5px;
+    float: left;
+    z-index: 9;
+    position: absolute;
+    font-size: 9px;
+}
+
+.log-seek-bar #seekbarTypeSelect select {
+    border-radius: 3px;
+    padding: 0px 5px;
 }
 
 .log-graph video {

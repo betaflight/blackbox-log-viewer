@@ -454,10 +454,6 @@
                 <h4>Workspace</h4>
                 <div class="log-workspace-selection"></div>
             </li>
-            <li class="log-seekBar-panel">
-                <h4>Seekbar mode</h4>
-                <div class="seekBar-selection"></div>
-            </li>
         </ul>
         <div id="screenshot-frame" class="graph-row">
             <div class="log-graph">
@@ -575,8 +571,12 @@
         </div>
     </div>
     <!-- Log Scroll bar -->
-    <div class="log-seek-bar">
+    <div id="log-seek-bar" class="log-seek-bar">
         <canvas width="200" height="100"></canvas>
+        <span id="seekbarToolbar" class="non-shift">
+            <div id="seekbarType" class="seekBar-selection" data-toggle="tooltip" title="Vaue to plot">
+            </div>
+        </span>
     </div>
     <!-- Status Bar -->
     <div id="status-bar">

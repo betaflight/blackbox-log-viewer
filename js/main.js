@@ -325,7 +325,7 @@ function BlackboxLogViewer() {
                 ["maxMotorDiff", "Maximum motor differential"],
             ];
         seekBarContainer.empty();
-        seekBarPicker = $('<select class="seekBar-index form-control no-wheel">');
+        seekBarPicker = $('<select id="seekbarTypeSelect", class="seekbarTypeSelect">');
         seekBarPicker.change(function() {
             let 
                 activity = flightLog.getActivitySummary(),
