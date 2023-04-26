@@ -105,6 +105,7 @@ function BlackboxLogViewer() {
         seekBar = new SeekBar(seekBarCanvas),
         
         seekBarRepaintRateLimited = $.throttle(200, $.proxy(seekBar.repaint, seekBar)),
+        seekBarMode = "avgThrottle",
         
         updateValuesChartRateLimited,
         
@@ -312,6 +313,36 @@ function BlackboxLogViewer() {
         }
     }
     
+    function renderSeekBarPicker(){
+        var
+            seekBarContainer = $(".seekBar-selection"),
+            seekBarPicker,
+            seekBarItems = [
+                ["avgThrottle", "Average motor throttle"],
+                ["maxRC", "Maximum stick input"],
+                ["maxMotorDiff", "Maximum motor differential"],
+            ];
+        seekBarContainer.empty();
+        seekBarPicker = $('<select id="seekbarTypeSelect", class="seekbarTypeSelect">');
+        seekBarPicker.change(function() {
+            let 
+                activity = flightLog.getActivitySummary(),
+                displayItem = $(this).val();
+            seekBarMode = displayItem;
+            seekBar.setActivity(activity.times, activity[displayItem], activity.hasEvent);
+            seekBar.repaint();
+        });
+        for (let item of seekBarItems) {
+            let option;
+            option = $("<option></option>");
+            option.text(item[1]);
+            option.attr("value", item[0]);
+            seekBarPicker.append(option);
+        }
+        seekBarContainer.append(seekBarPicker);
+
+    }
+
     function renderLogFileInfo(file) {
         $(".log-filename").text(file.name);
 
@@ -336,7 +367,7 @@ function BlackboxLogViewer() {
         }
         
         for (index = 0; index < logCount; index++) {
-            var
+            let
                 logLabel,
                 option, holder,
                 error;
@@ -411,9 +442,8 @@ function BlackboxLogViewer() {
         
         var 
             activity = flightLog.getActivitySummary();
-        
-        seekBar.setActivity(activity.times, activity.avgThrottle, activity.hasEvent);
-        
+
+        seekBar.setActivity(activity.times, activity[seekBarMode], activity.hasEvent);
         seekBar.repaint();
 
         // Add flightLog to map
@@ -708,6 +738,7 @@ function BlackboxLogViewer() {
             }
             
             renderLogFileInfo(file);
+            renderSeekBarPicker();
             currentOffsetCache.log      = file.name; // store the name of the loaded log file
             currentOffsetCache.index    = null;      // and clear the index
             
@@ -2092,7 +2123,7 @@ function BlackboxLogViewer() {
                 }
             }
             if (fullPath != null) {
-                const filename = fullPath.replace(/^.*[\\\/]/, '');
+                const filename = fullPath.replace(/^.*[\\/]/, '');
                 const file = new File(fullPath, filename);
                 loadFiles([file]);
             }
