@@ -467,3 +467,7 @@ function getManifestVersion(manifest) {
         return "-"
     }
 }
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
