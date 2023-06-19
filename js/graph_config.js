@@ -101,7 +101,7 @@ function GraphConfig(graphConfig) {
                 if ((matches = field.name.match(/^(.+)\[all\]$/))) {
                     var
                         nameRoot = matches[1],
-                        nameRegex = new RegExp("^" + nameRoot + "\[[0-9]+\]$"),
+                        nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$"),
                         colorIndexOffset = 0;
 
                     for (var k = 0; k < logFieldNames.length; k++) {
@@ -267,6 +267,8 @@ GraphConfig.load = function(config) {
                         DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                     outputRange: 1.0,
                 };
+            } else if (fieldName.match(/^eRPM\(\/100\)\[/)) {
+                return getCurveForMinMaxFields('eRPM(/100)[0]', 'eRPM(/100)[1]', 'eRPM(/100)[2]', 'eRPM(/100)[3]', 'eRPM(/100)[4]', 'eRPM(/100)[5]', 'eRPM(/100)[6]', 'eRPM(/100)[7]');
             } else if (fieldName.match(/^servo\[/)) {
                 return {
                     offset: -1500,
@@ -954,6 +956,9 @@ GraphConfig.load = function(config) {
         if (!flightLog.isFieldDisabled().MOTORS) {
             EXAMPLE_GRAPHS.push({label: "Motors",fields: ["motor[all]", "servo[5]"]});
             EXAMPLE_GRAPHS.push({label: "Motors (Legacy)",fields: ["motorLegacy[all]", "servo[5]"]});
+        }
+        if (!flightLog.isFieldDisabled().RPM) {
+            EXAMPLE_GRAPHS.push({label: "RPM",fields: ["eRPM(/100)[all]"]});
         }
         if (!flightLog.isFieldDisabled().GYRO) {
             EXAMPLE_GRAPHS.push({label: "Gyros",fields: ["gyroADC[all]"]});

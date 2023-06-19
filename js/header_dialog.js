@@ -459,6 +459,7 @@ function HeaderDialog(dialog, onSave) {
             {name: 'Debug', description: 'Debug values'},
             {name: 'Motors', description: 'Motors and tricopter servo values'},
             {name: 'GPS', description: 'All GPS-related values'},
+            {name: 'RPM', description: 'Angular velocity for all motors'},
         ];
 
         const fieldsList_e = $('.fields_list');

@@ -1336,5 +1336,6 @@ FlightLog.prototype.isFieldDisabled = function() {
             DEBUG         : (disabledFields & (1 << 9))!==0,
             MOTORS        : (disabledFields & (1 << 10))!==0,
             GPS           : (disabledFields & (1 << 11))!==0,
+            RPM           : (disabledFields & (1 << 12))!==0,
         };
 };
