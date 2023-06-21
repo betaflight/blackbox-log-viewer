@@ -454,12 +454,13 @@ function HeaderDialog(dialog, onSave) {
             {name: 'Magnetometer', description: ''},
             {name: 'Altitude', description: 'Barometer and rangefinder'},
             {name: 'RSSI', description: ''},
-            {name: 'Gyroscope', description: 'Raw gyro data'},
+            {name: 'Filtered Gyroscope', description: 'Filtered gyro data'},
             {name: 'Accelerometer', description: 'Raw accelerometer data'},
             {name: 'Debug', description: 'Debug values'},
             {name: 'Motors', description: 'Motors and tricopter servo values'},
             {name: 'GPS', description: 'All GPS-related values'},
             {name: 'RPM', description: 'Angular velocity for all motors'},
+            {name: 'Unfiltered Gyroscope', description: 'Unfiltered gyro data'},
         ];
 
         const fieldsList_e = $('.fields_list');
