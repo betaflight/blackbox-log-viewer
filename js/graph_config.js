@@ -865,6 +865,15 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'GPS_UNIT_CONNECTION':
+                        switch (fieldName) {
+                            case 'debug[0]': // model
+                            case 'debug[1]': // packetCounter
+                            case 'debug[2]': // interval
+                            case 'debug[3]': // baudRate
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     case 'ALTITUDE':
                         switch (fieldName) {
                             case 'debug[0]': // GPS Trust

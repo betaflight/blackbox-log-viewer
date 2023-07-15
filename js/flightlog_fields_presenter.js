@@ -990,6 +990,17 @@ function FlightLogFieldPresenter() {
             'debug[6]':'Not Used',
             'debug[7]':'Not Used',
         },
+        'GPS_UNIT_CONNECTION' : {
+            'debug[all]':'GPS Unit Connection',
+            'debug[0]':'Nav Model',
+            'debug[1]':'Package Count',
+            'debug[2]':'Interval ms',
+            'debug[3]':'Baud Rate',
+            'debug[4]':'Main State',
+            'debug[5]':'Position State',
+            'debug[6]':'Ack State',
+            'debug[7]':'Not Used',
+        },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
             'debug[0]':'accADC X',
@@ -1716,6 +1727,20 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // altitude cm
                         case 'debug[3]': // altitude target cm
                             return (value / 100).toFixed(1) + ' m';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'GPS_UNIT_CONNECTION':
+                    switch (fieldName) {
+                        case 'debug[0]': // Model
+                        case 'debug[1]': // Counter
+                        case 'debug[2]': // Interval
+                            return value.toFixed(0);
+                        case 'debug[3]': // Baud Rate
+                            return (value * 100).toFixed(0);
+                        case 'debug[4]': // main state
+                        case 'debug[5]': // position state
+                        case 'debug[6]': // ack state
                         default:
                             return value.toFixed(0);
                     }

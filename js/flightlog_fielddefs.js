@@ -346,6 +346,7 @@ let
         "GPS_RESCUE_VELOCITY",
         "GPS_RESCUE_HEADING",
         "GPS_RESCUE_TRACKING",
+        "GPS_UNIT_CONNECTION",
         "ATTITUDE",
         "VTX_MSP",
         "GPS_DOP",
