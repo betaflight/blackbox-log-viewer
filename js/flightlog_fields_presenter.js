@@ -990,16 +990,16 @@ function FlightLogFieldPresenter() {
             'debug[6]':'Not Used',
             'debug[7]':'Not Used',
         },
-        'GPS_UNIT_CONNECTION' : {
-            'debug[all]':'GPS Unit Connection',
+        'GPS_CONNECTION' : {
+            'debug[all]':'GPS Connection',
             'debug[0]':'Nav Model',
-            'debug[1]':'Package Count',
-            'debug[2]':'Interval ms',
-            'debug[3]':'Baud Rate',
-            'debug[4]':'Main State',
-            'debug[5]':'Position State',
+            'debug[1]':'GPS Nav interval',
+            'debug[2]':'Task timer',
+            'debug[3]':'Baud Rate / FC interval',
+            'debug[4]':'State*100 +SubState',
+            'debug[5]':'ExecuteTime',
             'debug[6]':'Ack State',
-            'debug[7]':'Not Used',
+            'debug[7]':'Rx buffer size',
         },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
@@ -1730,18 +1730,18 @@ function FlightLogFieldPresenter() {
                         default:
                             return value.toFixed(0);
                     }
-                case 'GPS_UNIT_CONNECTION':
+                case 'GPS__CONNECTION':
                     switch (fieldName) {
-                        case 'debug[0]': // Model
-                        case 'debug[1]': // Counter
-                        case 'debug[2]': // Interval
+                        case 'debug[0]': // Flight model
+                        case 'debug[1]': // GPS Nav packet interval
+                        case 'debug[2]': // FC Nav data time
                             return value.toFixed(0);
-                        case 'debug[3]': // Baud Rate
+                        case 'debug[3]': // Baud Rate / Nav interval
                             return (value * 100).toFixed(0);
-                        case 'debug[4]': // main state
-                        case 'debug[5]': // position state
+                        case 'debug[4]': // main state * 100 + subState
+                        case 'debug[5]': // executeTimeUs
                         case 'debug[6]': // ack state
-                        default:
+                        case 'debug[7]': // serial Rx buffer
                             return value.toFixed(0);
                     }
                 case 'ATTITUDE':

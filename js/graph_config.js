@@ -843,7 +843,7 @@ GraphConfig.load = function(config) {
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
-                            }
+                        }
                     case 'GPS_RESCUE_TRACKING':
                         switch (fieldName) {
                             case 'debug[0]': // velocity to home cm/s
@@ -864,16 +864,51 @@ GraphConfig.load = function(config) {
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
-                            }
-                    case 'GPS_UNIT_CONNECTION':
+                        }
+                    case 'GPS_CONNECTION':
                         switch (fieldName) {
-                            case 'debug[0]': // model
-                            case 'debug[1]': // packetCounter
-                            case 'debug[2]': // interval
-                            case 'debug[3]': // baudRate
+                            case 'debug[0]': // GPS flight model
+                            case 'debug[1]': // Nav Data interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // task interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Baud rate / resolved packet interval
+                            case 'debug[4]': // State*100 + SubState
+                                return getCurveForMinMaxFields(fieldName);
+                            case 'debug[5]': // ExecuteTimeUs
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 100,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[6]': // ackState
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[7]': // Incoming buffer
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 100,
+                                    outputRange: 1.0,
+                                };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
-                            }
+                        }
                     case 'ALTITUDE':
                         switch (fieldName) {
                             case 'debug[0]': // GPS Trust
@@ -916,7 +951,6 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
-    
                     case 'BARO':
                         switch (fieldName) {
                             case 'debug[0]': // Baro state 0-10
@@ -937,7 +971,7 @@ GraphConfig.load = function(config) {
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
-                            }
+                        }
                     }
             }
             // if not found above then
