@@ -421,7 +421,7 @@ var FlightLogParser = function(logData) {
             setpoint_relaxation_ratio : "setpointRelaxRatio",
             thr_expo                  : "thrExpo",
             thr_mid                   : "thrMid",
-            tpa_rate                  : "dynThrPID",
+            dynThrPID                 : "tpa_rate",
             use_unsynced_pwm          : "unsynced_fast_pwm",
             vbat_scale                : "vbatscale",
             vbat_pid_gain             : "vbat_pid_compensation",
