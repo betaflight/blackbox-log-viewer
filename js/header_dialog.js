@@ -609,7 +609,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('currentMeterScale'		,sysConfig.currentMeterScale,0);
         setParameter('thrMid'					,sysConfig.thrMid,2);
         setParameter('thrExpo'					,sysConfig.thrExpo,2);
-        setParameter('dynThrPID'				,sysConfig.dynThrPID,2);
+        setParameter('tpa_rate'					,sysConfig.tpa_rate,2);
         setParameter('tpa-breakpoint'			,sysConfig.tpa_breakpoint,0);
 		setParameter('superExpoFactor'			,sysConfig.superExpoFactor,2);
 		setParameter('superExpoFactorYaw'		,sysConfig.superExpoFactorYaw,2);
