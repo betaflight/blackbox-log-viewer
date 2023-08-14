@@ -238,6 +238,7 @@ var FlightLogParser = function(logData) {
             dshot_bidir:null,                       // DShot bidir protocol enabled
             dterm_lpf_hz:null,                      // DTerm Lowpass Filter Hz
             dterm_lpf_dyn_hz:[null, null],          // DTerm Lowpass Dynamic Filter Min and Max Hz
+            dterm_lpf_dyn_expo:null,                // DTerm Lowpass Dynamic Filter Expo
             dterm_lpf2_hz:null,                     // DTerm Lowpass Filter Hz 2
             dterm_differentiator:null,              // DTerm Differentiator
             H_sensitivity:null,                     // Horizon Sensitivity
@@ -248,6 +249,7 @@ var FlightLogParser = function(logData) {
             gyro_32khz_hardware_lpf:null,           // Gyro 32khz hardware lpf setting. (post BF3.4)
             gyro_lowpass_hz:null,                   // Gyro Soft Lowpass Filter Hz
             gyro_lowpass_dyn_hz:[null, null],       // Gyro Soft Lowpass Dynamic Filter Min and Max Hz
+            gyro_lowpass_dyn_expo:null,             // Gyro Soft Lowpass Dynamic Filter Expo
             gyro_lowpass2_hz:null,                  // Gyro Soft Lowpass Filter Hz 2
             gyro_notch_hz:null,                     // Gyro Notch Frequency
             gyro_notch_cutoff:null,                 // Gyro Notch Cutoff
@@ -369,6 +371,7 @@ var FlightLogParser = function(logData) {
             dterm_lpf1_type           : "dterm_filter_type",
             dterm_lpf1_static_hz      : "dterm_lpf_hz",
             dterm_lpf1_dyn_hz         : "dterm_lpf_dyn_hz",
+            dterm_lpf1_dyn_expo       : "dterm_lpf_dyn_expo",
             dterm_lpf2_type           : "dterm_filter2_type",
             dterm_lpf2_static_hz      : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",
@@ -391,6 +394,7 @@ var FlightLogParser = function(logData) {
             gyro_lpf1_type            : "gyro_soft_type",
             gyro_lpf1_static_hz       : "gyro_lowpass_hz",
             gyro_lpf1_dyn_hz          : "gyro_lowpass_dyn_hz",
+            gyro_lpf1_dyn_expo        : "gyro_lowpass_dyn_expo",
             gyro_lpf2_type            : "gyro_soft2_type",
             gyro_lpf2_static_hz       : "gyro_lowpass2_hz",
             "gyro.scale"              : "gyro_scale",
@@ -835,6 +839,8 @@ var FlightLogParser = function(logData) {
             case "rc_smoothing_active_cutoffs":
             case "rc_smoothing_active_cutoffs_ff_sp_thr":
             case "gyro_lowpass_dyn_hz":
+            case "gyro_lowpass_dyn_expo":
+            case "dterm_lpf_dyn_expo":
             case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
