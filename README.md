@@ -130,6 +130,10 @@ If no platform is provided, only for the platform you are building from will be 
 The release distribution for macOS uses a DMG file to install the application.
 The PSD source for the DMG background image can be found in the root (`dmg-background.png`). After changing the source, export the image to PNG format in folder `./images/`.
 
+#### Leverage GitHub-Actions to build binaries
+
+You can use the GitHub `Actions` tab in your fork to build binaries as well. Select `Actions`>`Manual Build`>`Run Workflow`. Choose your custom branch and click `Run workflow`. The workflow will dispatch in a few moments and upon completion, the build "Artifacts" will be available for download from within the workflow run.
+
 ## Flight video won't load, or jumpy flight video upon export
 
 Some flight video formats aren't supported by Chrome, so the viewer can't open them. You can fix this by re-encoding
