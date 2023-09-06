@@ -202,8 +202,10 @@ var FlightLogParser = function(logData) {
         defaultSysConfigExtension = {
             abs_control_gain:null,                  // Absolute control gain
             anti_gravity_gain:null,                 // Anti gravity gain
+            anti_gravity_p_gain:null,               // Anti gravity P gain
             anti_gravity_mode:null,                 // Anti gravity mode
             anti_gravity_threshold:null,            // Anti gravity threshold for step mode
+            anti_gravity_cutoff_hz:null,            // Anti gravity Cutoff
             blackbox_high_resolution:null,          // Blackbox high resolution mode
             thrMid:null,                            // Throttle Mid Position
             thrExpo:null,                           // Throttle Expo
@@ -690,6 +692,8 @@ var FlightLogParser = function(logData) {
             case "debug_mode":
             case "anti_gravity_mode":
             case "anti_gravity_gain":
+            case "anti_gravity_p_gain":
+            case "anti_gravity_cutoff_hz":
             case "abs_control_gain":
             case "use_integrated_yaw":
             case "d_min_gain":

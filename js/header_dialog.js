@@ -64,6 +64,8 @@ function HeaderDialog(dialog, onSave) {
         {name:'digitalIdleOffset'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
         {name:'antiGravityGain'              , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
         {name:'antiGravityThreshold'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'4.3.999'},
+        {name:'anti_gravity_cutoff_hz'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.4.0', max:'999.9.9'},
+        {name:'anti_gravity_p_gain'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.4.0', max:'999.9.9'},
         {name:'itermWindupPointPercent'      , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.1.0', max:'999.9.9'},
         {name:'pidSumLimit'                  , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
         {name:'pidSumLimitYaw'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.3.0', max:'999.9.9'},
@@ -791,7 +793,7 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('motorOutputHigh'			,sysConfig.motorOutput[1],0);
 		setParameter('digitalIdleOffset'		,sysConfig.digitalIdleOffset,2);
         renderSelect('antiGravityMode'          ,sysConfig.anti_gravity_mode, ANTI_GRAVITY_MODE);
-        if((activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) ||
+        if((activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.1.0') && semver.lte(activeSysConfig.firmwareVersion, '4.3.9')) ||
                 (activeSysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '2.0.0'))) {
             setParameter('antiGravityGain'      ,sysConfig.anti_gravity_gain,3);
         } else {
@@ -801,6 +803,8 @@ function HeaderDialog(dialog, onSave) {
         if (sysConfig.anti_gravity_mode === ANTI_GRAVITY_MODE.indexOf('SMOOTH')) {
             $('.parameter td[name="antiGravityThreshold"]').css('display', 'none');
         }
+        setParameter('anti_gravity_p_gain'      ,sysConfig.anti_gravity_p_gain,0);
+        setParameter('anti_gravity_cutoff_hz'   ,sysConfig.anti_gravity_cutoff_hz,0);
 		setParameter('setpointRelaxRatio'		,sysConfig.setpointRelaxRatio,2);
 		setParameter('pidSumLimit'     			,sysConfig.pidSumLimit,0);
         setParameter('pidSumLimitYaw'			,sysConfig.pidSumLimitYaw,0);
