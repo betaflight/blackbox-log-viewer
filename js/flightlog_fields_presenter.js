@@ -974,10 +974,10 @@ function FlightLogFieldPresenter() {
             'debug[1]':'GPS Heading',
             'debug[2]':'IMU Attitude',
             'debug[3]':'Angle to home',
-            'debug[4]':'Not Used',
-            'debug[5]':'Not Used',
-            'debug[6]':'Not Used',
-            'debug[7]':'Not Used',
+            'debug[4]':'magYaw',
+            'debug[5]':'Roll MixAtt',
+            'debug[6]':'Roll Added',
+            'debug[7]':'Rescue Yaw Rate',
         },
         'GPS_RESCUE_TRACKING' : {
             'debug[all]':'GPS Rescue Tracking',
@@ -1704,7 +1704,12 @@ function FlightLogFieldPresenter() {
                         case 'debug[1]': // GPS Ground course degrees * 10
                         case 'debug[2]': // Attitude in degrees * 10
                         case 'debug[3]': // Angle to home in degrees * 10
+                        case 'debug[4]': // magYaw in degrees * 10
                             return (value / 10).toFixed(1) + " °";
+                        case 'debug[6]': // Roll Added deg * 100
+                            return (value / 100).toFixed(1) + " °";
+                        case 'debug[5]': // Roll Mix Att
+                        case 'debug[7]': // Rescue Yaw Rate
                         default:
                             return value.toFixed(0);
                     }
