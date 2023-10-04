@@ -353,6 +353,12 @@ var FlightLogParser = function(logData) {
             throttle_boost: null,                    // throttle boost
             throttle_boost_cutoff: null,
             thrust_linear: null,
+            gyro_llc_freq_hz: null,
+            gyro_llc_phase: null,
+            dterm_llc_freq_hz: null,
+            dterm_llc_phase: null,
+            pterm_llc_freq_hz: null,
+            pterm_llc_phase: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -435,6 +441,12 @@ var FlightLogParser = function(logData) {
             yaw_accel_limit           : "yawRateAccelLimit",
             yaw_lowpass_hz            : "yaw_lpf_hz",
             thrust_linear             : "thrust_linear",
+            gyro_llc_freq_hz          : "gyro_llc_freq_hz",
+            gyro_llc_phase            : "gyro_llc_phase",
+            dterm_llc_freq_hz         : "dterm_llc_freq_hz",
+            dterm_llc_phase           : "dterm_llc_phase",
+            pterm_llc_freq_hz         : "pterm_llc_freq_hz",
+            pterm_llc_phase           : "pterm_llc_phase",
         },
 
         frameTypes,
@@ -848,6 +860,12 @@ var FlightLogParser = function(logData) {
             case "gyro_lowpass_dyn_expo":
             case "dterm_lpf_dyn_expo":
             case "thrust_linear":
+            case "gyro_llc_freq_hz":
+            case "gyro_llc_phase":
+            case "dterm_llc_freq_hz":
+            case "dterm_llc_phase":
+            case "pterm_llc_freq_hz":
+            case "pterm_llc_phase":
             case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
