@@ -25,6 +25,29 @@ onmessage = function(event) {
             .join(opts.columnDelimiter);
     }
 
+    /**
+     * Converts `null` and other empty non-numeric values to zero value string.
+     * 
+     * @param {object} value is not a number
+     * @returns {string}
+     */
+    function normalizeEmptyToZero(value) {
+        return !!value ? value : "0";
+    }
+
+    /**
+     * @param {array} columns 
+     * @returns {string}
+     */
+    function joinColumnValues(columns) {
+        return _(columns)
+            .map(value => 
+                _.isNumber(value)
+                ? value
+                : normalizeEmptyToZero(value))
+            .join(opts.columnDelimiter);
+    }
+
     let opts = event.data.opts,
         stringDelim = opts.quoteStrings
             ? opts.stringDelimiter
@@ -32,7 +55,7 @@ onmessage = function(event) {
         mainFields = _([joinColumns(event.data.fieldNames)])
             .concat(_(event.data.frames)
                 .flatten()
-                .map(row => joinColumns(row))
+                .map(row => joinColumnValues(row))
                 .value())
             .join("\n"),
         headers = _(event.data.sysConfig)
