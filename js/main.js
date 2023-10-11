@@ -214,6 +214,24 @@ function BlackboxLogViewer() {
 
                 table.append(rows.join(""));
                 
+                const statRows = [];
+                const statsTable = $(".log-field-values #stats-table");
+                $("tr:not(:first)", statsTable).remove();
+                const stats = SimpleStats(flightLog).calculate();
+                const tpl = _.template("<tr><td><%= name %></td><td><%= min %> (<%= min_raw %>)</td><td><%= max %> (<%= max_raw %>)</td><td><%= mean %> (<%= mean_raw %>)</td></tr>");
+                for (const field in stats) {
+                    const stat = stats[field];
+                    statRows.push(tpl({
+                        name: fieldPresenter.fieldNameToFriendly(stat.name, flightLog.getSysConfig().debug_mode),
+                        min_raw: atMost2DecPlaces(stat.min[0]),
+                        min: stat.min[1],
+                        max_raw: atMost2DecPlaces(stat.max[0]),
+                        max: stat.max[1],
+                        mean_raw: atMost2DecPlaces(stat.mean[0]),
+                        mean: stat.mean[1],
+                    }));
+                }                
+                statsTable.append(statRows.join(""));
             }
 
             // Update flight mode flags on status bar

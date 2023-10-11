@@ -565,6 +565,26 @@
                     </tr>
                 </tbody>
             </table>
+            
+            <a href="#log-field-values">
+                <h4>Statistics</h4>
+            </a>
+            <table id="stats-table" class="table table-condensed">
+                <caption>Min/max values from this log</caption>
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Min</th>
+                        <th>Max</th>
+                        <th>Mean</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!-- auto filled by updateValues function -->
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="configuration-file" id="configuration-file">
             <!-- auto filled by configuration function -->
@@ -3224,6 +3244,7 @@
     <script src="js/laptimer.js"></script>
     <script src="js/localization.js"></script>
     <script src="js/graph_map.js"></script>
+    <script src="js/simple-stats.js"></script>
     <script src="js/main.js"></script>
     <script src="index.js"></script>
 
