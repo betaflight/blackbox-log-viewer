@@ -3,24 +3,19 @@ const SimpleStats = function (flightLog) {
         .map(chunk => chunk.frames).flatten().value(),
         fields = _.map(flightLog.getMainFieldNames(), (f) => {
             // fix typo. potential bug in either FW or BBE
-            if (f == "BaroAlt") { return "baroAlt"; } else { return f; }
+            if (f === "BaroAlt") { return "baroAlt"; } else { return f; }
         });
 
-    const formatter = (value, fieldName) => [
-        value,
-        FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, fieldName, value),
-    ];
-
     const getMinMaxMean = (fieldName) => {
-        const index = _.findIndex(fields, (f) => f == fieldName);
-        if (index == -1) {
+        const index = _.findIndex(fields, (f) => f === fieldName);
+        if (index === -1 || !frames.length || !(index in frames[0])) {
             return undefined;
         }
         const result = _.mapValues({
             "min": _.minBy(frames, (f) => f[index])[index],
             "max": _.maxBy(frames, (f) => f[index])[index],
             "mean": _.meanBy(frames, (f) => f[index]),
-        }, (v) => formatter(v, fieldName));
+        });
         result["name"] = fieldName;
         return result;
     };

@@ -221,14 +221,17 @@ function BlackboxLogViewer() {
                 const tpl = _.template("<tr><td><%= name %></td><td><%= min %> (<%= min_raw %>)</td><td><%= max %> (<%= max_raw %>)</td><td><%= mean %> (<%= mean_raw %>)</td></tr>");
                 for (const field in stats) {
                     const stat = stats[field];
+                    if (stat === undefined) {
+                        continue;
+                    }
                     statRows.push(tpl({
                         name: fieldPresenter.fieldNameToFriendly(stat.name, flightLog.getSysConfig().debug_mode),
-                        min_raw: atMost2DecPlaces(stat.min[0]),
-                        min: stat.min[1],
-                        max_raw: atMost2DecPlaces(stat.max[0]),
-                        max: stat.max[1],
-                        mean_raw: atMost2DecPlaces(stat.mean[0]),
-                        mean: stat.mean[1],
+                        min_raw: atMost2DecPlaces(stat.min),
+                        min: FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.min),
+                        max_raw: atMost2DecPlaces(stat.max),
+                        max: FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.max),
+                        mean_raw: atMost2DecPlaces(stat.mean),
+                        mean: FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.mean),
                     }));
                 }                
                 statsTable.append(statRows.join(""));
