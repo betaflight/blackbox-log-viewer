@@ -32,7 +32,7 @@ onmessage = function(event) {
      * @returns {string}
      */
     function normalizeEmptyToNaN(value) {
-        return !!value ? value : "NaN";
+        return value ? value : "NaN";
     }
 
     /**
