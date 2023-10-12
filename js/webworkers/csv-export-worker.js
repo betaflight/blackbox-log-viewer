@@ -26,16 +26,8 @@ onmessage = function(event) {
     }
 
     /**
-     * Converts `null` and other empty non-numeric values to NaN value string.
+     * Converts `null` entries in columns and other empty non-numeric values to NaN value string.
      * 
-     * @param {object} value is not a number
-     * @returns {string}
-     */
-    function normalizeEmptyToNaN(value) {
-        return value ? value : "NaN";
-    }
-
-    /**
      * @param {array} columns 
      * @returns {string}
      */
@@ -44,7 +36,7 @@ onmessage = function(event) {
             .map(value => 
                 _.isNumber(value)
                 ? value
-                : normalizeEmptyToNaN(value))
+                : "NaN")
             .join(opts.columnDelimiter);
     }
 
