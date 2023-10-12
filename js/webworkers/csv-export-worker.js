@@ -34,7 +34,7 @@ onmessage = function(event) {
     function joinColumnValues(columns) {
         return _(columns)
             .map(value => 
-                _.isNumber(value)
+                (_.isNumber(value) || _.value)
                 ? value
                 : "NaN")
             .join(opts.columnDelimiter);
