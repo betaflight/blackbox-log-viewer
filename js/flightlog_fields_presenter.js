@@ -1,5 +1,7 @@
 "use strict";
 
+// @SONAR_STOP@
+
 function FlightLogFieldPresenter() {
     // this is intentional
 }
@@ -1780,3 +1782,6 @@ function FlightLogFieldPresenter() {
         return fieldName;
     };
 })();
+
+// @SONAR_START@
+
