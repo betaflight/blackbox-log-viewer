@@ -388,7 +388,7 @@ function FlightLog(logData) {
                     // The G frames need to be processed always. They are "invalid" if not H (Home) has been detected 
                     // before, but if not processed the viewer shows cuts and gaps. This happens if the quad takes off before 
                     // fixing enough satellites.
-                    if (frameValid || (frameType == 'G')) {
+                    if (frameValid || (frameType == 'G' && frame)) {
                         switch (frameType) {
                             case 'P':
                             case 'I':
