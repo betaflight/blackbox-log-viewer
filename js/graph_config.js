@@ -808,10 +808,32 @@ GraphConfig.load = function(config) {
                             case 'debug[1]': // GPS GroundCourse
                             case 'debug[2]': // Yaw attitude * 10
                             case 'debug[3]': // Angle to home * 10
+                            case 'debug[4]': // magYaw * 10
                                 return {
                                     offset: -1800,
                                     power: 1.0,
                                     inputRange: 1800,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[5]': // magYaw * 10
+                                return {
+                                    offset: -10,
+                                    power: 1.0,
+                                    inputRange: 10,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[6]': // roll angle *100
+                                return {
+                                    offset: -900,
+                                    power: 1.0,
+                                    inputRange: 900,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[7]': // yaw rate deg/s
+                                return {
+                                    offset: -100,
+                                    power: 1.0,
+                                    inputRange: 100,
                                     outputRange: 1.0,
                                 };
                             default:
