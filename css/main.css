@@ -792,13 +792,6 @@ html.has-config .configuration-list {
     padding-right: 0.7em;
 }
 
-.graph-legend-field {
-    margin-bottom: 0.5em;
-    cursor:pointer;
-    padding-left:  0.7em;
-    padding-right: 0.7em;
-}
-
 .graph-legend-field-name:hover {
     text-decoration: underline;
 }
