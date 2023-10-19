@@ -8,7 +8,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         var 
             graphs = config.getGraphs(),
             i, j;
-        
+
         targetElem.empty();
 
         for (i = 0; i < graphs.length; i++) {
@@ -27,10 +27,11 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                     li = $('<li class="graph-legend-field field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>'),
                     nameElem = $('<span class="graph-legend-field-name field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
                     valueElem = $('<span class="graph-legend-field-value field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
-                    settingsElem = $('<div class="graph-legend-field-settings field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></div>'),
-                    analyseElem = $('<span class="glyphicon glyphicon-equalizer"></span>');
+                    settingsElem = $('<div class="graph-legend-field-settings field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j + '"></div>'),
+                    visibilityIcon = config.isGraphFieldHidden(i, j) ? "glyphicon-eye-close" : "glyphicon-eye-open",
+                    visibilityElem = $('<span class="glyphicon ' + visibilityIcon + ' graph-legend-field-visibility" graph="' + i + '" field="' + j + '"></span>');
                 li.append(nameElem);
-                li.append(analyseElem);
+                li.append(visibilityElem);
                 li.append(valueElem);
                 li.append(settingsElem);
 
@@ -63,7 +64,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         });
 
         // Add a trigger on legend; select the analyser graph/field to plot
-        $('.graph-legend-field').on('click', function(e) {
+        $('.graph-legend-field-name').on('click', function (e) {
 
             if(e.which!=1) return; // only accept left mouse clicks
 
@@ -134,7 +135,18 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         });
 
         // on first show, hide the analyser button
-        if(!config.selectedFieldName) $('.hide-analyser-window').hide();
+        if (!config.selectedFieldName) $('.hide-analyser-window').hide();
+
+        // Add a trigger on legend; select the analyser graph/field to plot
+        $('.graph-legend-field-visibility').on('click', function (e) {
+            if (e.which != 1) return; // only accept left mouse clicks
+
+            const $this = $(this),
+                graphIndex = $this.attr('graph'),
+                fieldIndex = $this.attr('field');
+
+            config.toggleGraphField(graphIndex, fieldIndex);
+        });
     }
 
     this.updateValues = function (flightLog, frame) {

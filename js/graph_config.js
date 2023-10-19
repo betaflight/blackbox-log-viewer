@@ -19,6 +19,8 @@ function GraphConfig(graphConfig) {
     this.highlightGraphIndex = null;
     this.highlightFieldIndex = null;
 
+    const hiddenGraphFields = new Set();
+
     this.getGraphs = function() {
         return graphs;
     };
@@ -28,6 +30,8 @@ function GraphConfig(graphConfig) {
      */
     this.setGraphs = function(newGraphs) {
         graphs = newGraphs;
+
+        hiddenGraphFields.clear();
 
         notifyListeners();
     };
@@ -128,6 +132,20 @@ function GraphConfig(graphConfig) {
 
     this.addListener = function(listener) {
         listeners.push(listener);
+    };
+
+    this.toggleGraphField = (graphIndex, fieldIndex) => {
+        const item = graphIndex + ":" + fieldIndex;
+        if (hiddenGraphFields.has(item)) {
+            hiddenGraphFields.delete(item);
+        } else {
+            hiddenGraphFields.add(item);
+        }
+        notifyListeners();
+    };
+
+    this.isGraphFieldHidden = (graphIndex, fieldIndex) => {
+        return hiddenGraphFields.has(graphIndex + ":" + fieldIndex);
     };
 }
 
