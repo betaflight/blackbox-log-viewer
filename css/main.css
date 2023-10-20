@@ -792,6 +792,10 @@ html.has-config .configuration-list {
     padding-right: 0.7em;
 }
 
+.graph-legend-field-name:hover {
+    text-decoration: underline;
+}
+
 .graph-legend-field-value {
     float: right;
 }
@@ -810,6 +814,11 @@ html.has-config .configuration-list {
 }
 
 .graph-legend-field > .glyphicon-equalizer {
+    float: right;
+    margin-left: 0.7em;
+}
+
+.graph-legend-field-visibility {
     float: right;
     margin-left: 0.7em;
 }
