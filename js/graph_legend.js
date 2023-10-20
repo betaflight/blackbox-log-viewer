@@ -64,7 +64,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
         });
 
         // Add a trigger on legend; select the analyser graph/field to plot
-        $('.graph-legend-field-name').on('click', function (e) {
+        $('.graph-legend-field-name, .graph-legend-field-settings, .graph-legend-field-value').on('click', function (e) {
 
             if(e.which!=1) return; // only accept left mouse clicks
 
