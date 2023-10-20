@@ -141,7 +141,6 @@ function GraphConfig(graphConfig) {
         } else {
             hiddenGraphFields.add(item);
         }
-        notifyListeners();
     };
 
     this.isGraphFieldHidden = (graphIndex, fieldIndex) => {

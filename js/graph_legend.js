@@ -148,6 +148,17 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                 fieldIndex = $this.attr('field');
 
             config.toggleGraphField(graphIndex, fieldIndex);
+            onHighlightChange();
+
+            if (config.isGraphFieldHidden(graphIndex, fieldIndex)) {
+                $this.removeClass("glyphicon-eye-open");
+                $this.addClass("glyphicon-eye-close");
+            } else {
+                $this.addClass("glyphicon-eye-open");
+                $this.removeClass("glyphicon-eye-close");
+            }
+
+            e.preventDefault();
         });
     }
 
