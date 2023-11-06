@@ -73,15 +73,15 @@ function FlightLogFieldPresenter() {
         'motor[6]': 'Motor [7]',
         'motor[7]': 'Motor [8]',
 
-        'eRPM(/100)[all]': 'RPM',
-        'eRPM(/100)[0]': 'RPM [1]',
-        'eRPM(/100)[1]': 'RPM [2]',
-        'eRPM(/100)[2]': 'RPM [3]',
-        'eRPM(/100)[3]': 'RPM [4]',
-        'eRPM(/100)[4]': 'RPM [5]',
-        'eRPM(/100)[5]': 'RPM [6]',
-        'eRPM(/100)[6]': 'RPM [7]',
-        'eRPM(/100)[7]': 'RPM [8]',
+        'eRPM[all]': 'RPM',
+        'eRPM[0]': 'RPM [1]',
+        'eRPM[1]': 'RPM [2]',
+        'eRPM[2]': 'RPM [3]',
+        'eRPM[3]': 'RPM [4]',
+        'eRPM[4]': 'RPM [5]',
+        'eRPM[5]': 'RPM [6]',
+        'eRPM[6]': 'RPM [7]',
+        'eRPM[7]': 'RPM [8]',
 
         'servo[all]': 'Servos',
         'servo[5]': 'Servo Tail',
@@ -1308,14 +1308,14 @@ function FlightLogFieldPresenter() {
             case 'motor[7]':
                 return `${flightLog.rcMotorRawToPctPhysical(value).toFixed(2)} %`;
 
-            case 'eRPM(/100)[0]':
-            case 'eRPM(/100)[1]':
-            case 'eRPM(/100)[2]':
-            case 'eRPM(/100)[3]':
-            case 'eRPM(/100)[4]':
-            case 'eRPM(/100)[5]':
-            case 'eRPM(/100)[6]':
-            case 'eRPM(/100)[7]':
+            case 'eRPM[0]':
+            case 'eRPM[1]':
+            case 'eRPM[2]':
+            case 'eRPM[3]':
+            case 'eRPM[4]':
+            case 'eRPM[5]':
+            case 'eRPM[6]':
+            case 'eRPM[7]':
                 let motor_poles = flightLog.getSysConfig()['motor_poles'];
                 return (value * 200 / motor_poles).toFixed(0) + " rpm / " + (value * 3.333 / motor_poles).toFixed(1) + ' hz';
 
