@@ -1,11 +1,12 @@
 "use strict";
 
 const
-    FIELD_THROTTLE_NAME = 'rcCommands[3]',
+    FIELD_THROTTLE_NAME = ['rcCommands[3]'],
+    FIELD_RPM_NAMES = ['eRPM[0]', 'eRPM[1]', 'eRPM[2]', 'eRPM[3]', 'eRPM[4]', 'eRPM[5]', 'eRPM[6]', 'eRPM[7]'],
     FREQ_VS_THR_CHUNK_TIME_MS = 300,
     FREQ_VS_THR_WINDOW_DIVISOR = 6,
     MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
-    THROTTLE_VALUES = 100;
+    NUM_VS_BINS = 100;
 
 var GraphSpectrumCalc = GraphSpectrumCalc || {
     _analyserTimeRange : { 
@@ -69,18 +70,19 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
     return fftData;
 };
 
-GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
 
-    var flightSamples = this._getFlightSamplesFreqVsThrottle();
+GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames) {
+
+    var flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames);
 
     // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle 
     // for each chunk. We use a moving window to get more chunks available. 
     var fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
     var fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
 
-    var maxNoiseThrottle = 0; // Stores the max noise produced
-    var matrixFftOutput = new Array(THROTTLE_VALUES);  // One for each throttle value, without decimal part
-    var numberSamplesThrottle = new Uint32Array(THROTTLE_VALUES); // Number of samples in each throttle value, used to average them later.
+    var maxNoise = 0; // Stores the max noise produced
+    var matrixFftOutput = new Array(NUM_VS_BINS);  // One for each throttle value, without decimal part
+    var numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each throttle value, used to average them later.
 
     var fft = new FFT.complex(fftChunkLength, false);
     for (var fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
@@ -100,36 +102,37 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
         // Use only abs values
         for (var i = 0; i < fftChunkLength; i++) {
             fftOutput[i] = Math.abs(fftOutput[i]);
-            if (fftOutput[i] > maxNoiseThrottle) {
-                maxNoiseThrottle = fftOutput[i];
+            if (fftOutput[i] > maxNoise) {
+                maxNoise = fftOutput[i];
             }
         }
 
-        // Calculate average throttle
-        var avgThrottle = 0; 
-        for (var indexThrottle = fftChunkIndex; indexThrottle < fftChunkIndex + fftChunkLength; indexThrottle++) {
-            avgThrottle += flightSamples.throttle[indexThrottle];
+        // Calculate average of the VS value int the chunk
+        var sumVsValues = 0;
+        for (var indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
+            sumVsValues += flightSamples.vsValues[indexVs];
         } 
-        // Average throttle, removing the decimal part
-        avgThrottle = Math.round(avgThrottle / 10 / fftChunkLength);
+        // Translate the average vs value to a bin index
+        const avgVsValue = sumVsValues / fftChunkLength;
+        var vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
 
-        numberSamplesThrottle[avgThrottle]++;
-        if (!matrixFftOutput[avgThrottle]) {
-            matrixFftOutput[avgThrottle] = fftOutput;
+        numberSamples[vsBinIndex]++;
+        if (!matrixFftOutput[vsBinIndex]) {
+            matrixFftOutput[vsBinIndex] = fftOutput;
         } else {
-            matrixFftOutput[avgThrottle] = matrixFftOutput[avgThrottle].map(function (num, idx) {
+            matrixFftOutput[vsBinIndex] = matrixFftOutput[vsBinIndex].map(function (num, idx) {
                 return num + fftOutput[idx];
             });
         }
     }
 
     // Divide by the number of samples
-    for (var i = 0; i < THROTTLE_VALUES; i++) {
-        if (numberSamplesThrottle[i] > 1) {
+    for (var i = 0; i < NUM_VS_BINS; i++) {
+        if (numberSamples[i] > 1) {
             for (var j = 0; j < matrixFftOutput[i].length; j++) {
-                matrixFftOutput[i][j] /= numberSamplesThrottle[i]; 
+                matrixFftOutput[i][j] /= numberSamples[i];
             }
-        } else if (numberSamplesThrottle[i] == 0) {
+        } else if (numberSamples[i] == 0) {
             matrixFftOutput[i] = new Float64Array(fftChunkLength * 2);
         }
     }
@@ -143,13 +146,21 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
             fieldName    : this._dataBuffer.fieldName,
             fftLength    : fftChunkLength,
             fftOutput    : matrixFftOutput,
-            maxNoise     : maxNoiseThrottle,
+            maxNoise     : maxNoise,
             blackBoxRate : this._blackBoxRate,
     };
 
     return fftData;
 
 };
+
+GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
+    return this._dataLoadFrequencyVsX(FIELD_THROTTLE_NAME);
+};
+
+GraphSpectrumCalc.dataLoadFrequencyVsRpm = function() {
+    return this._dataLoadFrequencyVsX(FIELD_RPM_NAMES);
+}
 
 GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
 
@@ -254,30 +265,51 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
     };
 };
 
-GraphSpectrumCalc._getFlightSamplesFreqVsThrottle = function() {
+GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
+    let fieldIndexes = []
+    for (let i = 0; i < vsFieldNames.length; ++i) {
+        if (Object.hasOwn(this._flightLog.getMainFieldIndexes(), vsFieldNames[i])) {
+            fieldIndexes.push(this._flightLog.getMainFieldIndexByName(vsFieldNames[i]));
+        }
+    }
+    return fieldIndexes;
+}
+
+GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames) {
 
     var allChunks = this._getFlightChunks();
 
     var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-    var throttle = new Uint16Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+    var vsValues = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
 
-    const FIELD_THROTTLE_INDEX = this._flightLog.getMainFieldIndexByName(FIELD_THROTTLE_NAME);
+    var vsIndexes = this._getVsIndexes(vsFieldNames);
 
-    // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
+    var maxValue = -Infinity
+    var minValue = Infinity
+
     var samplesCount = 0;
     for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
         var chunk = allChunks[chunkIndex];
         for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
             samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
-            throttle[samplesCount] = chunk.frames[frameIndex][FIELD_THROTTLE_INDEX]*10;
+
+            for (const vsFieldIx of vsIndexes) {
+                let value = chunk.frames[frameIndex][vsFieldIx];
+                maxValue = Math.max(maxValue, value);
+                minValue = Math.min(minValue, value);
+                vsValues[samplesCount] += value;
+            }
+            vsValues[samplesCount] /= vsIndexes.length;
             samplesCount++;
         }
     }
 
     return {
-            samples  : samples,
-            throttle : throttle,
-            count    : samplesCount
+            samples  : samples.slice(0, samplesCount),
+            vsValues : vsValues.slice(0, samplesCount),
+            count    : samplesCount,
+            minValue : minValue,
+            maxValue : maxValue,
            };
 };
 

@@ -15,6 +15,7 @@ const SPECTRUM_TYPE = {
         FREQUENCY        : 0,
         FREQ_VS_THROTTLE : 1,
         PIDERROR_VS_SETPOINT : 2,
+        FREQ_VS_RPM      : 3,
       };
 
 const SPECTRUM_OVERDRAW_TYPE = {
@@ -129,6 +130,10 @@ GraphSpectrumPlot._drawGraph = function(canvasCtx) {
         break;
 
     case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
+        this._drawFrequencyVsThrottleGraph(canvasCtx);
+        break;
+
+    case SPECTRUM_TYPE.FREQ_VS_RPM:
         this._drawFrequencyVsThrottleGraph(canvasCtx);
         break;
 
@@ -651,7 +656,7 @@ GraphSpectrumPlot._drawLowpassDynFilter = function(canvasCtx, frequency1, freque
     const x1 = this._drawVerticalMarkerLine(canvasCtx, frequency1, sampleRate / 2, dynFilterLabel, WIDTH, HEIGHT, OFFSET, stroke, lineWidth);
 
     // frequency2 line
-    const offsetByType = (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE)? 0 : OFFSET;
+    const offsetByType = (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM)? 0 : OFFSET;
     const x2 = this._drawVerticalMarkerLine(canvasCtx, frequency2, sampleRate / 2, null, WIDTH, HEIGHT, offsetByType, stroke, lineWidth);
 
     // Join line between frequency1 and frequency2 lines
@@ -659,7 +664,7 @@ GraphSpectrumPlot._drawLowpassDynFilter = function(canvasCtx, frequency1, freque
     canvasCtx.lineWidth = lineWidth || DEFAULT_MARK_LINE_WIDTH;
     canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
 
-    if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+    if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM) {
         /*
          * It draws a curve:
          *      frequency = (throttle - (throttle * throttle * throttle) / 3.0f) * 1.5f;
@@ -712,7 +717,7 @@ GraphSpectrumPlot._drawNotchFilter = function(canvasCtx, center, cutoff, sampleR
     canvasCtx.lineWidth = lineWidth || DEFAULT_MARK_LINE_WIDTH;
     canvasCtx.strokeStyle = stroke || "rgba(128,128,255,0.50)";
 
-    if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+    if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM) {
 
         canvasCtx.moveTo(cutoffX, 0);
         canvasCtx.lineTo(centerX*2 - cutoffX, HEIGHT);
@@ -742,7 +747,7 @@ GraphSpectrumPlot._drawNotchFilter = function(canvasCtx, center, cutoff, sampleR
 GraphSpectrumPlot._drawMousePosition = function(canvasCtx, mouseX, mouseY, WIDTH, HEIGHT, OFFSET, stroke, lineWidth) {
 
     // X axis
-    if (this._spectrumType === SPECTRUM_TYPE.FREQUENCY || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+    if (this._spectrumType === SPECTRUM_TYPE.FREQUENCY || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM) {
         // Calculate frequency at mouse
         const sampleRate = this._fftData.blackBoxRate / this._zoomX;
         const marginLeft = this._getActualMarginLeft();
@@ -752,8 +757,9 @@ GraphSpectrumPlot._drawMousePosition = function(canvasCtx, mouseX, mouseY, WIDTH
             this._drawInterestFrequency(canvasCtx, mouseFrequency, sampleRate, '', WIDTH, HEIGHT, OFFSET, "rgba(0,255,0,0.50)", 3);
         }
 
+        // TODO adjust axis after known min and max values?
         // Y axis
-        if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+        if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE || this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM) {
             const mouseThrottle = (1 - (mouseY / HEIGHT)) * 100;
             if (mouseThrottle >= 0 && mouseThrottle <= 100) {
                 const throttleLabel = `${mouseThrottle.toFixed(0)}%`;
@@ -787,6 +793,7 @@ GraphSpectrumPlot._getActualMarginLeft = function() {
     switch (this._spectrumType) {
 
     case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
+    case SPECTRUM_TYPE.FREQ_VS_RPM:
         actualMarginLeft = (this._isFullScreen)? MARGIN_LEFT_FULLSCREEN : MARGIN_LEFT;
         break;
     case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
