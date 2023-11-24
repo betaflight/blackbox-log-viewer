@@ -107,22 +107,25 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
             }
         }
 
-        // Calculate average of the VS value int the chunk
-        var sumVsValues = 0;
-        for (var indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
-            sumVsValues += flightSamples.vsValues[indexVs];
-        } 
-        // Translate the average vs value to a bin index
-        const avgVsValue = sumVsValues / fftChunkLength;
-        var vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
+        // go through all different vs values
+        for (const vsValueArray of flightSamples.vsValues) {
+            // Calculate average of the VS values in the chunk
+            var sumVsValues = 0;
+            for (var indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
+                sumVsValues += vsValueArray[indexVs];
+            }
+            // Translate the average vs value to a bin index
+            const avgVsValue = sumVsValues / fftChunkLength;
+            var vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
 
-        numberSamples[vsBinIndex]++;
-        if (!matrixFftOutput[vsBinIndex]) {
-            matrixFftOutput[vsBinIndex] = fftOutput;
-        } else {
-            matrixFftOutput[vsBinIndex] = matrixFftOutput[vsBinIndex].map(function (num, idx) {
-                return num + fftOutput[idx];
-            });
+            numberSamples[vsBinIndex]++;
+            if (!matrixFftOutput[vsBinIndex]) {
+                matrixFftOutput[vsBinIndex] = fftOutput;
+            } else {
+                matrixFftOutput[vsBinIndex] = matrixFftOutput[vsBinIndex].map(function (num, idx) {
+                    return num + fftOutput[idx];
+                });
+            }
         }
     }
 
@@ -283,11 +286,13 @@ GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
 GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
     var allChunks = this._getFlightChunks();
+    var vsIndexes = this._getVsIndexes(vsFieldNames);
 
     var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-    var vsValues = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-
-    var vsIndexes = this._getVsIndexes(vsFieldNames);
+    var vsValues = []
+    for (const vsFieldIx of vsIndexes) {
+        vsValues.push(new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
+    }
 
     var samplesCount = 0;
     for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
@@ -295,13 +300,13 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
         for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
             samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
 
-            for (const vsFieldIx of vsIndexes) {
+            for (let i = 0; i < vsIndexes.length; i++) {
+                let vsFieldIx = vsIndexes[i];
                 let value = chunk.frames[frameIndex][vsFieldIx];
                 maxValue = Math.max(maxValue, value);
                 minValue = Math.min(minValue, value);
-                vsValues[samplesCount] += value;
+                vsValues[i][samplesCount] = value;
             }
-            vsValues[samplesCount] /= vsIndexes.length;
             samplesCount++;
         }
     }
@@ -318,9 +323,14 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
         }
     }
 
+    let slicedVsValues = []
+    for (const vsValueArray of vsValues) {
+        slicedVsValues.push(vsValueArray.slice(0, samplesCount));
+    }
+
     return {
             samples  : samples.slice(0, samplesCount),
-            vsValues : vsValues.slice(0, samplesCount),
+            vsValues : slicedVsValues,
             count    : samplesCount,
             minValue : minValue,
             maxValue : maxValue,
