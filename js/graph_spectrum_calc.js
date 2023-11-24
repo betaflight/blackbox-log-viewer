@@ -71,9 +71,9 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 };
 
 
-GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames) {
+GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
-    var flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames);
+    var flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue);
 
     // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle 
     // for each chunk. We use a moving window to get more chunks available. 
@@ -148,6 +148,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames) {
             fftOutput    : matrixFftOutput,
             maxNoise     : maxNoise,
             blackBoxRate : this._blackBoxRate,
+            vsRange      : { min: flightSamples.minValue, max: flightSamples.maxValue},
     };
 
     return fftData;
@@ -155,11 +156,15 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames) {
 };
 
 GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
-    return this._dataLoadFrequencyVsX(FIELD_THROTTLE_NAME);
+    return this._dataLoadFrequencyVsX(FIELD_THROTTLE_NAME, 0, 100);
 };
 
 GraphSpectrumCalc.dataLoadFrequencyVsRpm = function() {
-    return this._dataLoadFrequencyVsX(FIELD_RPM_NAMES);
+    var fftData = this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
+    var motorPoles = this._flightLog.getSysConfig()['motor_poles']
+    fftData.vsRange.max *= 3.333 / motorPoles;
+    fftData.vsRange.min *= 3.333 / motorPoles;
+    return fftData;
 }
 
 GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
@@ -275,7 +280,7 @@ GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
     return fieldIndexes;
 }
 
-GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames) {
+GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
     var allChunks = this._getFlightChunks();
 
@@ -283,9 +288,6 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames) {
     var vsValues = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
 
     var vsIndexes = this._getVsIndexes(vsFieldNames);
-
-    var maxValue = -Infinity
-    var minValue = Infinity
 
     var samplesCount = 0;
     for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
@@ -301,6 +303,18 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames) {
             }
             vsValues[samplesCount] /= vsIndexes.length;
             samplesCount++;
+        }
+    }
+
+    if (minValue > maxValue) {
+        if (minValue == Infinity) {  // this should never happen
+            minValue = 0;
+            maxValue = 100;
+            console.log("Invalid minimum value");
+        } else {
+            console.log("Maximum value %f smaller than minimum value %d", maxValue, minValue);
+            minValue = 0;
+            maxValue = 100;
         }
     }
 
