@@ -352,6 +352,7 @@ var FlightLogParser = function(logData) {
             throttle_limit_percent: null,
             throttle_boost: null,                    // throttle boost
             throttle_boost_cutoff: null,
+            thrust_linear: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -433,6 +434,7 @@ var FlightLogParser = function(logData) {
             vbat_pid_gain             : "vbat_pid_compensation",
             yaw_accel_limit           : "yawRateAccelLimit",
             yaw_lowpass_hz            : "yaw_lpf_hz",
+            thrust_linear             : "thrust_linear",
         },
 
         frameTypes,
@@ -845,6 +847,7 @@ var FlightLogParser = function(logData) {
             case "gyro_lowpass_dyn_hz":
             case "gyro_lowpass_dyn_expo":
             case "dterm_lpf_dyn_expo":
+            case "thrust_linear":
             case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
