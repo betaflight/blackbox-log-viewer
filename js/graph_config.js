@@ -904,6 +904,50 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'GPS_CONNECTION':
+                        switch (fieldName) {
+                            case 'debug[0]': // GPS flight model
+                            case 'debug[1]': // Nav Data interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // task interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Baud rate / resolved packet interval
+                            case 'debug[4]': // State*100 + SubState
+                                return getCurveForMinMaxFields(fieldName);
+                            case 'debug[5]': // ExecuteTimeUs
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 100,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[6]': // ackState
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[7]': // Incoming buffer
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 100,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
                     case 'ALTITUDE':
                         switch (fieldName) {
                             case 'debug[0]': // GPS Trust
@@ -984,14 +1028,20 @@ GraphConfig.load = function(config) {
                         }
                     case 'ANGLE_MODE':
                         switch (fieldName) {
-                            case 'debug[0]':
-                            case 'debug[1]':
-                            case 'debug[2]':
-                            case 'debug[3]':
+                            case 'debug[0]': // angle target
+                            case 'debug[3]': // angle achieved
                                 return {
                                     offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // angle error correction
+                            case 'debug[2]': // angle feedforward
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
                                     outputRange: 1.0,
                                 };
                             default:

@@ -990,6 +990,17 @@ function FlightLogFieldPresenter() {
             'debug[6]':'Not Used',
             'debug[7]':'Not Used',
         },
+        'GPS_CONNECTION' : {
+            'debug[all]':'GPS Connection',
+            'debug[0]':'Nav Model',
+            'debug[1]':'GPS Nav interval',
+            'debug[2]':'Task timer',
+            'debug[3]':'Baud Rate / FC interval',
+            'debug[4]':'State*100 +SubState',
+            'debug[5]':'ExecuteTime',
+            'debug[6]':'Ack State',
+            'debug[7]':'Rx buffer size',
+        },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
             'debug[0]':'accADC X',
@@ -1084,11 +1095,11 @@ function FlightLogFieldPresenter() {
             'debug[0]': 'Mag X',
             'debug[1]': 'Mag Y',
             'debug[2]': 'Mag Z',
-            'debug[3]': 'Norm / Length of magADC',
+            'debug[3]': 'Field Strength',
             'debug[4]': 'Estimated Mag Bias X',
             'debug[5]': 'Estimated Mag Bias Y',
             'debug[6]': 'Estimated Mag Bias Z',
-            'debug[7]': 'Mag Bias Estimator',
+            'debug[7]': 'Lambda',
         },
         'MAG_TASK_RATE' : {
             'debug[all]': 'Mag Task Rate',
@@ -1799,6 +1810,21 @@ function FlightLogFieldPresenter() {
                         case 'debug[2]': // altitude cm
                         case 'debug[3]': // altitude target cm
                             return (value / 100).toFixed(1) + ' m';
+                        default:
+                            return value.toFixed(0);
+                    }
+                case 'GPS__CONNECTION':
+                    switch (fieldName) {
+                        case 'debug[0]': // Flight model
+                        case 'debug[1]': // GPS Nav packet interval
+                        case 'debug[2]': // FC Nav data time
+                            return value.toFixed(0);
+                        case 'debug[3]': // Baud Rate / Nav interval
+                            return (value * 100).toFixed(0);
+                        case 'debug[4]': // main state * 100 + subState
+                        case 'debug[5]': // executeTimeUs
+                        case 'debug[6]': // ack state
+                        case 'debug[7]': // serial Rx buffer
                         default:
                             return value.toFixed(0);
                     }
