@@ -990,6 +990,17 @@ function FlightLogFieldPresenter() {
             'debug[6]':'Not Used',
             'debug[7]':'Not Used',
         },
+        'GPS_CONNECTION' : {
+            'debug[all]':'GPS Connection',
+            'debug[0]':'Nav Model',
+            'debug[1]':'GPS Nav interval',
+            'debug[2]':'Task timer',
+            'debug[3]':'Baud Rate / FC interval',
+            'debug[4]':'State*100 +SubState',
+            'debug[5]':'ExecuteTime',
+            'debug[6]':'Ack State',
+            'debug[7]':'Rx buffer size',
+        },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
             'debug[0]':'accADC X',
@@ -1023,6 +1034,83 @@ function FlightLogFieldPresenter() {
             'debug[6]':'Not Used',
             'debug[7]':'Not Used',
         },
+        'FAILSAFE' : {
+            'debug[all]': 'Failsafe',
+            'debug[0]': 'Failsafe Phase switch',
+            'debug[1]': 'Failsafe State',
+            'debug[2]': 'Receiving data from Rx',
+            'debug[3]': 'Failsafe Phase',
+        },
+        'GYRO_CALIBRATION' : {
+            'debug[all]': 'Gyro Calibration',
+            'debug[0]': 'Gyro Calibration X',
+            'debug[1]': 'Gyro Calibration Y',
+            'debug[2]': 'Gyro Calibration Z',
+            'debug[3]': 'Calibration Cycles remaining',
+        },
+        'ANGLE_MODE' : {
+            'debug[all]': 'Angle Mode',
+            'debug[0]': 'Angle Target',
+            'debug[1]': 'Angle Error',
+            'debug[2]': 'Angle Feedforward',
+            'debug[3]': 'Angle Current',
+        },
+        'ANGLE_TARGET' : {
+            'debug[all]': 'Angle Target',
+            'debug[0]': 'Angle Target',
+            'debug[1]': 'Sin Angle',
+            'debug[2]': 'Current PID Setpoint',
+            'debug[3]': 'Angle Current',
+        },
+        'CURRENT_ANGLE' : {
+            'debug[all]': 'Current Angle',
+            'debug[0]': 'Current Angle X',
+            'debug[1]': 'Current Angle Y',
+            'debug[2]': 'Current Angle Z',
+        },
+        'DSHOT_TELEMETRY_COUNTS' : {
+            'debug[all]': 'DShot Telemetry Counts',
+            'debug[0]': 'DShot Telemetry Debug[0] + 1',
+            'debug[1]': 'DShot Telemetry Debug[1] + 1',
+            'debug[2]': 'DShot Telemetry Debug[2] + 1',
+            'debug[3]': 'Preamble Skip',
+        },
+        'RPM_LIMIT' : {
+            'debug[all]': 'RPM Limit',
+            'debug[0]': 'Average RPM',
+            'debug[1]': 'Average RPM (unsmoothed)',
+            'debug[2]': 'RPM Limit throttle scale',
+            'debug[3]': 'Throttle',
+            'debug[4]': 'Error',
+            'debug[5]': 'Proportional',
+            'debug[6]': 'Integral',
+            'debug[7]': 'Derivative',
+        },
+        'RC_STATS' : {
+            'debug[all]': 'RC Stats',
+            'debug[0]': 'Average Throttle',
+        },
+        'MAG_CALIB' : {
+            'debug[all]': 'Mag Calibration',
+            'debug[0]': 'Mag X',
+            'debug[1]': 'Mag Y',
+            'debug[2]': 'Mag Z',
+            'debug[3]': 'Field Strength',
+            'debug[4]': 'Estimated Mag Bias X',
+            'debug[5]': 'Estimated Mag Bias Y',
+            'debug[6]': 'Estimated Mag Bias Z',
+            'debug[7]': 'Lambda',
+        },
+        'MAG_TASK_RATE' : {
+            'debug[all]': 'Mag Task Rate',
+            'debug[0]': 'Task Rate (Hz)',
+            'debug[1]': 'Actual Data Rate (Hz)',
+            'debug[2]': 'Data Interval (Us)',
+            'debug[3]': 'Execute Time (Us)',
+            'debug[4]': 'Bus Busy',
+            'debug[5]': 'Read State',
+            'debug[6]': 'Task Time (Us)',
+        },
     };
 
     let DEBUG_FRIENDLY_FIELD_NAMES = null;
@@ -1032,6 +1120,7 @@ function FlightLogFieldPresenter() {
         DEBUG_FRIENDLY_FIELD_NAMES = {...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL};
 
         if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
+
             if (semver.gte(firmwareVersion, '4.4.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.BARO = {
                     'debug[all]':'Debug Barometer',
@@ -1724,6 +1813,21 @@ function FlightLogFieldPresenter() {
                         default:
                             return value.toFixed(0);
                     }
+                case 'GPS__CONNECTION':
+                    switch (fieldName) {
+                        case 'debug[0]': // Flight model
+                        case 'debug[1]': // GPS Nav packet interval
+                        case 'debug[2]': // FC Nav data time
+                            return value.toFixed(0);
+                        case 'debug[3]': // Baud Rate / Nav interval
+                            return (value * 100).toFixed(0);
+                        case 'debug[4]': // main state * 100 + subState
+                        case 'debug[5]': // executeTimeUs
+                        case 'debug[6]': // ack state
+                        case 'debug[7]': // serial Rx buffer
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'ATTITUDE':
                     switch (fieldName) {
                         case 'debug[0]': // accADC X
@@ -1752,6 +1856,18 @@ function FlightLogFieldPresenter() {
                         default:
                             return (value / 100).toFixed(2);
                     }
+                case 'FAILSAFE':
+                    return value.toFixed(0);
+                case 'GYRO_CALIBRATION':
+                    return value.toFixed(0);
+                case 'ANGLE_MODE':
+                    return value.toFixed(0);
+                case 'ANGLE_TARGET':
+                    return value.toFixed(0);
+                case 'CURRENT_ANGLE':
+                    return value.toFixed(0);
+                case 'DSHOT_TELEMETRY_COUNTS':
+                    return value.toFixed(0);
             }
             return value.toFixed(0);
         }

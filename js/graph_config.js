@@ -904,6 +904,50 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'GPS_CONNECTION':
+                        switch (fieldName) {
+                            case 'debug[0]': // GPS flight model
+                            case 'debug[1]': // Nav Data interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // task interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Baud rate / resolved packet interval
+                            case 'debug[4]': // State*100 + SubState
+                                return getCurveForMinMaxFields(fieldName);
+                            case 'debug[5]': // ExecuteTimeUs
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 100,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[6]': // ackState
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[7]': // Incoming buffer
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 100,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
                     case 'ALTITUDE':
                         switch (fieldName) {
                             case 'debug[0]': // GPS Trust
@@ -931,22 +975,6 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
-                    case 'GPS_DOP':
-                        switch (fieldName) {
-                            case 'debug[0]': // Number of Satellites (now this is in normal GPS data, maybe gpsTrust?)
-                            case 'debug[1]': // pDOP
-                            case 'debug[2]': // hDOP
-                            case 'debug[3]': // vDOP
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
-                                };
-                            default:
-                                return getCurveForMinMaxFields(fieldName);
-                        }
-    
                     case 'BARO':
                         switch (fieldName) {
                             case 'debug[0]': // Baro state 0-10
@@ -967,8 +995,147 @@ GraphConfig.load = function(config) {
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
-                            }
-                    }
+                        }
+                    case 'GPS_DOP':
+                        switch (fieldName) {
+                            case 'debug[0]': // Number of Satellites (now this is in normal GPS data, maybe gpsTrust?)
+                            case 'debug[1]': // pDOP
+                            case 'debug[2]': // hDOP
+                            case 'debug[3]': // vDOP
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                    case 'FAILSAFE':
+                        switch (fieldName) {
+                            case 'debug[0]':
+                            case 'debug[1]':
+                            case 'debug[2]':
+                            case 'debug[3]':
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                    case 'ANGLE_MODE':
+                        switch (fieldName) {
+                            case 'debug[0]': // angle target
+                            case 'debug[3]': // angle achieved
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // angle error correction
+                            case 'debug[2]': // angle feedforward
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                    case 'DSHOT_TELEMETRY_COUNTS':
+                        switch (fieldName) {
+                            case 'debug[0]': 
+                            case 'debug[1]': 
+                            case 'debug[2]': 
+                            case 'debug[3]': 
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                    case 'MAG_CALIB':
+                        switch (fieldName) {
+                            case 'debug[0]': // X
+                            case 'debug[1]': // Y
+                            case 'debug[2]': // Z
+                            case 'debug[3]': // Field
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 2000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[4]': // X Cal
+                            case 'debug[5]': // Y Cal
+                            case 'debug[6]': // Z Cal
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[7]': // Lambda
+                                return {
+                                    offset: -2000,
+                                    power: 1.0,
+                                    inputRange: 2000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                    case 'MAG_TASK_RATE':
+                        switch (fieldName) {
+                            case 'debug[0]': // Task Rate
+                            case 'debug[1]': // Data Rate
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 1000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // Data Interval
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Execute Time
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 20,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[4]': // Bus Busy Check
+                            case 'debug[5]': // Read State Check
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 2,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[6]': // Time since previous task uS
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 10000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                }
             }
             // if not found above then
             // Scale and center the field based on the whole-log observed ranges for that field
