@@ -503,6 +503,33 @@ GraphConfig.load = function(config) {
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0
                         };
+                    case 'ALTITUDE':
+                        switch (fieldName) {
+                            case 'debug[0]': // GPS Trust
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // Baro Alt
+                            case 'debug[2]': // GPS Alt
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[3]': // Vario
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
                     case 'FFT':
                         switch (fieldName) {
                             case 'debug[0]': // pre-dyn notch gyro [for gyro debug axis]
@@ -635,6 +662,48 @@ GraphConfig.load = function(config) {
                             inputRange: 300,
                             outputRange: 1.0,
                         };
+                    case 'BARO':
+                        switch (fieldName) {
+                            case 'debug[0]': // Baro state 0-10
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 20,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[1]': // Baro Temp
+                            case 'debug[2]': // Baro Raw
+                            case 'debug[3]': // Baro smoothed
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 2000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
+                    case 'GPS_RESCUE_THROTTLE_PID':
+                        switch (fieldName) {
+                            case 'debug[0]': // Throttle P uS added
+                            case 'debug[1]': // Throttle D uS added
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 200,
+                                    outputRange: 1.0,
+                                };
+                            case 'debug[2]': // Altitude
+                            case 'debug[3]': // Target Altitude
+                                return {
+                                    offset: 0,
+                                    power: 1.0,
+                                    inputRange: 5000,
+                                    outputRange: 1.0,
+                                };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                        }
                     case 'DYN_IDLE':
                         switch (fieldName) {
                             case 'debug[0]': // in 4.3 is dyn idle P
@@ -768,27 +837,6 @@ GraphConfig.load = function(config) {
                             // debug 0 = Phase offset us
                             // debug 1 = Filtered phase offset us
                             // debug 3 = Phase shift in us
-                            default:
-                                return getCurveForMinMaxFields(fieldName);
-                            }
-                    case 'GPS_RESCUE_THROTTLE_PID':
-                        switch (fieldName) {
-                            case 'debug[0]': // Throttle P uS added
-                            case 'debug[1]': // Throttle D uS added
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
-                                };
-                            case 'debug[2]': // Altitude
-                            case 'debug[3]': // Target Altitude
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
-                                };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
@@ -948,24 +996,12 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
-                    case 'ALTITUDE':
+                    case 'ATTITUDE':
                         switch (fieldName) {
-                            case 'debug[0]': // GPS Trust
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
-                                };
-                            case 'debug[1]': // Baro Alt
-                            case 'debug[2]': // GPS Alt
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
-                                };
-                            case 'debug[3]': // Vario
+                            case 'debug[0]':
+                            case 'debug[1]':
+                            case 'debug[2]':
+                            case 'debug[3]':
                                 return {
                                     offset: 0,
                                     power: 1.0,
@@ -973,28 +1009,12 @@ GraphConfig.load = function(config) {
                                     outputRange: 1.0,
                                 };
                             default:
-                                return getCurveForMinMaxFields(fieldName);
-                        }
-                    case 'BARO':
-                        switch (fieldName) {
-                            case 'debug[0]': // Baro state 0-10
                                 return {
                                     offset: 0,
                                     power: 1.0,
-                                    inputRange: 20,
+                                    inputRange: 500,
                                     outputRange: 1.0,
                                 };
-                            case 'debug[1]': // Baro Temp
-                            case 'debug[2]': // Baro Raw
-                            case 'debug[3]': // Baro smoothed
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 2000,
-                                    outputRange: 1.0,
-                                };
-                            default:
-                                return getCurveForMinMaxFields(fieldName);
                         }
                     case 'GPS_DOP':
                         switch (fieldName) {

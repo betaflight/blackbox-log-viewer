@@ -269,15 +269,15 @@ let
         "NONE",
         "CYCLETIME",
         "BATTERY",
-        "GYRO",
+        "GYRO",                         // deprecated (GYRO_FILTERED)
         "ACCELEROMETER",
-        "MIXER",
-        "AIRMODE",
+        "MIXER",                        // deprecated
+        "AIRMODE",                      // deprecated
         "PIDLOOP",
-        "NOTCH",
+        "NOTCH",                        // deprecated (GYRO_SCALED)
         "RC_INTERPOLATION",
-        "VELOCITY",
-        "DTERM_FILTER",
+        "VELOCITY",                     // deprecated
+        "DTERM_FILTER",                 // deprecated
         "ANGLERATE",
         "ESC_SENSOR",
         "SCHEDULER",
@@ -289,10 +289,10 @@ let
         "FFT_TIME",
         "FFT_FREQ",
         "RX_FRSKY_SPI",
-        "GYRO_RAW",
-        "DUAL_GYRO",
+        "GYRO_RAW",                     // deprecated
+        "DUAL_GYRO",                    // deprecated
         "DUAL_GYRO_RAW",
-        "DUAL_GYRO_COMBINED",
+        "DUAL_GYRO_COMBINED",           // deprecated
         "DUAL_GYRO_DIFF",
         "MAX7456_SIGNAL",
         "MAX7456_SPICLOCK",
@@ -329,8 +329,8 @@ let
         "BARO",
         "GPS_RESCUE_THROTTLE_PID",
         "DYN_IDLE",
-        "FF_LIMIT",
-        "FF_INTERPOLATED",
+        "FF_LIMIT",                     // deprecated (FEEDFORWARD_LIMIT)
+        "FF_INTERPOLATED",              // deprecated (FEEDFORWARD)
         "BLACKBOX_OUTPUT",
         "GYRO_SAMPLE",
         "RX_TIMING",
