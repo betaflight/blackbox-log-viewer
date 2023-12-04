@@ -1003,14 +1003,10 @@ function FlightLogFieldPresenter() {
         },
         'ATTITUDE' : {
             'debug[all]':'Attitude',
-            'debug[0]':'accADC X',
-            'debug[1]':'accADC Y',
-            'debug[2]':'Setpoint Roll',
-            'debug[3]':'Setpoint Pitch',
-            'debug[4]':'Not Used',
-            'debug[5]':'Not Used',
-            'debug[6]':'Not Used',
-            'debug[7]':'Not Used',
+            'debug[0]':'IMU Gain',
+            'debug[1]':'EZ_EF',
+            'debug[2]':'GroundSpeedError',
+            'debug[3]':'VelocityFactor',
         },
         'VTX_MSP' : {
             'debug[all]': 'VTX MSP',
@@ -1050,10 +1046,10 @@ function FlightLogFieldPresenter() {
         },
         'ANGLE_MODE' : {
             'debug[all]': 'Angle Mode',
-            'debug[0]': 'Angle Target',
-            'debug[1]': 'Angle Error',
-            'debug[2]': 'Angle Feedforward',
-            'debug[3]': 'Angle Current',
+            'debug[0]': 'Target Angle',
+            'debug[1]': 'Error P correction',
+            'debug[2]': 'Feedforward correction',
+            'debug[3]': 'Angle Achieved',
         },
         'ANGLE_TARGET' : {
             'debug[all]': 'Angle Target',
@@ -1861,7 +1857,15 @@ function FlightLogFieldPresenter() {
                 case 'GYRO_CALIBRATION':
                     return value.toFixed(0);
                 case 'ANGLE_MODE':
-                    return value.toFixed(0);
+                    switch (fieldName) {
+                        case 'debug[0]': // target angle
+                        case 'debug[1]': // angle error
+                        case 'debug[2]': // angle feedforward
+                        case 'debug[3]': // angle achieved
+                            return (value / 10).toFixed(1) + " °";
+                        default:
+                            return value.toFixed(0);
+                    }
                 case 'ANGLE_TARGET':
                     return value.toFixed(0);
                 case 'CURRENT_ANGLE':
