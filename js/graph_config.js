@@ -996,26 +996,6 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
-                    case 'ATTITUDE':
-                        switch (fieldName) {
-                            case 'debug[0]':
-                            case 'debug[1]':
-                            case 'debug[2]':
-                            case 'debug[3]':
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
-                                };
-                            default:
-                                return {
-                                    offset: 0,
-                                    power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
-                                };
-                        }
                     case 'GPS_DOP':
                         switch (fieldName) {
                             case 'debug[0]': // Number of Satellites (now this is in normal GPS data, maybe gpsTrust?)
