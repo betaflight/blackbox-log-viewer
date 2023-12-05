@@ -416,7 +416,8 @@ let
         "BMI160",
         "BMI270",
         "LSM6DSO",
-        "FAKE",
+        "LSM6DSV16X",
+        "VIRTUAL",
     ]),
 
     BARO_HARDWARE = makeReadOnly([
