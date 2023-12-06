@@ -1107,6 +1107,13 @@ function FlightLogFieldPresenter() {
             'debug[5]': 'Read State',
             'debug[6]': 'Task Time (Us)',
         },
+        'EZLANDING' : {
+            'debug[all]': 'EZ Landing',
+            'debug[0]': 'EZ Land Factor',
+            'debug[1]': 'Adjusted Throttle',
+            'debug[2]': 'Upper Limit',
+            'debug[3]': 'EZ Land Limit',
+        },
     };
 
     let DEBUG_FRIENDLY_FIELD_NAMES = null;
