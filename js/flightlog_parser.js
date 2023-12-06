@@ -187,7 +187,7 @@ var FlightLogParser = function(logData) {
             vbatmaxcellvoltage:43,
             vbatwarningcellvoltage: 35,
             gyroScale: 0.0001, // Not even close to the default, but it's hardware specific so we can't do much better
-            acc_1G: 4096, // Ditto ^
+            acc_1G: 2048, // Ditto ^
             minthrottle: 1150,
             maxthrottle: 1850,
             currentMeterOffset: 0,
