@@ -356,6 +356,7 @@ var FlightLogParser = function(logData) {
             tpa_rate_lower: null,
             tpa_breakpoint_lower: null,
             tpa_breakpoint_lower_fade: null,
+            mixer_type: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -441,6 +442,7 @@ var FlightLogParser = function(logData) {
             tpa_rate_lower            : "tpa_rate_lower",
             tpa_breakpoint_lower      : "tpa_breakpoint_lower",
             tpa_breakpoint_lower_fade : "tpa_breakpoint_lower_fade",
+            mixer_type                : "mixer_type",
         },
 
         frameTypes,
@@ -857,6 +859,7 @@ var FlightLogParser = function(logData) {
             case "tpa_rate_lower":
             case "tpa_breakpoint_lower":
             case "tpa_breakpoint_lower_fade":
+            case "mixer_type":
             case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
