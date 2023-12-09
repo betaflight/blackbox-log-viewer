@@ -360,6 +360,7 @@ let
         "RC_STATS",
         "MAG_CALIB",
         "MAG_TASK_RATE",
+        "EZLANDING",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
