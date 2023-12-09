@@ -353,9 +353,9 @@ var FlightLogParser = function(logData) {
             throttle_boost: null,                    // throttle boost
             throttle_boost_cutoff: null,
             thrust_linear: null,
-            tpa_rate_lower: null,
-            tpa_breakpoint_lower: null,
-            tpa_breakpoint_lower_fade: null,
+            tpa_low_rate: null,
+            tpa_low_breakpoint: null,
+            tpa_low_always: null,
             mixer_type: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
@@ -439,9 +439,9 @@ var FlightLogParser = function(logData) {
             yaw_accel_limit           : "yawRateAccelLimit",
             yaw_lowpass_hz            : "yaw_lpf_hz",
             thrust_linear             : "thrust_linear",
-            tpa_rate_lower            : "tpa_rate_lower",
-            tpa_breakpoint_lower      : "tpa_breakpoint_lower",
-            tpa_breakpoint_lower_fade : "tpa_breakpoint_lower_fade",
+            tpa_low_rate              : "tpa_low_rate",
+            tpa_low_breakpoint        : "tpa_low_breakpoint",
+            tpa_low_always            : "tpa_low_always",
             mixer_type                : "mixer_type",
         },
 
@@ -856,9 +856,9 @@ var FlightLogParser = function(logData) {
             case "gyro_lowpass_dyn_expo":
             case "dterm_lpf_dyn_expo":
             case "thrust_linear":
-            case "tpa_rate_lower":
-            case "tpa_breakpoint_lower":
-            case "tpa_breakpoint_lower_fade":
+            case "tpa_low_rate":
+            case "tpa_low_breakpoint":
+            case "tpa_low_always":
             case "mixer_type":
             case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
