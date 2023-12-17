@@ -908,9 +908,9 @@ function FlightLogFieldPresenter() {
             'debug[1]':'ID of Late Task',
             'debug[2]':'Task Delay Time',
             'debug[3]':'Gyro Clock Skew',
-            'debug[4]':'Not Used',
-            'debug[5]':'Not Used',
-            'debug[6]':'Not Used',
+            'debug[4]':'Minimum Gyro period in 100th of a us',
+            'debug[5]':'Maximum Gyro period in 100th of a us',
+            'debug[6]':'Span of Gyro period in 100th of a us',
             'debug[7]':'Not Used',
         },
         'TIMING_ACCURACY' : {
