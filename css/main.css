@@ -593,6 +593,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 .analyser #spectrumType select {
     border-radius: 3px;
     padding: 0px 5px;
+    color: black;
 }
 
 .analyser:hover .non-shift #overdrawSpectrumType {
@@ -602,7 +603,6 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 }
 
 .analyser #overdrawSpectrumType {
-    color: #bbb;
     height: 0;
     overflow: hidden;
     opacity: 0;
@@ -616,6 +616,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 .analyser #overdrawSpectrumType select {
     border-radius: 3px;
     padding: 0px 5px;
+    color: black;
 }
 
 .analyser #analyserResize:hover {
@@ -667,7 +668,6 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
     left: 20px;
 }
 .log-seek-bar #seekbarTypeSelect {
-    color: #bbb;
     height: 0;
     overflow: hidden;
     opacity: 0;
@@ -681,6 +681,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 .log-seek-bar #seekbarTypeSelect select {
     border-radius: 3px;
     padding: 0px 5px;
+    color: black;
 }
 
 .log-graph video {
