@@ -908,6 +908,13 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 
                 field.index = flightLog.getMainFieldIndexByName(field.name);
                 
+                // Convert data if use MinMax
+                if(field.curve.EnabledMinMax)
+                {
+                    field.curve.inputRange = (field.curve.MinMax.max - field.curve.MinMax.min) / 2;
+                    field.curve.offset = -(field.curve.MinMax.max + field.curve.MinMax.min) / 2;
+                }
+                
                 // Convert the field's curve settings into an actual expo curve object:
                 field.curve = new ExpoCurve(field.curve.offset, 
                                             ((options.graphExpoOverride)?1.0:field.curve.power), 
