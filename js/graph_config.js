@@ -241,7 +241,9 @@ GraphConfig.load = function(config) {
                 offset: -(mm.max + mm.min) / 2,
                 power: 1.0,
                 inputRange: Math.max((mm.max - mm.min) / 2, 1.0),
-                outputRange: 1.0
+                outputRange: 1.0,
+				MinMax: mm,
+                EnabledMinMax: false
             };
         }
 
@@ -252,40 +254,50 @@ GraphConfig.load = function(config) {
                 offset: 0,
                 power: 1.0,
                 inputRange: Math.max(Math.max(Math.abs(mm.max), Math.abs(mm.min)), 1.0),
-                outputRange: 1.0
+                outputRange: 1.0,
+				MinMax: mm,
+                EnabledMinMax: false
             };
         }
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
-
+		var mm = getMinMaxForFields(fieldName);
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
                     offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
                     power: 1.0,
                     inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^servo\[/)) {
                 return {
                     offset: -1500,
                     power: 1.0,
                     inputRange: 500,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^accSmooth\[/)) {
                 return {
                     offset: 0,
                     power: 0.5,
                     inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName == "rcCommands[3]") { // Throttle scaled
                 return {
                     offset: -50,
                     power: 1.0, /* Make this 1.0 to scale linearly */
                     inputRange: 50,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^axisError\[/)  ||     // Gyro, Gyro Scaled, RC Command Scaled and axisError
                        fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
@@ -294,56 +306,72 @@ GraphConfig.load = function(config) {
                     offset: 0,
                     power: 0.25, /* Make this 1.0 to scale linearly */
                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20% 
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
                 return {
                     offset: 0,
                     power: 0.3,
                     inputRange: 1000, // Was 400 ?
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle
                 return {
                     offset: -1500,
                     power: 1.0,
                     inputRange: 500, 
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
                     offset: 0,
                     power: 0.25,
                     inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName == "heading[2]") {
                 return {
                     offset: -Math.PI,
                     power: 1.0,
                     inputRange: Math.PI,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^heading\[/)) {
                 return {
                     offset: 0,
                     power: 1.0,
                     inputRange: Math.PI,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^sonar.*/)) {
                 return {
                     offset: -200,
                     power: 1.0,
                     inputRange: 200,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^rssi.*/)) {
                 return {
                     offset: -512,
                     power: 1.0,
                     inputRange: 512,
-                    outputRange: 1.0
+                    outputRange: 1.0,
+					MinMax: mm,
+                    EnabledMinMax: false
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
@@ -356,14 +384,18 @@ GraphConfig.load = function(config) {
                                     offset: -50,
                                     power: 1,
                                     inputRange: 50,
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+									MinMax: mm,
+                                    EnabledMinMax: false
                                 };                            
                             default:
                                 return {
                                     offset: -1000,    // zero offset
                                     power: 1.0,
                                     inputRange: 1000, //  0-2000uS
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+									MinMax: mm,
+                                    EnabledMinMax: false
                                 };
                         }
                     case 'PIDLOOP': 
@@ -371,7 +403,9 @@ GraphConfig.load = function(config) {
                                 offset: -250,    // zero offset
                                 power: 1.0,
                                 inputRange: 250, //  0-500uS
-                                outputRange: 1.0
+                                outputRange: 1.0,
+								MinMax: mm,
+                                EnabledMinMax: false
                             };       
                     case 'GYRO':
                     case 'GYRO_FILTERED':
@@ -387,21 +421,27 @@ GraphConfig.load = function(config) {
                             offset: 0,
                             power: 0.25,
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                            outputRange: 1.0
+                            outputRange: 1.0,
+                            MinMax: mm,
+                            EnabledMinMax: false
                         };
                     case 'ACCELEROMETER':
                         return {
                             offset: 0,
                             power: 0.5,
                             inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
-                            outputRange: 1.0
+                            outputRange: 1.0,
+                            MinMax: mm,
+                            EnabledMinMax: false
                         };
                     case 'MIXER':
                         return {
                             offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
                             power: 1.0,
                             inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
-                            outputRange: 1.0
+                            outputRange: 1.0,
+                            MinMax: mm,
+                            EnabledMinMax: false
                         };
                     case 'BATTERY':
                         switch (fieldName) {
@@ -410,14 +450,18 @@ GraphConfig.load = function(config) {
                                     offset: -2048,
                                     power: 1,
                                     inputRange: 2048,
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+                                    MinMax: mm,
+                                    EnabledMinMax: false
                                 };                            
                             default:
                                 return {
                                     offset: -130,
                                     power: 1.0,
                                     inputRange: 130, // 0-26.0v
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+                                    MinMax: mm,
+                                    EnabledMinMax: false
                                 };
                         }
                     case 'RC_INTERPOLATION':
@@ -434,7 +478,9 @@ GraphConfig.load = function(config) {
                                     offset: 0,
                                     power: 0.25,
                                     inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands 
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+                                    MinMax: mm,
+                                    EnabledMinMax: false
                                 };
                             case 'debug[1]': // raw RC command derivative
                             case 'debug[2]': // smoothed RC command derivative
@@ -453,7 +499,9 @@ GraphConfig.load = function(config) {
                             offset: 0,
                             power: 0.25, /* Make this 1.0 to scale linearly */
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                            outputRange: 1.0
+                            outputRange: 1.0,
+                            MinMax: mm,
+                            EnabledMinMax: false
                         };
                     case 'FFT':
                         switch (fieldName) {
@@ -464,7 +512,9 @@ GraphConfig.load = function(config) {
                                     offset: 0,
                                     power: 0.25,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+                                    MinMax: mm,
+                                    EnabledMinMax: false
                                 };
                         }
                         break;
@@ -479,7 +529,9 @@ GraphConfig.load = function(config) {
                                     offset: 0,
                                     power: 0.25,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+                                    MinMax: mm,
+                                    EnabledMinMax: false
                                 };
                         }
                         break;
@@ -494,7 +546,9 @@ GraphConfig.load = function(config) {
                                     offset: 0,
                                     power: 0.25,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                                    outputRange: 1.0
+                                    outputRange: 1.0,
+                                    MinMax: mm,
+                                    EnabledMinMax: false
                                 };
                         }
                         break;
@@ -503,7 +557,9 @@ GraphConfig.load = function(config) {
                             offset: 0,
                             power: 1.0,
                             inputRange: 100,
-                            outputRange: 1.0
+                            outputRange: 1.0,
+                            MinMax: mm,
+                            EnabledMinMax: false
                         };   
                     case 'ESC_SENSOR_RPM':
                     case 'DSHOT_RPM_TELEMETRY':
@@ -536,7 +592,9 @@ GraphConfig.load = function(config) {
                 offset: 0,
                 power: 1.0,
                 inputRange: 500,
-                outputRange: 1.0
+                outputRange: 1.0,
+                MinMax: mm,
+                EnabledMinMax: false
             };
         }
     };
