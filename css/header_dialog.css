@@ -1,6 +1,6 @@
-/* Colums  START> */
+/* Columns  START> */
 .cf_column {
-    min-height: 20px;
+    min-height: 18px;
     margin-bottom: 0;
 }
 
@@ -53,9 +53,16 @@
 
 /* Default Parameter Entry Field */
 input[type="number"]::-webkit-inner-spin-button {
-    opacity: 1; /* required for chromium 33+ beta */
-    margin-left: 5px;
+    opacity: 0; /* 1 is required for chromium 33+ beta  to show the arrows / spinners */
+/*    margin-left: 5px;*/
 }
+
+/* Hide select dropdown arrow 
+select {
+    appearance: none;
+    padding-left: 5px;
+}
+*/
 
 .clear-both {
     clear: both;
@@ -73,7 +80,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .gui_box {
     border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #FFFFFF;
+    background-color: #ccc;
     float: left;
     width: calc(100% - 2px);
     margin-bottom: 10px;
@@ -81,15 +88,21 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .gui_box_titlebar {
-    background-color: #e4e4e4;
+    background-color: #808080;
     border-radius: 3px 3px 0 0;
-    font-size: 13px;
+    font-size: 14px;
     width: 100%;
     height: 27px;
     padding-bottom: 0;
     float: left;
-    margin-bottom: 7px;
+    color: white;
+    margin-bottom: 0px;
     font-family: 'open_sanssemibold', Arial, serif;
+}
+
+.h5 {
+    color: red;
+    margin: 0;
 }
 
 /* Spacers */
@@ -101,10 +114,12 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .spacer_box {
-    padding: 10px;
-    margin-bottom: 3px;
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
 }
 
+/* main title for each div*/
 .spacer_box_title {
     padding-left: 10px;
     padding-right: 10px;
@@ -113,15 +128,16 @@ input[type="number"]::-webkit-inner-spin-button {
     float: left;
 }
 
+/* space around each div*/
 .spacer_left {
-    padding-left: 15px;
+    padding-left: 0px;
     float: left;
-    width: calc(100% - 15px);
+    width: calc(100%);
 }
 
 .spacer_right {
-    padding-right: 15px;
-    width: calc(100% - 15px);
+    padding-right: 5px;
+    width: calc(100% - 5px);
     float: left;
 }
 
@@ -133,39 +149,43 @@ input[type="number"]::-webkit-inner-spin-button {
     border-top-right-radius: 3px;
 }
 
-.header-dialog .parameter label {
-    background-color: #828885;
-    padding: 4px;
+/* Parameter box titles */
+.header-dialog .parameter th {
+    background-color: #b0b0b0;
+    padding: 2px;
+    padding-left: 10px;
     border-left: 0 solid #ccc;
-    border-bottom: 1px solid #ccc;
-    font-weight: normal;
-    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    color: #505050;
     text-align: left;
-    width:100%;
 }
 
-.header-dialog .parameter th {
-    background-color: #828885;
-    padding: 4px;
+/* Parameter box other lines */
+.header-dialog .parameter label {
+    background-color: #d8d8d8;
+    padding: 0px;
+    margin: 0px;
     border-left: 0 solid #ccc;
-    border-bottom: 1px solid #ccc;
-    font-weight: bold;
-    color: white;
-    text-align: left;
+    font-weight: normal;
+    font-size: 13px;
+    color: #505050;
+                                text-align: center;
+}
+
+/* Parameter box other rows */
+.header-dialog .cf tr {
+    background-color: #d8d8d8;
+    text-align: center;
 }
 
 .header-dialog .modal-dialog {
     width:75%;
-    min-width:954px;
-}
-
-.header-dialog .cf tr {
-    background-color: #DEDEDE;
+    min-width:850px;
 }
 
 .header-dialog .cf th {
     border-right: solid 1px silver;
-    height: 19px;
     font-weight: normal;
 }
 
@@ -184,17 +204,26 @@ input[type="number"]::-webkit-inner-spin-button {
     border-top-right-radius: 3px;
 }
 
+/* Box holding numeric inputs */
 .header-dialog .cf input {
-    margin: 4px;
     width: calc(100% - 10px);
     border: 1px solid silver;
     border-radius: 3px;
+    margin-left: 2px;
+    text-align: center;
 }
 
+/* Box holding text down elements */
 .header-dialog .cf select {
-    margin: 4px;
+    appearance: none; /* hide arrow at right*/
     width: calc(100% - 10px);
     border: 1px solid silver;
+    background-color: #FFFFFF;
+    color: black;
+    padding-top: 1px;
+    padding-left: 2px;
+    text-align: center;
+    text-align-last: center;
 }
 
 .header-dialog .parameter th:nth-child(2) {
@@ -214,7 +243,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .header-dialog table {
-    float: left;
+    float: center;
     margin: 0;
     border-collapse: collapse;
     width: calc(100% - 1px);
@@ -226,13 +255,11 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog .parameter td+input {
     padding: 1px;
-    background-color:red;
     border-bottom: 0 solid #ccc;
 }
 
 .header-dialog table, .header-dialog table td {
     padding: 1px;
-    border-bottom: 0 solid #ccc;
 }
 
 .header-dialog table th {
@@ -245,7 +272,6 @@ input[type="number"]::-webkit-inner-spin-button {
     padding: 5px;
     text-align: left;
     border-right: 1px solid #ccc;
-    width: calc(100% - 1px);
 }
 
 .header-dialog .pid_titlebar th:first-child {
@@ -256,8 +282,9 @@ input[type="number"]::-webkit-inner-spin-button {
     border-right: none;
 }
 
+/* for labels in PID rows */
 .header-dialog table:not(.parameter) tr td:first-child {
-    text-align: left;
+    text-align: center;
     padding-left: 5px;
 }
 
@@ -268,27 +295,28 @@ input[type="number"]::-webkit-inner-spin-button {
 .header-dialog table td,
 .header-dialog .pid_titlebar th {
     padding: 1px;
-    width: 20%;
+    width: 15%;
     border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
 }
 
 .header-dialog table tr td {
-    text-align: left;
-    padding-left: 0;
+    text-align: center;
+    padding-left: ;
 }
 
+/* numeric inputs in tables */
 .header-dialog table input {
     display: block;
     width: calc(100% - 4px);
-    height: 20px;
-    line-height: 20px;
-    text-align: right;
+    text-align: center;
     border: 0 solid #ccc;
     border-radius: 0;
+    background-color: #F5F5F5;
 }
 
 .header-dialog .missing {
-	background:rgba(255,0,0,0.2);
+    background:rgba(255,0,0,0.2);
 }
 
 .header-dialog .static-features span {
@@ -311,8 +339,8 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .header-dialog .controller select {
     width: calc(100% - 10px);
-    height: 20px;
-    line-height: 20px;
+    height: 18px;
+    line-height: 18px;
 }
 
 .header-dialog .profile {
@@ -325,7 +353,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .header-dialog .profile .head {
     display: block;
     text-align: left;
-    line-height: 20px;
+    line-height: 18px;
     border-bottom: 1px solid #ccc;
     background-color: #828885;
     color: white;
@@ -337,8 +365,8 @@ input[type="number"]::-webkit-inner-spin-button {
 .header-dialog .profile select {
     width: 100%;
     padding-left: calc(100% - 35px);
-    height: 20px;
-    line-height: 20px;
+    height: 18px;
+    line-height: 18px;
 }
 
 .header-dialog .pid_tuning .name {
@@ -369,18 +397,18 @@ input[type="number"]::-webkit-inner-spin-button {
     width: 80%;
 }
 
+/* text in parameter boxes*/
 .header-dialog .parameter {
     float: right;
-    width: calc(100% - 2px);
-    margin-top: 10px;
     /* padding-left: 0; */
 }
 
+/*drop-down names display text*/
 html:not(.isCF) .cf-only,
 html:not(.isBF) .bf-only {
     /*display:none;*/
     /*visibility:hidden;*/
-    opacity:0.25;
+    /*opacity:0.25;*/
 }
 /*
 html:not(.isBF28) .bf-only {
@@ -399,9 +427,16 @@ html:not(.isBF28) .bf-only {
 }
 
 .header-dialog .spacer_box {
-    padding-bottom: 10px;
     float: left;
-    width: calc(100% - 5px);
+}
+
+.pid_labels th{
+    text-align: center;
+}
+
+.pid_labels th label{
+    font-weight: normal;
+    font-size: 12px;
 }
 
 .pid_mode {
@@ -414,7 +449,7 @@ html:not(.isBF28) .bf-only {
     padding: 8px 0 0 5px;
     font-size: 12px;
     border-bottom: 1px solid #ccc;
-    color: #828282;
+    color: #202020;
     font-family: 'open_sans', Arial, serif;
     background: #D6D6D6 linear-gradient(315deg, rgba(255, 255, 255, .2) 10%, transparent 10%, transparent 20%,
     rgba(255, 255, 255, .2) 20%, rgba(255, 255, 255, .2) 30%, transparent 30%, transparent 40%,
@@ -429,7 +464,8 @@ html:not(.isBF28) .bf-only {
     background-color: #828885;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    height: 20px;
+    height: 18px;
+    padding: 30px;
 }
 
 .pid_titlebar td:first-child {
@@ -484,9 +520,7 @@ html:not(.isBF28) .bf-only {
 .header-dialog .number input {
     width: 50px;
     padding-left: 3px;
-    height: 20px;
-    line-height: 20px;
-    text-align: left;
+    text-align: center;
     border: 1px solid silver;
     border-radius: 3px;
     margin-right: 11px;
@@ -509,8 +543,6 @@ html:not(.isBF28) .bf-only {
 .header-dialog .static-features label{
     /* width: 70px; */
     /* padding-left: 3px; */
-    height: 20px;
-    line-height: 20px;
     text-align: left;
     border: 0 solid silver;
     border-radius: 3px;
@@ -523,8 +555,8 @@ html:not(.isBF28) .bf-only {
 .header-dialog .features span,
 .header-dialog .static-features span {
     padding-right: 3px;
-    height: 20px;
-    line-height: 20px;
+    height: 18px;
+    line-height: 18px;
     text-align: left;
     border: 0 solid silver;
     border-radius: 3px;
@@ -537,12 +569,12 @@ html:not(.isBF28) .bf-only {
     font-style: normal;
     font-family: 'open_sansregular', Arial, sans-serif;
     line-height: 19px;
-    color: #7d7d7d;
+    color: #404040;
     font-size: 11px;
 }
 
 .noline {
-	border:0;
+    border:0;
 }
 
 .header-dialog .resetbt {

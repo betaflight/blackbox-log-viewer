@@ -112,6 +112,10 @@ var
                 fftData = GraphSpectrumCalc.dataLoadFrequencyVsThrottle();
                 break;
 
+            case SPECTRUM_TYPE.FREQ_VS_RPM:
+                fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm();
+                break;
+
             case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
                 fftData = GraphSpectrumCalc.dataLoadPidErrorVsSetpoint();
                 break;

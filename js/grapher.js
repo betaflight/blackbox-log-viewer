@@ -232,7 +232,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         idents.vbatField = fieldIndex;
                         idents.numCells = flightLog.getNumCellsEstimate();
                     break;
-                    case "BaroAlt":
+                    case "baroAlt":
                         idents.baroField = fieldIndex;
                     break;
                     case "roll":
@@ -729,7 +729,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             craft3D.resize(craftSize, craftSize);
         }
 
-        // Positon the craft canvas according to options
+        // Position the craft canvas according to options
         $(craftCanvas).css({
             left:Math.max(((canvas.width * parseInt(options.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
             top: Math.max(((canvas.height * parseInt(options.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",
@@ -800,6 +800,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         drawAxisBackground(canvas.height * graph.height);
                     
                     for (j = 0; j < graph.fields.length; j++) {
+                        if (graphConfig.isGraphFieldHidden(i, j)) {
+                            continue;
+                        }
                         var field = graph.fields[j];
                         plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, 
                             field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],

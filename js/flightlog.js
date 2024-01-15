@@ -141,6 +141,8 @@ function FlightLog(logData) {
         return {
             times: directory.times,
             avgThrottle: directory.avgThrottle,
+            maxMotorDiff: directory.maxMotorDiff,
+            maxRC: directory.maxRC,
             hasEvent: directory.hasEvent
         };
     };
@@ -207,15 +209,23 @@ function FlightLog(logData) {
         } else
             return false;
     };
-
+    
     function buildFieldNames() {
         // Make an independent copy
         fieldNames = parser.frameDefs.I.name.slice(0);
 
         // Add names of slow fields which we'll merge into the main stream
         if (parser.frameDefs.S) {
-            for (let i = 0; i < parser.frameDefs.S.name.length; i++) {
-                fieldNames.push(parser.frameDefs.S.name[i]);
+            for (const name of parser.frameDefs.S.name) {
+                fieldNames.push(name);
+            }
+        }
+        // Add names of gps fields which we'll merge into the main stream
+        if (parser.frameDefs.G) {
+            for (const name of parser.frameDefs.G.name) {
+                if (name !== 'time') { // remove duplicate time field
+                    fieldNames.push(name);
+                }
             }
         }
 
@@ -240,10 +250,10 @@ function FlightLog(logData) {
     }
 
     function estimateNumMotors() {
-        var count = 0;
+        let count = 0;
 
-        for (var j = 0; j < 8; j++) {
-            if (that.getMainFieldIndexByName("motor[" + j + "]") !== undefined) {
+        for (let j = 0; j < MAX_MOTOR_NUMBER; j++) {
+            if (that.getMainFieldIndexByName(`motor[${j}]`) !== undefined) {
                 count++;
             }
         }
@@ -366,16 +376,19 @@ function FlightLog(logData) {
                 var
                     mainFrameIndex = 0,
                     slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
-                    lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [];
+                    lastSlow = parser.frameDefs.S ? iframeDirectory.initialSlow[chunkIndex].slice(0) : [],
+                    lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count-1 : 0, // -1 since we exclude the time field
+                    lastGPS = parser.frameDefs.G ? iframeDirectory.initialGPS[chunkIndex].slice(0) : [];
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
                     var
-                        destFrame;
+                        destFrame,
+                        destFrame_currentIndex;
 
                     // The G frames need to be processed always. They are "invalid" if not H (Home) has been detected 
                     // before, but if not processed the viewer shows cuts and gaps. This happens if the quad takes off before 
                     // fixing enough satellites.
-                    if (frameValid || (frameType == 'G')) {
+                    if (frameValid || (frameType == 'G' && frame)) {
                         switch (frameType) {
                             case 'P':
                             case 'I':
@@ -383,7 +396,7 @@ function FlightLog(logData) {
                                 //The parser re-uses the "frame" array so we must copy that data somewhere else
 
                                 var
-                                    numOutputFields = frame.length + slowFrameLength + ADDITIONAL_COMPUTED_FIELD_COUNT;
+                                    numOutputFields = frame.length + slowFrameLength + lastGPSLength + ADDITIONAL_COMPUTED_FIELD_COUNT;
 
                                 //Do we have a recycled chunk to copy on top of?
                                 if (chunk.frames[mainFrameIndex]) {
@@ -400,10 +413,18 @@ function FlightLog(logData) {
                                     destFrame[i] = frame[i];
                                 }
 
+                                destFrame_currentIndex = frame.length; // Keeps track of where to place direct data in the destFrame.
                                 // Then merge in the last seen slow-frame data
-                                for (var i = 0; i < slowFrameLength; i++) {
-                                    destFrame[i + frame.length] = lastSlow[i] === undefined ? null : lastSlow[i];
+                                for (let slowFrameIndex = 0; slowFrameIndex < slowFrameLength; slowFrameIndex++) {
+                                    destFrame[slowFrameIndex + destFrame_currentIndex] = lastSlow[slowFrameIndex] === undefined ? null : lastSlow[slowFrameIndex];
                                 }
+                                destFrame_currentIndex += slowFrameLength;
+                                
+                                // Also merge last seen gps-frame data
+                                for (let gpsFrameIndex = 0; gpsFrameIndex < lastGPSLength; gpsFrameIndex++) {
+                                    destFrame[gpsFrameIndex + destFrame_currentIndex] = lastGPS[gpsFrameIndex] === undefined ? null : lastGPS[gpsFrameIndex];
+                                }
+                                // destFrame_currentIndex += lastGPSLength; Add this line if you wish to add more fields.
 
                                 for (var i = 0; i < eventNeedsTimestamp.length; i++) {
                                     eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
@@ -437,10 +458,18 @@ function FlightLog(logData) {
                                 }
                             break;
                             case 'H':
+                                // TODO
+                                // contains coordinates only
+                                // should be handled separately
                             case 'G':
-                                // TODO pending to do something with GPS frames
                                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
                                 // But other data from the G frame can be valid (time, num sats)
+
+                                //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+                                frame.shift(); // remove time
+                                for (let i = 0; i < frame.length; i++) {
+                                    lastGPS[i] = frame[i];
+                                }
                             break;
                         }
                     } else {
@@ -515,23 +544,24 @@ function FlightLog(logData) {
      * sourceChunks and destChunks can be the same array.
      */
     function injectComputedFields(sourceChunks, destChunks) {
-        var
-            gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]],
-            accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]],
-            magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]],
-            rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]],
-            setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]],
 
-            flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"], // This points to the flightmode data
+        let gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
+        let accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
+        let magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
+        let rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]];
+        let setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]];
 
-            sourceChunkIndex, destChunkIndex,
+        const flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"]; // This points to the flightmode data
 
-            sysConfig,
-            attitude,
+        let axisPID = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"], fieldNameToIndex["axisF[0]"]],
+                         [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"]],
+                         [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"]]];
 
-            axisPID = [[fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"], fieldNameToIndex["axisF[0]"]],
-                       [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"]],
-                       [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"]]];
+        let sourceChunkIndex;
+        let destChunkIndex;
+        let attitude;
+
+        const sysConfig = that.getSysConfig();
 
         if (destChunks.length === 0) {
             return;
@@ -561,8 +591,6 @@ function FlightLog(logData) {
         if (!axisPID[0]) {
             axisPID = false;
         }
-
-        sysConfig = that.getSysConfig();
 
         sourceChunkIndex = 0;
         destChunkIndex = 0;
@@ -654,9 +682,12 @@ function FlightLog(logData) {
                     if (axisPID && gyroADC) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
-                            destFrame[fieldIndex++] = gyroADCdegrees - destFrame[fieldIndexRcCommands + axis];
+                            destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
                         }
                     }
+
+                    // Remove empty fields at the end
+                    destFrame.splice(fieldIndex);
 
                 }
             }
@@ -1007,6 +1038,10 @@ function FlightLog(logData) {
 
         return true;
     };
+
+    this.hasGpsData = function() {
+        return this.getStats()?.frame?.G ? true : false;;
+    };
 }
 
 FlightLog.prototype.accRawToGs = function(value) {
@@ -1145,9 +1180,42 @@ FlightLog.prototype.rcCommandRawToThrottle = function(value) {
     return Math.min(Math.max(((value - this.getSysConfig().minthrottle) / (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) * 100.0, 0.0),100.0);
 };
 
-FlightLog.prototype.rcMotorRawToPct = function(value) {
+FlightLog.prototype.rcMotorRawToPctPhysical = function(value) {
+
     // Motor displayed as percentage
-    return Math.min(Math.max(((value - this.getSysConfig().motorOutput[0]) / (this.getSysConfig().motorOutput[1] - this.getSysConfig().motorOutput[0])) * 100.0, 0.0),100.0);
+    let motorPct;
+    if (this.isDigitalProtocol()) {
+        motorPct = ((value - DSHOT_MIN_VALUE) / DSHOT_RANGE) * 100;
+    } else {
+        const MAX_ANALOG_VALUE = this.getSysConfig().maxthrottle;
+        const MIN_ANALOG_VALUE = this.getSysConfig().minthrottle;
+        const ANALOG_RANGE = MAX_ANALOG_VALUE - MIN_ANALOG_VALUE;
+        motorPct = ((value - MIN_ANALOG_VALUE) / ANALOG_RANGE) * 100;
+    }
+    return Math.min(Math.max(motorPct, 0.0), 100.0);
+
+};
+
+FlightLog.prototype.isDigitalProtocol = function() {
+    let digitalProtocol;
+    switch(FAST_PROTOCOL[this.getSysConfig().fast_pwm_protocol]) {
+    case "PWM":
+    case "ONESHOT125":
+    case "ONESHOT42":
+    case "MULTISHOT":
+    case "BRUSHED":
+        digitalProtocol = false;
+        break;
+    case "DSHOT150":
+    case "DSHOT300":
+    case "DSHOT600":
+    case "DSHOT1200":
+    case "PROSHOT1000":
+    default:
+        digitalProtocol = true;
+        break;
+    }
+    return digitalProtocol;
 };
 
 FlightLog.prototype.getPIDPercentage = function(value) {
@@ -1268,5 +1336,7 @@ FlightLog.prototype.isFieldDisabled = function() {
             DEBUG         : (disabledFields & (1 << 9))!==0,
             MOTORS        : (disabledFields & (1 << 10))!==0,
             GPS           : (disabledFields & (1 << 11))!==0,
+            RPM           : (disabledFields & (1 << 12))!==0,
+            GYROUNFILT    : (disabledFields & (1 << 13))!==0,
         };
 };

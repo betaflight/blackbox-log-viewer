@@ -1,6 +1,6 @@
 # Betaflight Blackbox Explorer
 
-[![Build Status](https://travis-ci.com/betaflight/blackbox-log-viewer.svg?branch=master)](https://travis-ci.com/betaflight/blackbox-log-viewer) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer) [![Build Status](https://dev.azure.com/Betaflight/Betaflight%20Nightlies/_apis/build/status/betaflight.blackbox-log-viewer?branchName=master)](https://dev.azure.com/Betaflight/Betaflight%20Nightlies/_build/latest?definitionId=2&branchName=master)
+[![Latest version](https://img.shields.io/github/v/release/betaflight/blackbox-log-viewer)](https://github.com/betaflight/blackbox-log-viewer/releases) [![Build](https://img.shields.io/github/actions/workflow/status/betaflight/blackbox-log-viewer/nightly.yml?branch=master)](https://github.com/betaflight/blackbox-log-viewer/actions/workflows/nightly.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ![Main explorer interface](screenshots/main-interface.jpg)
 
@@ -12,37 +12,21 @@ be played behind the log. You can export the graphs as a WebM video to share wit
 
 ### Standalone
 
-Download the installer from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
+Betaflight 4.3 users should use the [latest nightly release](https://github.com/betaflight/blackbox-log-viewer-nightlies).
+Users of earlier Betaflight firmware should first try the nightly release, but if some fields don't render properly, try an earlier version from [Releases](https://github.com/betaflight/blackbox-log-viewer/releases).
+### Notes
 
-#### Note for MacOS X users
+#### Windows users
+
+The minimum required version of Windows is Windows 8.
+
+#### MacOS X users
 
 Changes to the security model used in the latest versions of MacOS X 10.14 (Mojave) and 10.15 (Catalina) mean that the operating system will show an error message ('"Betaflight\ Blackbox\ Explorer.app" is damaged and can’t be opened. You should move it to the Trash.') when trying to install the application. To work around this, run the following command in a terminal before installing: `sudo xattr -rd com.apple.quarantine /Applications/Betaflight\ Blackbox\ Explorer.app`.
 
-
-### Via Chrome Web Store (for ChromeOS)
-
-[![available in the Chrome web store](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/jhigimciiclphnbhmemimenbpbdclklf)
-
-1. Visit the [Betaflight Blackbox Log Viewer product page in the Chrome web store](https://chrome.google.com/webstore/detail/jhigimciiclphnbhmemimenbpbdclklf)
-2. Click **+ Add to Chrome**
-
-Please note - the application will automatically update itself when new versions are released.
-
-### Alternative way, Chrome app:
-
-1. Clone the repo to any local directory or download it as zip.
-2. If downloaded as a zip, extract it into a new directory.
-3. Start Google Chrome.
-4. Click the 3-dots on the far right of the URL bar.
-5. Select "More Tools"
-6. Select "Extensions"
-7. Check the Developer Mode checkbox.
-8. Click on load unpacked extension.
-9. Point it to the folder you extracted the zip to.
-
 ### Unstable Testing Versions
 
-Unstable testing versions of the lates builds of the Betaflight Blackbox Explorer for most platforms can be downloaded from [here](https://github.com/betaflight/blackbox-log-viewer-nightlies/releases).
+Unstable testing versions of the latest builds of the Betaflight Blackbox Explorer for most platforms can be downloaded from [here](https://github.com/betaflight/blackbox-log-viewer-nightlies/releases).
 
 **Be aware that these versions are intended for testing / feedback only, and may be buggy or broken.**
 
@@ -66,22 +50,6 @@ negative values move it towards the beginning.
 Click the "Graph Setup" button on the right side of the display in order to choose which fields should be plotted on
 the graph. You may, for example, want to remove the default gyro plot and add separate gyro plots for each rotation axis.
 Or you may want to plot vbat against throttle to examine your battery's performance.
-
-## Notes
-
-This tool has not been tested on Internet Explorer, but definitely won't work on versions earlier than version 9.
-
-Your web browser must support the video codec that your flight video uses in order to play it. Firefox doesn't support
-H.264 videos on Mac, so if your video won't play, try Google Chrome instead. If it still won't play, follow the 
-instructions in the next section to convert your video using Handbrake.
-
-The best performing web browser tends to be Google Chrome, especially when trying to play your flight video at the same
-time.
-
-This tool is currently in the Beta stage, so a number of key features have yet to be implemented:
-
-- There is no control over the amount of smoothing applied to the graph lines
-- There is no way to single-step between loop iterations with the arrow keys
 
 ## Native app build via NW.js
 
@@ -136,22 +104,35 @@ finally build the DMG itself, which will end up in blackbox-log-viewer/release/,
 ```
 yarn gulp release
 ```
+or just:
+```
+gulp release
+```
+For a build with debugging capabilities (use F12 to open the debug console):
+```
+yarn start
+```
+
+
 
 #### Build or release app for one specific platform
-To build or release only for one specific platform you can append the plaform after the `task-name`.
-If no platform is provided, only for the platform you are builing from will be build.
+To build or release only for one specific platform you can append the platform after the `task-name`.
+If no platform is provided, only for the platform you are building from will be build.
 
 * **MacOS X** use `yarn gulp <task-name> --osx64`
 * **Linux** use `yarn gulp <task-name> --linux64`
-* **Windows** use `yarn gulp <task-name> --win32`
-* **ChromeOS** use `yarn gulp <task-name> --chromeos`
+* **Windows** use `yarn gulp <task-name> --win64`
 
-You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`.
+`<task-name>` would typically be `release`.  You can also use multiple platforms e.g. `yarn gulp <taskname> --osx64 --linux64`. Other platforms like `--win32` and `--linux32` can be used too, but they are not officially supported, so use them at your own risk.
 
 #### macOS DMG installation background image
 
 The release distribution for macOS uses a DMG file to install the application.
-The PSD source for the DMG backgound image can be found in the root (`dmg-background.png`). After changing the source, export the image to PNG format in folder `./images/`.
+The PSD source for the DMG background image can be found in the root (`dmg-background.png`). After changing the source, export the image to PNG format in folder `./images/`.
+
+#### Leverage GitHub-Actions to build binaries
+
+You can use the GitHub `Actions` tab in your fork to build binaries as well. Select `Actions`>`Manual Build`>`Run Workflow`. Choose your custom branch and click `Run workflow`. The workflow will dispatch in a few moments and upon completion, the build "Artifacts" will be available for download from within the workflow run.
 
 ## Flight video won't load, or jumpy flight video upon export
 

@@ -25,6 +25,21 @@ onmessage = function(event) {
             .join(opts.columnDelimiter);
     }
 
+    /**
+     * Converts `null` entries in columns and other empty non-numeric values to NaN value string.
+     * 
+     * @param {array} columns 
+     * @returns {string}
+     */
+    function joinColumnValues(columns) {
+        return _(columns)
+            .map(value => 
+                (_.isNumber(value) || _.value)
+                ? value
+                : "NaN")
+            .join(opts.columnDelimiter);
+    }
+
     let opts = event.data.opts,
         stringDelim = opts.quoteStrings
             ? opts.stringDelimiter
@@ -32,7 +47,7 @@ onmessage = function(event) {
         mainFields = _([joinColumns(event.data.fieldNames)])
             .concat(_(event.data.frames)
                 .flatten()
-                .map(row => joinColumns(row))
+                .map(row => joinColumnValues(row))
                 .value())
             .join("\n"),
         headers = _(event.data.sysConfig)

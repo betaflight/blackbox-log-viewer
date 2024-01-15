@@ -2,13 +2,12 @@
   "name": "betaflight-blackbox-explorer",
   "displayName": "Betaflight - Blackbox Explorer",
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "main": "index.html",
   "chromium-args": "--disable-features=nw2",
   "default_locale": "en",
   "scripts": {
     "start": "gulp debug",
-    "postinstall": "platform-dependent-modules",
     "gulp": "gulp",
     "release": "gulp release"
   },
@@ -16,8 +15,8 @@
     "id": "main",
     "show": true,
     "icon": "images/bf_icon_128.png",
-    "min_width": 1340,
-    "min_height": 920
+    "min_width": 930,
+    "min_height": 480
   },
   "repository": {
     "type": "git",
@@ -26,37 +25,38 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
+    "Leaflet.MultiOptionsPolyline": "hgoebl/Leaflet.MultiOptionsPolyline",
     "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
-    "lodash": "^4.17.19",
-    "webm-writer": "^0.3.0"
+    "leaflet": "^1.9.3",
+    "leaflet-marker-rotation": "^0.4.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@quanle94/innosetup": "^6.0.2",
     "command-exists": "^1.2.8",
     "del": "^5.0.0",
     "gulp": "^4.0.1",
-    "gulp-concat": "~2.6.1",
-    "gulp-debian": "~0.1.8",
+    "gulp-debian": "^0.3.2",
     "gulp-rename": "^2.0.0",
-    "gulp-yarn": "^2.0.0",
+    "gulp-util": "3.0.8",
+    "gulp-yarn": "^3.0.0",
     "gulp-zip": "^5.0.0",
     "inflection": "1.12.0",
-    "nw-builder": "^3.5.7",
+    "nw-builder": "3.8.3",
     "os": "^0.1.1",
-    "platform-dependent-modules": "0.0.14",
     "rpm-builder": "^1.0.0",
     "temp": "^0.9.0",
+    "through2": "4.0.2",
     "yarn": "^1.22.0"
+  },
+  "optionalDependencies": {
+    "appdmg": "^0.6.6"
   },
   "resolutions": {
     "**/**/lodash.template": "^4.5.0"
   },
-  "config": {
-    "platformDependentModules": {
-      "darwin": [
-        "gulp-appdmg@1.0.3"
-      ]
-    }
+  "engines": {
+    "node": "20.x"
   }
 }

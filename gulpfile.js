@@ -2,7 +2,6 @@
 
 const pkg = require('./package.json');
 
-const child_process = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,7 +14,6 @@ const buildRpm = require('rpm-builder')
 const commandExistsSync = require('command-exists').sync;
 
 const gulp = require('gulp');
-const concat = require('gulp-concat');
 const yarn = require("gulp-yarn");
 const rename = require('gulp-rename');
 const os = require('os');
@@ -28,7 +26,7 @@ const RELEASE_DIR = './release/';
 const LINUX_INSTALL_DIR = '/opt/betaflight';
 
 var nwBuilderOptions = {
-    version: '0.47.0',
+    version: '0.72.0',
     files: './dist/**/*',
     macIcns: './images/bf_icon.icns',
     macPlist: { 'CFBundleDisplayName': 'Betaflight Blackbox Explorer'},
@@ -81,10 +79,10 @@ gulp.task('default', debugBuild);
 
 // Get platform from commandline args
 // #
-// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32, --win64, or --chromeos)
+// # gulp <task> [<platform>]+        Run only for platform(s) (with <platform> one of --linux64, --linux32, --osx64, --win32 or --win64)
 // # 
 function getInputPlatforms() {
-    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64', 'chromeos'];
+    var supportedPlatforms = ['linux64', 'linux32', 'osx64', 'win32', 'win64'];
     var platforms = [];
     var regEx = /--(\w+)/;
     for (var i = 3; i < process.argv.length; i++) {
@@ -119,7 +117,7 @@ function getInputPlatforms() {
 
 // Gets the default platform to be used
 function getDefaultPlatform() {
-    var defaultPlatform;
+    let defaultPlatform;
     switch (os.platform()) {
     case 'darwin':
         defaultPlatform = 'osx64';
@@ -130,13 +128,13 @@ function getDefaultPlatform() {
 
         break;
     case 'win32':
-        defaultPlatform = 'win32';
+        defaultPlatform = 'win64';
 
         break;
-        
+
     default:
         defaultPlatform = '';
-    
+
         break;
     }
     return defaultPlatform;
@@ -147,40 +145,46 @@ function getPlatforms() {
 }
 
 function removeItem(platforms, item) {
-    var index = platforms.indexOf(item);
+    const index = platforms.indexOf(item);
     if (index >= 0) {
         platforms.splice(index, 1);
     }
 }
 
 function getRunDebugAppCommand(arch) {
+
+    let command;
+
     switch (arch) {
     case 'osx64':
-        return 'open ' + path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.app');
+        const pkgName = `${pkg.name}.app`;
+        command = `open ${path.join(DEBUG_DIR, pkg.name, arch, pkgName)}`;
 
         break;
 
     case 'linux64':
     case 'linux32':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name);
 
         break;
 
     case 'win32':
     case 'win64':
-        return path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
+        command = path.join(DEBUG_DIR, pkg.name, arch, pkg.name + '.exe');
 
         break;
 
     default:
-        return '';
+        command = '';
 
         break;
     }
+
+    return command;
 }
 
-function getReleaseFilename(platform, ext) {
-    return `${pkg.name}_${pkg.version}_${platform}.${ext}`;
+function getReleaseFilename(platform, ext, portable = false) {
+    return `${pkg.name}_${pkg.version}_${platform}${portable ? "-portable" : ""}.${ext}`;
 }
 
 function clean_dist() { 
@@ -208,68 +212,14 @@ function clean_cache() {
 function dist() {
     var distSources = [
         // CSS files
-        './css/header_dialog.css',
-        './css/jquery.nouislider.min.css',
-        './css/keys_dialog.css',
-        './css/main.css',
-        './css/user_settings_dialog.css',
+        './css/**/*',
 
         // JavaScript
-        './chromeBackground.js',
-        './index.js',
-        './js/cache.js',
-        './js/complex.js',
-        './js/configuration.js',
-        './js/craft_2d.js',
-        './js/craft_3d.js',
-        './js/datastream.js',
-        './js/decoders.js',
-        './js/expo.js',
-        './js/flightlog.js',
-        './js/flightlog_fielddefs.js',
-        './js/flightlog_fields_presenter.js',
-        './js/flightlog_index.js',
-        './js/flightlog_parser.js',
-        './js/flightlog_video_renderer.js',
-        './js/graph_config.js',
-        './js/graph_config_dialog.js',
-        './js/graph_legend.js',
-        './js/workspace_selection.js',
-        './js/graph_spectrum.js',
-        './js/graph_spectrum_calc.js',
-        './js/graph_spectrum_plot.js',
-        './js/grapher.js',
-        './js/sticks.js',
-        './js/gui.js',
-        './js/header_dialog.js',
-        './js/imu.js',
-        './js/keys_dialog.js',
-        './js/laptimer.js',
-        './js/localization.js',
-        './js/main.js',
-        './js/pref_storage.js',
-        './js/real.js',
-        './js/release_checker.js',
-        './js/seekbar.js',
-        './js/tools.js',
-        './js/user_settings_dialog.js',
-        './js/video_export_dialog.js',
-        './js/csv-exporter.js',
-        './js/webworkers/csv-export-worker.js',
-        './js/vendor/FileSaver.js',
-        './js/vendor/jquery-1.11.3.min.js',
-        './js/vendor/jquery-ui-1.11.4.min.js',
-        './js/vendor/jquery.ba-throttle-debounce.js',
-        './js/vendor/jquery.nouislider.all.min.js',
-        './js/vendor/modernizr-2.6.2-respond-1.1.0.min.js',
-        './js/vendor/semver.js',
-        './js/vendor/three.js',
-        './js/vendor/three.min.js',
-        './js/screenshot.js',
+        './*.js',
+        './js/**/*',
 
         // everything else
         './package.json', // For NW.js
-        './manifest.json', // For Chrome app
         './*.html',
         './images/**/*',
         './_locales/**/*',
@@ -285,7 +235,6 @@ function dist() {
 // Create runable app directories in ./apps
 function apps(done) {
     var platforms = getPlatforms();
-    removeItem(platforms, 'chromeos');
 
     buildNWApps(platforms, 'normal', APPS_DIR, done);
 };
@@ -381,7 +330,6 @@ function post_build(arch, folder, done) {
 // Create debug app directories in ./debug
 function debug(done) {
     var platforms = getPlatforms();
-    removeItem(platforms, 'chromeos');
 
     buildNWApps(platforms, 'sdk', DEBUG_DIR, done);
 }
@@ -459,19 +407,10 @@ function release_win(arch, appDirectory, done) {
 // Create distribution package (zip) for windows and linux platforms
 function release_zip(arch, appDirectory) {
     const src = path.join(appDirectory, pkg.name, arch, '**');
-    const output = getReleaseFilename(arch, 'zip');
+    const output = getReleaseFilename(arch, 'zip', true);
     const base = path.join(appDirectory, pkg.name, arch);
 
     return compressFiles(src, base, output, 'Betaflight Blackbox Explorer');
-}
-
-// Create distribution package for chromeos platform
-function release_chromeos() {
-    var src = path.join(DIST_DIR, '**');
-    var output = getReleaseFilename('chromeos', 'zip');
-    var base = DIST_DIR;
-
-    return compressFiles(src, base, output, '.');
 }
 
 // Compress files from srcPath, using basePath, to outputFile in the RELEASE_DIR
@@ -514,12 +453,19 @@ function release_deb(arch, appDirectory, done) {
              maintainer: pkg.author,
              description: pkg.description,
              preinst: [`rm -rf ${LINUX_INSTALL_DIR}/${pkg.name}`],
-             postinst: [`chown root:root ${LINUX_INSTALL_DIR}`, `chown -R root:root ${LINUX_INSTALL_DIR}/${pkg.name}`, `cp ${LINUX_INSTALL_DIR}/${pkg.name}/mime/${pkg.name}.xml /usr/share/mime/packages/`, 'update-mime-database /usr/share/mime',
+             postinst: [`chown root:root ${LINUX_INSTALL_DIR}`,
+                        `chown -R root:root ${LINUX_INSTALL_DIR}/${pkg.name}`,
+                        `cp ${LINUX_INSTALL_DIR}/${pkg.name}/mime/${pkg.name}.xml /usr/share/mime/packages/`, 'update-mime-database /usr/share/mime',
                         `cp ${LINUX_INSTALL_DIR}/${pkg.name}/icon/bf_icon_128.png /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png`, 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
-                        `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${pkg.name}/${pkg.name}.desktop`],
+                        `xdg-desktop-menu install ${LINUX_INSTALL_DIR}/${pkg.name}/${pkg.name}.desktop`,
+                        `chmod +xr ${LINUX_INSTALL_DIR}/${pkg.name}/chrome_crashpad_handler`,
+                        `chmod +xr ${LINUX_INSTALL_DIR}/${pkg.name}/${pkg.name}`,
+                        `chmod -R +Xr ${LINUX_INSTALL_DIR}/${pkg.name}/`,
+            ],
              prerm: [`rm /usr/share/mime/packages/${pkg.name}.xml`, 'update-mime-database /usr/share/mime',
                      'rm /usr/share/icons/hicolor/128x128/mimetypes/application-x-blackboxlog.png', 'gtk-update-icon-cache /usr/share/icons/hicolor -f',
                      `xdg-desktop-menu uninstall ${pkg.name}.desktop`],
+             conffiles: './test/configs/opt/etc/dummy.cfg',
              depends: 'libgconf-2-4',
              changelog: [],
              _target: `${LINUX_INSTALL_DIR}/${pkg.name}`,
@@ -576,7 +522,7 @@ function release_rpm(arch, appDirectory, done) {
 
 // Create distribution package for macOS platform
 function release_osx64(appDirectory) {
-    var appdmg = require('gulp-appdmg');
+    var appdmg = require('./gulp-appdmg');
 
     // The appdmg does not generate the folder correctly, manually
     createDirIfNotExists(RELEASE_DIR);
@@ -648,10 +594,6 @@ function listReleaseTasks(appDirectory) {
 
     var releaseTasks = [];
 
-    if (platforms.indexOf('chromeos') !== -1) {
-        releaseTasks.push(release_chromeos);
-    }
-
     if (platforms.indexOf('linux64') !== -1) {
         releaseTasks.push(function release_linux64_zip(){
             return release_zip('linux64', appDirectory);
@@ -683,12 +625,18 @@ function listReleaseTasks(appDirectory) {
     }
 
     if (platforms.indexOf('win32') !== -1) {
+        releaseTasks.push(function release_win32_zip() {
+            return release_zip('win32', appDirectory);
+        });
         releaseTasks.push(function release_win32(done) {
             return release_win('win32', appDirectory, done);
         });
     }
 
     if (platforms.indexOf('win64') !== -1) {
+        releaseTasks.push(function release_win64_zip() {
+            return release_zip('win64', appDirectory);
+        });
         releaseTasks.push(function release_win64(done) {
             return release_win('win64', appDirectory, done);
         });

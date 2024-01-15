@@ -187,7 +187,7 @@ var FlightLogParser = function(logData) {
             vbatmaxcellvoltage:43,
             vbatwarningcellvoltage: 35,
             gyroScale: 0.0001, // Not even close to the default, but it's hardware specific so we can't do much better
-            acc_1G: 4096, // Ditto ^
+            acc_1G: 2048, // Ditto ^
             minthrottle: 1150,
             maxthrottle: 1850,
             currentMeterOffset: 0,
@@ -195,16 +195,21 @@ var FlightLogParser = function(logData) {
             deviceUID: null
         },
 
-        // These are now part of the blackbox log header, but they are in addition to the
-        // standard logger.
+        // Blackbox log header parameter names.
+        // each name should exist in the blackbox log of the current firmware, or
+        // be an older name which is translated into a current name in the table below
 
         defaultSysConfigExtension = {
-            abs_control_gain:null,                  // Aboslute control gain
+            abs_control_gain:null,                  // Absolute control gain
             anti_gravity_gain:null,                 // Anti gravity gain
+            anti_gravity_p_gain:null,               // Anti gravity P gain
             anti_gravity_mode:null,                 // Anti gravity mode
             anti_gravity_threshold:null,            // Anti gravity threshold for step mode
+            anti_gravity_cutoff_hz:null,            // Anti gravity Cutoff
+            blackbox_high_resolution:null,          // Blackbox high resolution mode
             thrMid:null,                            // Throttle Mid Position
             thrExpo:null,                           // Throttle Expo
+            tpa_mode:null,                          // TPA Mode
             tpa_breakpoint:null,                    // TPA Breakpoint
             airmode_activate_throttle:null,         // airmode activation level
             serialrx_provider:null,                 // name of the serial rx provider
@@ -220,7 +225,6 @@ var FlightLogParser = function(logData) {
             rollPID:[null, null, null],             // Roll [P, I, D]
             pitchPID:[null, null, null],            // Pitch[P, I, D]
             yawPID:[null, null, null],              // Yaw  [P, I, D]
-            feedforward_transition:null,            // Feedforward transition
             altPID:[null, null, null],              // Altitude Hold [P, I, D]
             posPID:[null, null, null],              // Position Hold [P, I, D]
             posrPID:[null, null, null],             // Position Rate [P, I, D]
@@ -236,6 +240,7 @@ var FlightLogParser = function(logData) {
             dshot_bidir:null,                       // DShot bidir protocol enabled
             dterm_lpf_hz:null,                      // DTerm Lowpass Filter Hz
             dterm_lpf_dyn_hz:[null, null],          // DTerm Lowpass Dynamic Filter Min and Max Hz
+            dterm_lpf_dyn_expo:null,                // DTerm Lowpass Dynamic Filter Expo
             dterm_lpf2_hz:null,                     // DTerm Lowpass Filter Hz 2
             dterm_differentiator:null,              // DTerm Differentiator
             H_sensitivity:null,                     // Horizon Sensitivity
@@ -246,12 +251,14 @@ var FlightLogParser = function(logData) {
             gyro_32khz_hardware_lpf:null,           // Gyro 32khz hardware lpf setting. (post BF3.4)
             gyro_lowpass_hz:null,                   // Gyro Soft Lowpass Filter Hz
             gyro_lowpass_dyn_hz:[null, null],       // Gyro Soft Lowpass Dynamic Filter Min and Max Hz
+            gyro_lowpass_dyn_expo:null,             // Gyro Soft Lowpass Dynamic Filter Expo
             gyro_lowpass2_hz:null,                  // Gyro Soft Lowpass Filter Hz 2
             gyro_notch_hz:null,                     // Gyro Notch Frequency
             gyro_notch_cutoff:null,                 // Gyro Notch Cutoff
             gyro_rpm_notch_harmonics:null,          // Number of Harmonics in the gyro rpm filter
             gyro_rpm_notch_q:null,                  // Value of Q in the gyro rpm filter
             gyro_rpm_notch_min:null,                // Min Hz for the gyro rpm filter
+            rpm_notch_lpf:null,                     // Cutoff for smoothing rpm filter data
             dterm_rpm_notch_harmonics:null,         // Number of Harmonics in the dterm rpm filter
             dterm_rpm_notch_q:null,                 // Value of Q in the dterm rpm filter
             dterm_rpm_notch_min:null,               // Min Hz for the dterm rpm filter
@@ -265,26 +272,24 @@ var FlightLogParser = function(logData) {
             vbat_pid_compensation:null,             // VBAT PID compensation
             rate_limits:[null, null, null],         // RC Rate limits
             rc_smoothing:null,                      // RC Control Smoothing
-            rc_smoothing_type:null,                 // Type of the RC Smoothing
             rc_interpolation:null,                  // RC Control Interpolation type
             rc_interpolation_channels:null,         // RC Control Interpotlation channels
             rc_interpolation_interval:null,         // RC Control Interpolation Interval
             rc_smoothing_active_cutoffs:[null,null],// RC Smoothing active cutoffs
-            rc_smoothing_auto_factor:null,          // RC Smoothing auto factor
             rc_smoothing_cutoffs:[null, null],      // RC Smoothing input and derivative cutoff
             rc_smoothing_filter_type:[null,null],   // RC Smoothing input and derivative type
-            rc_smoothing_rx_average:null,           // RC Smoothing rx average readed in ms
+            rc_smoothing_rx_average:null,           // RC Smoothing rx average read in ms
             rc_smoothing_debug_axis:null,           // Axis recorded in the debug mode of rc_smoothing
-            dterm_filter_type:null,                 // D term filtering type (PT1, BIQUAD)
-            dterm_filter2_type:null,                // D term 2 filtering type (PT1, BIQUAD)
+            dterm_filter_type:null,                 // D term filtering type (PT1, BIQUAD, PT2, PT3)
+            dterm_filter2_type:null,                // D term 2 filtering type (PT1, BIQUAD, PT2, PT3)
             pidAtMinThrottle:null,                  // Stabilisation at zero throttle
             itermThrottleGain:null,                 // Betaflight PID
             ptermSetpointWeight:null,               // Betaflight PID
             dtermSetpointWeight:null,               // Betaflight PID
             yawRateAccelLimit:null,                 // Betaflight PID
             rateAccelLimit:null,                    // Betaflight PID
-            gyro_soft_type:null,                    // Gyro soft filter type (PT1, BIQUAD)
-            gyro_soft2_type:null,                   // Gyro soft filter 2 type (PT1, BIQUAD)
+            gyro_soft_type:null,                    // Gyro soft filter type (PT1, BIQUAD, PT2, PT3)
+            gyro_soft2_type:null,                   // Gyro soft filter 2 type (PT1, BIQUAD, PT2, PT3)
             debug_mode:null,                        // Selected Debug Mode
             features:null,                          // Activated features (e.g. MOTORSTOP etc)
             Craft_name:null,                        // Craft Name
@@ -294,8 +299,8 @@ var FlightLogParser = function(logData) {
             pidSumLimitYaw:null,                    // PID sum limit yaw
             use_integrated_yaw : null,              // Use integrated yaw
             d_min : [null, null, null],             // D_Min [P, I, D]
-            d_min_gain : null,                      // D_Min gain
-            d_min_advance : null,                   // D_Min advance
+            d_min_gain : null,                      // D_Min gain - D_Max in 4.3
+            d_min_advance : null,                   // D_Min advance - D_Max in 4.3
             iterm_relax: null,                      // ITerm Relax mode
             iterm_relax_type: null,                 // ITerm Relax type
             iterm_relax_cutoff: null,               // ITerm Relax cutoff
@@ -307,10 +312,58 @@ var FlightLogParser = function(logData) {
             rates_type: null,
             fields_disabled_mask: null,
             vbat_sag_compensation: null,
+            gyro_to_use: null,
+            dynamic_idle_min_rpm: null,
+            motor_poles: 1,
+            ff_transition: null,
+            ff_averaging: null,
+            ff_smooth_factor: null,
+            ff_jitter_factor: null,
+            ff_boost: null,
+            ff_max_rate_limit: null,
+            rc_smoothing_mode:null,                 // ** 4.3** RC on or off (0 or 1)
+            rc_smoothing_feedforward_hz:null,       // RC Smoothing manual cutoff for feedforward
+            rc_smoothing_setpoint_hz:null,          // RC Smoothing manual cutoff for setpoint
+            rc_smoothing_auto_factor_setpoint:null, // RC Smoothing auto factor for roll, pitch and yaw setpoint
+            rc_smoothing_throttle_hz:null,          // RC Smoothing manual cutoff for throttle
+            rc_smoothing_auto_factor_throttle:null, // RC Smoothing cutoff for throttle
+            rc_smoothing_active_cutoffs_ff_sp_thr:[null,null,null],// RC Smoothing active cutoffs feedforward, setpoint, throttle
+            dyn_notch_count: null,                  // Number of dynamic notches 4.3
+            rpm_filter_fade_range_hz: null,         // Fade range for RPM notch filters in Hz
+            dyn_idle_p_gain: null,
+            dyn_idle_i_gain: null,
+            dyn_idle_d_gain: null,
+            dyn_idle_max_increase: null,
+            simplified_pids_mode: null,             // Simplified / slider PIDS
+            simplified_pi_gain: null,
+            simplified_i_gain: null,
+            simplified_d_gain: null,
+            simplified_dmax_gain: null,
+            simplified_feedforward_gain: null,
+            simplified_pitch_d_gain: null,
+            simplified_pitch_pi_gain: null,
+            simplified_master_multiplier: null,
+            simplified_dterm_filter: null,
+            simplified_dterm_filter_multiplier: null,
+            simplified_gyro_filter: null,
+            simplified_gyro_filter_multiplier: null,
+            motor_output_limit: null,                // motor output limit
+            throttle_limit_type: null,               // throttle limit
+            throttle_limit_percent: null,
+            throttle_boost: null,                    // throttle boost
+            throttle_boost_cutoff: null,
+            thrust_linear: null,
+            tpa_low_rate: null,
+            tpa_low_breakpoint: null,
+            tpa_low_always: null,
+            mixer_type: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
         // Translation of the field values name to the sysConfig var where it must be stored
+        // on the left are field names from the latest versions of blackbox.c
+        // on the right are older field names that must exist in the list above
+
         translationValues = {
             acc_limit_yaw             : "yawRateAccelLimit",
             accel_limit               : "rateAccelLimit",
@@ -322,16 +375,39 @@ var FlightLogParser = function(logData) {
             dterm_lowpass_hz          : "dterm_lpf_hz",
             dterm_lowpass_dyn_hz      : "dterm_lpf_dyn_hz",
             dterm_lowpass2_hz         : "dterm_lpf2_hz",
+            dterm_lpf1_type           : "dterm_filter_type",
+            dterm_lpf1_static_hz      : "dterm_lpf_hz",
+            dterm_lpf1_dyn_hz         : "dterm_lpf_dyn_hz",
+            dterm_lpf1_dyn_expo       : "dterm_lpf_dyn_expo",
+            dterm_lpf2_type           : "dterm_filter2_type",
+            dterm_lpf2_static_hz      : "dterm_lpf2_hz",
             dterm_setpoint_weight     : "dtermSetpointWeight",
             digital_idle_value        : "digitalIdleOffset",
+            d_max_gain                : "d_min_gain",
+            d_max_advance             : "d_min_advance",
             dshot_idle_value          : "digitalIdleOffset",
+            dyn_idle_min_rpm          : "dynamic_idle_min_rpm",
+            feedforward_transition    : "ff_transition",
+            feedforward_averaging     : "ff_averaging",
+            feedforward_smooth_factor : "ff_smooth_factor",
+            feedforward_jitter_factor : "ff_jitter_factor",
+            feedforward_boost         : "ff_boost",
+            feedforward_max_rate_limit : "ff_max_rate_limit",
+            feedforward_weight        : "dtermSetpointWeight",
             gyro_hardware_lpf         : "gyro_lpf",
             gyro_lowpass              : "gyro_lowpass_hz",
             gyro_lowpass_type         : "gyro_soft_type",
             gyro_lowpass2_type        : "gyro_soft2_type",
+            gyro_lpf1_type            : "gyro_soft_type",
+            gyro_lpf1_static_hz       : "gyro_lowpass_hz",
+            gyro_lpf1_dyn_hz          : "gyro_lowpass_dyn_hz",
+            gyro_lpf1_dyn_expo        : "gyro_lowpass_dyn_expo",
+            gyro_lpf2_type            : "gyro_soft2_type",
+            gyro_lpf2_static_hz       : "gyro_lowpass2_hz",
             "gyro.scale"              : "gyro_scale",
             iterm_windup              : "itermWindupPointPercent",
             motor_pwm_protocol        : "fast_pwm_protocol",
+            pid_at_min_throttle       : "pidAtMinThrottle",
             pidsum_limit              : "pidSumLimit",
             pidsum_limit_yaw          : "pidSumLimitYaw",
             rc_expo_yaw               : "rcYawExpo",
@@ -339,19 +415,34 @@ var FlightLogParser = function(logData) {
             rc_interp_int             : "rc_interpolation_interval",
             rc_rate                   : "rc_rates",
             rc_rate_yaw               : "rcYawRate",
+            rc_smoothing              : "rc_smoothing_mode",
+            rc_smoothing_auto_factor  : "rc_smoothing_auto_factor_setpoint",
+            rc_smoothing_feedforward_cutoff : "rc_smoothing_feedforward_hz",
+            rc_smoothing_setpoint_cutoff : "rc_smoothing_setpoint_hz",
+            rc_smoothing_throttle_cutoff : "rc_smoothing_throttle_hz",
+            rc_smoothing_type         : "rc_smoothing_mode",
             rc_yaw_expo               : "rcYawExpo",
             rcExpo                    : "rc_expo",
             rcRate                    : "rc_rates",
+            rpm_filter_harmonics      : "gyro_rpm_notch_harmonics",
+            rpm_filter_q              : "gyro_rpm_notch_q",
+            rpm_filter_min_hz         : "gyro_rpm_notch_min",
+            rpm_filter_lpf_hz         : "rpm_notch_lpf",
             setpoint_relax_ratio      : "setpointRelaxRatio",
             setpoint_relaxation_ratio : "setpointRelaxRatio",
             thr_expo                  : "thrExpo",
             thr_mid                   : "thrMid",
-            tpa_rate                  : "dynThrPID",
+            dynThrPID                 : "tpa_rate",
             use_unsynced_pwm          : "unsynced_fast_pwm",
             vbat_scale                : "vbatscale",
             vbat_pid_gain             : "vbat_pid_compensation",
             yaw_accel_limit           : "yawRateAccelLimit",
-            yaw_lowpass_hz            : "yaw_lpf_hz"
+            yaw_lowpass_hz            : "yaw_lpf_hz",
+            thrust_linear             : "thrust_linear",
+            tpa_low_rate              : "tpa_low_rate",
+            tpa_low_breakpoint        : "tpa_low_breakpoint",
+            tpa_low_always            : "tpa_low_always",
+            mixer_type                : "mixer_type",
         },
 
         frameTypes,
@@ -536,7 +627,8 @@ var FlightLogParser = function(logData) {
             case "rcRate":
             case "thrMid":
             case "thrExpo":
-            case "dynThrPID":
+            case "tpa_rate":
+            case "tpa_mode":
             case "tpa_breakpoint":
             case "airmode_activate_throttle":
             case "serialrx_provider":
@@ -567,10 +659,16 @@ var FlightLogParser = function(logData) {
             case "gyro_cal_on_first_arm":
             case "vbat_pid_compensation":
             case "rc_smoothing":
-            case "rc_smoothing_auto_factor":
             case "rc_smoothing_type":
             case "rc_smoothing_debug_axis":
             case "rc_smoothing_rx_average":
+            case "rc_smoothing_mode":  // 4.3 rc smoothing stuff
+            case "rc_smoothing_auto_factor_setpoint":
+            case "rc_smoothing_auto_factor_throttle":
+            case "rc_smoothing_feedforward_hz":
+            case "rc_smoothing_setpoint_hz":
+            case "rc_smoothing_feedforward_hz":
+            case "rc_smoothing_throttle_hz":
             case "superExpoYawMode":
             case "features":
             case "dynamic_pid":
@@ -592,13 +690,20 @@ var FlightLogParser = function(logData) {
             case "itermWindupPointPercent":
             case "ptermSRateWeight":
             case "setpointRelaxRatio":
-            case "feedforward_transition":
+            case "ff_transition":
+            case "ff_averaging":
+            case "ff_smooth_factor":
+            case "ff_jitter_factor":
+            case "ff_boost":
+            case "ff_max_rate_limit":
             case "dtermSetpointWeight":
             case "gyro_soft_type":
             case "gyro_soft2_type":
             case "debug_mode":
             case "anti_gravity_mode":
             case "anti_gravity_gain":
+            case "anti_gravity_p_gain":
+            case "anti_gravity_cutoff_hz":
             case "abs_control_gain":
             case "use_integrated_yaw":
             case "d_min_gain":
@@ -607,6 +712,8 @@ var FlightLogParser = function(logData) {
             case "gyro_rpm_notch_harmonics":
             case "gyro_rpm_notch_q":
             case "gyro_rpm_notch_min":
+            case "rpm_filter_fade_range_hz":
+            case "rpm_notch_lpf":
             case "dterm_rpm_notch_harmonics":
             case "dterm_rpm_notch_q":
             case "dterm_rpm_notch_min":
@@ -616,11 +723,43 @@ var FlightLogParser = function(logData) {
             case "dyn_notch_range":
             case "dyn_notch_width_percent":
             case "dyn_notch_q":
+            case "dyn_notch_count":
             case "dyn_notch_min_hz":
             case "dyn_notch_max_hz":
             case "rates_type":
             case "vbat_sag_compensation":
             case "fields_disabled_mask":
+            case "motor_pwm_protocol":
+            case "gyro_to_use":
+            case "dynamic_idle_min_rpm":
+            case "dyn_idle_p_gain":
+            case "dyn_idle_i_gain":
+            case "dyn_idle_d_gain":
+            case "dyn_idle_max_increase":
+            case "simplified_pids_mode":
+            case "simplified_pi_gain":
+            case "simplified_i_gain":
+            case "simplified_d_gain":
+            case "simplified_dmax_gain":
+            case "simplified_feedforward_gain":
+            case "simplified_pitch_d_gain":
+            case "simplified_pitch_pi_gain":
+            case "simplified_master_multiplier":
+
+            case "simplified_dterm_filter":
+            case "simplified_dterm_filter_multiplier":
+            case "simplified_gyro_filter":
+            case "simplified_gyro_filter_multiplier":
+
+            case "motor_output_limit":
+            case "throttle_limit_type":
+            case "throttle_limit_percent":
+            case "throttle_boost":
+            case "throttle_boost_cutoff":
+
+            case "motor_poles":
+
+            case "blackbox_high_resolution":
                 that.sysConfig[fieldName] = parseInt(fieldValue, 10);
             break;
             case "rc_expo":
@@ -690,13 +829,13 @@ var FlightLogParser = function(logData) {
                     var expoParams = parseCommaSeparatedString(fieldValue);
                     that.sysConfig.superExpoFactor    = expoParams[0];
                     that.sysConfig.superExpoFactorYaw = expoParams[1];
-
                 } else {
                     that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
                 }
             break;
 
             /* CSV packed values */
+
             case "rates":
             case "rate_limits":
             case "rollPID":
@@ -710,30 +849,42 @@ var FlightLogParser = function(logData) {
             case "velPID":
             case "motorOutput":
             case "rate_limits":
-            case "rc_smoothing_active_cutoffs":
             case "rc_smoothing_cutoffs":
-            case "rc_smoothing_filter_type":
+            case "rc_smoothing_active_cutoffs":
+            case "rc_smoothing_active_cutoffs_ff_sp_thr":
             case "gyro_lowpass_dyn_hz":
+            case "gyro_lowpass_dyn_expo":
+            case "dterm_lpf_dyn_expo":
+            case "thrust_linear":
+            case "tpa_low_rate":
+            case "tpa_low_breakpoint":
+            case "tpa_low_always":
+            case "mixer_type":
             case "dterm_lpf_dyn_hz":
-            case "d_min":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
             case "magPID":
                 that.sysConfig.magPID = parseCommaSeparatedString(fieldValue,3); //[parseInt(fieldValue, 10), null, null];
             break;
-
-            case "feedforward_weight":
-                // Add it to the end of the rollPID, pitchPID and yawPID
+            case "d_min":
+                // Add Dmin values as Derivative numbers to PID array
+                 var dMinValues = parseCommaSeparatedString(fieldValue);
+                 that.sysConfig["rollPID"].push(dMinValues[0]);
+                 that.sysConfig["pitchPID"].push(dMinValues[1]);
+                 that.sysConfig["yawPID"].push(dMinValues[2]);
+            break;
+            case "ff_weight":
+                // Add feedforward values to the PID array
                 var ffValues = parseCommaSeparatedString(fieldValue);
                 that.sysConfig["rollPID"].push(ffValues[0]);
                 that.sysConfig["pitchPID"].push(ffValues[1]);
                 that.sysConfig["yawPID"].push(ffValues[2]);
             break;
+
             /* End of CSV packed values */
 
             case "vbatcellvoltage":
                 var vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
-
                 that.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
                 that.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
                 that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
@@ -741,14 +892,12 @@ var FlightLogParser = function(logData) {
             case "currentMeter":
             case "currentSensor":
                 var currentMeterParams = parseCommaSeparatedString(fieldValue);
-
                 that.sysConfig.currentMeterOffset = currentMeterParams[0];
                 that.sysConfig.currentMeterScale = currentMeterParams[1];
             break;
             case "gyro.scale":
             case "gyro_scale":
                     that.sysConfig.gyroScale = hexToFloat(fieldValue);
-
                     /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
                      * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
                      * match Baseflight so we can use Baseflight's IMU for both: */
@@ -865,9 +1014,11 @@ var FlightLogParser = function(logData) {
                             console.log("Saw unsupported field header \"" + fieldName + "\"");
                     }
                 } else {
-                    console.log("Ignoring unsupported header \"" + fieldName + "\"");
-                    if(that.sysConfig.unknownHeaders==null) that.sysConfig.unknownHeaders = new Array();
-                    that.sysConfig.unknownHeaders.push({ name: fieldName, value: fieldValue });// Save the unknown headers
+                    console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
+                    if (that.sysConfig.unknownHeaders === null) {
+                        that.sysConfig.unknownHeaders = new Array();
+                    }
+                    that.sysConfig.unknownHeaders.push({ name: fieldName, value: fieldValue }); // Save the unknown headers
                 }
             break;
         }
@@ -1506,6 +1657,7 @@ var FlightLogParser = function(logData) {
         }
 
         adjustFieldDefsList(that.sysConfig.firmwareType, that.sysConfig.firmwareVersion);
+        FlightLogFieldPresenter.adjustDebugDefsList(that.sysConfig.firmwareType, that.sysConfig.firmwareVersion);
 
         if (!isFrameDefComplete(this.frameDefs.I)) {
             throw "Log is missing required definitions for I frames, header may be corrupt";

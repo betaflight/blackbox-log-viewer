@@ -43,9 +43,12 @@ function FlightLogIndex(logData) {
                     times: [],
                     offsets: [],
                     avgThrottle: [],
+                    maxRC: [],
+                    maxMotorDiff: [],
                     initialIMU: [],
                     initialSlow: [],
                     initialGPSHome: [],
+                    initialGPS: [],
                     hasEvent: [],
                     minTime: false,
                     maxTime: false
@@ -56,8 +59,12 @@ function FlightLogIndex(logData) {
                 
                 iframeCount = 0,
                 motorFields = [],
+                maxRCFields = [],
                 matches,
                 throttleTotal,
+                rcTotal,
+                maxMotor,
+                minMotor,
                 eventInThisChunk = null,
                 parsedHeader,
                 sawEndMarker = false;
@@ -77,18 +84,27 @@ function FlightLogIndex(logData) {
                 var 
                     sysConfig = parser.sysConfig,
                     mainFrameDef = parser.frameDefs.I,
-                    
+                                        
                     gyroADC = [mainFrameDef.nameToIndex["gyroADC[0]"], mainFrameDef.nameToIndex["gyroADC[1]"], mainFrameDef.nameToIndex["gyroADC[2]"]],
                     accSmooth = [mainFrameDef.nameToIndex["accSmooth[0]"], mainFrameDef.nameToIndex["accSmooth[1]"], mainFrameDef.nameToIndex["accSmooth[2]"]],
                     magADC = [mainFrameDef.nameToIndex["magADC[0]"], mainFrameDef.nameToIndex["magADC[1]"], mainFrameDef.nameToIndex["magADC[2]"]],
                     
                     lastSlow = [],
-                    lastGPSHome = [];
-                
+                    lastGPSHome = [],
+                    lastGPS = [];
+
                 // Identify motor fields so they can be used to show the activity summary bar
-                for (var j = 0; j < 8; j++) {
+                for (let j = 0; j < 8; j++) {
                     if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {
                         motorFields.push(mainFrameDef.nameToIndex["motor[" + j + "]"]);
+                    }
+                }
+
+                for (let j = 0; j < 3; j++) {
+                    if (mainFrameDef.nameToIndex["rcCommand[" + j + "]"] !== undefined) {
+                        maxRCFields.push(mainFrameDef.nameToIndex["rcCommand[" + j + "]"]);
+                    } else {
+                        console.log("RCField not found");
                     }
                 }
                 
@@ -125,11 +141,24 @@ function FlightLogIndex(logData) {
                                     
                                     if (motorFields.length) {
                                         throttleTotal = 0;
-                                        for (var j = 0; j < motorFields.length; j++) {
-                                            throttleTotal += frame[motorFields[j]];
+                                        maxMotor = 0;
+                                        minMotor = 2000;
+                                        for (let mofo of motorFields) {
+                                            maxMotor = Math.max(frame[mofo], maxMotor);
+                                            minMotor = Math.min(frame[mofo], minMotor);
+                                            throttleTotal += frame[mofo];
                                         }
                                         
+                                        intraIndex.maxMotorDiff.push(maxMotor - minMotor);
                                         intraIndex.avgThrottle.push(Math.round(throttleTotal / motorFields.length));
+                                    }
+                                    if (maxRCFields.length) {
+                                        rcTotal = 0;
+                                        for (let rcfo of maxRCFields) {
+                                            rcTotal += Math.max(rcTotal,Math.abs(frame[rcfo]));
+                                        }
+
+                                        intraIndex.maxRC.push(rcTotal);
                                     }
                                     
                                     /* To enable seeking to an arbitrary point in the log without re-reading anything
@@ -139,6 +168,7 @@ function FlightLogIndex(logData) {
                                     intraIndex.initialIMU.push(new IMU(imu));
                                     intraIndex.initialSlow.push(lastSlow);
                                     intraIndex.initialGPSHome.push(lastGPSHome);
+                                    intraIndex.initialGPS.push(lastGPS);
                                 }
                                 
                                 iframeCount++;
@@ -152,6 +182,10 @@ function FlightLogIndex(logData) {
                                 sysConfig.gyroScale, 
                                 magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
                             );
+                        break;
+                        case 'G':
+                            lastGPS = frame.slice(0);
+                            lastGPS.shift(); // Remove the time field
                         break;
                         case 'H':
                             lastGPSHome = frame.slice(0);
@@ -227,7 +261,9 @@ function FlightLogIndex(logData) {
                     offsets: new Array(sourceIndex.offsets.length),
                     minTime: sourceIndex.minTime,
                     maxTime: sourceIndex.maxTime,
-                    avgThrottle: new Array(sourceIndex.avgThrottle.length)
+                    avgThrottle: new Array(sourceIndex.avgThrottle.length),
+                    maxRC: new Array(sourceIndex.maxRC.length),
+                    maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length),
                 };
             
             if (sourceIndex.times.length > 0) {
@@ -250,11 +286,14 @@ function FlightLogIndex(logData) {
             }
             
             if (sourceIndex.avgThrottle.length > 0) {
-                for (j = 0; j < sourceIndex.avgThrottle.length; j++) {
+                // Assuming that avgThrottle, maxRC and maxMotorDiff Arrays are the same length
+                // since they are build in the same loop. Just to get rid of a codesmell on Sonarcloud
+                for (let j = 0; j < sourceIndex.avgThrottle.length; j++) {
                     resultIndex.avgThrottle[j] = sourceIndex.avgThrottle[j] - 1000;
+                    resultIndex.maxRC[j] = sourceIndex.maxRC[j] * 20 - 1000;
+                    resultIndex.maxMotorDiff[j] = sourceIndex.maxMotorDiff[j] * 20 - 1000;
                 }
-            }
-            
+            }           
             resultIndexes[i] = resultIndex;
         }
         

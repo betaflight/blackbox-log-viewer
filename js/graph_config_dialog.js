@@ -86,7 +86,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
             if(field.curve!=null) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');				
+                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
                 $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);				
 				if(field.curve.MinMax!=null) {
 					// Set the line MinMax values !!!
@@ -151,7 +151,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('select.color-picker', elem).replaceWith(chooseColor(color));
         
 
-        // Ade event when selection changed to retreive the current smoothing settings.
+        // Add event when selection changed to retrieve the current smoothing settings.
         $('select.form-control', elem).change( function() {
             var selectedField = {
                 name: $('select.form-control option:selected', elem).val()
@@ -204,9 +204,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="line">Line</th>'
                                                     + '<th name="color">Color</th>'
                                                     + '<th name="grid">Grid</th>'
-                                                    + '<th name="on_minmax">MM</th>'
+                                                    + '<th name="on_minmax">MinMax</th>'
                                                     + '<th name="MinValue">Minimum</th>'
-                                                    + '<th name="MaxValue">Maximum</th>'                                                   
+                                                    + '<th name="MaxValue">Maximum</th>'    
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
@@ -334,7 +334,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     name: $("select", this).val(),
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
                     curve: {
-                        power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exagerate center values - expo)
+                        power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0,     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
 						MinMax: {
 							min: parseInt($("input[name=MinValue]", this).val()),

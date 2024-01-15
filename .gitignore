@@ -1,7 +1,6 @@
 /.settings/
 /.project
 .DS_Store
-/blackbox-chrome-app.zip
 .idea/workspace.xml
 .idea/tasks.xml
 /.idea/
@@ -15,3 +14,6 @@ release/
 
 # artefacts for Visual Studio Code
 /.vscode/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -3,9 +3,7 @@ openLinksInExternalBrowserByDefault();
 
 $(document).ready(function () {
     // translate to user-selected language
-    if (isNW()) {
-        localize();
-    }
+    localize();
 });
 
 function checkForConfiguratorUpdates() {
@@ -55,25 +53,22 @@ function notifyOutdatedVersion(releaseData) {
     });
 }
 
-if (isNW()) {
-    checkForConfiguratorUpdates();
-}
+checkForConfiguratorUpdates();
 
 function openLinksInExternalBrowserByDefault() {
 
-    if (isNW()) {
-        const gui = require('nw.gui');
+    const gui = require('nw.gui');
 
-        //Get the current window
-        const win = gui.Window.get();
+    //Get the current window
+    const win = gui.Window.get();
 
-        win.on('new-win-policy', function(frame, url, policy) {
-            // do not open the window
-            policy.ignore();
-            // and open it in external browser
-            gui.Shell.openExternal(url);
-        });
-    }
+    win.on('new-win-policy', function(frame, url, policy) {
+        // do not open the window
+        policy.ignore();
+        // and open it in external browser
+        gui.Shell.openExternal(url);
+    });
+
 }
 
 

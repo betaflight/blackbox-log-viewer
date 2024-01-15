@@ -5,8 +5,16 @@ var userSettings = {};
 
 var VIEWER_VERSION = getManifestVersion(); // Current version
 
-const INNER_BOUNDS_WIDTH  = 1340;
-const INNER_BOUNDS_HEIGHT = 900;
+// these values set the initial dimensions of a secondary window
+// which always opens at the centre of the user's screen
+const NEW_WINDOW_WIDTH  = 1000;
+const NEW_WINDOW_HEIGHT  = 760;
+
+// these values set the minimum resize dimensions of a secondary window
+// minimum resize dimensions of the initial window are set in package.json
+const INNER_BOUNDS_WIDTH  = 930;
+const INNER_BOUNDS_HEIGHT = 480;
+
 const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
@@ -27,10 +35,10 @@ function BlackboxLogViewer() {
         PLAYBACK_MAX_RATE = 300,
         PLAYBACK_DEFAULT_RATE = 100,
         PLAYBACK_RATE_STEP = 5,
-        GRAPH_MIN_ZOOM = 10,
+        GRAPH_MIN_ZOOM = 1,
         GRAPH_MAX_ZOOM = 1000,
         GRAPH_DEFAULT_ZOOM = 100,
-        GRAPH_ZOOM_STEP = 10;
+        GRAPH_ZOOM_STEP = 1;
     
     var
         graphState = GRAPH_STATE_PAUSED,
@@ -50,7 +58,6 @@ function BlackboxLogViewer() {
         
         // JSON graph configuration:
         graphConfig = {},
-        
 
         offsetCache = [], // Storage for the offset cache (last 20 files)
         currentOffsetCache = {log:null, index:null, video:null, offset:null},
@@ -69,7 +76,7 @@ function BlackboxLogViewer() {
         fieldPresenter = FlightLogFieldPresenter,
         
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
-        hasTable = true, hasAnalyser, hasAnalyserFullscreen,
+        hasTable = true, hasAnalyser, hasMap, hasAnalyserFullscreen,
         hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false, hadTable,
         hasConfig = false, hasConfigOverlay = false,
 
@@ -98,6 +105,7 @@ function BlackboxLogViewer() {
         seekBar = new SeekBar(seekBarCanvas),
         
         seekBarRepaintRateLimited = $.throttle(200, $.proxy(seekBar.repaint, seekBar)),
+        seekBarMode = "avgThrottle",
         
         updateValuesChartRateLimited,
         
@@ -106,38 +114,25 @@ function BlackboxLogViewer() {
         playbackRate = PLAYBACK_DEFAULT_RATE,
 
         graphZoom = GRAPH_DEFAULT_ZOOM,
-        lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
+        lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
+
+        mapGrapher = new MapGrapher();
+
 
         function createNewBlackboxWindow(fileToOpen) {
-            var timestampId = Date.now();
-            if (isNW()) {
-                const gui = require('nw.gui');
-                gui.Window.open(INITIAL_APP_PAGE,
-                {
-                    'min_width'  : INNER_BOUNDS_WIDTH,
-                    'min_height' : INNER_BOUNDS_HEIGHT,
-                },
-                function (createdWindow) {
-                    if (fileToOpen !== undefined) {
-                        createdWindow.window.argv = fileToOpen;
-                    }
-                });
 
-            } else {
-                chrome.app.window.create(INITIAL_APP_PAGE,
-                {
-                    'id': "main" + timestampId,
-                    'innerBounds' : {
-                        'width'  : INNER_BOUNDS_WIDTH,
-                        'height' : INNER_BOUNDS_HEIGHT,
-                    },
-                },
-                function (createdWindow) {
-                    if (fileToOpen !== undefined) {
-                        createdWindow.contentWindow.argv = fileToOpen;
-                    }
-                });
-            }
+            const gui = require('nw.gui');
+            gui.Window.open(INITIAL_APP_PAGE,
+            {
+                'width'  : NEW_WINDOW_WIDTH,
+                'height' : NEW_WINDOW_HEIGHT,
+                'min_width'  : INNER_BOUNDS_WIDTH,
+                'min_height' : INNER_BOUNDS_HEIGHT,
+            },
+            function (createdWindow) {
+                createdWindow.window.argv = fileToOpen;
+            });
+
         }
 
     function blackboxTimeFromVideoTime() {
@@ -172,7 +167,7 @@ function BlackboxLogViewer() {
     
         if (value === null)
             return "(absent)";
-        
+
         return value.toFixed(2);
     }
     
@@ -219,6 +214,27 @@ function BlackboxLogViewer() {
 
                 table.append(rows.join(""));
                 
+                const statRows = [];
+                const statsTable = $(".log-field-values #stats-table");
+                $("tr:not(:first)", statsTable).remove();
+                const stats = SimpleStats(flightLog).calculate();
+                const tpl = _.template("<tr><td><%= name %></td><td><%= min %> (<%= min_raw %>)</td><td><%= max %> (<%= max_raw %>)</td><td><%= mean %> (<%= mean_raw %>)</td></tr>");
+                for (const field in stats) {
+                    const stat = stats[field];
+                    if (stat === undefined) {
+                        continue;
+                    }
+                    statRows.push(tpl({
+                        name: fieldPresenter.fieldNameToFriendly(stat.name, flightLog.getSysConfig().debug_mode),
+                        min_raw: atMost2DecPlaces(stat.min),
+                        min: FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.min),
+                        max_raw: atMost2DecPlaces(stat.max),
+                        max: FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.max),
+                        mean_raw: atMost2DecPlaces(stat.mean),
+                        mean: FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.mean),
+                    }));
+                }                
+                statsTable.append(statRows.join(""));
             }
 
             // Update flight mode flags on status bar
@@ -275,6 +291,10 @@ function BlackboxLogViewer() {
         seekBar.setCurrentTime(currentBlackboxTime);
         seekBar.setWindow(graph.getWindowWidthTime());
 
+        if (flightLog.hasGpsData()) {
+            mapGrapher.setCurrentTime(currentBlackboxTime);
+        }
+
         updateValuesChartRateLimited();
         
         if (graphState == GRAPH_STATE_PLAY) {
@@ -306,11 +326,44 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.resize(width, height);
             seekBar.resize(canvas.offsetWidth, 50);
-            
+            if(flightLog.hasGpsData()) {
+                mapGrapher.resize(width, height);
+            }
+
             invalidateGraph();
         }
     }
     
+    function renderSeekBarPicker(){
+        var
+            seekBarContainer = $(".seekBar-selection"),
+            seekBarPicker,
+            seekBarItems = [
+                ["avgThrottle", "Average motor throttle"],
+                ["maxRC", "Maximum stick input"],
+                ["maxMotorDiff", "Maximum motor differential"],
+            ];
+        seekBarContainer.empty();
+        seekBarPicker = $('<select id="seekbarTypeSelect", class="seekbarTypeSelect">');
+        seekBarPicker.change(function() {
+            let 
+                activity = flightLog.getActivitySummary(),
+                displayItem = $(this).val();
+            seekBarMode = displayItem;
+            seekBar.setActivity(activity.times, activity[displayItem], activity.hasEvent);
+            seekBar.repaint();
+        });
+        for (let item of seekBarItems) {
+            let option;
+            option = $("<option></option>");
+            option.text(item[1]);
+            option.attr("value", item[0]);
+            seekBarPicker.append(option);
+        }
+        seekBarContainer.append(seekBarPicker);
+
+    }
+
     function renderLogFileInfo(file) {
         $(".log-filename").text(file.name);
 
@@ -335,7 +388,7 @@ function BlackboxLogViewer() {
         }
         
         for (index = 0; index < logCount; index++) {
-            var
+            let
                 logLabel,
                 option, holder,
                 error;
@@ -410,10 +463,17 @@ function BlackboxLogViewer() {
         
         var 
             activity = flightLog.getActivitySummary();
-        
-        seekBar.setActivity(activity.times, activity.avgThrottle, activity.hasEvent);
-        
+
+        seekBar.setActivity(activity.times, activity[seekBarMode], activity.hasEvent);
         seekBar.repaint();
+
+        // Add flightLog to map
+        html.toggleClass("has-gps", flightLog.hasGpsData());
+        if(flightLog.hasGpsData()) {
+            mapGrapher.setUserSettings(userSettings);
+            mapGrapher.setFlightLog(flightLog);
+        }
+
     }
     
     function setGraphState(newState) {
@@ -694,11 +754,12 @@ function BlackboxLogViewer() {
             try {
                 flightLog = new FlightLog(flightLogDataArray);
             } catch (err) {
-                alert("Sorry, an error occured while trying to open this log:\n\n" + err);
+                alert("Sorry, an error occurred while trying to open this log:\n\n" + err);
                 return;
             }
             
             renderLogFileInfo(file);
+            renderSeekBarPicker();
             currentOffsetCache.log      = file.name; // store the name of the loaded log file
             currentOffsetCache.index    = null;      // and clear the index
             
@@ -907,26 +968,33 @@ function BlackboxLogViewer() {
         reader.readAsText(file);
     }
 
-    function exportCsv(file, options={}) {
-
-        function onSuccess(data) {
-            console.debug("CSV export finished in", (performance.now() - startTime) / 1000, "secs");
+    function createExportCallback(fileExtension, fileType, file, startTime) {
+        const callback = function(data) {
+            console.debug(`${fileExtension.toUpperCase()} export finished in ${(performance.now() - startTime) / 1000} secs`);
             if (!data) {
                 console.debug("Empty data, nothing to save");
                 return;
             }
-            let blob = new Blob([data], {type: 'text/csv'}),
+            let blob = new Blob([data], {type: fileType}),
                 e    = document.createEvent('MouseEvents'),
                 a    = document.createElement('a');
-            a.download = file || $(".log-filename").text() + ".csv";
+            a.download = file || $(".log-filename").text() + "." + fileExtension;
             a.href = window.URL.createObjectURL(blob);
-            a.dataset.downloadurl =  ['text/csv', a.download, a.href].join(':');
+            a.dataset.downloadurl =  [fileType, a.download, a.href].join(':');
             e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             a.dispatchEvent(e);
-        }
+          };
+          return callback;
+    }
 
-        let startTime = performance.now();
+    function exportCsv(file, options={}) {
+        const onSuccess = createExportCallback('csv', 'text/csv', file, performance.now());
         CsvExporter(flightLog, options).dump(onSuccess);
+    }
+
+    function exportGpx(file) {
+        const onSuccess = createExportCallback('gpx', 'GPX File', file, performance.now());
+        GpxExporter(flightLog).dump(onSuccess);
     }
 
     function newGraphConfig(newConfig) {
@@ -939,14 +1007,14 @@ function BlackboxLogViewer() {
     }
 
     // Store to local cache and update Workspace Selector control
-    function onSwitchWorkspace(newWorkspaces, newAciveId) {
-        prefs.set('activeWorkspace', newAciveId);      
+    function onSwitchWorkspace(newWorkspaces, newActiveId) {
+        prefs.set('activeWorkspace', newActiveId);      
         prefs.set('workspaceGraphConfigs', newWorkspaces);
         workspaceSelection.setWorkspaces(newWorkspaces)
-        workspaceSelection.setActiveWorkspace(newAciveId)
-        if (flightLog && newWorkspaces[newAciveId] && newWorkspaces[newAciveId].graphConfig) {
-           newGraphConfig(newWorkspaces[newAciveId].graphConfig);
-           document.getElementById("legend_title").textContent = newWorkspaces[newAciveId].title
+        workspaceSelection.setActiveWorkspace(newActiveId)
+        if (flightLog && newWorkspaces[newActiveId] && newWorkspaces[newActiveId].graphConfig) {
+           newGraphConfig(newWorkspaces[newActiveId].graphConfig);
+           document.getElementById("legend_title").textContent = newWorkspaces[newActiveId].title
         }
     }
 
@@ -1114,6 +1182,15 @@ function BlackboxLogViewer() {
             html.toggleClass("has-analyser", hasAnalyser);       
             prefs.set('hasAnalyser', hasAnalyser);
             invalidateGraph();
+        });
+
+        $(".view-map").click(function() {
+            hasMap = !hasMap;
+            html.toggleClass("has-map", hasMap);
+            prefs.set('hasMap', hasMap);
+            if(flightLog.hasGpsData()) {
+                mapGrapher.initialize(userSettings);
+            }
         });
 
         $(".view-analyser-fullscreen").click(function() {
@@ -1291,7 +1368,7 @@ function BlackboxLogViewer() {
             }
         });
 
-        function expandGraphConfig(index) { // Put each of the fields into a seperate graph
+        function expandGraphConfig(index) { // Put each of the fields into a separate graph
 
             var expandedGraphConfig = [];
 
@@ -1376,6 +1453,9 @@ function BlackboxLogViewer() {
 	                graph.refreshOptions(newSettings);
 	                graph.refreshLogo();
 	                graph.initializeCraftModel();
+                    if(flightLog.hasGpsData()) {
+                        mapGrapher.setUserSettings(newSettings);
+                    }
 	                updateCanvasSize();
 	            }
 
@@ -1447,6 +1527,11 @@ function BlackboxLogViewer() {
             exportCsv();
             e.preventDefault();
         });
+        $(".btn-gpx-export").click(function(e) {
+            setGraphState(GRAPH_STATE_PAUSED);
+            exportGpx();
+            e.preventDefault();
+        });
                 
         if (FlightLogVideoRenderer.isSupported()) {
             $(".btn-video-export").click(function(e) {
@@ -1497,7 +1582,7 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
-            if(graph!=null && field==null) { // save ALL pens withing group
+            if(graph!=null && field==null) { // save ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     if(graphConfig[parseInt(graph)].fields[i].default==null) {
                         graphConfig[parseInt(graph)].fields[i].default = [];
@@ -1530,7 +1615,7 @@ function BlackboxLogViewer() {
 
             if(graph==null && field==null) return false; // no pen specified, just exit
 
-            if(graph!=null && field==null) { // restore ALL pens withing group
+            if(graph!=null && field==null) { // restore ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     if(graphConfig[parseInt(graph)].fields[i].default!=null) {
                         graphConfig[parseInt(graph)].fields[i].smoothing         = graphConfig[parseInt(graph)].fields[i].default.smoothing;
@@ -1567,7 +1652,7 @@ function BlackboxLogViewer() {
             savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Smoothing</h4>';
-            if(graph!=null && field==null) { // change ALL pens withing group
+            if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].smoothing += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].smoothing = constrain(graphConfig[parseInt(graph)].fields[i].smoothing, range.min, range.max);
@@ -1599,7 +1684,7 @@ function BlackboxLogViewer() {
             savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Zoom</h4>';
-            if(graph!=null && field==null) { // change ALL pens withing group
+            if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[i].curve.outputRange, range.min, range.max);
@@ -1631,7 +1716,7 @@ function BlackboxLogViewer() {
             savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
             var changedValue = '<h4>Expo</h4>';
-            if(graph!=null && field==null) { // change ALL pens withing group
+            if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     graphConfig[parseInt(graph)].fields[i].curve.power += ((delta)?-scroll:+scroll);
                     graphConfig[parseInt(graph)].fields[i].curve.power = constrain(graphConfig[parseInt(graph)].fields[i].curve.power, range.min, range.max);
@@ -1837,7 +1922,7 @@ function BlackboxLogViewer() {
                         try {
                             if (!e.altKey) { // Workspaces feature
                                 var id = e.which - 48;
-                                if (!e.shiftKey) { // retreive graph configuration from workspace
+                                if (!e.shiftKey) { // retrieve graph configuration from workspace
                                     if (workspaceGraphConfigs[id] != null) {
                                         onSwitchWorkspace(workspaceGraphConfigs, id)
                                     }
@@ -2052,14 +2137,14 @@ function BlackboxLogViewer() {
             // Chrome or opening a file association
             if ((typeof argv !== 'undefined') && (argv.length > 0)) {
                 fullPath = argv[0];
-            } else if (isNW()) {
+            } else {
                 const gui = require('nw.gui');
                 if (gui.App.argv.length > 0) {
                     fullPath = gui.App.argv[0];
                 }
             }
             if (fullPath != null) {
-                const filename = fullPath.replace(/^.*[\\\/]/, '');
+                const filename = fullPath.replace(/^.*[\\/]/, '');
                 const file = new File(fullPath, filename);
                 loadFiles([file]);
             }
@@ -2067,31 +2152,30 @@ function BlackboxLogViewer() {
         checkIfFileAsParameter();
 
         // File extension association
-        var onOpenFileAssociation = function() {
+        function onOpenFileAssociation() {
 
-            if (isNW()) {
-                const gui = require('nw.gui');
-                gui.App.on('open', function(path) {
+            const gui = require('nw.gui');
+            gui.App.on('open', function(path) {
 
-                    // All the windows opened try to open the new blackbox,
-                    // so we limit it to one of them, the first in the list for example
-                    const windows = chrome.app.window.getAll();
+                // All the windows opened try to open the new blackbox,
+                // so we limit it to one of them, the first in the list for example
+                const windows = chrome.app.window.getAll();
 
-                    const firstWindowId = windows[0].id;
-                    const currentWindowId = chrome.app.window.current().id;
+                const firstWindow = windows[0];
+                const currentWindow = chrome.app.window.current();
 
-                    if (currentWindowId === firstWindowId) {
+                if (currentWindow === firstWindow) {
 
-                        const filePathToOpenExpression = /.*"([^"]*)"$/;
-                        const fileToOpen = path.match(filePathToOpenExpression);
+                    const filePathToOpenExpression = /.*"([^"]*)"$/;
+                    const fileToOpen = path.match(filePathToOpenExpression);
 
-                        if (fileToOpen.length > 1) {
-                            const fullPathFile = fileToOpen[1];
-                            createNewBlackboxWindow([fullPathFile]);
-                        }
+                    if (fileToOpen.length > 1) {
+                        const fullPathFile = fileToOpen[1];
+                        createNewBlackboxWindow([fullPathFile]);
                     }
-                });
-            }
+                }
+            });
+
         }
         onOpenFileAssociation();
 
@@ -2120,7 +2204,7 @@ function BlackboxLogViewer() {
     });
 }
 
-// Close the dropdowns if not clicking a decendant of the dropdown
+// Close the dropdowns if not clicking a descendant of the dropdown
 $(document).click(function (e) {
     var p = $(e.target).closest(".dropdown");
     if (!p.length) {
@@ -2128,7 +2212,7 @@ $(document).click(function (e) {
     }
 });
 
-// Boostrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
+// Bootstrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off('.data-api');
 
 window.blackboxLogViewer = new BlackboxLogViewer();

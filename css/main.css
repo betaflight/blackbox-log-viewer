@@ -491,6 +491,7 @@ html.has-log .log-graph-config {
 
 #craftCanvas,
 #analyserCanvas,
+#mapContainer,
 #stickCanvas {
     position:absolute;
     top:0;
@@ -501,16 +502,56 @@ html.has-log .log-graph-config {
 
 html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas,
+html.has-map #mapContainer,
 html.has-sticks #stickCanvas {
 	display:block;
+}
+
+#mapContainer.no-gps-data:before {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+    content: "";
+    background-color: gray;
+    opacity: .5;
+}
+
+#mapContainer.no-gps-data:after {
+    position: absolute;
+    display: block;
+    top: calc(30%);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10001;
+    content: "No GPS Data";
+    text-align: center;
+    font-size: 3vw;
 }
 
 html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenException) {
 	display:block;
 }
 
-#analyser {
+#analyser ,#log-seek-bar {
     z-index: 10;
+}
+
+/* This filters change the color of a black png image. For new colors check: https://codepen.io/sosuke/pen/Pjoqqp */
+.isBF #mapContainer .icon {
+    filter: invert(36%) sepia(28%) saturate(3957%) hue-rotate(28deg) brightness(93%) contrast(103%);
+}
+
+.isCF #mapContainer .icon {
+    filter: invert(28%) sepia(100%) saturate(2050%) hue-rotate(134deg) brightness(100%) contrast(104%);
+}
+
+.isINAV #mapContainer .icon {
+    filter: invert(14%) sepia(100%) saturate(4698%) hue-rotate(244deg) brightness(64%) contrast(130%);
 }
 
 .analyser:hover .non-shift #analyserResize {
@@ -552,6 +593,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 .analyser #spectrumType select {
     border-radius: 3px;
     padding: 0px 5px;
+    color: black;
 }
 
 .analyser:hover .non-shift #overdrawSpectrumType {
@@ -561,7 +603,6 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 }
 
 .analyser #overdrawSpectrumType {
-    color: #bbb;
     height: 0;
     overflow: hidden;
     opacity: 0;
@@ -575,6 +616,7 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 .analyser #overdrawSpectrumType select {
     border-radius: 3px;
     padding: 0px 5px;
+    color: black;
 }
 
 .analyser #analyserResize:hover {
@@ -606,8 +648,40 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 	position: absolute;
 }
 
-.analyser {
+.analyser, .map-container, .log-seek-bar {
 	position: absolute;
+}
+
+#log-seek-bar {
+    width: 100%;
+}
+
+.log-seek-bar:hover .non-shift #seekbarTypeSelect {
+    opacity: 1;
+    height: auto;
+    transition: opacity 500ms ease-in;
+}
+
+#seekbarToolbar {
+    position: absolute;
+    top: 8px;
+    left: 20px;
+}
+.log-seek-bar #seekbarTypeSelect {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    left: 5px;
+    float: left;
+    z-index: 9;
+    position: absolute;
+    font-size: 9px;
+}
+
+.log-seek-bar #seekbarTypeSelect select {
+    border-radius: 3px;
+    padding: 0px 5px;
+    color: black;
 }
 
 .log-graph video {
@@ -719,6 +793,10 @@ html.has-config .configuration-list {
     padding-right: 0.7em;
 }
 
+.graph-legend-field-name:hover {
+    text-decoration: underline;
+}
+
 .graph-legend-field-value {
     float: right;
 }
@@ -737,6 +815,11 @@ html.has-config .configuration-list {
 }
 
 .graph-legend-field > .glyphicon-equalizer {
+    float: right;
+    margin-left: 0.7em;
+}
+
+.graph-legend-field-visibility {
     float: right;
     margin-left: 0.7em;
 }
@@ -774,6 +857,7 @@ html .view-analyser-fullscreen {
 
 html.has-analyser-sticks.isBF .view-analyser-sticks,
 html.has-analyser.isBF .view-analyser,
+html.has-map.isBF .view-map,
 html.has-table.isBF .view-table,
 html.has-sticks.isBF .view-sticks,
 html.has-craft.isBF .view-craft,
@@ -783,6 +867,7 @@ html:not(.video-hidden).isBF .view-video {
 
 html.has-analyser-sticks.isCF .view-analyser-sticks,
 html.has-analyser.isCF .view-analyser,
+html.has-map.isCF .view-map,
 html.has-table.isCF .view-table,
 html.has-sticks.isCF .view-sticks,
 html.has-craft.isCF .view-craft,
@@ -792,6 +877,7 @@ html:not(.video-hidden).isCF .view-video {
 
 html.has-analyser-sticks.isINAV .view-analyser-sticks,
 html.has-analyser.isINAV .view-analyser,
+html.has-map.isINAV .view-map,
 html.has-table.isINAV .view-table,
 html.has-sticks.isINAV .view-sticks,
 html.has-craft.isINAV .view-craft,
@@ -978,7 +1064,7 @@ html.has-log .video-top-controls {
 
 .playback-rate-control,
 .graph-zoom-control  {
-    width: 130px;
+    width: 200px;
     margin-right: 13px;
     margin-top: 6px;
 }
@@ -1137,8 +1223,10 @@ html.isCF .navbar-logo img {
 }
 
 html.isBF .navbar-logo img {
-	content: url(".././images/bf_logo_white.svg");
-	width: auto;
+    content: url(".././images/light-wide-2.svg");
+    width: 282px;
+    height: 50px;
+    margin-left: 0 !important;
 }
 
 html.isINAV .navbar-logo img {
@@ -1159,8 +1247,8 @@ html.isINAV .navbar-logo img {
 .navbar-logo a {
     padding: 0;
     position: absolute;
-    top: 44%;
-    left: 68%;
+    top: 32%;
+    left: 75%;
     width: 100%;
 }
 
@@ -1201,6 +1289,12 @@ html.has-log .navbar-static-top {
 
 html:not(.has-log) #status-bar {
     display: none;
+}
+
+html:not(.has-gps) .view-map,
+html:not(.has-gps) .map-container,
+html:not(.has-gps) .btn-gpx-export {
+	display: none !important;
 }
 
 #status-bar .bookmark-1,
