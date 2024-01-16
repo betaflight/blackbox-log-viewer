@@ -88,6 +88,10 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
                 $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
                 $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);				
+                
+                $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
+                $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);				
+                
 				if(field.curve.MinMax!=null) {
 					// Set the line MinMax values !!!
 					$('input[name=MinValue]',elem).val((field.curve.MinMax.min)?field.curve.MinMax.min:(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min));		
@@ -163,6 +167,12 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('select.color-picker', elem).change( function() {
             $(this).css('background', $('select.color-picker option:selected', elem).val())
                    .css('color', $('select.color-picker option:selected', elem).val());
+        });
+        
+        // Add event when enable MinMax checkbox is changed to change the Minimun and Maximum fields readonly attr. 
+        $('input[name=EnabledMinMax]',elem).change( function() {
+            $('input[name=MinValue]',elem).attr("readonly", !this.checked);
+            $('input[name=MaxValue]',elem).attr("readonly", !this.checked);
         });
         
 
