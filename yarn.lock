@@ -1944,7 +1944,7 @@ gulp-zip@^5.0.0:
     vinyl "^2.1.0"
     yazl "^2.5.1"
 
-gulp@^4.0.1:
+gulp@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/gulp/-/gulp-4.0.2.tgz#543651070fd0f6ab0a0650c6a3e6ff5a7cb09caa"
   integrity sha512-dvEs27SCZt2ibF29xYgmnwwCYZxdxhQ/+LFWlbAW8y7jt68L/65402Lz3+CKy0Ov4rOs+NERmDq7YlZaDqUIfA==
@@ -1995,7 +1995,7 @@ has-gulplog@^0.1.0:
   dependencies:
     sparkles "^1.0.0"
 
-has-property-descriptors@^1.0.0:
+has-property-descriptors@^1.0.0, has-property-descriptors@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/has-property-descriptors/-/has-property-descriptors-1.0.1.tgz#52ba30b6c5ec87fd89fa574bc1c39125c6f65340"
   integrity sha512-VsX8eaIewvas0xnvinAe9bw4WfIeODpGYikiWYLH+dma0Jw6KHYqWiWfhQlgOVK8D6PvjubK5Uc4P0iIhIcNVg==
@@ -3736,14 +3736,15 @@ set-blocking@^2.0.0:
   integrity sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==
 
 set-function-length@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/set-function-length/-/set-function-length-1.1.1.tgz#4bc39fafb0307224a33e106a7d35ca1218d659ed"
-  integrity sha512-VoaqjbBJKiWtg4yRcKBQ7g7wnGnLV3M8oLvVWwOk2PdYY6PEFegR1vezXR0tw6fZGF9csVakIRjrJiy2veSBFQ==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/set-function-length/-/set-function-length-1.2.0.tgz#2f81dc6c16c7059bda5ab7c82c11f03a515ed8e1"
+  integrity sha512-4DBHDoyHlM1IRPGYcoxexgh67y4ueR53FKV1yyxwFMY7aCqcN/38M1+SwZ/qJQ8iLv7+ck385ot4CcisOAPT9w==
   dependencies:
     define-data-property "^1.1.1"
-    get-intrinsic "^1.2.1"
+    function-bind "^1.1.2"
+    get-intrinsic "^1.2.2"
     gopd "^1.0.1"
-    has-property-descriptors "^1.0.0"
+    has-property-descriptors "^1.0.1"
 
 set-value@^2.0.0, set-value@^2.0.1:
   version "2.0.1"
@@ -3934,9 +3935,9 @@ stream-exhaust@^1.0.1:
   integrity sha512-b/qaq/GlBK5xaq1yrK9/zFcyRSTNxmcZwFLGSTG0mXgZl/4Z6GgiyYOXOvY7N3eEvFRAG1bkDRz5EPGSvPYQlw==
 
 stream-shift@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.1.tgz#d7088281559ab2778424279b0877da3c392d5a3d"
-  integrity sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.2.tgz#548bff71c92322e1ade886979f7f67c0723eb9e4"
+  integrity sha512-rV4Bovi9xx0BFzOb/X0B2GqoIjvqPCttZdu0Wgtx2Dxkj7ETyWl9gmqJ4EutWRLvtZWm8dxE+InQZX1IryZn/w==
 
 string-width@^1.0.1, string-width@^1.0.2:
   version "1.0.2"
