@@ -93,23 +93,23 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
                 $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
 
-				if(field.curve.MinMax!=null) {
-					// Set the line MinMax values !!!
-					$('input[name=MinValue]',elem).val((field.curve.MinMax.min)?field.curve.MinMax.min:(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min));
-					$('input[name=MaxValue]',elem).val((field.curve.MinMax.max)?field.curve.MinMax.max:(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max));
-				}
-				else{
-					$('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
-					$('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
-				}
+                if(field.curve.MinMax!=null) {
+                    // Set the line MinMax values !!!
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);
+                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max);
+                }
+                else{
+                    $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
+                    $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+                }
 
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
                 $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100).toFixed(0)+'%');
-				$('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
-				$('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
-				$('input[name=EnabledMinMax]',elem).attr("checked", false);
+                $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
+                $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+                $('input[name=EnabledMinMax]',elem).attr("checked", false);
             }
         }
     }
@@ -129,9 +129,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
                     + '<td><input name="grid" type="checkbox"/></td>'
-					+ '<td><input name="EnabledMinMax" type="checkbox"/></td>'
-					+ '<td><input name="MinValue" class="form-control" type="text" readonly="true"/></td>'
-					+ '<td><input name="MaxValue" class="form-control" type="text" readonly="true"/></td>'
+                    + '<td><input name="EnabledMinMax" type="checkbox"/></td>'
+                    + '<td><input name="MinValue" class="form-control" type="text" readonly="true"/></td>'
+                    + '<td><input name="MaxValue" class="form-control" type="text" readonly="true"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -201,7 +201,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                                         + '</ul>'
                                     + '</div>'
                                 + '</div>'
-								+ '<label class="control-label">Fields:</label>'
+                                + '<label class="control-label">Fields:</label>'
                                 + '<div class="form-group config-graph-field-header">'
                                     + '<div class="col-sm-12">'
                                         + '<table class="config-graph-field-list">'
@@ -346,21 +346,21 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     curve: {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0,     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
-						MinMax: {
-							min: parseInt($("input[name=MinValue]", this).val()),
-							max: parseInt($("input[name=MaxValue]", this).val())
-						},
-						EnabledMinMax: $('input[name=EnabledMinMax]', this).is(':checked')
+                        MinMax: {
+                            min: parseInt($("input[name=MinValue]", this).val()),
+                            max: parseInt($("input[name=MaxValue]", this).val())
+                        },
+                        EnabledMinMax: $('input[name=EnabledMinMax]', this).is(':checked')
                     },
                     default: { // These are used to restore configuration if using mousewheel adjustments
                         smoothing: parseInt($("input[name=smoothing]", this).val())*100,
                         power: parseInt($("input[name=power]", this).val())/100.0,
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0,
-						MinMax: {
-							min: parseInt($("input[name=MinValue]", this).val()),
-							max: parseInt($("input[name=MaxValue]", this).val())
-						},
-						EnabledMinMax: $('input[name=EnabledMinMax]', this).is(':checked')
+                        MinMax: {
+                            min: parseInt($("input[name=MinValue]", this).val()),
+                            max: parseInt($("input[name=MaxValue]", this).val())
+                        },
+                        EnabledMinMax: $('input[name=EnabledMinMax]', this).is(':checked')
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
