@@ -94,8 +94,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                 
 				if(field.curve.MinMax!=null) {
 					// Set the line MinMax values !!!
-					$('input[name=MinValue]',elem).val((field.curve.MinMax.min)?field.curve.MinMax.min:(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min));		
-					$('input[name=MaxValue]',elem).val((field.curve.MinMax.max)?field.curve.MinMax.max:(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max));
+					$('input[name=MinValue]',elem).val(field.curve.MinMax.min);		
+					$('input[name=MaxValue]',elem).val(field.curve.MinMax.max);
 				}
 				else{
 					$('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
