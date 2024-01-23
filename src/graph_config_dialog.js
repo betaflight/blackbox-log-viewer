@@ -176,6 +176,18 @@ export function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MaxValue]',elem).attr("readonly", !this.checked);
         });
 
+        // Add event when mouse click at the clear Minimum input field to restore default Min values.
+        $('input[name=MinValue]',elem).click( function() {
+            if($(this).val().trim() == '')
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
+        });
+
+        // Add event when mouse click at the clear Maximum input field to restore default Max values.
+        $('input[name=MaxValue]',elem).click( function() {
+            if($(this).val().trim() == '')
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+        });
+
         return elem;
     }
 
