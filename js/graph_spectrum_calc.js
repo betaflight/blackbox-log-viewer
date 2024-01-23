@@ -118,6 +118,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
             const avgVsValue = sumVsValues / fftChunkLength;
             let vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
             // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
+            console.log(vsBinIndex);
             if (vsBinIndex === NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
             numberSamples[vsBinIndex]++;
 
