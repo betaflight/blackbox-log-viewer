@@ -57,12 +57,12 @@ gulp.task('clean-cache', clean_cache);
 const distRebuild = gulp.series(clean_dist, dist);
 gulp.task('dist', distRebuild);
 
-const appsBuild = gulp.series(gulp.parallel(clean_apps, distRebuild), apps, gulp.parallel(listPostBuildTasks(APPS_DIR)));
+const appsBuild = gulp.series(gulp.parallel(clean_apps, distRebuild), apps);
 gulp.task('apps', appsBuild);
 
-const debugAppsBuild = gulp.series(gulp.parallel(clean_debug, distRebuild), debug, gulp.parallel(listPostBuildTasks(DEBUG_DIR)));
+const debugAppsBuild = gulp.series(gulp.parallel(clean_debug, distRebuild), debug);
 
-const debugBuild = gulp.series(dist, debug, gulp.parallel(listPostBuildTasks(DEBUG_DIR)), start_debug);
+const debugBuild = gulp.series(dist, debug, start_debug);
 gulp.task('debug', debugBuild);
 
 const releaseBuild = gulp.series(gulp.parallel(clean_release, appsBuild), gulp.parallel(listReleaseTasks(APPS_DIR)));
@@ -238,94 +238,6 @@ function apps(done) {
 
     buildNWApps(platforms, 'normal', APPS_DIR, done);
 };
-
-function listPostBuildTasks(folder, done) {
-
-    var platforms = getPlatforms();
-
-    var postBuildTasks = [];
-
-    if (platforms.indexOf('win32') != -1) {
-        postBuildTasks.push(function post_build_win32(done){ return post_build('win32', folder, done) });
-    }
-
-    if (platforms.indexOf('win64') != -1) {
-        postBuildTasks.push(function post_build_win64(done){ return post_build('win64', folder, done) });
-    }
-
-    if (platforms.indexOf('linux32') != -1) {
-        postBuildTasks.push(function post_build_linux32(done){ return post_build('linux32', folder, done) });
-    }
-
-    if (platforms.indexOf('linux64') != -1) {
-        postBuildTasks.push(function post_build_linux64(done){ return post_build('linux64', folder, done) });
-    }
-
-    if (platforms.indexOf('osx64') != -1) {
-        postBuildTasks.push(function post_build_osx64(done){ return post_build('osx64', folder, done) });
-    }
-
-    // We need to return at least one task, if not gulp will throw an error
-    if (postBuildTasks.length == 0) {
-        postBuildTasks.push(function post_build_none(done){ done() });
-    }
-    return postBuildTasks;
-}
-
-function post_build(arch, folder, done) {
-
-    if ((arch == 'win32') || (arch == 'win64')) {
-        // Copy ffmpeg codec library into Windows app
-        var libSrc = './library/' + arch + '/ffmpeg.dll'
-        var libDest = path.join(folder, pkg.name, arch);
-        console.log('Copy ffmpeg library to Windows app (' + libSrc + ' to ' + libDest + ')');
-        return gulp.src(libSrc)
-                   .pipe(gulp.dest(libDest));
-    }
-
-    if ((arch == 'linux32') || (arch == 'linux64')) {
-
-        // Copy Ubuntu launcher scripts to destination dir
-        var launcherDir = path.join(folder, pkg.name, arch);
-
-       // Copy ffmpeg codec library into Linux app
-        var libSrc = './library/' + arch + '/libffmpeg.so'
-        var libDest = path.join(launcherDir, 'lib');
-
-        console.log('Copy Ubuntu launcher scripts to ' + launcherDir);        
-        gulp.src('assets/linux/**')                   
-            .pipe(gulp.dest(launcherDir))
-            .on('end', function() {
-
-                console.log('Copy ffmpeg library to Linux app (' + libSrc + ' to ' + libDest + ')');
-                gulp.src(libSrc)
-                    .pipe(gulp.dest(libDest))
-                    .on('end', function() {done()});
-
-            });
-        return;
-    }
-
-    if (arch == 'osx64') {
-        // Determine the WebKit version distributed in nw.js
-        var pathToVersions = path.join(folder, pkg.name, 'osx64', pkg.name + '.app', 'Contents', 'Frameworks', 'nwjs Framework.framework', 'Versions');
-        var files = fs.readdirSync(pathToVersions);
-        if (files.length >= 1) {
-            var webKitVersion = files[0];
-            console.log('Found nwjs version: ' + webKitVersion)
-            // Copy ffmpeg codec library into macOS app
-            var libSrc = './library/osx64/libffmpeg.dylib'
-            var libDest = path.join(pathToVersions, webKitVersion) + '/';
-            console.log('Copy ffmpeg library to macOS app (' + libSrc + ' to ' + libDest + ')');
-            return gulp.src(libSrc)
-                       .pipe(gulp.dest(libDest));
-        } else {
-            console.log('Error: could not find the Version folder.');
-        }
-    }
-
-    return done();
-}
 
 // Create debug app directories in ./debug
 function debug(done) {
