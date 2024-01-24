@@ -252,8 +252,10 @@ GraphConfig.load = function(config) {
         }
 
         var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
-            var mm = getMinMaxForFields.apply(null, arguments);
-
+            let mm = getMinMaxForFields.apply(null, arguments);
+            // added convertation min max values from log file units to friendly chart
+            mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
+            mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
             return {
                 offset: -(mm.max + mm.min) / 2,
                 power: 1.0,
@@ -265,8 +267,10 @@ GraphConfig.load = function(config) {
         }
 
         var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
-            const mm = getMinMaxForFields.apply(null, arguments);
-
+            let mm = getMinMaxForFields.apply(null, arguments);
+            // added convertation min max values from log file units to friendly chart
+            mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
+            mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
             return {
                 offset: 0,
                 power: 1.0,
@@ -279,7 +283,10 @@ GraphConfig.load = function(config) {
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
         const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
-        const mm = getMinMaxForFields(fieldName);
+        let mm = getMinMaxForFields(fieldName);
+        // added convertation min max values from log file units to friendly chart
+        mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
+        mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
