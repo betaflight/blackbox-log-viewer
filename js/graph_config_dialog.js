@@ -176,14 +176,14 @@ function GraphConfigurationDialog(dialog, onSave) {
         });
         
         
-        // Add event when mouse click at the clear Minimum input field to restore default Min values. 
-        $('input[name=MinValue]',elem).click( function() {
-            if($(this).val().trim() == '')
+        // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
+        $('input[name=MinValue]',elem).dblclick( function() {
+            if($(this).prop('readonly') == false)
                 $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
         });
-        // Add event when mouse click at the clear Maximum input field to restore default Max values.
-        $('input[name=MaxValue]',elem).click( function() {
-            if($(this).val().trim() == '')
+        // Add event when mouse double click at the enabled Maximum input field to restore default Max values.
+        $('input[name=MaxValue]',elem).dblclick( function() {
+            if($(this).prop('readonly') == false)
                 $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
         });
         
