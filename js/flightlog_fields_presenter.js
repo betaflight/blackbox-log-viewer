@@ -1921,6 +1921,171 @@ function FlightLogFieldPresenter() {
 
         return fieldName;
     };
+    
+ 
+    /**
+     * Attempt to decode fields values from log file to chart units and back.
+     *
+     * @param fieldName Name of the field
+     * @param value Value of the field
+     * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
+     */ 
+    FlightLogFieldPresenter.ConvertFieldValue = function(flightLog, fieldName, toFriendly, value) {
+        if (value === undefined) {
+            return 0;
+        }
+
+        const highResolutionScale = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 10 : 1;
+        const highResolutionAddPrecision = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 1 : 0;
+
+        switch (fieldName) {
+            case 'time':
+                return toFriendly ? value / 1000 : value*1000;
+
+            case 'gyroADC[0]':
+            case 'gyroADC[1]':
+            case 'gyroADC[2]':
+            case 'gyroUnfilt[0]':
+            case 'gyroUnfilt[1]':
+            case 'gyroUnfilt[2]':
+                return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value / highResolutionScale) : value*highResolutionScale/flightLog.gyroRawToDegreesPerSecond(1.0);
+
+
+
+            case 'axisError[0]':
+            case 'axisError[1]':
+            case 'axisError[2]':
+                return toFriendly ? value / highResolutionScale : value * highResolutionScale;
+
+            case 'rcCommand[0]':
+            case 'rcCommand[1]':
+            case 'rcCommand[2]':
+                return toFriendly ? value / highResolutionScale + 1500 : (value - 1500) * highResolutionScale;
+            case 'rcCommand[3]':
+                return toFriendly ? value / highResolutionScale : value * highResolutionScale;
+
+            case 'motor[0]':
+            case 'motor[1]':
+            case 'motor[2]':
+            case 'motor[3]':
+            case 'motor[4]':
+            case 'motor[5]':
+            case 'motor[6]':
+            case 'motor[7]':
+                return toFriendly ? flightLog.rcMotorRawToPctPhysical(value) : flightLog.PctPhysicalTorcMotorRaw(value);
+
+            case 'eRPM[0]':
+            case 'eRPM[1]':
+            case 'eRPM[2]':
+            case 'eRPM[3]':
+            case 'eRPM[4]':
+            case 'eRPM[5]':
+            case 'eRPM[6]':
+            case 'eRPM[7]':
+                let motor_poles = flightLog.getSysConfig()['motor_poles'];
+                return toFriendly ? value * 200 / motor_poles : value * motor_poles / 200; 
+
+
+            case 'axisSum[0]':
+            case 'axisSum[1]':
+            case 'axisSum[2]':
+            case 'axisP[0]':
+            case 'axisP[1]':
+            case 'axisP[2]':
+            case 'axisI[0]':
+            case 'axisI[1]':
+            case 'axisI[2]':
+            case 'axisD[0]':
+            case 'axisD[1]':
+            case 'axisD[2]':
+            case 'axisF[0]':
+            case 'axisF[1]':
+            case 'axisF[2]':
+                return toFriendly ? flightLog.getPIDPercentage(value) : value/flightLog.getPIDPercentage(1.0);
+
+            case 'accSmooth[0]':
+            case 'accSmooth[1]':
+            case 'accSmooth[2]':
+                return toFriendly ? flightLog.accRawToGs(value) : value/flightLog.accRawToGs(1.0);
+
+            case 'vbatLatest':
+                if (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
+                    return toFriendly ? value / 100 : value * 100;
+                } else if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
+                   (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
+                    return toFriendly ? value / 10 : value * 10;
+                } else {
+                    return toFriendly ? value / 1000 : value * 1000;
+                }
+
+            case 'amperageLatest':
+                if ((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
+                   (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
+                       return toFriendly ? value / 100 : value * 100;
+                } else if (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                    return toFriendly ? value / 100 : value * 100;
+                } else {
+                    return toFriendly ? value / 1000 : value * 1000;
+                }
+
+            case 'heading[0]':
+            case 'heading[1]':
+            case 'heading[2]':
+                return toFriendly ? value / Math.PI * 180 : value*Math.PI/180;
+
+            case 'baroAlt':
+                return toFriendly ? FlightLogFieldPresenter.decodeAltitudeLogToChart(value/100, userSettings.altitudeUnits) : value*100/FlightLogFieldPresenter.decodeAltitudeLogToChart(1.0, userSettings.altitudeUnits);
+
+            case 'flightModeFlags':
+                return value;
+
+            case 'stateFlags':
+                return value;
+
+            case 'failsafePhase':
+                return value;
+
+            case 'features':
+                return value;
+
+            case 'rssi':
+                return toFriendly ? value / 1024 * 100 : value*1024/100;
+
+            //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+            case 'GPS_numSat':
+                return value;
+            case 'GPS_coord[0]':
+            case 'GPS_coord[1]':
+                return toFriendly ? value/10000000 : value*10000000;
+            case 'GPS_altitude':
+                return toFriendly ? FlightLogFieldPresenter.decodeAltitudeLogToChart(value/10, userSettings.altitudeUnits) : value*10/FlightLogFieldPresenter.decodeAltitudeLogToChart(1.0, userSettings.altitudeUnits);
+            case 'GPS_speed':
+                switch (userSettings.speedUnits) {
+                    case 1:
+                        return toFriendly ? value/100 : value*100; // m/s
+                    case 2:
+                        return toFriendly ?  (value/100) * 3.6 : 100*value/3.6; // kph
+                    case 3:
+                        return toFriendly ?  (value/100) * 2.2369 : value*100/2.2369; //mph
+                }
+            case 'GPS_ground_course':
+                return toFriendly ?  value/10 : value*10;
+
+            case 'debug[0]':
+            case 'debug[1]':
+            case 'debug[2]':
+            case 'debug[3]':
+            case 'debug[4]':
+            case 'debug[5]':
+            case 'debug[6]':
+            case 'debug[7]':
+                return FlightLogFieldPresenter.ConvertDebugFieldValue(flightLog, fieldName, toFriendly, value);
+
+            default:
+                return value;
+        }
+    };
+
 /**
      * Attempt to decode debug fields values from log file to chart units and back.
      *
@@ -2291,7 +2456,6 @@ function FlightLogFieldPresenter() {
                 case 'DSHOT_TELEMETRY_COUNTS':
                     return value;
             }
-            return value;
         }
         return value;
     };

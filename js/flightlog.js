@@ -1204,7 +1204,6 @@ FlightLog.prototype.rcMotorRawToPctPhysical = function(value) {
 };
 // rcMotorRaw back transform function
 FlightLog.prototype.PctPhysicalTorcMotorRaw = function(value) {
-    return value;
     // Motor displayed as percentage
     let motorRaw;
     if (this.isDigitalProtocol()) {
