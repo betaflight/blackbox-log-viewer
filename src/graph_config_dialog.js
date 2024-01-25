@@ -89,10 +89,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
                 $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
                 $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);
-
                 $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
                 $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
-
+                
                 if(field.curve.MinMax!=null) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min);
