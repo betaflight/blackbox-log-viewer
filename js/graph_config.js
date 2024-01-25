@@ -252,41 +252,50 @@ GraphConfig.load = function(config) {
         }
 
         var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
-            let mm = getMinMaxForFields.apply(null, arguments);
+            const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
-            mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
+            const mmChartUnits = 
+            {
+                min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
+                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
+            };
             return {
                 offset: -(mm.max + mm.min) / 2,
                 power: 1.0,
                 inputRange: Math.max((mm.max - mm.min) / 2, 1.0),
                 outputRange: 1.0,
-                MinMax: mm,
+                MinMax: mmChartUnits,
                 EnabledMinMax: false
             };
         }
 
         var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
-            let mm = getMinMaxForFields.apply(null, arguments);
+            const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
-            mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
+            const mmChartUnits = 
+            {
+                min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
+                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
+            };
             return {
                 offset: 0,
                 power: 1.0,
                 inputRange: Math.max(Math.max(Math.abs(mm.max), Math.abs(mm.min)), 1.0),
                 outputRange: 1.0,
-                MinMax: mm,
+                MinMax: mmChartUnits,
                 EnabledMinMax: false
             };
         }
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
         const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
-        let mm = getMinMaxForFields(fieldName);
+        const mm = getMinMaxForFields(fieldName);
         // added convertation min max values from log file units to friendly chart
-        mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
-        mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
+        const mmChartUnits = 
+            {
+                min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
+                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
+            };
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
@@ -296,7 +305,7 @@ GraphConfig.load = function(config) {
                     inputRange: flightLog.isDigitalProtocol() ?
                         DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^eRPM\[/)) {
@@ -307,7 +316,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 500,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^accSmooth\[/)) {
@@ -316,7 +325,7 @@ GraphConfig.load = function(config) {
                     power: 0.5,
                     inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName == "rcCommands[3]") { // Throttle scaled
@@ -325,7 +334,7 @@ GraphConfig.load = function(config) {
                     power: 1.0, /* Make this 1.0 to scale linearly */
                     inputRange: 50,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^axisError\[/)  ||     // Gyro, Gyro Scaled, RC Command Scaled and axisError
@@ -337,7 +346,7 @@ GraphConfig.load = function(config) {
                     power: 0.25, /* Make this 1.0 to scale linearly */
                     inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
@@ -346,7 +355,7 @@ GraphConfig.load = function(config) {
                     power: 0.3,
                     inputRange: 1000, // Was 400 ?
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle
@@ -355,7 +364,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 500 * highResolutionScale,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
@@ -364,7 +373,7 @@ GraphConfig.load = function(config) {
                     power: 0.25,
                     inputRange: 500 * highResolutionScale * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName == "heading[2]") {
@@ -373,7 +382,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: Math.PI,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^heading\[/)) {
@@ -382,7 +391,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: Math.PI,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^sonar.*/)) {
@@ -391,7 +400,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 200,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^rssi.*/)) {
@@ -400,7 +409,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 512,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName == 'GPS_ground_course') {
@@ -409,7 +418,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 1800,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName == 'GPS_numSat') {
@@ -418,7 +427,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 20,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName == 'GPS_speed') {
@@ -427,7 +436,7 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 1000,
                     outputRange: 1.0,
-                    MinMax: mm,
+                    MinMax: mmChartUnits,
                     EnabledMinMax: false
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
@@ -442,7 +451,7 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -451,7 +460,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000, //  0-2000uS
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                         }
@@ -461,7 +470,7 @@ GraphConfig.load = function(config) {
                                 power: 1.0,
                                 inputRange: 250, //  0-500uS
                                 outputRange: 1.0,
-                                MinMax: mm,
+                                MinMax: mmChartUnits,
                                 EnabledMinMax: false
                             };
                     case 'GYRO':
@@ -480,7 +489,7 @@ GraphConfig.load = function(config) {
                             power: 0.25,
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0,
-                            MinMax: mm,
+                            MinMax: mmChartUnits,
                             EnabledMinMax: false
                         };
                     case 'ACCELEROMETER':
@@ -489,7 +498,7 @@ GraphConfig.load = function(config) {
                             power: 0.5,
                             inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
                             outputRange: 1.0,
-                            MinMax: mm,
+                            MinMax: mmChartUnits,
                             EnabledMinMax: false
                         };
                     case 'MIXER':
@@ -498,7 +507,7 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
                             outputRange: 1.0,
-                            MinMax: mm,
+                            MinMax: mmChartUnits,
                             EnabledMinMax: false
                         };
                     case 'BATTERY':
@@ -509,7 +518,7 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     inputRange: 2048,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -518,7 +527,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 130, // 0-26.0v
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                         }
@@ -538,7 +547,7 @@ GraphConfig.load = function(config) {
                                     power: 0.25,
                                     inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // raw RC command derivative
@@ -561,7 +570,7 @@ GraphConfig.load = function(config) {
                             power: 0.25, /* Make this 1.0 to scale linearly */
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0,
-                            MinMax: mm,
+                            MinMax: mmChartUnits,
                             EnabledMinMax: false
                         };
                     case 'ALTITUDE':
@@ -572,7 +581,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // Baro Alt
@@ -582,7 +591,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // Vario
@@ -591,7 +600,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -607,7 +616,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -625,7 +634,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -643,7 +652,7 @@ GraphConfig.load = function(config) {
                                     power: 0.25,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -655,7 +664,7 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: 100,
                             outputRange: 1.0,
-                            MinMax: mm,
+                            MinMax: mmChartUnits,
                             EnabledMinMax: false
                         };
                     case 'ESC_SENSOR_RPM':
@@ -691,7 +700,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // Clip or Count
@@ -700,7 +709,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -714,7 +723,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin),
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // feedforward delta element
@@ -724,7 +733,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // rcCommand delta
@@ -733,7 +742,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -746,7 +755,7 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: 300,
                             outputRange: 1.0,
-                            MinMax: mm,
+                            MinMax: mmChartUnits,
                             EnabledMinMax: false
                         };
                     case 'BARO':
@@ -757,7 +766,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 20,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // Baro Temp
@@ -768,7 +777,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -783,7 +792,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[2]': // Altitude
@@ -793,7 +802,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -809,7 +818,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // in 4.3 and 4.2 is minRPS
@@ -818,7 +827,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -832,7 +841,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             // debug 1 is Count of Unknown Frames
@@ -851,7 +860,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 128,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // LQ percent
@@ -860,7 +869,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -874,7 +883,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // ID of late task
@@ -884,7 +893,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // gyro skew 100 = 10us
@@ -893,7 +902,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -908,7 +917,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[2]': // total delay in last second
@@ -917,7 +926,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // total tasks per second
@@ -926,7 +935,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -940,7 +949,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             // debug 0 = Lost connection count
@@ -968,7 +977,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[2]': // Velocity in cm/s
@@ -978,7 +987,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -992,7 +1001,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // GPS GroundCourse
@@ -1004,7 +1013,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1800,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[5]': // magYaw * 10
@@ -1013,7 +1022,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[6]': // roll angle *100
@@ -1022,7 +1031,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 900,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[7]': // yaw rate deg/s
@@ -1031,7 +1040,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 100,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1045,7 +1054,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 4000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // Rescue Phase
@@ -1055,7 +1064,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // Failure counters coded
@@ -1064,7 +1073,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1079,7 +1088,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[2]': // altitude m
@@ -1089,7 +1098,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1104,7 +1113,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[2]': // task interval
@@ -1113,7 +1122,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // Baud rate / resolved packet interval
@@ -1125,7 +1134,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 100,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[6]': // ackState
@@ -1134,7 +1143,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[7]': // Incoming buffer
@@ -1143,7 +1152,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 100,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1160,7 +1169,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1177,7 +1186,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1192,7 +1201,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[1]': // angle error correction
@@ -1202,7 +1211,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1219,7 +1228,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1236,7 +1245,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[4]': // X Cal
@@ -1247,7 +1256,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[7]': // Lambda
@@ -1256,7 +1265,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1271,7 +1280,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[2]': // Data Interval
@@ -1280,7 +1289,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[3]': // Execute Time
@@ -1289,7 +1298,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 20,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[4]': // Bus Busy Check
@@ -1299,7 +1308,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             case 'debug[6]': // Time since previous task uS
@@ -1308,7 +1317,7 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mm,
+                                    MinMax: mmChartUnits,
                                     EnabledMinMax: false
                                 };
                             default:
@@ -1325,7 +1334,7 @@ GraphConfig.load = function(config) {
                 power: 1.0,
                 inputRange: 500,
                 outputRange: 1.0,
-                MinMax: mm,
+                MinMax: mmChartUnits,
                 EnabledMinMax: false
             };
         }
