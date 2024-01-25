@@ -177,14 +177,19 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         
         // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
-        $('input[name=MinValue]',elem).dblclick( function() {
-            if($(this).prop('readonly') == false)
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
+        // field.name is "" for new row!! Therefore,  use $('select.form-control option:selected', elem).val() for it in events handlers 
+        $('input[name=MinValue]',elem).dblclick( function() {        
+            if($(this).prop('readonly') == false) {
+                let name = $('select.form-control option:selected', elem).val();
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min);
+            }
         });
         // Add event when mouse double click at the enabled Maximum input field to restore default Max values.
         $('input[name=MaxValue]',elem).dblclick( function() {
-            if($(this).prop('readonly') == false)
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+            if($(this).prop('readonly') == false) {
+                let name = $('select.form-control option:selected', elem).val();
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max);
+            }
         });
         
         
