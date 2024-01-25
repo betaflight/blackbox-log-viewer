@@ -95,7 +95,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
                 if(field.curve.MinMax!=null) {
                     // Set line MinMax values !!!
-                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);        
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max);
                 }
                 else{
@@ -176,14 +176,19 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
 
         // Add event when mouse double click at the enabled Minimum input field to restore default Min values.
+        // field.name is "" for new row!! Therefore,  use $('select.form-control option:selected', elem).val() for it in events handlers
         $('input[name=MinValue]',elem).dblclick( function() {
-            if($(this).prop('readonly') == false)
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
+            if($(this).prop('readonly') == false) {
+                let name = $('select.form-control option:selected', elem).val();
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min);
+            }
         });
         // Add event when mouse double click at the enabled Maximum input field to restore default Max values.
         $('input[name=MaxValue]',elem).dblclick( function() {
-            if($(this).prop('readonly') == false)
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+            if($(this).prop('readonly') == false) {
+                let name = $('select.form-control option:selected', elem).val();
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max);
+            }
         });
 
         return elem;
@@ -350,10 +355,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
             graph.height = parseInt($('select.graph-height option:selected', this).val());
 
             $(".config-graph-field", this).each(function() {
-                let fieldName = $("select", this).val(); 
+                let fieldName = $("select", this).val();
                 let minimum = $("input[name=MinValue]", this).val();
                 let maximum = $("input[name=MaxValue]", this).val();
-                
+
                 field = {
                     name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
