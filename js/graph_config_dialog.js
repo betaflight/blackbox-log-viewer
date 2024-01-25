@@ -87,14 +87,13 @@ function GraphConfigurationDialog(dialog, onSave) {
             if(field.curve!=null) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
                 $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
-                $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);                
-                
+                $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);
                 $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
-                $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);                
+                $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
                 
                 if(field.curve.MinMax!=null) {
                     // Set line MinMax values !!!
-                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);        
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max);
                 }
                 else{
@@ -178,9 +177,9 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
-        $('input[name=MinValue]',elem).dblclick( function() {        
+        $('input[name=MinValue]',elem).dblclick( function() {
             if($(this).prop('readonly') == false) {
-                let name = field.name ?? $('select.form-control option:selected', elem).val();              
+                let name = field.name ?? $('select.form-control option:selected', elem).val();
                 $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min);
             }
         });
