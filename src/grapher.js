@@ -928,8 +928,10 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
                 // Convert data if use MinMax
                 if(field.curve.EnabledMinMax)
                 {
-                    field.curve.inputRange = (field.curve.MinMax.max - field.curve.MinMax.min) / 2;
-                    field.curve.offset = -(field.curve.MinMax.max + field.curve.MinMax.min) / 2;
+                    let min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.min);
+                    let max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.max);
+                    field.curve.inputRange = (max - min) / 2;
+                    field.curve.offset = -(max + min) / 2;
                 }
                 // Convert the field's curve settings into an actual expo curve object:
                 field.curve = new ExpoCurve(field.curve.offset, 
