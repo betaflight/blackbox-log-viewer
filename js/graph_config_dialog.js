@@ -93,11 +93,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);                
                 
                 if(field.curve.MinMax!=null) {
-                    // Set the line MinMax values !!!
-                    let minimum = FlightLogFieldPresenter.ConvertFieldValue(activeFlightLog, field.name, true, field.curve.MinMax.min);
-                    let maximum = FlightLogFieldPresenter.ConvertFieldValue(activeFlightLog, field.name, true, field.curve.MinMax.max);
-                    $('input[name=MinValue]',elem).val(minimum);        
-                    $('input[name=MaxValue]',elem).val(maximum);
+                    // Set line MinMax values !!!
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);        
+                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max);
                 }
                 else{
                     $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
@@ -359,8 +357,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 let fieldName = $("select", this).val(); 
                 let minimum = $("input[name=MinValue]", this).val();
                 let maximum = $("input[name=MaxValue]", this).val();
-                minimum = FlightLogFieldPresenter.ConvertFieldValue(activeFlightLog, fieldName, false, minimum);
-                maximum = FlightLogFieldPresenter.ConvertFieldValue(activeFlightLog, fieldName, false, maximum);
+                
                 field = {
                     name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
@@ -368,8 +365,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0,     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
                         MinMax: {
-                            min: parseInt(minimum),
-                            max: parseInt(maximum)
+                            min: parseFloat(minimum),
+                            max: parseFloat(maximum)
                         },
                         EnabledMinMax: $('input[name=EnabledMinMax]', this).is(':checked')
                     },
@@ -378,8 +375,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,
                         outputRange: parseInt($("input[name=scale]", this).val())/100.0,
                         MinMax: {
-                            min: parseInt(minimum),
-                            max: parseInt(maximum)
+                            min: parseFloat(minimum),
+                            max: parseFloat(maximum)
                         },
                         EnabledMinMax: $('input[name=EnabledMinMax]', this).is(':checked')
                     },
