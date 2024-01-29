@@ -10,8 +10,8 @@ function GraphConfigurationDialog(dialog, onSave) {
     
 
     function chooseColor(currentSelection) {
-    	var selectColor = $('<select class="color-picker"></select>');
-    		for(var i=0; i<GraphConfig.PALETTE.length; i++) {
+        var selectColor = $('<select class="color-picker"></select>');
+            for(var i=0; i<GraphConfig.PALETTE.length; i++) {
                 var option = $('<option></option>')
                     .text(GraphConfig.PALETTE[i].name)
                     .attr('value', GraphConfig.PALETTE[i].color)
@@ -195,7 +195,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('.minmax-control', elem).contextmenu( function(e) {
             if($('input[name=EnabledMinMax]', elem).is(':checked')) {
                 let name = field.name ?? $('select.form-control option:selected', elem).val();
-                showMinMaxSetupContextMenu(name, $(".config-graph-field", $(this).parents('.config-graph')), e);
+                showMinMaxSetupContextMenu(flightLog, name, $(".config-graph-field", $(this).parents('.config-graph')), e);
             }
             return false;
         });
@@ -203,32 +203,99 @@ function GraphConfigurationDialog(dialog, onSave) {
         return elem;
     }
     
-    function showMinMaxSetupContextMenu(field_name, field_list, e) {
+    function showMinMaxSetupContextMenu(flightLog, field_name, field_list, e) {
         let rows = [];
+        let subCurvesNamesOneScale = new nw.Menu();
+        let subCurvesNamesOneZero = new nw.Menu();
         field_list.each(function() {
             let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
             if(enabled) {
                 let fieldName = $("select", this).val();
+                let fieldFriendlyName = $('select.form-control option:selected', this).text();
                 let minimum = $("input[name=MinValue]", this).val();
                 let maximum = $("input[name=MaxValue]", this).val();
-
                 let row = {
                     name: fieldName,
+                    friendly_name: fieldFriendlyName,
                     min: parseFloat(minimum),
                     max: parseFloat(maximum)
                 };
                 rows.push(row);
+                
+                if(fieldName != field_name) {
+                    subCurvesNamesOneScale.append(new nw.MenuItem({
+                        label: fieldFriendlyName,
+                        click: FitCurveToOneScale
+                    }));
+                    
+                    subCurvesNamesOneZero.append(new nw.MenuItem({
+                        label: fieldFriendlyName,
+                        click: FitCurveToOneZeroLevel
+                    }));
+                }
             }
         });
         
         let menu = new nw.Menu();
-        menu.append(new nw.MenuItem({label: 'Set all minmax values to default'}));
-        menu.append(new nw.MenuItem({label: 'Set all curves to one scale'}));
+        menu.append(new nw.MenuItem({
+            label: 'Set all minmax values to default',
+            click: SetAllMinmaxValuesToDefault
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Set all curves to one scale',
+            click: SetAllCurvesToOneScale
+        }));
         menu.append(new nw.MenuItem({type: 'separator'}));
-        menu.append(new nw.MenuItem({label: 'Set this curve minmax to default'}));
-        menu.append(new nw.MenuItem({label: 'Set this curve to one scale at:'}));
-        menu.append(new nw.MenuItem({label: 'Set this curve to one zero level at:'}));
+        menu.append(new nw.MenuItem({
+            label: 'Set this curve minmax to default',
+            click: SetCurveDefaultMinMax
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Fit this curve to one scale at:',
+            submenu: subCurvesNamesOneScale
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Fit this curve to one zero level at:',
+            submenu: subCurvesNamesOneZero
+        }));
         menu.popup(e.screenX, e.screenY);
+        
+        function SetAllMinmaxValuesToDefault() {
+            field_list.each(function() {
+                let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
+                if(enabled) {
+                    let fieldName = $("select", this).val();
+                    $('input[name=MinValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.min);
+                    $('input[name=MaxValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.max);
+                }
+            });
+        }
+        
+        function SetAllCurvesToOneScale(e) {
+            let Max = Number.MIN_VALUE, Min = Number.MAX_VALUE;
+            rows.forEach (function (row){
+                Min = Math.min(Min, row.min);
+                Max = Math.max(Max, row.max);
+            });
+            
+            field_list.each(function() {
+                let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
+                if(enabled) {
+                    $('input[name=MinValue]',this).val(Min);
+                    $('input[name=MaxValue]',this).val(Max);
+                }
+            });
+        }
+        
+        function SetCurveDefaultMinMax(e) {
+        }
+        
+        function FitCurveToOneScale(e) {
+        }
+        
+        function FitCurveToOneZeroLevel(e) {
+        }
+        
     }
     
     function renderGraph(flightLog, index, graph) {
