@@ -91,7 +91,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);
                 $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
                 $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
-                
+
                 if(field.curve.MinMax!=null) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min);
@@ -127,9 +127,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
                     + '<td><input name="grid" type="checkbox"/></td>'
-                    + '<td><input name="EnabledMinMax" type="checkbox"/></td>'
-                    + '<td><input name="MinValue" class="form-control" type="text" readonly="true"/></td>'
-                    + '<td><input name="MaxValue" class="form-control" type="text" readonly="true"/></td>'
+                    + '<td><input name="EnabledMinMax" class="minmax-control"  type="checkbox"/></td>'
+                    + '<td><input name="MinValue" class="form-control minmax-control" type="text" readonly="true"/></td>'
+                    + '<td><input name="MaxValue" class="form-control minmax-control" type="text" readonly="true"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -191,7 +191,43 @@ export function GraphConfigurationDialog(dialog, onSave) {
             }
         });
 
+        $('.minmax-control', elem).contextmenu( function(e) {
+            if($('input[name=EnabledMinMax]', elem).is(':checked')) {
+                let name = field.name ?? $('select.form-control option:selected', elem).val();
+                showMinMaxSetupContextMenu(name, $(".config-graph-field", $(this).parents('.config-graph')), e);
+            }
+            return false;
+        });
+
         return elem;
+    }
+
+    function showMinMaxSetupContextMenu(field_name, field_list, e) {
+        let rows = [];
+        field_list.each(function() {
+            let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
+            if(enabled) {
+                let fieldName = $("select", this).val();
+                let minimum = $("input[name=MinValue]", this).val();
+                let maximum = $("input[name=MaxValue]", this).val();
+
+                let row = {
+                    name: fieldName,
+                    min: parseFloat(minimum),
+                    max: parseFloat(maximum)
+                };
+                rows.push(row);
+            }
+        });
+
+        let menu = new nw.Menu();
+        menu.append(new nw.MenuItem({label: 'Set all minmax values to default'}));
+        menu.append(new nw.MenuItem({label: 'Set all curves to one scale'}));
+        menu.append(new nw.MenuItem({type: 'separator'}));
+        menu.append(new nw.MenuItem({label: 'Set this curve minmax to default'}));
+        menu.append(new nw.MenuItem({label: 'Set this curve to one scale at:'}));
+        menu.append(new nw.MenuItem({label: 'Set this curve to one zero level at:'}));
+        menu.popup(e.screenX, e.screenY);
     }
 
     function renderGraph(flightLog, index, graph) {
