@@ -204,11 +204,11 @@ function GraphConfigurationDialog(dialog, onSave) {
     }
     
     // Show context menu to setup min-max values
-    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_list) {
+    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {
         let curvesData = {};
         let subCurvesNamesOneScale = new nw.Menu();
         let subCurvesNamesOneZero = new nw.Menu();
-        curves_list.each(function() {
+        curves_table.each(function() {
             let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
             if(enabled) {
                 let fieldName = $("select", this).val();
@@ -226,7 +226,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 if(fieldName != selected_field_name) {
                     subCurvesNamesOneScale.append(new nw.MenuItem({
                         label: fieldFriendlyName,
-                        click: FitSelectedCurveToOneScaleWithOther
+                        click: FitSelectedCurveToOneScaleWithSecond
                     }));
                     
                     subCurvesNamesOneZero.append(new nw.MenuItem({
@@ -262,7 +262,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         menu.popup(menu_pos_x, menu_pos_y);
         
         function SetAllMinmaxValuesToDefault() {
-            curves_list.each(function() {
+            curves_table.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
                     let fieldName = $("select", this).val();
@@ -279,7 +279,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 Max = Math.max(Max, curvesData[key].max);
             }
             
-            curves_list.each(function() {
+            curves_table.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
                     $('input[name=MinValue]',this).val(Min.toFixed(1));
@@ -293,13 +293,31 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MaxValue]', selected_curve).val(GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax.max.toFixed(1));
         }
         
-        function FitSelectedCurveToOneScaleWithOther() {
-
+        function FitSelectedCurveToOneScaleWithSecond() {
+            let SecondCurveName = this.label;
+            let SecondCurve = curvesData[SecondCurveName];
+            let SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
+            let SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+            let min = Math.min(SelectedCurveMin, SecondCurve.min);
+            let max = Math.max(SelectedCurveMax, SecondCurve.max);
+            
+            $('input[name=MinValue]', selected_curve).val(min.toFixed(1));
+            $('input[name=MaxValue]', selected_curve).val(max.toFixed(1));
+            
+            curves_table.each(function() {
+                let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
+                if(enabled) {
+                    let fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    if(SecondCurveName == fieldFriendlyName) {
+                        $('input[name=MinValue]',this).val(min.toFixed(1));
+                        $('input[name=MaxValue]',this).val(max.toFixed(1));
+                    }
+                }
+            });
         }
         
         function FitCurveToOneZeroLevel() {
-        alert(label);
-        alert(this.label);
+
         }
         
     }
