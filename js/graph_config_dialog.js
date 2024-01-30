@@ -93,20 +93,20 @@ function GraphConfigurationDialog(dialog, onSave) {
                 
                 if(field.curve.MinMax!=null) {
                     // Set line MinMax values !!!
-                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min);
-                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max);
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
                 }
                 else{
-                    $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
-                    $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+                    $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
                 }
                 
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
                 $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100).toFixed(0)+'%');
-                $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min);
-                $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max);
+                $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
+                $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
                 $('input[name=EnabledMinMax]',elem).attr("checked", false);
             }
         }
@@ -180,7 +180,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('input[name=MinValue]',elem).dblclick( function() {
             if($(this).prop('readonly') == false) {
                 let name = field.name ?? $('select.form-control option:selected', elem).val();
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min);
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min.toFixed(1));
             }
         });
         // Add event when mouse double click at the enabled Maximum input field to restore default Max values.
@@ -188,7 +188,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('input[name=MaxValue]',elem).dblclick( function() {
             if($(this).prop('readonly') == false) {
                 let name = field.name ?? $('select.form-control option:selected', elem).val();
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max);
+                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(1));
             }
         });
         
@@ -265,8 +265,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
                     let fieldName = $("select", this).val();
-                    $('input[name=MinValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.min);
-                    $('input[name=MaxValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.max);
+                    $('input[name=MinValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.max.toFixed(1));
                 }
             });
         }
@@ -281,8 +281,8 @@ function GraphConfigurationDialog(dialog, onSave) {
             field_list.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
-                    $('input[name=MinValue]',this).val(Min);
-                    $('input[name=MaxValue]',this).val(Max);
+                    $('input[name=MinValue]',this).val(Min.toFixed(1));
+                    $('input[name=MaxValue]',this).val(Max.toFixed(1));
                 }
             });
         }
