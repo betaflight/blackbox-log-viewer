@@ -195,7 +195,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('.minmax-control', elem).contextmenu( function(e) {
             if($('input[name=EnabledMinMax]', elem).is(':checked')) {
                 let name = field.name ?? $('select.form-control option:selected', elem).val();
-                showMinMaxSetupContextMenu(flightLog, name, $(".config-graph-field", $(this).parents('.config-graph')), e);
+                showMinMaxSetupContextMenu(e.screenX, e.screenY, flightLog, name, elem, $(".config-graph-field", $(this).parents('.config-graph')));
             }
             return false;
         });
@@ -203,11 +203,12 @@ function GraphConfigurationDialog(dialog, onSave) {
         return elem;
     }
     
-    function showMinMaxSetupContextMenu(flightLog, field_name, field_list, e) {
+    // Show context menu to setup min-max values
+    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_list) {
         let rows = [];
         let subCurvesNamesOneScale = new nw.Menu();
         let subCurvesNamesOneZero = new nw.Menu();
-        field_list.each(function() {
+        curves_list.each(function() {
             let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
             if(enabled) {
                 let fieldName = $("select", this).val();
@@ -222,7 +223,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 };
                 rows.push(row);
                 
-                if(fieldName != field_name) {
+                if(fieldName != selected_field_name) {
                     subCurvesNamesOneScale.append(new nw.MenuItem({
                         label: fieldFriendlyName,
                         click: FitCurveToOneScale
@@ -248,7 +249,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         menu.append(new nw.MenuItem({type: 'separator'}));
         menu.append(new nw.MenuItem({
             label: 'Set this curve minmax to default',
-            click: SetCurveDefaultMinMax
+            click: SetSelectedCurveMinMaxToDefault
         }));
         menu.append(new nw.MenuItem({
             label: 'Fit this curve to one scale at:',
@@ -258,10 +259,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             label: 'Fit this curve to one zero level at:',
             submenu: subCurvesNamesOneZero
         }));
-        menu.popup(e.screenX, e.screenY);
+        menu.popup(menu_pos_x, menu_pos_y);
         
         function SetAllMinmaxValuesToDefault() {
-            field_list.each(function() {
+            curves_list.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
                     let fieldName = $("select", this).val();
@@ -271,14 +272,14 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
         }
         
-        function SetAllCurvesToOneScale(e) {
+        function SetAllCurvesToOneScale() {
             let Max = Number.MIN_VALUE, Min = Number.MAX_VALUE;
             rows.forEach (function (row){
                 Min = Math.min(Min, row.min);
                 Max = Math.max(Max, row.max);
             });
             
-            field_list.each(function() {
+            curves_list.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
                     $('input[name=MinValue]',this).val(Min.toFixed(1));
@@ -287,13 +288,15 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
         }
         
-        function SetCurveDefaultMinMax(e) {
+        function SetSelectedCurveMinMaxToDefault() {
+            $('input[name=MinValue]', selected_curve).val(GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax.min.toFixed(1));
+            $('input[name=MaxValue]', selected_curve).val(GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax.max.toFixed(1));
         }
         
-        function FitCurveToOneScale(e) {
+        function FitCurveToOneScale() {
         }
         
-        function FitCurveToOneZeroLevel(e) {
+        function FitCurveToOneZeroLevel() {
         }
         
     }
