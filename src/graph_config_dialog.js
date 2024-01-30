@@ -206,7 +206,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
     function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {
         let curvesData = {};
         let subCurvesNamesOneScale = new nw.Menu();
-        let subCurvesNamesOneZero = new nw.Menu();
         curves_table.each(function() {
             let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
             if(enabled) {
@@ -227,11 +226,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                         label: fieldFriendlyName,
                         click: FitSelectedCurveToOneScaleWithSecond
                     }));
-
-                    subCurvesNamesOneZero.append(new nw.MenuItem({
-                        label: fieldFriendlyName,
-                        click: FitCurveToOneZeroLevel
-                    }));
                 }
             }
         });
@@ -245,6 +239,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
             label: 'Set all curves to one scale',
             click: SetAllCurvesToOneScale
         }));
+        menu.append(new nw.MenuItem({
+            label: 'Set all curves to one zero axis',
+            click: SetAllCurvesToOneZeroAxis
+        }));
         menu.append(new nw.MenuItem({type: 'separator'}));
         menu.append(new nw.MenuItem({
             label: 'Set this curve minmax to default',
@@ -255,8 +253,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
             submenu: subCurvesNamesOneScale
         }));
         menu.append(new nw.MenuItem({
-            label: 'Fit this curve to one zero level at:',
-            submenu: subCurvesNamesOneZero
+            label: 'Place this curve around zero axis',
+            click: FitSelectedCurveAroundZeroAxis
         }));
         menu.popup(menu_pos_x, menu_pos_y);
 
@@ -299,10 +297,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
             let SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
             let min = Math.min(SelectedCurveMin, SecondCurve.min);
             let max = Math.max(SelectedCurveMax, SecondCurve.max);
-            
+
             $('input[name=MinValue]', selected_curve).val(min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(max.toFixed(1));
-            
+
             curves_table.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
@@ -315,8 +313,27 @@ export function GraphConfigurationDialog(dialog, onSave) {
             });
         }
 
-        function FitCurveToOneZeroLevel() {
+        function SetAllCurvesToOneZeroAxis() {
+            curves_table.each(function() {
+                let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
+                if(enabled) {
+                    let Min = $('input[name=MinValue]',this).val();
+                    let Max = $('input[name=MaxValue]',this).val();
+                    Max = Math.max(Math.abs(Min), Math.abs(Max));
+                    Min = -Max;
+                    $('input[name=MinValue]',this).val(Min.toFixed(1));
+                    $('input[name=MaxValue]',this).val(Max.toFixed(1));
+                }
+            });
+        }
 
+        function FitSelectedCurveAroundZeroAxis() {
+            let Min = $('input[name=MinValue]', selected_curve).val();
+            let Max = $('input[name=MaxValue]', selected_curve).val();
+            Max = Math.max(Math.abs(Min), Math.abs(Max));
+            Min = -Max;
+            $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
+            $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
         }
 
     }
