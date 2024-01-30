@@ -233,20 +233,20 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
-            label: 'Set all minmax values to default',
+            label: 'Place all curves at full range',
             click: SetAllMinmaxValuesToDefault
         }));
         menu.append(new nw.MenuItem({
-            label: 'Set all curves to one scale',
+            label: 'Place all curves to one scale',
             click: SetAllCurvesToOneScale
         }));
         menu.append(new nw.MenuItem({
-            label: 'Set all curves to one zero axis',
+            label: 'Place all curves around zero axis',
             click: SetAllCurvesToOneZeroAxis
         }));
         menu.append(new nw.MenuItem({type: 'separator'}));
         menu.append(new nw.MenuItem({
-            label: 'Set this curve minmax to default',
+            label: 'Place this curve at full range',
             click: SetSelectedCurveMinMaxToDefault
         }));
         menu.append(new nw.MenuItem({
