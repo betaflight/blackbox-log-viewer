@@ -116,7 +116,9 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
             }
             // Translate the average vs value to a bin index
             const avgVsValue = sumVsValues / fftChunkLength;
-            const vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
+            let vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
+            // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
+            if (vsBinIndex === NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
             numberSamples[vsBinIndex]++;
 
             // add the output from the fft to the row given by the vs value bin index
