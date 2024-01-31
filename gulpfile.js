@@ -32,7 +32,7 @@ console.log('osPlatform: '+osPlatform);
 console.log('osRelease: '+osRelease);
 
 switch (osPlatform) {
-    case 'darwin':
+    case 'osx64':
         NWversion ='0.72.0';
         break;
     case 'win32':
