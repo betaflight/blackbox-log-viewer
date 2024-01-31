@@ -25,8 +25,27 @@ const RELEASE_DIR = './release/';
 
 const LINUX_INSTALL_DIR = '/opt/betaflight';
 
+var NWversion;
+const osPlatform = getDefaultPlatform();
+const osRelease = os.release();
+console.log('osPlatform: '+osPlatform);
+console.log('osRelease: '+osRelease);
+
+switch (osPlatform) {
+    case 'darwin':
+        NWversion ='0.72.0';
+        break;
+    case 'win32':
+        NWversion ='0.42.6';
+        break;
+    default:
+        NWversion ='0.83.0';
+        break;
+}
+
+console.log('NWjs version: '+NWversion);
 var nwBuilderOptions = {
-    version: '0.83.0',
+    version: NWversion,
     files: './dist/**/*',
     macIcns: './images/bf_icon.icns',
     macPlist: { 'CFBundleDisplayName': 'Betaflight Blackbox Explorer'},
