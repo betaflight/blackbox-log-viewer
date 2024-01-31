@@ -25,7 +25,7 @@ const RELEASE_DIR = './release/';
 
 const LINUX_INSTALL_DIR = '/opt/betaflight';
 
-var NWversion;
+let NWversion;
 const osPlatform = getDefaultPlatform();
 const osRelease = os.release();
 console.log('osPlatform: '+osPlatform);
