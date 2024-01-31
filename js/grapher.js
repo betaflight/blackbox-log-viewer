@@ -912,7 +912,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 field.index = flightLog.getMainFieldIndexByName(field.name);
                 
                 // Convert data if use MinMax
-                if(field.curve.EnabledMinMax)
+                if (field.curve.EnabledMinMax)
                 {
                     let min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.min);
                     let max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.max);

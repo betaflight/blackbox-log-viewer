@@ -1360,6 +1360,7 @@ function FlightLogFieldPresenter() {
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
      * no better representation is available.
      *
+     * @param flightLog The pointer to FlightLog object
      * @param fieldName Name of the field
      * @param value Value of the field
      */
@@ -1926,6 +1927,7 @@ function FlightLogFieldPresenter() {
     /**
      * Attempt to decode fields values from log file to chart units and back.
      *
+     * @param flightLog The pointer to FlightLog object
      * @param fieldName Name of the field
      * @param value Value of the field
      * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
@@ -2089,6 +2091,7 @@ function FlightLogFieldPresenter() {
 /**
      * Attempt to decode debug fields values from log file to chart units and back.
      *
+     * @param flightLog The pointer to FlightLog object
      * @param fieldName Name of the field
      * @param value Value of the field
      * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
