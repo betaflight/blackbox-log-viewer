@@ -1073,9 +1073,6 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
     return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
 };
 
-
-
-
 /***
 
     The rcCommandToDegreesPerSecond function is betaflight version specific
@@ -1205,7 +1202,7 @@ FlightLog.prototype.rcCommandRawToThrottle = function(value) {
 // rcCommandThrottle back transform function
 FlightLog.prototype.ThrottleTorcCommandRaw = function(value) {
     // Throttle displayed as percentage
-    return  value/100*(this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle) + this.getSysConfig().minthrottle;
+    return  value / 100 * (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle) + this.getSysConfig().minthrottle;
 };
 
 FlightLog.prototype.rcMotorRawToPctPhysical = function(value) {
@@ -1228,12 +1225,12 @@ FlightLog.prototype.PctPhysicalTorcMotorRaw = function(value) {
     // Motor displayed as percentage
     let motorRaw;
     if (this.isDigitalProtocol()) {
-        motorRaw = value/100*DSHOT_RANGE + DSHOT_MIN_VALUE;
+        motorRaw = value / 100 * DSHOT_RANGE + DSHOT_MIN_VALUE;
     } else {
         const MAX_ANALOG_VALUE = this.getSysConfig().maxthrottle;
         const MIN_ANALOG_VALUE = this.getSysConfig().minthrottle;
         const ANALOG_RANGE = MAX_ANALOG_VALUE - MIN_ANALOG_VALUE;
-        motorRaw = value/100*ANALOG_RANGE + MIN_ANALOG_VALUE;
+        motorRaw = value / 100 * ANALOG_RANGE + MIN_ANALOG_VALUE;
     }
     return motorRaw;
 

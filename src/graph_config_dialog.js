@@ -11,9 +11,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
 
     function chooseColor(currentSelection) {
-        var selectColor = $('<select class="color-picker"></select>');
-            for(var i=0; i<GraphConfig.PALETTE.length; i++) {
-                var option = $('<option></option>')
+        const selectColor = $('<select class="color-picker"></select>');
+            for(let i=0; i<GraphConfig.PALETTE.length; i++) {
+                let option = $('<option></option>')
                     .text(GraphConfig.PALETTE[i].name)
                     .attr('value', GraphConfig.PALETTE[i].color)
                     .css('color', GraphConfig.PALETTE[i].color);
@@ -29,11 +29,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
     }
 
     function chooseHeight(currentSelection) {
-        var MAX_HEIGHT = 5;
+        const MAX_HEIGHT = 5;
 
-        var selectHeight = $('<select class="form-control graph-height"></select>');
-            for(var i=1; i<=MAX_HEIGHT; i++) {
-                var option = $('<option></option>')
+        const selectHeight = $('<select class="form-control graph-height"></select>');
+            for(let i=1; i<=MAX_HEIGHT; i++) {
+                const option = $('<option></option>')
                     .text(i)
                     .attr('value', i);
                 if(currentSelection == i || (currentSelection==null && i==1)) {
@@ -85,14 +85,14 @@ export function GraphConfigurationDialog(dialog, onSave) {
         if(elem) {
             // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
             $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
-            if(field.curve!=null) {
+            if (field.curve != null) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
                 $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
                 $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);
                 $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
                 $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
 
-                if(field.curve.MinMax!=null) {
+                if (field.curve.MinMax != null) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
@@ -208,7 +208,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         let subCurvesNamesOneScale = new nw.Menu();
         curves_table.each(function() {
             let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
-            if(enabled) {
+            if (enabled) {
                 let fieldName = $("select", this).val();
                 let fieldFriendlyName = $('select.form-control option:selected', this).text();
                 let minimum = $("input[name=MinValue]", this).val();
@@ -221,7 +221,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 };
 
                 curvesData[fieldFriendlyName] = curve;
-                if(fieldName != selected_field_name) {
+
+                if (fieldName != selected_field_name) {
                     subCurvesNamesOneScale.append(new nw.MenuItem({
                         label: fieldFriendlyName,
                         click: FitSelectedCurveToOneScaleWithSecond
@@ -261,7 +262,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         function SetAllMinmaxValuesToDefault() {
             curves_table.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
-                if(enabled) {
+                if (enabled) {
                     let fieldName = $("select", this).val();
                     $('input[name=MinValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',this).val(GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax.max.toFixed(1));
