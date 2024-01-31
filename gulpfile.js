@@ -29,7 +29,7 @@ let NWversion;
 const osPlatform = getDefaultPlatform();
 const osRelease = os.release();
 console.log('osPlatform:', osPlatform);
-console.log('osRelease: '+osRelease);
+console.log('osRelease:', osRelease);
 
 switch (osPlatform) {
     case 'osx64':
