@@ -1028,6 +1028,11 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
     this.getWindowWidthTime = function() {
         return windowWidthMicros;
     }
+    
+    // New function to return the windowCenterTime.
+    this.getWindowCenterTime = function() {
+        return windowCenterTime;
+    }
 
     // Add option toggling
     this.setDrawSticks = function(state) {
