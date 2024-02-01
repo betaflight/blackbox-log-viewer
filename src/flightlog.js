@@ -1063,6 +1063,41 @@ export function FlightLog(logData) {
     this.hasGpsData = function() {
         return this.getStats()?.frame?.G ? true : false;;
     };
+    
+    this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
+        let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
+        let startFrameIndex;
+        let minValue = Number.MAX_VALUE,
+            maxValue = Number.MIN_VALUE;
+        
+        const fieldIndex = this.getMainFieldIndexByName(field_name);
+        if (chunks.length == 0 || fieldIndex == undefined)
+            return {
+                min: Number.MIN_VALUE,
+                max: Number.MAX_VALUE
+            };
+        
+        //Find the first sample that lies inside the window
+        for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
+            if (chunks[0].frames[startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= start_time) {
+                break;
+            }
+        }
+        
+        for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+            const chunk = chunks[chunkIndex];
+            for (let frameIndex = startFrameIndex; frameIndex < chunk.frames.length; frameIndex++) {
+                const fieldValue = chunk.frames[frameIndex][fieldIndex];
+                minValue = Math.min(minValue, fieldValue);
+                maxValue = Math.max(maxValue, fieldValue);
+            }            
+        }
+        
+        return {
+            min: minValue,
+            max: maxValue
+        };
+    };
 }
 
 FlightLog.prototype.accRawToGs = function(value) {
@@ -1379,4 +1414,6 @@ FlightLog.prototype.isFieldDisabled = function() {
             RPM           : (disabledFields & (1 << 12))!==0,
             GYROUNFILT    : (disabledFields & (1 << 13))!==0,
         };
+        
+        
 };
