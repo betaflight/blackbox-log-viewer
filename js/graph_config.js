@@ -242,6 +242,12 @@ GraphConfig.load = function(config) {
                     min = Math.min(min, fieldStat.min);
                     max = Math.max(max, fieldStat.max);
                 }
+                else if (fieldIndex != undefined) {
+                    const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
+                    if (mm.min != Number.MIN_VALUE && mm.max != Number.MAX_VALUE) {
+                        return mm;
+                    }
+                }
             }
 
             if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
