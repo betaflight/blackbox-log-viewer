@@ -235,11 +235,11 @@ function GraphConfigurationDialog(dialog, onSave) {
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
             label: 'Place all curves at global full range',
-            click: SetAllMinMaxValuesToDefault
+            click: SetAllMinMaxToFullRangeDuringAllTime
         }));
         menu.append(new nw.MenuItem({
             label: 'Place all curves at window full range',
-            click: SetAllMinMaxValuesToFullRangeDuringWindowTime
+            click: SetAllMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
             label: 'Place all curves to one scale',
@@ -252,7 +252,11 @@ function GraphConfigurationDialog(dialog, onSave) {
         menu.append(new nw.MenuItem({type: 'separator'}));
         menu.append(new nw.MenuItem({
             label: 'Place this curve at global full range',
-            click: SetSelectedCurveMinMaxToDefault
+            click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place this curve at window full range',
+            click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
             label: 'Fit this curve to one scale at:',
@@ -264,7 +268,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         }));
         menu.popup(menu_pos_x, menu_pos_y);
         
-        function SetAllMinMaxValuesToDefault() {
+        function SetAllMinMaxToFullRangeDuringAllTime() {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if (enabled) {
@@ -276,7 +280,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
         }
         
-        function SetAllMinMaxValuesToFullRangeDuringWindowTime() {
+        function SetAllMinMaxToFullRangeDuringWindowTime() {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if (enabled) {
@@ -304,9 +308,16 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
         }
         
-        function SetSelectedCurveMinMaxToDefault() {
-            $('input[name=MinValue]', selected_curve).val(GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax.min.toFixed(1));
-            $('input[name=MaxValue]', selected_curve).val(GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax.max.toFixed(1));
+        function SetSelectedCurveMinMaxToFullRangeDuringAllTime() {
+            const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
+            $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
+            $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+        }
+        
+        function SetSelectedCurveMinMaxToFullRangeDuringWindowTime() {
+            const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
+            $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
+            $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
         }
         
         function FitSelectedCurveToOneScaleWithSecond() {
