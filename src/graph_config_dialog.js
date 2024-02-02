@@ -7,8 +7,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
         BLACKLISTED_FIELDS = {time:true, loopIteration:true, 'setpoint[0]':true, 'setpoint[1]':true, 'setpoint[2]':true, 'setpoint[3]':true},
         offeredFieldNames = [],
         exampleGraphs = [],
-        activeFlightLog;
-
+        activeFlightLog,
+        logGrapher = null;
 
     function chooseColor(currentSelection) {
         const selectColor = $('<select class="color-picker"></select>');
@@ -596,10 +596,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }
     }
 
-    this.show = function(flightLog, config) {
+    this.show = function(flightLog, config, grapher) {
         dialog.modal('show');
 
         activeFlightLog = flightLog;
+        logGrapher = grapher;
 
         buildOfferedFieldNamesList(flightLog, config);
 
