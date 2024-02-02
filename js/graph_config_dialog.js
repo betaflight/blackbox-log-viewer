@@ -234,8 +234,12 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
-            label: 'Place all curves at full range',
+            label: 'Place all curves at global full range',
             click: SetAllMinMaxValuesToDefault
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place all curves at window full range',
+            click: SetAllMinMaxValuesToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
             label: 'Place all curves to one scale',
@@ -272,7 +276,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
         }
         
-        function SetAllMinMaxValuesToDefaultDuringWindowTime() {
+        function SetAllMinMaxValuesToFullRangeDuringWindowTime() {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if (enabled) {
