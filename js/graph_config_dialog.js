@@ -196,7 +196,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('.minmax-control', elem).contextmenu( function(e) {
             if($('input[name=EnabledMinMax]', elem).is(':checked')) {
                 let name = field.name ?? $('select.form-control option:selected', elem).val();
-                showMinMaxSetupContextMenu(e.screenX, e.screenY, flightLog, name, elem, $(".config-graph-field", $(this).parents('.config-graph')));
+                showMinMaxSetupContextMenu(e.clientX, e.clientY, flightLog, name, elem, $(".config-graph-field", $(this).parents('.config-graph')));
             }
             return false;
         });
