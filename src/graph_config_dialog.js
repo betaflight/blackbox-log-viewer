@@ -234,42 +234,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
             }
         });
 
-        let menu = new nw.Menu();
-        menu.append(new nw.MenuItem({
-            label: 'Place all curves at global full range',
-            click: SetAllMinMaxToFullRangeDuringAllTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place all curves at window full range',
-            click: SetAllMinMaxToFullRangeDuringWindowTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place all curves to one scale',
-            click: SetAllCurvesToOneScale
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place all curves around zero axis',
-            click: SetAllCurvesToOneZeroAxis
-        }));
-        menu.append(new nw.MenuItem({type: 'separator'}));
-        menu.append(new nw.MenuItem({
-            label: 'Place this curve at global full range',
-            click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place this curve at window full range',
-            click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Fit this curve to one scale at:',
-            submenu: subCurvesNamesOneScale
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place this curve around zero axis',
-            click: FitSelectedCurveAroundZeroAxis
-        }));
-        menu.popup(menu_pos_x, menu_pos_y);
-
         function SetAllMinMaxToFullRangeDuringAllTime() {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
@@ -375,6 +339,42 @@ export function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
             RefreshCharts();
         }
+
+        let menu = new nw.Menu();
+        menu.append(new nw.MenuItem({
+            label: 'Place all curves at global full range',
+            click: SetAllMinMaxToFullRangeDuringAllTime
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place all curves at window full range',
+            click: SetAllMinMaxToFullRangeDuringWindowTime
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place all curves to one scale',
+            click: SetAllCurvesToOneScale
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place all curves around zero axis',
+            click: SetAllCurvesToOneZeroAxis
+        }));
+        menu.append(new nw.MenuItem({type: 'separator'}));
+        menu.append(new nw.MenuItem({
+            label: 'Place this curve at global full range',
+            click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place this curve at window full range',
+            click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Fit this curve to one scale at:',
+            submenu: subCurvesNamesOneScale
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Place this curve around zero axis',
+            click: FitSelectedCurveAroundZeroAxis
+        }));
+        menu.popup(menu_pos_x, menu_pos_y);
     }
 
     function renderGraph(flightLog, index, graph) {
