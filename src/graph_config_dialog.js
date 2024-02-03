@@ -649,6 +649,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
     $(".graph-configuration-dialog-save").click(function() {
         onSave(convertUIToGraphConfig());
     });
+    
+    $(".graph-configuration-dialog-cancel").click(function() {
+        onSave(prevCfg);
+    });
 
     function RefreshCharts() {
         onSave(convertUIToGraphConfig());
