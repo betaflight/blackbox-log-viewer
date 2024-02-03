@@ -8,7 +8,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
         offeredFieldNames = [],
         exampleGraphs = [],
         activeFlightLog,
-        logGrapher = null;
+        logGrapher = null,
+        prevCfg = null;
 
     function chooseColor(currentSelection) {
         const selectColor = $('<select class="color-picker"></select>');
@@ -172,6 +173,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('input[name=EnabledMinMax]',elem).change( function() {
             $('input[name=MinValue]',elem).attr("readonly", !this.checked);
             $('input[name=MaxValue]',elem).attr("readonly", !this.checked);
+            RefreshCharts();
         });
 
         // Add event when mouse double click at the enabled Minimum input field to restore default Min values.
@@ -277,6 +279,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
                 }
             });
+            RefreshCharts();
         }
 
         function SetAllMinMaxToFullRangeDuringWindowTime() {
@@ -289,6 +292,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
                 }
             });
+            RefreshCharts();
         }
 
         function SetAllCurvesToOneScale() {
@@ -305,18 +309,21 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     $('input[name=MaxValue]',this).val(Max.toFixed(1));
                 }
             });
+            RefreshCharts();
         }
 
         function SetSelectedCurveMinMaxToFullRangeDuringAllTime() {
             const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+            RefreshCharts();
         }
 
         function SetSelectedCurveMinMaxToFullRangeDuringWindowTime() {
             const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+            RefreshCharts();
         }
 
         function FitSelectedCurveToOneScaleWithSecond() {
@@ -340,6 +347,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     }
                 }
             });
+            RefreshCharts();
         }
 
         function SetAllCurvesToOneZeroAxis() {
@@ -354,6 +362,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     $('input[name=MaxValue]',this).val(Max.toFixed(1));
                 }
             });
+            RefreshCharts();
         }
 
         function FitSelectedCurveAroundZeroAxis() {
@@ -365,6 +374,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
         }
 
+        RefreshCharts();
     }
 
     function renderGraph(flightLog, index, graph) {
@@ -626,7 +636,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     this.show = function(flightLog, config, grapher) {
         dialog.modal('show');
-
         activeFlightLog = flightLog;
         logGrapher = grapher;
 
@@ -634,12 +643,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         populateExampleGraphs(flightLog, exampleGraphsMenu);
         renderGraphs(flightLog, config);
+        prevCfg = convertUIToGraphConfig();
     };
 
     $(".graph-configuration-dialog-save").click(function() {
         onSave(convertUIToGraphConfig());
     });
 
+    function RefreshCharts() {
+        onSave(convertUIToGraphConfig());
+    }
 
     var
         exampleGraphsButton = $(".config-graphs-add"),
