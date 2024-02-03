@@ -198,6 +198,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         $('.minmax-control', elem).contextmenu( function(e) {
             if($('input[name=EnabledMinMax]', elem).is(':checked')) {
                 let name = field.name ?? $('select.form-control option:selected', elem).val();
+                e.preventDefault();
                 showMinMaxSetupContextMenu(e.clientX, e.clientY, flightLog, name, elem, $(".config-graph-field", $(this).parents('.config-graph')));
             }
             return false;
@@ -373,8 +374,8 @@ function GraphConfigurationDialog(dialog, onSave) {
             Min = -Max;
             $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
+            RefreshCharts();
         }
-        RefreshCharts();
     }
     
     function renderGraph(flightLog, index, graph) {
