@@ -725,6 +725,21 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                             }
+                    case 'GYRO_SAMPLE':
+                        switch (fieldName) {
+                            case 'debug[0]': // Before downsampling
+                            case 'debug[1]': // After downsampling
+                            case 'debug[2]': // After RPM
+                            case 'debug[3]': // After all but Dyn Notch
+                            return {
+                                offset: 0,
+                                power: 0.25, /* Make this 1.0 to scale linearly */
+                                inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
+                                outputRange: 1.0
+                            };
+                            default:
+                                return getCurveForMinMaxFields(fieldName);
+                            }
                     case 'RX_TIMING':
                         switch (fieldName) {
                             case 'debug[0]': // CRC 0 to max int16_t
