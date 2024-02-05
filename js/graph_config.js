@@ -226,7 +226,9 @@ GraphConfig.load = function(config) {
             }
         }
 
-        var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
+/*
+//!!!!!! The stats data have small issues of min-max data !!!! 
+        var getMinMaxForFields = function() {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
                 stats = flightLog.getStats(),
@@ -244,9 +246,8 @@ GraphConfig.load = function(config) {
                 }
                 else if (fieldIndex != undefined) {
                     const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
-                    if (mm.min != Number.MIN_VALUE && mm.max != Number.MAX_VALUE) {
-                        return mm;
-                    }
+                    min = Math.min(mm.min, min);
+                    max = Math.max(mm.max, max);
                 }
             }
 
@@ -256,7 +257,28 @@ GraphConfig.load = function(config) {
 
             return {min:-500, max:500};
         }
+*/
+//!!! Use new function while stat data issue do not resolved
+        var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
+            // helper to make a curve scale based on the combined min/max of one or more fields
+            var
+                stats = flightLog.getStats(),
+                min = Number.MAX_VALUE,
+                max = Number.MIN_VALUE;
 
+            for(var i in arguments) {
+                const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
+                min = Math.min(mm.min, min);
+                max = Math.max(mm.max, max);
+            }
+
+            if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
+                return {min:min, max:max};
+            }
+
+            return {min:-500, max:500};
+        }
+        
         var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
