@@ -1065,7 +1065,7 @@ export function FlightLog(logData) {
     };
     
     this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
-        let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
+        let chunks = this.getChunksInTimeRange(start_time, end_time);
         let startFrameIndex;
         let minValue = Number.MAX_VALUE,
             maxValue = Number.MIN_VALUE;
