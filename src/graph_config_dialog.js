@@ -180,7 +180,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MinValue]',elem).dblclick( function() {
             if($(this).prop('readonly') == false) {
-                let name = field.name ?? $('select.form-control option:selected', elem).val();
+                let name = $('select.form-control option:selected', elem).val();
                 $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min.toFixed(1));
             }
         });
@@ -188,14 +188,14 @@ export function GraphConfigurationDialog(dialog, onSave) {
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MaxValue]',elem).dblclick( function() {
             if($(this).prop('readonly') == false) {
-                let name = field.name ?? $('select.form-control option:selected', elem).val();
+                let name = $('select.form-control option:selected', elem).val();
                 $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(1));
             }
         });
 
         $('.minmax-control', elem).contextmenu( function(e) {
             if($('input[name=EnabledMinMax]', elem).is(':checked')) {
-                let name = field.name ?? $('select.form-control option:selected', elem).val();
+                let name = $('select.form-control option:selected', elem).val();
                 e.preventDefault();
                 showMinMaxSetupContextMenu(e.clientX, e.clientY, flightLog, name, elem, $(".config-graph-field", $(this).parents('.config-graph')));
             }
