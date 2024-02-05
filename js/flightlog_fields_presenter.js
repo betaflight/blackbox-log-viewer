@@ -1586,6 +1586,7 @@ function FlightLogFieldPresenter() {
                 case 'DUAL_GYRO_DIFF':
                 case 'DUAL_GYRO_RAW':
                 case 'NOTCH':
+                case 'GYRO_SAMPLE':
                     return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
                 case 'ANGLERATE':
                     return value.toFixed(0) + " °/s";
@@ -2153,6 +2154,7 @@ function FlightLogFieldPresenter() {
                 case 'DUAL_GYRO_DIFF':
                 case 'DUAL_GYRO_RAW':
                 case 'NOTCH':
+                case 'GYRO_SAMPLE':
                     return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value) : value/flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
                 case 'ANGLERATE':
                     return value; // °/s;

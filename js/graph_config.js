@@ -849,7 +849,9 @@ GraphConfig.load = function(config) {
                                 offset: 0,
                                 power: 0.25, /* Make this 1.0 to scale linearly */
                                 inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
-                                outputRange: 1.0
+                                outputRange: 1.0,
+                                MinMax: mmChartUnits,
+                                EnabledMinMax: false
                             };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
