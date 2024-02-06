@@ -110,8 +110,8 @@ function GraphConfig(graphConfig) {
 
                     for (var k = 0; k < logFieldNames.length; k++) {
                         if (logFieldNames[k].match(nameRegex)) {
-                            // add special condition for rcCommands and debug as each of the fields requires a different scaling.
-                            let forceNewCurve = (nameRoot=='rcCommand') || (nameRoot=='rcCommands') || (nameRoot=='debug');
+                            // forceNewCurve must be true for min max computing extended curves.
+                            let forceNewCurve = true;
                             newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
                             colorIndexOffset++;
                         }
@@ -262,7 +262,6 @@ GraphConfig.load = function(config) {
         var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
-                stats = flightLog.getStats(),
                 min = Number.MAX_VALUE,
                 max = Number.MIN_VALUE;
 
