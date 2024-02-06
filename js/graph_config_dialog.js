@@ -28,7 +28,7 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         return selectColor;
     }
-    
+
     function chooseHeight(currentSelection) {
         const MAX_HEIGHT = 5;
 
@@ -77,10 +77,10 @@ function GraphConfigurationDialog(dialog, onSave) {
         if (fieldName == selectedName) {
             option.attr("selected", "selected");
         }
-        
+
         return option;
     }
-    
+
     // Set the current smoothing options for a field
     function renderSmoothingOptions(elem, flightLog, field) {
         if(elem) {
@@ -92,7 +92,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=EnabledMinMax]',elem).attr("checked", (field.curve.EnabledMinMax)? field.curve.EnabledMinMax:false);
                 $('input[name=MinValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
                 $('input[name=MaxValue]',elem).attr("readonly", !field.curve.EnabledMinMax);
-                
+
                 if (field.curve.MinMax != null) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
@@ -140,11 +140,11 @@ function GraphConfigurationDialog(dialog, onSave) {
             select = $('select.form-control', elem),
             selectedFieldName = field ?field.name : false,
             i;
-        
+
         for (i = 0; i < offeredFieldNames.length; i++) {
             select.append(renderFieldOption(offeredFieldNames[i], selectedFieldName));
         }
-        
+
         // Set the smoothing values
         renderSmoothingOptions(elem, flightLog, field);
 
@@ -171,15 +171,15 @@ function GraphConfigurationDialog(dialog, onSave) {
             $(this).css('background', $('select.color-picker option:selected', elem).val())
                    .css('color', $('select.color-picker option:selected', elem).val());
         });
-        
+
         // Add event when enable MinMax checkbox is changed to change the Minimun and Maximum fields readonly attr. 
         $('input[name=EnabledMinMax]',elem).change( function() {
             $('input[name=MinValue]',elem).attr("readonly", !this.checked);
             $('input[name=MaxValue]',elem).attr("readonly", !this.checked);
             RefreshCharts();
         });
-        
-        
+
+
         // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MinValue]',elem).dblclick( function() {
@@ -196,7 +196,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(1));
             }
         });
-        
+
         $('.minmax-control', elem).contextmenu( function(e) {
             if($('input[name=EnabledMinMax]', elem).is(':checked')) {
                 let name = $('select.form-control option:selected', elem).val();
@@ -205,10 +205,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
             return false;
         });
-        
+
         return elem;
     }
-    
+
     // Show context menu to setup min-max values
     function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {               
         var SetAllMinMaxToFullRangeDuringAllTime = function () {
@@ -223,7 +223,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
             RefreshCharts();
         };
-        
+
         var SetAllMinMaxToFullRangeDuringWindowTime = function () {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
@@ -236,14 +236,14 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
             RefreshCharts();
         };
-        
+
         var SetAllCurvesToOneScale = function () {
             let Max = Number.MIN_VALUE, Min = Number.MAX_VALUE;
             for (let key in curvesData) {
                 Min = Math.min(Min, curvesData[key].min);
                 Max = Math.max(Max, curvesData[key].max);
             }
-            
+
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
@@ -253,7 +253,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
             RefreshCharts();
         };
-        
+
         var SetSelectedCurveMinMaxToFullRangeDuringAllTime = function () {
             const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
@@ -267,7 +267,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
         };
-        
+
         var FitSelectedCurveToOneScaleWithSecond = function () {
             let SecondCurveName = this.label;
             let SecondCurve = curvesData[SecondCurveName];
@@ -291,7 +291,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
             RefreshCharts();
         };
-        
+
         var SetAllCurvesToOneZeroAxis = function () {
             curves_table.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
@@ -306,7 +306,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             });
             RefreshCharts();
         };
-        
+
         var FitSelectedCurveAroundZeroAxis = function () {
             let Min = $('input[name=MinValue]', selected_curve).val();
             let Max = $('input[name=MaxValue]', selected_curve).val();
@@ -379,7 +379,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         }));
         menu.popup(menu_pos_x, menu_pos_y);
     }
-    
+
     function renderGraph(flightLog, index, graph) {
         var 
             graphElem = $(
@@ -432,9 +432,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 + '</li>'
             ),
             fieldList = $(".config-graph-field-list", graphElem);
-        
+
         $("input", graphElem).val(graph.label);
-        
+
         var fieldCount = graph.fields.length;
 
         // "Add field" button
@@ -459,10 +459,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             var 
                 field = graph.fields[i],
                 fieldElem = renderField(flightLog, field, field.color?(field.color):(GraphConfig.PALETTE[i].color));
-            
+
             fieldList.append(fieldElem);
         }
-        
+
         fieldList.on('click', 'button', function(e) {
             var
                 parentGraph = $(this).parents('.config-graph');
@@ -479,29 +479,29 @@ function GraphConfigurationDialog(dialog, onSave) {
         });
 
         updateRemoveAllButton();
-        
+
         return graphElem;
     }
     
     function renderGraphs(flightLog, graphs) {
         var
             graphList = $(".config-graphs-list", dialog);
-        
+
         graphList.empty();
-        
+
         for (var i = 0; i < graphs.length; i++) {
             graphList.append(renderGraph(flightLog, i, graphs[i]));
         }
     }
-    
+
     function populateExampleGraphs(flightLog, menu) {
         var
             i;
         
         menu.empty();
-        
+
         exampleGraphs = GraphConfig.getExampleGraphConfigs(flightLog);
-        
+
         exampleGraphs.unshift({
             label: "Custom graph",
             fields: [{name:""}],
@@ -516,7 +516,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('a', li)
                 .text(graph.label)
                 .data('graphIndex', i);
-            
+
             menu.append(li);
             
             if (graph.dividerAfter) {
@@ -524,27 +524,27 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
         }
     }
-    
+
     function convertUIToGraphConfig() {
         var 
             graphs = [],
             graph,
             field;
-        
+
         $(".config-graph", dialog).each(function() {
             graph = {
                fields: [],
                height: 1
             };
-            
+
             graph.label = $("input[type='text']", this).val();
             graph.height = parseInt($('select.graph-height option:selected', this).val());
-            
+
             $(".config-graph-field", this).each(function() {
                 let fieldName = $("select", this).val();
                 let minimum = $("input[name=MinValue]", this).val();
                 let maximum = $("input[name=MaxValue]", this).val();
-                
+
                 field = {
                     name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
@@ -571,7 +571,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
                     grid: $('input[name=grid]', this).is(':checked'),
                 };
-                
+
                 if (field.name.length > 0) {
                     graph.fields.push(field);
                 }
@@ -579,7 +579,7 @@ function GraphConfigurationDialog(dialog, onSave) {
 
             graphs.push(graph);
         });
-        
+
         return graphs;
     }
 
@@ -590,18 +590,18 @@ function GraphConfigurationDialog(dialog, onSave) {
             lastRoot = null,
             fieldNames = flightLog.getMainFieldNames(),
             fieldsSeen = {};
-        
+
         offeredFieldNames = [];
-        
+
         for (i = 0; i < fieldNames.length; i++) {
             // For fields with multiple bracketed x[0], x[1] versions, add an "[all]" option
             var 
                 fieldName = fieldNames[i],
                 matches = fieldName.match(/^(.+)\[[0-9]+\]$/);
-            
+
             if (BLACKLISTED_FIELDS[fieldName])
                 continue;
-            
+
             if (matches) {
                 if (matches[1] != lastRoot) {
                     lastRoot = matches[1];
@@ -612,11 +612,11 @@ function GraphConfigurationDialog(dialog, onSave) {
             } else {
                 lastRoot = null;
             }
-            
+
             offeredFieldNames.push(fieldName);
             fieldsSeen[fieldName] = true;
         }
-        
+
         /* 
          * If the graph config has any fields in it that we don't have available in our flight log, add them to
          * the GUI anyway. (This way we can build a config when using a tricopter (which includes a tail servo) and
@@ -636,12 +636,12 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
         }
     }
-    
+
     this.show = function(flightLog, config, grapher) {
         dialog.modal('show');
         activeFlightLog = flightLog;
         logGrapher = grapher;
-        
+
         buildOfferedFieldNamesList(flightLog, config);
 
         populateExampleGraphs(flightLog, exampleGraphsMenu);
@@ -652,7 +652,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     $(".graph-configuration-dialog-save").click(function() {
         onSave(convertUIToGraphConfig());
     });
-    
+
     $(".graph-configuration-dialog-cancel").click(function() {
         onSave(prevCfg);
     });
