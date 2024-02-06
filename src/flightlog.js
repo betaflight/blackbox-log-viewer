@@ -1064,6 +1064,13 @@ export function FlightLog(logData) {
         return this.getStats()?.frame?.G ? true : false;;
     };
     
+    /**
+     * Function to compute of min and max curve values during time interval.
+     * @param field_name String: Curve fields name.
+     * @param start_time Integer: The interval start time .
+     * @end_time start_time Integer: The interval end time .
+     * @returns {min: MinValue, max: MaxValue} if success, or {min: Number.MAX_VALUE, max: Number.MIN_VALUE} if error
+     */
     this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
         let chunks = this.getChunksInTimeRange(start_time, end_time);
         let startFrameIndex;
@@ -1073,8 +1080,8 @@ export function FlightLog(logData) {
         const fieldIndex = this.getMainFieldIndexByName(field_name);
         if (chunks.length == 0 || fieldIndex == undefined)
             return {
-                min: Number.MIN_VALUE,
-                max: Number.MAX_VALUE
+                min: Number.MAX_VALUE,
+                max: Number.MIN_VALUE
             };
         
         //Find the first sample that lies inside the window
