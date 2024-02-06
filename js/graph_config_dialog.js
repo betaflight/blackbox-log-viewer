@@ -210,34 +210,8 @@ function GraphConfigurationDialog(dialog, onSave) {
     }
     
     // Show context menu to setup min-max values
-    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {
-        let curvesData = {};
-        let subCurvesNamesOneScale = new nw.Menu();
-        curves_table.each(function() {
-            let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
-            if (enabled) {
-                let fieldName = $("select", this).val();
-                let fieldFriendlyName = $('select.form-control option:selected', this).text();
-                let minimum = $("input[name=MinValue]", this).val();
-                let maximum = $("input[name=MaxValue]", this).val();
-                let curve = {
-                    name: fieldName,
-                    friendly_name: fieldFriendlyName,
-                    min: parseFloat(minimum),
-                    max: parseFloat(maximum)
-                };
-                curvesData[fieldFriendlyName] = curve;
-                
-                if (fieldName != selected_field_name) {
-                    subCurvesNamesOneScale.append(new nw.MenuItem({
-                        label: fieldFriendlyName,
-                        click: FitSelectedCurveToOneScaleWithSecond
-                    }));
-                }
-            }
-        });
-                
-        function SetAllMinMaxToFullRangeDuringAllTime() {
+    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {               
+        var SetAllMinMaxToFullRangeDuringAllTime = function () {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if (enabled) {
@@ -248,9 +222,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 }
             });
             RefreshCharts();
-        }
+        };
         
-        function SetAllMinMaxToFullRangeDuringWindowTime() {
+        var SetAllMinMaxToFullRangeDuringWindowTime = function () {
             curves_table.each(function() {
                 const enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if (enabled) {
@@ -261,9 +235,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 }
             });
             RefreshCharts();
-        }
+        };
         
-        function SetAllCurvesToOneScale() {
+        var SetAllCurvesToOneScale = function () {
             let Max = Number.MIN_VALUE, Min = Number.MAX_VALUE;
             for (let key in curvesData) {
                 Min = Math.min(Min, curvesData[key].min);
@@ -278,23 +252,23 @@ function GraphConfigurationDialog(dialog, onSave) {
                 }
             });
             RefreshCharts();
-        }
+        };
         
-        function SetSelectedCurveMinMaxToFullRangeDuringAllTime() {
+        var SetSelectedCurveMinMaxToFullRangeDuringAllTime = function () {
             const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
-        }
+        };
         
-        function SetSelectedCurveMinMaxToFullRangeDuringWindowTime() {
+        var SetSelectedCurveMinMaxToFullRangeDuringWindowTime = function () {
             const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
-        }
+        };
         
-        function FitSelectedCurveToOneScaleWithSecond() {
+        var FitSelectedCurveToOneScaleWithSecond = function () {
             let SecondCurveName = this.label;
             let SecondCurve = curvesData[SecondCurveName];
             let SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
@@ -316,9 +290,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 }
             });
             RefreshCharts();
-        }
+        };
         
-        function SetAllCurvesToOneZeroAxis() {
+        var SetAllCurvesToOneZeroAxis = function () {
             curves_table.each(function() {
                 let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
                 if(enabled) {
@@ -331,9 +305,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 }
             });
             RefreshCharts();
-        }
+        };
         
-        function FitSelectedCurveAroundZeroAxis() {
+        var FitSelectedCurveAroundZeroAxis = function () {
             let Min = $('input[name=MinValue]', selected_curve).val();
             let Max = $('input[name=MaxValue]', selected_curve).val();
             Max = Math.max(Math.abs(Min), Math.abs(Max));
@@ -341,7 +315,33 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
             RefreshCharts();
-        }
+        };
+
+        let curvesData = {};
+        let subCurvesNamesOneScale = new nw.Menu();
+        curves_table.each(function() {
+            let enabled = $('input[name=EnabledMinMax]', this).is(':checked');
+            if (enabled) {
+                let fieldName = $("select", this).val();
+                let fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let minimum = $("input[name=MinValue]", this).val();
+                let maximum = $("input[name=MaxValue]", this).val();
+                let curve = {
+                    name: fieldName,
+                    friendly_name: fieldFriendlyName,
+                    min: parseFloat(minimum),
+                    max: parseFloat(maximum)
+                };
+                curvesData[fieldFriendlyName] = curve;
+
+                if (fieldName != selected_field_name) {
+                    subCurvesNamesOneScale.append(new nw.MenuItem({
+                        label: fieldFriendlyName,
+                        click: FitSelectedCurveToOneScaleWithSecond
+                    }));
+                }
+            }
+        });
 
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
