@@ -109,6 +109,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
                 $('input[name=EnabledMinMax]',elem).attr("checked", false);
+                $('input[name=MinValue]',elem).attr("readonly", true);
+                $('input[name=MaxValue]',elem).attr("readonly", true);
             }
         }
     }
