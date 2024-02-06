@@ -145,14 +145,14 @@ function FlightLogFieldPresenter() {
         },
         'BATTERY' : {
             'debug[all]':'Debug Battery',
-            'debug[0]':'Battery Volt ADC',
-            'debug[1]':'Battery Volt',
-            'debug[2]':'Not Used',
-            'debug[3]':'Not Used',
-            'debug[4]':'Not Used',
-            'debug[5]':'Not Used',
-            'debug[6]':'Not Used',
-            'debug[7]':'Not Used',
+            'debug[0]':'Battery Raw',
+            'debug[1]':'Battery Filtered',
+            'debug[2]':'Sag Goodness',
+            'debug[3]':'Sag Attenuation',
+            'debug[4]':'isVoltageStable',
+            'debug[5]':'isVoltageFromBattery',
+            'debug[6]':'VoltageStep',
+            'debug[7]':'voltageState',
         },
         'GYRO' : {
             'debug[all]':'Debug Gyro',
@@ -1547,10 +1547,13 @@ function FlightLogFieldPresenter() {
                     }
                 case 'BATTERY':
                     switch (fieldName) {
-                        case 'debug[0]':
+                        case 'debug[2]':
+                        case 'debug[4]':
+                        case 'debug[5]':
+                        case 'debug[7]':
                             return value.toFixed(0);
                         default:
-                            return (value / 10).toFixed(1) + " V";
+                            return (value / 100).toFixed(2) + " V";
                     }
                 case 'ACCELEROMETER':
                     return flightLog.accRawToGs(value).toFixed(2) + " g";

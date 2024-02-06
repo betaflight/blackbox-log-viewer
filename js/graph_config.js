@@ -450,18 +450,34 @@ GraphConfig.load = function(config) {
                         };
                     case 'BATTERY':
                         switch (fieldName) {
-                            case 'debug[0]': //Raw Value (0-4095)
+                            case 'debug[0]': // Raw Value (0-4095) but 6S is around 24V so this is OK
+                            case 'debug[1]': // Filtered Voltage value
+                            case 'debug[6]': // Voltage steps during cell count
                                 return {
-                                    offset: -2048,
-                                    power: 1,
-                                    inputRange: 2048,
+                                    offset: -1250,
+                                    power: 1.0,
+                                    inputRange: 1250,
                                     outputRange: 1.0
                                 };
-                            default:
+                            case 'debug[2]': // VBat Sag Goodness 0-100
                                 return {
-                                    offset: -130,
+                                    offset: -100,
                                     power: 1.0,
-                                    inputRange: 130, // 0-26.0v
+                                    inputRange: 100,
+                                    outputRange: 1.0
+                                };
+                            case 'debug[3]': // VBat Sag Attenuation volts * 100 
+                                return {
+                                    offset: -500,
+                                    power: 1.0,
+                                    inputRange: 500,
+                                    outputRange: 1.0,
+                                };
+                            default: // others are counters or boolean
+                                return {
+                                    offset: -10,
+                                    power: 1.0,
+                                    inputRange: 10, // 
                                     outputRange: 1.0
                                 };
                         }
