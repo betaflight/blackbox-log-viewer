@@ -8,7 +8,8 @@ function GraphConfigurationDialog(dialog, onSave) {
         exampleGraphs = [],
         activeFlightLog,
         logGrapher = null,
-        prevCfg = null;
+        prevCfg = null,
+        cfgMustBeRestored = false;
     
 
     function chooseColor(currentSelection) {
@@ -647,17 +648,26 @@ function GraphConfigurationDialog(dialog, onSave) {
         populateExampleGraphs(flightLog, exampleGraphsMenu);
         renderGraphs(flightLog, config);
         prevCfg = convertUIToGraphConfig();
+        cfgMustBeRestored = false;
     };
+    
+    $("#dlgGraphConfiguration").on('hidden.bs.modal', function() {
+        if (cfgMustBeRestored)
+            onSave(prevCfg);
+    });
  
     $(".graph-configuration-dialog-save").click(function() {
+        cfgMustBeRestored = false;
         onSave(convertUIToGraphConfig());
     });
 
     $(".graph-configuration-dialog-cancel").click(function() {
+        cfgMustBeRestored = false;
         onSave(prevCfg);
     });
 
     function RefreshCharts() {
+        cfgMustBeRestored = true;
         onSave(convertUIToGraphConfig());
     }
 
