@@ -298,11 +298,13 @@ GraphConfig.load = function(config) {
         var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            const mmChartUnits = 
+            let mmChartUnits = 
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
             };
+            mmChartUnits.max = Math.max(Math.max(Math.abs(mmChartUnits.max), Math.abs(mmChartUnits.min)), 1.0)
+            mmChartUnits.min = -mmChartUnits.max;
             return {
                 offset: 0,
                 power: 1.0,
@@ -330,7 +332,10 @@ GraphConfig.load = function(config) {
                     inputRange: flightLog.isDigitalProtocol() ?
                         DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 100
+                    }
                 };
             } else if (fieldName.match(/^eRPM\[/)) {
                 return getCurveForMinMaxFields('eRPM[0]', 'eRPM[1]', 'eRPM[2]', 'eRPM[3]', 'eRPM[4]', 'eRPM[5]', 'eRPM[6]', 'eRPM[7]');
@@ -340,7 +345,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 500,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 1000,
+                        max: 2000
+                    }
                 };
             } else if (fieldName.match(/^accSmooth\[/)) {
                 return {
@@ -348,7 +356,10 @@ GraphConfig.load = function(config) {
                     power: 0.5,
                     inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: -16,
+                        max: 16
+                    }
                 };
             } else if (fieldName == "rcCommands[3]") { // Throttle scaled
                 return {
@@ -356,7 +367,10 @@ GraphConfig.load = function(config) {
                     power: 1.0, /* Make this 1.0 to scale linearly */
                     inputRange: 50,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 100
+                    }
                 };
             } else if (fieldName.match(/^axisError\[/)  ||     // Gyro, Gyro Scaled, RC Command Scaled and axisError
                        fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
@@ -367,7 +381,10 @@ GraphConfig.load = function(config) {
                     power: 0.25, /* Make this 1.0 to scale linearly */
                     inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: -maxDegreesSecond(gyroScaleMargin),
+                        max: maxDegreesSecond(gyroScaleMargin)
+                    }
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
                 return {
@@ -375,7 +392,10 @@ GraphConfig.load = function(config) {
                     power: 0.3,
                     inputRange: 1000, // Was 400 ?
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: -100,
+                        max: 100
+                    }
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle
                 return {
@@ -383,7 +403,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 500 * highResolutionScale,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 1000,
+                        max: 2000
+                    }
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
@@ -391,7 +414,10 @@ GraphConfig.load = function(config) {
                     power: 0.25,
                     inputRange: 500 * highResolutionScale * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 1000,
+                        max: 2000
+                    }
                 };
             } else if (fieldName == "heading[2]") {
                 return {
@@ -399,7 +425,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: Math.PI,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 360
+                    }
                 };
             } else if (fieldName.match(/^heading\[/)) {
                 return {
@@ -407,7 +436,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: Math.PI,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: -180,
+                        max: 180
+                    }
                 };
             } else if (fieldName.match(/^sonar.*/)) {
                 return {
@@ -415,7 +447,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 200,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 400
+                    }
                 };
             } else if (fieldName.match(/^rssi.*/)) {
                 return {
@@ -423,7 +458,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 512,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 100
+                    }
                 };
             } else if (fieldName == 'GPS_ground_course') {
                 return {
@@ -431,7 +469,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 1800,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 360
+                    }
                 };
             } else if (fieldName == 'GPS_numSat') {
                 return {
@@ -439,7 +480,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 20,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: 0,
+                        max: 40
+                    }
                 };
             } else if (fieldName == 'GPS_speed') {
                 return {
@@ -447,7 +491,10 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     inputRange: 1000,
                     outputRange: 1.0,
-                    MinMax: mmChartUnits
+                    MinMax: {
+                        min: -100,
+                        max: 100
+                    }
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
