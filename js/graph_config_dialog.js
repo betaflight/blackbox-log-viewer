@@ -190,10 +190,20 @@ function GraphConfigurationDialog(dialog, onSave) {
 
     // Show context menu to setup min-max values
     function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {               
-        var SetAllMinMaxToFullRangeDuringAllTime = function () {
+        var SetAllMinMaxToDefault = function () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
+                $('input[name=MinValue]',this).val(mm.min.toFixed(1));
+                $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            });
+            RefreshCharts();
+        };
+
+        var SetAllMinMaxToFullRangeDuringAllTime = function () {
+            curves_table.each(function() {
+                const fieldName = $("select", this).val();
+                const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -306,11 +316,15 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
-            label: 'Place all curves at global full range',
+            label: 'Set all min-max values to default',
+            click: SetAllMinMaxToDefault
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Fit all curves at global full range',
             click: SetAllMinMaxToFullRangeDuringAllTime
         }));
         menu.append(new nw.MenuItem({
-            label: 'Place all curves at window full range',
+            label: 'Fit all curves at window full range',
             click: SetAllMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
@@ -323,11 +337,11 @@ function GraphConfigurationDialog(dialog, onSave) {
         }));
         menu.append(new nw.MenuItem({type: 'separator'}));
         menu.append(new nw.MenuItem({
-            label: 'Place this curve at global full range',
+            label: 'Fit this curve at global full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
         }));
         menu.append(new nw.MenuItem({
-            label: 'Place this curve at window full range',
+            label: 'Fit this curve at window full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
