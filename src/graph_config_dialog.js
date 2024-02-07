@@ -233,8 +233,15 @@ export function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
-        var SetSelectedCurveMinMaxToFullRangeDuringAllTime = function () {
+        var SetSelectedCurveMinMaxToDefault = function () {
             const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
+            $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
+            $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+            RefreshCharts();
+        };
+
+        var SetSelectedCurveMinMaxToFullRangeDuringAllTime = function () {
+            const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
@@ -315,7 +322,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
-            label: 'Set all min-max values to default',
+            label: 'Set all curves min-max values to default',
             click: SetAllMinMaxToDefault
         }));
         menu.append(new nw.MenuItem({
@@ -334,7 +341,13 @@ export function GraphConfigurationDialog(dialog, onSave) {
             label: 'Place all curves around zero axis',
             click: SetAllCurvesToOneZeroAxis
         }));
+
         menu.append(new nw.MenuItem({type: 'separator'}));
+
+        menu.append(new nw.MenuItem({
+            label: 'Set this curve min-max values to default',
+            click: SetSelectedCurveMinMaxToDefault
+        }));
         menu.append(new nw.MenuItem({
             label: 'Fit this curve at global full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
