@@ -105,8 +105,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100).toFixed(0)+'%');
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
-                $('input[name=MinValue]',elem).attr("readonly", true);
-                $('input[name=MaxValue]',elem).attr("readonly", true);
             }
         }
     }
@@ -169,18 +167,14 @@ export function GraphConfigurationDialog(dialog, onSave) {
         // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MinValue]',elem).dblclick( function() {
-            if($(this).prop('readonly') == false) {
-                let name = $('select.form-control option:selected', elem).val();
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min.toFixed(1));
-            }
+            let name = $('select.form-control option:selected', elem).val();
+            $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min.toFixed(1));
         });
         // Add event when mouse double click at the enabled Maximum input field to restore default Max values.
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MaxValue]',elem).dblclick( function() {
-            if($(this).prop('readonly') == false) {
-                let name = $('select.form-control option:selected', elem).val();
-                $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(1));
-            }
+            let name = $('select.form-control option:selected', elem).val();
+            $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(1));
         });
 
         $('.minmax-control', elem).contextmenu( function(e) {
