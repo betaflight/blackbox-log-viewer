@@ -510,7 +510,10 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 100
+                                    }
                                 };
                             default:
                                 return {
@@ -518,7 +521,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000, //  0-2000uS
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 2000
+                                    }
                                 };
                         }
                     case 'PIDLOOP':
@@ -527,7 +533,10 @@ GraphConfig.load = function(config) {
                                 power: 1.0,
                                 inputRange: 250, //  0-500uS
                                 outputRange: 1.0,
-                                MinMax: mmChartUnits
+                                MinMax: {
+                                    min: 0,
+                                    max: 500
+                                }
                             };
                     case 'GYRO':
                     case 'GYRO_FILTERED':
@@ -545,7 +554,10 @@ GraphConfig.load = function(config) {
                             power: 0.25,
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0,
-                            MinMax: mmChartUnits
+                            MinMax: {
+                                min: -maxDegreesSecond(gyroScaleMargin),
+                                max: maxDegreesSecond(gyroScaleMargin)
+                            }
                         };
                     case 'ACCELEROMETER':
                         return {
@@ -553,7 +565,10 @@ GraphConfig.load = function(config) {
                             power: 0.5,
                             inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
                             outputRange: 1.0,
-                            MinMax: mmChartUnits
+                            MinMax: {
+                                min: -16,
+                                max: 16
+                            }
                         };
                     case 'MIXER':
                         return {
@@ -561,7 +576,10 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
                             outputRange: 1.0,
-                            MinMax: mmChartUnits
+                            MinMax: {
+                                min: -100,
+                                max: 100
+                            }
                         };
                     case 'BATTERY':
                         switch (fieldName) {
@@ -571,7 +589,10 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     inputRange: 2048,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 4096
+                                    }
                                 };
                             default:
                                 return {
@@ -579,7 +600,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 130, // 0-26.0v
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                     MinMax: {
+                                        min: 0,
+                                        max: 26
+                                    }
                                 };
                         }
                     case 'RC_INTERPOLATION':
@@ -598,7 +622,10 @@ GraphConfig.load = function(config) {
                                     power: 0.25,
                                     inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 1000,
+                                        max: 2000
+                                    }
                                 };
                             case 'debug[1]': // raw RC command derivative
                             case 'debug[2]': // smoothed RC command derivative
@@ -620,7 +647,10 @@ GraphConfig.load = function(config) {
                             power: 0.25, /* Make this 1.0 to scale linearly */
                             inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                             outputRange: 1.0,
-                            MinMax: mmChartUnits
+                            MinMax: {
+                                min: -maxDegreesSecond(gyroScaleMargin),
+                                max: maxDegreesSecond(gyroScaleMargin)
+                            }
                         };
                     case 'ALTITUDE':
                         switch (fieldName) {
@@ -630,7 +660,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             case 'debug[1]': // Baro Alt
                             case 'debug[2]': // GPS Alt
@@ -639,7 +672,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -50,
+                                        max: 50
+                                    }
                                 };
                             case 'debug[3]': // Vario
                                 return {
@@ -647,7 +683,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -5,
+                                        max: 5
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -662,7 +701,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -maxDegreesSecond(gyroScaleMargin),
+                                        max: maxDegreesSecond(gyroScaleMargin)
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -679,7 +721,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -maxDegreesSecond(gyroScaleMargin),
+                                        max: maxDegreesSecond(gyroScaleMargin)
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -696,7 +741,10 @@ GraphConfig.load = function(config) {
                                     power: 0.25,
                                     inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -maxDegreesSecond(gyroScaleMargin),
+                                        max: maxDegreesSecond(gyroScaleMargin)
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -707,7 +755,10 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: 100,
                             outputRange: 1.0,
-                            MinMax: mmChartUnits
+                            MinMax: {
+                                min: -100,
+                                max: 100
+                            }
                         };
                     case 'ESC_SENSOR_RPM':
                     case 'DSHOT_RPM_TELEMETRY':
@@ -742,7 +793,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -1000,
+                                        max: 1000
+                                    }
                                 };
                             case 'debug[3]': // Clip or Count
                                 return {
@@ -750,7 +804,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 20
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -763,7 +820,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: maxDegreesSecond(gyroScaleMargin),
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -maxDegreesSecond(gyroScaleMargin),
+                                        max: maxDegreesSecond(gyroScaleMargin)
+                                    }
                                 };
                             case 'debug[1]': // feedforward delta element
                             case 'debug[2]': // feedforward boost element
@@ -772,7 +832,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -1000,
+                                        max: 1000
+                                    }
                                 };
                             case 'debug[3]': // rcCommand delta
                                 return {
@@ -780,7 +843,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -10000,
+                                        max: 10000
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -792,7 +858,10 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             inputRange: 300,
                             outputRange: 1.0,
-                            MinMax: mmChartUnits
+                            MinMax: {
+                                min: -300,
+                                max: 300
+                            }
                         };
                     case 'BARO':
                         switch (fieldName) {
@@ -802,7 +871,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 20,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -20,
+                                        max: 20
+                                    }
                                 };
                             case 'debug[1]': // Baro Temp
                             case 'debug[2]': // Baro Raw
@@ -812,7 +884,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -826,7 +901,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             case 'debug[2]': // Altitude
                             case 'debug[3]': // Target Altitude
@@ -835,7 +913,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -50,
+                                        max: 50
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -850,7 +931,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -1000,
+                                        max: 1000
+                                    }
                                 };
                             case 'debug[3]': // in 4.3 and 4.2 is minRPS
                                 return {
@@ -858,7 +942,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 12000
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -874,7 +961,10 @@ GraphConfig.load = function(config) {
                                 power: 0.25, /* Make this 1.0 to scale linearly */
                                 inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
                                 outputRange: 1.0,
-                                MinMax: mmChartUnits
+                                MinMax: {
+                                    min: -maxDegreesSecond(gyroScaleMargin * highResolutionScale),
+                                    max: maxDegreesSecond(gyroScaleMargin * highResolutionScale)
+                                }
                             };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -887,7 +977,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 20
+                                    }
                                 };
                             // debug 1 is Count of Unknown Frames
                             // debug 2 and 3 not used
@@ -905,7 +998,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 128,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -256,
+                                        max: 0
+                                    }
                                 };
                             case 'debug[3]': // LQ percent
                                 return {
@@ -913,7 +1009,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 100
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -926,7 +1025,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 1000
+                                    }
                                 };
                             case 'debug[1]': // ID of late task
                             case 'debug[2]': // task delay time 100us in middle
@@ -935,7 +1037,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 200
+                                    }
                                 };
                             case 'debug[3]': // gyro skew 100 = 10us
                                 return {
@@ -943,7 +1048,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -50,
+                                        max: 50
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -957,7 +1065,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 100
+                                    }
                                 };
                             case 'debug[2]': // total delay in last second
                                 return {
@@ -965,7 +1076,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 100
+                                    }
                                 };
                             case 'debug[3]': // total tasks per second
                                 return {
@@ -973,7 +1087,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 10000
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -986,7 +1103,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 50,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 100
+                                    }
                                 };
                             // debug 0 = Lost connection count
                             // debug 1 = RSSI
@@ -1013,7 +1133,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -20,
+                                        max: 20
+                                    }
                                 };
                             case 'debug[2]': // Velocity in cm/s
                             case 'debug[3]': // Velocity to home in cm/s
@@ -1022,7 +1145,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -5,
+                                        max: 5
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1035,7 +1161,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -100,
+                                        max: 100
+                                    }
                                 };
                             case 'debug[1]': // GPS GroundCourse
                             case 'debug[2]': // Yaw attitude * 10
@@ -1046,7 +1175,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1800,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 360
+                                    }
                                 };
                             case 'debug[5]': // magYaw * 10
                                 return {
@@ -1054,7 +1186,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 20
+                                    }
                                 };
                             case 'debug[6]': // roll angle *100
                                 return {
@@ -1062,7 +1197,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 900,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 180
+                                    }
                                 };
                             case 'debug[7]': // yaw rate deg/s
                                 return {
@@ -1070,7 +1208,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 100,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 200
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1083,7 +1224,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 4000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -4000,
+                                        max: 4000
+                                    }
                                 };
                             case 'debug[1]': // Rescue Phase
                             case 'debug[2]': // Failure code
@@ -1092,7 +1236,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 20
+                                    }
                                 };
                             case 'debug[3]': // Failure counters coded
                                 return {
@@ -1100,7 +1247,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 4000
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1114,7 +1264,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -10,
+                                        max: 10
+                                    }
                                 };
                             case 'debug[2]': // altitude m
                             case 'debug[3]': // Target altitude m
@@ -1123,7 +1276,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -50,
+                                        max: 50
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1137,7 +1293,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             case 'debug[2]': // task interval
                                 return {
@@ -1145,7 +1304,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             case 'debug[3]': // Baud rate / resolved packet interval
                             case 'debug[4]': // State*100 + SubState
@@ -1156,7 +1318,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 100,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -100,
+                                        max: 100
+                                    }
                                 };
                             case 'debug[6]': // ackState
                                 return {
@@ -1164,7 +1329,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -10,
+                                        max: 10
+                                    }
                                 };
                             case 'debug[7]': // Incoming buffer
                                 return {
@@ -1172,7 +1340,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 100,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -100,
+                                        max: 100
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1188,7 +1359,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1204,7 +1378,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1218,7 +1395,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -100,
+                                        max: 100
+                                    }
                                 };
                             case 'debug[1]': // angle error correction
                             case 'debug[2]': // angle feedforward
@@ -1227,7 +1407,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 5000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -500,
+                                        max: 500
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1243,7 +1426,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 200,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -200,
+                                        max: 200
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1259,7 +1445,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -2000,
+                                        max: 2000
+                                    }
                                 };
                             case 'debug[4]': // X Cal
                             case 'debug[5]': // Y Cal
@@ -1269,7 +1458,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 500,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -500,
+                                        max: 500
+                                    }
                                 };
                             case 'debug[7]': // Lambda
                                 return {
@@ -1277,7 +1469,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: 0,
+                                        max: 4000
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1291,7 +1486,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 1000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -1000,
+                                        max: 1000
+                                    }
                                 };
                             case 'debug[2]': // Data Interval
                                 return {
@@ -1299,7 +1497,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -10000,
+                                        max: 10000
+                                    }
                                 };
                             case 'debug[3]': // Execute Time
                                 return {
@@ -1307,7 +1508,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 20,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -20,
+                                        max: 20
+                                    }
                                 };
                             case 'debug[4]': // Bus Busy Check
                             case 'debug[5]': // Read State Check
@@ -1316,7 +1520,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 2,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -2,
+                                        max: 2
+                                    }
                                 };
                             case 'debug[6]': // Time since previous task uS
                                 return {
@@ -1324,7 +1531,10 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     inputRange: 10000,
                                     outputRange: 1.0,
-                                    MinMax: mmChartUnits
+                                    MinMax: {
+                                        min: -10000,
+                                        max: 10000
+                                    }
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1340,7 +1550,10 @@ GraphConfig.load = function(config) {
                 power: 1.0,
                 inputRange: 500,
                 outputRange: 1.0,
-                MinMax: mmChartUnits
+                MinMax: {
+                    min: -500,
+                    max: 500
+                }
             };
         }
     };
