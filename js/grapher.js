@@ -900,28 +900,26 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             i, graph;
         
         graphs = jQuery.extend(true, [], graphConfig.getGraphs());
-        
+
         for (i = 0; i < graphs.length; i++) {
             graph = graphs[i];
-            
+
             heightSum += graph.height ? graph.height : 1.0;
-            
+
             for (var j = 0; j < graphs[i].fields.length; j++) {
                 var field = graphs[i].fields[j];
-                
+
                 field.index = flightLog.getMainFieldIndexByName(field.name);
+
+                // Compute inputRange and offset from min-max values
+                let min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.min);
+                let max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.max);
+                field.curve.inputRange = (max - min) / 2;
+                field.curve.offset = -(max + min) / 2;
                 
-                // Convert data if use MinMax
-                if (field.curve.EnabledMinMax)
-                {
-                    let min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.min);
-                    let max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.max);
-                    field.curve.inputRange = (max - min) / 2;
-                    field.curve.offset = -(max + min) / 2;
-                }
                 // Convert the field's curve settings into an actual expo curve object:
                 field.curve = new ExpoCurve(field.curve.offset, 
-                                            ((options.graphExpoOverride)?1.0:field.curve.power), 
+                                            ((options.graphExpoOverride) ? 1.0 : field.curve.power), 
                                             field.curve.inputRange, 
                                             field.curve.outputRange, 
                                             field.curve.steps); 
