@@ -1124,41 +1124,46 @@ function FlightLogFieldPresenter() {
 
         if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
 
-            if (semver.gte(firmwareVersion, '4.4.0')) {
-                DEBUG_FRIENDLY_FIELD_NAMES.BARO = {
-                    'debug[all]':'Debug Barometer',
-                    'debug[0]':'Baro State',
-                    'debug[1]':'Baro Pressure',
-                    'debug[2]':'Baro Temperature',
-                    'debug[3]':'Baro Altitude',
+            if (semver.gte(firmwareVersion, '4.1.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                    'debug[all]':'Feedforward [roll]',
+                    'debug[0]':'Setpoint Delta [roll]',
+                    'debug[1]':'Boost [roll]',
+                    'debug[2]':'Boost, clipped [roll]',
+                    'debug[3]':'Duplicate Counter [roll]',
                     'debug[4]':'Not Used',
                     'debug[5]':'Not Used',
                     'debug[6]':'Not Used',
                     'debug[7]':'Not Used',
                 };
-                DEBUG_FRIENDLY_FIELD_NAMES.RTH = {
-                    'debug[all]':'RTH Rescue codes',
-                    'debug[0]':'Pitch angle, deg',
-                    'debug[1]':'Rescue Phase',
-                    'debug[2]':'Failure code',
-                    'debug[3]':'Failure timers',
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
+                    'debug[all]':'Feedforward Limit [roll]',
+                    'debug[0]':'FF limit input [roll]',
+                    'debug[1]':'FF limit input [pitch]',
+                    'debug[2]':'FF limited [roll]',
+                    'debug[3]':'Not Used',
                     'debug[4]':'Not Used',
                     'debug[5]':'Not Used',
                     'debug[6]':'Not Used',
                     'debug[7]':'Not Used',
                 };
-                DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
-                    'debug[all]':'GPS Rescue throttle PIDs',
-                    'debug[0]':'Throttle P',
-                    'debug[1]':'Throttle D',
-                    'debug[2]':'Altitude',
-                    'debug[3]':'Target altitude',
+            }
+
+            if (semver.gte(firmwareVersion, '4.2.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                    'debug[all]':'Feedforward [roll]',
+                    'debug[0]':'Setpoint Delta [roll]',
+                    'debug[1]':'Acceleration [roll]',
+                    'debug[2]':'Acceleration, clipped [roll]',
+                    'debug[3]':'Duplicate Counter [roll]',
                     'debug[4]':'Not Used',
                     'debug[5]':'Not Used',
                     'debug[6]':'Not Used',
                     'debug[7]':'Not Used',
                 };
-            } else if (semver.gte(firmwareVersion, '4.3.0')) {
+            }
+
+            if (semver.gte(firmwareVersion, '4.3.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
                     'debug[all]':'Feedforward [roll]',
                     'debug[0]':'Setpoint, un-smoothed [roll]',
@@ -1236,36 +1241,37 @@ function FlightLogFieldPresenter() {
                     'debug[6]':'Not Used',
                     'debug[7]':'Not Used',
                 };
-            } else if (semver.gte(firmwareVersion, '4.2.0')) {
-                DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
-                    'debug[all]':'Feedforward [roll]',
-                    'debug[0]':'Setpoint Delta [roll]',
-                    'debug[1]':'Acceleration [roll]',
-                    'debug[2]':'Acceleration, clipped [roll]',
-                    'debug[3]':'Duplicate Counter [roll]',
+            }
+
+            if (semver.gte(firmwareVersion, '4.4.0')) {
+                DEBUG_FRIENDLY_FIELD_NAMES.BARO = {
+                    'debug[all]':'Debug Barometer',
+                    'debug[0]':'Baro State',
+                    'debug[1]':'Baro Pressure',
+                    'debug[2]':'Baro Temperature',
+                    'debug[3]':'Baro Altitude',
                     'debug[4]':'Not Used',
                     'debug[5]':'Not Used',
                     'debug[6]':'Not Used',
                     'debug[7]':'Not Used',
                 };
-            } else if (semver.gte(firmwareVersion, '4.1.0')) {
-                DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
-                    'debug[all]':'Feedforward [roll]',
-                    'debug[0]':'Setpoint Delta [roll]',
-                    'debug[1]':'Boost [roll]',
-                    'debug[2]':'Boost, clipped [roll]',
-                    'debug[3]':'Duplicate Counter [roll]',
+                DEBUG_FRIENDLY_FIELD_NAMES.RTH = {
+                    'debug[all]':'RTH Rescue codes',
+                    'debug[0]':'Pitch angle, deg',
+                    'debug[1]':'Rescue Phase',
+                    'debug[2]':'Failure code',
+                    'debug[3]':'Failure timers',
                     'debug[4]':'Not Used',
                     'debug[5]':'Not Used',
                     'debug[6]':'Not Used',
                     'debug[7]':'Not Used',
                 };
-                DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
-                    'debug[all]':'Feedforward Limit [roll]',
-                    'debug[0]':'FF limit input [roll]',
-                    'debug[1]':'FF limit input [pitch]',
-                    'debug[2]':'FF limited [roll]',
-                    'debug[3]':'Not Used',
+                DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+                    'debug[all]':'GPS Rescue throttle PIDs',
+                    'debug[0]':'Throttle P',
+                    'debug[1]':'Throttle D',
+                    'debug[2]':'Altitude',
+                    'debug[3]':'Target altitude',
                     'debug[4]':'Not Used',
                     'debug[5]':'Not Used',
                     'debug[6]':'Not Used',
