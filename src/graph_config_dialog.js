@@ -164,7 +164,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                    .css('color', $('select.color-picker option:selected', elem).val());
         });
 
-        // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
+        // Add event when mouse double click at the enabled Minimum input field to restore default Min values.
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MinValue]',elem).dblclick( function() {
             let name = $('select.form-control option:selected', elem).val();
@@ -189,10 +189,20 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     // Show context menu to setup min-max values
     function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {
-        var SetAllMinMaxToFullRangeDuringAllTime = function () {
+        var SetAllMinMaxToDefault = function () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
+                $('input[name=MinValue]',this).val(mm.min.toFixed(1));
+                $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            });
+            RefreshCharts();
+        };
+
+        var SetAllMinMaxToFullRangeDuringAllTime = function () {
+            curves_table.each(function() {
+                const fieldName = $("select", this).val();
+                const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -305,11 +315,15 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         let menu = new nw.Menu();
         menu.append(new nw.MenuItem({
-            label: 'Place all curves at global full range',
+            label: 'Set all min-max values to default',
+            click: SetAllMinMaxToDefault
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Fit all curves at global full range',
             click: SetAllMinMaxToFullRangeDuringAllTime
         }));
         menu.append(new nw.MenuItem({
-            label: 'Place all curves at window full range',
+            label: 'Fit all curves at window full range',
             click: SetAllMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
@@ -322,11 +336,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }));
         menu.append(new nw.MenuItem({type: 'separator'}));
         menu.append(new nw.MenuItem({
-            label: 'Place this curve at global full range',
+            label: 'Fit this curve at global full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
         }));
         menu.append(new nw.MenuItem({
-            label: 'Place this curve at window full range',
+            label: 'Fit this curve at window full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
