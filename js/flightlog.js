@@ -1048,20 +1048,17 @@ function FlightLog(logData) {
      * @param field_name String: Curve fields name.
      * @param start_time Integer: The interval start time .
      * @end_time start_time Integer: The interval end time .
-     * @returns {min: MinValue, max: MaxValue} if success, or {min: Number.MAX_VALUE, max: Number.MIN_VALUE} if error
+     * @returns {min: MinValue, max: MaxValue} if success, or {min: Number.MAX_VALUE, max: Number.MAX_VALUE} if error
      */
     this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
         let chunks = this.getChunksInTimeRange(start_time, end_time);
         let startFrameIndex;
         let minValue = Number.MAX_VALUE,
-            maxValue = Number.MIN_VALUE;
+            maxValue = -Number.MAX_VALUE;
         
         const fieldIndex = this.getMainFieldIndexByName(field_name);
         if (chunks.length == 0 || fieldIndex == undefined)
-            return {
-                min: Number.MAX_VALUE,
-                max: Number.MIN_VALUE
-            };
+            return undefined;
         
         //Find the first sample that lies inside the window
         for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {

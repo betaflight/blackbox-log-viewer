@@ -263,15 +263,17 @@ GraphConfig.load = function(config) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
                 min = Number.MAX_VALUE,
-                max = Number.MIN_VALUE;
+                max = -Number.MAX_VALUE;
 
             for(var i in arguments) {
                 const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
+                if (mm == undefined)
+                    continue;
                 min = Math.min(mm.min, min);
                 max = Math.max(mm.max, max);
             }
 
-            if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
+            if (min != Number.MAX_VALUE && max != -Number.MAX_VALUE) {
                 return {min:min, max:max};
             }
 
@@ -1357,7 +1359,7 @@ GraphConfig.load = function(config) {
         const maxTime = WindowCenterTime + WindowWidthTime/2;
         
         let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
-        if (mm.min == Number.MAX_VALUE || mm.max == Number.MIN_VALUE)
+        if (mm == undefined)
             return {
                 min: -500,
                 max: 500
@@ -1376,7 +1378,7 @@ GraphConfig.load = function(config) {
      */
     GraphConfig.getMinMaxForFieldDuringAllTime = function(flightLog, fieldName) {
         let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, flightLog.getMinTime(), flightLog.getMaxTime());
-        if (mm.min == Number.MAX_VALUE || mm.max == Number.MIN_VALUE)
+        if (mm == undefined)
             return {
                 min: -500,
                 max: 500
