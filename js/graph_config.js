@@ -178,6 +178,12 @@ GraphConfig.load = function(config) {
                 if ((matches = field.name.match(/^gyroData(.+)$/))) {
                     field.name = "gyroADC" + matches[1];
                 }
+// added checking for compatibality with previous versions of BBE by first start
+                if(field.curve.MinMax == undefined)
+                    field.curve.MinMax = {
+                        min: -500,
+                        max: 500
+                    };
             }
         }
     } else {
