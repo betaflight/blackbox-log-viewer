@@ -627,7 +627,7 @@ GraphConfig.load = function(config) {
                                     outputRange: 1.0,
                                     MinMax: {
                                         min: 1000,
-                                        max: 2000
+                                        max: 2000 * gyroScaleMargin
                                     }
                                 };
                             case 'debug[1]': // raw RC command derivative
