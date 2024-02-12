@@ -245,7 +245,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var SetAllCurvesToOneScale = function () {
-            let Max = Number.MIN_VALUE, Min = Number.MAX_VALUE;
+            let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
             for (let key in curvesData) {
                 Min = Math.min(Min, curvesData[key].min);
                 Max = Math.max(Max, curvesData[key].max);
@@ -282,8 +282,8 @@ function GraphConfigurationDialog(dialog, onSave) {
         var FitSelectedCurveToOneScaleWithSecond = function () {
             let SecondCurveName = this.label;
             let SecondCurve = curvesData[SecondCurveName];
-            let SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
-            let SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+            let SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
+            let SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
             let min = Math.min(SelectedCurveMin, SecondCurve.min);
             let max = Math.max(SelectedCurveMax, SecondCurve.max);
             
@@ -302,8 +302,8 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var SetAllCurvesToOneZeroAxis = function () {
             curves_table.each(function() {
-                let Min = $('input[name=MinValue]',this).val();
-                let Max = $('input[name=MaxValue]',this).val();
+                let Min = parseFloat($('input[name=MinValue]',this).val());
+                let Max = parseFloat($('input[name=MaxValue]',this).val());
                 Max = Math.max(Math.abs(Min), Math.abs(Max));
                 Min = -Max;
                 $('input[name=MinValue]',this).val(Min.toFixed(1));
@@ -313,8 +313,8 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var FitSelectedCurveAroundZeroAxis = function () {
-            let Min = $('input[name=MinValue]', selected_curve).val();
-            let Max = $('input[name=MaxValue]', selected_curve).val();
+            let Min = parseFloat($('input[name=MinValue]', selected_curve).val());
+            let Max = parseFloat($('input[name=MaxValue]', selected_curve).val());
             Max = Math.max(Math.abs(Min), Math.abs(Max));
             Min = -Max;
             $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
