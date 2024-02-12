@@ -322,6 +322,16 @@ function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
+        var ApplySelectedCurveMinMaxToAllCurves = function () {
+            const Min = $('input[name=MinValue]', selected_curve).val();
+            const Max = $('input[name=MaxValue]', selected_curve).val();
+            curves_table.each(function() {
+                $('input[name=MinValue]',this).val(Min);
+                $('input[name=MaxValue]',this).val(Max);
+            });
+            RefreshCharts();
+        };
+
         let curvesData = {};
         let subCurvesNamesOneScale = new nw.Menu();
         curves_table.each(function() {
@@ -374,7 +384,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             label: 'Place all curves to zero ofset',
             click: SetAllCurvesToOneZeroAxis
         }));
-
+        menu.append(new nw.MenuItem({
+            label: 'Apply this curves min-max to all curves',
+            click: ApplySelectedCurveMinMaxToAllCurves
+        }));
         menu.append(new nw.MenuItem({type: 'separator'}));
 
         menu.append(new nw.MenuItem({
