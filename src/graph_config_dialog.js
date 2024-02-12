@@ -331,8 +331,12 @@ export function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
+        var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
+        };
+
         let curvesData = {};
         let subCurvesNamesOneScale = new nw.Menu();
+        let subCurvesNamesWithCheckbox = new nw.Menu();
         curves_table.each(function() {
             let fieldName = $("select", this).val();
             let fieldFriendlyName = $('select.form-control option:selected', this).text();
@@ -350,6 +354,12 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 subCurvesNamesOneScale.append(new nw.MenuItem({
                     label: fieldFriendlyName,
                     click: FitSelectedCurveToOneScaleWithSecond
+                }));
+
+                subCurvesNamesWithCheckbox.append(new nw.MenuItem({
+                    label: fieldFriendlyName,
+                    type:  'checkbox',
+                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
                 }));
             }
         });
@@ -408,6 +418,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
         menu.append(new nw.MenuItem({
             label: 'Place this curve to zero offset',
             click: FitSelectedCurveAroundZeroAxis
+        }));
+        menu.append(new nw.MenuItem({
+            label: 'Apply this curves min-max to ...',
+            submenu: subCurvesNamesWithCheckbox
         }));
         menu.popup(menu_pos_x, menu_pos_y);
     }
