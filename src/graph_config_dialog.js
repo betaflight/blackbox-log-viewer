@@ -375,7 +375,21 @@ export function GraphConfigurationDialog(dialog, onSave) {
             }
         });
 
+        const oneRow = subCurvesNamesWithCheckbox.items.length == 0;
+        if (!oneRow) {
+            subCurvesNamesWithCheckbox.append(new nw.MenuItem({
+                        type:  'separator'
+                    }));
+            subCurvesNamesWithCheckbox.append(new nw.MenuItem({
+                        label: "Set min-max values",
+                        click: ApplySelectedCurveMinMaxToOtherSelectedCurves
+                    }));
+        }
+        
+
         let menu = new nw.Menu();
+
+        if (!oneRow) {
         menu.append(new nw.MenuItem({
             label: 'Set all curves min-max values to default',
             click: SetAllMinMaxToDefault
@@ -408,8 +422,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
             label: 'Apply this curves min-max to all curves',
             click: ApplySelectedCurveMinMaxToAllCurves
         }));
-        menu.append(new nw.MenuItem({type: 'separator'}));
-
+            menu.append(new nw.MenuItem({
+                label: 'Apply this curves min-max to ...',
+                submenu: subCurvesNamesWithCheckbox
+            }));
+            menu.append(new nw.MenuItem({
+                label: 'Fit this curve to one scale at:',
+                submenu: subCurvesNamesOneScale
+            }));
+            menu.append(new nw.MenuItem({type: 'separator'}));
+        }
         menu.append(new nw.MenuItem({
             label: 'Set this curve min-max values to default',
             click: SetSelectedCurveMinMaxToDefault
@@ -423,17 +445,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
             click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
         }));
         menu.append(new nw.MenuItem({
-            label: 'Fit this curve to one scale at:',
-            submenu: subCurvesNamesOneScale
-        }));
-        menu.append(new nw.MenuItem({
             label: 'Place this curve to zero offset',
             click: FitSelectedCurveAroundZeroAxis
         }));
-        menu.append(new nw.MenuItem({
-            label: 'Apply this curves min-max to ...',
-            submenu: subCurvesNamesWithCheckbox
-        }));
+
         menu.popup(menu_pos_x, menu_pos_y);
     }
 
