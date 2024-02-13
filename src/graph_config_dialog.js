@@ -332,20 +332,27 @@ export function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
-            const SecondCurveName = this.label;
-            const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
-            const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
-            curves_table.each(function() {
-                const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                if(SecondCurveName == fieldFriendlyName) {
-                    $('input[name=MinValue]',this).val(SelectedCurveMin);
-                    $('input[name=MaxValue]',this).val(SelectedCurveMax);
-                }
-            });
-            RefreshCharts();
+            if (this.type == 'checkbox') {
+                const fieldFriendlyName = this.label;
+                curvesData[fieldFriendlyName].checked = this.checked;
+                ShowNotSelectedCurvesCheckboxedMenu();
+            }
+            else {
+                const SecondCurveName = this.label;
+                const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
+                const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+                curves_table.each(function() {
+                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    if(curvesData[fieldFriendlyName].checked) {
+                        $('input[name=MinValue]',this).val(SelectedCurveMin);
+                        $('input[name=MaxValue]',this).val(SelectedCurveMax);
+                    }
+                });
+                RefreshCharts();
+            }
         };
 
-        var ShowFieldsWithoutSelectedCheckboxedMenu = function() {
+        var ShowNotSelectedCurvesCheckboxedMenu = function() {
             let FieldsCheckboxedMenu = new nw.Menu();
             for (let key in curvesData) {
                 const curve = curvesData[key];
@@ -353,6 +360,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     FieldsCheckboxedMenu.append(new nw.MenuItem({
                     label: curve.friendly_name,
                     type: 'checkbox',
+                    checked: curvesData[curve.friendly_name].checked,
                     click: ApplySelectedCurveMinMaxToOtherSelectedCurves
                     }));
                 }
@@ -432,7 +440,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }));
             menu.append(new nw.MenuItem({
                 label: 'Apply this curves min-max to ...',
-                click: ShowFieldsWithoutSelectedCheckboxedMenu
+                click: ShowNotSelectedCurvesCheckboxedMenu
             }));
             menu.append(new nw.MenuItem({
                 label: 'Fit this curve to one scale at:',
