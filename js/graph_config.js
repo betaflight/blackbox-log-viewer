@@ -230,7 +230,7 @@ GraphConfig.load = function(config) {
         }
 
 /*
-//!!!!!! The stats data have small issues of min-max data !!!! 
+TODO -  The stats data have small issues of min-max data !!!! 
         var getMinMaxForFields = function() {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
@@ -261,14 +261,14 @@ GraphConfig.load = function(config) {
             return {min:-500, max:500};
         }
 */
-//!!! Use new function while stat data issue do not resolved
+//  TODO -  Use new function while stat data issue do not resolved
         var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
                 min = Number.MAX_VALUE,
                 max = -Number.MAX_VALUE;
 
-            for(var i in arguments) {
+            for(const i in arguments) {
                 const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
                 if (mm == undefined)
                     continue;
