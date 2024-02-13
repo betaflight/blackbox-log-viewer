@@ -347,17 +347,26 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ShowFieldsWithoutSelectedCheckboxedMenu = function() {
-            let subCurvesNamesWithCheckbox = new nw.Menu();
+            let FieldsCheckboxedMenu = new nw.Menu();
             for (let key in curvesData) {
                 const curve = curvesData[key];
                 if (!curve.selected) {
-                    subCurvesNamesWithCheckbox.append(new nw.MenuItem({
+                    FieldsCheckboxedMenu.append(new nw.MenuItem({
                     label: curve.friendly_name,
+                    type: 'checkbox',
                     click: ApplySelectedCurveMinMaxToOtherSelectedCurves
                     }));
                 }
             }
-            subCurvesNamesWithCheckbox.popup(menu_pos_x, menu_pos_y);
+            FieldsCheckboxedMenu.append(new nw.MenuItem({
+                        type:  'separator'
+                    }));
+            FieldsCheckboxedMenu.append(new nw.MenuItem({
+                        label: "Set min-max values",
+                        click: ApplySelectedCurveMinMaxToOtherSelectedCurves
+                    }));
+
+            FieldsCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
         }
 
         let curvesData = {};
