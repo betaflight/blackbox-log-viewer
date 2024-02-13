@@ -345,9 +345,23 @@ export function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
+        var ShowFieldsWithoutSelectedCheckboxedMenu = function() {
+            let subCurvesNamesWithCheckbox = new nw.Menu();
+            for (let key in curvesData) {
+                const curve = curvesData[key];
+                if (!curve.selected) {
+                    subCurvesNamesWithCheckbox.append(new nw.MenuItem({
+                    label: curve.friendly_name,
+                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
+                    }));
+                }
+            }
+            subCurvesNamesWithCheckbox.popup(menu_pos_x, menu_pos_y);
+        }
+
         let curvesData = {};
         let subCurvesNamesOneScale = new nw.Menu();
-        let subCurvesNamesWithCheckbox = new nw.Menu();
+        
         curves_table.each(function() {
             let fieldName = $("select", this).val();
             let fieldFriendlyName = $('select.form-control option:selected', this).text();
@@ -357,35 +371,20 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 name: fieldName,
                 friendly_name: fieldFriendlyName,
                 min: parseFloat(minimum),
-                max: parseFloat(maximum)
+                max: parseFloat(maximum),
+                selected: fieldName == selected_field_name,
+                checked: false
             };
             curvesData[fieldFriendlyName] = curve;
 
-            if (fieldName != selected_field_name) {
+            if (fieldName != selected_field_name) 
                 subCurvesNamesOneScale.append(new nw.MenuItem({
                     label: fieldFriendlyName,
                     click: FitSelectedCurveToOneScaleWithSecond
                 }));
-
-                subCurvesNamesWithCheckbox.append(new nw.MenuItem({
-                    label: fieldFriendlyName,
-//                  type:  'checkbox',                      //will research next time
-                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
-                }));
-            }
         });
 
-        const oneRow = subCurvesNamesWithCheckbox.items.length == 0;
-        if (!oneRow) {
-            subCurvesNamesWithCheckbox.append(new nw.MenuItem({
-                        type:  'separator'
-                    }));
-            subCurvesNamesWithCheckbox.append(new nw.MenuItem({
-                        label: "Set min-max values",
-                        click: ApplySelectedCurveMinMaxToOtherSelectedCurves
-                    }));
-        }
-        
+        const oneRow = curvesData.length == 0;
 
         let menu = new nw.Menu();
 
@@ -424,7 +423,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }));
             menu.append(new nw.MenuItem({
                 label: 'Apply this curves min-max to ...',
-                submenu: subCurvesNamesWithCheckbox
+                click: ShowFieldsWithoutSelectedCheckboxedMenu
             }));
             menu.append(new nw.MenuItem({
                 label: 'Fit this curve to one scale at:',
