@@ -332,6 +332,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
+            const SecondCurveName = this.label;
+            const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
+            const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+            curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                if(SecondCurveName == fieldFriendlyName) {
+                    $('input[name=MinValue]',this).val(SelectedCurveMin);
+                    $('input[name=MaxValue]',this).val(SelectedCurveMax);
+                }
+            });
+            RefreshCharts();
         };
 
         let curvesData = {};
@@ -358,7 +369,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
                 subCurvesNamesWithCheckbox.append(new nw.MenuItem({
                     label: fieldFriendlyName,
-                    type:  'checkbox',
+//                  type:  'checkbox',                      //will research next time
                     click: ApplySelectedCurveMinMaxToOtherSelectedCurves
                 }));
             }
