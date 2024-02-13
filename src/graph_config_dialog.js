@@ -372,6 +372,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
         let curvesData = {};
         let subCurvesNamesOneScale = new nw.Menu();
 
+        let rowCount = 0;
+
         curves_table.each(function() {
             let fieldName = $("select", this).val();
             let fieldFriendlyName = $('select.form-control option:selected', this).text();
@@ -387,21 +389,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
             };
             curvesData[fieldFriendlyName] = curve;
 
-            if (fieldName != selected_field_name)
+            if (fieldName != selected_field_name) 
+
                 subCurvesNamesOneScale.append(new nw.MenuItem({
                     label: fieldFriendlyName,
                     click: FitSelectedCurveToOneScaleWithSecond
                 }));
-
-                subCurvesNamesWithCheckbox.append(new nw.MenuItem({
-                    label: fieldFriendlyName,
-//                  type:  'checkbox',                      //will research next time
-                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
-                }));
-            }
+            ++rowCount;
         });
 
-        const oneRow = curvesData.length == 0;
+        const oneRow = rowCount == 1;
 
         let menu = new nw.Menu();
 
