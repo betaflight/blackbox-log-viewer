@@ -409,8 +409,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
         };
 
         let curvesData = {};
-        let rowCount = 0;
-
         curves_table.each(function() {
             let fieldName = $("select", this).val();
             let fieldFriendlyName = $('select.form-control option:selected', this).text();
@@ -425,7 +423,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 checked: false
             };
             curvesData[fieldFriendlyName] = curve;
-            ++rowCount;
         });
 
         const oneRow = Object.keys(curvesData).length == 1;
