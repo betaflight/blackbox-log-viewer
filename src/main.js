@@ -1582,7 +1582,6 @@ function BlackboxLogViewer() {
                     if(graphConfig[parseInt(graph)].fields[i].default==null) {
                         graphConfig[parseInt(graph)].fields[i].default = [];
                         graphConfig[parseInt(graph)].fields[i].default.smoothing   = graphConfig[parseInt(graph)].fields[i].smoothing;
-                        graphConfig[parseInt(graph)].fields[i].default.outputRange = graphConfig[parseInt(graph)].fields[i].curve.outputRange;
                         graphConfig[parseInt(graph)].fields[i].default.power       = graphConfig[parseInt(graph)].fields[i].curve.power;
                     }
                 }
@@ -1592,7 +1591,6 @@ function BlackboxLogViewer() {
                 if(graphConfig[parseInt(graph)].fields[parseInt(field)].default==null) {
                     graphConfig[parseInt(graph)].fields[parseInt(field)].default = [];
                     graphConfig[parseInt(graph)].fields[parseInt(field)].default.smoothing    = graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing;
-                    graphConfig[parseInt(graph)].fields[parseInt(field)].default.outputRange  = graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange;
                     graphConfig[parseInt(graph)].fields[parseInt(field)].default.power        = graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power;
                     return '<h4>Stored defaults for single pen</h4>';
                 }
@@ -1614,7 +1612,6 @@ function BlackboxLogViewer() {
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
                     if(graphConfig[parseInt(graph)].fields[i].default!=null) {
                         graphConfig[parseInt(graph)].fields[i].smoothing         = graphConfig[parseInt(graph)].fields[i].default.smoothing;
-                        graphConfig[parseInt(graph)].fields[i].curve.outputRange = graphConfig[parseInt(graph)].fields[i].default.outputRange;
                         graphConfig[parseInt(graph)].fields[i].curve.power       = graphConfig[parseInt(graph)].fields[i].default.power;
                     } else return false;
                 }
@@ -1623,7 +1620,6 @@ function BlackboxLogViewer() {
             if(graph!=null && field!=null) { // restore single pen
                 if(graphConfig[parseInt(graph)].fields[parseInt(field)].default!=null) {
                     graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing         = graphConfig[parseInt(graph)].fields[parseInt(field)].default.smoothing;
-                    graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange = graphConfig[parseInt(graph)].fields[parseInt(field)].default.outputRange;
                     graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power       = graphConfig[parseInt(graph)].fields[parseInt(field)].default.power;
                     return '<h4>Restored defaults for single pen</h4>';
                 } else return false;
@@ -1681,16 +1677,12 @@ function BlackboxLogViewer() {
             var changedValue = '<h4>Zoom</h4>';
             if(graph!=null && field==null) { // change ALL pens within group
                 for(var i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
-                    graphConfig[parseInt(graph)].fields[i].curve.outputRange += ((delta)?-scroll:+scroll);
-                    graphConfig[parseInt(graph)].fields[i].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[i].curve.outputRange, range.min, range.max);
-                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' x' + (graphConfig[parseInt(graph)].fields[i].curve.outputRange).toFixed(1)+ '\n';
+                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' x100' + '\n';
                 }
                 return changedValue;
             }
             if(graph!=null && field!=null) { // change single pen
-                graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange += ((delta)?-scroll:+scroll);
-                graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange, range.min, range.max);
-                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' x' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.outputRange).toFixed(1) + '\n';;
+                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' x100' + '\n';;
             }
             return false; // nothing was changed
         }
