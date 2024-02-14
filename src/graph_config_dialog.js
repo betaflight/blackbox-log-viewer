@@ -428,7 +428,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             ++rowCount;
         });
 
-        const oneRow = rowCount == 1;
+        const oneRow = Object.keys(curvesData).length == 1;
 
         let menu = new nw.Menu();
 
