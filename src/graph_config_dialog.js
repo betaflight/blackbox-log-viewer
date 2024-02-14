@@ -351,14 +351,18 @@ export function GraphConfigurationDialog(dialog, onSave) {
             }
         };
 
-        var ShowCurvesToSetSameScaleCheckboxedMenu = function() {
+        var ShowCurvesToSetSameScaleCheckboxedMenu = function(multipleCall) {
             let CurvesCheckboxedMenu = new nw.Menu();
+            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
             for (const key in curvesData) {
                 const curve = curvesData[key];
+                // Checked selected curve when menu is showed firstly
+                if (multipleCall==undefined && curve.friendly_name == SelectedCurveName)
+                    curve.checked = true;
                 CurvesCheckboxedMenu.append(new nw.MenuItem({
                 label: curve.friendly_name,
                 type: 'checkbox',
-                checked: curvesData[curve.friendly_name].checked,
+                checked: curve.checked,
                 click: FitSelectedCurveToSameScale
                 }));
             }
@@ -377,7 +381,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             if (this.type == 'checkbox') {
                 const fieldFriendlyName = this.label;
                 curvesData[fieldFriendlyName].checked = this.checked;
-                ShowCurvesToSetSameScaleCheckboxedMenu();
+                ShowCurvesToSetSameScaleCheckboxedMenu(true);
             }
             else {
                 const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
@@ -466,7 +470,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     click: ShowCurvesToSetMinMaxCheckboxedMenu
                 }));
                 menu.append(new nw.MenuItem({
-                    label: 'Fit selected curves to same scale ...',
+                    label: 'Fit curves to same scale ...',
                     click: ShowCurvesToSetSameScaleCheckboxedMenu
                 }));
                 menu.append(new nw.MenuItem({type: 'separator'}));
