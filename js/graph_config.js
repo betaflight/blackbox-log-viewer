@@ -26,7 +26,7 @@ function GraphConfig(graphConfig) {
     };
 
     /**
-     * newGraphs is an array of objects like {label: "graph label", height:, fields:[{name: curve:{offset:, power:, inputRange:, outputRange:, steps:}, color:, }, ...]}
+     * newGraphs is an array of objects like {label: "graph label", height:, fields:[{name: curve:{power:, MinMax:, steps:}, color:, }, ...]}
      */
     this.setGraphs = function(newGraphs) {
         graphs = newGraphs;
@@ -74,11 +74,6 @@ function GraphConfig(graphConfig) {
                     if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
                     } else {
-                        /* The curve may have been originally created for a craft with different endpoints, so use the
-                         * recommended offset and input range instead of the provided one.
-                         */
-                        field.curve.offset = defaultCurve.offset;
-                        field.curve.inputRange = defaultCurve.inputRange;
                         // added checking for compatibality with previous versions of BBE by first start
                         if (field.curve.MinMax == undefined)                           
                             field.curve.MinMax = defaultCurve.MinMax;
@@ -292,10 +287,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
             };
             return {
-                offset: -(mm.max + mm.min) / 2,
                 power: 1.0,
-                inputRange: Math.max((mm.max - mm.min) / 2, 1.0),
-                outputRange: 1.0,
                 MinMax: mmChartUnits
             };
         }
@@ -311,10 +303,7 @@ TODO -  The stats data have small issues of min-max data !!!!
             mmChartUnits.max = Math.max(Math.max(Math.abs(mmChartUnits.max), Math.abs(mmChartUnits.min)), 1.0)
             mmChartUnits.min = -mmChartUnits.max;
             return {
-                offset: 0,
                 power: 1.0,
-                inputRange: Math.max(Math.max(Math.abs(mm.max), Math.abs(mm.min)), 1.0),
-                outputRange: 1.0,
                 MinMax: mmChartUnits
             };
         }
@@ -331,12 +320,7 @@ TODO -  The stats data have small issues of min-max data !!!!
         try {
             if (fieldName.match(/^motor\[/)) {
                 return {
-                    offset: flightLog.isDigitalProtocol() ?
-                        -(DSHOT_MIN_VALUE + DSHOT_RANGE / 2) : -(sysConfig.minthrottle + (sysConfig.maxthrottle - sysConfig.minthrottle) / 2),
                     power: 1.0,
-                    inputRange: flightLog.isDigitalProtocol() ?
-                        DSHOT_RANGE / 2 : (sysConfig.maxthrottle - sysConfig.minthrottle) / 2,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 100
@@ -346,10 +330,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 return getCurveForMinMaxFields('eRPM[0]', 'eRPM[1]', 'eRPM[2]', 'eRPM[3]', 'eRPM[4]', 'eRPM[5]', 'eRPM[6]', 'eRPM[7]');
             } else if (fieldName.match(/^servo\[/)) {
                 return {
-                    offset: -1500,
                     power: 1.0,
-                    inputRange: 500,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 1000,
                         max: 2000
@@ -357,10 +338,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName.match(/^accSmooth\[/)) {
                 return {
-                    offset: 0,
                     power: 0.5,
-                    inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
-                    outputRange: 1.0,
                     MinMax: {
                         min: -16,
                         max: 16
@@ -368,10 +346,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName == "rcCommands[3]") { // Throttle scaled
                 return {
-                    offset: -50,
                     power: 1.0, /* Make this 1.0 to scale linearly */
-                    inputRange: 50,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 100
@@ -382,10 +357,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                        fieldName.match(/^gyroADC\[/)    ||     // same range.
                        fieldName.match(/^gyroUnfilt\[/)) {
                 return {
-                    offset: 0,
                     power: 0.25, /* Make this 1.0 to scale linearly */
-                    inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
-                    outputRange: 1.0,
                     MinMax: {
                         min: -maxDegreesSecond(gyroScaleMargin),
                         max: maxDegreesSecond(gyroScaleMargin)
@@ -393,10 +365,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
                 return {
-                    offset: 0,
                     power: 0.3,
-                    inputRange: 1000, // Was 400 ?
-                    outputRange: 1.0,
                     MinMax: {
                         min: -100,
                         max: 100
@@ -404,10 +373,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle
                 return {
-                    offset: -1500 * highResolutionScale,
                     power: 1.0,
-                    inputRange: 500 * highResolutionScale,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 1000,
                         max: 2000
@@ -415,10 +381,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
-                    offset: 0,
                     power: 0.25,
-                    inputRange: 500 * highResolutionScale * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
-                    outputRange: 1.0,
                     MinMax: {
                         min: 1000,
                         max: 2000
@@ -426,10 +389,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName == "heading[2]") {
                 return {
-                    offset: -Math.PI,
                     power: 1.0,
-                    inputRange: Math.PI,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 360
@@ -437,10 +397,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName.match(/^heading\[/)) {
                 return {
-                    offset: 0,
                     power: 1.0,
-                    inputRange: Math.PI,
-                    outputRange: 1.0,
                     MinMax: {
                         min: -180,
                         max: 180
@@ -448,10 +405,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName.match(/^sonar.*/)) {
                 return {
-                    offset: -200,
                     power: 1.0,
-                    inputRange: 200,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 400
@@ -459,10 +413,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName.match(/^rssi.*/)) {
                 return {
-                    offset: -512,
                     power: 1.0,
-                    inputRange: 512,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 100
@@ -470,10 +421,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName == 'GPS_ground_course') {
                 return {
-                    offset: -1800,
                     power: 1.0,
-                    inputRange: 1800,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 360
@@ -481,10 +429,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName == 'GPS_numSat') {
                 return {
-                    offset: -20,
                     power: 1.0,
-                    inputRange: 20,
-                    outputRange: 1.0,
                     MinMax: {
                         min: 0,
                         max: 40
@@ -492,10 +437,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 };
             } else if (fieldName == 'GPS_speed') {
                 return {
-                    offset: 0,
                     power: 1.0,
-                    inputRange: 1000,
-                    outputRange: 1.0,
                     MinMax: {
                         min: -100,
                         max: 100
@@ -509,10 +451,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[1]': //CPU Load
                                 return {
-                                    offset: -50,
                                     power: 1,
-                                    inputRange: 50,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 100
@@ -520,10 +459,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             default:
                                 return {
-                                    offset: -1000,    // zero offset
                                     power: 1.0,
-                                    inputRange: 1000, //  0-2000uS
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 2000
@@ -532,10 +468,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         }
                     case 'PIDLOOP':
                             return {
-                                offset: -250,    // zero offset
                                 power: 1.0,
-                                inputRange: 250, //  0-500uS
-                                outputRange: 1.0,
                                 MinMax: {
                                     min: 0,
                                     max: 500
@@ -553,10 +486,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                     case 'AC_CORRECTION':
                     case 'AC_ERROR':
                         return {
-                            offset: 0,
                             power: 0.25,
-                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                            outputRange: 1.0,
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
                                 max: maxDegreesSecond(gyroScaleMargin)
@@ -564,10 +494,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         };
                     case 'ACCELEROMETER':
                         return {
-                            offset: 0,
                             power: 0.5,
-                            inputRange: sysConfig.acc_1G * 16.0, /* Reasonable typical maximum for acc */
-                            outputRange: 1.0,
                             MinMax: {
                                 min: -16,
                                 max: 16
@@ -575,10 +502,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         };
                     case 'MIXER':
                         return {
-                            offset: -(sysConfig.motorOutput[1] + sysConfig.motorOutput[0]) / 2,
                             power: 1.0,
-                            inputRange: (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]) / 2,
-                            outputRange: 1.0,
                             MinMax: {
                                 min: -100,
                                 max: 100
@@ -588,10 +512,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': //Raw Value (0-4095)
                                 return {
-                                    offset: -2048,
                                     power: 1,
-                                    inputRange: 2048,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 4096
@@ -599,10 +520,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             default:
                                 return {
-                                    offset: -130,
                                     power: 1.0,
-                                    inputRange: 130, // 0-26.0v
-                                    outputRange: 1.0,
                                      MinMax: {
                                         min: 0,
                                         max: 26
@@ -621,10 +539,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // raw RC command
                                 return {
-                                    offset: 0,
                                     power: 0.25,
-                                    inputRange: 500 * gyroScaleMargin, // +20% to let compare in the same scale with the rccommands
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 1000,
                                         max: 2000 * gyroScaleMargin
@@ -646,10 +561,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         }
                     case 'ANGLERATE':
                         return {
-                            offset: 0,
                             power: 0.25, /* Make this 1.0 to scale linearly */
-                            inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                            outputRange: 1.0,
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
                                 max: maxDegreesSecond(gyroScaleMargin)
@@ -659,10 +571,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // GPS Trust
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -671,10 +580,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // Baro Alt
                             case 'debug[2]': // GPS Alt
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -50,
                                         max: 50
@@ -682,10 +588,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // Vario
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -5,
                                         max: 5
@@ -700,10 +603,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // post-dyn notch gyro [for gyro debug axis]
                             case 'debug[2]': // pre-dyn notch gyro downsampled for FFT [for gyro debug axis]
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
                                         max: maxDegreesSecond(gyroScaleMargin)
@@ -720,10 +620,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 return getCurveForMinMaxFields('debug[0]', 'debug[1]', 'debug[2]');
                             case 'debug[3]': // pre-dyn notch gyro [for gyro debug axis]
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
                                         max: maxDegreesSecond(gyroScaleMargin)
@@ -740,10 +637,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // gyro scaled [for selected axis]
                             case 'debug[3]': // pre-dyn notch gyro [for selected axis]
                                 return {
-                                    offset: 0,
                                     power: 0.25,
-                                    inputRange: maxDegreesSecond(gyroScaleMargin), // Maximum grad/s + 20%
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
                                         max: maxDegreesSecond(gyroScaleMargin)
@@ -754,10 +648,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         }
                     case 'FFT_TIME':
                         return {
-                            offset: 0,
                             power: 1.0,
-                            inputRange: 100,
-                            outputRange: 1.0,
                             MinMax: {
                                 min: -100,
                                 max: 100
@@ -792,10 +683,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // AccelerationModified
                             case 'debug[2]': // Acceleration
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -1000,
                                         max: 1000
@@ -803,10 +691,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // Clip or Count
                                 return {
-                                    offset: -10,
                                     power: 1.0,
-                                    inputRange: 10,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 20
@@ -819,10 +704,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // in 4.3 is interpolated setpoint
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: maxDegreesSecond(gyroScaleMargin),
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
                                         max: maxDegreesSecond(gyroScaleMargin)
@@ -831,10 +713,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // feedforward delta element
                             case 'debug[2]': // feedforward boost element
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -1000,
                                         max: 1000
@@ -842,10 +721,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // rcCommand delta
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 10000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -10000,
                                         max: 10000
@@ -857,10 +733,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                     case 'FF_LIMIT':
                     case 'FEEDFORWARD_LIMIT':
                         return {
-                            offset: 0,
                             power: 1.0,
-                            inputRange: 300,
-                            outputRange: 1.0,
                             MinMax: {
                                 min: -300,
                                 max: 300
@@ -870,10 +743,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // Baro state 0-10
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 20,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -20,
                                         max: 20
@@ -883,10 +753,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // Baro Raw
                             case 'debug[3]': // Baro smoothed
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 2000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -900,10 +767,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // Throttle P uS added
                             case 'debug[1]': // Throttle D uS added
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -912,10 +776,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // Altitude
                             case 'debug[3]': // Target Altitude
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -50,
                                         max: 50
@@ -930,10 +791,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // in 4.3 is dyn idle I
                             case 'debug[2]': // in 4.3 is dyn idle D
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -1000,
                                         max: 1000
@@ -941,10 +799,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // in 4.3 and 4.2 is minRPS
                                 return {
-                                    offset: -1000,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 12000
@@ -960,10 +815,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // After RPM
                             case 'debug[3]': // After all but Dyn Notch
                             return {
-                                offset: 0,
                                 power: 0.25, /* Make this 1.0 to scale linearly */
-                                inputRange: maxDegreesSecond(gyroScaleMargin * highResolutionScale), // Maximum grad/s + 20%
-                                outputRange: 1.0,
                                 MinMax: {
                                     min: -maxDegreesSecond(gyroScaleMargin * highResolutionScale),
                                     max: maxDegreesSecond(gyroScaleMargin * highResolutionScale)
@@ -976,10 +828,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // CRC 0 to max int16_t
                                 return {  // start at bottom, scale up to 20ms
-                                    offset: -1000,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 20
@@ -997,10 +846,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 return getCurveForMinMaxFieldsZeroOffset(fieldName);
                             case 'debug[2]': // RSSI
                                 return {
-                                    offset: 128,
                                     power: 1.0,
-                                    inputRange: 128,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -256,
                                         max: 0
@@ -1008,10 +854,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // LQ percent
                                 return {
-                                    offset: -50,
                                     power: 1.0,
-                                    inputRange: 50,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 100
@@ -1024,10 +867,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // Gyro task cycle us * 10 so 1250 = 125us
                                 return {
-                                    offset: -5000,
                                     power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 1000
@@ -1036,10 +876,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // ID of late task
                             case 'debug[2]': // task delay time 100us in middle
                                 return {
-                                    offset: -1000,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 200
@@ -1047,10 +884,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // gyro skew 100 = 10us
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -50,
                                         max: 50
@@ -1064,10 +898,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // % CPU Busy
                             case 'debug[1]': // late tasks per second
                                 return {
-                                    offset: -50,
                                     power: 1.0,
-                                    inputRange: 50,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 100
@@ -1075,10 +906,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[2]': // total delay in last second
                                 return {
-                                    offset: -500,
                                     power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 100
@@ -1086,10 +914,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // total tasks per second
                                 return {
-                                    offset: -5000,
                                     power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 10000
@@ -1102,10 +927,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[2]': // Uplink LQ
                                 return {
-                                    offset: -50,
                                     power: 1.0,
-                                    inputRange: 50,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 100
@@ -1132,10 +954,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // Pitch P deg * 100
                             case 'debug[1]': // Pitch D deg * 100
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 2000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -20,
                                         max: 20
@@ -1144,10 +963,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // Velocity in cm/s
                             case 'debug[3]': // Velocity to home in cm/s
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -5,
                                         max: 5
@@ -1160,10 +976,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // Groundspeed cm/s
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 10000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -100,
                                         max: 100
@@ -1174,10 +987,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[3]': // Angle to home * 10
                             case 'debug[4]': // magYaw * 10
                                 return {
-                                    offset: -1800,
                                     power: 1.0,
-                                    inputRange: 1800,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 360
@@ -1185,10 +995,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[5]': // magYaw * 10
                                 return {
-                                    offset: -10,
                                     power: 1.0,
-                                    inputRange: 10,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 20
@@ -1196,10 +1003,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[6]': // roll angle *100
                                 return {
-                                    offset: -900,
                                     power: 1.0,
-                                    inputRange: 900,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 180
@@ -1207,10 +1011,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[7]': // yaw rate deg/s
                                 return {
-                                    offset: -100,
                                     power: 1.0,
-                                    inputRange: 100,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 200
@@ -1223,10 +1024,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                         switch (fieldName) {
                             case 'debug[0]': // Pitch angle, deg * 100
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 4000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -4000,
                                         max: 4000
@@ -1235,10 +1033,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // Rescue Phase
                             case 'debug[2]': // Failure code
                                 return {
-                                    offset: -10,
                                     power: 1.0,
-                                    inputRange: 10,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 20
@@ -1246,10 +1041,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // Failure counters coded
                                 return {
-                                    offset: -2000,
                                     power: 1.0,
-                                    inputRange: 2000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 4000
@@ -1263,10 +1055,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // velocity to home cm/s
                             case 'debug[1]': // target velocity cm/s
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -10,
                                         max: 10
@@ -1275,10 +1064,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // altitude m
                             case 'debug[3]': // Target altitude m
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -50,
                                         max: 50
@@ -1292,10 +1078,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // GPS flight model
                             case 'debug[1]': // Nav Data interval
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -1303,10 +1086,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[2]': // task interval
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -1317,10 +1097,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 return getCurveForMinMaxFields(fieldName);
                             case 'debug[5]': // ExecuteTimeUs
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 100,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -100,
                                         max: 100
@@ -1328,10 +1105,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[6]': // ackState
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 10,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -10,
                                         max: 10
@@ -1339,10 +1113,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[7]': // Incoming buffer
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 100,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -100,
                                         max: 100
@@ -1358,10 +1129,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // hDOP
                             case 'debug[3]': // vDOP
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -1377,10 +1145,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]':
                             case 'debug[3]':
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -1394,10 +1159,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // angle target
                             case 'debug[3]': // angle achieved
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -100,
                                         max: 100
@@ -1406,10 +1168,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[1]': // angle error correction
                             case 'debug[2]': // angle feedforward
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 5000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -500,
                                         max: 500
@@ -1425,10 +1184,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': 
                             case 'debug[3]': 
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 200,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -200,
                                         max: 200
@@ -1444,10 +1200,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[2]': // Z
                             case 'debug[3]': // Field
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 2000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -2000,
                                         max: 2000
@@ -1457,10 +1210,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[5]': // Y Cal
                             case 'debug[6]': // Z Cal
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 500,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -500,
                                         max: 500
@@ -1468,10 +1218,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[7]': // Lambda
                                 return {
-                                    offset: -2000,
                                     power: 1.0,
-                                    inputRange: 2000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 4000
@@ -1485,10 +1232,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[0]': // Task Rate
                             case 'debug[1]': // Data Rate
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 1000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -1000,
                                         max: 1000
@@ -1496,10 +1240,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[2]': // Data Interval
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 10000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -10000,
                                         max: 10000
@@ -1507,10 +1248,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[3]': // Execute Time
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 20,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -20,
                                         max: 20
@@ -1519,10 +1257,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                             case 'debug[4]': // Bus Busy Check
                             case 'debug[5]': // Read State Check
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 2,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -2,
                                         max: 2
@@ -1530,10 +1265,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                                 };
                             case 'debug[6]': // Time since previous task uS
                                 return {
-                                    offset: 0,
                                     power: 1.0,
-                                    inputRange: 10000,
-                                    outputRange: 1.0,
                                     MinMax: {
                                         min: -10000,
                                         max: 10000
@@ -1549,10 +1281,7 @@ TODO -  The stats data have small issues of min-max data !!!!
             return getCurveForMinMaxFields(fieldName);
         } catch(e) {
             return {
-                offset: 0,
                 power: 1.0,
-                inputRange: 500,
-                outputRange: 1.0,
                 MinMax: {
                     min: -500,
                     max: 500
