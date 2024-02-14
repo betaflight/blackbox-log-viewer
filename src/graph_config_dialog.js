@@ -89,7 +89,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
             if (field.curve != null) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
                 if (field.curve.MinMax != null) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
@@ -102,7 +101,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
-                $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100).toFixed(0)+'%');
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
             }
@@ -120,7 +118,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><select class="form-control"><option value="">(choose a field)</option></select></td>'
                     + '<td><input name="smoothing" class="form-control" type="text"/></td>'
                     + '<td><input name="power" class="form-control" type="text"/></td>'
-                    + '<td><input name="scale" class="form-control" type="text"/></td>'
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
                     + '<td><input name="grid" type="checkbox"/></td>'
@@ -496,7 +493,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="field">Name</th>'
                                                     + '<th name="smoothing">Smooth</th>'
                                                     + '<th name="expo">Expo</th>'
-                                                    + '<th name="zoom">Zoom</th>'
                                                     + '<th name="line">Line</th>'
                                                     + '<th name="color">Color</th>'
                                                     + '<th name="grid">Grid</th>'
@@ -634,7 +630,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
                     curve: {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
-                        outputRange: parseInt($("input[name=scale]", this).val())/100.0,     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
                         MinMax: {
                             min: parseFloat(minimum),
                             max: parseFloat(maximum)
@@ -643,7 +638,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     default: { // These are used to restore configuration if using mousewheel adjustments
                         smoothing: parseInt($("input[name=smoothing]", this).val())*100,
                         power: parseInt($("input[name=power]", this).val())/100.0,
-                        outputRange: parseInt($("input[name=scale]", this).val())/100.0,
                         MinMax: {
                             min: parseFloat(minimum),
                             max: parseFloat(maximum)
