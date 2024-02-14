@@ -243,7 +243,7 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var SetAllCurvesToOneScale = function () {
             let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
-            for (let key in curvesData) {
+            for (const key in curvesData) {
                 Min = Math.min(Min, curvesData[key].min);
                 Max = Math.max(Max, curvesData[key].max);
             }
@@ -273,27 +273,6 @@ function GraphConfigurationDialog(dialog, onSave) {
             const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
-            RefreshCharts();
-        };
-
-        var FitSelectedCurveToOneScaleWithSecond = function () {
-            let SecondCurveName = this.label;
-            let SecondCurve = curvesData[SecondCurveName];
-            let SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
-            let SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
-            let min = Math.min(SelectedCurveMin, SecondCurve.min);
-            let max = Math.max(SelectedCurveMax, SecondCurve.max);
-
-            $('input[name=MinValue]', selected_curve).val(min.toFixed(1));
-            $('input[name=MaxValue]', selected_curve).val(max.toFixed(1));
-            
-            curves_table.each(function() {
-                let fieldFriendlyName = $('select.form-control option:selected', this).text();
-                if(SecondCurveName == fieldFriendlyName) {
-                    $('input[name=MinValue]',this).val(min.toFixed(1));
-                    $('input[name=MaxValue]',this).val(max.toFixed(1));
-                }
-            });
             RefreshCharts();
         };
 
@@ -329,14 +308,37 @@ function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
+        var ShowCurvesToSetMinMaxCheckboxedMenu = function() {
+            let CurvesCheckboxedMenu = new nw.Menu();
+            for (const key in curvesData) {
+                const curve = curvesData[key];
+                if (!curve.selected) {
+                    CurvesCheckboxedMenu.append(new nw.MenuItem({
+                    label: curve.friendly_name,
+                    type: 'checkbox',
+                    checked: curvesData[curve.friendly_name].checked,
+                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
+                    }));
+                }
+            }
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                        type:  'separator'
+                    }));
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                        label: "Set min-max values",
+                        click: ApplySelectedCurveMinMaxToOtherSelectedCurves
+                    }));
+
+            CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
+        }
+
         var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
             if (this.type == 'checkbox') {
                 const fieldFriendlyName = this.label;
                 curvesData[fieldFriendlyName].checked = this.checked;
-                ShowNotSelectedCurvesCheckboxedMenu();
+                ShowCurvesToSetMinMaxCheckboxedMenu();
             }
             else {
-                const SecondCurveName = this.label;
                 const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
                 const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
                 curves_table.each(function() {
@@ -350,32 +352,60 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
         };
 
-        var ShowNotSelectedCurvesCheckboxedMenu = function() {
-            let FieldsCheckboxedMenu = new nw.Menu();
-            for (let key in curvesData) {
+        var ShowCurvesToSetSameScaleCheckboxedMenu = function() {
+            let CurvesCheckboxedMenu = new nw.Menu();
+            for (const key in curvesData) {
                 const curve = curvesData[key];
-                if (!curve.selected) {
-                    FieldsCheckboxedMenu.append(new nw.MenuItem({
-                    label: curve.friendly_name,
-                    type: 'checkbox',
-                    checked: curvesData[curve.friendly_name].checked,
-                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
-                    }));
-                }
+                CurvesCheckboxedMenu.append(new nw.MenuItem({
+                label: curve.friendly_name,
+                type: 'checkbox',
+                checked: curvesData[curve.friendly_name].checked,
+                click: FitSelectedCurveToSameScale
+                }));
             }
-            FieldsCheckboxedMenu.append(new nw.MenuItem({
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
                         type:  'separator'
                     }));
-            FieldsCheckboxedMenu.append(new nw.MenuItem({
-                        label: "Set min-max values",
-                        click: ApplySelectedCurveMinMaxToOtherSelectedCurves
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                        label: "Set to same scale",
+                        click: FitSelectedCurveToSameScale
                     }));
 
-            FieldsCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
+            CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
         }
 
+        var FitSelectedCurveToSameScale = function () {
+            if (this.type == 'checkbox') {
+                const fieldFriendlyName = this.label;
+                curvesData[fieldFriendlyName].checked = this.checked;
+                ShowCurvesToSetSameScaleCheckboxedMenu();
+            }
+            else {
+                const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
+                const SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
+                let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
+                Min = Math.min(Min, SelectedCurveMin);
+                Max = Math.max(Max, SelectedCurveMax);
+                for (const key in curvesData) {
+                    if (curvesData[key].checked) {
+                        Min = Math.min(Min, curvesData[key].min);
+                        Max = Math.max(Max, curvesData[key].max);
+                    }
+                }
+
+                const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+                curves_table.each(function() {
+                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    if(curvesData[fieldFriendlyName].checked) {
+                        $('input[name=MinValue]',this).val(Min.toFixed(1));
+                        $('input[name=MaxValue]',this).val(Max.toFixed(1));
+                    }
+                });
+                RefreshCharts();
+            }
+        };
+
         let curvesData = {};
-        let subCurvesNamesOneScale = new nw.Menu();
         let rowCount = 0;
         curves_table.each(function() {
             let fieldName = $("select", this).val();
@@ -391,11 +421,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                 checked: false
             };
             curvesData[fieldFriendlyName] = curve;
-            if (fieldName != selected_field_name) 
-                subCurvesNamesOneScale.append(new nw.MenuItem({
-                    label: fieldFriendlyName,
-                    click: FitSelectedCurveToOneScaleWithSecond
-                }));
             ++rowCount;
         });
 
@@ -438,11 +463,11 @@ function GraphConfigurationDialog(dialog, onSave) {
             }));
                 menu.append(new nw.MenuItem({
                     label: 'Apply this curves min-max to ...',
-                    click: ShowNotSelectedCurvesCheckboxedMenu
+                    click: ShowCurvesToSetMinMaxCheckboxedMenu
                 }));
                 menu.append(new nw.MenuItem({
-                    label: 'Fit this curve to one scale at:',
-                    submenu: subCurvesNamesOneScale
+                    label: 'Fit selected curves to same scale ...',
+                    click: ShowCurvesToSetSameScaleCheckboxedMenu
                 }));
                 menu.append(new nw.MenuItem({type: 'separator'}));
         }
