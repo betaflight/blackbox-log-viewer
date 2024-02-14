@@ -296,7 +296,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
-        var SetAllCurvesToOneZeroAxis = function () {
+        var SetAllCurvesToZeroOffset = function () {
             curves_table.each(function() {
                 let Min = parseFloat($('input[name=MinValue]',this).val());
                 let Max = parseFloat($('input[name=MaxValue]',this).val());
@@ -308,7 +308,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
-        var FitSelectedCurveAroundZeroAxis = function () {
+        var SetSelectedCurveToZeroOffset = function () {
             let Min = parseFloat($('input[name=MinValue]', selected_curve).val());
             let Max = parseFloat($('input[name=MaxValue]', selected_curve).val());
             Max = Math.max(Math.abs(Min), Math.abs(Max));
@@ -386,7 +386,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             };
             curvesData[fieldFriendlyName] = curve;
 
-            if (fieldName != selected_field_name) 
+            if (fieldName != selected_field_name)
 
                 subCurvesNamesOneScale.append(new nw.MenuItem({
                     label: fieldFriendlyName,
@@ -400,47 +400,47 @@ export function GraphConfigurationDialog(dialog, onSave) {
         let menu = new nw.Menu();
 
         if (!oneRow) {
-        menu.append(new nw.MenuItem({
-            label: 'Set all curves min-max values to default',
-            click: SetAllMinMaxToDefault
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Fit all curves at global full range',
-            click: SetAllMinMaxToFullRangeDuringAllTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Fit all curves to zero ofset at global full range',
-            click: SetAllMinMaxToZeroOffsetDuringAllTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Fit all curves at window full range',
-            click: SetAllMinMaxToFullRangeDuringWindowTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Fit all curves to zero offset at window full range',
-            click: SetAllMinMaxToZeroOffsetDuringWindowTime
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place all curves to one scale',
-            click: SetAllCurvesToOneScale
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Place all curves to zero ofset',
-            click: SetAllCurvesToOneZeroAxis
-        }));
-        menu.append(new nw.MenuItem({
-            label: 'Apply this curves min-max to all curves',
-            click: ApplySelectedCurveMinMaxToAllCurves
-        }));
             menu.append(new nw.MenuItem({
-                label: 'Apply this curves min-max to ...',
-                click: ShowNotSelectedCurvesCheckboxedMenu
+                label: 'Set all curves min-max values to default',
+                click: SetAllMinMaxToDefault
             }));
             menu.append(new nw.MenuItem({
-                label: 'Fit this curve to one scale at:',
-                submenu: subCurvesNamesOneScale
+                label: 'Fit all curves at global full range',
+                click: SetAllMinMaxToFullRangeDuringAllTime
             }));
-            menu.append(new nw.MenuItem({type: 'separator'}));
+            menu.append(new nw.MenuItem({
+                label: 'Fit all curves to zero ofset at global full range',
+                click: SetAllMinMaxToZeroOffsetDuringAllTime
+            }));
+            menu.append(new nw.MenuItem({
+                label: 'Fit all curves at window full range',
+                click: SetAllMinMaxToFullRangeDuringWindowTime
+            }));
+            menu.append(new nw.MenuItem({
+                label: 'Fit all curves to zero offset at window full range',
+                click: SetAllMinMaxToZeroOffsetDuringWindowTime
+            }));
+            menu.append(new nw.MenuItem({
+                label: 'Place all curves to one scale',
+                click: SetAllCurvesToOneScale
+            }));
+            menu.append(new nw.MenuItem({
+                label: 'Place all curves to zero ofset',
+                click: SetAllCurvesToZeroOffset
+            }));
+            menu.append(new nw.MenuItem({
+                label: 'Apply this curves min-max to all curves',
+                click: ApplySelectedCurveMinMaxToAllCurves
+            }));
+                menu.append(new nw.MenuItem({
+                    label: 'Apply this curves min-max to ...',
+                    click: ShowNotSelectedCurvesCheckboxedMenu
+                }));
+                menu.append(new nw.MenuItem({
+                    label: 'Fit this curve to one scale at:',
+                    submenu: subCurvesNamesOneScale
+                }));
+                menu.append(new nw.MenuItem({type: 'separator'}));
         }
         menu.append(new nw.MenuItem({
             label: 'Set this curve min-max values to default',
@@ -456,7 +456,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }));
         menu.append(new nw.MenuItem({
             label: 'Place this curve to zero offset',
-            click: FitSelectedCurveAroundZeroAxis
+            click: SetSelectedCurveToZeroOffset
         }));
 
         menu.popup(menu_pos_x, menu_pos_y);
