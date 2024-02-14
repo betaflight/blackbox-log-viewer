@@ -81,7 +81,7 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
         
         craft3D = null, craft2D = null,
         
-    	analyser = null, /* define a new spectrum analyser */
+        analyser = null, /* define a new spectrum analyser */
 
         watermarkLogo, /* Watermark feature */
         
@@ -280,7 +280,7 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
     function drawLapTimer() {
         // Update the Lap Timer
         lapTimer.refresh(windowCenterTime, (3600*1000000/*a long time*/), blackboxLogViewer.getBookmarkTimes());
-    	lapTimer.drawCanvas(canvas, options);
+        lapTimer.drawCanvas(canvas, options);
     }
 
     var
@@ -412,13 +412,13 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
     function drawAxisLine() {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
         canvasContext.lineWidth = 1;
-		canvasContext.setLineDash([5]); // Make the center line a dash        
+        canvasContext.setLineDash([5]); // Make the center line a dash        
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
         canvasContext.lineTo(canvas.width, 0);
         
         canvasContext.stroke();
-		canvasContext.setLineDash([]);        
+        canvasContext.setLineDash([]);        
     }
 
     //Draw an background for the line for a graph (at the origin and spanning the window)
@@ -443,7 +443,7 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
             yScale = -plotHeight/2;
 
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)"; // Grid Color
-		canvasContext.setLineDash([1,10]); // Make the grid line a dash        
+        canvasContext.setLineDash([1,10]); // Make the grid line a dash        
         canvasContext.lineWidth = 1;
         canvasContext.beginPath();
 
@@ -455,15 +455,15 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
                 canvasContext.lineTo(canvas.width, yValue);
             }
         }
-		// vertical lines
-		for(var i=(windowStartTime / 100000).toFixed(0) * 100000; i<windowEndTime; i+=100000) {
+        // vertical lines
+        for(var i=(windowStartTime / 100000).toFixed(0) * 100000; i<windowEndTime; i+=100000) {
             var x = timeToCanvasX(i);
             canvasContext.moveTo(x, yScale);
             canvasContext.lineTo(x, -yScale);
-		}
+        }
 
         canvasContext.stroke();
-		canvasContext.setLineDash([]); // clear the dash
+        canvasContext.setLineDash([]); // clear the dash
 
         // range values,
         //drawAxisLabel(max.toFixed(0), yScale + 12);
@@ -642,9 +642,9 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
 
         // Draw Bookmarks Event Line
         if(bookmarkEvents!=null) {
-        	for(var i=0; i<=9; i++) {
-        		if(bookmarkEvents[i]!=null) {
-		            if(bookmarkEvents[i].state) 
+            for(var i=0; i<=9; i++) {
+                if(bookmarkEvents[i]!=null) {
+                    if(bookmarkEvents[i].state) 
                         if ((bookmarkEvents[i].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) && (bookmarkEvents[i].time < windowEndTime)) {
                             drawEvent(
                                 {
@@ -654,7 +654,7 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
                                 }, sequenceNum++);
                         };
                     };
-        	};
+            };
         };
     
     }
@@ -850,7 +850,7 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
                 canvasContext.moveTo(centerX, 0);
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
-		         
+                 
             }
             
             // Draw events - if option set or even if option is not set but there are graphs
@@ -886,8 +886,8 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
             // Draw Analyser
             if (options.drawAnalyser && graphConfig.selectedFieldName) {
                 try{ // If we do not select a graph/field, then the analyser is hidden
-                var graph = graphs[graphConfig.selectedGraphIndex]; 		
-				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
+                var graph = graphs[graphConfig.selectedGraphIndex];         
+                var field = graph.fields[graphConfig.selectedFieldIndex];                   
                 analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
                 } catch(err) {console.log('Cannot plot analyser ' + err);}            
             }
@@ -926,16 +926,17 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
                 field.index = flightLog.getMainFieldIndexByName(field.name);
 
                 // Compute inputRange and offset from min-max values
-                let min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.min);
-                let max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.max);
-                field.curve.inputRange = (max - min) / 2;
-                field.curve.offset = -(max + min) / 2;
+                const min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.min);
+                const max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, field.name, false, field.curve.MinMax.max);
+                const inputRange = (max - min) / 2;
+                const offset = -(max + min) / 2;
+                const outputRange = 1.0;            // There is no direct zoom now, set outputRange to 1
                 
                 // Convert the field's curve settings into an actual expo curve object:
-                field.curve = new ExpoCurve(field.curve.offset, 
+                field.curve = new ExpoCurve(offset, 
                                             ((options.graphExpoOverride) ? 1.0 : field.curve.power), 
-                                            field.curve.inputRange, 
-                                            field.curve.outputRange, 
+                                            inputRange, 
+                                            outputRange, 
                                             field.curve.steps); 
                 
                 if (field.smoothing > 0) {
@@ -1072,10 +1073,10 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
     this.refreshLogo();
     
     /* Create the FlightLogAnalyser object */
-	analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
+    analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
 
     /* Create the Lap Timer object */
-	lapTimer = new LapTimer();
+    lapTimer = new LapTimer();
 
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);
