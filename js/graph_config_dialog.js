@@ -330,7 +330,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     }));
 
             CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
-        }
+        };
 
         var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
             if (this.type == 'checkbox') {
@@ -376,7 +376,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     }));
 
             CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
-        }
+        };
 
         var FitSelectedCurveToSameScale = function () {
             if (this.type == 'checkbox') {
@@ -409,6 +409,78 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
         };
 
+        let zoomScale = 1.0;
+        const labelZoomIn25 = 'Zoom in 25%',
+            labelZoomIn50 = 'Zoom in 50%',
+            labelZoomOut25 = 'Zoom out 25%',
+            labelZoomOut50 = 'Zoom out 50%';
+        var SetZoomToCurves = function() {
+            zoomScale = 1.0;
+            switch (this.label) {
+                case labelZoomIn25:
+                    zoomScale = 0.75;
+                    break;
+                case labelZoomIn50:
+                    zoomScale = 0.50;
+                    break;
+                case labelZoomOut25:
+                    zoomScale = 1.25;
+                    break;
+                case labelZoomOut50:
+                    zoomScale = 1.50;
+                    break;
+            }
+
+            ShowCurvesToSetZoomCheckboxedMenu();
+        };
+
+        var ShowCurvesToSetZoomCheckboxedMenu = function (multipleCall) {
+            let CurvesCheckboxedMenu = new nw.Menu();
+            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+            for (const key in curvesData) {
+                const curve = curvesData[key];
+                if (multipleCall==undefined)
+                    curve.checked = true;
+                CurvesCheckboxedMenu.append(new nw.MenuItem({
+                label: curve.friendly_name,
+                type: 'checkbox',
+                checked: curve.checked,
+                click: SetZoomToSelectedCurves
+                }));
+            }
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                    type: 'separator'
+                }));
+
+            const Caption = zoomScale < 1 ? "Zoom in " : "Zoom out ";
+            const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%"
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                        label: Caption + procent,
+                        click: SetZoomToSelectedCurves
+                    }));
+
+            CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
+        };
+
+        var SetZoomToSelectedCurves = function () {
+            if (this.type == 'checkbox') {
+                const fieldFriendlyName = this.label;
+                curvesData[fieldFriendlyName].checked = this.checked;
+                ShowCurvesToSetZoomCheckboxedMenu(true);
+            }
+            else {
+                curves_table.each(function() {
+                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    const curve = curvesData[fieldFriendlyName];
+                    if(curve.checked) {
+                        $('input[name=MinValue]',this).val((curve.min*zoomScale).toFixed(1));
+                        $('input[name=MaxValue]',this).val((curve.max*zoomScale).toFixed(1));
+                    }
+                });
+                RefreshCharts();
+            }
+        };
+
         let curvesData = {};
         curves_table.each(function() {
             let fieldName = $("select", this).val();
@@ -428,69 +500,92 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         const oneRow = Object.keys(curvesData).length == 1;
 
-        let menu = new nw.Menu();
+        let zoomSubMenu = new nw.Menu();
+        zoomSubMenu.append(new nw.MenuItem({
+                label: labelZoomIn25,
+                click: SetZoomToCurves
+            }));
+        zoomSubMenu.append(new nw.MenuItem({
+                label: labelZoomIn50,
+                click: SetZoomToCurves
+            }));
+        zoomSubMenu.append(new nw.MenuItem({
+                label: labelZoomOut25,
+                click: SetZoomToCurves
+            }));
+        zoomSubMenu.append(new nw.MenuItem({
+                label: labelZoomOut50,
+                click: SetZoomToCurves
+            }));
+
+        let mainMenu = new nw.Menu();
 
         if (!oneRow) {
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Set all curves min-max values to default',
                 click: SetAllMinMaxToDefault
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Fit all curves at global full range',
                 click: SetAllMinMaxToFullRangeDuringAllTime
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Fit all curves to zero ofset at global full range',
                 click: SetAllMinMaxToZeroOffsetDuringAllTime
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Fit all curves at window full range',
                 click: SetAllMinMaxToFullRangeDuringWindowTime
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Fit all curves to zero offset at window full range',
                 click: SetAllMinMaxToZeroOffsetDuringWindowTime
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Place all curves to one scale',
                 click: SetAllCurvesToOneScale
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Place all curves to zero ofset',
                 click: SetAllCurvesToZeroOffset
             }));
-            menu.append(new nw.MenuItem({
+            mainMenu.append(new nw.MenuItem({
                 label: 'Apply this curves min-max to all curves',
                 click: ApplySelectedCurveMinMaxToAllCurves
             }));
-                menu.append(new nw.MenuItem({
+                mainMenu.append(new nw.MenuItem({
                     label: 'Apply this curves min-max to ...',
                     click: ShowCurvesToSetMinMaxCheckboxedMenu
                 }));
-                menu.append(new nw.MenuItem({
+                mainMenu.append(new nw.MenuItem({
                     label: 'Fit curves to same scale ...',
                     click: ShowCurvesToSetSameScaleCheckboxedMenu
                 }));
-                menu.append(new nw.MenuItem({type: 'separator'}));
+                mainMenu.append(new nw.MenuItem({type: 'separator'}));
         }
-        menu.append(new nw.MenuItem({
+        mainMenu.append(new nw.MenuItem({
             label: 'Set this curve min-max values to default',
             click: SetSelectedCurveMinMaxToDefault
         }));
-        menu.append(new nw.MenuItem({
+        mainMenu.append(new nw.MenuItem({
             label: 'Fit this curve at global full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
         }));
-        menu.append(new nw.MenuItem({
+        mainMenu.append(new nw.MenuItem({
             label: 'Fit this curve at window full range',
             click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
         }));
-        menu.append(new nw.MenuItem({
+        mainMenu.append(new nw.MenuItem({
             label: 'Place this curve to zero offset',
             click: SetSelectedCurveToZeroOffset
         }));
+        mainMenu.append(new nw.MenuItem({type: 'separator'}));
+        mainMenu.append(new nw.MenuItem({
+            label: 'Zoom',
+            submenu: zoomSubMenu
+        }));
 
-        menu.popup(menu_pos_x, menu_pos_y);
+        mainMenu.popup(menu_pos_x, menu_pos_y);
     }
 
     function renderGraph(flightLog, index, graph) {
