@@ -436,7 +436,6 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var ShowCurvesToSetZoomCheckboxedMenu = function (multipleCall) {
             let CurvesCheckboxedMenu = new nw.Menu();
-            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
             for (const key in curvesData) {
                 const curve = curvesData[key];
                 if (multipleCall==undefined)
