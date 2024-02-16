@@ -310,6 +310,13 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var ShowCurvesToSetMinMaxCheckboxedMenu = function() {
             let CurvesCheckboxedMenu = new nw.Menu();
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                label: "SELECT CURVES:",
+                enabled: false,
+                }));
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                    type:  'separator'
+                }));
             for (const key in curvesData) {
                 const curve = curvesData[key];
                 if (!curve.selected) {
@@ -325,7 +332,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                         type:  'separator'
                     }));
             CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        label: "Set min-max values",
+                        label: "SET MIN-MAX VALUES",
                         click: ApplySelectedCurveMinMaxToOtherSelectedCurves
                     }));
 
@@ -355,6 +362,13 @@ function GraphConfigurationDialog(dialog, onSave) {
         var ShowCurvesToSetSameScaleCheckboxedMenu = function(multipleCall) {
             let CurvesCheckboxedMenu = new nw.Menu();
             const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                label: "SELECT CURVES:",
+                enabled: false,
+                }));
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                    type:  'separator'
+                }));
             for (const key in curvesData) {
                 const curve = curvesData[key];
                 // Checked selected curve when menu is showed firstly
@@ -371,7 +385,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                         type:  'separator'
                     }));
             CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        label: "Set to same scale",
+                        label: "SET CURVES TO SAME SCALE",
                         click: FitSelectedCurveToSameScale
                     }));
 
@@ -436,6 +450,14 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var ShowCurvesToSetZoomCheckboxedMenu = function (multipleCall) {
             let CurvesCheckboxedMenu = new nw.Menu();
+            
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                label: "SELECT CURVES:",
+                enabled: false,
+                }));
+            CurvesCheckboxedMenu.append(new nw.MenuItem({
+                    type:  'separator'
+                }));
             for (const key in curvesData) {
                 const curve = curvesData[key];
                 if (multipleCall==undefined)
@@ -451,7 +473,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     type: 'separator'
                 }));
 
-            const Caption = zoomScale < 1 ? "Zoom in " : "Zoom out ";
+            const Caption = zoomScale < 1 ? "APPLY ZOOM IN " : "APPLY ZOOM OUT ";
             const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%"
             CurvesCheckboxedMenu.append(new nw.MenuItem({
                         label: Caption + procent,
@@ -518,7 +540,6 @@ function GraphConfigurationDialog(dialog, onSave) {
             }));
 
         let mainMenu = new nw.Menu();
-
         if (!oneRow) {
             mainMenu.append(new nw.MenuItem({
                 label: 'Set all curves min-max values to default',
@@ -580,7 +601,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         }));
         mainMenu.append(new nw.MenuItem({type: 'separator'}));
         mainMenu.append(new nw.MenuItem({
-            label: 'Zoom',
+            label: 'Curves zoom',
             submenu: zoomSubMenu
         }));
 
