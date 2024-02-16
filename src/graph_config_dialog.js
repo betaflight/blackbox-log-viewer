@@ -519,7 +519,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
 
         const oneRow = Object.keys(curvesData).length == 1;
-
+//      the curves zoom submenu
         let zoomSubMenu = new nw.Menu();
         zoomSubMenu.append(new nw.MenuItem({
                 label: labelZoomIn25,
@@ -537,72 +537,86 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 label: labelZoomOut50,
                 click: SetZoomToCurves
             }));
+//      the full range presentations type submenu
+        let fullRangeTypeSubMenu = new nw.Menu();
+        fullRangeTypeSubMenu.append(new nw.MenuItem({
+                label: 'At all global log time',
+                click: SetAllMinMaxToFullRangeDuringAllTime
+            }));
+        fullRangeTypeSubMenu.append(new nw.MenuItem({
+                label: 'At local window time',
+                click: SetAllMinMaxToFullRangeDuringWindowTime
+            }));
+//      The all other feature are added to otherActionsMenu
+        let otherActionsMenu = new nw.Menu();
+        otherActionsMenu.append(new nw.MenuItem({
+            label: 'Fit all curves to zero ofset at global full range',
+            click: SetAllMinMaxToZeroOffsetDuringAllTime
+        }));
+        otherActionsMenu.append(new nw.MenuItem({
+            label: 'Fit all curves to zero offset at window full range',
+            click: SetAllMinMaxToZeroOffsetDuringWindowTime
+        }));
+        otherActionsMenu.append(new nw.MenuItem({
+            label: 'Place all curves to one scale',
+            click: SetAllCurvesToOneScale
+        }));
+        otherActionsMenu.append(new nw.MenuItem({type: 'separator'}));
+        otherActionsMenu.append(new nw.MenuItem({
+            label: 'Fit this curve at global full range',
+            click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
+        }));
 
         let mainMenu = new nw.Menu();
         if (!oneRow) {
             mainMenu.append(new nw.MenuItem({
-                label: 'Set all curves min-max values to default',
-                click: SetAllMinMaxToDefault
-            }));
+                    label: 'All to defailt',
+                    click: SetAllMinMaxToDefault
+                }));
             mainMenu.append(new nw.MenuItem({
-                label: 'Fit all curves at global full range',
-                click: SetAllMinMaxToFullRangeDuringAllTime
-            }));
-            mainMenu.append(new nw.MenuItem({
-                label: 'Fit all curves to zero ofset at global full range',
-                click: SetAllMinMaxToZeroOffsetDuringAllTime
-            }));
-            mainMenu.append(new nw.MenuItem({
-                label: 'Fit all curves at window full range',
-                click: SetAllMinMaxToFullRangeDuringWindowTime
-            }));
-            mainMenu.append(new nw.MenuItem({
-                label: 'Fit all curves to zero offset at window full range',
-                click: SetAllMinMaxToZeroOffsetDuringWindowTime
-            }));
-            mainMenu.append(new nw.MenuItem({
-                label: 'Place all curves to one scale',
-                click: SetAllCurvesToOneScale
-            }));
-            mainMenu.append(new nw.MenuItem({
-                label: 'Place all curves to zero ofset',
-                click: SetAllCurvesToZeroOffset
-            }));
-            mainMenu.append(new nw.MenuItem({
-                label: 'Apply this curves min-max to all curves',
-                click: ApplySelectedCurveMinMaxToAllCurves
-            }));
-                mainMenu.append(new nw.MenuItem({
-                    label: 'Apply this curves min-max to ...',
+                    label: 'Selected to this one ...',
                     click: ShowCurvesToSetMinMaxCheckboxedMenu
                 }));
-                mainMenu.append(new nw.MenuItem({
-                    label: 'Fit curves to same scale ...',
+            mainMenu.append(new nw.MenuItem({
+                    label: 'Selected to one scale ...',
                     click: ShowCurvesToSetSameScaleCheckboxedMenu
                 }));
-                mainMenu.append(new nw.MenuItem({type: 'separator'}));
+            mainMenu.append(new nw.MenuItem({
+                    label: 'All centered',
+                    click: SetAllCurvesToZeroOffset
+                }));
+            mainMenu.append(new nw.MenuItem({
+                    label: 'All full range',
+                    submenu: fullRangeTypeSubMenu
+                }));
+            mainMenu.append(new nw.MenuItem({
+                    type: 'separator',
+                }));
         }
         mainMenu.append(new nw.MenuItem({
-            label: 'Set this curve min-max values to default',
-            click: SetSelectedCurveMinMaxToDefault
-        }));
+                label: 'This curve to defailt',
+                click: SetSelectedCurveMinMaxToDefault
+            }));
         mainMenu.append(new nw.MenuItem({
-            label: 'Fit this curve at global full range',
-            click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
-        }));
+                label: 'This curve to:',
+                enabled: false
+            }));
         mainMenu.append(new nw.MenuItem({
-            label: 'Fit this curve at window full range',
-            click: SetSelectedCurveMinMaxToFullRangeDuringWindowTime
-        }));
+                label: 'This curve centered',
+                click: SetSelectedCurveToZeroOffset
+            }));
         mainMenu.append(new nw.MenuItem({
-            label: 'Place this curve to zero offset',
-            click: SetSelectedCurveToZeroOffset
-        }));
-        mainMenu.append(new nw.MenuItem({type: 'separator'}));
+                type: 'separator',
+            }));
         mainMenu.append(new nw.MenuItem({
             label: 'Curves zoom',
             submenu: zoomSubMenu
         }));
+        mainMenu.append(new nw.MenuItem({type: 'separator'}));
+        mainMenu.append(new nw.MenuItem({
+                label: 'Other actions:',
+                submenu: otherActionsMenu
+            }));
 
         mainMenu.popup(menu_pos_x, menu_pos_y);
     }
