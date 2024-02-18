@@ -444,6 +444,8 @@ function HeaderDialog(dialog, onSave) {
 	}
 
     function builtSelectedFieldsList(sysConfig) {
+        if ($('.fields_list').find('tr').length != 1)
+            return;
 
         const value = sysConfig.fields_disabled_mask;
 
