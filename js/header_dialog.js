@@ -465,8 +465,7 @@ function HeaderDialog(dialog, onSave) {
             {name: 'Unfiltered Gyroscope', description: 'Unfiltered gyro data'},
         ];
 
-        const fieldsList_e = $('.fields_list');
-        fieldsList_e.empty();
+        const fieldsList_e = $('.fields_list').empty();
 
         for (let i = 0; i < fields.length; i++) {
             const row_e = $(`<tr><td><label class="option"><input class="field ${i}
