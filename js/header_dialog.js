@@ -444,8 +444,6 @@ function HeaderDialog(dialog, onSave) {
 	}
 
     function builtSelectedFieldsList(sysConfig) {
-        if ($('.fields_list').find('tr').length != 1)
-            return;
 
         const value = sysConfig.fields_disabled_mask;
 
@@ -468,6 +466,7 @@ function HeaderDialog(dialog, onSave) {
         ];
 
         const fieldsList_e = $('.fields_list');
+        fieldsList_e.empty();
 
         for (let i = 0; i < fields.length; i++) {
             const row_e = $(`<tr><td><label class="option"><input class="field ${i}
