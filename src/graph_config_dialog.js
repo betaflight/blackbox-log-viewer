@@ -519,106 +519,129 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
 
         const oneRow = Object.keys(curvesData).length == 1;
-//      the curves zoom submenu
-        let zoomSubMenu = new nw.Menu();
-        zoomSubMenu.append(new nw.MenuItem({
-                label: labelZoomIn25,
-                click: SetZoomToCurves
-            }));
-        zoomSubMenu.append(new nw.MenuItem({
-                label: labelZoomIn50,
-                click: SetZoomToCurves
-            }));
-        zoomSubMenu.append(new nw.MenuItem({
-                label: labelZoomOut25,
-                click: SetZoomToCurves
-            }));
-        zoomSubMenu.append(new nw.MenuItem({
-                label: labelZoomOut50,
-                click: SetZoomToCurves
-            }));
-//      the full range presentations type submenu
-        let fullRangeTypeSubMenu = new nw.Menu();
-        fullRangeTypeSubMenu.append(new nw.MenuItem({
-                label: 'At all global log time',
-                click: SetAllMinMaxToFullRangeDuringAllTime
-            }));
-        fullRangeTypeSubMenu.append(new nw.MenuItem({
-                label: 'At local window time',
-                click: SetAllMinMaxToFullRangeDuringWindowTime
-            }));
-//      The all other feature are added to otherActionsMenu
-        let otherActionsMenu = new nw.Menu();
-        otherActionsMenu.append(new nw.MenuItem({
-            label: 'Fit all curves to zero ofset at global full range',
-            click: SetAllMinMaxToZeroOffsetDuringAllTime
-        }));
-        otherActionsMenu.append(new nw.MenuItem({
-            label: 'Fit all curves to zero offset at window full range',
-            click: SetAllMinMaxToZeroOffsetDuringWindowTime
-        }));
-        otherActionsMenu.append(new nw.MenuItem({
-            label: 'Place all curves to one scale',
-            click: SetAllCurvesToOneScale
-        }));
-        otherActionsMenu.append(new nw.MenuItem({type: 'separator'}));
-        otherActionsMenu.append(new nw.MenuItem({
-            label: 'Fit this curve at global full range',
-            click: SetSelectedCurveMinMaxToFullRangeDuringAllTime
-        }));
-
-        let mainMenu = new nw.Menu();
+      
+        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
+        let menu2 = $(".dropdown-content.menu2", selected_curve.parents(".config-graph"));
+        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
+        menu1.empty();
+        menu2.empty();
+        menu3.empty();
+        
+        let elem = undefined;
         if (!oneRow) {
-            mainMenu.append(new nw.MenuItem({
-                    label: 'All to defailt',
-                    click: SetAllMinMaxToDefault
-                }));
-            mainMenu.append(new nw.MenuItem({
-                    label: 'Selected to this one ...',
-                    click: ShowCurvesToSetMinMaxCheckboxedMenu
-                }));
-            mainMenu.append(new nw.MenuItem({
-                    label: 'Selected to one scale ...',
-                    click: ShowCurvesToSetSameScaleCheckboxedMenu
-                }));
-            mainMenu.append(new nw.MenuItem({
-                    label: 'All centered',
-                    click: SetAllCurvesToZeroOffset
-                }));
-            mainMenu.append(new nw.MenuItem({
-                    label: 'All full range',
-                    submenu: fullRangeTypeSubMenu
-                }));
-            mainMenu.append(new nw.MenuItem({
-                    type: 'separator',
-                }));
-        }
-        mainMenu.append(new nw.MenuItem({
-                label: 'This curve to defailt',
-                click: SetSelectedCurveMinMaxToDefault
-            }));
-        mainMenu.append(new nw.MenuItem({
-                label: 'This curve to:',
-                enabled: false
-            }));
-        mainMenu.append(new nw.MenuItem({
-                label: 'This curve centered',
-                click: SetSelectedCurveToZeroOffset
-            }));
-        mainMenu.append(new nw.MenuItem({
-                type: 'separator',
-            }));
-        mainMenu.append(new nw.MenuItem({
-            label: 'Curves zoom',
-            submenu: zoomSubMenu
-        }));
-        mainMenu.append(new nw.MenuItem({type: 'separator'}));
-        mainMenu.append(new nw.MenuItem({
-                label: 'Other actions:',
-                submenu: otherActionsMenu
-            }));
+            elem = $('<div> All to defailt</div>');
+            elem.click(SetAllMinMaxToDefault);
+            menu1.append(elem);
+            
+            menu1.append($('<div>Selected to this one ...</div>'));        
+            menu1.append($('<div>Selected to one scale ...</div>'));        
+            
+            
+            elem = $('<div>All centered</div>');
+            elem.click(SetAllCurvesToZeroOffset);
+            menu1.append(elem);
+            
+            elem = $('<div class="bottomBorder iconDiv">All full range...</div>');
+            elem.click(function () {
+                menu1.removeClass('show');
+                menu2.empty();
+                let elem = $('<div>At all global log time</div>');
+                elem.click(SetAllMinMaxToFullRangeDuringAllTime);
+                menu2.append(elem);
 
-        mainMenu.popup(menu_pos_x, menu_pos_y);
+                elem = $('<div>At local window time</div>');
+                elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
+                menu2.append(elem);
+
+                elem = $('<div class="topBorder iconDiv">Back</div>');
+                elem.click(function () {
+                    menu2.removeClass('show');
+                    menu1.addClass('show');
+                });
+                menu2.append(elem);
+                menu2.addClass('show');
+            });
+            menu1.append(elem);
+        }
+
+        elem = $('<div> This curve to defailt</div>');
+        elem.click(SetSelectedCurveMinMaxToDefault);
+        menu1.append(elem);
+        
+        elem = $('<div>This curve to:</div>');
+//      elem.click(SetSelectedCurveMinMaxToDefault);
+        menu1.append(elem);
+        
+        elem = $('<div class="bottomBorder iconDiv">This curve centered</div>');
+        elem.click(SetSelectedCurveToZeroOffset);
+        menu1.append(elem);
+
+        elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom ...</div>');
+        elem.click(function () {
+            menu1.removeClass('show');
+            menu2.empty();
+            let elem = $('<div>' + labelZoomIn25 + '</div>');
+            //elem.click(SetAllCurvesToZeroOffset);
+            menu2.append(elem);
+
+            elem = $('<div>' + labelZoomIn50 + '</div>');
+            menu2.append(elem);
+
+            elem = $('<div>' + labelZoomOut25 + '</div>');
+            menu2.append(elem);
+
+            elem = $('<div>' + labelZoomOut50 + '</div>');
+            menu2.append(elem);
+
+            elem = $('<div class="topBorder iconDiv">Back</div>');
+            elem.click(function () {
+                menu2.removeClass('show');
+                menu1.addClass('show');
+            });
+            menu2.append(elem);
+            menu2.addClass('show');
+        });
+        menu1.append(elem);
+        
+        elem = $('<div>Other actions:</div>');
+        elem.click(function () {
+            menu1.removeClass('show');
+            menu2.empty();
+
+            let elem = $('<div>Fit all curves to zero ofset at global full range</div>');
+            elem.click(SetAllMinMaxToZeroOffsetDuringAllTime);
+            menu2.append(elem);
+
+            elem = $('<div>Fit all curves to zero offset at window full range</div>');
+            elem.click(SetAllMinMaxToZeroOffsetDuringWindowTime);
+            menu2.append(elem);
+
+            elem = $('<div class="bottomBorder iconDiv>Place all curves to one scale</div>');
+            elem.click(SetAllCurvesToOneScale);
+            menu2.append(elem);
+            menu2.addClass('show');
+            
+            elem = $('<div class="Fit this curve at global full range</div>');
+            elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
+            menu2.append(elem);
+            
+            elem = $('<div class="topBorder iconDiv">Back</div>');
+            elem.click(function () {
+                menu2.removeClass('show');
+                menu1.addClass('show');
+            });
+            menu2.append(elem);
+            menu2.addClass('show');
+        });
+        menu1.append(elem); 
+
+        elem = $('<div class="topBorder iconDiv">Exit</div>');
+        elem.click(function () {
+            menu1.removeClass('show');
+            menu1.empty();
+        });
+        menu1.append(elem);
+        menu1.addClass('show');
     }
 
     function renderGraph(flightLog, index, graph) {
