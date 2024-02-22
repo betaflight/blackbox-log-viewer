@@ -428,9 +428,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             labelZoomIn50 = 'Zoom in 50%',
             labelZoomOut25 = 'Zoom out 25%',
             labelZoomOut50 = 'Zoom out 50%';
-        var SetZoomToCurves = function() {
+        var SetZoomToCurves = function(e) {
             zoomScale = 1.0;
-            switch (this.label) {
+            switch (e.target.innerHTML) {
                 case labelZoomIn25:
                     zoomScale = 0.75;
                     break;
@@ -445,51 +445,38 @@ function GraphConfigurationDialog(dialog, onSave) {
                     break;
             }
 
-            ShowCurvesToSetZoomCheckboxedMenu();
-        };
+            menu2.removeClass("show");
+			menu2.empty();
+			let elem = undefined;
+            let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
+            menu3.empty();
+			elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+			menu3.append(elem);
 
-        var ShowCurvesToSetZoomCheckboxedMenu = function (multipleCall) {
-            let CurvesCheckboxedMenu = new nw.Menu();
-            
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                label: "SELECT CURVES:",
-                enabled: false,
-                }));
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                    type:  'separator'
-                }));
             for (const key in curvesData) {
                 const curve = curvesData[key];
-                if (multipleCall==undefined)
-                    curve.checked = true;
-                CurvesCheckboxedMenu.append(new nw.MenuItem({
-                label: curve.friendly_name,
-                type: 'checkbox',
-                checked: curve.checked,
-                click: SetZoomToSelectedCurves
-                }));
+                curve.checked = true;
+				elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+				elem.click(function (e) {
+					let curve = curvesData[this.innerText];
+					curve.checked = this.checked;
+				});
+				menu3.append(elem);
             }
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                    type: 'separator'
-                }));
 
             const Caption = zoomScale < 1 ? "APPLY ZOOM IN " : "APPLY ZOOM OUT ";
             const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%"
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        label: Caption + procent,
-                        click: SetZoomToSelectedCurves
-                    }));
-
-            CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
+			elem = $('<div class="topBorder">'+Caption+procent+'</div>');
+			elem.click(function () {
+				menu3.removeClass("show");
+				menu3.empty();
+				SetZoomToSelectedCurves();
+			});
+			menu3.append(elem);
+            menu3.addClass("show");
         };
 
         var SetZoomToSelectedCurves = function () {
-            if (this.type == 'checkbox') {
-                const fieldFriendlyName = this.label;
-                curvesData[fieldFriendlyName].checked = this.checked;
-                ShowCurvesToSetZoomCheckboxedMenu(true);
-            }
-            else {
                 curves_table.each(function() {
                     const fieldFriendlyName = $('select.form-control option:selected', this).text();
                     const curve = curvesData[fieldFriendlyName];
@@ -499,7 +486,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                     }
                 });
                 RefreshCharts();
-            }
         };
 
         let curvesData = {};
@@ -582,16 +568,19 @@ function GraphConfigurationDialog(dialog, onSave) {
             menu1.removeClass('show');
             menu2.empty();
             let elem = $('<div>' + labelZoomIn25 + '</div>');
-            //elem.click(SetAllCurvesToZeroOffset);
+            elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div>' + labelZoomIn50 + '</div>');
+			elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div>' + labelZoomOut25 + '</div>');
+			elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div>' + labelZoomOut50 + '</div>');
+			elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
