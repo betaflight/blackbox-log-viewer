@@ -1,0 +1,101 @@
+:root {
+  --bgColor: #0fddaf;
+  --txtColor: #ffffff;
+  --borColor: rgba(0, 0, 0, 0);
+  --sizeVar: 8px;
+  --textPrimary: #4b4760;
+  --textSecondary: #7f7989;
+  --borderColor: #cccccc;
+}
+
+
+.flexDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: fit-content;
+  //margin: 32px;
+}
+
+.selectWrapper {
+  width: 100%;
+  position: relative;
+  transition: opacity 100ms linear 0s;
+  filter: drop-shadow(0 6px 26px rgba(0, 0, 0, 0.24));
+  padding-top: calc(var(--sizeVar) / 2);
+  z-index: 200;
+}
+
+.dropdown-content {
+  display: none;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  border: 1px solid var(--borderColor);
+  box-sizing: border-box;
+  border-radius: calc(var(--sizeVar) / 2);
+  position: absolute;
+  width: 180px;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  background: #ffffff;
+  transition: transform 300ms ease-in-out 0s, clip-path 300ms ease-in-out 0s;
+  z-index: 200;
+}
+.dropdown-content div {
+  color: var(--textPrimary);
+  padding: 2px;
+  width: 180px;
+  cursor: pointer;
+}
+
+.show { display: block;}
+
+.dropdown-content div:hover {
+  background-color: #f6f6f6;
+}
+
+.bottomBorder {
+  border-bottom: 1px solid var(--borderColor);
+}
+.topBorder {
+  border-top: 1px solid var(--borderColor);
+}
+.iconDiv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.noSpace {
+  justify-content: flex-start;
+  gap: 6px;
+}
+.titleDiv {
+  pointer-events: none;
+  font-weight: 700;
+}
+.justHover i {
+  opacity: 0;
+}
+.justHover:hover i {
+  opacity: 1;
+}
+.dropdown-content .placeholder {
+  color: var(--textSecondary);
+  font-style: italic;
+}
+.dropdown-content .narrow {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.dropdown-content i {
+  color: var(--textSecondary);
+}
+.dropdown-content {
+  transform: translateX(100%);
+  clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+}
+
+.dropdown-content:nth-of-type(1) {
+  transform: translateX(0);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
