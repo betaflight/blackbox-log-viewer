@@ -541,7 +541,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem.click(SetAllCurvesToZeroOffset);
             menu1.append(elem);
             
-            elem = $('<div class="bottomBorder iconDiv">All full range...</div>');
+            elem = $('<div class="bottomBorder iconDiv">All full range&#9658;</div>');
             elem.click(function () {
                 menu1.removeClass('show');
                 menu2.empty();
@@ -553,7 +553,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
                 menu2.append(elem);
 
-                elem = $('<div class="topBorder iconDiv">Back</div>');
+                elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
                 elem.click(function () {
                     menu2.removeClass('show');
                     menu1.addClass('show');
@@ -576,7 +576,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         elem.click(SetSelectedCurveToZeroOffset);
         menu1.append(elem);
 
-        elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom ...</div>');
+        elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
         elem.click(function () {
             menu1.removeClass('show');
             menu2.empty();
@@ -593,7 +593,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div>' + labelZoomOut50 + '</div>');
             menu2.append(elem);
 
-            elem = $('<div class="topBorder iconDiv">Back</div>');
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
             elem.click(function () {
                 menu2.removeClass('show');
                 menu1.addClass('show');
@@ -603,7 +603,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
         menu1.append(elem);
         
-        elem = $('<div>Other actions:</div>');
+        elem = $('<div>Other actions&#9658;</div>');
         elem.click(function () {
             menu1.removeClass('show');
             menu2.empty();
@@ -625,7 +625,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
             menu2.append(elem);
             
-            elem = $('<div class="topBorder iconDiv">Back</div>');
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
             elem.click(function () {
                 menu2.removeClass('show');
                 menu1.addClass('show');
@@ -635,7 +635,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
         menu1.append(elem); 
 
-        elem = $('<div class="topBorder iconDiv">Exit</div>');
+        elem = $('<div class="topBorder iconDiv">&#9668;Exit</div>');
         elem.click(function () {
             menu1.removeClass('show');
             menu1.empty();
