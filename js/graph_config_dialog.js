@@ -309,6 +309,8 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ShowCurvesToSetMinMaxCheckboxedMenu = function() {
+            let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
+            menu1.css('pointer-events', 'none'); 
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
             elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
@@ -332,6 +334,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 menu3.removeClass("show");
                 menu3.empty();
                 ApplySelectedCurveMinMaxToOtherSelectedCurves();
+                menu1.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
             menu3.addClass("show");
@@ -351,6 +354,8 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ShowCurvesToSetSameScaleCheckboxedMenu = function(multipleCall) {
+            let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
+            menu1.css('pointer-events', 'none'); 
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
             elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
@@ -372,6 +377,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 menu3.removeClass("show");
                 menu3.empty();
                 FitSelectedCurveToSameScale();
+                menu1.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
             menu3.addClass("show");
@@ -423,6 +429,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                     break;
             }
 
+            let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
+            menu1.css('pointer-events', 'none'); 
             menu2.removeClass("show");
             menu2.empty();
             let elem = undefined;
@@ -449,6 +457,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 menu3.removeClass("show");
                 menu3.empty();
                 SetZoomToSelectedCurves();
+                menu1.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
             menu3.addClass("show");
@@ -512,7 +521,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             
             elem = $('<div class="bottomBorder iconDiv">All full range&#9658;</div>');
             elem.click(function () {
-                menu1.removeClass('show');
+                menu1.css('pointer-events', 'none'); 
                 menu2.empty();
                 let elem = $('<div>At all global log time</div>');
                 elem.click(SetAllMinMaxToFullRangeDuringAllTime);
@@ -525,7 +534,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
                 elem.click(function () {
                     menu2.removeClass('show');
-                    menu1.addClass('show');
+                    menu1.css('pointer-events', 'all'); 
                 });
                 menu2.append(elem);
                 menu2.addClass('show');
@@ -547,7 +556,7 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
         elem.click(function () {
-            menu1.removeClass('show');
+            menu1.css('pointer-events', 'none');
             menu2.empty();
             let elem = $('<div>' + labelZoomIn25 + '</div>');
             elem.click(SetZoomToCurves);
@@ -568,7 +577,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
             elem.click(function () {
                 menu2.removeClass('show');
-                menu1.addClass('show');
+                menu1.css('pointer-events', 'all');
             });
             menu2.append(elem);
             menu2.addClass('show');
@@ -577,7 +586,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         
         elem = $('<div>Other actions&#9658;</div>');
         elem.click(function () {
-            menu1.removeClass('show');
+            menu1.css('pointer-events', 'none');
             menu2.empty();
 
             let elem = $('<div>Fit all curves to zero ofset at global full range</div>');
@@ -600,7 +609,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
             elem.click(function () {
                 menu2.removeClass('show');
-                menu1.addClass('show');
+                menu1.css('pointer-events', 'all');
             });
             menu2.append(elem);
             menu2.addClass('show');
