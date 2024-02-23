@@ -351,67 +351,54 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ShowCurvesToSetSameScaleCheckboxedMenu = function(multipleCall) {
-            let CurvesCheckboxedMenu = new nw.Menu();
-            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                label: "SELECT CURVES:",
-                enabled: false,
-                }));
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                    type:  'separator'
-                }));
+            let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
+            menu3.empty();
+            elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+            menu3.append(elem);
+
             for (const key in curvesData) {
                 const curve = curvesData[key];
-                // Checked selected curve when menu is showed firstly
-                if (multipleCall==undefined && curve.friendly_name == SelectedCurveName)
                     curve.checked = true;
-                CurvesCheckboxedMenu.append(new nw.MenuItem({
-                label: curve.friendly_name,
-                type: 'checkbox',
-                checked: curve.checked,
-                click: FitSelectedCurveToSameScale
-                }));
+                    elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                    $('input', elem).click(function (e) {
+                        let curve = curvesData[this.parentElement.innerText];
+                        curve.checked = this.checked;
+                    });
+                    menu3.append(elem);
             }
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        type:  'separator'
-                    }));
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        label: "SET CURVES TO SAME SCALE",
-                        click: FitSelectedCurveToSameScale
-                    }));
 
-            CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
+            elem = $('<div class="topBorder">SET CURVES TO SAME SCALE</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                FitSelectedCurveToSameScale();
+            });
+            menu3.append(elem);
+            menu3.addClass("show");
         };
 
         var FitSelectedCurveToSameScale = function () {
-            if (this.type == 'checkbox') {
-                const fieldFriendlyName = this.label;
-                curvesData[fieldFriendlyName].checked = this.checked;
-                ShowCurvesToSetSameScaleCheckboxedMenu(true);
-            }
-            else {
-                const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
-                const SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
-                let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
-                Min = Math.min(Min, SelectedCurveMin);
-                Max = Math.max(Max, SelectedCurveMax);
-                for (const key in curvesData) {
-                    if (curvesData[key].checked) {
-                        Min = Math.min(Min, curvesData[key].min);
-                        Max = Math.max(Max, curvesData[key].max);
-                    }
+            const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
+            const SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
+            let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
+            Min = Math.min(Min, SelectedCurveMin);
+            Max = Math.max(Max, SelectedCurveMax);
+            for (const key in curvesData) {
+                if (curvesData[key].checked) {
+                    Min = Math.min(Min, curvesData[key].min);
+                    Max = Math.max(Max, curvesData[key].max);
                 }
+            }
 
-                const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
-                curves_table.each(function() {
-                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                    if(curvesData[fieldFriendlyName].checked) {
-                        $('input[name=MinValue]',this).val(Min.toFixed(1));
+            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+            curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                if(curvesData[fieldFriendlyName].checked) {
+                    $('input[name=MinValue]',this).val(Min.toFixed(1));
                         $('input[name=MaxValue]',this).val(Max.toFixed(1));
                     }
                 });
                 RefreshCharts();
-            }
         };
 
         let zoomScale = 1.0;
@@ -511,14 +498,13 @@ function GraphConfigurationDialog(dialog, onSave) {
             elem.click(SetAllMinMaxToDefault);
             menu1.append(elem);
             
-            elem = $('<div>Selected to this one&#9658;</div>');
+            elem = $('<div>All to this one&#9658;</div>');
             elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
             menu1.append(elem);
-            menu1.append();     
-
-            
-            menu1.append($('<div>Selected to one scale ...</div>'));        
-            
+              
+            elem = $('<div>Selected to one scale&#9658;</div>');        
+            elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
+            menu1.append(elem);
             
             elem = $('<div>All centered</div>');
             elem.click(SetAllCurvesToZeroOffset);
