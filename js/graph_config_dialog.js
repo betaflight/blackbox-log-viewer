@@ -309,54 +309,45 @@ function GraphConfigurationDialog(dialog, onSave) {
         };
 
         var ShowCurvesToSetMinMaxCheckboxedMenu = function() {
-            let CurvesCheckboxedMenu = new nw.Menu();
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                label: "SELECT CURVES:",
-                enabled: false,
-                }));
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                    type:  'separator'
-                }));
+            let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
+            menu3.empty();
+            elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+            menu3.append(elem);
+
             for (const key in curvesData) {
                 const curve = curvesData[key];
                 if (!curve.selected) {
-                    CurvesCheckboxedMenu.append(new nw.MenuItem({
-                    label: curve.friendly_name,
-                    type: 'checkbox',
-                    checked: curvesData[curve.friendly_name].checked,
-                    click: ApplySelectedCurveMinMaxToOtherSelectedCurves
-                    }));
+                        curve.checked = true;
+                        elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                        $('input', elem).click(function (e) {
+                            let curve = curvesData[this.parentElement.innerText];
+                            curve.checked = this.checked;
+                        });
+                    menu3.append(elem);
                 }
             }
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        type:  'separator'
-                    }));
-            CurvesCheckboxedMenu.append(new nw.MenuItem({
-                        label: "SET MIN-MAX VALUES",
-                        click: ApplySelectedCurveMinMaxToOtherSelectedCurves
-                    }));
 
-            CurvesCheckboxedMenu.popup(menu_pos_x, menu_pos_y);
+            elem = $('<div class="topBorder">SET MIN-MAX VALUES</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                ApplySelectedCurveMinMaxToOtherSelectedCurves();
+            });
+            menu3.append(elem);
+            menu3.addClass("show");
         };
 
         var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
-            if (this.type == 'checkbox') {
-                const fieldFriendlyName = this.label;
-                curvesData[fieldFriendlyName].checked = this.checked;
-                ShowCurvesToSetMinMaxCheckboxedMenu();
-            }
-            else {
-                const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
-                const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
-                curves_table.each(function() {
-                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                    if(curvesData[fieldFriendlyName].checked) {
-                        $('input[name=MinValue]',this).val(SelectedCurveMin);
-                        $('input[name=MaxValue]',this).val(SelectedCurveMax);
-                    }
-                });
-                RefreshCharts();
-            }
+            const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
+            const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+            curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                if(curvesData[fieldFriendlyName].checked) {
+                    $('input[name=MinValue]',this).val(SelectedCurveMin);
+                    $('input[name=MaxValue]',this).val(SelectedCurveMax);
+                }
+            });
+            RefreshCharts();
         };
 
         var ShowCurvesToSetSameScaleCheckboxedMenu = function(multipleCall) {
@@ -446,33 +437,33 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
 
             menu2.removeClass("show");
-			menu2.empty();
-			let elem = undefined;
+            menu2.empty();
+            let elem = undefined;
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
-			elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
-			menu3.append(elem);
+            elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+            menu3.append(elem);
 
             for (const key in curvesData) {
                 const curve = curvesData[key];
                 curve.checked = true;
-				elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
-				elem.click(function (e) {
-					let curve = curvesData[this.innerText];
-					curve.checked = this.checked;
-				});
-				menu3.append(elem);
+                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                $('input', elem).click(function (e) {
+                    let curve = curvesData[this.parentElement.innerText];
+                    curve.checked = this.checked;
+                });
+                menu3.append(elem);
             }
 
             const Caption = zoomScale < 1 ? "APPLY ZOOM IN " : "APPLY ZOOM OUT ";
             const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%"
-			elem = $('<div class="topBorder">'+Caption+procent+'</div>');
-			elem.click(function () {
-				menu3.removeClass("show");
-				menu3.empty();
-				SetZoomToSelectedCurves();
-			});
-			menu3.append(elem);
+            elem = $('<div class="topBorder">'+Caption+procent+'</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                SetZoomToSelectedCurves();
+            });
+            menu3.append(elem);
             menu3.addClass("show");
         };
 
@@ -520,7 +511,12 @@ function GraphConfigurationDialog(dialog, onSave) {
             elem.click(SetAllMinMaxToDefault);
             menu1.append(elem);
             
-            menu1.append($('<div>Selected to this one ...</div>'));        
+            elem = $('<div>Selected to this one&#9658;</div>');
+            elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
+            menu1.append(elem);
+            menu1.append();     
+
+            
             menu1.append($('<div>Selected to one scale ...</div>'));        
             
             
@@ -572,15 +568,15 @@ function GraphConfigurationDialog(dialog, onSave) {
             menu2.append(elem);
 
             elem = $('<div>' + labelZoomIn50 + '</div>');
-			elem.click(SetZoomToCurves);
+            elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div>' + labelZoomOut25 + '</div>');
-			elem.click(SetZoomToCurves);
+            elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div>' + labelZoomOut50 + '</div>');
-			elem.click(SetZoomToCurves);
+            elem.click(SetZoomToCurves);
             menu2.append(elem);
 
             elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
