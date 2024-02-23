@@ -336,6 +336,15 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu1.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
+
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                menu1.css('pointer-events', 'all'); 
+            });
+            menu3.append(elem);
+
             menu3.addClass("show");
         };
 
@@ -379,6 +388,15 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu1.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
+
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                menu1.css('pointer-events', 'all'); 
+            });
+            menu3.append(elem);
+
             menu3.addClass("show");
         };
 
@@ -430,8 +448,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
             let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
             menu1.css('pointer-events', 'none'); 
-            menu2.removeClass("show");
-            menu2.empty();
+            menu2.css('pointer-events', 'none'); 
             let elem = undefined;
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
@@ -457,8 +474,19 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu3.empty();
                 SetZoomToSelectedCurves();
                 menu1.css('pointer-events', 'all'); 
+                menu2.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
+
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                menu1.css('pointer-events', 'all'); 
+                menu2.css('pointer-events', 'all'); 
+            });
+            menu3.append(elem);
+
             menu3.addClass("show");
         };
 
@@ -533,6 +561,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
                 elem.click(function () {
                     menu2.removeClass('show');
+                    menu2.empty();
                     menu1.css('pointer-events', 'all'); 
                 });
                 menu2.append(elem);
@@ -576,6 +605,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
             elem.click(function () {
                 menu2.removeClass('show');
+                menu2.empty();
                 menu1.css('pointer-events', 'all');
             });
             menu2.append(elem);
@@ -608,6 +638,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
             elem.click(function () {
                 menu2.removeClass('show');
+                menu2.empty();
                 menu1.css('pointer-events', 'all');
             });
             menu2.append(elem);
