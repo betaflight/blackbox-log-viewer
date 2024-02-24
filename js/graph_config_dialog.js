@@ -186,11 +186,17 @@ function GraphConfigurationDialog(dialog, onSave) {
     }
 
     // Show context menu to setup min-max values
-    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {               
+    function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {   
+    
         var SetAllMinMaxToDefault = function () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+
+                curve.min = mm.min;
+                curve.max = mm.max;
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -201,6 +207,11 @@ function GraphConfigurationDialog(dialog, onSave) {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
+
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = mm.min;
+                curve.max = mm.max;
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -213,6 +224,11 @@ function GraphConfigurationDialog(dialog, onSave) {
                 let mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
                 mm.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
                 mm.min = -mm.max;
+
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = mm.min;
+                curve.max = mm.max;
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -223,6 +239,11 @@ function GraphConfigurationDialog(dialog, onSave) {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
+
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = mm.min;
+                curve.max = mm.max;
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -235,6 +256,11 @@ function GraphConfigurationDialog(dialog, onSave) {
                 let mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
                 mm.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
                 mm.min = -mm.max;
+
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = mm.min;
+                curve.max = mm.max;
                 $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
@@ -249,6 +275,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
 
             curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = Min;
+                curve.max = Max;
                 $('input[name=MinValue]',this).val(Min.toFixed(1));
                 $('input[name=MaxValue]',this).val(Max.toFixed(1));
             });
@@ -257,6 +287,10 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var SetSelectedCurveMinMaxToDefault = function () {
             const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
+            const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+            let curve = curvesData[fieldFriendlyName];
+            curve.min = mm.min;
+            curve.max = mm.max;
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
@@ -264,6 +298,10 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var SetSelectedCurveMinMaxToFullRangeDuringAllTime = function () {
             const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
+            const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+            let curve = curvesData[fieldFriendlyName];
+            curve.min = mm.min;
+            curve.max = mm.max;
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
@@ -271,6 +309,11 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         var SetSelectedCurveMinMaxToFullRangeDuringWindowTime = function () {
             const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
+
+            const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+            let curve = curvesData[fieldFriendlyName];
+            curve.min = mm.min;
+            curve.max = mm.max;
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
@@ -282,6 +325,10 @@ function GraphConfigurationDialog(dialog, onSave) {
                 let Max = parseFloat($('input[name=MaxValue]',this).val());
                 Max = Math.max(Math.abs(Min), Math.abs(Max));
                 Min = -Max;
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = Min;
+                curve.max = Max;
                 $('input[name=MinValue]',this).val(Min.toFixed(1));
                 $('input[name=MaxValue]',this).val(Max.toFixed(1));
             });
@@ -293,6 +340,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             let Max = parseFloat($('input[name=MaxValue]', selected_curve).val());
             Max = Math.max(Math.abs(Min), Math.abs(Max));
             Min = -Max;
+            const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+            let curve = curvesData[fieldFriendlyName];
+            curve.min = Min;
+            curve.max = Max;
             $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
             RefreshCharts();
@@ -302,6 +353,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             const Min = $('input[name=MinValue]', selected_curve).val();
             const Max = $('input[name=MaxValue]', selected_curve).val();
             curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                curve.min = parseFloat(Min);
+                curve.max = parseFloat(Max);
                 $('input[name=MinValue]',this).val(Min);
                 $('input[name=MaxValue]',this).val(Max);
             });
@@ -354,7 +409,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
             curves_table.each(function() {
                 const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
                 if(curvesData[fieldFriendlyName].checked) {
+                    curve.min = parseFloat(SelectedCurveMin);
+                    curve.max = parseFloat(SelectedCurveMax);
                     $('input[name=MinValue]',this).val(SelectedCurveMin);
                     $('input[name=MaxValue]',this).val(SelectedCurveMax);
                 }
@@ -417,7 +475,10 @@ function GraphConfigurationDialog(dialog, onSave) {
             const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
             curves_table.each(function() {
                 const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                if(curvesData[fieldFriendlyName].checked) {
+                let curve = curvesData[fieldFriendlyName];
+                if(curve.checked) {
+                    curve.min = Min;
+                    curve.max = Max;
                     $('input[name=MinValue]',this).val(Min.toFixed(1));
                         $('input[name=MaxValue]',this).val(Max.toFixed(1));
                     }
@@ -425,34 +486,17 @@ function GraphConfigurationDialog(dialog, onSave) {
                 RefreshCharts();
         };
 
-        let zoomScale = 1.0;
-        const labelZoomIn25 = 'Zoom in 25%',
-            labelZoomIn50 = 'Zoom in 50%',
-            labelZoomOut25 = 'Zoom out 25%',
-            labelZoomOut50 = 'Zoom out 50%';
         var SetZoomToCurves = function(e) {
-            zoomScale = 1.0;
-            switch (e.target.innerHTML) {
-                case labelZoomIn25:
-                    zoomScale = 0.75;
-                    break;
-                case labelZoomIn50:
-                    zoomScale = 0.50;
-                    break;
-                case labelZoomOut25:
-                    zoomScale = 1.25;
-                    break;
-                case labelZoomOut50:
-                    zoomScale = 1.50;
-                    break;
-            }
-
             let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
             menu1.css('pointer-events', 'none'); 
-            menu2.css('pointer-events', 'none'); 
             let elem = undefined;
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
+            
+            elem = $('<label class="bottomBorder">INPUT ZOOM SCALE:</label>');
+            menu3.append(elem);
+            elem = $('<div><input type="text" value="1"/></div>');
+            menu3.append(elem);
             elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
             menu3.append(elem);
 
@@ -467,15 +511,16 @@ function GraphConfigurationDialog(dialog, onSave) {
                 menu3.append(elem);
             }
 
-            const Caption = zoomScale < 1 ? "APPLY ZOOM IN " : "APPLY ZOOM OUT ";
-            const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%";
-            elem = $('<div class="topBorder">'+Caption+procent+'</div>');
+            elem = $('<div class="topBorder">APPLY ZOOM</div>');
             elem.click(function () {
-                menu3.removeClass("show");
-                menu3.empty();
-                SetZoomToSelectedCurves();
-                menu1.css('pointer-events', 'all'); 
-                menu2.css('pointer-events', 'all'); 
+                let zoomScale = parseFloat($("input[type=text]", menu3).val());
+                if(zoomScale > 0.05 && zoomScale < 20.0) {
+                    zoomScale = 1.0 / zoomScale;
+                    SetZoomToSelectedCurves(zoomScale);
+                    menu3.removeClass("show");
+                    menu3.empty();
+                    menu1.css('pointer-events', 'all'); 
+                }
             });
             menu3.append(elem);
 
@@ -484,20 +529,21 @@ function GraphConfigurationDialog(dialog, onSave) {
                 menu3.removeClass("show");
                 menu3.empty();
                 menu1.css('pointer-events', 'all'); 
-                menu2.css('pointer-events', 'all'); 
             });
             menu3.append(elem);
 
             menu3.addClass("show");
         };
 
-        var SetZoomToSelectedCurves = function () {
+        var SetZoomToSelectedCurves = function (zoomScale) {
                 curves_table.each(function() {
                     const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                    const curve = curvesData[fieldFriendlyName];
+                    const curve = curvesData[fieldFriendlyName]; 
                     if(curve.checked) {
-                        $('input[name=MinValue]',this).val((curve.min*zoomScale).toFixed(1));
-                        $('input[name=MaxValue]',this).val((curve.max*zoomScale).toFixed(1));
+                        curve.min *= zoomScale; 
+                        curve.max *= zoomScale;
+                        $('input[name=MinValue]',this).val((curve.min).toFixed(1));
+                        $('input[name=MaxValue]',this).val((curve.max).toFixed(1));
                     }
                 });
                 RefreshCharts();
@@ -584,34 +630,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         menu1.append(elem);
 
         elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
-        elem.click(function () {
-            menu1.css('pointer-events', 'none');
-            menu2.empty();
-            let elem = $('<div>' + labelZoomIn25 + '</div>');
-            elem.click(SetZoomToCurves);
-            menu2.append(elem);
-
-            elem = $('<div>' + labelZoomIn50 + '</div>');
-            elem.click(SetZoomToCurves);
-            menu2.append(elem);
-
-            elem = $('<div>' + labelZoomOut25 + '</div>');
-            elem.click(SetZoomToCurves);
-            menu2.append(elem);
-
-            elem = $('<div>' + labelZoomOut50 + '</div>');
-            elem.click(SetZoomToCurves);
-            menu2.append(elem);
-
-            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
-            elem.click(function () {
-                menu2.removeClass('show');
-                menu2.empty();
-                menu1.css('pointer-events', 'all');
-            });
-            menu2.append(elem);
-            menu2.addClass('show');
-        });
+        elem.click(SetZoomToCurves);
         menu1.append(elem);
         
         elem = $('<div>Other actions&#9658;</div>');
