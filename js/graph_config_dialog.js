@@ -493,9 +493,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
             
-            elem = $('<label class="bottomBorder">INPUT ZOOM SCALE:</label>');
+            elem = $('<label class="bottomBorder">INPUT ZOOM:</label>');
             menu3.append(elem);
-            elem = $('<div><input type="text" value="1"/></div>');
+            elem = $('<div><input type="number" min="10" max="500" step="10" value="100"/></div>');
             menu3.append(elem);
             elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
             menu3.append(elem);
@@ -513,14 +513,11 @@ function GraphConfigurationDialog(dialog, onSave) {
 
             elem = $('<div class="topBorder">APPLY ZOOM</div>');
             elem.click(function () {
-                let zoomScale = parseFloat($("input[type=text]", menu3).val());
-                if(zoomScale > 0.05 && zoomScale < 20.0) {
-                    zoomScale = 1.0 / zoomScale;
-                    SetZoomToSelectedCurves(zoomScale);
-                    menu3.removeClass("show");
-                    menu3.empty();
-                    menu1.css('pointer-events', 'all'); 
-                }
+                let zoomScale = parseFloat($("input[type=number]", menu3).val());
+				zoomScale = Math.min(zoomScale, 5.0);
+				zoomScale = Math.max(zoomScale, 1000);
+                zoomScale = 100.0/zoomScale;
+                SetZoomToSelectedCurves(zoomScale);
             });
             menu3.append(elem);
 
