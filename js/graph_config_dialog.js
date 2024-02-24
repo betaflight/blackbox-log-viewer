@@ -468,7 +468,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             }
 
             const Caption = zoomScale < 1 ? "APPLY ZOOM IN " : "APPLY ZOOM OUT ";
-            const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%"
+            const procent =  Math.abs((1.0 - zoomScale) * 100 ).toFixed(0) + "%";
             elem = $('<div class="topBorder">'+Caption+procent+'</div>');
             elem.click(function () {
                 menu3.removeClass("show");
