@@ -398,7 +398,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu1.css('pointer-events', 'all');
             });
             menu3.append(elem);
-
+            menu3.css("left", this.clientWidth);
+            menu3.css("top", this.clientHeight);
             menu3.addClass("show");
         };
 
@@ -453,7 +454,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu1.css('pointer-events', 'all');
             });
             menu3.append(elem);
-
+            menu3.css("left", this.clientWidth);
+            menu3.css("top", 2*this.clientHeight);
             menu3.addClass("show");
         };
 
@@ -526,7 +528,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu1.css('pointer-events', 'all');
             });
             menu3.append(elem);
-
+            menu3.css("left", this.clientWidth);
+            menu3.css("top", 8*this.clientHeight);
             menu3.addClass("show");
         };
 
@@ -607,6 +610,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     menu1.css('pointer-events', 'all');
                 });
                 menu2.append(elem);
+                menu2.css("left", this.clientWidth);
+                menu2.css("top", 4*this.clientHeight);
                 menu2.addClass('show');
             });
             menu1.append(elem);
@@ -657,6 +662,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu1.css('pointer-events', 'all');
             });
             menu2.append(elem);
+            menu2.css("left", this.clientWidth);
+            menu2.css("top", 9*this.clientHeight);
             menu2.addClass('show');
         });
         menu1.append(elem);
