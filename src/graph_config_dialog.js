@@ -514,8 +514,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div class="topBorder">APPLY ZOOM</div>');
             elem.click(function () {
                 let zoomScale = parseFloat($("input[type=number]", menu3).val());
-                zoomScale = Math.min(zoomScale, 5.0);
-                zoomScale = Math.max(zoomScale, 1000);
+                zoomScale = Math.max(zoomScale, 5.0);
+                zoomScale = Math.min(zoomScale, 1000);
                 zoomScale = 100.0/zoomScale;
                 SetZoomToSelectedCurves(zoomScale);
             });
