@@ -672,11 +672,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
         elem.click(function () {
             menu1.removeClass('show');
             menu1.empty();
-            $('.config-graph-field').css('pointer-events', 'all'); 
+            $('.graph-configuration-dialog').css('pointer-events', 'all');
         });
         menu1.append(elem);
+
+        $('.graph-configuration-dialog').css('pointer-events', 'none'); 
+        menu1.css('pointer-events', 'all'); 
+        menu2.css('pointer-events', 'all'); 
+        menu3.css('pointer-events', 'all'); 
+
         menu1.addClass('show');
-        $('.config-graph-field').css('pointer-events', 'none'); 
     }
 
     function renderGraph(flightLog, index, graph) {
