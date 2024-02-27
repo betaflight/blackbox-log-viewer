@@ -188,7 +188,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     // Show context menu to setup min-max values
     function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, flightLog, selected_field_name, selected_curve, curves_table) {   
     
-        var SetAllMinMaxToDefault = function () {
+        function SetAllMinMaxToDefault () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
@@ -201,9 +201,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
             RefreshCharts();
-        };
+        }
 
-        var SetAllMinMaxToFullRangeDuringAllTime = function () {
+        function SetAllMinMaxToFullRangeDuringAllTime () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
@@ -216,9 +216,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
             RefreshCharts();
-        };
+        }
 
-        var SetAllMinMaxToZeroOffsetDuringAllTime = function () {
+        function SetAllMinMaxToZeroOffsetDuringAllTime () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 let mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
@@ -233,9 +233,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
             RefreshCharts();
-        };
+        }
 
-        var SetAllMinMaxToFullRangeDuringWindowTime = function () {
+        function SetAllMinMaxToFullRangeDuringWindowTime () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
@@ -248,9 +248,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
             RefreshCharts();
-        };
+        }
 
-        var SetAllMinMaxToZeroOffsetDuringWindowTime = function () {
+        function SetAllMinMaxToZeroOffsetDuringWindowTime () {
             curves_table.each(function() {
                 const fieldName = $("select", this).val();
                 let mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
@@ -265,9 +265,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
             });
             RefreshCharts();
-        };
+        }
 
-        var SetAllCurvesToOneScale = function () {
+        function SetAllCurvesToOneScale () {
             let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
             for (const key in curvesData) {
                 Min = Math.min(Min, curvesData[key].min);
@@ -283,9 +283,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(Max.toFixed(1));
             });
             RefreshCharts();
-        };
+        }
 
-        var SetSelectedCurveMinMaxToDefault = function () {
+        function SetSelectedCurveMinMaxToDefault () {
             const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
             const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
             let curve = curvesData[fieldFriendlyName];
@@ -294,9 +294,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
-        };
+        }
 
-        var SetSelectedCurveMinMaxToFullRangeDuringAllTime = function () {
+        function SetSelectedCurveMinMaxToFullRangeDuringAllTime () {
             const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
             const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
             let curve = curvesData[fieldFriendlyName];
@@ -305,9 +305,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
-        };
+        }
 
-        var SetSelectedCurveMinMaxToFullRangeDuringWindowTime = function () {
+        function SetSelectedCurveMinMaxToFullRangeDuringWindowTime () {
             const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
 
             const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
@@ -317,9 +317,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
             RefreshCharts();
-        };
+        }
 
-        var ShowCurvesToSetZeroOffsetCheckboxedMenu = function(e) {
+        function ShowCurvesToSetZeroOffsetCheckboxedMenu (e) {
             let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
             menu1.css('pointer-events', 'none'); 
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
@@ -381,9 +381,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 });
                 RefreshCharts();
             }
-        };
+        }
 
-        var SetSelectedCurveToZeroOffset = function () {
+        function SetSelectedCurveToZeroOffset () {
             let Min = parseFloat($('input[name=MinValue]', selected_curve).val());
             let Max = parseFloat($('input[name=MaxValue]', selected_curve).val());
             Max = Math.max(Math.abs(Min), Math.abs(Max));
@@ -395,9 +395,9 @@ function GraphConfigurationDialog(dialog, onSave) {
             $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
             $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
             RefreshCharts();
-        };
+        }
 
-        var ApplySelectedCurveMinMaxToAllCurves = function () {
+        function ApplySelectedCurveMinMaxToAllCurves () {
             const Min = $('input[name=MinValue]', selected_curve).val();
             const Max = $('input[name=MaxValue]', selected_curve).val();
             curves_table.each(function() {
@@ -409,9 +409,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=MaxValue]',this).val(Max);
             });
             RefreshCharts();
-        };
+        }
 
-        var ShowCurvesToSetMinMaxCheckboxedMenu = function(e) {
+        function ShowCurvesToSetMinMaxCheckboxedMenu (e) {
             let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
             menu1.css('pointer-events', 'none'); 
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
@@ -474,9 +474,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                 });
                 RefreshCharts();
             }
-        };
+        }
 
-        var ShowCurvesToSetSameScaleCheckboxedMenu = function(e) {
+        function ShowCurvesToSetSameScaleCheckboxedMenu(e) {
             let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
             menu1.css('pointer-events', 'none'); 
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
@@ -548,9 +548,9 @@ function GraphConfigurationDialog(dialog, onSave) {
                     });
                     RefreshCharts();
             }
-        };
+        }
 
-        var SetZoomToCurves = function(e) {
+        function SetZoomToCurves () {
             let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
             menu1.css('pointer-events', 'none'); 
             let elem = undefined;
@@ -568,7 +568,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                 const curve = curvesData[key];
                 curve.checked = true;
                 elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
-                $('input', elem).click(function (e) {
+                $('input', elem).click(function () {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
                 });
@@ -596,7 +596,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             menu3.css("top", this.offsetTop);
             menu3.addClass("show");
 
-            var SetZoomToSelectedCurves = function (zoomScale) {
+            function SetZoomToSelectedCurves (zoomScale) {
                 curves_table.each(function() {
                     const fieldFriendlyName = $('select.form-control option:selected', this).text();
                     const curve = curvesData[fieldFriendlyName]; 
@@ -608,8 +608,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                     }
                 });
                 RefreshCharts();
-            };
-        };
+            }
+        }
 
         let curvesData = {};
         curves_table.each(function() {
@@ -687,9 +687,9 @@ function GraphConfigurationDialog(dialog, onSave) {
         elem.click(SetSelectedCurveMinMaxToDefault);
         menu1.append(elem);
         
-        elem = $('<div>This curve to:</div>');
+//        elem = $('<div>This curve to:</div>');
 //      elem.click(SetSelectedCurveMinMaxToDefault);
-        menu1.append(elem);
+        //menu1.append(elem);
         
         elem = $('<div class="bottomBorder iconDiv">This curve centered</div>');
         elem.click(SetSelectedCurveToZeroOffset);
