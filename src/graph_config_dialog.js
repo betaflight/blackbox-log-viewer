@@ -399,7 +399,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             });
             menu3.append(elem);
             menu3.css("left", this.clientWidth);
-            menu3.css("top", this.clientHeight);
+            menu3.css("top", this.offsetTop);
             menu3.addClass("show");
         };
 
@@ -455,7 +455,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             });
             menu3.append(elem);
             menu3.css("left", this.clientWidth);
-            menu3.css("top", 2*this.clientHeight);
+            menu3.css("top", this.offsetTop);
             menu3.addClass("show");
         };
 
@@ -529,7 +529,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             });
             menu3.append(elem);
             menu3.css("left", this.clientWidth);
-            menu3.css("top", 8*this.clientHeight);
+            menu3.css("top", this.offsetTop);
             menu3.addClass("show");
         };
 
@@ -590,32 +590,34 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem = $('<div>All centered</div>');
             elem.click(SetAllCurvesToZeroOffset);
             menu1.append(elem);
-
-            elem = $('<div class="bottomBorder iconDiv">All full range&#9658;</div>');
-            elem.click(function () {
-                menu1.css('pointer-events', 'none');
-                menu2.empty();
-                let elem = $('<div>At all global log time</div>');
-                elem.click(SetAllMinMaxToFullRangeDuringAllTime);
-                menu2.append(elem);
-
-                elem = $('<div>At local window time</div>');
-                elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
-                menu2.append(elem);
-
-                elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
-                elem.click(function () {
-                    menu2.removeClass('show');
-                    menu2.empty();
-                    menu1.css('pointer-events', 'all');
-                });
-                menu2.append(elem);
-                menu2.css("left", this.clientWidth);
-                menu2.css("top", 4*this.clientHeight);
-                menu2.addClass('show');
-            });
-            menu1.append(elem);
         }
+
+        let caption = oneRow ?  "This full range&#9658;" : "All full range&#9658;"
+        elem = $('<div class="bottomBorder iconDiv">' + caption + '</div>');
+        elem.click(function () {
+            menu2.empty();
+            let elem = $('<div>At all global log time</div>');
+            elem.click(SetAllMinMaxToFullRangeDuringAllTime);
+            menu2.append(elem);
+
+            elem = $('<div>At local window time</div>');
+            elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
+            menu2.append(elem);
+
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+            elem.click(function () {
+                menu2.removeClass('show');
+                menu2.empty();
+                menu1.css('pointer-events', 'all');
+            });
+            menu2.append(elem);
+            menu2.css("left", this.clientWidth);
+            menu2.css("top", this.offsetTop);
+            menu2.addClass('show');
+
+            menu1.css('pointer-events', 'none');
+        });
+        menu1.append(elem);
 
         elem = $('<div> This curve to defailt</div>');
         elem.click(SetSelectedCurveMinMaxToDefault);
@@ -663,7 +665,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             });
             menu2.append(elem);
             menu2.css("left", this.clientWidth);
-            menu2.css("top", 9*this.clientHeight);
+            menu2.css("top", this.offsetTop);
             menu2.addClass('show');
         });
         menu1.append(elem);
@@ -676,10 +678,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
         menu1.append(elem);
 
-        $('.graph-configuration-dialog').css('pointer-events', 'none'); 
-        menu1.css('pointer-events', 'all'); 
-        menu2.css('pointer-events', 'all'); 
-        menu3.css('pointer-events', 'all'); 
+        $('.graph-configuration-dialog').css('pointer-events', 'none');
+        menu1.css('pointer-events', 'all');
+        menu2.css('pointer-events', 'all');
+        menu3.css('pointer-events', 'all');
 
         menu1.addClass('show');
     }
