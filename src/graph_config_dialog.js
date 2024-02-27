@@ -556,9 +556,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
             let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
             menu3.empty();
 
-            elem = $('<label class="bottomBorder">INPUT ZOOM:</label>');
+            elem = $('<label class="bottomBorder">INPUT ZOOM [%]:</label>');
             menu3.append(elem);
-            elem = $('<div><input type="number" min="10" max="500" step="10" value="100"/></div>');
+            elem = $('<div><input type="number" min="5" max="1000" step="10" value="10"/></div>');
             menu3.append(elem);
             elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
             menu3.append(elem);
@@ -574,12 +574,22 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 menu3.append(elem);
             }
 
-            elem = $('<div class="topBorder">APPLY ZOOM</div>');
+            elem = $('<div class="topBorder">ZOOM IN</div>');
             elem.click(function () {
                 let zoomScale = parseFloat($("input[type=number]", menu3).val());
                 zoomScale = Math.max(zoomScale, 5.0);
                 zoomScale = Math.min(zoomScale, 1000);
-                zoomScale = 100.0/zoomScale;
+                zoomScale = 100.0 / (100.0 + zoomScale);
+                SetZoomToSelectedCurves(zoomScale);
+            });
+            menu3.append(elem);
+
+            elem = $('<div class="topBorder">ZOOM OUT</div>');
+            elem.click(function () {
+                let zoomScale = parseFloat($("input[type=number]", menu3).val());
+                zoomScale = Math.max(zoomScale, 5.0);
+                zoomScale = Math.min(zoomScale, 1000);
+                zoomScale = (100.0 + zoomScale) / 100.0;
                 SetZoomToSelectedCurves(zoomScale);
             });
             menu3.append(elem);
@@ -729,7 +739,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
         menu1.append(elem);
 
-        elem = $('<div class="topBorder iconDiv">&#9658;Save</div>');
+        elem = $('<div class="topBorder iconDiv">Save&#9658;</div>');
         menu1.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Exit</div>');
