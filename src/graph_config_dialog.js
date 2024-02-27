@@ -729,6 +729,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
         menu1.append(elem);
 
+        elem = $('<div class="topBorder iconDiv">&#9658;Save</div>');
+        menu1.append(elem);
+
         elem = $('<div class="topBorder iconDiv">&#9668;Exit</div>');
         elem.click(function () {
             menu1.removeClass('show');
