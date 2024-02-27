@@ -317,20 +317,61 @@ export function GraphConfigurationDialog(dialog, onSave) {
             RefreshCharts();
         };
 
-        var SetAllCurvesToZeroOffset = function () {
-            curves_table.each(function() {
-                let Min = parseFloat($('input[name=MinValue]',this).val());
-                let Max = parseFloat($('input[name=MaxValue]',this).val());
-                Max = Math.max(Math.abs(Min), Math.abs(Max));
-                Min = -Max;
-                const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                let curve = curvesData[fieldFriendlyName];
-                curve.min = Min;
-                curve.max = Max;
-                $('input[name=MinValue]',this).val(Min.toFixed(1));
-                $('input[name=MaxValue]',this).val(Max.toFixed(1));
+        var ShowCurvesToSetZeroOffsetCheckboxedMenu = function() {
+            let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
+            menu1.css('pointer-events', 'none');
+            let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
+            menu3.empty();
+            elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+            menu3.append(elem);
+
+            for (const key in curvesData) {
+                const curve = curvesData[key];
+                    curve.checked = true;
+                    elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                    $('input', elem).click(function (e) {
+                        let curve = curvesData[this.parentElement.innerText];
+                        curve.checked = this.checked;
+                    });
+                    menu3.append(elem);
+            }
+
+            elem = $('<div class="topBorder">SET CURVES TO ZERO OFFSET</div>');
+            elem.click(function () {
+                SetSelectedCurvesToZeroOffset();
             });
-            RefreshCharts();
+            menu3.append(elem);
+
+            elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+            elem.click(function () {
+                menu3.removeClass("show");
+                menu3.empty();
+                menu1.css('pointer-events', 'all');
+            });
+            menu3.append(elem);
+            menu3.css("left", this.clientWidth);
+            menu3.css("top", this.offsetTop);
+            menu3.addClass("show");
+
+            var SetSelectedCurvesToZeroOffset = function () {
+                curves_table.each(function() {
+                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    let curve = curvesData[fieldFriendlyName];
+                    if(curve.checked) {
+                        let Min = parseFloat($('input[name=MinValue]',this).val());
+                        let Max = parseFloat($('input[name=MaxValue]',this).val());
+                        Max = Math.max(Math.abs(Min), Math.abs(Max));
+                        Min = -Max;
+                        const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                        let curve = curvesData[fieldFriendlyName];
+                        curve.min = Min;
+                        curve.max = Max;
+                        $('input[name=MinValue]',this).val(Min.toFixed(1));
+                        $('input[name=MaxValue]',this).val(Max.toFixed(1));
+                    }
+                });
+                RefreshCharts();
+            };
         };
 
         var SetSelectedCurveToZeroOffset = function () {
@@ -587,8 +628,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
             elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
             menu1.append(elem);
 
-            elem = $('<div>All centered</div>');
-            elem.click(SetAllCurvesToZeroOffset);
+            elem = $('<div>Selected curve centered&#9658;</div>');
+            elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
             menu1.append(elem);
         }
 
@@ -962,7 +1003,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
     };
 
     $("#dlgGraphConfiguration").on('hidden.bs.modal', function() {
-        $('.graph-configuration-dialog').css('pointer-events', 'all'); 
+        $('.graph-configuration-dialog').css('pointer-events', 'all');
         if (cfgMustBeRestored)
             onSave(prevCfg);
     });
