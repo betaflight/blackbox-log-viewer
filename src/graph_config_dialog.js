@@ -401,22 +401,22 @@ export function GraphConfigurationDialog(dialog, onSave) {
             menu3.css("left", this.clientWidth);
             menu3.css("top", this.offsetTop);
             menu3.addClass("show");
-        };
 
-        var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
-            const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
-            const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
-            curves_table.each(function() {
-                const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                let curve = curvesData[fieldFriendlyName];
-                if(curvesData[fieldFriendlyName].checked) {
-                    curve.min = parseFloat(SelectedCurveMin);
-                    curve.max = parseFloat(SelectedCurveMax);
-                    $('input[name=MinValue]',this).val(SelectedCurveMin);
-                    $('input[name=MaxValue]',this).val(SelectedCurveMax);
-                }
-            });
-            RefreshCharts();
+            var ApplySelectedCurveMinMaxToOtherSelectedCurves = function() {
+                const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
+                const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+                curves_table.each(function() {
+                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    let curve = curvesData[fieldFriendlyName];
+                    if(curvesData[fieldFriendlyName].checked) {
+                        curve.min = parseFloat(SelectedCurveMin);
+                        curve.max = parseFloat(SelectedCurveMax);
+                        $('input[name=MinValue]',this).val(SelectedCurveMin);
+                        $('input[name=MaxValue]',this).val(SelectedCurveMax);
+                    }
+                });
+                RefreshCharts();
+            };
         };
 
         var ShowCurvesToSetSameScaleCheckboxedMenu = function(multipleCall) {
@@ -457,33 +457,33 @@ export function GraphConfigurationDialog(dialog, onSave) {
             menu3.css("left", this.clientWidth);
             menu3.css("top", this.offsetTop);
             menu3.addClass("show");
-        };
 
-        var FitSelectedCurveToSameScale = function () {
-            const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
-            const SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
-            let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
-            Min = Math.min(Min, SelectedCurveMin);
-            Max = Math.max(Max, SelectedCurveMax);
-            for (const key in curvesData) {
-                if (curvesData[key].checked) {
-                    Min = Math.min(Min, curvesData[key].min);
-                    Max = Math.max(Max, curvesData[key].max);
-                }
-            }
-
-            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
-            curves_table.each(function() {
-                const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                let curve = curvesData[fieldFriendlyName];
-                if(curve.checked) {
-                    curve.min = Min;
-                    curve.max = Max;
-                    $('input[name=MinValue]',this).val(Min.toFixed(1));
-                        $('input[name=MaxValue]',this).val(Max.toFixed(1));
+            var FitSelectedCurveToSameScale = function () {
+                const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
+                const SelectedCurveMax = parseFloat($('input[name=MaxValue]', selected_curve).val());
+                let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
+                Min = Math.min(Min, SelectedCurveMin);
+                Max = Math.max(Max, SelectedCurveMax);
+                for (const key in curvesData) {
+                    if (curvesData[key].checked) {
+                        Min = Math.min(Min, curvesData[key].min);
+                        Max = Math.max(Max, curvesData[key].max);
                     }
-                });
-                RefreshCharts();
+                }
+
+                const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+                curves_table.each(function() {
+                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                    let curve = curvesData[fieldFriendlyName];
+                    if(curve.checked) {
+                        curve.min = Min;
+                        curve.max = Max;
+                        $('input[name=MinValue]',this).val(Min.toFixed(1));
+                            $('input[name=MaxValue]',this).val(Max.toFixed(1));
+                        }
+                    });
+                    RefreshCharts();
+            };
         };
 
         var SetZoomToCurves = function(e) {
@@ -531,9 +531,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
             menu3.css("left", this.clientWidth);
             menu3.css("top", this.offsetTop);
             menu3.addClass("show");
-        };
 
-        var SetZoomToSelectedCurves = function (zoomScale) {
+            var SetZoomToSelectedCurves = function (zoomScale) {
                 curves_table.each(function() {
                     const fieldFriendlyName = $('select.form-control option:selected', this).text();
                     const curve = curvesData[fieldFriendlyName];
@@ -545,6 +544,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     }
                 });
                 RefreshCharts();
+            };
         };
 
         let curvesData = {};
@@ -594,7 +594,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         let caption = oneRow ?  "This full range&#9658;" : "All full range&#9658;"
         elem = $('<div class="bottomBorder iconDiv">' + caption + '</div>');
-        elem.click(function () {
+        elem.click(function (e) {
             menu2.empty();
             let elem = $('<div>At all global log time</div>');
             elem.click(SetAllMinMaxToFullRangeDuringAllTime);
