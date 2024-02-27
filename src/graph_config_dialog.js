@@ -962,6 +962,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
     };
 
     $("#dlgGraphConfiguration").on('hidden.bs.modal', function() {
+        $('.graph-configuration-dialog').css('pointer-events', 'all'); 
         if (cfgMustBeRestored)
             onSave(prevCfg);
     });
