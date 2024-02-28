@@ -24,15 +24,14 @@ var GraphSpectrumCalc = GraphSpectrumCalc || {
 };
 
 GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
-
     this._flightLog = flightLog; 
     this._sysConfig = sysConfig;
 
-    var gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
-    this._blackBoxRate = gyroRate * this._sysConfig['frameIntervalPNum'] / this._sysConfig['frameIntervalPDenom'];
-    if (this._sysConfig.pid_process_denom != null) {
-        this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
-    }
+    let minTime = this._flightLog.getMinTime();
+    let maxTime = this._flightLog.getMaxTime();
+    var allChunks = this._flightLog.getChunksInTimeRange(minTime, maxTime);
+    const len = allChunks.reduce((acc, chunk) => acc + chunk.frames.length, 0);
+    this._blackBoxRate = (1000000 * len / (maxTime - minTime)).toFixed(0);
 };
 
 GraphSpectrumCalc.setInTime = function(time) {
