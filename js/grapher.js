@@ -67,7 +67,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         
         craft3D = null, craft2D = null,
         
-    	analyser = null, /* define a new spectrum analyser */
+        analyser = null, /* define a new spectrum analyser */
 
         watermarkLogo, /* Watermark feature */
         
@@ -266,7 +266,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     function drawLapTimer() {
         // Update the Lap Timer
         lapTimer.refresh(windowCenterTime, (3600*1000000/*a long time*/), blackboxLogViewer.getBookmarkTimes());
-    	lapTimer.drawCanvas(canvas, options);
+         lapTimer.drawCanvas(canvas, options);
     }
 
     var
@@ -300,9 +300,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             drawingLine = false,
             notInBounds = -5, // when <0, then line is always drawn, (this allows us to paritially dash the line when the bounds is exceeded)
             inGap = false,
-            lastX, lastY,
             yScale = -plotHeight,
-            xScale = canvas.width / windowWidthMicros;
+            xScale = canvas.width / windowWidthMicros,
+            drawDshotStatusArrayField = DEBUG_MODE[flightLog.parser.sysConfig.debug_mode].startsWith("DSHOT_STATUS_N_");
 
         //Draw points from this line until we leave the window
         
@@ -323,26 +323,33 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 var
                     fieldValue = chunk.frames[frameIndex][fieldIndex],
                     frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-                    nextX, nextY;
-    
+                    nextX, nextY, 
+                    valueIsArray = Array.isArray(fieldValue);
 
-                nextY = curve.lookup(fieldValue) * yScale;
+                // When field value is an array use the last array value to build the graph
+                if (valueIsArray) {
+                    nextY = curve.lookup(fieldValue[fieldValue.length - 1]) * yScale;
+                }
+                else {
+                    nextY = curve.lookup(fieldValue) * yScale;
+                }
+
                 nextX = (frameTime - windowStartTime) * xScale;
 
                 // clamp the Y to the range of the graph to prevent bleed into next graph if zoomed in (for example)
 
-                if(nextY>plotHeight) {
+                if (nextY > plotHeight) {
                     nextY = plotHeight;
                     notInBounds++;
                 } else
-                if(nextY<(-1)*plotHeight) {
-                    nextY = (-1)*plotHeight;
+                if (nextY < (-1) * plotHeight) {
+                    nextY = (-1) * plotHeight;
                     notInBounds++;
                 } else notInBounds = -5;
                 
-                if(notInBounds>5) notInBounds = -5; // reset it every 5th line draw (to simulate dashing)  
+                if (notInBounds>5) notInBounds = -5; // reset it every 5th line draw (to simulate dashing)
 
-                if (drawingLine && (notInBounds<=0)) {
+                if (drawingLine && (notInBounds <= 0)) {
                     canvasContext.lineTo(nextX, nextY);
 
                     if (!options.gapless && chunk.gapStartsHere[frameIndex]) {
@@ -350,7 +357,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         inGap = true;
                         drawingLine = false;
                         continue;
-                    } 
+                    }
                 } else {
                     canvasContext.moveTo(nextX, nextY);
                     
@@ -371,12 +378,38 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     }
                 }
 
+                // Draw DSHOT motor events
+                if (valueIsArray && drawDshotStatusArrayField) {
+                    // Draw triangle to notify motor alert event
+                    if (fieldValue[0]) {
+                        canvasContext.lineTo(nextX, nextY - 2);
+                        canvasContext.moveTo(nextX, nextY);
+                    }
+
+                    // Draw triangle to notify motor warning event
+                    if (fieldValue[1]) {
+                        canvasContext.lineTo(nextX - 4, nextY + 8);
+                        canvasContext.lineTo(nextX + 4, nextY + 8);
+                        canvasContext.lineTo(nextX, nextY);
+                    }
+
+                    // Draw vertical line to notify motor error event
+                    if (fieldValue[2]) {
+                        canvasContext.moveTo(nextX, -plotHeight);
+                        canvasContext.lineTo(nextX, plotHeight);
+                        canvasContext.fillText("Stall!!!", nextX, -plotHeight + 10);
+                    }
+
+                    // Restore last position
+                    canvasContext.moveTo(nextX, nextY);
+                }
+
                 drawingLine = true;
                 
                 if (frameTime >= windowEndTime)
                     break plottingLoop;
             }
-            
+
             frameIndex = 0;
         }
 
@@ -398,13 +431,13 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     function drawAxisLine() {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
         canvasContext.lineWidth = 1;
-		canvasContext.setLineDash([5]); // Make the center line a dash        
+        canvasContext.setLineDash([5]); // Make the center line a dash        
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
         canvasContext.lineTo(canvas.width, 0);
-        
+
         canvasContext.stroke();
-		canvasContext.setLineDash([]);        
+        canvasContext.setLineDash([]);
     }
 
     //Draw an background for the line for a graph (at the origin and spanning the window)
@@ -425,36 +458,36 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             GRID_LINES = 10,
             min = -settings.inputRange - settings.offset,
             max = settings.inputRange - settings.offset,
-            GRID_INTERVAL = 1/GRID_LINES * (max - min),
-            yScale = -plotHeight/2;
+            GRID_INTERVAL = 1 / GRID_LINES * (max - min),
+            yScale = -plotHeight / 2;
 
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)"; // Grid Color
-		canvasContext.setLineDash([1,10]); // Make the grid line a dash        
+        canvasContext.setLineDash([1, 10]); // Make the grid line a dash        
         canvasContext.lineWidth = 1;
         canvasContext.beginPath();
 
         // horizontal lines
-        for(var y=1; y<GRID_LINES; y++) {
+        for (var y = 1; y < GRID_LINES; y++) {
             var yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
-            if(yValue!=0 && Math.abs(yValue < plotHeight/2)) {
-                canvasContext.moveTo(0, yValue );
+            if (yValue != 0 && Math.abs(yValue < plotHeight / 2)) {
+                canvasContext.moveTo(0, yValue);
                 canvasContext.lineTo(canvas.width, yValue);
             }
         }
-		// vertical lines
-		for(var i=(windowStartTime / 100000).toFixed(0) * 100000; i<windowEndTime; i+=100000) {
+        // vertical lines
+        for (var i = (windowStartTime / 100000).toFixed(0) * 100000; i < windowEndTime; i += 100000) {
             var x = timeToCanvasX(i);
             canvasContext.moveTo(x, yScale);
             canvasContext.lineTo(x, -yScale);
-		}
+        }
 
         canvasContext.stroke();
-		canvasContext.setLineDash([]); // clear the dash
+        canvasContext.setLineDash([]); // clear the dash
 
         // range values,
         //drawAxisLabel(max.toFixed(0), yScale + 12);
         //drawAxisLabel(min.toFixed(0), -yScale - 8);
-        
+
 
     }
 
@@ -627,20 +660,20 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         }
 
         // Draw Bookmarks Event Line
-        if(bookmarkEvents!=null) {
-        	for(var i=0; i<=9; i++) {
-        		if(bookmarkEvents[i]!=null) {
-		            if(bookmarkEvents[i].state) 
+        if (bookmarkEvents != null) {
+            for (var i = 0; i <= 9; i++) {
+                if (bookmarkEvents[i] != null) {
+                    if (bookmarkEvents[i].state)
                         if ((bookmarkEvents[i].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) && (bookmarkEvents[i].time < windowEndTime)) {
                             drawEvent(
                                 {
-                                event:FlightLogEvent.CUSTOM,
-                                time:bookmarkEvents[i].time,
-                                label: i 
+                                    event: FlightLogEvent.CUSTOM,
+                                    time: bookmarkEvents[i].time,
+                                    label: i
                                 }, sequenceNum++);
                         };
-                    };
-        	};
+                };
+            };
         };
     
     }
@@ -763,7 +796,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
             startChunkIndex, startFrameIndex,
             i, j;
-        
+
         if (chunks.length) {
             //Find the first sample that lies inside the window
             for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
@@ -798,16 +831,16 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
                     if (options.drawGradient && graphs.length > 1) // only draw the background if more than one graph set.
                         drawAxisBackground(canvas.height * graph.height);
-                    
+
                     for (j = 0; j < graph.fields.length; j++) {
                         if (graphConfig.isGraphFieldHidden(i, j)) {
                             continue;
                         }
                         var field = graph.fields[j];
-                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, 
+                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2,
                             field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
-                            field.lineWidth ? field.lineWidth : null, 
-                            graphConfig.highlightGraphIndex==i && graphConfig.highlightFieldIndex==j);
+                            field.lineWidth ? field.lineWidth : null,
+                            graphConfig.highlightGraphIndex == i && graphConfig.highlightFieldIndex == j);
                     }
                     
                     if (graph.label) {
@@ -836,7 +869,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 canvasContext.moveTo(centerX, 0);
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
-		         
+                   
             }
             
             // Draw events - if option set or even if option is not set but there are graphs
@@ -871,11 +904,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             
             // Draw Analyser
             if (options.drawAnalyser && graphConfig.selectedFieldName) {
-                try{ // If we do not select a graph/field, then the analyser is hidden
-                var graph = graphs[graphConfig.selectedGraphIndex]; 		
-				var field = graph.fields[graphConfig.selectedFieldIndex];   	            
-                analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
-                } catch(err) {console.log('Cannot plot analyser ' + err);}            
+                try { // If we do not select a graph/field, then the analyser is hidden
+                    var graph = graphs[graphConfig.selectedGraphIndex];
+                    var field = graph.fields[graphConfig.selectedFieldIndex];
+                    analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
+                } catch (err) { console.log('Cannot plot analyser ' + err); }
             }
 
             //Draw Watermark
@@ -1047,10 +1080,10 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     this.refreshLogo();
     
     /* Create the FlightLogAnalyser object */
-	analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
+    analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
 
     /* Create the Lap Timer object */
-	lapTimer = new LapTimer();
+    lapTimer = new LapTimer();
 
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);

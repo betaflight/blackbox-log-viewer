@@ -361,6 +361,13 @@ let
         "MAG_CALIB",
         "MAG_TASK_RATE",
         "EZLANDING",
+        "DSHOT_STATUS_N_TEMPERATURE",
+        "DSHOT_STATUS_N_VOLTAGE",
+        "DSHOT_STATUS_N_CURRENT",
+        "DSHOT_STATUS_N_DEBUG1",
+        "DSHOT_STATUS_N_DEBUG2",
+        "DSHOT_STATUS_N_STRESS_LVL",
+        "DSHOT_STATUS_N_ERPM_FRACTION_18",
     ]),
 
     SUPER_EXPO_YAW = makeReadOnly([
