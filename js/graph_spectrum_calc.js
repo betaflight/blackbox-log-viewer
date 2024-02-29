@@ -6,10 +6,11 @@ const
     FREQ_VS_THR_CHUNK_TIME_MS = 300,
     FREQ_VS_THR_WINDOW_DIVISOR = 6,
     MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
-    NUM_VS_BINS = 100;
+    NUM_VS_BINS = 100,
+    WARNING_RATE_DIFFERENCE = 0.05;
 
 var GraphSpectrumCalc = GraphSpectrumCalc || {
-    _analyserTimeRange : { 
+    _analyserTimeRange : {
             in: 0,
             out: MAX_ANALYSER_LENGTH
     },
@@ -25,7 +26,7 @@ var GraphSpectrumCalc = GraphSpectrumCalc || {
 
 GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
 
-    this._flightLog = flightLog; 
+    this._flightLog = flightLog;
     this._sysConfig = sysConfig;
 
     var gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
@@ -33,6 +34,30 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
     if (this._sysConfig.pid_process_denom != null) {
         this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
     }
+    this._BetaflightRate = this._blackBoxRate;
+
+    let minTime = this._flightLog.getMinTime(),
+        maxTime = this._flightLog.getMaxTime();
+    let timeRange = maxTime - minTime;
+    if (timeRange > MAX_ANALYSER_LENGTH) {
+        maxTime = minTime + MAX_ANALYSER_LENGTH;
+        timeRange = MAX_ANALYSER_LENGTH;
+    }
+    const allChunks = this._flightLog.getChunksInTimeRange(minTime, maxTime);
+    const length = allChunks.reduce((acc, chunk) => acc + chunk.frames.length, 0);
+    this._actualeRate = 1e6 * length / timeRange;
+
+     if (Math.abs(this._BetaflightRate - this._actualeRate) / this._actualeRate > WARNING_RATE_DIFFERENCE)
+            this._blackBoxRate = Math.round(this._actualeRate);
+
+    if (this._BetaflightRate != this._blackBoxRate)
+        return {
+            actualRate: this._actualeRate,
+            betaflightRate: this._BetaflightRate
+        };
+    else
+        return undefined;
+
 };
 
 GraphSpectrumCalc.setInTime = function(time) {
@@ -51,6 +76,7 @@ GraphSpectrumCalc.setOutTime = function(time) {
 
 GraphSpectrumCalc.setDataBuffer = function(dataBuffer) {
     this._dataBuffer = dataBuffer;
+    return undefined;
 };
 
 GraphSpectrumCalc.dataLoadFrequency = function() {
@@ -75,8 +101,8 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     let flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue);
 
-    // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle 
-    // for each chunk. We use a moving window to get more chunks available. 
+    // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle
+    // for each chunk. We use a moving window to get more chunks available.
     var fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
     var fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
 
@@ -88,10 +114,10 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     var fft = new FFT.complex(fftChunkLength, false);
     for (var fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
-        
+
         let fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
         let fftOutput = new Float64Array(fftChunkLength * 2);
-        
+
         // Hanning window applied to input data
         if(userSettings.analyserHanning) {
             this._hanningWindow(fftInput, fftChunkLength);
@@ -137,8 +163,8 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
         }
     }
 
-    // The output data needs to be smoothed, the sampling is not perfect 
-    // but after some tests we let the data as is, an we prefer to apply a 
+    // The output data needs to be smoothed, the sampling is not perfect
+    // but after some tests we let the data as is, an we prefer to apply a
     // blur algorithm to the heat map image
 
     var fftData = {
@@ -231,13 +257,13 @@ GraphSpectrumCalc._getFlightChunks = function() {
         logStart = this._analyserTimeRange.in;
     } else {
         logStart = this._flightLog.getMinTime();
-    } 
+    }
 
-    var logEnd = 0; 
+    var logEnd = 0;
     if(this._analyserTimeRange.out) {
         logEnd = this._analyserTimeRange.out;
     } else {
-        logEnd = this._flightLog.getMaxTime(); 
+        logEnd = this._flightLog.getMaxTime();
     }
 
     // Limit size
@@ -405,7 +431,7 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
     var noiseLowEndIdx = 100 / maxFrequency * fftLength;
     var maxNoiseIdx = 0;
     var maxNoise = 0;
-    
+
     for (var i = 0; i < fftLength; i++) {
         fftOutput[i] = Math.abs(fftOutput[i]);
         if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
