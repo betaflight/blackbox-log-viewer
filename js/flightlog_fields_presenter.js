@@ -1885,6 +1885,8 @@ function FlightLogFieldPresenter() {
                     return value.toFixed(0);
                 case 'DSHOT_TELEMETRY_COUNTS':
                     return value.toFixed(0);
+                case 'EZLANDING':
+                    return `${(value / 100.0).toFixed(2)} %`;
             }
             return value.toFixed(0);
         }

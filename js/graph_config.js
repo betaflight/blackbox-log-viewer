@@ -1150,6 +1150,13 @@ GraphConfig.load = function(config) {
                             default:
                                 return getCurveForMinMaxFields(fieldName);
                         }
+                    case 'EZLANDING':
+                        return {
+                            offset: -5000,
+                            power: 1.0,
+                            inputRange: 5000,
+                            outputRange: 1.0,
+                        };
                 }
             }
             // if not found above then
