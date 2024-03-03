@@ -1,5 +1,3 @@
-"use strict";
-
 const BLUR_FILTER_PIXEL       = 1,
       DEFAULT_FONT_FACE       = "Verdana, Arial, sans-serif",
       DEFAULT_MARK_LINE_WIDTH = 2,
@@ -11,14 +9,14 @@ const BLUR_FILTER_PIXEL       = 1,
       PID_ERROR_VERTICAL_CHUNK= 5,
       ZOOM_X_MAX              = 5;
 
-const SPECTRUM_TYPE = {
+export const SPECTRUM_TYPE = {
         FREQUENCY        : 0,
         FREQ_VS_THROTTLE : 1,
         PIDERROR_VS_SETPOINT : 2,
         FREQ_VS_RPM      : 3,
       };
 
-const SPECTRUM_OVERDRAW_TYPE = {
+export const SPECTRUM_OVERDRAW_TYPE = {
         ALL_FILTERS      : 0,
         GYRO_FILTERS     : 1,
         DTERM_FILTERS    : 2,
@@ -27,7 +25,7 @@ const SPECTRUM_OVERDRAW_TYPE = {
         AUTO             : 5,
       };
 
-window.GraphSpectrumPlot = window.GraphSpectrumPlot || {
+export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
     _isFullScreen     : false,
     _cachedCanvas     : null,
     _cachedDataCanvas : null,

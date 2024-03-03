@@ -1,6 +1,4 @@
-"use strict";
-
-function LapTimer() {
+export function LapTimer() {
 
 	var lapTime = {
 			current: null,

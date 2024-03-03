@@ -1,6 +1,6 @@
-"use strict";
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 
-function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onHighlightChange, onZoomGraph, onExpandGraph, onNewGraphConfig) {
+export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onHighlightChange, onZoomGraph, onExpandGraph, onNewGraphConfig) {
     var
         that = this;
 

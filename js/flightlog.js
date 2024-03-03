@@ -1,4 +1,6 @@
-"use strict";
+import { FlightLogIndex } from "./flightlog_index";
+import { FlightLogParser } from "./flightlog_parser";
+import { MAX_MOTOR_NUMBER, DSHOT_MIN_VALUE, DSHOT_RANGE } from "./flightlog_fielddefs";
 
 /**
  * Uses a FlightLogParser to provide on-demand parsing (and caching) of the flight data log.
@@ -9,7 +11,7 @@
  * Additional computed fields are derived from the original data set and added as new fields in the resulting data.
  * Window based smoothing of fields is offered.
  */
-function FlightLog(logData) {
+export function FlightLog(logData) {
     var
         ADDITIONAL_COMPUTED_FIELD_COUNT = 15, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/
 

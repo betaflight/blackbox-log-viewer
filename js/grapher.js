@@ -1,6 +1,10 @@
 import { FlightLogSticks } from "./sticks"; 
+import { FlightLogParser } from "./flightlog_parser";
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { Craft2D } from "./craft_2d";
 import { FlightLogAnalyser } from "./graph_spectrum";
+import { LapTimer } from "./laptimer";
+import { GraphConfig } from "./graph_config";
 
 export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options) {
     var

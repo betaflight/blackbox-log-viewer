@@ -1,4 +1,6 @@
 import { debounce } from "throttle-debounce";
+import { GraphSpectrumCalc } from "./graph_spectrum_calc";
+import { GraphSpectrumPlot, SPECTRUM_TYPE, SPECTRUM_OVERDRAW_TYPE } from "./graph_spectrum_plot";
 
 export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 

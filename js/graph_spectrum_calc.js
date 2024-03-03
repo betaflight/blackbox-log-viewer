@@ -1,4 +1,4 @@
-"use strict";
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 
 const
     FIELD_THROTTLE_NAME = ['rcCommands[3]'],
@@ -10,8 +10,8 @@ const
     WARNING_RATE_DIFFERENCE = 0.05,
     MAX_RPM_VALUE = 10000;
 
-var GraphSpectrumCalc = GraphSpectrumCalc || {
-    _analyserTimeRange : {
+export const GraphSpectrumCalc = {
+    _analyserTimeRange : { 
             in: 0,
             out: MAX_ANALYSER_LENGTH
     },

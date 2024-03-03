@@ -1,3 +1,6 @@
+import { FlightLogParser } from "./flightlog_parser";
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+
 export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     var // inefficient; copied from grapher.js. Font could be a global?
 

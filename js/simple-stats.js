@@ -1,4 +1,4 @@
-const SimpleStats = function (flightLog) {
+export function SimpleStats(flightLog) {
     const frames = _(flightLog.getChunksInTimeRange(flightLog.getMinTime(), flightLog.getMaxTime()))
         .map(chunk => chunk.frames).flatten().value(),
         fields = _.map(flightLog.getMainFieldNames(), (f) => {

@@ -1,6 +1,4 @@
-"use strict";
-
-function SeekBar(canvas) {
+export function SeekBar(canvas) {
     var
         that = this,
         

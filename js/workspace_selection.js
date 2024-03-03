@@ -1,6 +1,4 @@
-"use strict";
-
-function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWorkspace) {
+export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWorkspace) {
     var
         numberSpan = null,
         titleSpan = null,

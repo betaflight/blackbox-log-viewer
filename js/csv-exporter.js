@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * @typedef {object} ExportOptions
  * @property {string} columnDelimiter
@@ -12,7 +10,7 @@
  * @param {FlightLog} flightLog 
  * @param {ExportOptions} [opts={}]
  */
-let CsvExporter = function(flightLog, opts={}) {
+export function CsvExporter(flightLog, opts={}) {
 
     var opts = _.merge({
         columnDelimiter: ",",

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Configuration
  * 
@@ -7,8 +5,7 @@
  * 
  */
 
-
-function Configuration(file, configurationDefaults, showConfigFile) {
+export function Configuration(file, configurationDefaults, showConfigFile) {
 
 	// Private Variables
 	var that = this; 	  // generic pointer back to this function
@@ -120,7 +117,7 @@ function Configuration(file, configurationDefaults, showConfigFile) {
     
 }
 
-function ConfigurationDefaults(prefs) {
+export function ConfigurationDefaults(prefs) {
 	
 	// Special configuration file that handles default values only
 

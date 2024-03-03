@@ -1,5 +1,3 @@
-"use strict";
-
 function makeReadOnly(x) {
     // Make read-only if browser supports it:
     if (Object.freeze) {
@@ -11,11 +9,10 @@ function makeReadOnly(x) {
 }
 
 // Some constants used at different places
-const MAX_MOTOR_NUMBER = 8;
-const DSHOT_MIN_VALUE = 48;
+export const MAX_MOTOR_NUMBER = 8;
+export const DSHOT_MIN_VALUE = 48;
 const DSHOT_MAX_VALUE = 2047;
-const DSHOT_RANGE = DSHOT_MAX_VALUE - DSHOT_MIN_VALUE;
-const ANALOG_MIN_VALUE = 1000;
+export const DSHOT_RANGE = DSHOT_MAX_VALUE - DSHOT_MIN_VALUE;
 
 // Fields definitions for lists
 let
@@ -535,7 +532,7 @@ let
         "CLIP",
     ]);
 
-function adjustFieldDefsList(firmwareType, firmwareVersion) {
+export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(firmwareVersion, '3.3.0')) {
 
         // Debug names

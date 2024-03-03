@@ -1,3 +1,5 @@
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+
 export function UserSettingsDialog(dialog, onLoad, onSave) {
 
 	// Private Variables

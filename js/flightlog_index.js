@@ -1,6 +1,6 @@
-"use strict";
+import { FlightLogParser } from "./flightlog_parser";
 
-function FlightLogIndex(logData) {
+export function FlightLogIndex(logData) {
     //Private:
     var 
         that = this,

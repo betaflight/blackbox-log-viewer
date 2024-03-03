@@ -1,14 +1,13 @@
-"use strict";
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+import { adjustFieldDefsList } from "./flightlog_fielddefs";
 
-var FlightLogIndex,
+globalThis.FIRMWARE_TYPE_UNKNOWN = 0;
+globalThis.FIRMWARE_TYPE_BASEFLIGHT = 1;
+globalThis.FIRMWARE_TYPE_CLEANFLIGHT = 2;
+globalThis.FIRMWARE_TYPE_BETAFLIGHT = 3;
+globalThis.FIRMWARE_TYPE_INAV = 4;
 
-    FIRMWARE_TYPE_UNKNOWN = 0,
-    FIRMWARE_TYPE_BASEFLIGHT = 1,
-    FIRMWARE_TYPE_CLEANFLIGHT = 2,
-    FIRMWARE_TYPE_BETAFLIGHT = 3,
-    FIRMWARE_TYPE_INAV = 4;
-
-var FlightLogParser = function(logData) {
+export function FlightLogParser(logData) {
     //Private constants:
     var
         FLIGHT_LOG_MAX_FIELDS = 128,

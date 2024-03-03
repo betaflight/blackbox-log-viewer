@@ -1,3 +1,6 @@
+import { GraphConfig } from "./graph_config";
+import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+
 export function GraphConfigurationDialog(dialog, onSave) {
     var
         // Some fields it doesn't make sense to graph

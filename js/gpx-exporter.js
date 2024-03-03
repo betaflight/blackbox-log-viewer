@@ -1,10 +1,8 @@
-"use strict";
-
 /**
  * @constructor
  * @param {FlightLog} flightLog 
  */
-let GpxExporter = function(flightLog) {
+export function GpxExporter(flightLog) {
 
     /** 
      * @param {function} success is a callback triggered when export is done

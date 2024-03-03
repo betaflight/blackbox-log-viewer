@@ -11,6 +11,17 @@ import { UserSettingsDialog } from './user_settings_dialog.js';
 import { GraphConfigurationDialog } from './graph_config_dialog.js';
 import { HeaderDialog } from './header_dialog.js';
 import { KeysDialog } from './keys_dialog.js';
+import { SimpleStats } from './simple-stats.js';
+import { Configuration, ConfigurationDefaults } from './configuration.js';
+import { GraphConfig } from './graph_config.js';
+import { SeekBar } from './seekbar.js';
+import { GpxExporter } from './gpx-exporter.js';
+import { CsvExporter } from './csv-exporter.js';
+import { WorkspaceSelection } from './workspace_selection.js';
+import { GraphLegend } from './graph_legend.js';
+import { FlightLog } from './flightlog.js';
+import { FlightLogParser } from './flightlog_parser.js';
+import { FlightLogFieldPresenter } from './flightlog_fields_presenter.js';
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
