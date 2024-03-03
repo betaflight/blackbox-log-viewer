@@ -1,6 +1,6 @@
-"use strict";
+import { debounce } from "throttle-debounce";
 
-function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
+export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
 const
         ANALYSER_LARGE_LEFT_MARGIN    = 10,
@@ -171,7 +171,7 @@ var
 
         /* add zoom controls */
         const DEFAULT_ZOOM = 100;
-        analyserZoomXElem.on('input', $.debounce(100, function() {
+        analyserZoomXElem.on('input', debounce(100, function() {
             analyserZoomX = (analyserZoomXElem.val() / 100);
             GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
             that.refresh();
@@ -179,7 +179,7 @@ var
             $(this).val(DEFAULT_ZOOM).trigger("input");
         }).val(DEFAULT_ZOOM);;
 
-        analyserZoomYElem.on('input', $.debounce(100, function() {
+        analyserZoomYElem.on('input', debounce(100, function() {
             analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
             GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
             that.refresh();

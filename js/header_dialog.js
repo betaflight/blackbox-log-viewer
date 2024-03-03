@@ -1,6 +1,4 @@
-'use strict';
-
-function HeaderDialog(dialog, onSave) {
+export function HeaderDialog(dialog, onSave) {
 
 	// Private Variables
 

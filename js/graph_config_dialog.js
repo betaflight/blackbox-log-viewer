@@ -1,6 +1,4 @@
-"use strict";
-
-function GraphConfigurationDialog(dialog, onSave) {
+export function GraphConfigurationDialog(dialog, onSave) {
     var
         // Some fields it doesn't make sense to graph
         BLACKLISTED_FIELDS = {time:true, loopIteration:true, 'setpoint[0]':true, 'setpoint[1]':true, 'setpoint[2]':true, 'setpoint[3]':true},

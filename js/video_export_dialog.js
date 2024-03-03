@@ -1,6 +1,6 @@
-"use strict";
+import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 
-function VideoExportDialog(dialog, onSave) {
+export function VideoExportDialog(dialog, onSave) {
     var
         DIALOG_MODE_SETTINGS = 0,
         DIALOG_MODE_IN_PROGRESS = 1,

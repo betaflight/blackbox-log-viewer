@@ -1,6 +1,4 @@
-"use strict";
-
-function MapGrapher() {
+export function MapGrapher() {
   let userSettings,
     myMap,
     currentLogStartDateTime,
@@ -243,7 +241,7 @@ function MapGrapher() {
   };
 
   this.setUserSettings = function (newUserSettings) {
-    userSettings = newUserSettings;
+    globalThis.userSettings = newUserSettings;
   };
 
   this.redrawAll = function () {

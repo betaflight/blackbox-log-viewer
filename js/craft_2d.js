@@ -1,6 +1,4 @@
-"use strict";
-
-function Craft2D(flightLog, canvas, propColors) {
+export function Craft2D(flightLog, canvas, propColors) {
     var
         ARM_THICKNESS_MULTIPLIER = 0.18,
         ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER = 1.1,
@@ -22,7 +20,7 @@ function Craft2D(flightLog, canvas, propColors) {
         }
 
     var numMotors; 
-        if(customMix===null) {
+        if(!customMix) {
             numMotors = propColors.length;
         } else {
             numMotors = customMix.motorOrder.length;
@@ -38,7 +36,7 @@ function Craft2D(flightLog, canvas, propColors) {
         yawOffset;
         
     // Motor numbering in counter-clockwise order starting from the 3 o'clock position
-    if(customMix===null) {
+    if(!customMix) {
         switch (numMotors) {
             case 3:
                 motorOrder = [0, 1, 2]; // Put motor 1 at the right

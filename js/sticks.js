@@ -1,6 +1,4 @@
-"use strict"
-
-function FlightLogSticks(flightLog, rcCommandFields, canvas) {
+export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     var // inefficient; copied from grapher.js. Font could be a global?
 
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -36,7 +34,7 @@ function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10);
 
     // Use defaults for any options not provided
-    userSettings = $.extend(defaultSettings, userSettings || {});
+    globalThis.userSettings = $.extend(defaultSettings, userSettings || {});
 
     this.resize = function (width, height) {
         // Resize canvas if size changed

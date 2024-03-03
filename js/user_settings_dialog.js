@@ -1,6 +1,4 @@
-'use strict';
-
-function UserSettingsDialog(dialog, onLoad, onSave) {
+export function UserSettingsDialog(dialog, onLoad, onSave) {
 
 	// Private Variables
     

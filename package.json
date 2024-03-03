@@ -9,7 +9,10 @@
   "scripts": {
     "start": "gulp debug",
     "gulp": "gulp",
-    "release": "gulp release"
+    "release": "gulp release",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "window": {
     "id": "main",
@@ -28,9 +31,13 @@
     "Leaflet.MultiOptionsPolyline": "hgoebl/Leaflet.MultiOptionsPolyline",
     "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
+    "jquery": "^3.7.1",
+    "jquery-ui": "^1.13.2",
     "leaflet": "^1.9.3",
     "leaflet-marker-rotation": "^0.4.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "throttle-debounce": "^5.0.0",
+    "vite": "^5.0.12"
   },
   "devDependencies": {
     "@quanle94/innosetup": "^6.0.2",

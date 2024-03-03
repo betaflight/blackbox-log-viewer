@@ -1,7 +1,19 @@
-"use strict";
+import $ from './jquery';
+import 'jquery-ui/dist/jquery-ui';
+import 'bootstrap';
+import './vendor/jquery.nouislider.all.min.js';
+import { throttle } from 'throttle-debounce';
+import { MapGrapher } from './graph_map';
+import { FlightLogGrapher } from './grapher.js';
+import { FlightLogVideoRenderer } from './flightlog_video_renderer.js';
+import { VideoExportDialog } from './video_export_dialog.js';
+import { UserSettingsDialog } from './user_settings_dialog.js';
+import { GraphConfigurationDialog } from './graph_config_dialog.js';
+import { HeaderDialog } from './header_dialog.js';
+import { KeysDialog } from './keys_dialog.js';
 
-// Global Level Variables
-var userSettings = {};
+// TODO: this is a hack, once we move to web fix this
+globalThis.userSettings = null;
 
 var VIEWER_VERSION = getManifestVersion(); // Current version
 
@@ -104,7 +116,7 @@ function BlackboxLogViewer() {
         seekBarCanvas = $(".log-seek-bar canvas")[0],
         seekBar = new SeekBar(seekBarCanvas),
         
-        seekBarRepaintRateLimited = $.throttle(200, $.proxy(seekBar.repaint, seekBar)),
+        seekBarRepaintRateLimited = throttle(200, $.proxy(seekBar.repaint, seekBar)),
         seekBarMode = "avgThrottle",
         
         updateValuesChartRateLimited,
@@ -254,7 +266,7 @@ function BlackboxLogViewer() {
         }
     }
     
-    updateValuesChartRateLimited = $.throttle(250, updateValuesChart);
+    updateValuesChartRateLimited = throttle(250, updateValuesChart);
     
     function animationLoop() {
         var 
@@ -878,28 +890,6 @@ function BlackboxLogViewer() {
     this.getBookmarkTimes = function() {
         return bookmarkTimes;
     }
-           
-    prefs.get('videoConfig', function(item) {
-        if (item) {
-            videoConfig = item;
-        } else {
-            videoConfig = {
-                width: 1280,
-                height: 720,
-                frameRate: 30,
-                videoDim: 0.4
-            };
-        }
-    });
-    
-    prefs.get('graphConfig', function(item) {
-        graphConfig = GraphConfig.load(item);
-        
-        if (!graphConfig) {
-            graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
-        }
-    });
-
     // Workspace save/restore to/from file.
     function saveWorkspaces(file) {
 
@@ -1027,41 +1017,11 @@ function BlackboxLogViewer() {
         onSwitchWorkspace(workspaceGraphConfigs, id)
     }
 
-    // New workspaces feature; local storage of user configurations
-    prefs.get('workspaceGraphConfigs', function(item) {
-        if(item) {
-            workspaceGraphConfigs = upgradeWorkspaceFormat(item);
-        } else {
-            workspaceGraphConfigs = [];
-        }
-
-        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
-    });
-
-    prefs.get('activeWorkspace', function (id){
-        if (id) {
-            activeWorkspace = id
-        }
-        else {
-            activeWorkspace = 1
-        }
-
-        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
-    });
-
-    // Get the offsetCache buffer
-    prefs.get('offsetCache', function(item) {
-        if(item) {
-            offsetCache = item;
-        }
-    })
-    
     activeGraphConfig.addListener(function() {
         invalidateGraph();
     });
     
-    $(document).ready(function() {
-
+    $(function() {
         $('[data-toggle="tooltip"]').tooltip({trigger: "hover", placement: "auto bottom"}); // initialise tooltips
         $('[data-toggle="dropdown"]').dropdown(); // initialise menus
         $('a.auto-hide-menu').click(function() {
@@ -1409,57 +1369,63 @@ function BlackboxLogViewer() {
         }
         
         var 
-            graphConfigDialog = new GraphConfigurationDialog($("#dlgGraphConfiguration"), function(newConfig) {
-                newGraphConfig(newConfig);   
-            }),
+            graphConfigDialog = new GraphConfigurationDialog(
+                $("#dlgGraphConfiguration"),
+                function(newConfig) {
+                    newGraphConfig(newConfig);   
+                }
+            ),
             
-            headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function(newSysConfig) {
-                if(newSysConfig!=null) {
-                    prefs.set('lastHeaderData', newSysConfig);
-                    flightLog.setSysConfig(newSysConfig);
+            headerDialog = new HeaderDialog(
+                $("#dlgHeaderDialog"),
+                function(newSysConfig) {
+                    if(newSysConfig!=null) {
+                        prefs.set('lastHeaderData', newSysConfig);
+                        flightLog.setSysConfig(newSysConfig);
 
-                    // Save Current Position then re-calculate all the log information
-                    var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
-                    
-                    selectLog(null);
-                    if (hasVideo) {
-                        setVideoTime(activePosition);
-                    } else {
-                        setCurrentBlackboxTime(activePosition);
+                        // Save Current Position then re-calculate all the log information
+                        var activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
+                        
+                        selectLog(null);
+                        if (hasVideo) {
+                            setVideoTime(activePosition);
+                        } else {
+                            setCurrentBlackboxTime(activePosition);
+                        }
                     }
                 }
-            }),
+            ),
 
             keysDialog = new KeysDialog($("#dlgKeysDialog")),
 
-            userSettingsDialog = new UserSettingsDialog($("#dlgUserSettings"), 
-            function(defaultSettings) { // onLoad
-                prefs.get('userSettings', function(item) {
-                    if (item) {
-                        userSettings = $.extend({}, defaultSettings, item);
-                    } else {
-                        userSettings = defaultSettings;
+            userSettingsDialog = new UserSettingsDialog(
+                $("#dlgUserSettings"), 
+                function(defaultSettings) { // onLoad
+                    prefs.get('userSettings', function(item) {
+                        if (item) {
+                            globalThis.userSettings = $.extend({}, defaultSettings, item);
+                        } else {
+                            globalThis.userSettings = defaultSettings;
+                        }
+                    });
+                },
+                function(newSettings) { // onSave
+                    globalThis.userSettings = newSettings;
+
+                    prefs.set('userSettings', newSettings);
+
+                    // refresh the craft model
+                    if(graph!=null) {
+                        graph.refreshOptions(newSettings);
+                        graph.refreshLogo();
+                        graph.initializeCraftModel();
+                        if(flightLog.hasGpsData()) {
+                            mapGrapher.setUserSettings(newSettings);
+                        }
+                        updateCanvasSize();
                     }
-                });
-            },
-
-            function(newSettings) { // onSave
-	            userSettings = newSettings;
-
-	            prefs.set('userSettings', newSettings);
-
-	            // refresh the craft model
-	            if(graph!=null) {
-	                graph.refreshOptions(newSettings);
-	                graph.refreshLogo();
-	                graph.initializeCraftModel();
-                    if(flightLog.hasGpsData()) {
-                        mapGrapher.setUserSettings(newSettings);
-                    }
-	                updateCanvasSize();
-	            }
-
-	        }),
+                }
+            ),
 
 	        exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
 	            videoConfig = newConfig;
@@ -2132,53 +2098,6 @@ function BlackboxLogViewer() {
 
         seekBar.onSeek = setCurrentBlackboxTime;
 
-        function checkIfFileAsParameter() {
-            let fullPath = null;
-            // Chrome or opening a file association
-            if ((typeof argv !== 'undefined') && (argv.length > 0)) {
-                fullPath = argv[0];
-            } else {
-                const gui = require('nw.gui');
-                if (gui.App.argv.length > 0) {
-                    fullPath = gui.App.argv[0];
-                }
-            }
-            if (fullPath != null) {
-                const filename = fullPath.replace(/^.*[\\/]/, '');
-                const file = new File(fullPath, filename);
-                loadFiles([file]);
-            }
-        }
-        checkIfFileAsParameter();
-
-        // File extension association
-        function onOpenFileAssociation() {
-
-            const gui = require('nw.gui');
-            gui.App.on('open', function(path) {
-
-                // All the windows opened try to open the new blackbox,
-                // so we limit it to one of them, the first in the list for example
-                const windows = chrome.app.window.getAll();
-
-                const firstWindow = windows[0];
-                const currentWindow = chrome.app.window.current();
-
-                if (currentWindow === firstWindow) {
-
-                    const filePathToOpenExpression = /.*"([^"]*)"$/;
-                    const fileToOpen = path.match(filePathToOpenExpression);
-
-                    if (fileToOpen.length > 1) {
-                        const fullPathFile = fileToOpen[1];
-                        createNewBlackboxWindow([fullPathFile]);
-                    }
-                }
-            });
-
-        }
-        onOpenFileAssociation();
-
         /* drag and drop support */
 
         window.ondragover = function(e) {
@@ -2200,6 +2119,56 @@ function BlackboxLogViewer() {
             } 
             return false;
         };
+           
+        prefs.get('videoConfig', function(item) {
+            if (item) {
+                videoConfig = item;
+            } else {
+                videoConfig = {
+                    width: 1280,
+                    height: 720,
+                    frameRate: 30,
+                    videoDim: 0.4
+                };
+            }
+        });
+        
+        prefs.get('graphConfig', function(item) {
+            graphConfig = GraphConfig.load(item);
+            
+            if (!graphConfig) {
+                graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
+            }
+        });
+
+        // New workspaces feature; local storage of user configurations
+        prefs.get('workspaceGraphConfigs', function(item) {
+            if(item) {
+                workspaceGraphConfigs = upgradeWorkspaceFormat(item);
+            } else {
+                workspaceGraphConfigs = [];
+            }
+
+            onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
+        });
+
+        prefs.get('activeWorkspace', function (id){
+            if (id) {
+                activeWorkspace = id
+            }
+            else {
+                activeWorkspace = 1
+            }
+
+            onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
+        });
+
+        // Get the offsetCache buffer
+        prefs.get('offsetCache', function(item) {
+            if(item) {
+                offsetCache = item;
+            }
+        })
 
     });
 }

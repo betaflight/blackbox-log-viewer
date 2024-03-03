@@ -1,6 +1,8 @@
-"use strict";
+import { FlightLogSticks } from "./sticks"; 
+import { Craft2D } from "./craft_2d";
+import { FlightLogAnalyser } from "./graph_spectrum";
 
-function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options) {
+export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options) {
     var
         PID_P = 0,
         PID_I = 1,
@@ -1028,7 +1030,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     }
 
     this.refreshLogo = function() {
-        if(options.watermark.logo) {
+        if(options?.watermark?.logo) {
             watermarkLogo = new Image();
             watermarkLogo.src = options.watermark.logo;
         }

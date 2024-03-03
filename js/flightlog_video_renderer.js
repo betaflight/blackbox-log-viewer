@@ -1,4 +1,4 @@
-"use strict";
+import { FlightLogGrapher } from "./grapher";
 
 /**
  * Render a video of the given log using the given videoOptions (user video settings) and logParameters.
@@ -22,7 +22,7 @@
  *     onComplete - On render completion, called with (success, frameCount)
  *     onProgress - Called periodically with (frameIndex, frameCount) to report progress
  */
-function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) {
+export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) {
     var
         WORK_CHUNK_SIZE_FOCUSED = 8,
         WORK_CHUNK_SIZE_UNFOCUSED = 32,

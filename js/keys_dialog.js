@@ -1,6 +1,4 @@
-'use strict';
-
-function KeysDialog(dialog) {
+export function KeysDialog(dialog) {
 
 	// Private Variables
 	var that = this; // generic pointer back to this function
