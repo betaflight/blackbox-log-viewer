@@ -7,7 +7,8 @@ const
     FREQ_VS_THR_WINDOW_DIVISOR = 6,
     MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
     NUM_VS_BINS = 100,
-    WARNING_RATE_DIFFERENCE = 0.05;
+    WARNING_RATE_DIFFERENCE = 0.05,
+    MAX_RPM_VALUE = 10000;
 
 var GraphSpectrumCalc = GraphSpectrumCalc || {
     _analyserTimeRange : {
@@ -315,6 +316,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     let vsValues = new Array(vsIndexes.length).fill(null).map(() => new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
 
     var samplesCount = 0;
+    let lastRPM = 0;
     for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
         var chunk = allChunks[chunkIndex];
         for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
@@ -323,6 +325,11 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
             for (let i = 0; i < vsIndexes.length; i++) {
                 let vsFieldIx = vsIndexes[i];
                 let value = chunk.frames[frameIndex][vsFieldIx];
+                if (vsFieldNames == FIELD_RPM_NAMES) {
+                    if (value > MAX_RPM_VALUE || value < 0)
+                        value = lastRPM;
+                    lastRPM = value;
+                }
                 maxValue = Math.max(maxValue, value);
                 minValue = Math.min(minValue, value);
                 vsValues[i][samplesCount] = value;
