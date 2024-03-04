@@ -130,7 +130,7 @@ var
         /* This function is called from the canvas drawing routines within grapher.js
            It is only used to record the current curve positions, collect the data and draw the
            analyser on screen*/
-        this.plotSpectrum =    function (fieldIndex, curve, fieldName) {
+        this.plotSpectrum = function (fieldIndex, curve, fieldName) {
             // Store the data pointers
             dataBuffer = {
                     fieldIndex: fieldIndex,
