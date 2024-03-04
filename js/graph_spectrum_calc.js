@@ -222,7 +222,7 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
     };
 };
 
-GraphSpectrumCalc._getFlightChunks = function() {
+GraphSpectrumCalc._getTimelineChunks = function() {
 
     const logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
     let logEnd = this._analyserTimeRange.out || this._flightLog.getMaxTime();
@@ -234,7 +234,7 @@ GraphSpectrumCalc._getFlightChunks = function() {
 };
 
 GraphSpectrumCalc._getFlightSamplesFreq = function() {
-    const allChunks = this._getFlightChunks();
+    const allChunks = this._getTimelineChunks();
     let samples = new Float64Array(MAX_ANALYSER_LENGTH / TIME_SCALE * this._blackBoxRate);
     let samplesCount = 0;
 
@@ -262,7 +262,7 @@ GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
 
 GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
-    const allChunks = this._getFlightChunks();
+    const allChunks = this._getTimelineChunks();
     const vsIndexes = this._getVsIndexes(vsFieldNames);
 
     const samplesLen = MAX_ANALYSER_LENGTH / TIME_SCALE * this._blackBoxRate;
@@ -311,7 +311,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
 
 GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
 
-    const allChunks = this._getFlightChunks();
+    const allChunks = this._getTimelineChunks();
 
     // Get the PID Error field
     const FIELD_PIDERROR_INDEX = this._flightLog.getMainFieldIndexByName(`axisError[${axisIndex}]`);
