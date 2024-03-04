@@ -5,7 +5,8 @@ const
     FIELD_RPM_NAMES = ['eRPM[0]', 'eRPM[1]', 'eRPM[2]', 'eRPM[3]', 'eRPM[4]', 'eRPM[5]', 'eRPM[6]', 'eRPM[7]'],
     FREQ_VS_THR_CHUNK_TIME_MS = 300,
     FREQ_VS_THR_WINDOW_DIVISOR = 6,
-    MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
+    TIME_SCALE = 1000 * 1000,
+    MAX_ANALYSER_LENGTH = 300 * TIME_SCALE, // 5min
     NUM_VS_BINS = 100;
 
 var GraphSpectrumCalc = GraphSpectrumCalc || {
@@ -27,11 +28,11 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
     this._flightLog = flightLog; 
     this._sysConfig = sysConfig;
 
-    let minTime = this._flightLog.getMinTime();
-    let maxTime = this._flightLog.getMaxTime();
-    var allChunks = this._flightLog.getChunksInTimeRange(minTime, maxTime);
+    const minTime = this._flightLog.getMinTime();
+    const maxTime = this._flightLog.getMaxTime();
+    const allChunks = this._flightLog.getChunksInTimeRange(minTime, maxTime);
     const len = allChunks.reduce((acc, chunk) => acc + chunk.frames.length, 0);
-    this._blackBoxRate = (1000000 * len / (maxTime - minTime)).toFixed(0);
+    this._blackBoxRate = (TIME_SCALE * len / (maxTime - minTime)).toFixed(0);
 };
 
 GraphSpectrumCalc.setInTime = function(time) {
@@ -44,7 +45,7 @@ GraphSpectrumCalc.setOutTime = function(time) {
         this._analyserTimeRange.out = time;
     } else {
         this._analyserTimeRange.out = analyserTimeRange.in + MAX_ANALYSER_LENGTH;
-    }
+    };
     return this._analyserTimeRange.out;
 };
 
@@ -94,7 +95,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
         // Hanning window applied to input data
         if(userSettings.analyserHanning) {
             this._hanningWindow(fftInput, fftChunkLength);
-        }
+        };
 
         fft.simple(fftOutput, fftInput, 'real');
 
@@ -104,7 +105,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
         for (let i = 0; i < fftChunkLength; i++) {
             fftOutput[i] = Math.abs(fftOutput[i]);
             maxNoise = Math.max(fftOutput[i], maxNoise);
-        }
+        };
 
         // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
         for (const vsValueArray of flightSamples.vsValues) {
@@ -123,18 +124,18 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
             // add the output from the fft to the row given by the vs value bin index
             for (let i = 0; i < fftOutput.length; i++) {
                 matrixFftOutput[vsBinIndex][i] += fftOutput[i];
-            }
-        }
-    }
+            };
+        };
+    };
 
     // Divide the values from the fft in each row (vs value bin) by the number of samples in the bin
     for (let i = 0; i < NUM_VS_BINS; i++) {
         if (numberSamples[i] > 1) {
             for (var j = 0; j < matrixFftOutput[i].length; j++) {
                 matrixFftOutput[i][j] /= numberSamples[i];
-            }
-        }
-    }
+            };
+        };
+    };
 
     // The output data needs to be smoothed, the sampling is not perfect 
     // but after some tests we let the data as is, an we prefer to apply a 
@@ -151,7 +152,6 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
     };
 
     return fftData;
-
 };
 
 GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
@@ -160,7 +160,7 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
 
 GraphSpectrumCalc.dataLoadFrequencyVsRpm = function() {
     let fftData = this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
-    const motorPoles = this._flightLog.getSysConfig()['motor_poles'];
+    const motorPoles = this._flightLog.getSysConfig().motor_poles;
     fftData.vsRange.max *= 3.333 / motorPoles;
     fftData.vsRange.min *= 3.333 / motorPoles;
     return fftData;
@@ -170,13 +170,13 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
 
     // Detect the axis
     let axisIndex;
-    if (this._dataBuffer.fieldName.indexOf('[roll]') >= 0) {
+    if (this._dataBuffer.fieldName.includes('[roll]')) {
         axisIndex = 0;
-    } else if (this._dataBuffer.fieldName.indexOf('[pitch]') >= 0) {
+    } else if (this._dataBuffer.fieldName.includes('[pitch]')) {
         axisIndex = 1;
-    } else if (this._dataBuffer.fieldName.indexOf('[yaw]') >= 0) {
+    } else if (this._dataBuffer.fieldName.includes('[yaw]')) {
         axisIndex = 2;
-    }
+    };
 
     const flightSamples = this._getFlightSamplesPidErrorVsSetpoint(axisIndex);
 
@@ -188,7 +188,7 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
     for (let i = 0; i <= flightSamples.maxSetpoint; i++) {
         errorBySetpoint[i] = 0;
         numberOfSamplesBySetpoint[i] = 0;
-    }
+    };
 
     // Sum by position
     for (let i = 0; i < flightSamples.count; i++) {
@@ -198,7 +198,7 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
 
         errorBySetpoint[setpointValue] += pidErrorValue;
         numberOfSamplesBySetpoint[setpointValue]++;
-    }
+    };
 
     // Calculate the media and max values
     let maxErrorBySetpoint = 0;
@@ -207,11 +207,11 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
             errorBySetpoint[i] = errorBySetpoint[i] / numberOfSamplesBySetpoint[i];
             if (errorBySetpoint[i] > maxErrorBySetpoint) {
                 maxErrorBySetpoint = errorBySetpoint[i];
-            }
+            };
         } else {
             errorBySetpoint[i] = null;
-        }
-    }
+        };
+    };
 
     return {
         fieldIndex   : this._dataBuffer.fieldIndex,
@@ -220,48 +220,29 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
         fftOutput    : errorBySetpoint,
         fftMaxOutput : maxErrorBySetpoint,
     };
-
 };
 
 GraphSpectrumCalc._getFlightChunks = function() {
 
-    var logStart = 0;
-    if(this._analyserTimeRange.in) {
-        logStart = this._analyserTimeRange.in;
-    } else {
-        logStart = this._flightLog.getMinTime();
-    } 
-
-    var logEnd = 0; 
-    if(this._analyserTimeRange.out) {
-        logEnd = this._analyserTimeRange.out;
-    } else {
-        logEnd = this._flightLog.getMaxTime(); 
-    }
+    const logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
+    let logEnd = this._analyserTimeRange.out || this._flightLog.getMaxTime();
 
     // Limit size
-    logEnd = (logEnd - logStart <= MAX_ANALYSER_LENGTH)? logEnd : logStart + MAX_ANALYSER_LENGTH;
+    logEnd = Math.min(logEnd, logStart + MAX_ANALYSER_LENGTH);
 
-    var allChunks = this._flightLog.getChunksInTimeRange(logStart, logEnd);
-
-    return allChunks;
-}
+    return this._flightLog.getChunksInTimeRange(logStart, logEnd);
+};
 
 GraphSpectrumCalc._getFlightSamplesFreq = function() {
+    const allChunks = this._getFlightChunks();
+    let samples = new Float64Array(MAX_ANALYSER_LENGTH / TIME_SCALE * this._blackBoxRate);
+    let samplesCount = 0;
 
-    var allChunks = this._getFlightChunks();
-
-    var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-
-    // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
-    var samplesCount = 0;
-    for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
-        var chunk = allChunks[chunkIndex];
-        for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
-            samplesCount++;
-        }
-    }
+    for (const chunk of allChunks) {
+        for (const frame of chunk.frames) {
+            samples[samplesCount++] = this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]);
+        };
+    };
 
     return {
         samples : samples,
@@ -274,34 +255,33 @@ GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
     for (const fieldName of vsFieldNames) {
         if (Object.hasOwn(this._flightLog.getMainFieldIndexes(), fieldName)) {
             fieldIndexes.push(this._flightLog.getMainFieldIndexByName(fieldName));
-        }
-    }
+        };
+    };
     return fieldIndexes;
 };
 
 GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
-    var allChunks = this._getFlightChunks();
-    let vsIndexes = this._getVsIndexes(vsFieldNames);
+    const allChunks = this._getFlightChunks();
+    const vsIndexes = this._getVsIndexes(vsFieldNames);
 
-    var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-    let vsValues = new Array(vsIndexes.length).fill(null).map(() => new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
+    const samplesLen = MAX_ANALYSER_LENGTH / TIME_SCALE * this._blackBoxRate;
+    let samples = new Float64Array(samplesLen);
+    let vsValues = vsIndexes.map(() => new Float64Array(samplesLen));
 
-    var samplesCount = 0;
-    for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
-        var chunk = allChunks[chunkIndex];
-        for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
+    let samplesCount = 0;
+    for (const chunk of allChunks) {
+        for (const frame of chunk.frames) {
+            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
 
-            for (let i = 0; i < vsIndexes.length; i++) {
-                let vsFieldIx = vsIndexes[i];
-                let value = chunk.frames[frameIndex][vsFieldIx];
+            vsIndexes.forEach((vsFieldIx, i) => {
+                const value = frame[vsFieldIx];
                 maxValue = Math.max(maxValue, value);
                 minValue = Math.min(minValue, value);
                 vsValues[i][samplesCount] = value;
-            }
+            });
             samplesCount++;
-        }
+        };
     }
 
     if (minValue > maxValue) {
@@ -337,8 +317,8 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
     const FIELD_PIDERROR_INDEX = this._flightLog.getMainFieldIndexByName(`axisError[${axisIndex}]`);
     const FIELD_SETPOINT_INDEX = this._flightLog.getMainFieldIndexByName(`setpoint[${axisIndex}]`);
 
-    const piderror = new Int16Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-    const setpoint = new Int16Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+    const piderror = new Int16Array(MAX_ANALYSER_LENGTH / TIME_SCALE * this._blackBoxRate);
+    const setpoint = new Int16Array(MAX_ANALYSER_LENGTH / TIME_SCALE * this._blackBoxRate);
 
     // Loop through all the samples in the chunks and assign them to a sample array.
     let samplesCount = 0;
