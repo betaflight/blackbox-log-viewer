@@ -863,7 +863,6 @@ GraphSpectrumPlot.setLogRateWarningInfo  = function(logRateInfo) {
     this._logRateWarning = logRateInfo;
 };
 
-
 GraphSpectrumPlot._drawRateWarning = function(canvasCtx) {
     if (this._logRateWarning != undefined) {
         canvasCtx.save();
