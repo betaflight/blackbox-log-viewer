@@ -239,7 +239,7 @@ function FlightLog(logData) {
         if (!that.isFieldDisabled().SETPOINT) {
             fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
         }
-        if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
+        if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
             fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
         }
 
@@ -632,7 +632,7 @@ function FlightLog(logData) {
                     }
 
                     // Add the Feedforward PID sum (P+I+D+F)
-                    if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
+                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
                         for (var axis = 0; axis < 3; axis++) {
                             let pidSum =
                                 (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
