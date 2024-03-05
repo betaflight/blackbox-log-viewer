@@ -51,14 +51,13 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
      if (Math.abs(this._BetaflightRate - this._actualeRate) / this._actualeRate > WARNING_RATE_DIFFERENCE)
             this._blackBoxRate = Math.round(this._actualeRate);
 
-    if (this._BetaflightRate != this._blackBoxRate)
+    if (this._BetaflightRate !== this._blackBoxRate) {
         return {
             actualRate: this._actualeRate,
             betaflightRate: this._BetaflightRate
         };
-    else
-        return undefined;
-
+    }
+    return undefined;
 };
 
 GraphSpectrumCalc.setInTime = function(time) {
