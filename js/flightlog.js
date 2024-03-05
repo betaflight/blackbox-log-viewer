@@ -672,8 +672,7 @@ function FlightLog(logData) {
                         } else {
                             // Roll, pitch and yaw
                             for (let axis = 0; axis <= AXIS.YAW; axis++) {
-                                destFrame[fieldIndex++] =
-                                    (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
+                                destFrame[fieldIndex++] = rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0;
                             }
                             // Throttle
                             destFrame[fieldIndex++] =
