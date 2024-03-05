@@ -75,7 +75,7 @@ var
             }
         };
 
-           this.resize = function() {
+       this.resize = function() {
 
             var newSize = getSize();
 
