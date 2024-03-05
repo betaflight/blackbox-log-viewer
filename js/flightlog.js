@@ -662,7 +662,7 @@ function FlightLog(logData) {
                         // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
                         if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
                             // Roll, pitch and yaw
-                            for (var axis = 0; axis <= AXIS.YAW; axis++) {
+                            for (let axis = 0; axis <= AXIS.YAW; axis++) {
                                 destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
                             }
                             // Throttle
