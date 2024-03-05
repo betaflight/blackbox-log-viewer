@@ -209,7 +209,7 @@ function FlightLog(logData) {
         } else
             return false;
     };
-    
+
     function buildFieldNames() {
         // Make an independent copy
         fieldNames = parser.frameDefs.I.name.slice(0);
@@ -239,7 +239,7 @@ function FlightLog(logData) {
         if (!that.isFieldDisabled().SETPOINT) {
             fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
         }
-        if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
+        if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
             fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
         }
 
@@ -385,8 +385,8 @@ function FlightLog(logData) {
                         destFrame,
                         destFrame_currentIndex;
 
-                    // The G frames need to be processed always. They are "invalid" if not H (Home) has been detected 
-                    // before, but if not processed the viewer shows cuts and gaps. This happens if the quad takes off before 
+                    // The G frames need to be processed always. They are "invalid" if not H (Home) has been detected
+                    // before, but if not processed the viewer shows cuts and gaps. This happens if the quad takes off before
                     // fixing enough satellites.
                     if (frameValid || (frameType == 'G' && frame)) {
                         switch (frameType) {
@@ -419,7 +419,7 @@ function FlightLog(logData) {
                                     destFrame[slowFrameIndex + destFrame_currentIndex] = lastSlow[slowFrameIndex] === undefined ? null : lastSlow[slowFrameIndex];
                                 }
                                 destFrame_currentIndex += slowFrameLength;
-                                
+
                                 // Also merge last seen gps-frame data
                                 for (let gpsFrameIndex = 0; gpsFrameIndex < lastGPSLength; gpsFrameIndex++) {
                                     destFrame[gpsFrameIndex + destFrame_currentIndex] = lastGPS[gpsFrameIndex] === undefined ? null : lastGPS[gpsFrameIndex];
@@ -617,7 +617,7 @@ function FlightLog(logData) {
                         destFrame = destChunk.frames[i],
                         fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
-                    if (gyroADC) { //don't calculate attitude if no gyro data
+                    if (!that.isFieldDisabled().GYRO) { //don't calculate attitude if no gyro data
                         attitude = chunkIMU.updateEstimatedAttitude(
                             [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
                             [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
@@ -632,7 +632,7 @@ function FlightLog(logData) {
                     }
 
                     // Add the Feedforward PID sum (P+I+D+F)
-                    if (axisPID) {
+                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
                         for (var axis = 0; axis < 3; axis++) {
                             let pidSum =
                                 (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
@@ -647,7 +647,7 @@ function FlightLog(logData) {
                             }
 
                             // Assign value
-                            destFrame[fieldIndex++] = pidSum; 
+                            destFrame[fieldIndex++] = pidSum;
                         }
                     }
 
@@ -657,29 +657,31 @@ function FlightLog(logData) {
                     // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
                     var fieldIndexRcCommands = fieldIndex;
 
-                    // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
-                    if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
-                        // Roll, pitch and yaw
-                        for (var axis = 0; axis <= AXIS.YAW; axis++) {
-                            destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
-                        } 
-                        // Throttle
-                        destFrame[fieldIndex++] = srcFrame[setpoint[AXIS.YAW + 1]]/10;
+                    if (!that.isFieldDisabled().SETPOINT) {
 
-                    // Versions earlier to 4.0 we must calculate the expected setpoint
-                    } else {
-                        // Roll, pitch and yaw
-                        for (var axis = 0; axis <= AXIS.YAW; axis++) {
+                        // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
+                        if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
+                            // Roll, pitch and yaw
+                            for (let axis = 0; axis <= AXIS.YAW; axis++) {
+                                destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
+                            }
+                            // Throttle
+                            destFrame[fieldIndex++] = srcFrame[setpoint[AXIS.YAW + 1]]/10;
+
+                        // Versions earlier to 4.0 we must calculate the expected setpoint
+                        } else {
+                            // Roll, pitch and yaw
+                            for (let axis = 0; axis <= AXIS.YAW; axis++) {
+                                destFrame[fieldIndex++] = rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0;
+                            }
+                            // Throttle
                             destFrame[fieldIndex++] =
-                                (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
-                        } 
-                        // Throttle
-                        destFrame[fieldIndex++] =
-                            (rcCommand[AXIS.YAW + 1] !== undefined ? that.rcCommandRawToThrottle(srcFrame[rcCommand[AXIS.YAW + 1]]) : 0);
+                                (rcCommand[AXIS.YAW + 1] !== undefined ? that.rcCommandRawToThrottle(srcFrame[rcCommand[AXIS.YAW + 1]]) : 0);
+                        }
                     }
 
                     // Calculate the PID Error
-                    if (axisPID && gyroADC) {
+                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
                             destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
@@ -1085,7 +1087,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             }
 
             var rcRate = sysConfig["rc_rates"][axis] / 100.0;
-            if (rcRate > 2.0) { 
+            if (rcRate > 2.0) {
                 rcRate += RC_RATE_INCREMENTAL * (rcRate - 2.0);
             }
 
