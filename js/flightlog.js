@@ -657,7 +657,7 @@ function FlightLog(logData) {
                     // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
                     var fieldIndexRcCommands = fieldIndex;
 
-                    if(!that.isFieldDisabled().SETPOINT) {
+                    if (!that.isFieldDisabled().SETPOINT) {
 
                         // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
                         if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
