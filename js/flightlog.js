@@ -671,7 +671,7 @@ function FlightLog(logData) {
                         // Versions earlier to 4.0 we must calculate the expected setpoint
                         } else {
                             // Roll, pitch and yaw
-                            for (var axis = 0; axis <= AXIS.YAW; axis++) {
+                            for (let axis = 0; axis <= AXIS.YAW; axis++) {
                                 destFrame[fieldIndex++] =
                                     (rcCommand[axis] !== undefined ? that.rcCommandRawToDegreesPerSecond(srcFrame[rcCommand[axis]], axis, currentFlightMode) : 0);
                             }
