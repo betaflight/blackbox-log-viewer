@@ -54,7 +54,7 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
     if (this._BetaflightRate !== this._blackBoxRate) {
         return {
             actualRate: this._actualeRate,
-            betaflightRate: this._BetaflightRate
+            betaflightRate: this._BetaflightRate,
         };
     }
     return undefined;
