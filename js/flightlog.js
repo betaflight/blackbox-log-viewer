@@ -681,7 +681,7 @@ function FlightLog(logData) {
                     }
 
                     // Calculate the PID Error
-                    if (!(that.isFieldDisabled().GYRO || that.isFieldDisabled().PID)) {
+                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
                             destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
