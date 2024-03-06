@@ -911,7 +911,7 @@ function FlightLogFieldPresenter() {
             'debug[4]':'Minimum Gyro period in 100th of a us',
             'debug[5]':'Maximum Gyro period in 100th of a us',
             'debug[6]':'Span of Gyro period in 100th of a us',
-            'debug[7]':'Not Used',
+            'debug[7]':'Gyro cycle deviation in 100th of a us',
         },
         'TIMING_ACCURACY' : {
             'debug[all]':'Timing Accuracy',
@@ -1897,6 +1897,8 @@ function FlightLogFieldPresenter() {
                     return value.toFixed(0);
                 case 'DSHOT_TELEMETRY_COUNTS':
                     return value.toFixed(0);
+                case 'EZLANDING':
+                    return `${(value / 100.0).toFixed(2)} %`;
             }
             return value.toFixed(0);
         }

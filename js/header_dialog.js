@@ -465,7 +465,7 @@ function HeaderDialog(dialog, onSave) {
             {name: 'Unfiltered Gyroscope', description: 'Unfiltered gyro data'},
         ];
 
-        const fieldsList_e = $('.fields_list');
+        const fieldsList_e = $('.fields_list').empty();
 
         for (let i = 0; i < fields.length; i++) {
             const row_e = $(`<tr><td><label class="option"><input class="field ${i}
@@ -602,9 +602,15 @@ function HeaderDialog(dialog, onSave) {
         setParameter('rcYawExpo'                ,sysConfig.rc_expo[2],2);
         setParameter('vbatscale'				,sysConfig.vbatscale,0);
         setParameter('vbatref'					,sysConfig.vbatref,0);
-        setParameter('vbatmincellvoltage'		,sysConfig.vbatmincellvoltage,1);
-        setParameter('vbatmaxcellvoltage'		,sysConfig.vbatmaxcellvoltage,1);
-        setParameter('vbatwarningcellvoltage'	,sysConfig.vbatwarningcellvoltage,1);
+        if (activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
+            setParameter('vbatmincellvoltage'       ,sysConfig.vbatmincellvoltage,2);
+            setParameter('vbatmaxcellvoltage'       ,sysConfig.vbatmaxcellvoltage,2);
+            setParameter('vbatwarningcellvoltage'   ,sysConfig.vbatwarningcellvoltage,2);
+        } else {
+            setParameter('vbatmincellvoltage'       ,sysConfig.vbatmincellvoltage,1);
+            setParameter('vbatmaxcellvoltage'       ,sysConfig.vbatmaxcellvoltage,1);
+            setParameter('vbatwarningcellvoltage'   ,sysConfig.vbatwarningcellvoltage,1);
+        }
         setParameter('minthrottle'				,sysConfig.minthrottle,0);
         setParameter('maxthrottle'				,sysConfig.maxthrottle,0);
         setParameter('currentMeterOffset'		,sysConfig.currentMeterOffset,0);
