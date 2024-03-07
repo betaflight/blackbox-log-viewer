@@ -52,11 +52,15 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
             this._blackBoxRate = Math.round(this._actualeRate);
 
     if (this._BetaflightRate !== this._blackBoxRate) {
+        $('.actual-lograte').text(this._actualeRate.toFixed(0) + "/" + this._BetaflightRate.toFixed(0)+"Hz");
         return {
             actualRate: this._actualeRate,
             betaflightRate: this._BetaflightRate,
         };
     }
+    else
+        $('.actual-lograte').text("");
+
     return undefined;
 };
 
