@@ -57,9 +57,9 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
             actualRate: this._actualeRate,
             betaflightRate: this._BetaflightRate,
         };
-    }
-    else
+    } else {
         $('.actual-lograte').text("");
+    }
 
     return undefined;
 };
