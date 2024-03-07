@@ -1712,3 +1712,7 @@ dialog h3 {
     padding-right: 9px;
     line-height: 28px;
 }
+
+.actual-lograte {
+    color: red;
+}
