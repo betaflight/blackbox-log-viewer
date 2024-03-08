@@ -485,8 +485,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             curves_table.each(function() {
                 const fieldFriendlyName = $('select.form-control option:selected', this).text();
                 let curve = curvesData[fieldFriendlyName];
-                if(curve.checked) {
-                }
+                $('input[name=saveMinMax]',this).attr("checked", curve.checked);
             });
         }
     }

@@ -123,6 +123,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="grid" type="checkbox"/></td>'
                     + '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>'
+                    + '<td><input name="saveMinMax" type="checkbox"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -231,6 +232,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="grid">Grid</th>'
                                                     + '<th name="MinValue">Minimum</th>'
                                                     + '<th name="MaxValue">Maximum</th>'
+                                                    + '<th>Save</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
