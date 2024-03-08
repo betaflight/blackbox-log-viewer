@@ -10,7 +10,7 @@ function GraphConfigurationDialog(dialog, onSave) {
         logGrapher = null,
         prevCfg = null,
         cfgMustBeRestored = false;
-    
+
     function chooseColor(currentSelection) {
         const selectColor = $('<select class="color-picker"></select>');
             for(let i=0; i<GraphConfig.PALETTE.length; i++) {
@@ -123,6 +123,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="grid" type="checkbox"/></td>'
                     + '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>'
+                    + '<td><input name="saveMinMax" type="checkbox"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -161,7 +162,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                    .css('color', $('select.color-picker option:selected', elem).val());
         });
 
-        // Add event when mouse double click at the enabled Minimum input field to restore default Min values. 
+        // Add event when mouse double click at the enabled Minimum input field to restore default Min values.
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MinValue]',elem).dblclick( function() {
             let name = $('select.form-control option:selected', elem).val();
@@ -231,7 +232,8 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="color">Color</th>'
                                                     + '<th name="grid">Grid</th>'
                                                     + '<th name="MinValue">Minimum</th>'
-                                                    + '<th name="MaxValue">Maximum</th>'    
+                                                    + '<th name="MaxValue">Maximum</th>'
+                                                    + '<th>Save</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
@@ -427,7 +429,7 @@ function GraphConfigurationDialog(dialog, onSave) {
             fieldsSeen[fieldName] = true;
         }
 
-        /* 
+        /*
          * If the graph config has any fields in it that we don't have available in our flight log, add them to
          * the GUI anyway. (This way we can build a config when using a tricopter (which includes a tail servo) and
          * keep that tail servo in the config when we're viewing a quadcopter).
@@ -459,9 +461,9 @@ function GraphConfigurationDialog(dialog, onSave) {
         prevCfg = convertUIToGraphConfig();
         cfgMustBeRestored = false;
     };
-    
+
     $("#dlgGraphConfiguration").on('hidden.bs.modal', function() {
-        $('.graph-configuration-dialog').css('pointer-events', 'all'); 
+        $('.graph-configuration-dialog').css('pointer-events', 'all');
         if (cfgMustBeRestored)
             onSave(prevCfg);
     });
