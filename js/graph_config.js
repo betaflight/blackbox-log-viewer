@@ -39,7 +39,7 @@ function GraphConfig(graphConfig) {
     /**
      * Convert the given graph configs to make them appropriate for the given flight log.
      */
-    this.adaptGraphs = function(flightLog, graphs) {
+    this.adaptGraphs = function(flightLog, graphs, isNewLog) {
         var
             logFieldNames = flightLog.getMainFieldNames(),
 
@@ -73,9 +73,9 @@ function GraphConfig(graphConfig) {
 
                     if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
-                    } else {
-                        // added checking for compatibality with previous versions of BBE by first start
-                        if (field.curve.MinMax == undefined)                           
+                    }
+                    else {
+                        if ((field.curve.MinMax == undefined) || (isNewLog == true && !field.curve.saveMinMax))
                             field.curve.MinMax = defaultCurve.MinMax;
                     }
 
@@ -225,7 +225,7 @@ GraphConfig.load = function(config) {
         }
 
 /*
-TODO -  The stats data have small issues of min-max data !!!! 
+TODO -  The stats data have small issues of min-max data !!!!
         var getMinMaxForFields = function() {
             // helper to make a curve scale based on the combined min/max of one or more fields
             var
@@ -277,11 +277,11 @@ TODO -  The stats data have small issues of min-max data !!!!
 
             return {min:-500, max:500};
         }
-        
+
         var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            const mmChartUnits = 
+            const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
@@ -295,7 +295,7 @@ TODO -  The stats data have small issues of min-max data !!!!
         var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            let mmChartUnits = 
+            let mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
@@ -312,7 +312,7 @@ TODO -  The stats data have small issues of min-max data !!!!
         const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
         const mm = getMinMaxForFields(fieldName);
         // added convertation min max values from log file units to friendly chart
-        const mmChartUnits = 
+        const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
@@ -1179,10 +1179,10 @@ TODO -  The stats data have small issues of min-max data !!!!
                         }
                     case 'DSHOT_TELEMETRY_COUNTS':
                         switch (fieldName) {
-                            case 'debug[0]': 
-                            case 'debug[1]': 
-                            case 'debug[2]': 
-                            case 'debug[3]': 
+                            case 'debug[0]':
+                            case 'debug[1]':
+                            case 'debug[2]':
+                            case 'debug[3]':
                                 return {
                                     power: 1.0,
                                     MinMax: {
@@ -1303,20 +1303,20 @@ TODO -  The stats data have small issues of min-max data !!!!
      * @param flightLog The reference to the FlightLog object
      * @param logGrapher The reference to the FlightLogGrapher object
      * @param fieldName Name of the field
-     */  
+     */
     GraphConfig.getMinMaxForFieldDuringWindowTimeInterval = function(flightLog, logGrapher, fieldName) {
         const WindowCenterTime = logGrapher.getWindowCenterTime();
         const WindowWidthTime = logGrapher.getWindowWidthTime();
         const minTime = WindowCenterTime - WindowWidthTime/2;
         const maxTime = WindowCenterTime + WindowWidthTime/2;
-        
+
         let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
                 min: -500,
                 max: 500
             };
-            
+
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
         mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
         return mm;
@@ -1335,7 +1335,7 @@ TODO -  The stats data have small issues of min-max data !!!!
                 min: -500,
                 max: 500
             };
-            
+
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
         mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
 
@@ -1403,7 +1403,7 @@ TODO -  The stats data have small issues of min-max data !!!!
             var
                 srcGraph = EXAMPLE_GRAPHS[i],
                 destGraph = {
-                    label: srcGraph.label, 
+                    label: srcGraph.label,
                     fields: [],
                     height: srcGraph.height || 1
                 },
@@ -1424,12 +1424,12 @@ TODO -  The stats data have small issues of min-max data !!!!
             }
 
             for (j = 0; j < srcGraph.fields.length; j++) {
-                var 
+                var
                     srcFieldName = srcGraph.fields[j],
                     destField = {
                         name: srcFieldName
                     };
-                
+
                 destGraph.fields.push(destField);
             }
 
