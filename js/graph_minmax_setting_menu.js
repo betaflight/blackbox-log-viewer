@@ -444,11 +444,11 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         for (const key in curvesData) {
             const curve = curvesData[key];
-                curve.checked = true;
-                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                elem = $('<div><input type="checkbox" checked="false">' + curve.friendly_name + '</input></div>');
+                $('input', elem).prop('checked', curve.save || e.shiftKey == true);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
-                    curve.checked = this.checked;
+                    curve.save = this.checked;
                 });
                 menu3.append(elem);
         }
@@ -462,10 +462,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         elem = $('<div class="topBorder">SET CURVES AS SAVING</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
             SetSelectedCurvesMinMaxForSave();
-            menu1.css('pointer-events', 'all');
         });
         menu3.append(elem);
 
@@ -484,25 +481,27 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
             curves_table.each(function() {
                 const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                let curve = curvesData[fieldFriendlyName];
-                $('input[name=saveMinMax]',this).attr("checked", curve.checked);
+                const curve = curvesData[fieldFriendlyName];
+                $('input[name=saveMinMax]', this).prop('checked', curve.save);
             });
         }
     }
 
     let curvesData = {};
     curves_table.each(function() {
-        let fieldName = $("select", this).val();
-        let fieldFriendlyName = $('select.form-control option:selected', this).text();
-        let minimum = $("input[name=MinValue]", this).val();
-        let maximum = $("input[name=MaxValue]", this).val();
+        const fieldName = $("select", this).val();
+        const fieldFriendlyName = $('select.form-control option:selected', this).text();
+        const minimum = $("input[name=MinValue]", this).val();
+        const maximum = $("input[name=MaxValue]", this).val();
+        const save = $("input[name=saveMinMax]", this).is(':checked');
         let curve = {
             name: fieldName,
             friendly_name: fieldFriendlyName,
             min: parseFloat(minimum),
             max: parseFloat(maximum),
             selected: fieldName == selected_field_name,
-            checked: false
+            checked: false,
+            save: save
         };
         curvesData[fieldFriendlyName] = curve;
     });
