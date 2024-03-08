@@ -674,7 +674,7 @@ function BlackboxLogViewer() {
         setVideoInTime(false);
         setVideoOutTime(false);
 
-        activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig, true);
 
         graph.onSeek = function(offset) {
             //Seek faster
