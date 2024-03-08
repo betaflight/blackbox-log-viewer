@@ -434,6 +434,63 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         }
     }
 
+    function ShowCurvesToSetSaveMinMaxCheckboxedMenu(e) {
+        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
+        menu1.css('pointer-events', 'none');
+        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
+        menu3.empty();
+        elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+        menu3.append(elem);
+
+        for (const key in curvesData) {
+            const curve = curvesData[key];
+                curve.checked = true;
+                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                $('input', elem).click(function (e) {
+                    let curve = curvesData[this.parentElement.innerText];
+                    curve.checked = this.checked;
+                });
+                menu3.append(elem);
+        }
+
+        if (e.shiftKey == true) {
+            SetSelectedCurvesMinMaxForSave();
+            menu3.empty();
+            menu1.css('pointer-events', 'all');
+            return;
+        }
+
+        elem = $('<div class="topBorder">SET CURVES AS SAVING</div>');
+        elem.click(function () {
+            menu3.removeClass("show");
+            menu3.empty();
+            SetSelectedCurvesMinMaxForSave();
+            menu1.css('pointer-events', 'all');
+        });
+        menu3.append(elem);
+
+        elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+        elem.click(function () {
+            menu3.removeClass("show");
+            menu3.empty();
+            menu1.css('pointer-events', 'all');
+        });
+        menu3.append(elem);
+        menu3.css("left", this.clientWidth);
+        menu3.css("top", this.offsetTop);
+        menu3.addClass("show");
+
+        function SetSelectedCurvesMinMaxForSave () {
+            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+            curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                if(curve.checked) {
+                }
+            });
+        }
+    }
+
     let curvesData = {};
     curves_table.each(function() {
         let fieldName = $("select", this).val();
@@ -558,6 +615,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     menu1.append(elem);
 
     elem = $('<div class="topBorder iconDiv">Save&#9658;</div>');
+    elem.click(ShowCurvesToSetSaveMinMaxCheckboxedMenu);
     menu1.append(elem);
 
     elem = $('<div class="topBorder iconDiv">&#9668;Exit</div>');
