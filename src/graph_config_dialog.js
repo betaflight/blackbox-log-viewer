@@ -93,16 +93,21 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
+                    if (field.curve.MinMax.save == undefined)
+                        field.curve.MinMax.save = false;
+                    $("input[name=saveMinMax]",elem).attr("checked", field.curve.MinMax.save);
                 }
                 else{
                     $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
+                    $("input[name=saveMinMax]",elem).attr("checked", false);
                 }
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
+                $("input[name=saveMinMax]",elem).attr("checked", false);
             }
         }
     }
@@ -356,10 +361,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
             graph.height = parseInt($('select.graph-height option:selected', this).val());
 
             $(".config-graph-field", this).each(function() {
-                let fieldName = $("select", this).val();
-                let minimum = $("input[name=MinValue]", this).val();
-                let maximum = $("input[name=MaxValue]", this).val();
-
+                const fieldName = $("select", this).val();
+                const minimum = $("input[name=MinValue]", this).val();
+                const maximum = $("input[name=MaxValue]", this).val();
+                const save = $("input[name=saveMinMax]",this).is(':checked');
                 field = {
                     name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
@@ -367,7 +372,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
                         MinMax: {
                             min: parseFloat(minimum),
-                            max: parseFloat(maximum)
+                            max: parseFloat(maximum),
+                            save: save
                         }
                     },
                     default: { // These are used to restore configuration if using mousewheel adjustments
@@ -375,7 +381,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,
                         MinMax: {
                             min: parseFloat(minimum),
-                            max: parseFloat(maximum)
+                            max: parseFloat(maximum),
+                            save: save
                         }
                     },
                     color: $('select.color-picker option:selected', this).val(),
