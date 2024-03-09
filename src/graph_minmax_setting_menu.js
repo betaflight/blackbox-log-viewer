@@ -158,9 +158,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder">SET CURVES TO ZERO OFFSET</div>');
+        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO ZERO OFFSET</div>');
         elem.click(function () {
             SetSelectedCurvesToZeroOffset();
+            menu3.removeClass("show");
+            menu3.empty();
+            menu1.css('pointer-events', 'all');
         });
         menu3.append(elem);
 
@@ -252,7 +255,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder">SET MIN-MAX VALUES</div>');
+        elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
             menu3.removeClass("show");
             menu3.empty();
@@ -315,7 +318,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder">SET CURVES TO SAME SCALE</div>');
+        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO SAME SCALE</div>');
         elem.click(function () {
             menu3.removeClass("show");
             menu3.empty();
@@ -460,9 +463,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder">SET CURVES AS SAVING</div>');
+        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES AS SAVING</div>');
         elem.click(function () {
             SetSelectedCurvesMinMaxForSave();
+            menu3.removeClass("show");
+            menu3.empty();
+            menu1.css('pointer-events', 'all');
         });
         menu3.append(elem);
 
