@@ -22,6 +22,7 @@ import {
     FF_AVERAGING,
     SIMPLIFIED_PIDS_MODE,
     THROTTLE_LIMIT_TYPE,
+    DEBUG_MODE,
 } from "./flightlog_fielddefs";
 
 export function HeaderDialog(dialog, onSave) {
@@ -571,6 +572,7 @@ export function HeaderDialog(dialog, onSave) {
 				});
 		}
 
+        let PID_CONTROLLER_TYPE = [];
 		if((sysConfig.firmware >= 3.0 && sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) ||
 		   (sysConfig.firmware >= 2.0 && sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT)) {
 
