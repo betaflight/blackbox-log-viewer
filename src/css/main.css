@@ -1,3 +1,7 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap/dist/css/bootstrap-theme.min.css";
+@import "leaflet/dist/leaflet.css";
+
 body {
     padding-bottom:2em;
 }
