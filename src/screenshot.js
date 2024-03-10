@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 export function makeScreenshot() {
     let el = document.querySelector("#screenshot-frame"),
         now = new Date(),
