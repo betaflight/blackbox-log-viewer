@@ -21,7 +21,7 @@
 
 
 .user-settings-dialog .watermark-logo-image {
-    background-image: url('../images/logo-background.png');
+    background-image: url('/images/logo-background.png');
     height: 100px;
     width: 100px;
     background-repeat:no-repeat;

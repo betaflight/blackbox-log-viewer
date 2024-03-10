@@ -1222,19 +1222,19 @@ html.isINAV .navbar-logo {
 }
 
 html.isCF .navbar-logo img {
-	content: url(".././images/cf_logo_white.svg");
+	content: url("/images/cf_logo_white.svg");
 	width: 160px;
 }
 
 html.isBF .navbar-logo img {
-    content: url(".././images/light-wide-2.svg");
+    content: url("/images/light-wide-2.svg");
     width: 282px;
     height: 50px;
     margin-left: 0 !important;
 }
 
 html.isINAV .navbar-logo img {
-	content: url(".././images/inav_logo_white.png");
+	content: url("/images/inav_logo_white.png");
 	width: auto;
 	left: -16px;
 	top: 3px;
