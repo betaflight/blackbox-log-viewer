@@ -33,6 +33,7 @@ import {
     mouseNotification,
     getManifestVersion,
 } from './tools.js';
+import { PrefStorage } from './pref_storage.js';
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;

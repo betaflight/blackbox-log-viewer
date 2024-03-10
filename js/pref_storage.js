@@ -1,11 +1,9 @@
-"use strict";
-
 /**
  * A local key/value store for JSON-encodable values. Supports localStorage and chrome.storage.local backends.
  * 
  * Supply keyPrefix if you want it automatically prepended to key names.
  */
-function PrefStorage(keyPrefix) {
+export function PrefStorage(keyPrefix) {
     var
         LOCALSTORAGE = 0,
         CHROME_STORAGE_LOCAL = 1,
