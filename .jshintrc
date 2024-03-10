@@ -9,15 +9,6 @@
         "$"                : false,
         "jQuery"           : false,
         "THREE"            : false,
-        "Modernizr"        : false,
-        
-        "ArrayDataStream"  : true,
-        "Craft2D"          : true,
-        "Craft3D"          : true,
-        "ExpoCurve"        : true,
-        "FIFOCache"        : true,
-        "FlightLogGrapher" : true,
-        "IMU"   : true,
-        "SeekBar"   : true
+        "Modernizr"        : false
     }
 }

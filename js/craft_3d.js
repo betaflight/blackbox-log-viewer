@@ -1,6 +1,4 @@
-"use strict";
-
-function Craft3D(flightLog, canvas, propColors) {
+export function Craft3D(flightLog, canvas, propColors) {
     var 
         // Sets the distance between the center point and the center of the motor mount
         ARM_LENGTH = 1,

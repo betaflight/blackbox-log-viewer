@@ -1,7 +1,5 @@
-"use strict";
-
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
-function hexToFloat(string) {
+export function hexToFloat(string) {
     var arr = new Uint32Array(1);
     arr[0] = parseInt(string, 16);
     
@@ -10,7 +8,7 @@ function hexToFloat(string) {
     return floatArr[0]; 
 }
 
-function uint32ToFloat(value) {
+export function uint32ToFloat(value) {
     var arr = new Uint32Array(1);
     arr[0] = value;
     
@@ -19,11 +17,11 @@ function uint32ToFloat(value) {
     return floatArr[0]; 
 }
 
-function asciiArrayToString(arr) {
+export function asciiArrayToString(arr) {
     return String.fromCharCode.apply(null, arr);
 }
 
-function asciiStringToByteArray(s) {
+export function asciiStringToByteArray(s) {
     var bytes = [];
     
     for (var i = 0; i < s.length; i++)
@@ -32,77 +30,52 @@ function asciiStringToByteArray(s) {
     return bytes;
 }
 
-function signExtend24Bit(u) {
+export function signExtend24Bit(u) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (u & 0x800000) ? (u | 0xFF000000) : u;
 }
 
-function signExtend16Bit(word) {
+export function signExtend16Bit(word) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (word & 0x8000) ? (word | 0xFFFF0000) : word;
 }
 
-function signExtend14Bit(word) {
+export function signExtend14Bit(word) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (word & 0x2000) ? (word | 0xFFFFC000) : word;
 }
 
-function signExtend8Bit(byte) {
+export function signExtend8Bit(byte) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (byte & 0x80) ? (byte | 0xFFFFFF00) : byte;
 }
 
-function signExtend7Bit(byte) {
+export function signExtend7Bit(byte) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (byte & 0x40) ? (byte | 0xFFFFFF80) : byte;
 }
 
-function signExtend6Bit(byte) {
+export function signExtend6Bit(byte) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (byte & 0x20) ? (byte | 0xFFFFFFC0) : byte;
 }
 
-function signExtend5Bit(byte) {
+export function signExtend5Bit(byte) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (byte & 0x10) ? (byte | 0xFFFFFFE0) : byte;
 }
 
-function signExtend4Bit(nibble) {
+export function signExtend4Bit(nibble) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (nibble & 0x08) ? (nibble | 0xFFFFFFF0) : nibble;
 }
 
-function signExtend2Bit(byte) {
+export function signExtend2Bit(byte) {
     //If sign bit is set, fill the top bits with 1s to sign-extend
     return (byte & 0x02) ? (byte | 0xFFFFFFFC) : byte;
 }
 
-/**
- * Get the first index of needle in haystack, or -1 if it was not found. Needle and haystack
- * are both byte arrays.
- * 
- * Provide startIndex in order to specify the first index to search from
- * @param haystack
- * @param needle
- * @returns {Number}
- */
-function memmem(haystack, needle, startIndex) {
-    var i, j, found;
-    
-    for (var i = startIndex ? startIndex : 0; i <= haystack.length - needle.length; i++) {
-        if (haystack[i] == needle[0]) {
-            for (var j = 1; j < needle.length && haystack[i + j] == needle[j]; j++)
-                ;
-        
-            if (j == needle.length)
-                return i;
-        }
-    }
-    
-    return -1;
-}
-
-function stringHasComma(string) {
+export function stringHasComma(string) {
     /***
      * Checks if the string contains at least one comma.
      *
@@ -114,7 +87,7 @@ function stringHasComma(string) {
     return string.match(/.*,.*/) != null;
 }
 
-function parseCommaSeparatedString(string, length) {
+export function parseCommaSeparatedString(string, length) {
     /***
      * Parse a comma separated string for individual values.
      *
@@ -158,7 +131,7 @@ var zoomLevels = [
         0.25, 0.33, 0.50, 0.67, 0.75, 0.80, 0.90, 1.00, 1.10, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 4.00, 5.00
     ];
 
-function zoomIn() {
+export function zoomIn() {
     var currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
     for(var i=0; i<zoomLevels.length; i++) {
         if(zoomLevels[i] > currentZoom) {
@@ -168,7 +141,7 @@ function zoomIn() {
     }
 }
 
-function zoomOut() {
+export function zoomOut() {
     var currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
     for(var i=zoomLevels.length-1; i>0; i--) {
         if(zoomLevels[i] < currentZoom) {
@@ -182,7 +155,7 @@ function zoomOut() {
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
  * of the next-smaller element (or 0 if `item` is smaller than all values in `list`).
  **/
-function binarySearchOrPrevious(list, item) {
+export function binarySearchOrPrevious(list, item) {
     var
         min = 0,
         max = list.length,
@@ -209,7 +182,7 @@ function binarySearchOrPrevious(list, item) {
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
  * of the next-larger element (or the index of the last item if `item` is larger than all values in `list`).
  */
-function binarySearchOrNext(list, item) {
+export function binarySearchOrNext(list, item) {
     var
         min = 0,
         max = list.length,
@@ -232,7 +205,7 @@ function binarySearchOrNext(list, item) {
     return result;
 }
 
-function leftPad(string, pad, minLength) {
+export function leftPad(string, pad, minLength) {
     string = "" + string;
     
     while (string.length < minLength)
@@ -241,7 +214,7 @@ function leftPad(string, pad, minLength) {
     return string;
 }
 
-function formatTime(msec, displayMsec) {
+export function formatTime(msec, displayMsec) {
 // modify function to allow negative times.
     var
         ms, secs, mins, hours;
@@ -261,7 +234,7 @@ function formatTime(msec, displayMsec) {
         + (displayMsec ? "." + leftPad(ms, "0", 3) : "");
 }
 
-function stringLoopTime(loopTime, pid_process_denom, unsynced_fast_pwm, motor_pwm_rate) {
+export function stringLoopTime(loopTime, pid_process_denom, unsynced_fast_pwm, motor_pwm_rate) {
     var returnString = '';
     if(loopTime!=null) {
         returnString = (loopTime +'\u03BCS (' + parseFloat((1000/loopTime).toFixed(3)) + 'kHz');
@@ -276,7 +249,7 @@ function stringLoopTime(loopTime, pid_process_denom, unsynced_fast_pwm, motor_pw
     return returnString;
 }
 
-function stringTimetoMsec(input) {
+export function stringTimetoMsec(input) {
     try {
             var matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
 
@@ -292,15 +265,15 @@ function stringTimetoMsec(input) {
         }
 }
 
-function constrain(value, min, max) {
+export function constrain(value, min, max) {
     return Math.max(min, Math.min(value, max));
 }
 
-function validate(value, defaultValue) {
+export function validate(value, defaultValue) {
     return (value!=null)?value:defaultValue;
 }
 
-function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
     if (typeof stroke == 'undefined') {
       stroke = true;
     }
@@ -334,7 +307,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
     }
   }
 
-var mouseNotification = {
+export var mouseNotification = {
     enabled: true,
     elem: $('.mouseNotification'),
     timeout: null,
@@ -430,7 +403,7 @@ var mouseNotification = {
     }
 };
 
-function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
+export function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
     /***
      * Check if firmware version is higher or equal to requested version
      *
@@ -449,7 +422,7 @@ function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
     }
 }
 
-function getManifestVersion(manifest) {
+export function getManifestVersion(manifest) {
     try {
         if (!manifest) {
             manifest = chrome.runtime.getManifest();
@@ -468,6 +441,6 @@ function getManifestVersion(manifest) {
     }
 }
 
-function escapeRegExp(string) {
+export function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

@@ -1,10 +1,8 @@
-"use strict";
-
 /**
  * This IMU code is used for attitude estimation, and is directly derived from Baseflight's imu.c.
  */
 
-function IMU(copyFrom) {
+export function IMU(copyFrom) {
     // Constants:
     var
         RAD = Math.PI / 180.0,

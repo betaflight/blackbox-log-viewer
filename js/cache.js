@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * A FIFO cache to hold key-pair mappings. Its capacity will be at least the initialCapacity
  * supplied on creation, which you can increase by increasing the "capacity" property. 
@@ -10,7 +8,7 @@
  * 
  * Element age is determined by the time it was added or last get()'d from the cache.
  */
-function FIFOCache(initialCapacity) {
+export function FIFOCache(initialCapacity) {
     //Private:
     var
         queue = [],

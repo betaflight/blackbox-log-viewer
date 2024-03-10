@@ -1,3 +1,29 @@
+import {
+    OFF_ON,
+    FAST_PROTOCOL,
+    MOTOR_SYNC,
+    SERIALRX_PROVIDER,
+    ANTI_GRAVITY_MODE,
+    RC_SMOOTHING_TYPE,
+    RC_SMOOTHING_MODE,
+    RC_SMOOTHING_DEBUG_AXIS,
+    FILTER_TYPE,
+    SUPER_EXPO_YAW,
+    GYRO_LPF,
+    GYRO_HARDWARE_LPF,
+    GYRO_32KHZ_HARDWARE_LPF,
+    ACC_HARDWARE,
+    BARO_HARDWARE,
+    MAG_HARDWARE,
+    ITERM_RELAX,
+    ITERM_RELAX_TYPE,
+    RATES_TYPE,
+    GYRO_TO_USE,
+    FF_AVERAGING,
+    SIMPLIFIED_PIDS_MODE,
+    THROTTLE_LIMIT_TYPE,
+} from "./flightlog_fielddefs";
+
 export function HeaderDialog(dialog, onSave) {
 
 	// Private Variables

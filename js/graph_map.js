@@ -1,6 +1,5 @@
 export function MapGrapher() {
-  let userSettings,
-    myMap,
+  let myMap,
     currentLogStartDateTime,
     currentTime,
     craftPosition,

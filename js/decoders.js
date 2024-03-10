@@ -1,4 +1,14 @@
-"use strict";
+import { ArrayDataStream } from './datastream.js';
+import {
+    signExtend24Bit,
+    signExtend16Bit,
+    signExtend8Bit,
+    signExtend7Bit,
+    signExtend6Bit,
+    signExtend5Bit,
+    signExtend4Bit,
+    signExtend2Bit,
+} from './tools.js';
 
 /**
  * Extend ArrayDataStream with decoders for advanced formats.

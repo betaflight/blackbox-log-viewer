@@ -1,3 +1,6 @@
+import { FILTER_TYPE } from "./flightlog_fielddefs";
+import { constrain } from "./tools";
+
 const BLUR_FILTER_PIXEL       = 1,
       DEFAULT_FONT_FACE       = "Verdana, Arial, sans-serif",
       DEFAULT_MARK_LINE_WIDTH = 2,

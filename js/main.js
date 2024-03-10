@@ -22,6 +22,17 @@ import { GraphLegend } from './graph_legend.js';
 import { FlightLog } from './flightlog.js';
 import { FlightLogParser } from './flightlog_parser.js';
 import { FlightLogFieldPresenter } from './flightlog_fields_presenter.js';
+import {
+    zoomIn,
+    zoomOut,
+    formatTime,
+    stringLoopTime,
+    stringTimetoMsec,
+    constrain,
+    validate,
+    mouseNotification,
+    getManifestVersion,
+} from './tools.js';
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;

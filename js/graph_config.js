@@ -1,5 +1,6 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-import { DSHOT_MIN_VALUE, DSHOT_RANGE } from "./flightlog_fielddefs";
+import { DSHOT_MIN_VALUE, DSHOT_RANGE, RATES_TYPE } from "./flightlog_fielddefs";
+import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
     var

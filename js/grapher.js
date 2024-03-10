@@ -1,10 +1,18 @@
 import { FlightLogSticks } from "./sticks"; 
 import { FlightLogParser } from "./flightlog_parser";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+import {
+    FlightLogEvent,
+    FLIGHT_LOG_FLIGHT_MODE_NAME,
+    FLIGHT_LOG_DISARM_REASON,
+} from "./flightlog_fielddefs";
 import { Craft2D } from "./craft_2d";
+import { Craft3D } from "./craft_3d";
 import { FlightLogAnalyser } from "./graph_spectrum";
 import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
+import { ExpoCurve } from "./expo";
+import { leftPad, formatTime } from "./tools";
 
 export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options) {
     var

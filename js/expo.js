@@ -1,11 +1,9 @@
-"use strict";
-
 /**
  * Creates a lookup-table based expo curve, which takes values that range between -inputrange and +inputRange, and
  * scales them to -outputRange to +outputRange with the given power curve (curve <1.0 exaggerates values near the origin,
  * curve = 1.0 is a straight line mapping). 
  */
-function ExpoCurve(offset, power, inputRange, outputRange, steps) {
+export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     var
         curve, inputScale, rawInputScale;
     

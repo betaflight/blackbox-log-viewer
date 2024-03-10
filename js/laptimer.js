@@ -1,3 +1,5 @@
+import { formatTime, roundRect } from "./tools";
+
 export function LapTimer() {
 
 	var lapTime = {
