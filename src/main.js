@@ -2147,7 +2147,7 @@ function BlackboxLogViewer() {
         prefs.get('graphConfig', function(item) {
             graphConfig = GraphConfig.load(item);
             
-            if (!graphConfig) {
+            if (!graphConfig && flightLog) {
                 graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
             }
         });
