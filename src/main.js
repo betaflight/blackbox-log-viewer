@@ -1,9 +1,9 @@
-import $ from './jquery';
+import $ from './jquery.js';
 import 'jquery-ui/dist/jquery-ui';
 import 'bootstrap';
 import './vendor/jquery.nouislider.all.min.js';
 import { throttle } from 'throttle-debounce';
-import { MapGrapher } from './graph_map';
+import { MapGrapher } from './graph_map.js';
 import { FlightLogGrapher } from './grapher.js';
 import { FlightLogVideoRenderer } from './flightlog_video_renderer.js';
 import { VideoExportDialog } from './video_export_dialog.js';
@@ -34,6 +34,7 @@ import {
     getManifestVersion,
 } from './tools.js';
 import { PrefStorage } from './pref_storage.js';
+import { makeScreenshot } from './screenshot.js';
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;

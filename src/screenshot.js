@@ -1,6 +1,4 @@
-"use strict";
-
-function makeScreenshot() {
+export function makeScreenshot() {
     let el = document.querySelector("#screenshot-frame"),
         now = new Date(),
         timestamp = "" + now.getFullYear() +
