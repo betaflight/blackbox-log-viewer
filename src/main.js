@@ -155,20 +155,9 @@ function BlackboxLogViewer() {
         mapGrapher = new MapGrapher();
 
 
+        // TODO: Figure out if we can open the same file in a new window
         function createNewBlackboxWindow(fileToOpen) {
-
-            const gui = require('nw.gui');
-            gui.Window.open(INITIAL_APP_PAGE,
-            {
-                'width'  : NEW_WINDOW_WIDTH,
-                'height' : NEW_WINDOW_HEIGHT,
-                'min_width'  : INNER_BOUNDS_WIDTH,
-                'min_height' : INNER_BOUNDS_HEIGHT,
-            },
-            function (createdWindow) {
-                createdWindow.window.argv = fileToOpen;
-            });
-
+            window.open(window.location.href, '_blank').focus();
         }
 
     function blackboxTimeFromVideoTime() {
