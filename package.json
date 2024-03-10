@@ -2,24 +2,13 @@
   "name": "betaflight-blackbox-explorer",
   "displayName": "Betaflight - Blackbox Explorer",
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
-  "version": "3.7.0",
+  "version": "4.0.0",
   "main": "index.html",
-  "chromium-args": "--disable-features=nw2",
   "default_locale": "en",
   "scripts": {
-    "start": "gulp debug",
-    "gulp": "gulp",
-    "release": "gulp release",
-    "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "preview": "vite preview"
-  },
-  "window": {
-    "id": "main",
-    "show": true,
-    "icon": "images/bf_icon_128.png",
-    "min_width": 930,
-    "min_height": 480
   },
   "repository": {
     "type": "git",
@@ -40,25 +29,8 @@
     "vite": "^5.0.12"
   },
   "devDependencies": {
-    "@quanle94/innosetup": "^6.0.2",
-    "command-exists": "^1.2.8",
-    "del": "^5.0.0",
-    "gulp": "^4.0.2",
-    "gulp-debian": "^0.3.2",
-    "gulp-rename": "^2.0.0",
-    "gulp-util": "3.0.8",
-    "gulp-yarn": "^3.0.0",
-    "gulp-zip": "^5.0.0",
     "inflection": "1.12.0",
-    "nw-builder": "3.8.3",
-    "os": "^0.1.1",
-    "rpm-builder": "^1.0.0",
-    "temp": "^0.9.0",
-    "through2": "4.0.2",
     "yarn": "^1.22.0"
-  },
-  "optionalDependencies": {
-    "appdmg": "^0.6.6"
   },
   "resolutions": {
     "**/**/lodash.template": "^4.5.0"
