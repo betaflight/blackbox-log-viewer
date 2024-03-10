@@ -1,10 +1,5 @@
 import $ from './jquery.js';
-import 'leaflet';
-import 'leaflet-marker-rotation';
-import 'Leaflet.MultiOptionsPolyline';
-import 'jquery-ui/dist/jquery-ui';
-import 'bootstrap';
-import './vendor/jquery.nouislider.all.min.js';
+import './vendor.js'
 import { throttle } from 'throttle-debounce';
 import { MapGrapher } from './graph_map.js';
 import { FlightLogGrapher } from './grapher.js';
