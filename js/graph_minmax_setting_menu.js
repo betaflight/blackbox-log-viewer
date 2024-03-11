@@ -621,11 +621,11 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     elem.click(function () {
         main_menu.removeClass('show');
         main_menu.empty();
-        $('.graph-configuration-dialog').css('pointer-events', 'all');
+        $('.config-graph-field, .btn').css('pointer-events', 'all');
     });
     main_menu.append(elem);
 
-    $('.graph-configuration-dialog').css('pointer-events', 'none');
+    $('.config-graph-field, .btn').css('pointer-events', 'none');
     main_menu.css('pointer-events', 'all');
     sub_menu.css('pointer-events', 'all');
     main_menu.addClass('show');
