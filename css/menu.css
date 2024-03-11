@@ -54,6 +54,10 @@
   background-color: #f6f6f6;
 }
 
+.dropdown-content div:active {
+  font-style: italic;
+}
+
 .bottomBorder {
   border-bottom: 1px solid var(--borderColor);
 }
