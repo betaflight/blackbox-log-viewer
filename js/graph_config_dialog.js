@@ -1,7 +1,7 @@
 "use strict";
 
 function GraphConfigurationDialog(dialog, onSave) {
-    var
+    let
         // Some fields it doesn't make sense to graph
         BLACKLISTED_FIELDS = {time:true, loopIteration:true, 'setpoint[0]':true, 'setpoint[1]':true, 'setpoint[2]':true, 'setpoint[3]':true},
         offeredFieldNames = [],
@@ -216,13 +216,10 @@ function GraphConfigurationDialog(dialog, onSave) {
                                 + '<div class="flexDiv">'
                                     + '<label class="control-label">Fields:</label>'
                                     + '<div class="selectWrapper">'
-                                        + '<div class="dropdown-content menu1"></div>'
+                                        + '<div class="dropdown-content main_menu"></div>'
                                     + '</div>'
                                     + '<div class="selectWrapper">'
-                                        + '<div class="dropdown-content menu2"></div>'
-                                    + '</div>'
-                                    + '<div class="selectWrapper">'
-                                        + '<div class="dropdown-content menu3"></div>'
+                                        + '<div class="dropdown-content sub_menu"></div>'
                                     + '</div>'
                                 +'</div>'
                                 + '<div class="form-group config-graph-field-header">'

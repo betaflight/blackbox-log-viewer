@@ -1,3 +1,4 @@
+"use strict";
 // Show context menu to setup min-max values
 function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name, selected_curve, curves_table, flightLog, logGrapher, RefreshCharts) {
 
@@ -133,12 +134,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function ShowCurvesToSetZeroOffsetCheckboxedMenu (e) {
-        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
-        menu1.css('pointer-events', 'none');
-        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
-        menu3.empty();
+        let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        main_menu.css('pointer-events', 'none');
+        let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        sub_menu.empty();
         elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         for (const key in curvesData) {
             const curve = curvesData[key];
@@ -148,35 +149,35 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
                 });
-                menu3.append(elem);
+                sub_menu.append(elem);
         }
 
         if (e.shiftKey == true) {
             SetSelectedCurvesToZeroOffset();
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO ZERO OFFSET</div>');
         elem.click(function () {
             SetSelectedCurvesToZeroOffset();
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
-        menu3.css("left", this.clientWidth);
-        menu3.css("top", this.offsetTop);
-        menu3.addClass("show");
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass("show");
 
         function SetSelectedCurvesToZeroOffset () {
             curves_table.each(function() {
@@ -228,12 +229,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function ShowCurvesToSetMinMaxCheckboxedMenu (e) {
-        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
-        menu1.css('pointer-events', 'none');
-        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
-        menu3.empty();
+        let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        main_menu.css('pointer-events', 'none');
+        let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        sub_menu.empty();
         elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         for (const key in curvesData) {
             const curve = curvesData[key];
@@ -244,36 +245,36 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                         let curve = curvesData[this.parentElement.innerText];
                         curve.checked = this.checked;
                     });
-                menu3.append(elem);
+                sub_menu.append(elem);
             }
         }
 
         if (e.shiftKey == true) {
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
+            sub_menu.removeClass("show");
+            sub_menu.empty();
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            menu1.css('pointer-events', 'all');
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
-        menu3.css("left", this.clientWidth);
-        menu3.css("top", this.offsetTop);
-        menu3.addClass("show");
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass("show");
 
         function ApplySelectedCurveMinMaxToOtherSelectedCurves () {
             const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
@@ -293,12 +294,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function ShowCurvesToSetSameScaleCheckboxedMenu(e) {
-        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
-        menu1.css('pointer-events', 'none');
-        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
-        menu3.empty();
+        let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        main_menu.css('pointer-events', 'none');
+        let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        sub_menu.empty();
         elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         for (const key in curvesData) {
             const curve = curvesData[key];
@@ -308,35 +309,35 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
                 });
-                menu3.append(elem);
+                sub_menu.append(elem);
         }
 
         if (e.shiftKey == true) {
             FitSelectedCurveToSameScale();
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO SAME SCALE</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
+            sub_menu.removeClass("show");
+            sub_menu.empty();
             FitSelectedCurveToSameScale();
-            menu1.css('pointer-events', 'all');
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
-        menu3.css("left", this.clientWidth);
-        menu3.css("top", this.offsetTop);
-        menu3.addClass("show");
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass("show");
 
         function FitSelectedCurveToSameScale () {
             const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
@@ -367,18 +368,18 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function SetZoomToCurves () {
-        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
-        menu1.css('pointer-events', 'none');
+        let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        main_menu.css('pointer-events', 'none');
         let elem = undefined;
-        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
-        menu3.empty();
+        let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        sub_menu.empty();
 
         elem = $('<label class="bottomBorder">INPUT ZOOM [%]:</label>');
-        menu3.append(elem);
+        sub_menu.append(elem);
         elem = $('<div><input type="number" min="5" max="1000" step="10" value="10"/></div>');
-        menu3.append(elem);
+        sub_menu.append(elem);
         elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         for (const key in curvesData) {
             const curve = curvesData[key];
@@ -388,39 +389,39 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 let curve = curvesData[this.parentElement.innerText];
                 curve.checked = this.checked;
             });
-            menu3.append(elem);
+            sub_menu.append(elem);
         }
 
         elem = $('<div class="topBorder">ZOOM IN</div>');
         elem.click(function () {
-            let zoomScale = parseFloat($("input[type=number]", menu3).val());
+            let zoomScale = parseFloat($("input[type=number]", sub_menu).val());
             zoomScale = Math.max(zoomScale, 5.0);
             zoomScale = Math.min(zoomScale, 1000);
             zoomScale = 100.0 / (100.0 + zoomScale);
             SetZoomToSelectedCurves(zoomScale);
         });
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder">ZOOM OUT</div>');
         elem.click(function () {
-            let zoomScale = parseFloat($("input[type=number]", menu3).val());
+            let zoomScale = parseFloat($("input[type=number]", sub_menu).val());
             zoomScale = Math.max(zoomScale, 5.0);
             zoomScale = Math.min(zoomScale, 1000);
             zoomScale = (100.0 + zoomScale) / 100.0;
             SetZoomToSelectedCurves(zoomScale);
         });
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
-        menu3.css("left", this.clientWidth);
-        menu3.css("top", this.offsetTop);
-        menu3.addClass("show");
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass("show");
 
         function SetZoomToSelectedCurves (zoomScale) {
             curves_table.each(function() {
@@ -438,12 +439,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function ShowCurvesToSetSaveMinMaxCheckboxedMenu(e) {
-        let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
-        menu1.css('pointer-events', 'none');
-        let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
-        menu3.empty();
+        let main_menu = $(".main_menu");
+        main_menu.css('pointer-events', 'none');
+        let sub_menu = $(".sub_menu");
+        sub_menu.empty();
         elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         for (const key in curvesData) {
             const curve = curvesData[key];
@@ -453,35 +454,35 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                     let curve = curvesData[this.parentElement.innerText];
                     curve.save = this.checked;
                 });
-                menu3.append(elem);
+                sub_menu.append(elem);
         }
 
         if (e.shiftKey == true) {
             SetSelectedCurvesMinMaxForSave();
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES AS SAVING</div>');
         elem.click(function () {
             SetSelectedCurvesMinMaxForSave();
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu3.removeClass("show");
-            menu3.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass("show");
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu3.append(elem);
-        menu3.css("left", this.clientWidth);
-        menu3.css("top", this.offsetTop);
-        menu3.addClass("show");
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass("show");
 
         function SetSelectedCurvesMinMaxForSave () {
             const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
@@ -514,126 +515,120 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
     const oneRow = Object.keys(curvesData).length == 1;
 
-    let menu1 = $(".dropdown-content.menu1", selected_curve.parents(".config-graph"));
-    let menu2 = $(".dropdown-content.menu2", selected_curve.parents(".config-graph"));
-    let menu3 = $(".dropdown-content.menu3", selected_curve.parents(".config-graph"));
-    menu1.empty();
-    menu2.empty();
-    menu3.empty();
+    let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+    let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+    main_menu.empty();
+    sub_menu.empty();
 
     let elem = undefined;
     if (!oneRow) {
         elem = $('<div> All to defailt</div>');
         elem.click(SetAllMinMaxToDefault);
-        menu1.append(elem);
+        main_menu.append(elem);
 
         elem = $('<div>Selected to this one&#9658;</div>');
         elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
-        menu1.append(elem);
+        main_menu.append(elem);
 
         elem = $('<div>Selected to one scale&#9658;</div>');
         elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
-        menu1.append(elem);
+        main_menu.append(elem);
 
         elem = $('<div>Selected centered&#9658;</div>');
         elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
-        menu1.append(elem);
+        main_menu.append(elem);
     }
 
     let caption = oneRow ?  "This full range&#9658;" : "All full range&#9658;"
     elem = $('<div class="bottomBorder iconDiv">' + caption + '</div>');
     elem.click(function (e) {
-        menu2.empty();
+        sub_menu.empty();
         let elem = $('<div>At all global log time</div>');
         elem.click(SetAllMinMaxToFullRangeDuringAllTime);
-        menu2.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div>At local window time</div>');
         elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
-        menu2.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu2.removeClass('show');
-            menu2.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass('show');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu2.append(elem);
-        menu2.css("left", this.clientWidth);
-        menu2.css("top", this.offsetTop);
-        menu2.addClass('show');
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass('show');
 
-        menu1.css('pointer-events', 'none');
+        main_menu.css('pointer-events', 'none');
     });
-    menu1.append(elem);
+    main_menu.append(elem);
 
     elem = $('<div> This curve to defailt</div>');
     elem.click(SetSelectedCurveMinMaxToDefault);
-    menu1.append(elem);
-
-//        elem = $('<div>This curve to:</div>');
-//      elem.click(SetSelectedCurveMinMaxToDefault);
-    //menu1.append(elem);
+    main_menu.append(elem);
 
     elem = $('<div class="bottomBorder iconDiv">This curve centered</div>');
     elem.click(SetSelectedCurveToZeroOffset);
-    menu1.append(elem);
+    main_menu.append(elem);
 
     elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
     elem.click(SetZoomToCurves);
-    menu1.append(elem);
+    main_menu.append(elem);
 
     elem = $('<div>Other actions&#9658;</div>');
     elem.click(function () {
-        menu1.css('pointer-events', 'none');
-        menu2.empty();
+        main_menu.css('pointer-events', 'none');
+        sub_menu.empty();
 
         let elem = $('<div>Fit all curves to zero ofset at global full range</div>');
         elem.click(SetAllMinMaxToZeroOffsetDuringAllTime);
-        menu2.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div>Fit all curves to zero offset at window full range</div>');
         elem.click(SetAllMinMaxToZeroOffsetDuringWindowTime);
-        menu2.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="bottomBorder iconDiv>Place all curves to one scale</div>');
         elem.click(SetAllCurvesToOneScale);
-        menu2.append(elem);
-        menu2.addClass('show');
+        sub_menu.append(elem);
+        sub_menu.addClass('show');
 
         elem = $('<div class="Fit this curve at global full range</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
-        menu2.append(elem);
+        sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            menu2.removeClass('show');
-            menu2.empty();
-            menu1.css('pointer-events', 'all');
+            sub_menu.removeClass('show');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
         });
-        menu2.append(elem);
-        menu2.css("left", this.clientWidth);
-        menu2.css("top", this.offsetTop);
-        menu2.addClass('show');
+        sub_menu.append(elem);
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass('show');
     });
-    menu1.append(elem);
+    main_menu.append(elem);
 
     elem = $('<div class="topBorder iconDiv">Save&#9658;</div>');
     elem.click(ShowCurvesToSetSaveMinMaxCheckboxedMenu);
-    menu1.append(elem);
+    main_menu.append(elem);
 
     elem = $('<div class="topBorder iconDiv">&#9668;Exit</div>');
     elem.click(function () {
-        menu1.removeClass('show');
-        menu1.empty();
+        main_menu.removeClass('show');
+        main_menu.empty();
         $('.graph-configuration-dialog').css('pointer-events', 'all');
     });
-    menu1.append(elem);
+    main_menu.append(elem);
 
     $('.graph-configuration-dialog').css('pointer-events', 'none');
-    menu1.css('pointer-events', 'all');
-    menu2.css('pointer-events', 'all');
-    menu3.css('pointer-events', 'all');
+    main_menu.css('pointer-events', 'all');
+    sub_menu.css('pointer-events', 'all');
+    main_menu.addClass('show');
 
-    menu1.addClass('show');
+    main_menu.addClass('show');
 }
