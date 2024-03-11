@@ -630,5 +630,33 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     sub_menu.css('pointer-events', 'all');
     main_menu.addClass('show');
 
-    main_menu.addClass('show');
+    selected_curve.parents(".config-graph").keydown( function (e) {
+        let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+
+        //handle the event once
+        if (this.lastEventTime == e.timeStamp) {
+            if (main_menu[0].childElementCount>0)
+                e.stopPropagation();
+            return;
+        }
+        this.lastEventTime = e.timeStamp;
+
+        if (e.which == 27) {
+            e.preventDefault();
+            if (sub_menu[0].childElementCount>0) {
+                sub_menu.removeClass("show");
+                sub_menu.empty();
+                main_menu.css('pointer-events', 'all');
+                e.stopPropagation();
+            }
+            else
+            if (main_menu[0].childElementCount>0) {
+                main_menu.removeClass('show');
+                main_menu.empty();
+                $('.config-graph-field, .btn').css('pointer-events', 'all');
+                e.stopPropagation();
+            }
+        }
+    });
 }
