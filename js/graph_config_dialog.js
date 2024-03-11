@@ -467,10 +467,12 @@ function GraphConfigurationDialog(dialog, onSave) {
     };
 
     $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
+        // The dialog close is locking, while the menu is opened
         if($('.config-graph-field').css('pointer-events') == 'none') {
             e.preventDefault();
             return false;
         }
+
         if (cfgMustBeRestored)
             onSave(prevCfg);
     });
