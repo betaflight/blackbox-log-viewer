@@ -454,9 +454,9 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function ShowCurvesToSetSaveMinMaxCheckboxedMenu(e) {
-        let main_menu = $(".main_menu");
+        let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
         main_menu.css('pointer-events', 'none');
-        let sub_menu = $(".sub_menu");
+        let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
         elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
         sub_menu.append(elem);
