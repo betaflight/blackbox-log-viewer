@@ -229,24 +229,39 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function ShowCurvesToSetMinMaxCheckboxedMenu (e) {
+        let inputMinValue = null, inputMaxValue = null;
         let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
         main_menu.css('pointer-events', 'none');
         let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
-        elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+
+        elem = $('<label class="bottomBorder topBorder">SET MIN MAX VALUES</label>');
+        sub_menu.append(elem);
+
+        const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
+        elem = $('<div>Min:<input name="InputMin" type="number" value="10"/></div>');
+        inputMinValue = $("input[name=InputMin]", elem);
+        inputMinValue.val(SelectedCurveMin);
+        sub_menu.append(elem);
+
+        const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+        elem = $('<div>Max:<input name="InputMax" type="number" value="100"/></div>');
+        inputMaxValue = $("input[name=InputMax]", elem);
+        inputMaxValue.val(SelectedCurveMax);
+        sub_menu.append(elem);
+
+        elem = $('<label class="bottomBorder topBorder">SELECT CURVES:</label>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
             const curve = curvesData[key];
-            if (!curve.selected) {
-                    curve.checked = true;
-                    elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
-                    $('input', elem).click(function (e) {
-                        let curve = curvesData[this.parentElement.innerText];
-                        curve.checked = this.checked;
-                    });
-                sub_menu.append(elem);
-            }
+            curve.checked = true;
+            elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+            $('input', elem).click(function (e) {
+                let curve = curvesData[this.parentElement.innerText];
+                curve.checked = this.checked;
+            });
+            sub_menu.append(elem);
         }
 
         if (e.shiftKey == true) {
@@ -256,7 +271,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
+        elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
             sub_menu.removeClass("show");
             sub_menu.empty();
@@ -277,16 +292,16 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         sub_menu.addClass("show");
 
         function ApplySelectedCurveMinMaxToOtherSelectedCurves () {
-            const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
-            const SelectedCurveMax = $('input[name=MaxValue]', selected_curve).val();
+            const curveMin = inputMinValue.val();
+            const curveMax = inputMaxValue.val();
             curves_table.each(function() {
                 const fieldFriendlyName = $('select.form-control option:selected', this).text();
                 let curve = curvesData[fieldFriendlyName];
                 if(curvesData[fieldFriendlyName].checked) {
-                    curve.min = parseFloat(SelectedCurveMin);
-                    curve.max = parseFloat(SelectedCurveMax);
-                    $('input[name=MinValue]',this).val(SelectedCurveMin);
-                    $('input[name=MaxValue]',this).val(SelectedCurveMax);
+                    curve.min = parseFloat(curveMin);
+                    curve.max = parseFloat(curveMax);
+                    $('input[name=MinValue]',this).val(curveMin);
+                    $('input[name=MaxValue]',this).val(curveMax);
                 }
             });
             RefreshCharts();
