@@ -159,7 +159,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<label class="topBorder iconDiv">&#9668;SET CURVES TO ZERO OFFSET</label>');
+        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO ZERO OFFSET</div>');
         elem.click(function () {
             SetSelectedCurvesToZeroOffset();
             sub_menu.removeClass("show");
@@ -271,7 +271,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<label class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</label>');
+        elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
             sub_menu.removeClass("show");
             sub_menu.empty();
@@ -558,12 +558,22 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     elem = $('<div class="bottomBorder iconDiv">' + caption + '</div>');
     elem.click(function (e) {
         sub_menu.empty();
-        let elem = $('<div>At all global log time</div>');
+        let elem = $('<label class="titleDiv bottomBorder">At all global log time</label>');
+        sub_menu.append(elem);
+        elem = $('<div>Full range</div>');
         elem.click(SetAllMinMaxToFullRangeDuringAllTime);
         sub_menu.append(elem);
+        elem = $('<div>Centered full range</div>');
+        elem.click(SetAllMinMaxToZeroOffsetDuringAllTime);
+        sub_menu.append(elem);
 
-        elem = $('<div>At local window time</div>');
+        elem = $('<label class="titleDiv topBorder bottomBorder">At local window time</label>');
+        sub_menu.append(elem);
+        elem = $('<div>Full range</div>');
         elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
+        sub_menu.append(elem);
+        elem = $('<div>Centered full range</div>');
+        elem.click(SetAllMinMaxToZeroOffsetDuringWindowTime);
         sub_menu.append(elem);
 
         elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
@@ -591,41 +601,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
     elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
     elem.click(SetZoomToCurves);
-    main_menu.append(elem);
-
-    elem = $('<div>Other actions&#9658;</div>');
-    elem.click(function () {
-        main_menu.css('pointer-events', 'none');
-        sub_menu.empty();
-
-        let elem = $('<div>Fit all curves to zero ofset at global full range</div>');
-        elem.click(SetAllMinMaxToZeroOffsetDuringAllTime);
-        sub_menu.append(elem);
-
-        elem = $('<div>Fit all curves to zero offset at window full range</div>');
-        elem.click(SetAllMinMaxToZeroOffsetDuringWindowTime);
-        sub_menu.append(elem);
-
-        elem = $('<div class="bottomBorder iconDiv>Place all curves to one scale</div>');
-        elem.click(SetAllCurvesToOneScale);
-        sub_menu.append(elem);
-        sub_menu.addClass('show');
-
-        elem = $('<div class="Fit this curve at global full range</div>');
-        elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
-        sub_menu.append(elem);
-
-        elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
-        elem.click(function () {
-            sub_menu.removeClass('show');
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
-        });
-        sub_menu.append(elem);
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass('show');
-    });
     main_menu.append(elem);
 
     elem = $('<div class="topBorder iconDiv">Save&#9658;</div>');
