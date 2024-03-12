@@ -121,6 +121,17 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         RefreshCharts();
     }
 
+    function SetSelectedMinMaxToZeroOffsetDuringAllTime () {
+        const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
+        const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+        let curve = curvesData[fieldFriendlyName];
+        curve.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
+        curve.min = -curve.max;
+        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(1));
+        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(1));
+        RefreshCharts();
+    }
+
     function SetSelectedCurveMinMaxToFullRangeDuringWindowTime () {
         const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
 
@@ -132,6 +143,20 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
         RefreshCharts();
     }
+
+    function SetSelectedMinMaxToZeroOffsetDuringWindowTime () {
+        const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
+
+        const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+        let curve = curvesData[fieldFriendlyName];
+        curve.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
+        curve.min = -curve.max;
+        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(1));
+        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(1));
+        RefreshCharts();
+    }
+
+
 
     function ShowCurvesToSetZeroOffsetCheckboxedMenu (e) {
         let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
@@ -554,7 +579,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         main_menu.append(elem);
     }
 
-    let caption = oneRow ?  "This full range&#9658;" : "All full range&#9658;"
+    let caption = oneRow ?  "This full range&#9658;" : "All full range&#9658;";
     elem = $('<div class="bottomBorder iconDiv">' + caption + '</div>');
     elem.click(function (e) {
         sub_menu.empty();
@@ -595,9 +620,47 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     elem.click(SetSelectedCurveMinMaxToDefault);
     main_menu.append(elem);
 
-    elem = $('<div class="bottomBorder iconDiv">This curve centered</div>');
+    elem = $('<div>This curve centered</div>');
     elem.click(SetSelectedCurveToZeroOffset);
     main_menu.append(elem);
+
+    if (!oneRow) {
+        elem = $('<div class="bottomBorder iconDiv">This curve full range&#9658;</div>');
+        elem.click(function (e) {
+            sub_menu.empty();
+            let elem = $('<label class="titleDiv bottomBorder">At all global log time</label>');
+            sub_menu.append(elem);
+            elem = $('<div>Full range</div>');
+            elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
+            sub_menu.append(elem);
+            elem = $('<div>Centered full range</div>');
+            elem.click(SetSelectedMinMaxToZeroOffsetDuringAllTime);
+            sub_menu.append(elem);
+
+            elem = $('<label class="titleDiv topBorder bottomBorder">At local window time</label>');
+            sub_menu.append(elem);
+            elem = $('<div>Full range</div>');
+            elem.click(SetSelectedCurveMinMaxToFullRangeDuringWindowTime);
+            sub_menu.append(elem);
+            elem = $('<div>Centered full range</div>');
+            elem.click(SetSelectedMinMaxToZeroOffsetDuringWindowTime);
+            sub_menu.append(elem);
+
+            elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
+            elem.click(function () {
+                sub_menu.removeClass('show');
+                sub_menu.empty();
+                main_menu.css('pointer-events', 'all');
+            });
+            sub_menu.append(elem);
+            sub_menu.css("left", this.clientWidth);
+            sub_menu.css("top", this.offsetTop);
+            sub_menu.addClass('show');
+
+            main_menu.css('pointer-events', 'none');
+        });
+        main_menu.append(elem);
+    }
 
     elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
     elem.click(SetZoomToCurves);
