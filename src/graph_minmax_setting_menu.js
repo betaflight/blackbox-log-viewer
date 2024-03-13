@@ -275,7 +275,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         inputMaxValue.val(SelectedCurveMax);
         sub_menu.append(elem);
 
-        elem = $('<label class="titleDiv bottomBorder topBorder">SELECT CURVES:</label>');
+        elem = $('<label class="titleDiv bottomBorder topBorder">TO SELECTED CURVES:</label>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
@@ -504,7 +504,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="bottomBorder iconDiv">&#9668;SET CURVES AS SAVING</div>');
+        elem = $('<div class="bottomBorder topBorder iconDiv">&#9668;SET CURVES TO SAVE</div>');
         elem.click(function () {
             SetSelectedCurvesMinMaxForSave();
             sub_menu.removeClass("show");
@@ -562,6 +562,9 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
     let elem = undefined;
     if (!oneRow) {
+        elem = $('<label class="titleDiv">Group curves actions:</label>');
+        main_menu.append(elem);
+
         elem = $('<div> All to defailt</div>');
         elem.click(SetAllMinMaxToDefault);
         main_menu.append(elem);
@@ -577,7 +580,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div>Selected centered&#9658;</div>');
         elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
         main_menu.append(elem);
-        
+
         elem = $('<div class="bottomBorder iconDiv">All full range&#9658;</div>');
         elem.click(function (e) {
             sub_menu.empty();
@@ -614,6 +617,10 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         });
         main_menu.append(elem);
     }
+
+    const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
+    elem = $('<label class="titleDiv">' + selectedFieldName + ':</label>');
+    main_menu.append(elem);
 
     elem = $('<div> This curve to defailt</div>');
     elem.click(SetSelectedCurveMinMaxToDefault);
