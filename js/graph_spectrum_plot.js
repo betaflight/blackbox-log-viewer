@@ -54,6 +54,8 @@ GraphSpectrumPlot.initialize = function(canvas, sysConfig) {
     this._invalidateCache();
     this._invalidateDataCache();
     this._logRateWarning = undefined;
+    this._zoomX =  1;
+    this._zoomY =  1;
 };
 
 GraphSpectrumPlot.setZoom = function(zoomX, zoomY) {
