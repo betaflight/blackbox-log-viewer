@@ -40,10 +40,6 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
     let minTime = this._flightLog.getMinTime(),
         maxTime = this._flightLog.getMaxTime();
     let timeRange = maxTime - minTime;
-    if (timeRange > MAX_ANALYSER_LENGTH) {
-        maxTime = minTime + MAX_ANALYSER_LENGTH;
-        timeRange = MAX_ANALYSER_LENGTH;
-    }
 
     const length = flightLog.getCurrentLogRowsCount();
     this._actualeRate = 1e6 * length / timeRange;
