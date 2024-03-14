@@ -1063,53 +1063,12 @@ export function FlightLog(logData) {
     this.hasGpsData = function() {
         return this.getStats()?.frame?.G ? true : false;;
     };
-    
-    /**
-     * Function to compute of min and max curve values during time interval.
-     * @param field_name String: Curve fields name.
-     * @param start_time Integer: The interval start time .
-     * @end_time start_time Integer: The interval end time .
-     * @returns {min: MinValue, max: MaxValue} if success, or {min: Number.MAX_VALUE, max: Number.MAX_VALUE} if error
-     */
-    this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
-        let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
-        let startFrameIndex;
-        let minValue = Number.MAX_VALUE,
-            maxValue = -Number.MAX_VALUE;
-        
-        const fieldIndex = this.getMainFieldIndexByName(field_name);
-        if (chunks.length == 0 || fieldIndex == undefined)
-            return undefined;
-        
-        //Find the first sample that lies inside the window
-        for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
-            if (chunks[0].frames[startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= start_time) {
-                break;
-            }
-        }
 
-        // Pick the sample before that to begin plotting from
-        if (startFrameIndex > 0)
-            startFrameIndex--;
-
-        let frameIndex = startFrameIndex;
-        findingLoop: 
-        for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-            const chunk = chunks[chunkIndex];
-            for (; frameIndex < chunk.frames.length; frameIndex++) {
-                const fieldValue = chunk.frames[frameIndex][fieldIndex];
-                const frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-                minValue = Math.min(minValue, fieldValue);
-                maxValue = Math.max(maxValue, fieldValue);
-                if(frameTime>end_time)
-                    break findingLoop;
-            } 
-            frameIndex = 0;
-        }
-        return {
-            min: minValue,
-            max: maxValue
-        };
+    this.getCurrentLogRowsCount = function () {
+        const stats = this.getStats(this.getLogIndex());
+        const countI = stats.frame['I'] ? stats.frame['I'].totalCount : 0;
+        const countP = stats.frame['P'] ? stats.frame['P'].totalCount : 0;
+        return countI + countP;
     };
 }
 
@@ -1427,6 +1386,6 @@ FlightLog.prototype.isFieldDisabled = function() {
             RPM           : (disabledFields & (1 << 12))!==0,
             GYROUNFILT    : (disabledFields & (1 << 13))!==0,
         };
-        
-        
+
+
 };
