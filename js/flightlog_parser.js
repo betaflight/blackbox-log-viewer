@@ -357,6 +357,14 @@ var FlightLogParser = function(logData) {
             tpa_low_breakpoint: null,
             tpa_low_always: null,
             mixer_type: null,
+            chirp_lag_freq_hz: null,
+            chirp_lead_freq_hz: null,
+            chirp_amplitude_roll: null,
+            chirp_amplitude_pitch: null,
+            chirp_amplitude_yaw: null,
+            chirp_frequency_start_deci_hz: null,
+            chirp_frequency_end_deci_hz: null,
+            chirp_time_seconds: null,
             unknownHeaders : []                     // Unknown Extra Headers
         },
 
@@ -443,6 +451,14 @@ var FlightLogParser = function(logData) {
             tpa_low_breakpoint        : "tpa_low_breakpoint",
             tpa_low_always            : "tpa_low_always",
             mixer_type                : "mixer_type",
+            chirp_lag_freq_hz         : "chirp_lag_freq_hz",
+            chirp_lead_freq_hz        : "chirp_lead_freq_hz",
+            chirp_amplitude_roll      : "chirp_amplitude_roll",
+            chirp_amplitude_pitch     : "chirp_amplitude_pitch",
+            chirp_amplitude_yaw       : "chirp_amplitude_yaw",
+            chirp_frequency_start_deci_hz : "chirp_frequency_start_deci_hz",
+            chirp_frequency_end_deci_hz : "chirp_frequency_end_deci_hz",
+            chirp_time_seconds        : "chirp_time_seconds",
         },
 
         frameTypes,
@@ -860,6 +876,14 @@ var FlightLogParser = function(logData) {
             case "tpa_low_breakpoint":
             case "tpa_low_always":
             case "mixer_type":
+            case "chirp_lag_freq_hz":
+            case "chirp_lead_freq_hz":
+            case "chirp_amplitude_roll":
+            case "chirp_amplitude_pitch":
+            case "chirp_amplitude_yaw":
+            case "chirp_frequency_start_deci_hz":
+            case "chirp_frequency_end_deci_hz":
+            case "chirp_time_seconds":
             case "dterm_lpf_dyn_hz":
                 that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
             break;
