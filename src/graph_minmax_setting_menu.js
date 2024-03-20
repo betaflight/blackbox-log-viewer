@@ -49,6 +49,26 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         RefreshCharts();
     }
 
+    function SetAllMinMaxToOneScaleDuringAllTime () {
+        let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
+        curves_table.each(function() {
+            const fieldName = $("select", this).val();
+            let mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
+            Max = Math.max(Max, Math.max(Math.abs(mm.min), Math.abs(mm.max)));
+        });
+        Min = -Max;
+
+        curves_table.each(function() {
+            const fieldFriendlyName = $('select.form-control option:selected', this).text();
+            let curve = curvesData[fieldFriendlyName];
+            curve.min = Min;
+            curve.max = Max;
+            $('input[name=MinValue]',this).val(Min.toFixed(1));
+            $('input[name=MaxValue]',this).val(Max.toFixed(1));
+        });
+        RefreshCharts();
+    }
+
     function SetAllMinMaxToFullRangeDuringWindowTime () {
         curves_table.each(function() {
             const fieldName = $("select", this).val();
@@ -77,6 +97,26 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             curve.max = mm.max;
             $('input[name=MinValue]',this).val(mm.min.toFixed(1));
             $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+        });
+        RefreshCharts();
+    }
+    
+    function SetAllMinMaxToOneScaleDuringWindowTime () {
+        let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
+        curves_table.each(function() {
+            const fieldName = $("select", this).val();
+            let mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
+            Max = Math.max(Max, Math.max(Math.abs(mm.min), Math.abs(mm.max)));
+        });
+        Min = -Max;
+
+        curves_table.each(function() {
+            const fieldFriendlyName = $('select.form-control option:selected', this).text();
+            let curve = curvesData[fieldFriendlyName];
+            curve.min = Min;
+            curve.max = Max;
+            $('input[name=MinValue]',this).val(Min.toFixed(1));
+            $('input[name=MaxValue]',this).val(Max.toFixed(1));
         });
         RefreshCharts();
     }
@@ -592,6 +632,9 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             elem = $('<div>Centered full range</div>');
             elem.click(SetAllMinMaxToZeroOffsetDuringAllTime);
             sub_menu.append(elem);
+            elem = $('<div>Centered one scale</div>');
+            elem.click(SetAllMinMaxToOneScaleDuringAllTime);
+            sub_menu.append(elem);
 
             elem = $('<label class="titleDiv topBorder bottomBorder">At local window time</label>');
             sub_menu.append(elem);
@@ -600,6 +643,9 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             sub_menu.append(elem);
             elem = $('<div>Centered full range</div>');
             elem.click(SetAllMinMaxToZeroOffsetDuringWindowTime);
+            sub_menu.append(elem);
+            elem = $('<div>Centered one scale</div>');
+            elem.click(SetAllMinMaxToOneScaleDuringWindowTime);
             sub_menu.append(elem);
 
             elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
