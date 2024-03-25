@@ -216,8 +216,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
                                     + '<label class="control-label">Fields:</label>'
                                     + '<div class="selectWrapper">'
                                         + '<div class="dropdown-content main_menu"></div>'
-                                    + '</div>'
-                                    + '<div class="selectWrapper">'
                                         + '<div class="dropdown-content sub_menu"></div>'
                                     + '</div>'
                                 +'</div>'
