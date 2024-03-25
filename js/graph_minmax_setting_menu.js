@@ -203,7 +203,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         main_menu.css('pointer-events', 'none');
         let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
-        elem = $('<label class="titleDiv bottomBorder">SELECT CURVES:</label>');
+        elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
@@ -300,7 +300,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
 
-        elem = $('<label class="titleDiv bottomBorder">SET MIN MAX VALUES</label>');
+        elem = $('<div class="titleDiv bottomBorder">SET MIN MAX VALUES</div>');
         sub_menu.append(elem);
 
         const SelectedCurveMin = $('input[name=MinValue]', selected_curve).val();
@@ -315,7 +315,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         inputMaxValue.val(SelectedCurveMax);
         sub_menu.append(elem);
 
-        elem = $('<label class="titleDiv bottomBorder topBorder">TO SELECTED CURVES:</label>');
+        elem = $('<div class="titleDiv bottomBorder topBorder">TO SELECTED CURVES:</div>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
@@ -378,7 +378,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         main_menu.css('pointer-events', 'none');
         let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
-        elem = $('<label class="bottomBorder titleDiv">SELECT CURVES:</label>');
+        elem = $('<div class="bottomBorder titleDiv">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
@@ -454,11 +454,11 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
 
-        elem = $('<label class="titleDiv bottomBorder">INPUT ZOOM [%]:</label>');
+        elem = $('<div class="titleDiv bottomBorder">INPUT ZOOM [%]:</div>');
         sub_menu.append(elem);
         elem = $('<div><input type="number" min="5" max="1000" step="10" value="10"/></div>');
         sub_menu.append(elem);
-        elem = $('<label class="titleDiv bottomBorder">SELECT CURVES:</label>');
+        elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
@@ -523,7 +523,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         main_menu.css('pointer-events', 'none');
         let sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         sub_menu.empty();
-        elem = $('<label class="bottomBorder">SELECT CURVES:</label>');
+        elem = $('<div class="bottomBorder titleDiv">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
         for (const key in curvesData) {
@@ -602,7 +602,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
     let elem = undefined;
     if (!oneRow) {
-        elem = $('<label class="titleDiv">Group curves actions:</label>');
+        elem = $('<div class="titleDiv">Group curves actions:</div>');
         main_menu.append(elem);
 
         elem = $('<div> All to defailt</div>');
@@ -624,7 +624,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="bottomBorder iconDiv">All full range&#9658;</div>');
         elem.click(function (e) {
             sub_menu.empty();
-            let elem = $('<label class="titleDiv bottomBorder">At all global log time</label>');
+            let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
             sub_menu.append(elem);
             elem = $('<div>Full range</div>');
             elem.click(SetAllMinMaxToFullRangeDuringAllTime);
@@ -636,7 +636,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             elem.click(SetAllMinMaxToOneScaleDuringAllTime);
             sub_menu.append(elem);
 
-            elem = $('<label class="titleDiv topBorder bottomBorder">At local window time</label>');
+            elem = $('<div class="titleDiv topBorder bottomBorder">At local window time</div>');
             sub_menu.append(elem);
             elem = $('<div>Full range</div>');
             elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
@@ -665,7 +665,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
-    elem = $('<label class="titleDiv">' + selectedFieldName + ':</label>');
+    elem = $('<div class="titleDiv">' + selectedFieldName + ':</div>');
     main_menu.append(elem);
 
     elem = $('<div> This curve to defailt</div>');
@@ -679,7 +679,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     elem = $('<div class="bottomBorder iconDiv">This curve full range&#9658;</div>');
     elem.click(function (e) {
         sub_menu.empty();
-        let elem = $('<label class="titleDiv bottomBorder">At all global log time</label>');
+        let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
         sub_menu.append(elem);
         elem = $('<div>Full range</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
@@ -688,7 +688,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(SetSelectedMinMaxToZeroOffsetDuringAllTime);
         sub_menu.append(elem);
 
-        elem = $('<label class="titleDiv topBorder bottomBorder">At local window time</label>');
+        elem = $('<div class="titleDiv topBorder bottomBorder">At local window time</div>');
         sub_menu.append(elem);
         elem = $('<div>Full range</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringWindowTime);
