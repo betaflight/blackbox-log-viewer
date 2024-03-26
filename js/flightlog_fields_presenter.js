@@ -1113,6 +1113,8 @@ function FlightLogFieldPresenter() {
             'debug[1]': 'Adjusted Throttle',
             'debug[2]': 'Upper Limit',
             'debug[3]': 'EZ Land Limit',
+            'debug[4]': 'Stick Limit',
+            'debug[5]': 'Speed Limit',
         },
     };
 
