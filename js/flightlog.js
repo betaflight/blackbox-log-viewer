@@ -1049,6 +1049,30 @@ function FlightLog(logData) {
     this.hasGpsData = function() {
         return this.getStats()?.frame?.G ? true : false;;
     };
+    this.getMinMaxForFieldDuringAllTime = function(field_name) {
+        let
+            stats = this.getStats(),
+            min = Number.MAX_VALUE,
+            max = -Number.MAX_VALUE;
+
+        let
+            fieldIndex = this.getMainFieldIndexByName(field_name),
+            fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+
+        if (fieldStat) {
+            min = Math.min(min, fieldStat.min);
+            max = Math.max(max, fieldStat.max);
+        }
+        else {
+            const mm = this.getMinMaxForFieldDuringTimeInterval(field_name, this.getMinTime(), this.getMaxTime());
+            if (mm != undefined) {
+                min = Math.min(mm.min, min);
+                max = Math.max(mm.max, max);
+            }
+        }
+
+        return {min:min, max:max};
+    }
 }
 
 FlightLog.prototype.accRawToGs = function(value) {
