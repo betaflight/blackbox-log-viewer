@@ -80,16 +80,21 @@ function FlightLog(logData) {
      * that the flightlog presents as one merged frame.
      */
     this.getStats = function(logIndex) {
-        var
-            rawStats = getRawStats(logIndex);
+        let rawStats = getRawStats(logIndex);
 
-        // Just modify the raw stats variable to add this field, the parser won't mind the extra field appearing:
-        if (rawStats.frame.S) {
-            rawStats.field = rawStats.frame.I.field.concat(rawStats.frame.S.field);
-        } else {
-            rawStats.field = rawStats.frame.I.field;
+        if (rawStats.field == undefined) {
+            rawStats.field = [];
+            for (let i=0; i<rawStats.frame.I.field.length; ++i) {
+                rawStats.field[i] = {
+                    min: Math.min(rawStats.frame.I.field[i].min, rawStats.frame.P.field[i].min),
+                    max: Math.max(rawStats.frame.I.field[i].max, rawStats.frame.P.field[i].max)
+                };
+            }
+
+            if (rawStats.frame.S) {
+                rawStats.field = rawStats.field.concat(rawStats.frame.S.field);
+            }
         }
-
         return rawStats;
     };
 
@@ -1044,6 +1049,61 @@ function FlightLog(logData) {
     this.hasGpsData = function() {
         return this.getStats()?.frame?.G ? true : false;;
     };
+
+    /**
+     * Function to compute of min and max curve values during time interval.
+     * @param field_name String: Curve fields name.
+     * @param start_time Integer: The interval start time .
+     * @end_time start_time Integer: The interval end time .
+     * @returns {min: MinValue, max: MaxValue} if success, or {min: Number.MAX_VALUE, max: Number.MAX_VALUE} if error
+     */
+    this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
+        let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
+        let startFrameIndex;
+        let minValue = Number.MAX_VALUE,
+            maxValue = -Number.MAX_VALUE;
+
+        const fieldIndex = this.getMainFieldIndexByName(field_name);
+        if (chunks.length == 0 || fieldIndex == undefined)
+            return undefined;
+
+        //Find the first sample that lies inside the window
+        for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
+            if (chunks[0].frames[startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= start_time) {
+                break;
+            }
+        }
+
+        // Pick the sample before that to begin plotting from
+        if (startFrameIndex > 0)
+            startFrameIndex--;
+
+        let frameIndex = startFrameIndex;
+        findingLoop:
+        for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+            const chunk = chunks[chunkIndex];
+            for (; frameIndex < chunk.frames.length; frameIndex++) {
+                const fieldValue = chunk.frames[frameIndex][fieldIndex];
+                const frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                minValue = Math.min(minValue, fieldValue);
+                maxValue = Math.max(maxValue, fieldValue);
+                if(frameTime>end_time)
+                    break findingLoop;
+            }
+            frameIndex = 0;
+        }
+        return {
+            min: minValue,
+            max: maxValue
+        };
+    };
+
+    this.getCurrentLogRowsCount = function () {
+        const stats = this.getStats(this.getLogIndex());
+        const countI = stats.frame['I'] ? stats.frame['I'].totalCount : 0;
+        const countP = stats.frame['P'] ? stats.frame['P'].totalCount : 0;
+        return countI + countP;
+    };
 }
 
 FlightLog.prototype.accRawToGs = function(value) {
@@ -1053,8 +1113,6 @@ FlightLog.prototype.accRawToGs = function(value) {
 FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
     return this.getSysConfig().gyroScale * 1000000 / (Math.PI / 180.0) * value;
 };
-
-
 
 /***
 
@@ -1182,6 +1240,12 @@ FlightLog.prototype.rcCommandRawToThrottle = function(value) {
     return Math.min(Math.max(((value - this.getSysConfig().minthrottle) / (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) * 100.0, 0.0),100.0);
 };
 
+// rcCommandThrottle back transform function
+FlightLog.prototype.ThrottleTorcCommandRaw = function(value) {
+    // Throttle displayed as percentage
+    return  value / 100 * (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle) + this.getSysConfig().minthrottle;
+};
+
 FlightLog.prototype.rcMotorRawToPctPhysical = function(value) {
 
     // Motor displayed as percentage
@@ -1195,6 +1259,21 @@ FlightLog.prototype.rcMotorRawToPctPhysical = function(value) {
         motorPct = ((value - MIN_ANALOG_VALUE) / ANALOG_RANGE) * 100;
     }
     return Math.min(Math.max(motorPct, 0.0), 100.0);
+
+};
+// rcMotorRaw back transform function
+FlightLog.prototype.PctPhysicalTorcMotorRaw = function(value) {
+    // Motor displayed as percentage
+    let motorRaw;
+    if (this.isDigitalProtocol()) {
+        motorRaw = value / 100 * DSHOT_RANGE + DSHOT_MIN_VALUE;
+    } else {
+        const MAX_ANALOG_VALUE = this.getSysConfig().maxthrottle;
+        const MIN_ANALOG_VALUE = this.getSysConfig().minthrottle;
+        const ANALOG_RANGE = MAX_ANALOG_VALUE - MIN_ANALOG_VALUE;
+        motorRaw = value / 100 * ANALOG_RANGE + MIN_ANALOG_VALUE;
+    }
+    return motorRaw;
 
 };
 
@@ -1341,4 +1420,6 @@ FlightLog.prototype.isFieldDisabled = function() {
             RPM           : (disabledFields & (1 << 12))!==0,
             GYROUNFILT    : (disabledFields & (1 << 13))!==0,
         };
+
+
 };

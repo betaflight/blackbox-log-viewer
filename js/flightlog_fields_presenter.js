@@ -1354,10 +1354,21 @@ function FlightLogFieldPresenter() {
         }
     };
 
+    // Altitude back convertacion function
+    FlightLogFieldPresenter.decodeAltitudeLogToChart = function(altitude, altitudeUnits) {
+        switch (altitudeUnits) {
+            case 1: // Keep it in meters.
+                return altitude;
+            case 2: // Translate it into feet.
+                return altitude * 3.28;
+        }
+    };
+
     /**
      * Attempt to decode the given raw logged value into something more human readable, or return an empty string if
      * no better representation is available.
      *
+     * @param flightLog The pointer to FlightLog object
      * @param fieldName Name of the field
      * @param value Value of the field
      */
@@ -1519,7 +1530,7 @@ function FlightLogFieldPresenter() {
             case 'debug[5]':
             case 'debug[6]':
             case 'debug[7]':
-                return FlightLogFieldPresenter.decodeDebugFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
+                return FlightLogFieldPresenter.decodeDebugFieldToFriendly(flightLog, fieldName, value);
 
             default:
                 return "";
@@ -1583,6 +1594,7 @@ function FlightLogFieldPresenter() {
                 case 'DUAL_GYRO_DIFF':
                 case 'DUAL_GYRO_RAW':
                 case 'NOTCH':
+                case 'GYRO_SAMPLE':
                     return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
                 case 'ANGLERATE':
                     return value.toFixed(0) + " °/s";
@@ -1920,5 +1932,546 @@ function FlightLogFieldPresenter() {
         }
 
         return fieldName;
+    };
+    
+ 
+    /**
+     * Attempt to decode fields values from log file to chart units and back.
+     *
+     * @param flightLog The pointer to FlightLog object
+     * @param fieldName Name of the field
+     * @param value Value of the field
+     * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
+     */ 
+    FlightLogFieldPresenter.ConvertFieldValue = function(flightLog, fieldName, toFriendly, value) {
+        if (value === undefined) {
+            return 0;
+        }
+
+        const highResolutionScale = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 10 : 1;
+        const highResolutionAddPrecision = (flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0) ? 1 : 0;
+
+        switch (fieldName) {
+            case 'time':
+                return toFriendly ? value / 1000 : value*1000;
+
+            case 'gyroADC[0]':
+            case 'gyroADC[1]':
+            case 'gyroADC[2]':
+            case 'gyroUnfilt[0]':
+            case 'gyroUnfilt[1]':
+            case 'gyroUnfilt[2]':
+                return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value / highResolutionScale) : value*highResolutionScale/flightLog.gyroRawToDegreesPerSecond(1.0);
+
+
+
+            case 'axisError[0]':
+            case 'axisError[1]':
+            case 'axisError[2]':
+                return toFriendly ? value / highResolutionScale : value * highResolutionScale;
+
+            case 'rcCommand[0]':
+            case 'rcCommand[1]':
+            case 'rcCommand[2]':
+                return toFriendly ? value / highResolutionScale + 1500 : (value - 1500) * highResolutionScale;
+            case 'rcCommand[3]':
+                return toFriendly ? value / highResolutionScale : value * highResolutionScale;
+
+            case 'motor[0]':
+            case 'motor[1]':
+            case 'motor[2]':
+            case 'motor[3]':
+            case 'motor[4]':
+            case 'motor[5]':
+            case 'motor[6]':
+            case 'motor[7]':
+                return toFriendly ? flightLog.rcMotorRawToPctPhysical(value) : flightLog.PctPhysicalTorcMotorRaw(value);
+
+            case 'eRPM[0]':
+            case 'eRPM[1]':
+            case 'eRPM[2]':
+            case 'eRPM[3]':
+            case 'eRPM[4]':
+            case 'eRPM[5]':
+            case 'eRPM[6]':
+            case 'eRPM[7]':
+                let motor_poles = flightLog.getSysConfig()['motor_poles'];
+                return toFriendly ? value * 200 / motor_poles : value * motor_poles / 200; 
+
+
+            case 'axisSum[0]':
+            case 'axisSum[1]':
+            case 'axisSum[2]':
+            case 'axisP[0]':
+            case 'axisP[1]':
+            case 'axisP[2]':
+            case 'axisI[0]':
+            case 'axisI[1]':
+            case 'axisI[2]':
+            case 'axisD[0]':
+            case 'axisD[1]':
+            case 'axisD[2]':
+            case 'axisF[0]':
+            case 'axisF[1]':
+            case 'axisF[2]':
+                return toFriendly ? flightLog.getPIDPercentage(value) : value/flightLog.getPIDPercentage(1.0);
+
+            case 'accSmooth[0]':
+            case 'accSmooth[1]':
+            case 'accSmooth[2]':
+                return toFriendly ? flightLog.accRawToGs(value) : value/flightLog.accRawToGs(1.0);
+
+            case 'vbatLatest':
+                if (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
+                    return toFriendly ? value / 100 : value * 100;
+                } else if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
+                   (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
+                    return toFriendly ? value / 10 : value * 10;
+                } else {
+                    return toFriendly ? value / 1000 : value * 1000;
+                }
+
+            case 'amperageLatest':
+                if ((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
+                   (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
+                       return toFriendly ? value / 100 : value * 100;
+                } else if (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                    return toFriendly ? value / 100 : value * 100;
+                } else {
+                    return toFriendly ? value / 1000 : value * 1000;
+                }
+
+            case 'heading[0]':
+            case 'heading[1]':
+            case 'heading[2]':
+                return toFriendly ? value / Math.PI * 180 : value*Math.PI/180;
+
+            case 'baroAlt':
+                return toFriendly ? FlightLogFieldPresenter.decodeAltitudeLogToChart(value/100, userSettings.altitudeUnits) : value*100/FlightLogFieldPresenter.decodeAltitudeLogToChart(1.0, userSettings.altitudeUnits);
+
+            case 'flightModeFlags':
+                return value;
+
+            case 'stateFlags':
+                return value;
+
+            case 'failsafePhase':
+                return value;
+
+            case 'features':
+                return value;
+
+            case 'rssi':
+                return toFriendly ? value / 1024 * 100 : value*1024/100;
+
+            //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
+            case 'GPS_numSat':
+                return value;
+            case 'GPS_coord[0]':
+            case 'GPS_coord[1]':
+                return toFriendly ? value/10000000 : value*10000000;
+            case 'GPS_altitude':
+                return toFriendly ? FlightLogFieldPresenter.decodeAltitudeLogToChart(value/10, userSettings.altitudeUnits) : value*10/FlightLogFieldPresenter.decodeAltitudeLogToChart(1.0, userSettings.altitudeUnits);
+            case 'GPS_speed':
+                switch (userSettings.speedUnits) {
+                    case 1:
+                        return toFriendly ? value/100 : value*100; // m/s
+                    case 2:
+                        return toFriendly ?  (value/100) * 3.6 : 100*value/3.6; // kph
+                    case 3:
+                        return toFriendly ?  (value/100) * 2.2369 : value*100/2.2369; //mph
+                }
+            case 'GPS_ground_course':
+                return toFriendly ?  value/10 : value*10;
+
+            case 'debug[0]':
+            case 'debug[1]':
+            case 'debug[2]':
+            case 'debug[3]':
+            case 'debug[4]':
+            case 'debug[5]':
+            case 'debug[6]':
+            case 'debug[7]':
+                return FlightLogFieldPresenter.ConvertDebugFieldValue(flightLog, fieldName, toFriendly, value);
+
+            default:
+                return value;
+        }
+    };
+
+/**
+     * Attempt to decode debug fields values from log file to chart units and back.
+     *
+     * @param flightLog The pointer to FlightLog object
+     * @param fieldName Name of the field
+     * @param value Value of the field
+     * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
+     */     
+    FlightLogFieldPresenter.ConvertDebugFieldValue = function(flightLog, fieldName, toFriendly, value) {
+        if (flightLog) {
+            const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
+            switch (debugModeName) {
+                case 'NONE':
+                case 'AIRMODE':
+                case 'BARO':
+                    switch (fieldName) {
+                        case 'debug[1]':
+                            return value; // hPa
+                        case 'debug[2]':
+                            return toFriendly ? value / 100 : value*100; // °C`
+                        case 'debug[3]':
+                            return toFriendly ? value / 100 : value*100; //m`
+                        default:
+                            return value;
+                    }
+                case 'VELOCITY':
+                case 'DFILTER':
+                    return value;
+                case 'CYCLETIME':
+                    switch (fieldName) {
+                        case 'debug[1]':
+                            return value;
+                        default:
+                            return value;
+                    }
+                case 'BATTERY':
+                    switch (fieldName) {
+                        case 'debug[0]':
+                            return value;
+                        default:
+                            return toFriendly ? value / 10 : value*10; // " V";
+                    }
+                case 'ACCELEROMETER':
+                    return toFriendly ? flightLog.accRawToGs(value) : value / flightLog.accRawToGs(1.0);
+                case 'MIXER':
+                    return toFriendly ? flightLog.rcCommandRawToThrottle(value) : flightLog.ThrottleTorcCommandRaw(value);
+                case 'PIDLOOP':
+                    return value;
+                case 'RC_INTERPOLATION':
+                    switch (fieldName) {
+                        case 'debug[1]': // current RX refresh rate
+                            return value; // ms
+                        case 'debug[3]': // setpoint [roll]
+                            return value; // °/s
+                        default:
+                            return value;
+                    }
+                case 'GYRO':
+                case 'GYRO_FILTERED':
+                case 'GYRO_SCALED':
+                case 'DUAL_GYRO':
+                case 'DUAL_GYRO_COMBINED':
+                case 'DUAL_GYRO_DIFF':
+                case 'DUAL_GYRO_RAW':
+                case 'NOTCH':
+                case 'GYRO_SAMPLE':
+                    return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value) : value/flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+                case 'ANGLERATE':
+                    return value; // °/s;
+                case 'ESC_SENSOR':
+                    switch (fieldName) {
+                        case 'debug[3]':
+                            return value;
+                        default:
+                            return value;
+                    }
+                case 'SCHEDULER':
+                    return value;
+                case 'STACK':
+                    return value;
+                case 'ESC_SENSOR_RPM':
+                    return value; // " rpm";
+                case 'ESC_SENSOR_TMP':
+                    return value; // " °C";
+                case 'ALTITUDE':
+                    switch (fieldName) {
+                        case 'debug[0]': // GPS Trust * 100
+                            return value;
+                        case 'debug[1]': // GPS Altitude cm
+                        case 'debug[2]': // OSD Altitude cm
+                        case 'debug[3]': // Control Altitude
+                            return toFriendly ? value / 100 : value*100; //  m
+                        default:
+                            return value;
+                    }
+                case 'FFT':
+                    switch (fieldName) {
+                        case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
+                        case 'debug[1]': // gyro post dyn notch [for gyro debug axis]
+                        case 'debug[2]': // gyro pre dyn notch, downsampled for FFT [for gyro debug axis]
+                            return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value) : value/flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+                        // debug 3 = not used
+                        default:
+                            return value;
+                    }
+                case 'FFT_TIME':
+                    switch (fieldName) {
+                        case 'debug[0]':
+                            return value;
+                        case 'debug[1]':
+                            return value;
+                        // debug 2 = not used
+                        // debug 3 = not used
+                        default:
+                            return value;
+                    }
+                case 'FFT_FREQ':
+                    switch (fieldName) {
+                        case 'debug[3]': // gyro pre dyn notch [for gyro debug axis]
+                            return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value) : value/flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+                        default:
+                            return value;
+                    }
+                case 'RTH':
+                    switch (fieldName) {
+// temporarily, perhaps
+//                        case 'debug[0]': // pitch angle +/-4000 means +/- 40 deg
+//                            return (value / 100).toFixed(1) + " °";
+                        default:
+                            return value;
+                    }
+                case 'ITERM_RELAX':
+                    switch (fieldName) {
+                        case 'debug[0]': // roll setpoint high-pass filtered
+                            return value; // °/s
+                        case 'debug[1]': // roll I-term relax factor
+                            return value;   // %
+                        case 'debug[3]': // roll absolute control axis error
+                            return toFriendly ? value / 10 : value*10;  // °
+                        default:
+                            return value;
+                    }
+                case 'RC_SMOOTHING':
+                    switch (fieldName) {
+                        case 'debug[0]':
+                            return toFriendly ? value + 1500 : value - 1500; // us
+                        case 'debug[3]': // rx frame rate [us]
+                            return toFriendly ? value / 1000 : value*1000; //  ms
+                        default:
+                            return value;
+                    }
+                case 'RC_SMOOTHING_RATE':
+                    switch (fieldName) {
+                        case 'debug[0]': // current frame rate [us]
+                        case 'debug[2]': // average frame rate [us]
+                            return toFriendly ? value / 1000 : value*1000; // ms
+                        default:
+                            return value;
+                    }
+                case 'DSHOT_RPM_TELEMETRY':
+                    let pole = flightLog.getSysConfig()['motor_poles'];
+                    return toFriendly ? (value * 200 / pole) : value*pole/200;
+                case 'RPM_FILTER':
+                    return toFriendly ? value * 60 : value/60;
+                case 'D_MIN':
+                    switch (fieldName) {
+                        case 'debug[0]': // roll gyro factor
+                        case 'debug[1]': // roll setpoint Factor
+                            return value;
+                        case 'debug[2]': // roll actual D
+                        case 'debug[3]': // pitch actual D
+                            return toFriendly ? value / 10 : value*10;
+                        default:
+                            return value;
+                    }
+                case 'DYN_LPF':
+                    switch (fieldName) {
+                        case 'debug[0]': // gyro scaled [for selected axis]
+                        case 'debug[3]': // pre-dyn notch gyro [for selected axis]
+                            return toFriendly ? flightLog.gyroRawToDegreesPerSecond(value) : value/flightLog.gyroRawToDegreesPerSecond(1.0); // °/s
+                        default:
+                            return value;
+                    }
+                case 'DYN_IDLE':
+                    switch (fieldName) {
+                        case 'debug[3]': // minRPS
+                            return toFriendly ? value * 6 : value/6;
+                        default:
+                            return value;
+                    }
+                case 'AC_CORRECTION':
+                    return toFriendly ? value / 10 : value*10; // °/s
+                case 'AC_ERROR':
+                    return toFriendly ? value / 10 : value*10; // °
+                case 'RX_TIMING':
+                    switch (fieldName) {
+                        case 'debug[0]': // Frame delta us/10
+                        case 'debug[1]': // Frame age us/10
+                            return toFriendly ? value / 100 : value*100; //ms
+                        default:
+                            return value;
+                    }
+                case 'GHST':
+                    switch (fieldName) {
+                        // debug 0 is CRC error count 0 to int16_t
+                        // debug 1 is unknown frame count 0 to int16_t
+                        // debug 2 is RSSI 0 to -128 -> 0 to 128
+                        case 'debug[3]': // LQ 0-100
+                            return value;
+                        default:
+                            return value;
+                    }
+                case 'GHST_MSP':
+                    switch (fieldName) {
+                        // debug 0 is msp frame count
+                        // debug 1 is msp frame count
+                        // debug 2 and 3 not used
+                        default:
+                            return value;
+                    }
+                case 'SCHEDULER_DETERMINISM':
+                    switch (fieldName) {
+                        case 'debug[0]': // cycle time in us*10
+                        case 'debug[2]': // task delay time in us*10
+                        case 'debug[3]': // task delay time in us*10
+                             return toFriendly ? value / 10 : value*10; // us
+                        // debug 1 is task ID of late task
+                        default:
+                            return value;
+                    }
+                case 'TIMING_ACCURACY':
+                    switch (fieldName) {
+                        case 'debug[0]': // CPU Busy %
+                            return value; // %
+                        case 'debug[2]': // task delay time in us*10
+                            return toFriendly ? value / 10 : value*10; // us
+                        default:
+                            return value;
+                    }
+                case 'RX_EXPRESSLRS_SPI':
+                    switch (fieldName) {
+                        case 'debug[3]': // uplink LQ %
+                            return value;
+                        // debug 0 = Lost connection count
+                        // debug 1 = RSSI
+                        // debug 2 = SNR
+                        default:
+                            return value;
+                    }
+                case 'RX_EXPRESSLRS_PHASELOCK':
+                    switch (fieldName) {
+                        case 'debug[2]': // Frequency offset in ticks
+                            return value;   // ' ticks';
+                        // debug 0 = Phase offset us
+                        // debug 1 = Filtered phase offset us
+                        // debug 3 = Pphase shift in us
+                        default:
+                            return value;   // ' us';
+                    }
+                case 'GPS_RESCUE_THROTTLE_PID':
+                    switch (fieldName) {
+                        case 'debug[0]': // Throttle P added uS
+                        case 'debug[1]': // Throttle D added * uS
+                            return value;       // ' uS';
+                        case 'debug[2]': // current altitude in m
+                        case 'debug[3]': // TARGET altitude in m
+                            return toFriendly ? value / 100 : value*100; //  m
+                        default:
+                            return value;
+                    }
+                case 'GPS_RESCUE_VELOCITY':
+                    switch (fieldName) {
+                        case 'debug[0]': // Pitch P degrees * 100
+                        case 'debug[1]': // Pitch D degrees * 100
+                            return toFriendly ? value / 100 : value*100;    // °
+                        case 'debug[2]': // velocity to home cm/s
+                        case 'debug[3]': // velocity target cm/s
+                            return toFriendly ? value / 100 : value*100;    // m/s
+                        default:
+                            return value;
+                    }
+                case 'GPS_RESCUE_HEADING':
+                    switch (fieldName) {
+                        case 'debug[0]': // Ground speed cm/s
+                            return toFriendly ? value / 100 : value*100;    // m/s
+                        case 'debug[1]': // GPS Ground course degrees * 10
+                        case 'debug[2]': // Attitude in degrees * 10
+                        case 'debug[3]': // Angle to home in degrees * 10
+                        case 'debug[4]': // magYaw in degrees * 10
+                            return toFriendly ? value / 10 : value*10; //°
+                        case 'debug[6]': // Roll Added deg * 100
+                            return toFriendly ? value / 100 : value*100;    // °
+                        case 'debug[5]': // Roll Mix Att
+                        case 'debug[7]': // Rescue Yaw Rate
+                        default:
+                            return value;
+                    }
+                case 'GPS_RESCUE_TRACKING':
+                    switch (fieldName) {
+                        case 'debug[0]': // velocity to home cm/s
+                        case 'debug[1]': // velocity target cm/s
+                            return toFriendly ? value / 100 : value*100; // m/s
+                        case 'debug[2]': // altitude cm
+                        case 'debug[3]': // altitude target cm
+                            return toFriendly ? value / 100 : value*100;
+                        default:
+                            return value;
+                    }
+                case 'GPS__CONNECTION':
+                    switch (fieldName) {
+                        case 'debug[0]': // Flight model
+                        case 'debug[1]': // GPS Nav packet interval
+                        case 'debug[2]': // FC Nav data time
+                            return value;
+                        case 'debug[3]': // Baud Rate / Nav interval
+                            return toFriendly ? value * 100 : value / 100;
+                        case 'debug[4]': // main state * 100 + subState
+                        case 'debug[5]': // executeTimeUs
+                        case 'debug[6]': // ack state
+                        case 'debug[7]': // serial Rx buffer
+                        default:
+                            return value;
+                    }
+                case 'ATTITUDE':
+                    switch (fieldName) {
+                        case 'debug[0]': // accADC X
+                        case 'debug[1]': // accADC Y
+                        case 'debug[2]': // setpoint Roll
+                        case 'debug[3]': // setpoint Pitch
+                        default:
+                            return value;
+                    }
+                case 'VTX_MSP':
+                    switch (fieldName) {
+                        case 'debug[0]': // packetCounter
+                        case 'debug[1]': // isCrsfPortConfig
+                        case 'debug[2]': // isLowPowerDisarmed
+                        case 'debug[3]': // mspTelemetryDescriptor
+                        default:
+                            return value;
+                    }
+                case 'GPS_DOP':
+                    switch (fieldName) {
+                        case 'debug[0]': // Number of Satellites
+                            return value;
+                        case 'debug[1]': // pDOP (positional - 3D)
+                        case 'debug[2]': // hDOP (horizontal - 2D)
+                        case 'debug[3]': // vDOP (vertical - 1D)
+                        default:
+                            return toFriendly ? value / 100 : value*100;
+                    }
+                case 'FAILSAFE':
+                    return value;
+                case 'GYRO_CALIBRATION':
+                    return value;
+                case 'ANGLE_MODE':
+                    switch (fieldName) {
+                        case 'debug[0]': // target angle
+                        case 'debug[1]': // angle error
+                        case 'debug[2]': // angle feedforward
+                        case 'debug[3]': // angle achieved
+                            return toFriendly ? value / 10 : value*10;    // °
+                        default:
+                            return value;
+                    }
+                case 'ANGLE_TARGET':
+                    return value;
+                case 'CURRENT_ANGLE':
+                    return value;
+                case 'DSHOT_TELEMETRY_COUNTS':
+                    return value;
+            }
+        }
+        return value;
     };
 })();

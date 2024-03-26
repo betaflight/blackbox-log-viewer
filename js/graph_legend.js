@@ -193,7 +193,7 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                 var j = $(this).attr('field');
                 var field = graphs[ i ].fields[ j ];
                 var str = 
-                    "Z"  + (field.curve.outputRange * 100).toFixed(0) +
+                    "Z100" +                                        // There are no direct zoom now, set 100%
                     " E" + (field.curve.power * 100).toFixed(0) +
                     " S" + (field.smoothing / 100).toFixed(0);
                 $(this).text(str);

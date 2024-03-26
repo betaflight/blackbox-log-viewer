@@ -530,9 +530,9 @@ var FlightLogParser = function(logData) {
     function translateFieldName(fieldName) {
         var translation = translationValues[fieldName];
         if (typeof translation !== 'undefined') {
-        	return translation;
+            return translation;
         } else {
-        	return fieldName;
+            return fieldName;
         }
     }
 
@@ -602,14 +602,14 @@ var FlightLogParser = function(logData) {
                     case "Cleanflight":
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
                         $('html').removeClass('isBaseF');
-    					$('html').addClass('isCF');
+                        $('html').addClass('isCF');
                         $('html').removeClass('isBF');
                         $('html').removeClass('isINAV');
                     break;
                     default:
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
                         $('html').addClass('isBaseF');
-    					$('html').removeClass('isCF');
+                        $('html').removeClass('isCF');
                         $('html').removeClass('isBF');
                         $('html').removeClass('isINAV');
                 }
@@ -946,7 +946,7 @@ var FlightLogParser = function(logData) {
                         $('html').addClass('isINAV');
                     } else {
 
-                    	// Cleanflight 1.x and others
+                        // Cleanflight 1.x and others
                         that.sysConfig.firmwareVersion = '0.0.0';
                         that.sysConfig.firmware        = 0.0;
                         that.sysConfig.firmwarePatch   = 0;
@@ -1744,7 +1744,6 @@ var FlightLogParser = function(logData) {
         stream.pos = stream.start;
         stream.end = endOffset === undefined ? stream.end : endOffset;
         stream.eof = false;
-
         while (true) {
             var command = stream.readChar();
 
@@ -1762,12 +1761,13 @@ var FlightLogParser = function(logData) {
                         sizeCount: new Int32Array(256), /* int32 arrays are zero-filled, handy! */
                         validCount: 0,
                         corruptCount: 0,
-                        field: []
+                        field: [],
+                        totalCount: 0
                     };
                 }
 
                 frameTypeStats = this.stats.frame[lastFrameType.marker];
-
+                frameTypeStats.totalCount++;
                 // If we see what looks like the beginning of a new frame, assume that the previous frame was valid:
                 if (lastFrameSize <= FLIGHT_LOG_MAX_FRAME_LENGTH && looksLikeFrameCompleted) {
                     var frameAccepted = true;
@@ -1781,7 +1781,7 @@ var FlightLogParser = function(logData) {
                         frameTypeStats.sizeCount[lastFrameSize]++;
                         frameTypeStats.validCount++;
                     } else {
-                        frameTypeStats.desyncCount++;
+                        frameTypeStats.desyncCount = frameTypeStats.desyncCount ? ++frameTypeStats.desyncCount : 1;
                     }
                 } else {
                     //The previous frame was corrupt
