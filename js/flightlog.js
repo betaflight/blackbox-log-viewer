@@ -1050,6 +1050,31 @@ function FlightLog(logData) {
         return this.getStats()?.frame?.G ? true : false;;
     };
 
+    this.getMinMaxForFieldDuringAllTime = function(field_name) {
+        let
+            stats = this.getStats(),
+            min = Number.MAX_VALUE,
+            max = -Number.MAX_VALUE;
+
+        let
+            fieldIndex = this.getMainFieldIndexByName(field_name),
+            fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+
+        if (fieldStat) {
+            min = Math.min(min, fieldStat.min);
+            max = Math.max(max, fieldStat.max);
+        }
+        else {
+            const mm = this.getMinMaxForFieldDuringTimeInterval(arguments[i], this.getMinTime(), this.getMaxTime());
+            if (mm != undefined) {
+                min = Math.min(mm.min, min);
+                max = Math.max(mm.max, max);
+            }
+        }
+
+        return {min:min, max:max};
+    }
+
     /**
      * Function to compute of min and max curve values during time interval.
      * @param field_name String: Curve fields name.

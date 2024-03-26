@@ -225,49 +225,14 @@ GraphConfig.load = function(config) {
             }
         }
 
-/*
-TODO -  The stats data have small issues of min-max data !!!!
-        var getMinMaxForFields = function() {
-            // helper to make a curve scale based on the combined min/max of one or more fields
-            var
-                stats = flightLog.getStats(),
-                min = Number.MAX_VALUE,
-                max = Number.MIN_VALUE;
-
-            for(var i in arguments) {
-                var
-                    fieldIndex = flightLog.getMainFieldIndexByName(arguments[i]),
-                    fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
-
-                if (fieldStat) {
-                    min = Math.min(min, fieldStat.min);
-                    max = Math.max(max, fieldStat.max);
-                }
-                else if (fieldIndex != undefined) {
-                    const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
-                    min = Math.min(mm.min, min);
-                    max = Math.max(mm.max, max);
-                }
-            }
-
-            if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
-                return {min:min, max:max};
-            }
-
-            return {min:-500, max:500};
-        }
-*/
-//  TODO -  Use new function while stat data issue do not resolved
         var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
-            var
+            let
                 min = Number.MAX_VALUE,
                 max = -Number.MAX_VALUE;
 
-            for(const i in arguments) {
-                const mm = flightLog.getMinMaxForFieldDuringTimeInterval(arguments[i], flightLog.getMinTime(), flightLog.getMaxTime());
-                if (mm == undefined)
-                    continue;
+            for(let i in arguments) {
+                const mm = flightLog.getMinMaxForFieldDuringAllTime(arguments[i]);
                 min = Math.min(mm.min, min);
                 max = Math.max(mm.max, max);
             }
@@ -1325,21 +1290,19 @@ TODO -  The stats data have small issues of min-max data !!!!
 
 /**
      * Compute min-max values for field during all time.
-     *
-     * @param flightLog The reference to the FlightLog object
      * @param fieldName Name of the field
      */
     GraphConfig.getMinMaxForFieldDuringAllTime = function(flightLog, fieldName) {
-        let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, flightLog.getMinTime(), flightLog.getMaxTime());
-        if (mm == undefined)
+        let mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
+        if (mm.min == Number.MAX_VALUE || mm.max == -Number.MAX_VALUE) {
             return {
                 min: -500,
                 max: 500
             };
-
+        }
+        
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
         mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
-
         return mm;
     }
 
