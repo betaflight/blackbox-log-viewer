@@ -80,16 +80,21 @@ function FlightLog(logData) {
      * that the flightlog presents as one merged frame.
      */
     this.getStats = function(logIndex) {
-        var
-            rawStats = getRawStats(logIndex);
+        let rawStats = getRawStats(logIndex);
 
-        // Just modify the raw stats variable to add this field, the parser won't mind the extra field appearing:
-        if (rawStats.frame.S) {
-            rawStats.field = rawStats.frame.I.field.concat(rawStats.frame.S.field);
-        } else {
-            rawStats.field = rawStats.frame.I.field;
+        if (rawStats.field == undefined) {
+            rawStats.field = [];
+            for (let i=0; i<rawStats.frame.I.field.length; ++i) {
+                rawStats.field[i] = {
+                    min: Math.min(rawStats.frame.I.field[i].min, rawStats.frame.P.field[i].min),
+                    max: Math.max(rawStats.frame.I.field[i].max, rawStats.frame.P.field[i].max)
+                };
+            }
+
+            if (rawStats.frame.S) {
+                rawStats.field = rawStats.field.concat(rawStats.frame.S.field);
+            }
         }
-
         return rawStats;
     };
 

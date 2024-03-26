@@ -228,13 +228,13 @@ GraphConfig.load = function(config) {
 
         var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
-            var
+            let
                 stats = flightLog.getStats(),
                 min = Number.MAX_VALUE,
-                max = Number.MIN_VALUE;
+                max = -Number.MAX_VALUE;
 
-            for(var i in arguments) {
-                var
+            for(let i in arguments) {
+                let
                     fieldIndex = flightLog.getMainFieldIndexByName(arguments[i]),
                     fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
 
@@ -244,7 +244,7 @@ GraphConfig.load = function(config) {
                 }
             }
 
-            if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
+            if (min != Number.MAX_VALUE && max != -Number.MAX_VALUE) {
                 return {min:min, max:max};
             }
 
