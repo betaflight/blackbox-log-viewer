@@ -1069,6 +1069,79 @@ export function FlightLog(logData) {
         return this.getStats()?.frame?.G ? true : false;;
     };
 
+    this.getMinMaxForFieldDuringAllTime = function(field_name) {
+        let
+            stats = this.getStats(),
+            min = Number.MAX_VALUE,
+            max = -Number.MAX_VALUE;
+
+        let
+            fieldIndex = this.getMainFieldIndexByName(field_name),
+            fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+
+        if (fieldStat) {
+            min = Math.min(min, fieldStat.min);
+            max = Math.max(max, fieldStat.max);
+        }
+        else {
+            const mm = this.getMinMaxForFieldDuringTimeInterval(arguments[i], this.getMinTime(), this.getMaxTime());
+            if (mm != undefined) {
+                min = Math.min(mm.min, min);
+                max = Math.max(mm.max, max);
+            }
+        }
+
+        return {min:min, max:max};
+    }
+
+    /**
+     * Function to compute of min and max curve values during time interval.
+     * @param field_name String: Curve fields name.
+     * @param start_time Integer: The interval start time .
+     * @end_time start_time Integer: The interval end time .
+     * @returns {min: MinValue, max: MaxValue} if success, or {min: Number.MAX_VALUE, max: Number.MAX_VALUE} if error
+     */
+    this.getMinMaxForFieldDuringTimeInterval = function(field_name, start_time, end_time) {
+        let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
+        let startFrameIndex;
+        let minValue = Number.MAX_VALUE,
+            maxValue = -Number.MAX_VALUE;
+
+        const fieldIndex = this.getMainFieldIndexByName(field_name);
+        if (chunks.length == 0 || fieldIndex == undefined)
+            return undefined;
+
+        //Find the first sample that lies inside the window
+        for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
+            if (chunks[0].frames[startFrameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >= start_time) {
+                break;
+            }
+        }
+
+        // Pick the sample before that to begin plotting from
+        if (startFrameIndex > 0)
+            startFrameIndex--;
+
+        let frameIndex = startFrameIndex;
+        findingLoop:
+        for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+            const chunk = chunks[chunkIndex];
+            for (; frameIndex < chunk.frames.length; frameIndex++) {
+                const fieldValue = chunk.frames[frameIndex][fieldIndex];
+                const frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+                minValue = Math.min(minValue, fieldValue);
+                maxValue = Math.max(maxValue, fieldValue);
+                if(frameTime>end_time)
+                    break findingLoop;
+            }
+            frameIndex = 0;
+        }
+        return {
+            min: minValue,
+            max: maxValue
+        };
+    };
+
     this.getCurrentLogRowsCount = function () {
         const stats = this.getStats(this.getLogIndex());
         const countI = stats.frame['I'] ? stats.frame['I'].totalCount : 0;

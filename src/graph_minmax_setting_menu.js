@@ -151,7 +151,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function SetSelectedCurveMinMaxToFullRangeDuringAllTime () {
-        const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
+        const mm = GraphConfig.getMinMaxForFieldDuringAllTime(selected_field_name);
         const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
         let curve = curvesData[fieldFriendlyName];
         curve.min = mm.min;
