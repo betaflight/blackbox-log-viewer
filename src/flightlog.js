@@ -114,6 +114,7 @@ export function FlightLog(logData) {
                 rawStats.field = rawStats.field.concat(rawStats.frame.S.field);
             }
         }
+
         return rawStats;
     };
 
