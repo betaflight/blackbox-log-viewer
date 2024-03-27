@@ -1059,6 +1059,24 @@ function BlackboxLogViewer() {
         }
 
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
+
+        // initial load of the configuration defaults if we have them
+        prefs.get('workspaceGraphConfigs', function(item) {
+            if(item) {
+                workspaceGraphConfigs = upgradeWorkspaceFormat(item);
+            } else {
+                workspaceGraphConfigs = [];
+            }
+        });
+
+        prefs.get('activeWorkspace', function (id){
+            if (id) {
+                activeWorkspace = id
+            }
+            else {
+                activeWorkspace = 1
+            }
+        });
         
         workspaceSelection = new WorkspaceSelection($(".log-workspace-selection"), workspaceGraphConfigs, onSwitchWorkspace, onSaveWorkspace);
         onSwitchWorkspace(workspaceGraphConfigs, workspaceSelection);
