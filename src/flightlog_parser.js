@@ -956,7 +956,7 @@ export function FlightLogParser(logData) {
                         $('html').addClass('isINAV');
                     } else {
 
-                        // Cleanflight 1.x and others
+                    	// Cleanflight 1.x and others
                         that.sysConfig.firmwareVersion = '0.0.0';
                         that.sysConfig.firmware        = 0.0;
                         that.sysConfig.firmwarePatch   = 0;
@@ -1754,6 +1754,7 @@ export function FlightLogParser(logData) {
         stream.pos = stream.start;
         stream.end = endOffset === undefined ? stream.end : endOffset;
         stream.eof = false;
+
         while (true) {
             var command = stream.readChar();
 
