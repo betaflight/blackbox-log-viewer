@@ -99,14 +99,20 @@ export function FlightLog(logData) {
      * that the flightlog presents as one merged frame.
      */
     this.getStats = function(logIndex) {
-        var
-            rawStats = getRawStats(logIndex);
+        let rawStats = getRawStats(logIndex);
 
-        // Just modify the raw stats variable to add this field, the parser won't mind the extra field appearing:
-        if (rawStats.frame.S) {
-            rawStats.field = rawStats.frame.I.field.concat(rawStats.frame.S.field);
-        } else {
-            rawStats.field = rawStats.frame.I.field;
+        if (rawStats.field == undefined) {
+            rawStats.field = [];
+            for (let i=0; i<rawStats.frame.I.field.length; ++i) {
+                rawStats.field[i] = {
+                    min: Math.min(rawStats.frame.I.field[i].min, rawStats.frame.P.field[i].min),
+                    max: Math.max(rawStats.frame.I.field[i].max, rawStats.frame.P.field[i].max)
+                };
+            }
+
+            if (rawStats.frame.S) {
+                rawStats.field = rawStats.field.concat(rawStats.frame.S.field);
+            }
         }
 
         return rawStats;
@@ -1063,6 +1069,30 @@ export function FlightLog(logData) {
     this.hasGpsData = function() {
         return this.getStats()?.frame?.G ? true : false;;
     };
+    this.getMinMaxForFieldDuringAllTime = function(field_name) {
+        let
+            stats = this.getStats(),
+            min = Number.MAX_VALUE,
+            max = -Number.MAX_VALUE;
+
+        let
+            fieldIndex = this.getMainFieldIndexByName(field_name),
+            fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+
+        if (fieldStat) {
+            min = Math.min(min, fieldStat.min);
+            max = Math.max(max, fieldStat.max);
+        }
+        else {
+            const mm = this.getMinMaxForFieldDuringTimeInterval(arguments[i], this.getMinTime(), this.getMaxTime());
+            if (mm != undefined) {
+                min = Math.min(mm.min, min);
+                max = Math.max(mm.max, max);
+            }
+        }
+
+        return {min:min, max:max};
+    }
 }
 
 FlightLog.prototype.accRawToGs = function(value) {
