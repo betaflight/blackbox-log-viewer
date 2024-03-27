@@ -73,7 +73,6 @@ function BlackboxLogViewer() {
         GRAPH_MAX_ZOOM = 1000,
         GRAPH_DEFAULT_ZOOM = 100,
         GRAPH_ZOOM_STEP = 1;
-
     var
         graphState = GRAPH_STATE_PAUSED,
         currentBlackboxTime = 0,
@@ -89,7 +88,6 @@ function BlackboxLogViewer() {
 
         // User's video render config:
         videoConfig = {},
-
         // JSON graph configuration:
         graphConfig = {},
 
@@ -127,7 +125,6 @@ function BlackboxLogViewer() {
 
         videoURL = false,
         videoOffset = 0.0,
-
         videoExportInTime = false,
         videoExportOutTime = false,
 
@@ -201,7 +198,6 @@ function BlackboxLogViewer() {
             i,
             frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
             fieldNames = flightLog.getMainFieldNames();
-
         $("tr:not(:first)", table).remove();
 
         if (frame) {
@@ -237,7 +233,6 @@ function BlackboxLogViewer() {
                 }
 
                 table.append(rows.join(""));
-
                 const statRows = [];
                 const statsTable = $(".log-field-values #stats-table");
                 $("tr:not(:first)", statsTable).remove();
@@ -274,7 +269,6 @@ function BlackboxLogViewer() {
 
             // Update the Legend Values
             if(graphLegend) graphLegend.updateValues(flightLog, frame);
-
         }
     }
     
@@ -288,13 +282,11 @@ function BlackboxLogViewer() {
             animationFrameIsQueued = false;
             return;
         }
-
         if (hasVideo) {
             currentBlackboxTime = blackboxTimeFromVideoTime();
         } else if (graphState == GRAPH_STATE_PLAY) {
             var
                 delta;
-
             if (lastRenderTime === false) {
                 delta = 0;
             } else {
@@ -329,7 +321,6 @@ function BlackboxLogViewer() {
             animationFrameIsQueued = true;
             requestAnimationFrame(animationLoop);
         } else {
-            seekBar.repaint();
 
             animationFrameIsQueued = false;
         }
@@ -346,7 +337,6 @@ function BlackboxLogViewer() {
         var
             width = $(canvas).width(),
             height = $(canvas).height();
-
         if (graph) {
             graph.resize(width, height);
             seekBar.resize(canvas.offsetWidth, 50);
@@ -456,14 +446,12 @@ function BlackboxLogViewer() {
      */
     function renderSelectedLogInfo() {
         $(".log-index").val(flightLog.getLogIndex());
-
         if (flightLog.getNumCellsEstimate()) {
             $(".log-cells").text(flightLog.getNumCellsEstimate() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
             $(".log-cells-header,.log-cells").css('display', 'block');
         } else {
             $(".log-cells-header,.log-cells").css('display', 'none');
         }
-
         /**
         Removed as cant see a reason to display this information
 
@@ -474,7 +462,6 @@ function BlackboxLogViewer() {
            $(".log-device-uid-header,.log-device-uid").css('display', 'none');
         }
         **/
-
         // Add log version information to status bar
         var sysConfig = flightLog.getSysConfig();
         $('.version', statusBar).text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
@@ -486,7 +473,7 @@ function BlackboxLogViewer() {
         seekBar.setActivityRange(flightLog.getSysConfig().motorOutput[0], flightLog.getSysConfig().motorOutput[1]);
 
         var
-            activity = flightLog.getActivitySummary();
+        activity = flightLog.getActivitySummary();
 
         seekBar.setActivity(activity.times, activity[seekBarMode], activity.hasEvent);
         seekBar.repaint();
@@ -591,7 +578,6 @@ function BlackboxLogViewer() {
         if (zoom >= GRAPH_MIN_ZOOM && zoom <= GRAPH_MAX_ZOOM) {
             lastGraphZoom = graphZoom;
             graphZoom = zoom;
-
             if (graph) {
                 graph.setGraphZoom(zoom / 100);
                 invalidateGraph();
@@ -633,7 +619,6 @@ function BlackboxLogViewer() {
     function selectLog(logIndex) {
         var
             success = false;
-
         try {
             if (logIndex === null) {
                 for (var i = 0; i < flightLog.getLogCount(); i++) {
@@ -660,7 +645,6 @@ function BlackboxLogViewer() {
         if (graph) {
             graph.destroy();
         }
-
 
         if((flightLog.getSysConfig().looptime             != null) &&
             (flightLog.getSysConfig().frameIntervalPNum   != null) &&
@@ -697,7 +681,6 @@ function BlackboxLogViewer() {
         renderSelectedLogInfo();
 
         updateCanvasSize();
-
         setGraphState(GRAPH_STATE_PAUSED);
         setGraphZoom(graphZoom, true);
     }
@@ -1462,6 +1445,11 @@ function BlackboxLogViewer() {
             e.preventDefault();
 
             graphConfigDialog.show(flightLog, activeGraphConfig.getGraphs(), graph);
+        exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
+	            videoConfig = newConfig;
+	            
+	            prefs.set('videoConfig', newConfig);
+	        });
         });
 
         $(".open-header-dialog").click(function(e) {
@@ -1471,13 +1459,11 @@ function BlackboxLogViewer() {
 
         $(".open-keys-dialog").click(function(e) {
             e.preventDefault();
-
             keysDialog.show();
         });
 
         $(".open-user-settings-dialog").click(function(e) {
             e.preventDefault();
-
             userSettingsDialog.show(flightLog, userSettings);
         });
 
@@ -1538,7 +1524,6 @@ function BlackboxLogViewer() {
                     hasAnalyser: hasAnalyser,
                     hasSticks: userSettings.drawSticks
                 }, videoConfig);
-
                 e.preventDefault();
             });
         } else {
@@ -1736,7 +1721,6 @@ function BlackboxLogViewer() {
             invalidateGraph();
         }
 
-
         $('.log-graph-legend').on("mousedown", function(e) {
 
             if(e.which != 2) return; // is it the middle mouse button, no, then ignore
@@ -1827,7 +1811,6 @@ function BlackboxLogViewer() {
                                 setVideoInTime(currentBlackboxTime);
                             }
                         }
-
                         e.preventDefault();
                     break;
                     case "O".charCodeAt(0):
@@ -2087,7 +2070,7 @@ function BlackboxLogViewer() {
                 setPlaybackRate(parseFloat($(this).val()), false);
             })
             .dblclick(function() {
-                setPlaybackRate(100, true);
+            setPlaybackRate(100, true);
             });
 
         $(".playback-rate-control .noUi-handle").text( playbackRate + '%');
@@ -2108,6 +2091,7 @@ function BlackboxLogViewer() {
             .on("slide", function() {
                 setGraphZoom(parseFloat($(this).val()), false);
             })
+
             .dblclick(function() {
                 setGraphZoom(100, true);
             });

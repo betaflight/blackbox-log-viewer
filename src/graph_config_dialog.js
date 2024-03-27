@@ -191,7 +191,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
         return elem;
     }
 
-
     function renderGraph(flightLog, index, graph) {
         var
             graphElem = $(

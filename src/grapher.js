@@ -850,7 +850,6 @@ export function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, cr
                 canvasContext.moveTo(centerX, 0);
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
-                 
             }
             
             // Draw events - if option set or even if option is not set but there are graphs

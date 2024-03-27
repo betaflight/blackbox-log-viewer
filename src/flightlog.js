@@ -1464,6 +1464,4 @@ FlightLog.prototype.isFieldDisabled = function() {
             RPM           : (disabledFields & (1 << 12))!==0,
             GYROUNFILT    : (disabledFields & (1 << 13))!==0,
         };
-
-
 };

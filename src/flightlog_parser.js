@@ -1754,6 +1754,7 @@ export function FlightLogParser(logData) {
         stream.pos = stream.start;
         stream.end = endOffset === undefined ? stream.end : endOffset;
         stream.eof = false;
+
         while (true) {
             var command = stream.readChar();
 
