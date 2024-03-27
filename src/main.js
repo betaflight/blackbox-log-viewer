@@ -1062,7 +1062,7 @@ function BlackboxLogViewer() {
 
         // initial load of the configuration defaults if we have them
         prefs.get('workspaceGraphConfigs', function(item) {
-            if(item) {
+            if (item) {
                 workspaceGraphConfigs = upgradeWorkspaceFormat(item);
             } else {
                 workspaceGraphConfigs = [];
