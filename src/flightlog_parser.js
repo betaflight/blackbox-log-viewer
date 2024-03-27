@@ -540,9 +540,9 @@ export function FlightLogParser(logData) {
     function translateFieldName(fieldName) {
         var translation = translationValues[fieldName];
         if (typeof translation !== 'undefined') {
-        	return translation;
+            return translation;
         } else {
-        	return fieldName;
+            return fieldName;
         }
     }
 
@@ -612,14 +612,14 @@ export function FlightLogParser(logData) {
                     case "Cleanflight":
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
                         $('html').removeClass('isBaseF');
-    					$('html').addClass('isCF');
+                        $('html').addClass('isCF');
                         $('html').removeClass('isBF');
                         $('html').removeClass('isINAV');
                     break;
                     default:
                         that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
                         $('html').addClass('isBaseF');
-    					$('html').removeClass('isCF');
+                        $('html').removeClass('isCF');
                         $('html').removeClass('isBF');
                         $('html').removeClass('isINAV');
                 }
@@ -1772,12 +1772,13 @@ export function FlightLogParser(logData) {
                         sizeCount: new Int32Array(256), /* int32 arrays are zero-filled, handy! */
                         validCount: 0,
                         corruptCount: 0,
-                        field: []
+                        field: [],
+                        totalCount: 0
                     };
                 }
 
                 frameTypeStats = this.stats.frame[lastFrameType.marker];
-
+                frameTypeStats.totalCount++;
                 // If we see what looks like the beginning of a new frame, assume that the previous frame was valid:
                 if (lastFrameSize <= FLIGHT_LOG_MAX_FRAME_LENGTH && looksLikeFrameCompleted) {
                     var frameAccepted = true;
@@ -1791,7 +1792,7 @@ export function FlightLogParser(logData) {
                         frameTypeStats.sizeCount[lastFrameSize]++;
                         frameTypeStats.validCount++;
                     } else {
-                        frameTypeStats.desyncCount++;
+                        frameTypeStats.desyncCount = frameTypeStats.desyncCount ? ++frameTypeStats.desyncCount : 1;
                     }
                 } else {
                     //The previous frame was corrupt

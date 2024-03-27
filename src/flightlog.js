@@ -1063,6 +1063,13 @@ export function FlightLog(logData) {
     this.hasGpsData = function() {
         return this.getStats()?.frame?.G ? true : false;;
     };
+
+    this.getCurrentLogRowsCount = function () {
+        const stats = this.getStats(this.getLogIndex());
+        const countI = stats.frame['I'] ? stats.frame['I'].totalCount : 0;
+        const countP = stats.frame['P'] ? stats.frame['P'].totalCount : 0;
+        return countI + countP;
+    };
 }
 
 FlightLog.prototype.accRawToGs = function(value) {
