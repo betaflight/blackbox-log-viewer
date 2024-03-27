@@ -1,3 +1,5 @@
+const UNTITLED = "Untitled";
+
 export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, onSaveWorkspace) {
     var
         numberSpan = null,
@@ -39,7 +41,7 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
         var inputElem = $('<input type="text" onkeyup="event.preventDefault()">');
         inputElem.click((e) => e.stopPropagation()); // Stop click from closing
         titleSpan.replaceWith(inputElem);
-        inputElem.val(workspaces[activeId].title)
+        inputElem.val(workspaces[activeId]?.title)
         inputElem.focus();
         inputElem.on('focusout', () => {
             inputElem.replaceWith(titleSpan);
@@ -88,7 +90,7 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
             var saveButton = $('<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>');
             saveButton.click((e) => {
                 if (!element) {
-                    onSaveWorkspace(id, "Unnamed");
+                    onSaveWorkspace(id, UNTITLED);
                 }
                 else {
                     onSaveWorkspace(id, element.title);
