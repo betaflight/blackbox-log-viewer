@@ -1,6 +1,6 @@
 import { GraphConfig } from "./graph_config";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-
+import { showMinMaxSetupContextMenu } from "./graph_minmax_setting_menu";
 export function GraphConfigurationDialog(dialog, onSave) {
     let
         // Some fields it doesn't make sense to graph

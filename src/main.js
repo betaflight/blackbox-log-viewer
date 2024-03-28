@@ -1456,7 +1456,7 @@ function BlackboxLogViewer() {
                         updateCanvasSize();
                     }
                 }
-            ),
+            );
 
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();

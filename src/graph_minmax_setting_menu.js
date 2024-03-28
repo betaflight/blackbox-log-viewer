@@ -1,6 +1,5 @@
-"use strict";
-// Show context menu to setup min-max values
-function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name, selected_curve, curves_table, flightLog, logGrapher, RefreshCharts) {
+import { GraphConfig } from "./graph_config";
+export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name, selected_curve, curves_table, flightLog, logGrapher, RefreshCharts) {
 
     function SetAllMinMaxToDefault () {
         curves_table.each(function() {
@@ -151,7 +150,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function SetSelectedCurveMinMaxToFullRangeDuringAllTime () {
-        const mm = GraphConfig.getMinMaxForFieldDuringAllTime(selected_field_name);
+        const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
         const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
         let curve = curvesData[fieldFriendlyName];
         curve.min = mm.min;
