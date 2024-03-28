@@ -1242,10 +1242,11 @@ GraphConfig.load = function(config) {
                         }
                     case 'EZLANDING':
                         return {
-                            offset: -5000,
                             power: 1.0,
-                            inputRange: 5000,
-                            outputRange: 1.0,
+                            MinMax: {
+                                min: 0,
+                                max: 10000
+                            }
                         };
                 }
             }
@@ -1300,7 +1301,7 @@ GraphConfig.load = function(config) {
                 max: 500
             };
         }
-        
+
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
         mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
         return mm;
