@@ -1065,7 +1065,7 @@ function FlightLog(logData) {
             max = Math.max(max, fieldStat.max);
         }
         else {
-            const mm = this.getMinMaxForFieldDuringTimeInterval(arguments[i], this.getMinTime(), this.getMaxTime());
+            const mm = this.getMinMaxForFieldDuringTimeInterval(field_name, this.getMinTime(), this.getMaxTime());
             if (mm != undefined) {
                 min = Math.min(mm.min, min);
                 max = Math.max(mm.max, max);
