@@ -99,7 +99,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         });
         RefreshCharts();
     }
-    
+
     function SetAllMinMaxToOneScaleDuringWindowTime () {
         let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
         curves_table.each(function() {
@@ -604,23 +604,23 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         elem = $('<div class="titleDiv">Group curves actions:</div>');
         main_menu.append(elem);
 
-        elem = $('<div> All to defailt</div>');
-        elem.click(SetAllMinMaxToDefault);
-        main_menu.append(elem);
-
-        elem = $('<div>Selected to this one&#9658;</div>');
+        elem = $('<div>Like this one</div>');
         elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
         main_menu.append(elem);
 
-        elem = $('<div>Selected to one scale&#9658;</div>');
-        elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
+        elem = $('<div>Zoom In</div>');
+        elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
-        elem = $('<div>Selected centered&#9658;</div>');
-        elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
+        elem = $('<div>Zoom Out</div>');
+        elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
-        elem = $('<div class="bottomBorder iconDiv">All full range&#9658;</div>');
+        elem = $('<div>Default</div>');
+        elem.click(SetAllMinMaxToDefault);
+        main_menu.append(elem);
+
+        elem = $('<div class="iconDiv">Full range</div>');
         elem.click(function (e) {
             sub_menu.empty();
             let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
@@ -661,21 +661,33 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             main_menu.css('pointer-events', 'none');
         });
         main_menu.append(elem);
+
+        elem = $('<div>One scale</div>');
+        elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
+        main_menu.append(elem);
+
+        elem = $('<div class="bottomBorder">Centered</div>');
+        elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
+        main_menu.append(elem);
     }
 
     const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
-    elem = $('<div class="titleDiv">' + selectedFieldName + ':</div>');
+    elem = $('<div class="titleDiv">' + selectedFieldName + ' action:</div>');
     main_menu.append(elem);
 
-    elem = $('<div> This curve to defailt</div>');
+    elem = $('<div> Default</div>');
     elem.click(SetSelectedCurveMinMaxToDefault);
     main_menu.append(elem);
 
-    elem = $('<div>This curve centered</div>');
-    elem.click(SetSelectedCurveToZeroOffset);
+    elem = $('<div>Zoom In</div>');
+    elem.click(SetZoomToCurves);
     main_menu.append(elem);
 
-    elem = $('<div class="bottomBorder iconDiv">This curve full range&#9658;</div>');
+    elem = $('<div>Zoom Out</div>');
+    elem.click(SetZoomToCurves);
+    main_menu.append(elem);
+
+    elem = $('<div class="iconDiv">Full range</div>');
     elem.click(function (e) {
         sub_menu.empty();
         let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
@@ -710,15 +722,11 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     });
     main_menu.append(elem);
 
-    elem = $('<div class="bottomBorder topBorder iconDiv">Curves zoom&#9658;</div>');
-    elem.click(SetZoomToCurves);
+    elem = $('<div>Centered</div>');
+    elem.click(SetSelectedCurveToZeroOffset);
     main_menu.append(elem);
 
-    elem = $('<div class="topBorder iconDiv">Save&#9658;</div>');
-    elem.click(ShowCurvesToSetSaveMinMaxCheckboxedMenu);
-    main_menu.append(elem);
-
-    elem = $('<div class="topBorder iconDiv">&#9668;Exit</div>');
+    elem = $('<div class="topBorder iconDiv">&#9668;Return</div>');
     elem.click(function () {
         main_menu.removeClass('show');
         main_menu.empty();
