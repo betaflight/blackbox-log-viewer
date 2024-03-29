@@ -446,7 +446,33 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         }
     }
 
-    function SetZoomToCurves () {
+    function SetZoomToCurves (e) {
+
+        if(e.shiftKey == false) {
+            let zoomScale = 1;
+            const target = $(e.target);
+            
+            if (target.hasClass('ZoomIn')) {
+                zoomScale = 1/1.05;
+            }
+            else
+            if (target.hasClass('ZoomOut')) {
+                zoomScale = 1.05;
+            }
+            
+            let SelectedCurveName = undefined;
+            if (target.hasClass('SingleCurve')) {
+                SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
+            }
+            
+            for (const key in curvesData) {
+                const curve = curvesData[key];
+                curve.checked = !SelectedCurveName || key == SelectedCurveName;
+            }
+            SetZoomToSelectedCurves(zoomScale);
+            return;
+        }
+
         let main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
         main_menu.css('pointer-events', 'none');
         let elem = undefined;
@@ -470,6 +496,8 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             });
             sub_menu.append(elem);
         }
+
+
 
         elem = $('<div class="topBorder">ZOOM IN</div>');
         elem.click(function () {
@@ -608,11 +636,11 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
         main_menu.append(elem);
 
-        elem = $('<div>Zoom In</div>');
+        elem = $('<div class="ZoomIn AllCurves">Zoom In</div>');
         elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
-        elem = $('<div>Zoom Out</div>');
+        elem = $('<div class="ZoomOut AllCurves">Zoom Out</div>');
         elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
@@ -679,11 +707,11 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     elem.click(SetSelectedCurveMinMaxToDefault);
     main_menu.append(elem);
 
-    elem = $('<div>Zoom In</div>');
+    elem = $('<div class="ZoomIn SingleCurve">Zoom In</div>');
     elem.click(SetZoomToCurves);
     main_menu.append(elem);
 
-    elem = $('<div>Zoom Out</div>');
+    elem = $('<div class="ZoomOut SingleCurve">Zoom Out</div>');
     elem.click(SetZoomToCurves);
     main_menu.append(elem);
 
