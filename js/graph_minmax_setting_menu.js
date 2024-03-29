@@ -217,7 +217,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 sub_menu.append(elem);
         }
 
-        if (e.shiftKey == true) {
+        if (e.shiftKey == false) {
             SetSelectedCurvesToZeroOffset();
             sub_menu.empty();
             main_menu.css('pointer-events', 'all');
@@ -329,7 +329,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             sub_menu.append(elem);
         }
 
-        if (e.shiftKey == true) {
+        if (e.shiftKey == false) {
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
             sub_menu.empty();
             main_menu.css('pointer-events', 'all');
@@ -392,7 +392,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 sub_menu.append(elem);
         }
 
-        if (e.shiftKey == true) {
+        if (e.shiftKey == false) {
             FitSelectedCurveToSameScale();
             sub_menu.empty();
             main_menu.css('pointer-events', 'all');
@@ -529,7 +529,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         for (const key in curvesData) {
             const curve = curvesData[key];
                 elem = $('<div><input type="checkbox" checked="false">' + curve.friendly_name + '</input></div>');
-                $('input', elem).prop('checked', curve.save || e.shiftKey == true);
+                $('input', elem).prop('checked', curve.save || e.shiftKey == false);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.save = this.checked;
@@ -537,7 +537,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 sub_menu.append(elem);
         }
 
-        if (e.shiftKey == true) {
+        if (e.shiftKey == false) {
             SetSelectedCurvesMinMaxForSave();
             sub_menu.empty();
             main_menu.css('pointer-events', 'all');
