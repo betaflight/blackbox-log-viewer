@@ -233,7 +233,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="grid">Grid</th>'
                                                     + '<th name="MinValue">Minimum</th>'
                                                     + '<th name="MaxValue">Maximum</th>'
-                                                    + '<th>Save</th>'
+                                                    + '<th>Default</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
