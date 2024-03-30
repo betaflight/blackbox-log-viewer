@@ -997,11 +997,11 @@ function BlackboxLogViewer() {
         GpxExporter(flightLog).dump(onSuccess);
     }
 
-    function newGraphConfig(newConfig, switchWorkspace) {
+    function newGraphConfig(newConfig) {
         lastGraphConfig = graphConfig; // Remember the last configuration.
         graphConfig = newConfig;
 
-        activeGraphConfig.adaptGraphs(flightLog, graphConfig, switchWorkspace == true);
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig, false);
 
         prefs.set('graphConfig', graphConfig);
     }
@@ -1013,7 +1013,7 @@ function BlackboxLogViewer() {
         workspaceSelection.setWorkspaces(newWorkspaces)
         workspaceSelection.setActiveWorkspace(newActiveId)
         if (flightLog && newWorkspaces[newActiveId] && newWorkspaces[newActiveId].graphConfig) {
-           newGraphConfig(newWorkspaces[newActiveId].graphConfig, true);
+           newGraphConfig(newWorkspaces[newActiveId].graphConfig);
            document.getElementById("legend_title").textContent = newWorkspaces[newActiveId].title
         }
     }
