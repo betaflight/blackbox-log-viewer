@@ -564,21 +564,23 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function SetZoomToCurves (e) {
-
-        if(e.shiftKey == false) {
+        const target = $(e.target);
+        const SingleCurve = target.hasClass('SingleCurve');
+        if(e.shiftKey == false || SingleCurve) {
+            const ZoomIn = target.hasClass('ZoomIn');
+            const ZoomOut = target.hasClass('ZoomOut');
             let zoomScale = 1;
-            const target = $(e.target);
 
-            if (target.hasClass('ZoomIn')) {
+            if (ZoomIn) {
                 zoomScale = 1/1.05;
             }
             else
-            if (target.hasClass('ZoomOut')) {
+            if (ZoomOut) {
                 zoomScale = 1.05;
             }
 
             let SelectedCurveName = undefined;
-            if (target.hasClass('SingleCurve')) {
+            if (SingleCurve) {
                 SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
             }
 
@@ -613,8 +615,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             });
             sub_menu.append(elem);
         }
-
-
 
         elem = $('<div class="topBorder">ZOOM IN</div>');
         elem.click(function () {
