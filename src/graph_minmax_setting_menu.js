@@ -701,6 +701,90 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         }
     }
 
+    function FillThisCurveActionsIntoMenu (menu) {
+        let elem = $('<div> Default</div>');
+        elem.click(SetSelectedCurveMinMaxToDefault);
+        menu.append(elem);
+
+        elem = $('<div class="ZoomIn SingleCurve">Zoom In</div>');
+        elem.click(SetZoomToCurves);
+        menu.append(elem);
+
+        elem = $('<div class="ZoomOut SingleCurve">Zoom Out</div>');
+        elem.click(SetZoomToCurves);
+        menu.append(elem);
+
+        elem = $('<div class="iconDiv SingleCurve">Full range</div>');
+        elem.click(SetCurvesToFullRange);
+        menu.append(elem);
+
+        elem = $('<div>Centered</div>');
+        elem.click(SetSelectedCurveToZeroOffset);
+        menu.append(elem);
+    }
+
+    function ShowThisCurvesActionSubmenu() {
+        const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        sub_menu.empty();
+
+        FillThisCurveActionsIntoMenu (sub_menu);
+
+        elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
+        elem.click(function () {
+            sub_menu.removeClass('show');
+            sub_menu.empty();
+            main_menu.css('pointer-events', 'all');
+        });
+        sub_menu.append(elem);
+
+        sub_menu.css("left", this.clientWidth);
+        sub_menu.css("top", this.offsetTop);
+        sub_menu.addClass('show');
+        main_menu.css('pointer-events', 'none');
+    }
+    
+    function addKeyboardEvents() {
+        selected_curve.parents(".config-graph").keydown( function (e) {
+            const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+            const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+
+            //handle the event once
+            if (this.lastEventTime == e.timeStamp) {
+                if (main_menu[0].childElementCount>0)
+                    e.stopPropagation();
+                return;
+            }
+            this.lastEventTime = e.timeStamp;
+
+            if (e.which == 27) {
+                e.preventDefault();
+                if (sub_menu[0].childElementCount>0) {
+                    sub_menu.removeClass("show");
+                    sub_menu.empty();
+                    main_menu.css('pointer-events', 'all');
+                    e.stopPropagation();
+                }
+                else
+                if (main_menu[0].childElementCount>0) {
+                    main_menu.removeClass('show');
+                    main_menu.empty();
+                    $('.config-graph-field, .btn').css('pointer-events', 'all');
+                    e.stopPropagation();
+                }
+            }
+            else
+            if (e.key == 'Shift') {
+                $(".right-arrow").css('display', 'inline');
+            }
+        });
+
+        selected_curve.parents(".config-graph").keyup( function (e) {
+            if (e.key == 'Shift') {
+                $(".right-arrow").css('display', 'none');
+            }
+        });
+    }
+
     let curvesData = {};
     curves_table.each(function() {
         const fieldName = $("select", this).val();
@@ -759,31 +843,18 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         elem = $('<div class="bottomBorder">Centered<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
         main_menu.append(elem);
+
+        const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
+        elem = $('<div>' + selectedFieldName + ' actions&#9658;</div>');
+        elem.click(ShowThisCurvesActionSubmenu);
+        main_menu.append(elem);
     }
-
-    const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
-    elem = $('<div class="titleDiv">' + selectedFieldName + ' actions:</div>');
-    main_menu.append(elem);
-
-    elem = $('<div> Default</div>');
-    elem.click(SetSelectedCurveMinMaxToDefault);
-    main_menu.append(elem);
-
-    elem = $('<div class="ZoomIn SingleCurve">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>');
-    elem.click(SetZoomToCurves);
-    main_menu.append(elem);
-
-    elem = $('<div class="ZoomOut SingleCurve">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>');
-    elem.click(SetZoomToCurves);
-    main_menu.append(elem);
-
-    elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
-    elem.click(SetCurvesToFullRange);
-    main_menu.append(elem);
-
-    elem = $('<div>Centered</div>');
-    elem.click(SetSelectedCurveToZeroOffset);
-    main_menu.append(elem);
+    else {
+        const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
+        elem = $('<div class="titleDiv">' + selectedFieldName + ' actions:</div>');
+        main_menu.append(elem);
+        FillThisCurveActionsIntoMenu(main_menu);
+    }
 
     elem = $('<div class="topBorder iconDiv">&#9668;Return</div>');
     elem.click(function () {
@@ -797,45 +868,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     main_menu.css('pointer-events', 'all');
     sub_menu.css('pointer-events', 'all');
     main_menu.addClass('show');
-
-    selected_curve.parents(".config-graph").keydown( function (e) {
-        const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-        const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-
-        //handle the event once
-        if (this.lastEventTime == e.timeStamp) {
-            if (main_menu[0].childElementCount>0)
-                e.stopPropagation();
-            return;
-        }
-        this.lastEventTime = e.timeStamp;
-
-        if (e.which == 27) {
-            e.preventDefault();
-            if (sub_menu[0].childElementCount>0) {
-                sub_menu.removeClass("show");
-                sub_menu.empty();
-                main_menu.css('pointer-events', 'all');
-                e.stopPropagation();
-            }
-            else
-            if (main_menu[0].childElementCount>0) {
-                main_menu.removeClass('show');
-                main_menu.empty();
-                $('.config-graph-field, .btn').css('pointer-events', 'all');
-                e.stopPropagation();
-            }
-        }
-        else
-        if (e.key == 'Shift') {
-            $(".right-arrow").css('display', 'inline');
-        }
-
-    });
-
-    selected_curve.parents(".config-graph").keyup( function (e) {
-        if (e.key == 'Shift') {
-            $(".right-arrow").css('display', 'none');
-        }
-    });
+    
+    addKeyboardEvents();
+    
 }
