@@ -1,6 +1,32 @@
 import { GraphConfig } from "./graph_config";
 export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name, selected_curve, curves_table, flightLog, logGrapher, RefreshCharts) {
 
+    function isActiveMenu(menu) {
+        return menu.hasClass('show');
+    }
+
+    function hideMenu(menu) {
+        menu.removeClass('show');
+        menu.empty();
+    }
+
+    function showMenu(menu) {
+        menu.addClass('show');
+    }
+
+    function positionMenu(menu, left, top) {
+        menu.css("left", left);
+        menu.css("top", top);
+    }
+
+    function enablePointerEvents(element) {
+        element.css('pointer-events', 'all');
+    }
+
+    function disablePointerEvents(element) {
+        element.css('pointer-events', 'none');
+    }
+
     function SetAllMinMaxToDefault () {
         curves_table.each(function() {
             const fieldName = $("select", this).val();
@@ -186,10 +212,10 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     function ShowSetAllCurvesFullRangeSubmenu(item) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
+
         let elem = $('<div class="titleDiv bottomBorder">FULL RANGE:</div>');
         sub_menu.append(elem);
-        sub_menu.empty();
         elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
         sub_menu.append(elem);
         elem = $('<div>Full range</div>');
@@ -216,21 +242,19 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass('show');
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", item.clientWidth);
-        sub_menu.css("top", item.offsetTop);
-        sub_menu.addClass('show');
-        main_menu.css('pointer-events', 'none');
+        positionMenu(sub_menu, item.clientWidth, item.offsetTop);
+        showMenu(sub_menu);
+        disablePointerEvents(main_menu);
     }
 
     function ShowSetSelectedCurveFullRangeSubmenu(item) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
 
         let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
         sub_menu.append(elem);
@@ -252,15 +276,13 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass('show');
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", item.clientWidth);
-        sub_menu.css("top", item.offsetTop);
-        sub_menu.addClass('show');
-        main_menu.css('pointer-events', 'none');
+        positionMenu(sub_menu, item.clientWidth, item.offsetTop);
+        showMenu(sub_menu);
+        disablePointerEvents(main_menu);
     }
 
     function SetCurvesToFullRange(e) {
@@ -299,9 +321,9 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     function ShowCurvesToSetZeroOffsetCheckboxedMenu (e) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-        main_menu.css('pointer-events', 'none');
+        disablePointerEvents(main_menu);
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
         elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
@@ -318,30 +340,28 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         if (e.shiftKey == false) {
             SetSelectedCurvesToZeroOffset();
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO ZERO OFFSET</div>');
         elem.click(function () {
             SetSelectedCurvesToZeroOffset();
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass("show");
+
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
 
         function SetSelectedCurvesToZeroOffset () {
             curves_table.each(function() {
@@ -395,9 +415,9 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     function ShowCurvesToSetMinMaxCheckboxedMenu (e) {
         let inputMinValue = null, inputMaxValue = null;
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-        main_menu.css('pointer-events', 'none');
+        disablePointerEvents(main_menu);
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
 
         elem = $('<div class="titleDiv bottomBorder">SET MIN MAX VALUES</div>');
         sub_menu.append(elem);
@@ -430,30 +450,28 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         if (e.shiftKey == false) {
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
+            hideMenu(sub_menu);
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            main_menu.css('pointer-events', 'all');
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass("show");
+
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
 
         function ApplySelectedCurveMinMaxToOtherSelectedCurves () {
             const curveMin = inputMinValue.val();
@@ -474,9 +492,9 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     function ShowCurvesToSetSameScaleCheckboxedMenu(e) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-        main_menu.css('pointer-events', 'none');
+        disablePointerEvents(main_menu);
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
         elem = $('<div class="bottomBorder titleDiv">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
@@ -493,30 +511,28 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         if (e.shiftKey == false) {
             FitSelectedCurveToSameScale();
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
             return;
         }
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO SAME SCALE</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
+            hideMenu(sub_menu);
             FitSelectedCurveToSameScale();
-            main_menu.css('pointer-events', 'all');
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass("show");
+
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
 
         function FitSelectedCurveToSameScale () {
             const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
@@ -574,10 +590,10 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         }
 
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-        main_menu.css('pointer-events', 'none');
+        disablePointerEvents(main_menu);
         let elem = undefined;
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
 
         elem = $('<div class="titleDiv bottomBorder">INPUT ZOOM [%]:</div>');
         sub_menu.append(elem);
@@ -621,14 +637,12 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass("show");
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
 
         function SetZoomToSelectedCurves (zoomScale) {
             curves_table.each(function() {
@@ -647,9 +661,9 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     function ShowCurvesToSetSaveMinMaxCheckboxedMenu(e) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-        main_menu.css('pointer-events', 'none');
+        disablePointerEvents(main_menu);
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
         elem = $('<div class="bottomBorder titleDiv">SELECT CURVES:</div>');
         sub_menu.append(elem);
 
@@ -666,30 +680,27 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         if (e.shiftKey == false) {
             SetSelectedCurvesMinMaxForSave();
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
             return;
         }
 
         elem = $('<div class="bottomBorder topBorder iconDiv">&#9668;SET CURVES TO SAVE</div>');
         elem.click(function () {
             SetSelectedCurvesMinMaxForSave();
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass("show");
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass("show");
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
 
         function SetSelectedCurvesMinMaxForSave () {
             const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
@@ -714,7 +725,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         elem.click(SetZoomToCurves);
         menu.append(elem);
 
-        elem = $('<div class="iconDiv SingleCurve">Full range</div>');
+        elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow2" style="display: none">&#9658;</span></div>');
         elem.click(SetCurvesToFullRange);
         menu.append(elem);
 
@@ -725,24 +736,22 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     function ShowThisCurvesActionSubmenu() {
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        sub_menu.empty();
+        hideMenu(sub_menu);
 
-        FillThisCurveActionsIntoMenu (sub_menu);
+        FillThisCurveActionsIntoMenu(sub_menu);
 
         elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            sub_menu.removeClass('show');
-            sub_menu.empty();
-            main_menu.css('pointer-events', 'all');
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
         });
         sub_menu.append(elem);
 
-        sub_menu.css("left", this.clientWidth);
-        sub_menu.css("top", this.offsetTop);
-        sub_menu.addClass('show');
-        main_menu.css('pointer-events', 'none');
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
+        disablePointerEvents(main_menu);
     }
-    
+
     function addKeyboardEvents() {
         selected_curve.parents(".config-graph").keydown( function (e) {
             const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
@@ -750,7 +759,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
             //handle the event once
             if (this.lastEventTime == e.timeStamp) {
-                if (main_menu[0].childElementCount>0)
+                if (isActiveMenu(main_menu))
                     e.stopPropagation();
                 return;
             }
@@ -758,22 +767,20 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
             if (e.which == 27) {
                 e.preventDefault();
-                if (sub_menu[0].childElementCount>0) {
-                    sub_menu.removeClass("show");
-                    sub_menu.empty();
-                    main_menu.css('pointer-events', 'all');
+                if (isActiveMenu(sub_menu)) {
+                    hideMenu(sub_menu);
+                    enablePointerEvents(main_menu);
                     e.stopPropagation();
                 }
                 else
-                if (main_menu[0].childElementCount>0) {
-                    main_menu.removeClass('show');
-                    main_menu.empty();
-                    $('.config-graph-field, .btn').css('pointer-events', 'all');
+                if (isActiveMenu(main_menu)) {
+                    hideMenu(main_menu);
+                    enablePointerEvents($('.config-graph-field, .btn'));
                     e.stopPropagation();
                 }
             }
             else
-            if (e.key == 'Shift') {
+            if (e.key == 'Shift' && !isActiveMenu(sub_menu)) {
                 $(".right-arrow").css('display', 'inline');
             }
         });
@@ -808,8 +815,8 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
     const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-    main_menu.empty();
-    sub_menu.empty();
+    hideMenu(main_menu);
+    hideMenu(sub_menu);
 
     let elem = undefined;
     if (!oneRow) {
@@ -858,17 +865,14 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     elem = $('<div class="topBorder iconDiv">&#9668;Return</div>');
     elem.click(function () {
-        main_menu.removeClass('show');
-        main_menu.empty();
-        $('.config-graph-field, .btn').css('pointer-events', 'all');
+        hideMenu(main_menu);
+        enablePointerEvents($('.config-graph-field, .btn'));
     });
     main_menu.append(elem);
 
-    $('.config-graph-field, .btn').css('pointer-events', 'none');
-    main_menu.css('pointer-events', 'all');
-    sub_menu.css('pointer-events', 'all');
-    main_menu.addClass('show');
-    
+    disablePointerEvents($('.config-graph-field, .btn'));
+    enablePointerEvents(main_menu);
+    enablePointerEvents(sub_menu);
     addKeyboardEvents();
-    
+    showMenu(main_menu);
 }
