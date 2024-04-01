@@ -218,6 +218,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                                     + '<div class="selectWrapper">'
                                         + '<div class="dropdown-content main_menu"></div>'
                                         + '<div class="dropdown-content sub_menu"></div>'
+										+ '<div class="dropdown-content sub_menu2"></div>'
                                     + '</div>'
                                 +'</div>'
                                 + '<div class="form-group config-graph-field-header">'

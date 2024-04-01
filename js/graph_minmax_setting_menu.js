@@ -255,35 +255,43 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     function ShowSetSelectedCurveFullRangeSubmenu(item) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
-        hideMenu(sub_menu);
+        const sub_menu2 = $(".sub_menu2", selected_curve.parents(".config-graph"));
+
+        const isSubmenuLevel2 = isActiveMenu(sub_menu);
+        const menu = isSubmenuLevel2 ? sub_menu2 : sub_menu;
+        const prev_menu = isSubmenuLevel2 ? sub_menu : main_menu;
+        hideMenu(menu);
 
         let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
-        sub_menu.append(elem);
+        menu.append(elem);
         elem = $('<div>Full range</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
-        sub_menu.append(elem);
+        menu.append(elem);
         elem = $('<div>Centered full range</div>');
         elem.click(SetSelectedMinMaxToZeroOffsetDuringAllTime);
-        sub_menu.append(elem);
+        menu.append(elem);
 
         elem = $('<div class="titleDiv topBorder bottomBorder">At local window time</div>');
-        sub_menu.append(elem);
+        menu.append(elem);
         elem = $('<div>Full range</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringWindowTime);
-        sub_menu.append(elem);
+        menu.append(elem);
         elem = $('<div>Centered full range</div>');
         elem.click(SetSelectedMinMaxToZeroOffsetDuringWindowTime);
-        sub_menu.append(elem);
+        menu.append(elem);
 
         elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
-            hideMenu(sub_menu);
-            enablePointerEvents(main_menu);
+            hideMenu(menu);
+            enablePointerEvents(prev_menu);
         });
-        sub_menu.append(elem);
-        positionMenu(sub_menu, item.clientWidth, item.offsetTop);
-        showMenu(sub_menu);
-        disablePointerEvents(main_menu);
+        menu.append(elem);
+
+        const left = item.clientWidth + (isSubmenuLevel2 ? main_menu[0].children[8].clientWidth : 0);
+        const top = item.offsetTop + (isSubmenuLevel2 ? main_menu[0].children[8].offsetTop : 0);
+        positionMenu(menu, left, top);
+        showMenu(menu);
+        disablePointerEvents(prev_menu);
     }
 
     function SetCurvesToFullRange(e) {
@@ -713,7 +721,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         }
     }
 
-    function FillThisCurveActionsIntoMenu (menu) {
+    function FillThisCurveActionsIntoMenu (menu, is_main_menu) {
         let elem = $('<div> Default</div>');
         elem.click(SetSelectedCurveMinMaxToDefault);
         menu.append(elem);
@@ -722,11 +730,14 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(SetZoomToCurves);
         menu.append(elem);
 
-        elem = $('<div class="ZoomOut SingleCurve">Zoom Out</div>');
+        elem = $('<div class="ZoomOut SingleCurve">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
         elem.click(SetZoomToCurves);
         menu.append(elem);
 
-        elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow2" style="display: none">&#9658;</span></div>');
+        if (is_main_menu)
+            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        else
+            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow2" style="display: none">&#9658;</span></div>');
         elem.click(SetCurvesToFullRange);
         menu.append(elem);
 
@@ -739,7 +750,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         hideMenu(sub_menu);
 
-        FillThisCurveActionsIntoMenu(sub_menu);
+        FillThisCurveActionsIntoMenu(sub_menu, false);
 
         elem = $('<div class="topBorder bottomBorder iconDiv">&#9668;Back</div>');
         elem.click(function () {
@@ -754,10 +765,11 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function addKeyboardEvents() {
-        selected_curve.parents(".config-graph").keydown( function (e) {
-            const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
-            const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        const sub_menu2 = $(".sub_menu2", selected_curve.parents(".config-graph"));
 
+        selected_curve.parents(".config-graph").keydown( function (e) {
             //handle the event once
             if (this.lastEventTime == e.timeStamp) {
                 if (isActiveMenu(main_menu))
@@ -768,6 +780,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
             if (e.which == 27) {
                 e.preventDefault();
+                if (isActiveMenu(sub_menu2)) {
+                    hideMenu(sub_menu2);
+                    enablePointerEvents(sub_menu);
+                    e.stopPropagation();
+                }
+                else
                 if (isActiveMenu(sub_menu)) {
                     hideMenu(sub_menu);
                     enablePointerEvents(main_menu);
@@ -781,14 +799,19 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 }
             }
             else
-            if (e.key == 'Shift' && !isActiveMenu(sub_menu)) {
-                $(".right-arrow").css('display', 'inline');
+            if (e.key == 'Shift') {
+                if (!isActiveMenu(sub_menu))
+                    $(".right-arrow").css('display', 'inline');
+                else
+                if (!isActiveMenu(sub_menu2))
+                    $(".right-arrow2").css('display', 'inline');
             }
         });
 
         selected_curve.parents(".config-graph").keyup( function (e) {
             if (e.key == 'Shift') {
                 $(".right-arrow").css('display', 'none');
+                $(".right-arrow2").css('display', 'none');
             }
         });
     }
@@ -824,15 +847,15 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="titleDiv">Group curves actions:</div>');
         main_menu.append(elem);
 
-        elem = $('<div>Like this one<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem = $('<div class="iconDiv">Like this one<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
         main_menu.append(elem);
 
-        elem = $('<div class="ZoomIn AllCurves">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem = $('<div class="ZoomIn AllCurves iconDiv">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
-        elem = $('<div class="ZoomOut AllCurves">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem = $('<div class="ZoomOut AllCurves iconDiv">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
@@ -844,16 +867,16 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(SetCurvesToFullRange);
         main_menu.append(elem);
 
-        elem = $('<div>One scale<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem = $('<div class="iconDiv">One scale<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
         main_menu.append(elem);
 
-        elem = $('<div class="bottomBorder">Centered<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem = $('<div class="iconDiv bottomBorder">Centered<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
         main_menu.append(elem);
 
         const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
-        elem = $('<div>' + selectedFieldName + ' actions&#9658;</div>');
+        elem = $('<div class="iconDiv">' + selectedFieldName + ' actions&#9658;</div>');
         elem.click(ShowThisCurvesActionSubmenu);
         main_menu.append(elem);
     }
@@ -861,7 +884,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
         elem = $('<div class="titleDiv">' + selectedFieldName + ' actions:</div>');
         main_menu.append(elem);
-        FillThisCurveActionsIntoMenu(main_menu);
+        FillThisCurveActionsIntoMenu(main_menu, true);
     }
 
     elem = $('<div class="topBorder iconDiv">&#9668;Return</div>');
