@@ -326,7 +326,66 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         RefreshCharts();
     }
 
+    function ShowCurvesToSetDefaultCheckboxedMenu (e) {
+        const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
+        disablePointerEvents(main_menu);
+        const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
+        hideMenu(sub_menu);
+        elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
+        sub_menu.append(elem);
 
+        for (const key in curvesData) {
+            const curve = curvesData[key];
+                curve.checked = true;
+                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                $('input', elem).click(function (e) {
+                    let curve = curvesData[this.parentElement.innerText];
+                    curve.checked = this.checked;
+                });
+                sub_menu.append(elem);
+        }
+
+        if (e.altKey == false) {
+            SetSelectedCurvesToDefault();
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
+            return;
+        }
+
+        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO DEFAULT</div>');
+        elem.click(function () {
+            SetSelectedCurvesToDefault();
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
+        });
+        sub_menu.append(elem);
+
+        elem = $('<div class="topBorder iconDiv">&#9668;Back</div>');
+        elem.click(function () {
+            hideMenu(sub_menu);
+            enablePointerEvents(main_menu);
+        });
+        sub_menu.append(elem);
+
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
+
+        function SetSelectedCurvesToDefault () {
+            curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                if(curve.checked) {
+                    const fieldName = $("select", this).val();
+                    const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
+                    curve.min = mm.min;
+                    curve.max = mm.max;
+                    $('input[name=MinValue]',this).val(mm.min.toFixed(1));
+                    $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+                }
+            });
+            RefreshCharts();
+        }
+    }
 
     function ShowCurvesToSetZeroOffsetCheckboxedMenu (e) {
         const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
@@ -381,8 +440,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                     let Max = parseFloat($('input[name=MaxValue]',this).val());
                     Max = Math.max(Math.abs(Min), Math.abs(Max));
                     Min = -Max;
-                    const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                    let curve = curvesData[fieldFriendlyName];
                     curve.min = Min;
                     curve.max = Max;
                     $('input[name=MinValue]',this).val(Min.toFixed(1));
@@ -721,31 +778,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         }
     }
 
-    function FillThisCurveActionsIntoMenu (menu, is_main_menu) {
-        let elem = $('<div> Default</div>');
-        elem.click(SetSelectedCurveMinMaxToDefault);
-        menu.append(elem);
-
-        elem = $('<div class="ZoomIn SingleCurve">Zoom In</div>');
-        elem.click(SetZoomToCurves);
-        menu.append(elem);
-
-        elem = $('<div class="ZoomOut SingleCurve">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
-        elem.click(SetZoomToCurves);
-        menu.append(elem);
-
-        if (is_main_menu)
-            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
-        else
-            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow2" style="display: none">&#9658;</span></div>');
-        elem.click(SetCurvesToFullRange);
-        menu.append(elem);
-
-        elem = $('<div>Centered</div>');
-        elem.click(SetSelectedCurveToZeroOffset);
-        menu.append(elem);
-    }
-
     function ShowThisCurvesActionSubmenu() {
         const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
         hideMenu(sub_menu);
@@ -816,6 +848,31 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         });
     }
 
+    function FillThisCurveActionsIntoMenu (menu, is_main_menu) {
+        let elem = $('<div> Default</div>');
+        elem.click(SetSelectedCurveMinMaxToDefault);
+        menu.append(elem);
+
+        elem = $('<div class="ZoomIn SingleCurve">Zoom In</div>');
+        elem.click(SetZoomToCurves);
+        menu.append(elem);
+
+        elem = $('<div class="ZoomOut SingleCurve">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
+        elem.click(SetZoomToCurves);
+        menu.append(elem);
+
+        if (is_main_menu)
+            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        else
+            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow2" style="display: none">&#9658;</span></div>');
+        elem.click(SetCurvesToFullRange);
+        menu.append(elem);
+
+        elem = $('<div>Centered</div>');
+        elem.click(SetSelectedCurveToZeroOffset);
+        menu.append(elem);
+    }
+
     let curvesData = {};
     curves_table.each(function() {
         const fieldName = $("select", this).val();
@@ -859,8 +916,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(SetZoomToCurves);
         main_menu.append(elem);
 
-        elem = $('<div>Default</div>');
-        elem.click(SetAllMinMaxToDefault);
+        elem = $('<div class="iconDiv">Default<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem.click(ShowCurvesToSetDefaultCheckboxedMenu);
         main_menu.append(elem);
 
         elem = $('<div class="iconDiv AllCurves">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
