@@ -901,3 +901,10 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     addKeyboardEvents();
     showMenu(main_menu);
 }
+
+/*
+    Unlock users interface
+*/
+function UnlockUsersInterfaceAfterWorkOfMinMaxMenu () {
+    $('.config-graph-field, .btn').css('pointer-events', 'all');
+}
