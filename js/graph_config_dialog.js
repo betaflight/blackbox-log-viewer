@@ -466,10 +466,8 @@ function GraphConfigurationDialog(dialog, onSave) {
     };
 
     $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
-        // Unlock dialog box interface
-        if($('.config-graph-field').css('pointer-events') == 'none') {
-            $('.config-graph-field, .btn').css('pointer-events', 'all');
-        }
+        // Unlock users interface if MinMax menu is openned
+        UnlockUsersInterfaceAfterWorkOfMinMaxMenu ();
 
         if (cfgMustBeRestored)
             onSave(prevCfg);
