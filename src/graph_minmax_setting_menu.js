@@ -962,6 +962,6 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 /*
     Unlock users interface
 */
-function UnlockUsersInterfaceAfterWorkOfMinMaxMenu () {
+export function UnlockUsersInterfaceAfterWorkOfMinMaxMenu () {
     $('.config-graph-field, .btn').css('pointer-events', 'all');
 }
