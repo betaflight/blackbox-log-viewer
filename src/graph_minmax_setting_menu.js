@@ -295,7 +295,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     function SetCurvesToFullRange(e) {
         const SingleCurve = $(e.target).hasClass('SingleCurve');
-        if (e.shiftKey == false) {
+        if (e.altKey == false) {
             if (SingleCurve) {
                 SetSelectedCurveMinMaxToFullRangeDuringAllTime();
             }
@@ -346,7 +346,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
                 sub_menu.append(elem);
         }
 
-        if (e.shiftKey == false) {
+        if (e.altKey == false) {
             SetSelectedCurvesToZeroOffset();
             hideMenu(sub_menu);
             enablePointerEvents(main_menu);
@@ -456,7 +456,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             sub_menu.append(elem);
         }
 
-        if (e.shiftKey == false) {
+        if (e.altKey == false) {
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
             hideMenu(sub_menu);
             enablePointerEvents(main_menu);
@@ -517,7 +517,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
                 sub_menu.append(elem);
         }
 
-        if (e.shiftKey == false) {
+        if (e.altKey == false) {
             FitSelectedCurveToSameScale();
             hideMenu(sub_menu);
             enablePointerEvents(main_menu);
@@ -573,7 +573,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     function SetZoomToCurves (e) {
         const target = $(e.target);
         const SingleCurve = target.hasClass('SingleCurve');
-        if(e.shiftKey == false || SingleCurve) {
+        if(e.altKey == false || SingleCurve) {
             const ZoomIn = target.hasClass('ZoomIn');
             const ZoomOut = target.hasClass('ZoomOut');
             let zoomScale = 1;
@@ -678,7 +678,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
                 elem = $('<div><input type="checkbox" checked="false">' + curve.friendly_name + '</input></div>');
-                $('input', elem).prop('checked', curve.save || e.shiftKey == false);
+                $('input', elem).prop('checked', curve.save || e.altKey == false);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.save = this.checked;
@@ -686,7 +686,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
                 sub_menu.append(elem);
         }
 
-        if (e.shiftKey == false) {
+        if (e.altKey == false) {
             SetSelectedCurvesMinMaxForSave();
             hideMenu(sub_menu);
             enablePointerEvents(main_menu);
@@ -798,7 +798,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
                 }
             }
             else
-            if (e.key == 'Shift') {
+            if (e.key == 'Alt') {
                 if (!isActiveMenu(sub_menu))
                     $(".right-arrow").css('display', 'inline');
                 else
@@ -808,7 +808,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         });
 
         selected_curve.parents(".config-graph").keyup( function (e) {
-            if (e.key == 'Shift') {
+            if (e.key == 'Alt') {
                 $(".right-arrow").css('display', 'none');
                 $(".right-arrow2").css('display', 'none');
             }
