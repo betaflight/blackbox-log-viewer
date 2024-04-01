@@ -894,6 +894,8 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     main_menu.append(elem);
 
     disablePointerEvents($('.config-graph-field, .btn'));
+    enablePointerEvents($('.graph-configuration-dialog-save'));
+    enablePointerEvents($('.graph-configuration-dialog-cancel'));
     enablePointerEvents(main_menu);
     enablePointerEvents(sub_menu);
     addKeyboardEvents();

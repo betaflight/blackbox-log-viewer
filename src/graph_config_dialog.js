@@ -217,7 +217,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                                     + '<div class="selectWrapper">'
                                         + '<div class="dropdown-content main_menu"></div>'
                                         + '<div class="dropdown-content sub_menu"></div>'
-										+ '<div class="dropdown-content sub_menu2"></div>'
+                                        + '<div class="dropdown-content sub_menu2"></div>'
                                     + '</div>'
                                 +'</div>'
                                 + '<div class="form-group config-graph-field-header">'
@@ -465,10 +465,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
     };
 
     $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
-        // The dialog close is locking, while the menu is opened
+        // Unlock dialog box interface
         if($('.config-graph-field').css('pointer-events') == 'none') {
-            e.preventDefault();
-            return false;
+            $('.config-graph-field, .btn').css('pointer-events', 'all');
         }
 
         if (cfgMustBeRestored)
