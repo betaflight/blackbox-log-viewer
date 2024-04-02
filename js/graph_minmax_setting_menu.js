@@ -14,8 +14,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
             curve.min = mm.min;
             curve.max = mm.max;
-            $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-            $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            $('input[name=MinValue]',this).val(mm.min.toFixed(0));
+            $('input[name=MaxValue]',this).val(mm.max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -29,8 +29,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = mm.min;
             curve.max = mm.max;
-            $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-            $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            $('input[name=MinValue]',this).val(mm.min.toFixed(0));
+            $('input[name=MaxValue]',this).val(mm.max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -46,8 +46,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = mm.min;
             curve.max = mm.max;
-            $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-            $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            $('input[name=MinValue]',this).val(mm.min.toFixed(0));
+            $('input[name=MaxValue]',this).val(mm.max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -66,8 +66,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = Min;
             curve.max = Max;
-            $('input[name=MinValue]',this).val(Min.toFixed(1));
-            $('input[name=MaxValue]',this).val(Max.toFixed(1));
+            $('input[name=MinValue]',this).val(Min.toFixed(0));
+            $('input[name=MaxValue]',this).val(Max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -81,8 +81,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = mm.min;
             curve.max = mm.max;
-            $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-            $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            $('input[name=MinValue]',this).val(mm.min.toFixed(0));
+            $('input[name=MaxValue]',this).val(mm.max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -98,8 +98,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = mm.min;
             curve.max = mm.max;
-            $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-            $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+            $('input[name=MinValue]',this).val(mm.min.toFixed(0));
+            $('input[name=MaxValue]',this).val(mm.max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -118,8 +118,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = Min;
             curve.max = Max;
-            $('input[name=MinValue]',this).val(Min.toFixed(1));
-            $('input[name=MaxValue]',this).val(Max.toFixed(1));
+            $('input[name=MinValue]',this).val(Min.toFixed(0));
+            $('input[name=MaxValue]',this).val(Max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -136,8 +136,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             let curve = curvesData[fieldFriendlyName];
             curve.min = Min;
             curve.max = Max;
-            $('input[name=MinValue]',this).val(Min.toFixed(1));
-            $('input[name=MaxValue]',this).val(Max.toFixed(1));
+            $('input[name=MinValue]',this).val(Min.toFixed(0));
+            $('input[name=MaxValue]',this).val(Max.toFixed(0));
         });
         RefreshCharts();
     }
@@ -148,8 +148,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let curve = curvesData[fieldFriendlyName];
         curve.min = mm.min;
         curve.max = mm.max;
-        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(0));
+        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(0));
         RefreshCharts();
     }
 
@@ -159,8 +159,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let curve = curvesData[fieldFriendlyName];
         curve.min = mm.min;
         curve.max = mm.max;
-        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(0));
+        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(0));
         RefreshCharts();
     }
 
@@ -170,8 +170,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let curve = curvesData[fieldFriendlyName];
         curve.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
         curve.min = -curve.max;
-        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(1));
+        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(0));
+        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(0));
         RefreshCharts();
     }
 
@@ -182,8 +182,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let curve = curvesData[fieldFriendlyName];
         curve.min = mm.min;
         curve.max = mm.max;
-        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(0));
+        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(0));
         RefreshCharts();
     }
 
@@ -292,8 +292,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let curve = curvesData[fieldFriendlyName];
         curve.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
         curve.min = -curve.max;
-        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(1));
+        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(0));
+        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(0));
         RefreshCharts();
     }
 
@@ -348,8 +348,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                     const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
                     curve.min = mm.min;
                     curve.max = mm.max;
-                    $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-                    $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+                    $('input[name=MinValue]',this).val(mm.min.toFixed(0));
+                    $('input[name=MaxValue]',this).val(mm.max.toFixed(0));
                 }
             });
             RefreshCharts();
@@ -409,8 +409,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                     Min = -Max;
                     curve.min = Min;
                     curve.max = Max;
-                    $('input[name=MinValue]',this).val(Min.toFixed(1));
-                    $('input[name=MaxValue]',this).val(Max.toFixed(1));
+                    $('input[name=MinValue]',this).val(Min.toFixed(0));
+                    $('input[name=MaxValue]',this).val(Max.toFixed(0));
                 }
             });
             RefreshCharts();
@@ -426,8 +426,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         let curve = curvesData[fieldFriendlyName];
         curve.min = Min;
         curve.max = Max;
-        $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
+        $('input[name=MinValue]', selected_curve).val(Min.toFixed(0));
+        $('input[name=MaxValue]', selected_curve).val(Max.toFixed(0));
         RefreshCharts();
     }
 
@@ -583,8 +583,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 if(curve.checked) {
                     curve.min = Min;
                     curve.max = Max;
-                    $('input[name=MinValue]',this).val(Min.toFixed(1));
-                        $('input[name=MaxValue]',this).val(Max.toFixed(1));
+                    $('input[name=MinValue]',this).val(Min.toFixed(0));
+                        $('input[name=MaxValue]',this).val(Max.toFixed(0));
                     }
                 });
                 RefreshCharts();
@@ -678,8 +678,8 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 if(curve.checked) {
                     curve.min *= zoomScale;
                     curve.max *= zoomScale;
-                    $('input[name=MinValue]',this).val((curve.min).toFixed(1));
-                    $('input[name=MaxValue]',this).val((curve.max).toFixed(1));
+                    $('input[name=MinValue]',this).val((curve.min).toFixed(0));
+                    $('input[name=MaxValue]',this).val((curve.max).toFixed(0));
                 }
             });
             RefreshCharts();
