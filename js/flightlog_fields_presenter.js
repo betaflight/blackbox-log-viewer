@@ -1910,7 +1910,7 @@ function FlightLogFieldPresenter() {
                     debugFields = DEBUG_FRIENDLY_FIELD_NAMES[DEBUG_MODE[0]];
                 }
 
-                return debugFields[fieldName];
+                return debugFields[fieldName] ?? fieldName;
             }
         }
         if (FRIENDLY_FIELD_NAMES[fieldName]) {
