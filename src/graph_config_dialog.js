@@ -1,7 +1,8 @@
 import { GraphConfig } from "./graph_config";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { showMinMaxSetupContextMenu } from "./graph_minmax_setting_menu";
-import { UnlockUsersInterfaceAfterWorkOfMinMaxMenu } from "./graph_minmax_setting_menu";
+import { closeMinMaxContextMenu } from "./graph_minmax_setting_menu";
+import { isMinMaxContextMenuActive } from "./graph_minmax_setting_menu";
 
 export function GraphConfigurationDialog(dialog, onSave) {
     let
@@ -467,19 +468,28 @@ export function GraphConfigurationDialog(dialog, onSave) {
     };
 
     $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
-        // Unlock users interface if MinMax menu is openned
-        UnlockUsersInterfaceAfterWorkOfMinMaxMenu ();
+        // Lock close window if MinMax menu is openned
+        if (isMinMaxContextMenuActive()) {
+            e.preventDefault();
+            return;
+        }
 
         if (cfgMustBeRestored)
             onSave(prevCfg);
     });
 
     $(".graph-configuration-dialog-save").click(function() {
+        if (isMinMaxContextMenuActive())
+            closeMinMaxContextMenu();
+
         cfgMustBeRestored = false;
         onSave(convertUIToGraphConfig());
     });
 
     $(".graph-configuration-dialog-cancel").click(function() {
+        if (isMinMaxContextMenuActive())
+            closeMinMaxContextMenu();
+
         cfgMustBeRestored = false;
         onSave(prevCfg);
     });
