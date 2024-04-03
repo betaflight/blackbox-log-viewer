@@ -44,7 +44,7 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
     const length = flightLog.getCurrentLogRowsCount();
     this._actualeRate = 1e6 * length / timeRange;
     if (Math.abs(this._BetaflightRate - this._actualeRate) / this._actualeRate > WARNING_RATE_DIFFERENCE)
-            this._blackBoxRate = Math.round(this._actualeRate);
+        this._blackBoxRate = Math.round(this._actualeRate);
 
     if (this._BetaflightRate !== this._blackBoxRate) {
         $('.actual-lograte').text(this._actualeRate.toFixed(0) + "/" + this._BetaflightRate.toFixed(0)+"Hz");
