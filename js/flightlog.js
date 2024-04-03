@@ -82,7 +82,7 @@ function FlightLog(logData) {
     this.getStats = function(logIndex) {
         let rawStats = getRawStats(logIndex);
 
-        if (rawStats.field == undefined) {
+        if (rawStats.field === undefined) {
             rawStats.field = [];
             for (let i = 0;  i < rawStats.frame.I.field.length; ++i) {
                 rawStats.field[i] = {
