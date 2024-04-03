@@ -815,10 +815,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(SetZoomToCurves);
         menu.append(elem);
 
-        if (is_main_menu)
-            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
-        else
-            elem = $('<div class="iconDiv SingleCurve">Full range<span class="right-arrow2" style="display: none">&#9658;</span></div>');
+        elem = $(`<div class="iconDiv SingleCurve">Full range<span class=${is_main_menu ? "right-arrow" : "right-arrow2"} style="display: none">&#9658;</span></div>`);
         elem.click(SetCurvesToFullRange);
         menu.append(elem);
 
