@@ -103,7 +103,7 @@ export function FlightLog(logData) {
 
         if (rawStats.field == undefined) {
             rawStats.field = [];
-            for (let i=0; i<rawStats.frame.I.field.length; ++i) {
+            for (let i = 0;  i < rawStats.frame.I.field.length; ++i) {
                 rawStats.field[i] = {
                     min: Math.min(rawStats.frame.I.field[i].min, rawStats.frame.P.field[i].min),
                     max: Math.max(rawStats.frame.I.field[i].max, rawStats.frame.P.field[i].max)
