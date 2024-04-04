@@ -90,3 +90,6 @@
 .dropdown-content i {
   color: var(--textSecondary);
 }
+.minmax-control {
+  autocomplete: off;
+}
