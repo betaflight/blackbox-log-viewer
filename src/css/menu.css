@@ -71,7 +71,7 @@
 }
 .titleDiv {
   pointer-events: none;
-  font-weight: 700;
+  font-weight: 600;
 }
 .justHover i {
   opacity: 0;
@@ -92,4 +92,13 @@
 }
 .minmax-control {
   autocomplete: off;
+}
+
+.menu-button {
+  background-color: #f6f6f6;
+  font-weight: 700;
+  border-top: 2px solid var(--borderColor);
+  border-bottom: 2px solid var(--borderColor);
+  border-left: 2px solid var(--borderColor);
+  border-right: 2px solid var(--borderColor);
 }
