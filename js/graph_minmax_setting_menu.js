@@ -5,6 +5,21 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
     const sub_menu2 = $(".sub_menu2", selected_curve.parents(".config-graph"));
 
+    function ActivateMainMenu (menu) {
+        $('.back-main-menu').addClass('menu-button');
+        enablePointerEvents(menu);
+    }
+
+    function DeactivateMainMenu (menu) {
+        $('.back-main-menu').removeClass('menu-button');
+        disablePointerEvents(main_menu);
+    }
+
+    function ActivateSubmenu (menu) {
+        enablePointerEvents(menu);
+        $('.back-submenu').addClass('menu-button');
+    }
+
     function SetAllMinMaxToDefault () {
         curves_table.each(function() {
             const fieldName = $("select", this).val();
@@ -219,14 +234,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="menu-button back-submenu iconDiv">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            enablePointerEvents(main_menu);
-            $('.back-main-menu').addClass('menu-button');
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
         positionMenu(sub_menu, item.clientWidth, item.offsetTop);
         showMenu(sub_menu);
-        $('.back-main-menu').removeClass('menu-button');
-        disablePointerEvents(main_menu);
+        DeactivateMainMenu(main_menu);
     }
 
     function ShowSetSelectedCurveFullRangeSubmenu(item) {
@@ -337,23 +350,20 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(function () {
             SetSelectedCurvesToDefault();
             hideMenu(sub_menu);
-            enablePointerEvents(main_menu);
-            $('.back-main-menu').addClass('menu-button');
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
 
         function SetSelectedCurvesToDefault () {
             curves_table.each(function() {
@@ -398,23 +408,20 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(function () {
             SetSelectedCurvesToZeroOffset();
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="menu-button back-submenu iconDiv">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
 
         function SetSelectedCurvesToZeroOffset () {
             curves_table.each(function() {
@@ -505,8 +512,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
             $('.back-main-menu').addClass('menu-button');
         });
         sub_menu.append(elem);
@@ -514,16 +520,14 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
 
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
 
         function ApplySelectedCurveMinMaxToOtherSelectedCurves () {
             const curveMin = inputMinValue.val();
@@ -568,23 +572,20 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(function () {
             hideMenu(sub_menu);
             FitSelectedCurveToSameScale();
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
 
         function FitSelectedCurveToSameScale () {
             const SelectedCurveMin = parseFloat($('input[name=MinValue]', selected_curve).val());
@@ -687,15 +688,13 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
 
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
 
         function SetZoomToSelectedCurves (zoomScale) {
             curves_table.each(function() {
@@ -738,22 +737,19 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem.click(function () {
             SetSelectedCurvesMinMaxForSave();
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
 
         function SetSelectedCurvesMinMaxForSave () {
             const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
@@ -773,15 +769,13 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
         elem.click(function () {
             hideMenu(sub_menu);
-            $('.back-main-menu').addClass('menu-button');
-            enablePointerEvents(main_menu);
+            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
         positionMenu(sub_menu, this.clientWidth, this.offsetTop);
         showMenu(sub_menu);
-        disablePointerEvents(main_menu);
-        $('.back-main-menu').removeClass('menu-button');
+        DeactivateMainMenu(main_menu);
     }
 
     function addKeyboardEvents() {
@@ -799,15 +793,13 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 e.preventDefault();
                 if (subMenu2.length > 0) {
                     hideMenu(subMenu2);
-                    enablePointerEvents(subMenu);
-                    $('.back-submenu').addClass('menu-button');
+                    ActivateSubmenu(subMenu);
                     e.stopPropagation();
                 }
                 else
                 if (subMenu.length > 0) {
                     hideMenu(subMenu);
-                    enablePointerEvents(mainMenu);
-                    $('.back-main-menu').addClass('menu-button');
+                    ActivateMainMenu(mainMenu);
                     e.stopPropagation();
                 }
                 else
@@ -931,7 +923,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     });
     main_menu.append(elem);
 
-    disablePointerEvents($('input, select, button'));
+    LockUsersInterface();
     enablePointerEvents($('.graph-configuration-dialog-save'));
     enablePointerEvents($('.graph-configuration-dialog-cancel'));
     enablePointerEvents(main_menu);
@@ -967,10 +959,18 @@ function disablePointerEvents(element) {
     element.css('pointer-events', 'none');
 }
 
+function LockUsersInterface () {
+    disablePointerEvents($('input, select, button'));
+}
+
+function UnlockUsersInterface () {
+    enablePointerEvents($('input, select, button'));
+}
+
 function closeMinMaxContextMenu () {
     const main_menu = $(".main_menu.show");
     hideMenu(main_menu);
-    enablePointerEvents($('input, select, button'));
+    UnlockUsersInterface();
 }
 
 function isMinMaxContextMenuActive () {
