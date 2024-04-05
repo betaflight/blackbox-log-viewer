@@ -467,6 +467,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
         cfgMustBeRestored = false;
     };
 
+    // Set focus to 'Cancel' button to do possible a closing dialog box by Esc or Enter keys
+    $("#dlgGraphConfiguration").on('shown.bs.modal', function(e) {
+        $(".graph-configuration-dialog-cancel").focus();
+    });
+    
     $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
         // Lock close window if MinMax menu is openned
         if (isMinMaxContextMenuActive()) {
