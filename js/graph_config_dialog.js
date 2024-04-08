@@ -90,23 +90,23 @@ function GraphConfigurationDialog(dialog, onSave) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
                 if (field.curve.MinMax != null) {
                     // Set line MinMax values !!!
-                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(0));
-                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(0));
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
                     if (field.curve.MinMax.save == undefined)
                         field.curve.MinMax.save = false;
                     $("input[name=saveMinMax]",elem).attr("checked", field.curve.MinMax.save);
                 }
                 else{
-                    $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(0));
-                    $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(0));
+                    $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
                     $("input[name=saveMinMax]",elem).attr("checked", false);
                 }
 
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
-                $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(0));
-                $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(0));
+                $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
+                $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
                 $("input[name=saveMinMax]",elem).attr("checked", false);
             }
         }
@@ -171,13 +171,13 @@ function GraphConfigurationDialog(dialog, onSave) {
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MinValue]',elem).dblclick( function() {
             let name = $('select.form-control option:selected', elem).val();
-            $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min.toFixed(0));
+            $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.min.toFixed(1));
         });
         // Add event when mouse double click at the enabled Maximum input field to restore default Max values.
         // field.name is undefined for the newest single curves, but it is not for the newest group curves. Therefore,  use $('select.form-control option:selected', elem).val() when field.name is undefined only
         $('input[name=MaxValue]',elem).dblclick( function() {
             let name = $('select.form-control option:selected', elem).val();
-            $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(0));
+            $(this).val(GraphConfig.getDefaultCurveForField(flightLog, name).MinMax.max.toFixed(1));
         });
 
         $('.minmax-control', elem).contextmenu( function(e) {
