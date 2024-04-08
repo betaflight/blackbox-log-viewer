@@ -90,13 +90,10 @@
 .dropdown-content i {
   color: var(--textSecondary);
 }
-.minmax-control {
-  autocomplete: off;
-}
-
 .menu-button {
   background-color: #f6f6f6;
   font-weight: 700;
   border: 1px solid black;
   border-radius: 3px;
 }
+
