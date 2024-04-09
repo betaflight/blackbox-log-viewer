@@ -70,6 +70,7 @@ export function HeaderDialog(dialog, onSave) {
         {name:'dterm_filter_type'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'dterm_filter2_type'           , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'pidAtMinThrottle'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
+        {name:'thrust_linear'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'999.9.9'},
         {name:'itermThrottleGain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.0.1'},
         {name:'ptermSRateWeight'             , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.0.0'},
         {name:'dtermSetpointWeight'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'3.0.0', max:'3.4.0'},

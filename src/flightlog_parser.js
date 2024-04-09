@@ -694,6 +694,7 @@ export function FlightLogParser(logData) {
             case "dterm_filter_type":
             case "dterm_filter2_type":
             case "pidAtMinThrottle":
+            case "thrust_linear":
             case "pidSumLimit":
             case "pidSumLimitYaw":
             case "anti_gravity_threshold":
