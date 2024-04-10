@@ -1020,6 +1020,7 @@ function BlackboxLogViewer() {
            newGraphConfig(newWorkspaces[newActiveId].graphConfig);
            document.getElementById("legend_title").textContent = newWorkspaces[newActiveId].title
         }
+        activeWorkspace = newActiveId;
     }
 
     // Save current config
@@ -1982,6 +1983,8 @@ function BlackboxLogViewer() {
                                 e.preventDefault();
                             } else if (e.altKey) {
                                 makeScreenshot();
+                            } else if (e.shiftKey) {
+                                onSaveWorkspace(activeWorkspace, workspaceGraphConfigs[activeWorkspace].title);
                             }
                         } catch(e) {
                             console.log('Smoothing override toggle feature not functioning');
