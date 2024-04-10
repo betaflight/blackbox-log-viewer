@@ -256,6 +256,9 @@ var
 
         function saveOneUserSetting(name, value) {
             prefs.get('userSettings', function(data) {
+                if (data === undefined) {
+                    data = {};
+                }
                 data[name] = value;
                 prefs.set('userSettings', data);
             });
