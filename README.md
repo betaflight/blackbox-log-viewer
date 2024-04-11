@@ -79,7 +79,7 @@ instruction there to install it.
 ### Development mode
 
 We are using [vite](https://vitejs.dev/) for development setup. It provides
-bundling and various over optimisations like hot module reloading.
+bundling and various optimisations like hot module reloading.
 
 With `node` and `yarn` setup, sto start developing run:
 
