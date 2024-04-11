@@ -81,7 +81,7 @@ instruction there to install it.
 We are using [vite](https://vitejs.dev/) for development setup. It provides
 bundling and various optimisations like hot module reloading.
 
-With `node` and `yarn` setup, sto start developing run:
+With `node` and `yarn` setup, to start developing run:
 
 ```bash
 yarn start
