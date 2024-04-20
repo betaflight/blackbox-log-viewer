@@ -511,6 +511,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
         elem.click(function () {
+            ApplySelectedCurveMinMaxToOtherSelectedCurves();
             hideMenu(sub_menu);
             ActivateMainMenu(main_menu);
             $('.back-main-menu').addClass('menu-button');
