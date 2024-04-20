@@ -76,6 +76,7 @@ export function GraphConfig(graphConfig) {
 
                     if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
+                        field.curve.MinMax.save = true;
                     }
                     else {
                         if ((field.curve.MinMax == undefined) || (isNewLog == true && !field.curve.MinMax.save))
