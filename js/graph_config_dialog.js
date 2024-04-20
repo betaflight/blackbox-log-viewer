@@ -93,21 +93,20 @@ function GraphConfigurationDialog(dialog, onSave) {
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
                     if (field.curve.MinMax.save == undefined)
-                        field.curve.MinMax.save = false;
+                        field.curve.MinMax.save = true;
                     $("input[name=saveMinMax]",elem).attr("checked", field.curve.MinMax.save);
                 }
                 else{
                     $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
-                    $("input[name=saveMinMax]",elem).attr("checked", false);
+                    $("input[name=saveMinMax]",elem).attr("checked", true);
                 }
-
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
-                $("input[name=saveMinMax]",elem).attr("checked", false);
+                $("input[name=saveMinMax]",elem).attr("checked", true);
             }
         }
     }
