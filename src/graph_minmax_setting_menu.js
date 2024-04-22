@@ -242,7 +242,74 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         DeactivateMainMenu(main_menu);
     }
 
-    function ShowSetSelectedCurveFullRangeSubmenu(item) {
+    function ShowSetSelectedCurvesFullRangeSubmenu(item) {
+        hideMenu(sub_menu);
+        elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
+        sub_menu.append(elem);
+
+        for (const key in curvesData) {
+            const curve = curvesData[key];
+                curve.checked = true;
+                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                $('input', elem).click(function (e) {
+                    let curve = curvesData[this.parentElement.innerText];
+                    curve.checked = this.checked;
+                });
+                sub_menu.append(elem);
+        }
+        elem = $('<div class="titleDiv topBorder bottomBorder">FULL RANGE:</div>');
+        sub_menu.append(elem);
+        elem = $('<div>At all global log time</div>');
+        elem.click("global", SetSelectedCurvesToFullRange);
+        sub_menu.append(elem);
+        elem = $('<div>At local window time</div>');
+        elem.click("local", SetSelectedCurvesToFullRange);
+        sub_menu.append(elem);
+        elem = $('<div>At marker time range</div>');
+        elem.click("marked", SetSelectedCurvesToFullRange);
+        sub_menu.append(elem);
+        elem = $('<div class="menu-button back-submenu iconDiv">&#9668;Back</div>');
+        elem.click(function () {
+            hideMenu(sub_menu);
+            ActivateMainMenu(main_menu);
+        });
+        sub_menu.append(elem);
+        positionMenu(sub_menu, item.clientWidth, item.offsetTop);
+        showMenu(sub_menu);
+        DeactivateMainMenu(main_menu);
+
+        function SetSelectedCurvesToFullRange (e) {
+            curves_table.each(function() {
+                const fieldFriendlyName = $('select.form-control option:selected', this).text();
+                let curve = curvesData[fieldFriendlyName];
+                if (curve.checked) {
+                    const fieldName = $("select", this).val();
+                    let mm;
+                    if (e.data == "global") {
+                        mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
+                    }
+                    else if (e.data == "local") {
+                        mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
+                    }
+                    else if (e.data == "marked") {
+                        mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
+                    }
+                    else
+                        mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
+
+                    let curve = curvesData[fieldFriendlyName];
+                    curve.min = mm.min;
+                    curve.max = mm.max;
+                    $('input[name=MinValue]',this).val(mm.min.toFixed(1));
+                    $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+                }
+            });
+            RefreshCharts();
+        }
+    }
+
+
+    function ShowSetOneCurveFullRangeSubmenu(item) {
         const isSubmenuLevel2 = isActiveMenu(sub_menu);
         const menu = isSubmenuLevel2 ? sub_menu2 : sub_menu;
         const prev_menu = isSubmenuLevel2 ? sub_menu : main_menu;
@@ -305,10 +372,10 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         }
 
         if (SingleCurve) {
-            ShowSetSelectedCurveFullRangeSubmenu(this);
+            ShowSetOneCurveFullRangeSubmenu(this);
         }
         else {
-            ShowSetAllCurvesFullRangeSubmenu(this);
+            ShowSetSelectedCurvesFullRangeSubmenu(this);
         }
     }
 
