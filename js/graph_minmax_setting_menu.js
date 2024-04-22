@@ -315,22 +315,16 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         const prev_menu = isSubmenuLevel2 ? sub_menu : main_menu;
         hideMenu(menu);
 
-        let elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
-        menu.append(elem);
-        elem = $('<div>Full range</div>');
+        elem = $('<div>At all global log time</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
         menu.append(elem);
-        elem = $('<div>Centered full range</div>');
-        elem.click(SetSelectedMinMaxToZeroOffsetDuringAllTime);
-        menu.append(elem);
 
-        elem = $('<div class="titleDiv topBorder bottomBorder">At local window time</div>');
-        menu.append(elem);
-        elem = $('<div>Full range</div>');
+        elem = $('<div>At local window time</div>');
         elem.click(SetSelectedCurveMinMaxToFullRangeDuringWindowTime);
         menu.append(elem);
-        elem = $('<div>Centered full range</div>');
-        elem.click(SetSelectedMinMaxToZeroOffsetDuringWindowTime);
+
+        elem = $('<div>At marker time range</div>');
+        elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
         menu.append(elem);
 
         elem = $('<div class="menu-button iconDiv {isSubmenuLevel2 ? back-submenu2 : back-submenu} ">&#9668;Back</div>');
