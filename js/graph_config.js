@@ -305,7 +305,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^accSmooth\[/)) {
                 return {
-                    power: 0.5,
+                    power: 1.0,
                     MinMax: {
                         min: -16,
                         max: 16
@@ -324,7 +324,7 @@ GraphConfig.load = function(config) {
                        fieldName.match(/^gyroADC\[/)    ||     // same range.
                        fieldName.match(/^gyroUnfilt\[/)) {
                 return {
-                    power: 0.25, /* Make this 1.0 to scale linearly */
+                    power: 1.0, 
                     MinMax: {
                         min: -maxDegreesSecond(gyroScaleMargin),
                         max: maxDegreesSecond(gyroScaleMargin)
@@ -332,7 +332,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
                 return {
-                    power: 0.3,
+                    power: 1.0,
                     MinMax: {
                         min: -100,
                         max: 100
@@ -348,7 +348,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
-                    power: 0.25,
+                    power: 1.0,
                     MinMax: {
                         min: 1000,
                         max: 2000
@@ -453,7 +453,7 @@ GraphConfig.load = function(config) {
                     case 'AC_CORRECTION':
                     case 'AC_ERROR':
                         return {
-                            power: 0.25,
+                            power: 1.0,
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
                                 max: maxDegreesSecond(gyroScaleMargin)
@@ -461,7 +461,7 @@ GraphConfig.load = function(config) {
                         };
                     case 'ACCELEROMETER':
                         return {
-                            power: 0.5,
+                            power: 1.0,
                             MinMax: {
                                 min: -16,
                                 max: 16
@@ -479,7 +479,7 @@ GraphConfig.load = function(config) {
                         switch (fieldName) {
                             case 'debug[0]': //Raw Value (0-4095)
                                 return {
-                                    power: 1,
+                                    power: 1.0,
                                     MinMax: {
                                         min: 0,
                                         max: 4096
@@ -506,7 +506,7 @@ GraphConfig.load = function(config) {
                         switch (fieldName) {
                             case 'debug[0]': // raw RC command
                                 return {
-                                    power: 0.25,
+                                    power: 1.0,
                                     MinMax: {
                                         min: 1000,
                                         max: 2000 * gyroScaleMargin
@@ -528,7 +528,7 @@ GraphConfig.load = function(config) {
                         }
                     case 'ANGLERATE':
                         return {
-                            power: 0.25, /* Make this 1.0 to scale linearly */
+                            power: 1.0, 
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
                                 max: maxDegreesSecond(gyroScaleMargin)
@@ -604,7 +604,7 @@ GraphConfig.load = function(config) {
                             case 'debug[0]': // gyro scaled [for selected axis]
                             case 'debug[3]': // pre-dyn notch gyro [for selected axis]
                                 return {
-                                    power: 0.25,
+                                    power: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
                                         max: maxDegreesSecond(gyroScaleMargin)
@@ -782,7 +782,7 @@ GraphConfig.load = function(config) {
                             case 'debug[2]': // After RPM
                             case 'debug[3]': // After all but Dyn Notch
                             return {
-                                power: 0.25, /* Make this 1.0 to scale linearly */
+                                power: 1.0, 
                                 MinMax: {
                                     min: -maxDegreesSecond(gyroScaleMargin * highResolutionScale),
                                     max: maxDegreesSecond(gyroScaleMargin * highResolutionScale)
