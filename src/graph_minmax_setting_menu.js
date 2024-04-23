@@ -465,11 +465,9 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             return;
         }
 
-        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO ZERO OFFSET</div>');
+        elem = $('<div class="topBorder iconDiv">SET CURVES TO ZERO OFFSET</div>');
         elem.click(function () {
             SetSelectedCurvesToZeroOffset();
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
@@ -630,11 +628,9 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             return;
         }
 
-        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO SAME SCALE</div>');
+        elem = $('<div class="topBorder iconDiv">SET CURVES TO SAME SCALE</div>');
         elem.click(function () {
-            hideMenu(sub_menu);
             FitSelectedCurveToSameScale();
-            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
