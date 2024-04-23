@@ -1300,12 +1300,11 @@ GraphConfig.load = function(config) {
     GraphConfig.getMinMaxForFieldDuringMarkedInterval = function(flightLog, logGrapher, fieldName) {
         let minTime = logGrapher.getMarkedInTime();
         let maxTime = logGrapher.getMarkedOutTime();
-        if (minTime==null || maxTime==null) {
-            const WindowCenterTime = logGrapher.getWindowCenterTime();
-            const WindowWidthTime = logGrapher.getWindowWidthTime();
-            minTime = minTime ?? WindowCenterTime - WindowWidthTime/2;
-            maxTime = maxTime ?? WindowCenterTime + WindowWidthTime/2;
-        }
+        if (minTime == false)
+            minTime = flightLog.getMinTime();
+        if (maxTime == false)
+            maxTime = flightLog.getMaxTime();
+
         let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
