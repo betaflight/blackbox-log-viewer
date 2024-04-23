@@ -5,22 +5,22 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         PID_P = 0,
         PID_I = 1,
         PID_D = 2,
-        
+
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
-        
+
         drawingParams = {
             fontSizePIDTableLabel: null,
             fontSizeAxisLabel: null,
             fontSizeFrameLabel: null,
             fontSizeEventLabel: null,
-            
+
             plotLineWidth: null,
-            
+
         },
-        
+
         // How far the center of the craft is from the top of the canvas, as a portion of height
         // CRAFT_POSITION_Y_PROPORTION         =  parseInt(options.craft.top) / 100.0 ||0.2,
-        
+
         lineColors = [
             "#fb8072", // Red
             "#8dd3c7", // Cyan
@@ -40,9 +40,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
     var
         windowStartTime, windowCenterTime, windowEndTime,
-        
+
         canvasContext = canvas.getContext("2d"),
-        
+
         defaultOptions = {
             gapless:false,
             craftType:"3D", drawPidTable:true, drawSticks:true, drawTime:true,
@@ -50,42 +50,42 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             analyserSampleRate:2000/*Hz*/,  // the loop time for the log
             eraseBackground: true           // Set to false if you want the graph to draw on top of an existing canvas image
         },
-        
+
         windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
-        
+
         idents,
-        
+
         sysConfig = flightLog.getSysConfig(),
 
         graphs = [],
 
         inTime = false, outTime = false,
-        
+
         lastMouseX, lastMouseY,
 
         sticks = null,
-        
+
         craft3D = null, craft2D = null,
-        
+
         analyser = null, /* define a new spectrum analyser */
 
         watermarkLogo, /* Watermark feature */
-        
+
         lapTimer, /* LapTimer feature */
 
         that = this;
 
-    
+
     this.onSeek = null;
-    
+
     this.getAnalyser = function() {
         return analyser;
     }
 
     function extend(base, top) {
-        var 
+        var
             target = {};
-        
+
         [base, top].forEach(function(obj) {
             for (var prop in obj) {
                 if (Object.prototype.hasOwnProperty.call(obj, prop)) {
@@ -93,75 +93,75 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 }
             }
         });
-        
+
         return target;
     }
-    
+
     function onMouseMove(e) {
         e.preventDefault();
-        
+
         if (that.onSeek) {
             //Reverse the seek direction so that it looks like you're dragging the data with the mouse
             that.onSeek((lastMouseX - e.pageX) / canvas.width * windowWidthMicros);
         }
-        
+
         lastMouseX = e.pageX;
         lastMouseY = e.pageY;
     }
 
     function onTouchMove(e) {
         e.preventDefault();
-        
+
         if (that.onSeek) {
             //Reverse the seek direction so that it looks like you're dragging the data
             that.onSeek((lastMouseX - e.originalEvent.touches[0].pageX) / canvas.width * windowWidthMicros);
         }
-        
+
         lastMouseX = e.originalEvent.touches[0].pageX;
         lastMouseY = e.originalEvent.touches[0].pageY;
     }
-    
+
     function onMouseDown(e) {
         if (e.which == 1) { //Left mouse button only for seeking
             lastMouseX = e.pageX;
             lastMouseY = e.pageY;
-            
+
             //"capture" the mouse so we can drag outside the boundaries of canvas
             $(document).on("mousemove", onMouseMove);
-            
+
             //Release the capture when the mouse is released
             $(document).one("mouseup", function () {
                 $(document).off("mousemove", onMouseMove);
             });
-            
-            e.preventDefault();
-        }
-    }
-    
-    function onTouchStart(e) {
-        if (e.which == 0) {
-            lastMouseX = e.originalEvent.touches[0].pageX;
-            lastMouseY = e.originalEvent.touches[0].pageY;
-            
-            //"capture" so we can drag outside the boundaries of canvas
-            $(document).on("touchmove", onTouchMove);
-            
-            //Release the capture when released
-            $(document).one("touchend", function () {
-                $(document).off("touchmove", onTouchMove);
-            });
-            
+
             e.preventDefault();
         }
     }
 
-    
+    function onTouchStart(e) {
+        if (e.which == 0) {
+            lastMouseX = e.originalEvent.touches[0].pageX;
+            lastMouseY = e.originalEvent.touches[0].pageY;
+
+            //"capture" so we can drag outside the boundaries of canvas
+            $(document).on("touchmove", onTouchMove);
+
+            //Release the capture when released
+            $(document).one("touchend", function () {
+                $(document).off("touchmove", onTouchMove);
+            });
+
+            e.preventDefault();
+        }
+    }
+
+
     function identifyFields() {
-        var 
+        var
             motorGraphColorIndex = 0,
             fieldIndex,
             fieldNames = flightLog.getMainFieldNames();
-        
+
         idents = {
             rcCommandFields:[],
             motorFields:[],
@@ -187,9 +187,9 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             heading:-1,
             axisPIDSum:[]
         };
-        
+
         for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
-            var 
+            var
                 fieldName = fieldNames[fieldIndex],
                 matches;
 
@@ -210,7 +210,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 idents.axisPIDSum[axisIndex] = fieldIndex;
             } else if ((matches = fieldName.match(/^axis(.)\[(\d+)]$/))) {
                 var axisIndex = matches[2];
-                
+
                 idents.axisPIDFields[matches[1]] = axisIndex;
                 idents.hasPIDs = true;
             } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
@@ -255,14 +255,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
         canvasContext.save();
         canvasContext.globalAlpha = parseInt(options.watermark.transparency)/100;
-        canvasContext.drawImage(watermarkLogo, parseInt(options.watermark.left)/100 * canvas.width, 
-                                               parseInt(options.watermark.top)/100 * canvas.height, 
-                                               parseInt(options.watermark.size)/100 * watermarkLogo.width, 
+        canvasContext.drawImage(watermarkLogo, parseInt(options.watermark.left)/100 * canvas.width,
+                                               parseInt(options.watermark.top)/100 * canvas.height,
+                                               parseInt(options.watermark.size)/100 * watermarkLogo.width,
                                                parseInt(options.watermark.size)/100 * watermarkLogo.height);
         canvasContext.restore();
 
     }
-    
+
     function drawLapTimer() {
         // Update the Lap Timer
         lapTimer.refresh(windowCenterTime, (3600*1000000/*a long time*/), blackboxLogViewer.getBookmarkTimes());
@@ -279,16 +279,16 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
         if (frameLabelTextWidthFrameNumber == null)
             frameLabelTextWidthFrameNumber = canvasContext.measureText("#0000000").width;
-        
+
         canvasContext.fillText("#" + leftPad(frameIndex, "0", 7), canvas.width - frameLabelTextWidthFrameNumber - 8, canvas.height - 8);
 
         if (frameLabelTextWidthFrameTime == null)
             frameLabelTextWidthFrameTime = canvasContext.measureText("00:00.000").width;
-        
+
         canvasContext.fillText(formatTime(timeMsec, true), canvas.width - frameLabelTextWidthFrameTime - 8, canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8);
 
     }
-    
+
     /**
      * Plot the given field within the specified time period. When the output from the curve applied to a field
      * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
@@ -305,26 +305,26 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             xScale = canvas.width / windowWidthMicros;
 
         //Draw points from this line until we leave the window
-        
+
         //We may start partway through the first chunk:
         frameIndex = startFrameIndex;
-        
+
         canvasContext.strokeStyle = color;
         canvasContext.lineWidth = (lineWidth)?lineWidth:drawingParams.plotLineWidth;
-        
+
         canvasContext.beginPath();
-        
+
         plottingLoop:
         for (chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-            var 
+            var
                 chunk = chunks[chunkIndex];
-            
+
             for (; frameIndex < chunk.frames.length; frameIndex++) {
                 var
                     fieldValue = chunk.frames[frameIndex][fieldIndex],
                     frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
                     nextX, nextY;
-    
+
 
                 nextY = curve.lookup(fieldValue) * yScale;
                 nextX = (frameTime - windowStartTime) * xScale;
@@ -339,8 +339,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     nextY = (-1)*plotHeight;
                     notInBounds++;
                 } else notInBounds = -5;
-                
-                if(notInBounds>5) notInBounds = -5; // reset it every 5th line draw (to simulate dashing)  
+
+                if(notInBounds>5) notInBounds = -5; // reset it every 5th line draw (to simulate dashing)
 
                 if (drawingLine && (notInBounds<=0)) {
                     canvasContext.lineTo(nextX, nextY);
@@ -350,15 +350,15 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         inGap = true;
                         drawingLine = false;
                         continue;
-                    } 
+                    }
                 } else {
                     canvasContext.moveTo(nextX, nextY);
-                    
+
                     if (!options.gapless) {
                         // Is this the end of a gap to be marked?
                         if (inGap) {
                             canvasContext.strokeRect(nextX - GAP_WARNING_BOX_RADIUS, nextY - GAP_WARNING_BOX_RADIUS, GAP_WARNING_BOX_RADIUS * 2, GAP_WARNING_BOX_RADIUS * 2);
-                            
+
                             if (chunk.gapStartsHere[frameIndex])
                                 continue;
                             else
@@ -372,11 +372,11 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 }
 
                 drawingLine = true;
-                
+
                 if (frameTime >= windowEndTime)
                     break plottingLoop;
             }
-            
+
             frameIndex = 0;
         }
 
@@ -390,21 +390,21 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             canvasContext.lineWidth = lineWidthTemp;
             canvasContext.globalAlpha = 1.0;
         }
-        
+
         canvasContext.stroke();
     }
-    
+
     //Draw an origin line for a graph (at the origin and spanning the window)
     function drawAxisLine() {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
         canvasContext.lineWidth = 1;
-        canvasContext.setLineDash([5]); // Make the center line a dash        
+        canvasContext.setLineDash([5]); // Make the center line a dash
         canvasContext.beginPath();
         canvasContext.moveTo(0, 0);
         canvasContext.lineTo(canvas.width, 0);
-        
+
         canvasContext.stroke();
-        canvasContext.setLineDash([]);        
+        canvasContext.setLineDash([]);
     }
 
     //Draw an background for the line for a graph (at the origin and spanning the window)
@@ -429,7 +429,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             yScale = -plotHeight/2;
 
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)"; // Grid Color
-        canvasContext.setLineDash([1,10]); // Make the grid line a dash        
+        canvasContext.setLineDash([1,10]); // Make the grid line a dash
         canvasContext.lineWidth = 1;
         canvasContext.beginPath();
 
@@ -454,7 +454,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         // range values,
         //drawAxisLabel(max.toFixed(0), yScale + 12);
         //drawAxisLabel(min.toFixed(0), -yScale - 8);
-        
+
 
     }
 
@@ -462,32 +462,32 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         canvasContext.font = drawingParams.fontSizeAxisLabel + "pt " + DEFAULT_FONT_FACE;
         canvasContext.fillStyle = "rgba(255,255,255,0.9)";
         canvasContext.textAlign = 'right';
-        
+
         canvasContext.fillText(axisLabel, canvas.width - 8, (y)?y:-8);
     }
-    
+
     function drawEventLine(x, labelY, label, color, width, labelColor, align) {
         width = width || 1.0;
-        
+
         canvasContext.lineWidth = width;
         canvasContext.strokeStyle = color || "rgba(255,255,255,0.5)";
-        
+
         canvasContext.beginPath();
-        
+
         canvasContext.moveTo(x, 0);
         canvasContext.lineTo(x, canvas.height);
-        
+
         canvasContext.stroke();
-        
+
         if (label) {
-            var 
+            var
                 margin = 8,
                 labelWidth = canvasContext.measureText(label).width + 2 * margin;
 
             align = align || 'left'
             canvasContext.textAlign = align;
             var labelDirection = (align=='left')?1:-1;
-            
+
             canvasContext.lineWidth = 1;
             canvasContext.beginPath();
 
@@ -505,26 +505,26 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             canvasContext.closePath();
 
             canvasContext.fillText(label, x + labelDirection * (width + 8), labelY);
-          
+
         }
     }
-    
+
     function timeToCanvasX(time) {
         return canvas.width / windowWidthMicros * (time - windowStartTime);
     }
-   
+
     function drawEvent(event, sequenceNum) {
-        var 
+        var
             x = timeToCanvasX(event.time),
             labelY = (sequenceNum + 1) * (drawingParams.fontSizeEventLabel + 10);
-        
+
         switch (event.event) {
             case FlightLogEvent.AUTOTUNE_TARGETS:
                 canvasContext.beginPath();
 
                 canvasContext.moveTo(x, canvas.height / 2 - 25);
                 canvasContext.lineTo(x, canvas.height / 2 + 25);
-                
+
                 canvasContext.stroke();
             break;
             case FlightLogEvent.LOGGING_RESUME:
@@ -557,27 +557,27 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             default:
                 drawEventLine(x);
         }
-        
+
     }
-    
+
     function drawEvents(chunks) {
-        var 
-            /* 
-             * Also draw events that are a little left of the window, so that their labels don't suddenly 
+        var
+            /*
+             * Also draw events that are a little left of the window, so that their labels don't suddenly
              * disappear when they scroll out of view:
-             */ 
-            BEGIN_MARGIN_MICROSECONDS = 100000, 
+             */
+            BEGIN_MARGIN_MICROSECONDS = 100000,
             shouldSetFont = true,
             sequenceNum = 0;
-        
+
         for (var i = 0; i < chunks.length; i++) {
             var events = chunks[i].events;
-            
+
             for (var j = 0; j < events.length; j++) {
                 if (events[j].time > windowEndTime) {
                     return;
                 }
-                
+
                 if (events[j].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
                     // Avoid setting the font if we don't draw any events
                     if (shouldSetFont) {
@@ -585,7 +585,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         canvasContext.font = drawingParams.fontSizeEventLabel + "pt " + DEFAULT_FONT_FACE;
                         shouldSetFont = false;
                     }
-                    
+
                     drawEvent(events[j], sequenceNum++);
                 }
             }
@@ -603,7 +603,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
         // Draw Marker Event Line
         if(markerEvent!=null) {
-            if(markerEvent.state) { 
+            if(markerEvent.state) {
 
                 if ((markerEvent.time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) && (markerEvent.time < windowEndTime)) {
                     drawEvent(
@@ -614,15 +614,15 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         align:(markerEvent.time<windowCenterTime)?'left':'right',
                         }, sequenceNum++);
                 };
-                
+
                 var markerFrequency = ((windowCenterTime-markerEvent.time).toFixed(0)!=0)?((1000000/(windowCenterTime-markerEvent.time)).toFixed(0) + "Hz") : '';
                 drawEvent(
                     {
                     event:FlightLogEvent.CUSTOM_BLANK, // Blank doesnt show a vertical line
                     time:windowCenterTime,
                     label: formatTime((windowCenterTime-markerEvent.time)/1000, true) + 'ms ' + markerFrequency,
-                    align:(markerEvent.time<windowCenterTime)?'right':'left', 
-                    }, sequenceNum++);                    
+                    align:(markerEvent.time<windowCenterTime)?'right':'left',
+                    }, sequenceNum++);
             };
         }
 
@@ -630,21 +630,21 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         if(bookmarkEvents!=null) {
             for(var i=0; i<=9; i++) {
                 if(bookmarkEvents[i]!=null) {
-                    if(bookmarkEvents[i].state) 
+                    if(bookmarkEvents[i].state)
                         if ((bookmarkEvents[i].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) && (bookmarkEvents[i].time < windowEndTime)) {
                             drawEvent(
                                 {
                                 event:FlightLogEvent.CUSTOM,
                                 time:bookmarkEvents[i].time,
-                                label: i 
+                                label: i
                                 }, sequenceNum++);
                         };
                     };
             };
         };
-    
+
     }
-    
+
     /**
      *  Mark the in/out of the video region (if present) and dim the view outside this region
      */
@@ -652,31 +652,31 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         if (inTime !== false && inTime >= windowStartTime || outTime !== false && outTime < windowEndTime) {
             var
                 inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
-                outMarkerX = outTime === false ? false : timeToCanvasX(outTime); 
+                outMarkerX = outTime === false ? false : timeToCanvasX(outTime);
 
             canvasContext.fillStyle = "rgba(0,0,0,0.8)";
-            
+
             if (inTime !== false && inTime >= windowStartTime) {
                 canvasContext.fillRect(0, 0, Math.min(inMarkerX, canvas.width), canvas.height);
-            } 
-            
+            }
+
             if (outTime !== false && outTime < windowEndTime) {
                 var
                     outMarkerXClipped = Math.max(outMarkerX, 0);
                 canvasContext.fillRect(outMarkerXClipped, 0, canvas.width - outMarkerXClipped, canvas.height);
             }
-            
+
             if (inMarkerX !== false && inMarkerX >= 0 && inMarkerX <= canvas.width || outMarkerX !== false && outMarkerX >= 0 && outMarkerX <= canvas.width) {
                 canvasContext.strokeStyle = 'rgb(200,200,200)';
                 canvasContext.lineWidth = 4;
-    
+
                 if (inMarkerX !== false && inMarkerX >= 0 && inMarkerX <= canvas.width) {
                     canvasContext.beginPath();
                     canvasContext.moveTo(inMarkerX, 0);
                     canvasContext.lineTo(inMarkerX, canvas.height);
                     canvasContext.stroke();
                 }
-    
+
                 if (outMarkerX !== false && outMarkerX >= 0 && outMarkerX <= canvas.width) {
                     canvasContext.beginPath();
                     canvasContext.moveTo(outMarkerX, 0);
@@ -690,23 +690,23 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     function computeDrawingParameters() {
         var
             fontSizeBase = Math.max(8, canvas.height / 60),
-            
+
             newParams = {
                 fontSizePIDTableLabel:     fontSizeBase * 3.4,
                 fontSizeAxisLabel:         fontSizeBase * 0.9,
                 fontSizeFrameLabel:        fontSizeBase * 0.9,
                 fontSizeEventLabel:        fontSizeBase * 0.8,
-                
+
                 plotLineWidth:             Math.max(1.25, canvas.height / 400),
             };
-  
+
         drawingParams = extend(drawingParams, newParams);
     }
-    
+
     this.resize = function(width, height) {
         canvas.width = width;
         canvas.height = height;
-        
+
         var sticksHeight = canvas.height * parseInt(options.sticks.size) / 2 / 100.0;
         // The total width available to draw both sticks in:
         var sticksWidth = canvas.width * parseInt(options.sticks.size) / 100.0;
@@ -722,7 +722,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
         });
 
         var craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
-        
+
         if (craft2D) {
             craft2D.resize(craftSize, craftSize);
         } else if (craft3D) {
@@ -734,7 +734,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             left:Math.max(((canvas.width * parseInt(options.craft.left) / 100.0) - (craftSize / 2)), 0) + "px",
             top: Math.max(((canvas.height * parseInt(options.craft.top) / 100.0) - (craftSize / 2)), 0) + "px",
         });
-        
+
         if(analyser!=null) analyser.resize();
 
         // Calculate again the position/size of frame label
@@ -743,12 +743,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
         computeDrawingParameters();
     };
-    
+
     this.render = function(windowCenterTimeMicros) {
         windowCenterTime = windowCenterTimeMicros;
         windowStartTime = windowCenterTime - windowWidthMicros / 2;
         windowEndTime = windowStartTime + windowWidthMicros;
-        
+
         if (options.eraseBackground) {
             // Work-around: The webm-writer does not like transparent backgrounds. Fill canvas with black.
             if (options.fillBackground) {
@@ -758,12 +758,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 canvasContext.clearRect(0, 0, canvas.width, canvas.height);
             }
         }
-        
-        var 
+
+        var
             chunks = flightLog.getSmoothedChunksInTimeRange(windowStartTime, windowEndTime),
             startChunkIndex, startFrameIndex,
             i, j;
-        
+
         if (chunks.length) {
             //Find the first sample that lies inside the window
             for (startFrameIndex = 0; startFrameIndex < chunks[0].frames.length; startFrameIndex++) {
@@ -771,20 +771,20 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     break;
                 }
             }
-            
+
             // Pick the sample before that to begin plotting from
             if (startFrameIndex > 0)
                 startFrameIndex--;
-            
+
             // Plot graphs
             for (i = 0; i < graphs.length; i++) {
-                var 
+                var
                     graph = graphs[i];
-            
+
                 canvasContext.save();
                 {
                     canvasContext.translate(0, canvas.height * graph.y);
-                    
+
                     drawAxisLine();
 
                     if(!options.graphGridOverride) {
@@ -798,28 +798,28 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
                     if (options.drawGradient && graphs.length > 1) // only draw the background if more than one graph set.
                         drawAxisBackground(canvas.height * graph.height);
-                    
+
                     for (j = 0; j < graph.fields.length; j++) {
                         if (graphConfig.isGraphFieldHidden(i, j)) {
                             continue;
                         }
                         var field = graph.fields[j];
-                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2, 
+                        plotField(chunks, startFrameIndex, field.index, field.curve, canvas.height * graph.height / 2,
                             field.color ? field.color : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
-                            field.lineWidth ? field.lineWidth : null, 
+                            field.lineWidth ? field.lineWidth : null,
                             graphConfig.highlightGraphIndex==i && graphConfig.highlightFieldIndex==j);
                     }
-                    
+
                     if (graph.label) {
                         drawAxisLabel(graph.label);
                     }
                 }
                 canvasContext.restore();
             }
-            
+
             //Draw a bar highlighting the current time if we are drawing any graphs
             if (options.drawVerticalBar && graphs.length) {
-                var 
+                var
                     centerX = canvas.width / 2;
 
                 canvasContext.strokeStyle = 'rgba(255, 64, 64, 0.2)';
@@ -836,14 +836,14 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 canvasContext.moveTo(centerX, 0);
                 canvasContext.lineTo(centerX, canvas.height);
                 canvasContext.stroke();
-                 
+
             }
-            
+
             // Draw events - if option set or even if option is not set but there are graphs
             // the option is for video export; if you export the video without any graphs set,
             // then the events are not shown either (to keep the video clean. but
             // if you export the video with a graph selected, then the events are also shown.
-            
+
             if(options.drawEvents || (!options.drawEvents && graphs.length > 0)) {
                 drawEvents(chunks);
             }
@@ -851,31 +851,31 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             // Draw details at the current time
             var
                 centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);
-            
+
             if (centerFrame) {
                 if (options.drawSticks) {
                     sticks.render(centerFrame, chunks, startFrameIndex, windowCenterTime);
                 }
-                
+
                 if (options.drawTime) {
                     drawFrameLabel(centerFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION], Math.round((windowCenterTime - flightLog.getMinTime()) / 1000));
                 }
-                
+
                 if (options.craftType == '3D') {
                     craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
                 } else if (options.craftType == '2D') {
                     craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
-                    
+
                 }
             }
-            
+
             // Draw Analyser
             if (options.drawAnalyser && graphConfig.selectedFieldName) {
                 try{ // If we do not select a graph/field, then the analyser is hidden
-                var graph = graphs[graphConfig.selectedGraphIndex];         
-                var field = graph.fields[graphConfig.selectedFieldIndex];                   
+                var graph = graphs[graphConfig.selectedGraphIndex];
+                var field = graph.fields[graphConfig.selectedFieldIndex];
                 analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
-                } catch(err) {console.log('Cannot plot analyser ' + err);}            
+                } catch(err) {console.log('Cannot plot analyser ' + err);}
             }
 
             //Draw Watermark
@@ -889,16 +889,16 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
             }
 
         }
-        
+
         drawInOutRegion();
     };
-    
+
     this.refreshGraphConfig = function() {
-        var 
+        var
             smoothing = {},
             heightSum = 0, allocatedHeight, graphHeight,
             i, graph;
-        
+
         graphs = jQuery.extend(true, [], graphConfig.getGraphs());
 
         for (i = 0; i < graphs.length; i++) {
@@ -917,42 +917,42 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 const inputRange = (max - min) / 2;
                 const offset = -(max + min) / 2;
                 const outputRange = 1.0;            // There is no direct zoom now, set outputRange to 1
-                
+
                 // Convert the field's curve settings into an actual expo curve object:
-                field.curve = new ExpoCurve(offset, 
-                                            ((options.graphExpoOverride) ? 1.0 : field.curve.power), 
-                                            inputRange, 
-                                            outputRange, 
-                                            field.curve.steps); 
-                
+                field.curve = new ExpoCurve(offset,
+                                            ((options.graphExpoOverride) ? 1.0 : field.curve.power),
+                                            inputRange,
+                                            outputRange,
+                                            field.curve.steps);
+
                 if (field.smoothing > 0) {
                     smoothing[field.index] = (options.graphSmoothOverride)?0:field.smoothing;
                 }
             }
         }
-        
+
         // Lay out the graphs vertically downwards in order
         allocatedHeight = 0;
         for (i = 0; i < graphs.length; i++) {
             graph = graphs[i];
-            
+
             graphHeight = graph.height / heightSum;
-            
+
             graph.y = allocatedHeight + graphHeight / 2;
-            
+
             allocatedHeight += graphHeight;
         }
-        
+
         // Scale the graph heights so they don't overlap
         for (i = 0; i < graphs.length; i++) {
             graph = graphs[i];
 
             graph.height = graph.height / heightSum * 0.975;
         }
-    
+
         flightLog.setFieldSmoothing(smoothing);
     }
-    
+
     this.initializeCraftModel = function() {
 
         // Ensure craftType is a valid value
@@ -973,22 +973,22 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 options.craftType = '2D';
             }
         }
-        
+
         if (options.craftType == '2D') {
             craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
         }
 
     }
-    
+
     this.destroy = function() {
         $(canvas).off("mousedown", onMouseDown);
         $(canvas).off("touchstart", onTouchStart);
     };
-    
+
     this.setGraphZoom = function(zoom) {
         windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
     };
-    
+
     this.setInTime = function(time) {
         inTime = time;
         analyser.setInTime(inTime);
@@ -1002,7 +1002,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     this.setOutTime = function(time) {
         outTime = time;
         analyser.setOutTime(outTime);
-        
+
         if (inTime >= outTime) {
             inTime = false;
             analyser.setInTime(inTime);
@@ -1013,27 +1013,37 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     this.getWindowWidthTime = function() {
         return windowWidthMicros;
     }
-    
+
     // New function to return the windowCenterTime.
     this.getWindowCenterTime = function() {
         return windowCenterTime;
     }
 
+    // New function to return the inTime.
+    this.getMarkedInTime = function() {
+        return inTime;
+    }
+
+    // New function to return the outTime.
+    this.getMarkedOutTime = function() {
+        return outTime;
+    }
+
     // Add option toggling
     this.setDrawSticks = function(state) {
-      options.drawSticks = state;  
+      options.drawSticks = state;
     };
 
     // Add option toggling
     this.setDrawAnalyser= function(state) {
-      options.drawAnalyser = state;  
+      options.drawAnalyser = state;
     };
-    
+
     // Add analyser zoom toggling
     this.setAnalyser= function(state) {
-      analyser.setFullscreen( state );  
+      analyser.setFullscreen( state );
     };
-    
+
     // Update user options
     this.refreshOptions = function(newSettings) {
         options = $.extend(defaultOptions, newSettings || {});
@@ -1048,7 +1058,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
     // Use defaults for any options not provided
     options = extend(defaultOptions, options || {});
-    
+
     identifyFields();
 
     /* Create the FlightLogSticks object */
@@ -1057,7 +1067,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     this.initializeCraftModel();
 
     this.refreshLogo();
-    
+
     /* Create the FlightLogAnalyser object */
     analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
 
@@ -1067,12 +1077,12 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     //Handle dragging events
     $(canvas).on("mousedown", onMouseDown);
     $(canvas).on("touchstart", onTouchStart);
-    
+
     graphConfig.addListener(this.refreshGraphConfig);
     this.refreshGraphConfig();
-        
+
     $('html').toggleClass("has-grid-override", options['graphGridOverride']);
-    
+
     this.resize(canvas.width, canvas.height);
 
 }
