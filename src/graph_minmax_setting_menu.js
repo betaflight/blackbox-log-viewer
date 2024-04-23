@@ -201,6 +201,18 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(0));
         RefreshCharts();
     }
+    
+    function SetSelectedCurveMinMaxToFullRangeDuringMarkedTime () {
+        const mm = GraphConfig.getMinMaxForFieldDuringMarkedInterval(flightLog, logGrapher, selected_field_name);
+
+        const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
+        let curve = curvesData[fieldFriendlyName];
+        curve.min = mm.min;
+        curve.max = mm.max;
+        $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
+        $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+        RefreshCharts();
+    }
 
     function ShowSetAllCurvesFullRangeSubmenu(item) {
         hideMenu(sub_menu);
@@ -292,7 +304,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
                         mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, fieldName);
                     }
                     else if (e.data == "marked") {
-                        mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
+                        mm = GraphConfig.getMinMaxForFieldDuringMarkedInterval(flightLog, logGrapher, fieldName);
                     }
                     else
                         mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, fieldName);
@@ -324,7 +336,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         menu.append(elem);
 
         elem = $('<div>At marker time range</div>');
-        elem.click(SetSelectedCurveMinMaxToFullRangeDuringAllTime);
+        elem.click(SetSelectedCurveMinMaxToFullRangeDuringMarkedTime);
         menu.append(elem);
 
         elem = $('<div class="menu-button iconDiv {isSubmenuLevel2 ? back-submenu2 : back-submenu} ">&#9668;Back</div>');
