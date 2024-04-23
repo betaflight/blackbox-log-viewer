@@ -325,7 +325,7 @@ GraphConfig.load = function(config) {
                        fieldName.match(/^gyroADC\[/)    ||     // same range.
                        fieldName.match(/^gyroUnfilt\[/)) {
                 return {
-                    power: 1.0, 
+                    power: 1.0,
                     MinMax: {
                         min: -maxDegreesSecond(gyroScaleMargin),
                         max: maxDegreesSecond(gyroScaleMargin)
@@ -529,7 +529,7 @@ GraphConfig.load = function(config) {
                         }
                     case 'ANGLERATE':
                         return {
-                            power: 1.0, 
+                            power: 1.0,
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
                                 max: maxDegreesSecond(gyroScaleMargin)
@@ -783,7 +783,7 @@ GraphConfig.load = function(config) {
                             case 'debug[2]': // After RPM
                             case 'debug[3]': // After all but Dyn Notch
                             return {
-                                power: 1.0, 
+                                power: 1.0,
                                 MinMax: {
                                     min: -maxDegreesSecond(gyroScaleMargin * highResolutionScale),
                                     max: maxDegreesSecond(gyroScaleMargin * highResolutionScale)
@@ -1265,7 +1265,7 @@ GraphConfig.load = function(config) {
         }
     };
 
-/**
+    /**
      * Compute min-max values for field during current windows time interval.
      *
      * @param flightLog The reference to the FlightLog object
@@ -1278,6 +1278,34 @@ GraphConfig.load = function(config) {
         const minTime = WindowCenterTime - WindowWidthTime/2;
         const maxTime = WindowCenterTime + WindowWidthTime/2;
 
+        let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
+        if (mm == undefined)
+            return {
+                min: -500,
+                max: 500
+            };
+
+        mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
+        mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
+        return mm;
+    };
+
+    /**
+     * Compute min-max values for field during marked in-out time interval.
+     *
+     * @param flightLog The reference to the FlightLog object
+     * @param logGrapher The reference to the FlightLogGrapher object
+     * @param fieldName Name of the field
+     */
+    GraphConfig.getMinMaxForFieldDuringMarkedInterval = function(flightLog, logGrapher, fieldName) {
+        let minTime = logGrapher.getMarkedInTime();
+        let maxTime = logGrapher.getMarkedOutTime();
+        if (minTime==null || maxTime==null) {
+            const WindowCenterTime = logGrapher.getWindowCenterTime();
+            const WindowWidthTime = logGrapher.getWindowWidthTime();
+            minTime = minTime ?? WindowCenterTime - WindowWidthTime/2;
+            maxTime = maxTime ?? WindowCenterTime + WindowWidthTime/2;
+        }
         let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
