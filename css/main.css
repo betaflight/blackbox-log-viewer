@@ -3,7 +3,7 @@ body {
 }
 
 html, body {
-	height:100%;
+    height:100%;
     overflow-y: visible; /* Show page scrollbar when packaged as a Chrome app */
 }
 
@@ -55,7 +55,7 @@ a.disabled {
         margin: 15px 0;
     }
     /* since 3.1.0 */
-    .navbar-collapse.collapse.in { 
+    .navbar-collapse.collapse.in {
         display: block!important;
     }
     .collapsing {
@@ -75,21 +75,21 @@ a.disabled {
         width:200px;
     }
     .workspace-selector-title {
-        width: 130px   
+        width: 130px
     }
 
 }
 
 @media (max-width: 768px) {
     .workspace-selector-title {
-        width: 94px   
+        width: 94px
     }
 }
 
 /*** toolbar expansion ***/
 
 @media (max-width: 1020px) {
-    .video-top-controls * h4 { 
+    .video-top-controls * h4 {
         display: none!important;
     }
 
@@ -147,7 +147,7 @@ a.disabled {
         height: 30px;
         padding-top: 5px;
     }
-    
+
     .video-top-controls li {
         margin-right: 1px;
     }
@@ -182,7 +182,7 @@ a.disabled {
     html.has-video .video-top-controls li {
         margin-right: 1px;
     }
-    
+
     html.has-video button.log-jump-start,
     html.has-video button.log-jump-back,
     html.has-video button.log-jump-forward,
@@ -370,15 +370,15 @@ html:not(.has-log):not(.has-video) .header-pane {
     background-color:#222;
     color:#bbb;
     padding:1em;
-    
+
     min-width: 135px;
-    
+
     -webkit-flex-grow: 0.02;
     flex-grow: 0.02;
-    
+
     -webkit-flex-direction:column;
     flex-direction:column;
-    
+
     display:none;
 }
 .log-graph-config h2 {
@@ -450,7 +450,7 @@ html.has-log .log-graph-config {
 
 .config-graph-field select.form-control {
     padding-left: 2px;
-    max-width: 150px;
+    max-width: 180px;
 }
 
 .config-graph-field input[name=linewidth],
@@ -504,7 +504,7 @@ html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas,
 html.has-map #mapContainer,
 html.has-sticks #stickCanvas {
-	display:block;
+    display:block;
 }
 
 #mapContainer.no-gps-data:before {
@@ -534,7 +534,7 @@ html.has-sticks #stickCanvas {
 }
 
 html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenException) {
-	display:block;
+    display:block;
 }
 
 #analyser ,#log-seek-bar {
@@ -565,9 +565,9 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
     overflow: hidden;
     opacity: 0;
     top: 5px;
-	left: 975px;
+    left: 975px;
     float: right;
-	z-index: 9;
+    z-index: 9;
     position: absolute;
     font-size: 18px;
 }
@@ -626,30 +626,30 @@ html.has-analyser-fullscreen.has-analyser .analyser input:not(.onlyFullScreenExc
 }
 
 .analyser input#analyserZoomX {
-	width: 100px;
-	height : 10px;
-	left: 975px;
-	top: 10px;
-	float: right;
+    width: 100px;
+    height : 10px;
+    left: 975px;
+    top: 10px;
+    float: right;
 }
 .analyser input#analyserZoomY {
-	width: 10px;
-	height: 100px;
-	-webkit-appearance: slider-vertical;
-	left: 1085px;
-	top: 30px;
+    width: 10px;
+    height: 100px;
+    -webkit-appearance: slider-vertical;
+    left: 1085px;
+    top: 30px;
 }
 
 .analyser input.onlyFullScreen {
-	display: none;
-	padding: 3px;
-	margin-right: 3px;
-	z-index: 9;
-	position: absolute;
+    display: none;
+    padding: 3px;
+    margin-right: 3px;
+    z-index: 9;
+    position: absolute;
 }
 
 .analyser, .map-container, .log-seek-bar {
-	position: absolute;
+    position: absolute;
 }
 
 #log-seek-bar {
@@ -1039,9 +1039,9 @@ html.has-log:not(.is-fullscreen).has-table .log-field-values {
 }
 
 .nowrap {
-	/* overflow-y: hidden; */
-	/* width: 40px; */
-	/* white-space: nowrap; */
+    /* overflow-y: hidden; */
+    /* width: 40px; */
+    /* white-space: nowrap; */
 }
 
 html.has-video .video-top-controls,
@@ -1053,13 +1053,13 @@ html.has-log .log-graph {
 
 html.has-video .video-top-controls,
 html.has-log .video-top-controls {
-	top:50px;
-	position:fixed;
-	z-index:10;
-	background-color:white;
-	width: 100%;
-	min-width: 1390px;
-	white-space: nowrap;
+    top:50px;
+    position:fixed;
+    z-index:10;
+    background-color:white;
+    width: 100%;
+    min-width: 1390px;
+    white-space: nowrap;
 }
 
 .playback-rate-control,
@@ -1098,11 +1098,11 @@ html.has-grid-override .toggle-grid
 }
 
 html.video-hidden video {
-	display:none;
+    display:none;
 }
 
 html:not(.has-video) .view-video {
-	display:none;
+    display:none;
 }
 
 html:not(.has-video) a.view-video,
@@ -1204,9 +1204,9 @@ progress {
 }
 
 .navbar-logo {
-	position: absolute;
-	display:block;
-	left: -40px;
+    position: absolute;
+    display:block;
+    left: -40px;
 }
 
 html.isCF .navbar-logo {
@@ -1218,8 +1218,8 @@ html.isINAV .navbar-logo {
 }
 
 html.isCF .navbar-logo img {
-	content: url(".././images/cf_logo_white.svg");
-	width: 160px;
+    content: url(".././images/cf_logo_white.svg");
+    width: 160px;
 }
 
 html.isBF .navbar-logo img {
@@ -1230,18 +1230,18 @@ html.isBF .navbar-logo img {
 }
 
 html.isINAV .navbar-logo img {
-	content: url(".././images/inav_logo_white.png");
-	width: auto;
-	left: -16px;
-	top: 3px;
+    content: url(".././images/inav_logo_white.png");
+    width: auto;
+    left: -16px;
+    top: 3px;
 }
 
 .navbar-logo img {
-	position:relative;
-	height: 35px;
-	width: 210px;
-	padding: 0;
-	display:block;
+    position:relative;
+    height: 35px;
+    width: 210px;
+    padding: 0;
+    display:block;
 }
 
 .navbar-logo a {
@@ -1253,11 +1253,11 @@ html.isINAV .navbar-logo img {
 }
 
 .navbar-logo span {
-	padding-left: 0;
+    padding-left: 0;
     position: relative;
-	left: -150px;
-	top: 20px;
-	color: antiquewhite;
+    left: -150px;
+    top: 20px;
+    color: antiquewhite;
 }
 
 html.isBF .navbar-logo span {
@@ -1271,7 +1271,7 @@ html.has-log .navbar-static-top {
 }
 
 .navbar-static-top {
-	display:none;
+    display:none;
     position: fixed;
        width: 100%;
 }
@@ -1294,7 +1294,7 @@ html:not(.has-log) #status-bar {
 html:not(.has-gps) .view-map,
 html:not(.has-gps) .map-container,
 html:not(.has-gps) .btn-gpx-export {
-	display: none !important;
+    display: none !important;
 }
 
 #status-bar .bookmark-1,
@@ -1341,7 +1341,7 @@ html:not(.has-gps) .btn-gpx-export {
 }
 
 html:not(.has-config) #status-bar .configuration-file-name {
-    display: none;    
+    display: none;
 }
 
 #status-bar div:not(:last-child) {
@@ -1361,132 +1361,132 @@ html:not(.has-config) #status-bar .configuration-file-name {
 
 /***
 
-	IOS Style Checkboxes common code
+    IOS Style Checkboxes common code
 
 ***/
 
-input[type="checkbox"].ios-switch { 
-	position: absolute;
-	opacity: 0;
+input[type="checkbox"].ios-switch {
+    position: absolute;
+    opacity: 0;
 }
 
 /* Normal Track */
 input[type="checkbox"].ios-switch + div {
-	vertical-align: middle;
-	width: 40px;
-	height: 20px;
-	border: 1px solid rgba(0,0,0,.4);
-	border-radius: 999px;
-	background-color: rgba(0, 0, 0, 0.1);
-	-webkit-transition-duration: .4s;
-	-webkit-transition-property: background-color, box-shadow;
-	box-shadow: inset 0 0 0 0 rgba(0,0,0,0.4);
-	margin: 0 0 0 2.5em;
-	display: inherit;
+    vertical-align: middle;
+    width: 40px;
+    height: 20px;
+    border: 1px solid rgba(0,0,0,.4);
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, 0.1);
+    -webkit-transition-duration: .4s;
+    -webkit-transition-property: background-color, box-shadow;
+    box-shadow: inset 0 0 0 0 rgba(0,0,0,0.4);
+    margin: 0 0 0 2.5em;
+    display: inherit;
 }
 
 /* Checked Track (Blue) */
 input[type="checkbox"].ios-switch:checked + div {
-	width: 40px;
+    width: 40px;
     background: #3b89ec 0 0;
     border: 1px solid #0e62cd;
-	box-shadow: inset 0 0 0 10px rgba(59,137,259,1);
+    box-shadow: inset 0 0 0 10px rgba(59,137,259,1);
 }
 
 /* Tiny Track */
 input[type="checkbox"].tinyswitch.ios-switch + div {
-	width: 34px;	height: 18px;
+    width: 34px;    height: 18px;
 }
 
 /* Big Track */
 input[type="checkbox"].bigswitch.ios-switch + div {
-	width: 50px;	height: 25px;
+    width: 50px;    height: 25px;
 }
 
 /* Green Track */
 input[type="checkbox"].green.ios-switch:checked + div,
 html.isCF input[type="checkbox"].ios-switch:checked + div {
-	background-color: #00e359;
-	border: 1px solid rgba(0, 162, 63,1);
-	box-shadow: inset 0 0 0 10px rgba(0,227,89,1);
+    background-color: #00e359;
+    border: 1px solid rgba(0, 162, 63,1);
+    box-shadow: inset 0 0 0 10px rgba(0,227,89,1);
 }
 
 /* Orange Track */
-input[type="checkbox"].orange.ios-switch:checked + div, 
+input[type="checkbox"].orange.ios-switch:checked + div,
 html.isBF input[type="checkbox"].ios-switch:checked + div {
-	background-color: #FFC638;
-	border: 1px solid rgba(158, 100, 0, 1);
-	box-shadow: inset 0 0 0 10px rgba(224,168,0,1);
+    background-color: #FFC638;
+    border: 1px solid rgba(158, 100, 0, 1);
+    box-shadow: inset 0 0 0 10px rgba(224,168,0,1);
 }
 
 /* Normal Knob */
 input[type="checkbox"].ios-switch + div > div {
-	float: left;
-	width: 18px;
-	height: 18px;
-	border-radius: inherit;
-	background: #ffffff;
-	-webkit-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
-	-webkit-transition-duration: 0.4s;
-	-webkit-transition-property: transform, background-color, box-shadow;
-	-moz-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
-	-moz-transition-duration: 0.4s;
-	-moz-transition-property: transform, background-color;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.4);
-	pointer-events: none;
-	margin-left: 0;
+    float: left;
+    width: 18px;
+    height: 18px;
+    border-radius: inherit;
+    background: #ffffff;
+    -webkit-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
+    -webkit-transition-duration: 0.4s;
+    -webkit-transition-property: transform, background-color, box-shadow;
+    -moz-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
+    -moz-transition-duration: 0.4s;
+    -moz-transition-property: transform, background-color;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    margin-left: 0;
 }
 
 /* Checked Knob (Blue Style) */
 input[type="checkbox"].ios-switch:checked + div > div {
-	-webkit-transform: translate3d(20px, 0, 0);
-	-moz-transform: translate3d(20px, 0, 0);
-	background-color: #ffffff;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
+    -webkit-transform: translate3d(20px, 0, 0);
+    -moz-transform: translate3d(20px, 0, 0);
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 /* Tiny Knob */
 input[type="checkbox"].tinyswitch.ios-switch + div > div {
-	width: 16px; height: 16px;
-	margin-top: 1px;
+    width: 16px; height: 16px;
+    margin-top: 1px;
 }
 
 /* Checked Tiny Knob (Blue Style) */
 input[type="checkbox"].tinyswitch.ios-switch:checked + div > div {
-	-webkit-transform: translate3d(16px, 0, 0);
-	-moz-transform: translate3d(16px, 0, 0);
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
+    -webkit-transform: translate3d(16px, 0, 0);
+    -moz-transform: translate3d(16px, 0, 0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 /* Big Knob */
 input[type="checkbox"].bigswitch.ios-switch + div > div {
-	width: 23px; height: 23px;
-	margin-top: 1px;
+    width: 23px; height: 23px;
+    margin-top: 1px;
 }
 
 /* Checked Big Knob (Blue Style) */
 input[type="checkbox"].bigswitch.ios-switch:checked + div > div {
-	-webkit-transform: translate3d(25px, 0, 0);
-	-moz-transform: translate3d(16px, 0, 0);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
+    -webkit-transform: translate3d(25px, 0, 0);
+    -moz-transform: translate3d(16px, 0, 0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 /* Green Knob */
 input[type="checkbox"].green.ios-switch:checked + div > div ,
 html.isCF input[type="checkbox"].ios-switch:checked + div > div {
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 162, 63,1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 162, 63,1);
 }
 
 /* Orange Knob */
 input[type="checkbox"].orange.ios-switch:checked + div > div ,
 html.isBF input[type="checkbox"].ios-switch:checked + div > div {
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0,1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0,1);
 }
 
 /* Blue Knob */
 input[type="checkbox"].blue.ios-switch:checked + div > div ,
 html.isINAV input[type="checkbox"].ios-switch:checked + div > div {
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172,1);
 }
 
 html.isBF .config-graph h4 span:first-child,
@@ -1552,7 +1552,7 @@ div#lap-timer td:first-child {
 */
 .tooltip {
     --tooltip-color: #363636;
-}    
+}
 .tooltip-inner {
   background-color: var(--tooltip-color);
 }

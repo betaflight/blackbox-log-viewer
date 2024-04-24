@@ -96,4 +96,7 @@
   border: 1px solid black;
   border-radius: 3px;
 }
+.minmax-control {
+  min-width: 60px;
+}
 
