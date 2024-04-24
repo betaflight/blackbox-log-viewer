@@ -72,14 +72,12 @@ export function GraphConfig(graphConfig) {
 
                 var adaptField = function(field, colorIndexOffset, forceNewCurve) {
                     const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
-                    defaultCurve.MinMax.save = false;
 
                     if (field.curve === undefined || forceNewCurve) {
                         field.curve = defaultCurve;
-                        field.curve.MinMax.save = true;
                     }
                     else {
-                        if ((field.curve.MinMax == undefined) || (isNewLog == true && !field.curve.MinMax.save))
+                        if (field.curve.MinMax == undefined)
                             field.curve.MinMax = defaultCurve.MinMax;
                     }
 
