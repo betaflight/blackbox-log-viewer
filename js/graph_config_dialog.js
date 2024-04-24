@@ -124,7 +124,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="power" class="form-control" type="text"/></td>'
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
-                    + '<td><input name="grid" type="checkbox"/></td>'
                     + '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><input name="saveMinMax" type="checkbox"/></td>'
@@ -144,9 +143,6 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         // Set the line width values
         $('input[name=linewidth]',elem).val((field.lineWidth)?field.lineWidth:1);
-
-        // Set the grid state
-        $('input[name=grid]',elem).attr("checked", (field.grid)?field.grid:false);
 
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
@@ -230,7 +226,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="expo">Expo</th>'
                                                     + '<th name="line">Line</th>'
                                                     + '<th name="color">Color</th>'
-                                                    + '<th name="grid">Grid</th>'
                                                     + '<th name="MinValue">Minimum</th>'
                                                     + '<th name="MaxValue">Maximum</th>'
                                                     + '<th>Keep</th>'
@@ -383,7 +378,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
-                    grid: $('input[name=grid]', this).is(':checked'),
                 };
 
                 if (field.name.length > 0) {
@@ -468,7 +462,7 @@ function GraphConfigurationDialog(dialog, onSave) {
     $("#dlgGraphConfiguration").on('shown.bs.modal', function(e) {
         $(".graph-configuration-dialog-cancel").focus();
     });
-    
+
     $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
         // Lock close window if MinMax menu is openned
         if (isMinMaxContextMenuActive()) {

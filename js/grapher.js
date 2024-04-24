@@ -787,13 +787,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
 
                     drawAxisLine();
 
-                    if(!options.graphGridOverride) {
-                        for (j = 0; j < graph.fields.length; j++) {
-                            if(graph.fields[j].grid){
-                                drawGrid(graph.fields[j].curve, canvas.height * graph.height);
-                                break;
-                            };
-                        };
+                    if(!options.graphGridOverride && graph.fields.length > 0) {
+                        drawGrid(graph.fields[0].curve, canvas.height * graph.height);
                     }
 
                     if (options.drawGradient && graphs.length > 1) // only draw the background if more than one graph set.
