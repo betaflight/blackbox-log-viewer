@@ -373,6 +373,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             }
             else {
                 SetAllMinMaxToFullRangeDuringAllTime();
+                closeMinMaxContextMenu();
             }
             return;
         }
@@ -415,7 +416,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         if (e.shiftKey == false) {
             SetSelectedCurvesToDefault();
-            hideMenu(sub_menu);
+            closeMinMaxContextMenu();
             return;
         }
 
@@ -473,7 +474,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         if (e.shiftKey == false) {
             SetSelectedCurvesToZeroOffset();
-            hideMenu(sub_menu);
+            closeMinMaxContextMenu();
             return;
         }
 
@@ -576,7 +577,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         if (e.shiftKey == false) {
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            hideMenu(sub_menu);
+            closeMinMaxContextMenu();
             return;
         }
 
@@ -636,7 +637,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
         if (e.shiftKey == false) {
             FitCheckedCurvesToSameScale();
-            hideMenu(sub_menu);
+            closeMinMaxContextMenu();
             return;
         }
 
@@ -773,56 +774,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 }
             });
             RefreshCharts();
-        }
-    }
-
-    function ShowCurvesToSetSaveMinMaxCheckboxedMenu(e) {
-        hideMenu(sub_menu);
-        elem = $('<div class="bottomBorder titleDiv">SELECT CURVES:</div>');
-        sub_menu.append(elem);
-
-        for (const key in curvesData) {
-            const curve = curvesData[key];
-                elem = $('<div><input type="checkbox" checked="false">' + curve.friendly_name + '</input></div>');
-                $('input', elem).prop('checked', curve.save || e.shiftKey == false);
-                $('input', elem).click(function (e) {
-                    let curve = curvesData[this.parentElement.innerText];
-                    curve.save = this.checked;
-                });
-                sub_menu.append(elem);
-        }
-
-        if (e.shiftKey == false) {
-            SetSelectedCurvesMinMaxForSave();
-            hideMenu(sub_menu);
-            return;
-        }
-
-        elem = $('<div class="bottomBorder topBorder iconDiv">&#9668;SET CURVES TO SAVE</div>');
-        elem.click(function () {
-            SetSelectedCurvesMinMaxForSave();
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
-        });
-        sub_menu.append(elem);
-
-        elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
-        elem.click(function () {
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
-        });
-        sub_menu.append(elem);
-        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
-        showMenu(sub_menu);
-        DeactivateMainMenu(main_menu);
-
-        function SetSelectedCurvesMinMaxForSave () {
-            const SelectedCurveName = $('select.form-control option:selected', selected_curve).text();
-            curves_table.each(function() {
-                const fieldFriendlyName = $('select.form-control option:selected', this).text();
-                const curve = curvesData[fieldFriendlyName];
-                $('input[name=saveMinMax]', this).prop('checked', curve.save);
-            });
         }
     }
 
