@@ -92,21 +92,16 @@ function GraphConfigurationDialog(dialog, onSave) {
                     // Set line MinMax values !!!
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
-                    if (field.curve.MinMax.save == undefined)
-                        field.curve.MinMax.save = true;
-                    $("input[name=saveMinMax]",elem).attr("checked", field.curve.MinMax.save);
                 }
                 else{
                     $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
-                    $("input[name=saveMinMax]",elem).attr("checked", true);
                 }
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
-                $("input[name=saveMinMax]",elem).attr("checked", true);
             }
         }
     }
@@ -126,7 +121,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><select class="color-picker"></select></td>'
                     + '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>'
-                    + '<td><input name="saveMinMax" type="checkbox"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -228,7 +222,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="color">Color</th>'
                                                     + '<th name="MinValue">Minimum</th>'
                                                     + '<th name="MaxValue">Maximum</th>'
-                                                    + '<th>Keep</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
@@ -355,7 +348,6 @@ function GraphConfigurationDialog(dialog, onSave) {
                 const fieldName = $("select", this).val();
                 const minimum = $("input[name=MinValue]", this).val();
                 const maximum = $("input[name=MaxValue]", this).val();
-                const save = $("input[name=saveMinMax]",this).is(':checked');
                 field = {
                     name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
@@ -363,8 +355,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
                         MinMax: {
                             min: parseFloat(minimum),
-                            max: parseFloat(maximum),
-                            save: save
+                            max: parseFloat(maximum)
                         }
                     },
                     default: { // These are used to restore configuration if using mousewheel adjustments
@@ -372,8 +363,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,
                         MinMax: {
                             min: parseFloat(minimum),
-                            max: parseFloat(maximum),
-                            save: save
+                            max: parseFloat(maximum)
                         }
                     },
                     color: $('select.color-picker option:selected', this).val(),
