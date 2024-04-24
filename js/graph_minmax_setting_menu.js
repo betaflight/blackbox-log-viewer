@@ -933,7 +933,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         FillThisCurveActionsIntoMenu(main_menu, true);
     }
 
-    elem = $('<div class="menu-button back-main-menu">&#9668;Return</div>');
+    elem = $('<div class="menu-button back-main-menu">&#9668;Close</div>');
     elem.click(function () {
         closeMinMaxContextMenu();
     });
