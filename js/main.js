@@ -1732,6 +1732,9 @@ function BlackboxLogViewer() {
 
         function saveOneUserSetting(name, value) {
             prefs.get('userSettings', function(data) {
+                if (!data) {
+                    data = {};
+                }
                 data[name] = value;
                 prefs.set('userSettings', data);
             });
