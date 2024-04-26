@@ -420,11 +420,9 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder iconDiv">&#9668;SET CURVES TO DEFAULT</div>');
+        elem = $('<div class="topBorder">SET CURVES TO DEFAULT</div>');
         elem.click(function () {
             SetSelectedCurvesToDefault();
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
         });
         sub_menu.append(elem);
 
@@ -581,12 +579,9 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             return;
         }
 
-        elem = $('<div class="topBorder iconDiv">&#9668;SET MIN-MAX VALUES</div>');
+        elem = $('<div class="topBorder">SET MIN-MAX VALUES</div>');
         elem.click(function () {
             ApplySelectedCurveMinMaxToOtherSelectedCurves();
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
-            $('.back-main-menu').addClass('menu-button');
         });
         sub_menu.append(elem);
 
