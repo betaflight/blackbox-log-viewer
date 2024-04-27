@@ -6,13 +6,12 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     const sub_menu2 = $(".sub_menu2", selected_curve.parents(".config-graph"));
 
     function ActivateMainMenu (menu) {
-        $('.back-main-menu').addClass('menu-button');
         enablePointerEvents(menu);
     }
 
     function DeactivateMainMenu (menu) {
-        $('.back-main-menu').removeClass('menu-button');
-        disablePointerEvents(main_menu);
+        disablePointerEvents(menu);
+        enablePointerEvents($('.back-main-menu'));
     }
 
     function ActivateSubmenu (menu) {
@@ -267,8 +266,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
             enablePointerEvents(prev_menu);
             if (isSubmenuLevel2) {
                 $('.back-submenu').addClass('menu-button');
-            } else {
-                $('.back-main-menu').addClass('menu-button');
             }
         });
         menu.append(elem);
@@ -277,13 +274,10 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         const top = item.offsetTop + (isSubmenuLevel2 ? main_menu[0].children[8].offsetTop : 0);
         positionMenu(menu, left, top);
         showMenu(menu);
-        $('.back-main-menu').removeClass('menu-button');
         disablePointerEvents(prev_menu);
 
         if (isSubmenuLevel2) {
             $('.back-submenu').removeClass('menu-button');
-        } else {
-            $('.back-main-menu').removeClass('menu-button');
         }
     }
 
@@ -829,7 +823,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         FillThisCurveActionsIntoMenu(main_menu, true);
     }
 
-    elem = $('<div class="menu-button back-main-menu">&#9668;Close</div>');
+    elem = $('<div class="menu-button back-main-menu">&#9660;Close</div>');
     elem.click(function () {
         closeMinMaxContextMenu();
     });
@@ -880,8 +874,18 @@ function UnlockUsersInterface () {
 }
 
 function closeMinMaxContextMenu () {
-    const main_menu = $(".main_menu.show");
-    hideMenu(main_menu);
+    let menu = $(".main_menu.show");
+    if (menu.length > 0)
+        hideMenu(menu);
+
+    menu = $(".sub_menu.show");
+    if (menu.length > 0)
+        hideMenu(menu);
+
+    menu = $(".sub_menu2.show");
+    if (menu.length > 0)
+        hideMenu(menu);
+
     UnlockUsersInterface();
 }
 
