@@ -33,6 +33,7 @@ import {
 } from './tools.js';
 import { PrefStorage } from './pref_storage.js';
 import { makeScreenshot } from './screenshot.js';
+import defaultWorkspaceGraphConfigs from './workspaces-ctzsnooze.json';
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
@@ -2174,7 +2175,7 @@ function BlackboxLogViewer() {
             if(item) {
                 workspaceGraphConfigs = upgradeWorkspaceFormat(item);
             } else {
-                workspaceGraphConfigs = [];
+                workspaceGraphConfigs = defaultWorkspaceGraphConfigs;
             }
 
             onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
