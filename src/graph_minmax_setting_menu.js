@@ -288,7 +288,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     }
 
     function SetCurvesToFullRange(e) {
-        const SingleCurve = $(e.target).hasClass('SingleCurve');
+        const SingleCurve = (e.data == 'SingleCurve');
         if (e.shiftKey == false) {
             if (SingleCurve) {
                 SetSelectedCurveMinMaxToFullRangeDuringAllTime();
@@ -579,7 +579,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
     function SetZoomToCurves (e) {
         const target = $(e.target);
-        const SingleCurve = target.hasClass('SingleCurve');
+        const SingleCurve = (target.data == 'SingleCurve');
         if(e.shiftKey == false || SingleCurve) {
             const ZoomIn = target.hasClass('ZoomIn');
             const ZoomOut = target.hasClass('ZoomOut');
@@ -743,16 +743,16 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         elem.click(SetSelectedCurveMinMaxToDefault);
         menu.append(elem);
 
-        elem = $('<div class="ZoomIn SingleCurve">Zoom In</div>');
-        elem.click(SetZoomToCurves);
+        elem = $('<div class="ZoomIn">Zoom In</div>');
+        elem.click('SingleCurve', SetZoomToCurves);
         menu.append(elem);
 
-        elem = $('<div class="ZoomOut SingleCurve">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
-        elem.click(SetZoomToCurves);
+        elem = $('<div class="ZoomOut">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
+        elem.click('SingleCurve', SetZoomToCurves);
         menu.append(elem);
 
-        elem = $(`<div class="iconDiv SingleCurve">Full range<span class=${is_main_menu ? "right-arrow" : "right-arrow2"} style="display: none">&#9658;</span></div>`);
-        elem.click(SetCurvesToFullRange);
+        elem = $(`<div class="iconDiv">Full range<span class=${is_main_menu ? "right-arrow" : "right-arrow2"} style="display: none">&#9658;</span></div>`);
+        elem.click('SingleCurve', SetCurvesToFullRange);
         menu.append(elem);
 
         elem = $('<div>Centered</div>');
