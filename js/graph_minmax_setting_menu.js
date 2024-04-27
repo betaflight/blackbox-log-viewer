@@ -20,21 +20,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         $('.back-submenu').addClass('menu-button');
     }
 
-    function SetAllMinMaxToDefault () {
-        curves_table.each(function() {
-            const fieldName = $("select", this).val();
-            const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
-            const fieldFriendlyName = $('select.form-control option:selected', this).text();
-            let curve = curvesData[fieldFriendlyName];
-
-            curve.min = mm.min;
-            curve.max = mm.max;
-            $('input[name=MinValue]',this).val(mm.min.toFixed(1));
-            $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
-        });
-        RefreshCharts();
-    }
-
     function SetAllMinMaxToFullRangeDuringAllTime () {
         curves_table.each(function() {
             const fieldName = $("select", this).val();
@@ -139,24 +124,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         RefreshCharts();
     }
 
-    function SetAllCurvesToOneScale () {
-        let Max = -Number.MAX_VALUE, Min = Number.MAX_VALUE;
-        for (const key in curvesData) {
-            Min = Math.min(Min, curvesData[key].min);
-            Max = Math.max(Max, curvesData[key].max);
-        }
-
-        curves_table.each(function() {
-            const fieldFriendlyName = $('select.form-control option:selected', this).text();
-            let curve = curvesData[fieldFriendlyName];
-            curve.min = Min;
-            curve.max = Max;
-            $('input[name=MinValue]',this).val(Min.toFixed(1));
-            $('input[name=MaxValue]',this).val(Max.toFixed(1));
-        });
-        RefreshCharts();
-    }
-
     function SetSelectedCurveMinMaxToDefault () {
         const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
         const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
@@ -176,17 +143,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         curve.max = mm.max;
         $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
         $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
-        RefreshCharts();
-    }
-
-    function SetSelectedMinMaxToZeroOffsetDuringAllTime () {
-        const mm = GraphConfig.getMinMaxForFieldDuringAllTime(flightLog, selected_field_name);
-        const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
-        let curve = curvesData[fieldFriendlyName];
-        curve.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
-        curve.min = -curve.max;
-        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(1));
         RefreshCharts();
     }
 
@@ -212,46 +168,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
         $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
         RefreshCharts();
-    }
-
-    function ShowSetAllCurvesFullRangeSubmenu(item) {
-        hideMenu(sub_menu);
-
-        let elem = $('<div class="titleDiv bottomBorder">FULL RANGE:</div>');
-        sub_menu.append(elem);
-        elem = $('<div class="titleDiv bottomBorder">At all global log time</div>');
-        sub_menu.append(elem);
-        elem = $('<div>Full range</div>');
-        elem.click(SetAllMinMaxToFullRangeDuringAllTime);
-        sub_menu.append(elem);
-        elem = $('<div>Centered full range</div>');
-        elem.click(SetAllMinMaxToZeroOffsetDuringAllTime);
-        sub_menu.append(elem);
-        elem = $('<div>Centered one scale</div>');
-        elem.click(SetAllMinMaxToOneScaleDuringAllTime);
-        sub_menu.append(elem);
-
-        elem = $('<div class="titleDiv topBorder bottomBorder">At local window time</div>');
-        sub_menu.append(elem);
-        elem = $('<div>Full range</div>');
-        elem.click(SetAllMinMaxToFullRangeDuringWindowTime);
-        sub_menu.append(elem);
-        elem = $('<div>Centered full range</div>');
-        elem.click(SetAllMinMaxToZeroOffsetDuringWindowTime);
-        sub_menu.append(elem);
-        elem = $('<div>Centered one scale</div>');
-        elem.click(SetAllMinMaxToOneScaleDuringWindowTime);
-        sub_menu.append(elem);
-
-        elem = $('<div class="menu-button back-submenu iconDiv">&#9668;Back</div>');
-        elem.click(function () {
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
-        });
-        sub_menu.append(elem);
-        positionMenu(sub_menu, item.clientWidth, item.offsetTop);
-        showMenu(sub_menu);
-        DeactivateMainMenu(main_menu);
     }
 
     function ShowSetSelectedCurvesFullRangeSubmenu(item) {
@@ -386,18 +302,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         }
     }
 
-    function SetSelectedMinMaxToZeroOffsetDuringWindowTime () {
-        const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(flightLog, logGrapher, selected_field_name);
-
-        const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
-        let curve = curvesData[fieldFriendlyName];
-        curve.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
-        curve.min = -curve.max;
-        $('input[name=MinValue]', selected_curve).val(curve.min.toFixed(1));
-        $('input[name=MaxValue]', selected_curve).val(curve.max.toFixed(1));
-        RefreshCharts();
-    }
-
     function ShowCurvesToSetDefaultCheckboxedMenu (e) {
         hideMenu(sub_menu);
         elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
@@ -523,20 +427,6 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
         curve.max = Max;
         $('input[name=MinValue]', selected_curve).val(Min.toFixed(1));
         $('input[name=MaxValue]', selected_curve).val(Max.toFixed(1));
-        RefreshCharts();
-    }
-
-    function ApplySelectedCurveMinMaxToAllCurves () {
-        const Min = $('input[name=MinValue]', selected_curve).val();
-        const Max = $('input[name=MaxValue]', selected_curve).val();
-        curves_table.each(function() {
-            const fieldFriendlyName = $('select.form-control option:selected', this).text();
-            let curve = curvesData[fieldFriendlyName];
-            curve.min = parseFloat(Min);
-            curve.max = parseFloat(Max);
-            $('input[name=MinValue]',this).val(Min);
-            $('input[name=MaxValue]',this).val(Max);
-        });
         RefreshCharts();
     }
 
