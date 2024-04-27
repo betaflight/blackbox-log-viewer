@@ -138,6 +138,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         $('input[name=power]',selected_curve).val(power);
         $('input[name=smoothing]',selected_curve).val(smoothing);
         RefreshCharts();
+        closeMinMaxContextMenu();
     }
 
     function SetSelectedCurveMinMaxToFullRangeDuringAllTime () {
@@ -274,7 +275,11 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         const top = item.offsetTop + (isSubmenuLevel2 ? main_menu[0].children[8].offsetTop : 0);
         positionMenu(menu, left, top);
         showMenu(menu);
-        disablePointerEvents(prev_menu);
+
+        if (isSubmenuLevel2)
+            disablePointerEvents(prev_menu);
+        else
+            DeactivateMainMenu(prev_menu);
 
         if (isSubmenuLevel2) {
             $('.back-submenu').removeClass('menu-button');
@@ -289,8 +294,8 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             }
             else {
                 SetAllMinMaxToFullRangeDuringAllTime();
-                closeMinMaxContextMenu();
             }
+            closeMinMaxContextMenu();
             return;
         }
 
@@ -433,6 +438,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         $('input[name=MinValue]', selected_curve).val(Min.toFixed(0));
         $('input[name=MaxValue]', selected_curve).val(Max.toFixed(0));
         RefreshCharts();
+        closeMinMaxContextMenu();
     }
 
     function ShowCurvesToSetMinMaxCheckboxedMenu (e) {
@@ -667,23 +673,6 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         }
     }
 
-    function ShowThisCurvesActionSubmenu() {
-        hideMenu(sub_menu);
-
-        FillThisCurveActionsIntoMenu(sub_menu, false);
-
-        elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
-        elem.click(function () {
-            hideMenu(sub_menu);
-            ActivateMainMenu(main_menu);
-        });
-        sub_menu.append(elem);
-
-        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
-        showMenu(sub_menu);
-        DeactivateMainMenu(main_menu);
-    }
-
     function addKeyboardEvents() {
         $(document).keydown( function (e) {
             const mainMenu = $(".main_menu.show");
@@ -731,6 +720,24 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             }
         });
     }
+
+    function ShowThisCurvesActionSubmenu() {
+        hideMenu(sub_menu);
+
+        FillThisCurveActionsIntoMenu(sub_menu, false);
+
+        elem = $('<div class="menu-button iconDiv back-submenu">&#9668;Back</div>');
+        elem.click(function () {
+            hideMenu(sub_menu);
+            ActivateMainMenu(main_menu);
+        });
+        sub_menu.append(elem);
+
+        positionMenu(sub_menu, this.clientWidth, this.offsetTop);
+        showMenu(sub_menu);
+        DeactivateMainMenu(main_menu);
+    }
+
 
     function FillThisCurveActionsIntoMenu (menu, is_main_menu) {
         let elem = $('<div> Default</div>');
