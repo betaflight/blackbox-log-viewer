@@ -125,13 +125,19 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
     }
 
     function SetSelectedCurveMinMaxToDefault () {
-        const mm = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name).MinMax;
+        const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name);
+        const mm = defaultCurve.MinMax;
+        const power = (defaultCurve.power*100).toFixed(0)+'%';
+        const smoothing = (GraphConfig.getDefaultSmoothingForField(flightLog, selected_field_name)/100)+'%';
+
         const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
         let curve = curvesData[fieldFriendlyName];
         curve.min = mm.min;
         curve.max = mm.max;
         $('input[name=MinValue]', selected_curve).val(mm.min.toFixed(1));
         $('input[name=MaxValue]', selected_curve).val(mm.max.toFixed(1));
+        $('input[name=power]',selected_curve).val(power);
+        $('input[name=smoothing]',selected_curve).val(smoothing);
         RefreshCharts();
     }
 
@@ -347,11 +353,16 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
                 let curve = curvesData[fieldFriendlyName];
                 if(curve.checked) {
                     const fieldName = $("select", this).val();
-                    const mm = GraphConfig.getDefaultCurveForField(flightLog, fieldName).MinMax;
+                    const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, fieldName);
+                    const mm = defaultCurve.MinMax;
+                    const power = (defaultCurve.power*100).toFixed(0)+'%';
+                    const smoothing = (GraphConfig.getDefaultSmoothingForField(flightLog, fieldName)/100)+'%';
                     curve.min = mm.min;
                     curve.max = mm.max;
                     $('input[name=MinValue]',this).val(mm.min.toFixed(1));
                     $('input[name=MaxValue]',this).val(mm.max.toFixed(1));
+                    $('input[name=power]',this).val(power);
+                    $('input[name=smoothing]',this).val(smoothing);
                 }
             });
             RefreshCharts();
