@@ -1,5 +1,6 @@
 {
   "name": "betaflight-blackbox-explorer",
+  "productName": "Blackbox Explorer",
   "displayName": "Betaflight - Blackbox Explorer",
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
   "version": "4.0.0",

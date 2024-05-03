@@ -16,8 +16,8 @@ export default {
             },
             includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
             manifest: {
-                name: pkg.name,
-                short_name: 'BBE',
+                name: pkg.displayName,
+                short_name: pkg.productName,
                 description: pkg.description,
                 theme_color: '#ffffff',
                 icons: [
@@ -37,7 +37,7 @@ export default {
                         type: 'image/png',
                     },
                 ],
-            }
-        })
+            },
+        }),
     ],
 }
