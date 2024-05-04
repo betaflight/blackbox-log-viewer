@@ -73,12 +73,18 @@ function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChang
                selectedFieldIndex    = $(this).attr('field');
 
             if(!e.altKey) {
-               config.selectedFieldName     = config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex].friendlyName;
-               config.selectedGraphIndex    = selectedGraphIndex;
-               config.selectedFieldIndex    = selectedFieldIndex;
-               if (onNewSelectionChange) {
-                   onNewSelectionChange();
-               }
+				const selectedFieldName = config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex].friendlyName;
+				if (config.selectedFieldName != selectedFieldName) {
+					config.selectedFieldName     = selectedFieldName;
+					config.selectedGraphIndex    = selectedGraphIndex;
+					config.selectedFieldIndex    = selectedFieldIndex;
+					if (onNewSelectionChange) {
+						onNewSelectionChange();
+					}
+				}
+				else {
+					onNewSelectionChange(true);
+				}
             }
             e.preventDefault();
         });

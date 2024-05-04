@@ -827,8 +827,8 @@ function BlackboxLogViewer() {
         updateCanvasSize();
     }
 
-    function onLegendSelectionChange() {
-        hasAnalyser = true;
+    function onLegendSelectionChange(toggleAnalizer) {
+        hasAnalyser = toggleAnalizer ? !hasAnalyser : true;
         graph.setDrawAnalyser(hasAnalyser);
         html.toggleClass("has-analyser", hasAnalyser);
         prefs.set('hasAnalyser', hasAnalyser);
