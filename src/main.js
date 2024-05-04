@@ -1070,7 +1070,7 @@ function BlackboxLogViewer() {
             if (item) {
                 workspaceGraphConfigs = upgradeWorkspaceFormat(item);
             } else {
-                workspaceGraphConfigs = [];
+                workspaceGraphConfigs = defaultWorkspaceGraphConfigs;
             }
         });
 
