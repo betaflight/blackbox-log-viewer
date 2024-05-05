@@ -151,12 +151,14 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 name: $('select.form-control option:selected', elem).val()
                     };
             renderSmoothingOptions(elem, activeFlightLog, selectedField);
+            RefreshCharts();
         });
 
         // Add event when color picker is changed to change the dropdown coloe
         $('select.color-picker', elem).change( function() {
             $(this).css('background', $('select.color-picker option:selected', elem).val())
                    .css('color', $('select.color-picker option:selected', elem).val());
+            RefreshCharts();
         });
 
         // Add event when mouse double click at the Minimum/Maxcimum input field to restore default MinMax values.
@@ -169,6 +171,15 @@ export function GraphConfigurationDialog(dialog, onSave) {
         });
 
         $('.minmax-control',elem).change(function(e) {
+            RefreshCharts();
+        });
+        $('input[name=smoothing]',elem).change(function(e) {
+            RefreshCharts();
+        });
+        $('input[name=power]',elem).change(function(e) {
+            RefreshCharts();
+        });
+        $('input[name=linewidth]',elem).change(function(e) {
             RefreshCharts();
         });
 
@@ -254,6 +265,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             var parentGraph = $(this).parents('.config-graph');
             parentGraph.remove();
             updateRemoveAllButton();
+            RefreshCharts();
             e.preventDefault();
         });
 
@@ -280,7 +292,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 parentGraph.remove();
             }
             updateRemoveAllButton();
-
+            RefreshCharts();
             e.preventDefault();
         });
 
@@ -512,14 +524,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         // Dismiss the dropdown button
         exampleGraphsButton.dropdown("toggle");
-
+        if (graph.label != "Custom graph") {
+            RefreshCharts();
+        }
         e.preventDefault();
     });
 
     // Remove all Graphs button
     var removeAllGraphsButton = $(".config-graphs-remove-all-graphs");
     removeAllGraphsButton.on("click", function() {
-            $('.config-graph').remove();
-            updateRemoveAllButton();
+        $('.config-graph').remove();
+        updateRemoveAllButton();
+        RefreshCharts();
     });
 }
