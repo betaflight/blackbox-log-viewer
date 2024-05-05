@@ -27,6 +27,11 @@ export function GraphConfig(graphConfig) {
         return graphs;
     };
 
+    let redrawChart = true;
+    this.setRedrawChart = function(isRedraw) {
+        redrawChart = isRedraw;
+    }
+
     /**
      * newGraphs is an array of objects like {label: "graph label", height:, fields:[{name: curve:{power:, MinMax:, steps:}, color:, }, ...]}
      */
@@ -34,8 +39,9 @@ export function GraphConfig(graphConfig) {
         graphs = newGraphs;
 
         hiddenGraphFields.clear();
-
-        notifyListeners();
+        if (redrawChart) {
+            notifyListeners();
+        }
     };
 
     /**

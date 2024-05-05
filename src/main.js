@@ -1002,10 +1002,10 @@ function BlackboxLogViewer() {
         GpxExporter(flightLog).dump(onSuccess);
     }
 
-    function newGraphConfig(newConfig) {
+    function newGraphConfig(newConfig, noRedraw) {
         lastGraphConfig = graphConfig; // Remember the last configuration.
         graphConfig = newConfig;
-
+        activeGraphConfig.setRedrawChart(noRedraw ? false : true);
         activeGraphConfig.adaptGraphs(flightLog, graphConfig, false);
 
         prefs.set('graphConfig', graphConfig);
@@ -1387,8 +1387,8 @@ function BlackboxLogViewer() {
         var
             graphConfigDialog = new GraphConfigurationDialog(
                 $("#dlgGraphConfiguration"),
-                function(newConfig) {
-                    newGraphConfig(newConfig);
+                function(newConfig, redrawChart) {
+                    newGraphConfig(newConfig, redrawChart);
                 }
             ),
 

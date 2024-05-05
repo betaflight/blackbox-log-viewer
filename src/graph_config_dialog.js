@@ -474,8 +474,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
             return;
         }
 
-        if (cfgMustBeRestored)
-            onSave(prevCfg);
+        if (cfgMustBeRestored) {
+            const noRedraw = false;
+            onSave(prevCfg, noRedraw);
+        }
     });
 
     $(".graph-configuration-dialog-save").click(function() {
@@ -483,20 +485,23 @@ export function GraphConfigurationDialog(dialog, onSave) {
             closeMinMaxContextMenu();
 
         cfgMustBeRestored = false;
-        onSave(convertUIToGraphConfig());
+        const noRedraw = true;
+        onSave(convertUIToGraphConfig(), noRedraw);
     });
 
     $(".graph-configuration-dialog-cancel").click(function() {
         if (isMinMaxContextMenuActive())
             closeMinMaxContextMenu();
 
+        const noRedraw = !cfgMustBeRestored;
+        onSave(prevCfg, noRedraw);
         cfgMustBeRestored = false;
-        onSave(prevCfg);
     });
 
     function RefreshCharts() {
         cfgMustBeRestored = true;
-        onSave(convertUIToGraphConfig());
+        const noRedraw = false;
+        onSave(convertUIToGraphConfig(), noRedraw);
     }
 
     var
