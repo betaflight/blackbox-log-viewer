@@ -263,7 +263,7 @@ export function FlightLog(logData) {
         if (!that.isFieldDisabled().SETPOINT) {
             fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]"); // Custom calculated scaled rccommand
         }
-        if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
+        if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().SETPOINT) {
             fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
         }
 
@@ -656,7 +656,7 @@ export function FlightLog(logData) {
                     }
 
                     // Add the Feedforward PID sum (P+I+D+F)
-                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
+                    if (!that.isFieldDisabled().PID) {
                         for (var axis = 0; axis < 3; axis++) {
                             let pidSum =
                                 (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
@@ -705,7 +705,7 @@ export function FlightLog(logData) {
                     }
 
                     // Calculate the PID Error
-                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().PID) {
+                    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().SETPOINT) {
                         for (var axis = 0; axis < 3; axis++) {
                             let gyroADCdegrees = (gyroADC[axis] !== undefined ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]) : 0);
                             destFrame[fieldIndex++] = destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
