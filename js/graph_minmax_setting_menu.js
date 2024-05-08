@@ -579,7 +579,7 @@ function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_field_name,
 
     function SetZoomToCurves (e) {
         const target = $(e.target);
-        const SingleCurve = (target.data == 'SingleCurve');
+        const SingleCurve = (e.data == 'SingleCurve');
         if(e.shiftKey == false || SingleCurve) {
             const ZoomIn = target.hasClass('ZoomIn');
             const ZoomOut = target.hasClass('ZoomOut');
