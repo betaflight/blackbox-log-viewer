@@ -740,24 +740,24 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
 
     function FillThisCurveActionsIntoMenu (menu, is_main_menu) {
-        let elem = $('<div> Default</div>');
-        elem.click(SetSelectedCurveMinMaxToDefault);
-        menu.append(elem);
-
-        elem = $('<div class="ZoomIn">Zoom In</div>');
-        elem.click('SingleCurve', SetZoomToCurves);
-        menu.append(elem);
-
-        elem = $('<div class="ZoomOut">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
-        elem.click('SingleCurve', SetZoomToCurves);
-        menu.append(elem);
-
         elem = $(`<div class="iconDiv">Full range<span class=${is_main_menu ? "right-arrow" : "right-arrow2"} style="display: none">&#9658;</span></div>`);
         elem.click('SingleCurve', SetCurvesToFullRange);
         menu.append(elem);
 
         elem = $('<div>Centered</div>');
         elem.click(SetSelectedCurveToZeroOffset);
+        menu.append(elem);
+        
+        elem = $('<div class="ZoomIn topBorder">Zoom In</div>');
+        elem.click('SingleCurve', SetZoomToCurves);
+        menu.append(elem);
+
+        elem = $('<div class="ZoomOut bottomBorder">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>');
+        elem.click('SingleCurve', SetZoomToCurves);
+        menu.append(elem);
+        
+        elem = $('<div> Default</div>');
+        elem.click(SetSelectedCurveMinMaxToDefault);
         menu.append(elem);
     }
 
@@ -794,18 +794,6 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
         main_menu.append(elem);
 
-        elem = $('<div class="ZoomIn AllCurves iconDiv">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>');
-        elem.click(SetZoomToCurves);
-        main_menu.append(elem);
-
-        elem = $('<div class="ZoomOut AllCurves iconDiv">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>');
-        elem.click(SetZoomToCurves);
-        main_menu.append(elem);
-
-        elem = $('<div class="iconDiv">Default<span class="right-arrow" style="display: none">&#9658;</span></div>');
-        elem.click(ShowCurvesToSetDefaultCheckboxedMenu);
-        main_menu.append(elem);
-
         elem = $('<div class="iconDiv AllCurves">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(SetCurvesToFullRange);
         main_menu.append(elem);
@@ -816,6 +804,18 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
 
         elem = $('<div class="iconDiv bottomBorder">Centered<span class="right-arrow" style="display: none">&#9658;</span></div>');
         elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
+        main_menu.append(elem);
+        
+        elem = $('<div class="ZoomIn AllCurves iconDiv">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem.click(SetZoomToCurves);
+        main_menu.append(elem);
+
+        elem = $('<div class="ZoomOut AllCurves iconDiv bottomBorder">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem.click(SetZoomToCurves);
+        main_menu.append(elem);
+
+        elem = $('<div class="iconDiv bottomBorder">Default<span class="right-arrow" style="display: none">&#9658;</span></div>');
+        elem.click(ShowCurvesToSetDefaultCheckboxedMenu);
         main_menu.append(elem);
 
         const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
