@@ -1,19 +1,24 @@
 import { GraphConfig } from "./graph_config";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+import { showMinMaxSetupContextMenu } from "./graph_minmax_setting_menu";
+import { closeMinMaxContextMenu } from "./graph_minmax_setting_menu";
+import { isMinMaxContextMenuActive } from "./graph_minmax_setting_menu";
 
 export function GraphConfigurationDialog(dialog, onSave) {
-    var
+    let
         // Some fields it doesn't make sense to graph
         BLACKLISTED_FIELDS = {time:true, loopIteration:true, 'setpoint[0]':true, 'setpoint[1]':true, 'setpoint[2]':true, 'setpoint[3]':true},
         offeredFieldNames = [],
         exampleGraphs = [],
-        activeFlightLog;
-
+        activeFlightLog,
+        logGrapher = null,
+        prevCfg = null,
+        cfgMustBeRestored = false;
 
     function chooseColor(currentSelection) {
-        var selectColor = $('<select class="color-picker"></select>');
-            for(var i=0; i<GraphConfig.PALETTE.length; i++) {
-                var option = $('<option></option>')
+        const selectColor = $('<select class="color-picker"></select>');
+            for(let i=0; i<GraphConfig.PALETTE.length; i++) {
+                let option = $('<option></option>')
                     .text(GraphConfig.PALETTE[i].name)
                     .attr('value', GraphConfig.PALETTE[i].color)
                     .css('color', GraphConfig.PALETTE[i].color);
@@ -29,11 +34,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
     }
 
     function chooseHeight(currentSelection) {
-        var MAX_HEIGHT = 5;
+        const MAX_HEIGHT = 5;
 
-        var selectHeight = $('<select class="form-control graph-height"></select>');
-            for(var i=1; i<=MAX_HEIGHT; i++) {
-                var option = $('<option></option>')
+        const selectHeight = $('<select class="form-control graph-height"></select>');
+            for(let i=1; i<=MAX_HEIGHT; i++) {
+                const option = $('<option></option>')
                     .text(i)
                     .attr('value', i);
                 if(currentSelection == i || (currentSelection==null && i==1)) {
@@ -85,13 +90,21 @@ export function GraphConfigurationDialog(dialog, onSave) {
         if(elem) {
             // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
             $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
-            if(field.curve!=null) {
+            if (field.curve != null) {
                 $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
-                $('input[name=scale]',elem).val((field.curve.outputRange!=null)?(field.curve.outputRange*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100)+'%');
+                if (field.curve.MinMax != null) {
+                    $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
+                }
+                else{
+                    $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
+                    $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
+                }
             } else
             {
                 $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
-                $('input[name=scale]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).outputRange*100).toFixed(0)+'%');
+                $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
+                $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
             }
         }
     }
@@ -107,10 +120,10 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><select class="form-control"><option value="">(choose a field)</option></select></td>'
                     + '<td><input name="smoothing" class="form-control" type="text"/></td>'
                     + '<td><input name="power" class="form-control" type="text"/></td>'
-                    + '<td><input name="scale" class="form-control" type="text"/></td>'
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
-                    + '<td><input name="grid" type="checkbox"/></td>'
+                    + '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>'
+                    + '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -128,9 +141,6 @@ export function GraphConfigurationDialog(dialog, onSave) {
         // Set the line width values
         $('input[name=linewidth]',elem).val((field.lineWidth)?field.lineWidth:1);
 
-        // Set the grid state
-        $('input[name=grid]',elem).attr("checked", (field.grid)?field.grid:false);
-
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
 
@@ -141,14 +151,44 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 name: $('select.form-control option:selected', elem).val()
                     };
             renderSmoothingOptions(elem, activeFlightLog, selectedField);
+            RefreshCharts();
         });
 
         // Add event when color picker is changed to change the dropdown coloe
         $('select.color-picker', elem).change( function() {
             $(this).css('background', $('select.color-picker option:selected', elem).val())
                    .css('color', $('select.color-picker option:selected', elem).val());
+            RefreshCharts();
         });
 
+        // Add event when mouse double click at the Minimum/Maxcimum input field to restore default MinMax values.
+        $('.minmax-control',elem).dblclick( function(e) {
+            const name = $('select.form-control option:selected', elem).val();
+            const MinMax = GraphConfig.getDefaultCurveForField(flightLog, name).MinMax;
+            const value = e.target.name == "MinValue" ? MinMax.min : MinMax.max;
+            $(this).val(value.toFixed(1));
+            RefreshCharts();
+        });
+
+        $('.minmax-control',elem).change(function(e) {
+            RefreshCharts();
+        });
+        $('input[name=smoothing]',elem).change(function(e) {
+            RefreshCharts();
+        });
+        $('input[name=power]',elem).change(function(e) {
+            RefreshCharts();
+        });
+        $('input[name=linewidth]',elem).change(function(e) {
+            RefreshCharts();
+        });
+
+        $('.minmax-control', elem).contextmenu( function(e) {
+            const name = $('select.form-control option:selected', elem).val();
+            e.preventDefault();
+            showMinMaxSetupContextMenu(e.clientX, e.clientY, name, elem, $(".config-graph-field", $(this).parents('.config-graph')), flightLog, logGrapher, RefreshCharts);
+            return false;
+        });
 
         return elem;
     }
@@ -175,19 +215,26 @@ export function GraphConfigurationDialog(dialog, onSave) {
                                         + '</ul>'
                                     + '</div>'
                                 + '</div>'
+                                + '<div class="flexDiv">'
+                                    + '<label class="control-label">Fields:</label>'
+                                    + '<div class="selectWrapper">'
+                                        + '<div class="dropdown-content main_menu"></div>'
+                                        + '<div class="dropdown-content sub_menu"></div>'
+                                        + '<div class="dropdown-content sub_menu2"></div>'
+                                    + '</div>'
+                                +'</div>'
                                 + '<div class="form-group config-graph-field-header">'
-                                    + '<label class="col-sm-2 control-label">Fields</label>'
-                                    + '<div class="col-sm-10">'
+                                    + '<div class="col-sm-12">'
                                         + '<table class="config-graph-field-list">'
                                             + '<thead>'
                                                 + '<tr name="field-header">'
                                                     + '<th name="field">Name</th>'
                                                     + '<th name="smoothing">Smooth</th>'
                                                     + '<th name="expo">Expo</th>'
-                                                    + '<th name="zoom">Zoom</th>'
                                                     + '<th name="line">Line</th>'
                                                     + '<th name="color">Color</th>'
-                                                    + '<th name="grid">Grid</th>'
+                                                    + '<th name="MinValue">Minimum</th>'
+                                                    + '<th name="MaxValue">Maximum</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
@@ -218,6 +265,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             var parentGraph = $(this).parents('.config-graph');
             parentGraph.remove();
             updateRemoveAllButton();
+            RefreshCharts();
             e.preventDefault();
         });
 
@@ -244,7 +292,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 parentGraph.remove();
             }
             updateRemoveAllButton();
-
+            RefreshCharts();
             e.preventDefault();
         });
 
@@ -311,21 +359,29 @@ export function GraphConfigurationDialog(dialog, onSave) {
             graph.height = parseInt($('select.graph-height option:selected', this).val());
 
             $(".config-graph-field", this).each(function() {
+                const fieldName = $("select", this).val();
+                const minimum = $("input[name=MinValue]", this).val();
+                const maximum = $("input[name=MaxValue]", this).val();
                 field = {
-                    name: $("select", this).val(),
+                    name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
                     curve: {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
-                        outputRange: parseInt($("input[name=scale]", this).val())/100.0     // Value 0-100%    = 0-1.0 (higher values > 100% zoom in graph vertically)
+                        MinMax: {
+                            min: parseFloat(minimum),
+                            max: parseFloat(maximum)
+                        }
                     },
                     default: { // These are used to restore configuration if using mousewheel adjustments
                         smoothing: parseInt($("input[name=smoothing]", this).val())*100,
                         power: parseInt($("input[name=power]", this).val())/100.0,
-                        outputRange: parseInt($("input[name=scale]", this).val())/100.0
+                        MinMax: {
+                            min: parseFloat(minimum),
+                            max: parseFloat(maximum)
+                        }
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
-                    grid: $('input[name=grid]', this).is(':checked'),
                 };
 
                 if (field.name.length > 0) {
@@ -393,21 +449,60 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }
     }
 
-    this.show = function(flightLog, config) {
+    this.show = function(flightLog, config, grapher) {
         dialog.modal('show');
-
         activeFlightLog = flightLog;
+        logGrapher = grapher;
 
         buildOfferedFieldNamesList(flightLog, config);
 
         populateExampleGraphs(flightLog, exampleGraphsMenu);
         renderGraphs(flightLog, config);
+        prevCfg = convertUIToGraphConfig();
+        cfgMustBeRestored = false;
     };
 
-    $(".graph-configuration-dialog-save").click(function() {
-        onSave(convertUIToGraphConfig());
+    // Set focus to 'Cancel' button to do possible a closing dialog box by Esc or Enter keys
+    $("#dlgGraphConfiguration").on('shown.bs.modal', function(e) {
+        $(".graph-configuration-dialog-cancel").focus();
     });
 
+    $("#dlgGraphConfiguration").on('hide.bs.modal', function(e) {
+        // Lock close window if MinMax menu is openned
+        if (isMinMaxContextMenuActive()) {
+            e.preventDefault();
+            return;
+        }
+
+        if (cfgMustBeRestored) {
+            const noRedraw = false;
+            onSave(prevCfg, noRedraw);
+        }
+    });
+
+    $(".graph-configuration-dialog-save").click(function() {
+        if (isMinMaxContextMenuActive())
+            closeMinMaxContextMenu();
+
+        cfgMustBeRestored = false;
+        const noRedraw = true;
+        onSave(convertUIToGraphConfig(), noRedraw);
+    });
+
+    $(".graph-configuration-dialog-cancel").click(function() {
+        if (isMinMaxContextMenuActive())
+            closeMinMaxContextMenu();
+
+        const noRedraw = !cfgMustBeRestored;
+        onSave(prevCfg, noRedraw);
+        cfgMustBeRestored = false;
+    });
+
+    function RefreshCharts() {
+        cfgMustBeRestored = true;
+        const noRedraw = false;
+        onSave(convertUIToGraphConfig(), noRedraw);
+    }
 
     var
         exampleGraphsButton = $(".config-graphs-add"),
@@ -434,14 +529,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         // Dismiss the dropdown button
         exampleGraphsButton.dropdown("toggle");
-
+        if (graph.label != "Custom graph") {
+            RefreshCharts();
+        }
         e.preventDefault();
     });
 
     // Remove all Graphs button
     var removeAllGraphsButton = $(".config-graphs-remove-all-graphs");
     removeAllGraphsButton.on("click", function() {
-            $('.config-graph').remove();
-            updateRemoveAllButton();
+        $('.config-graph').remove();
+        updateRemoveAllButton();
+        RefreshCharts();
     });
 }

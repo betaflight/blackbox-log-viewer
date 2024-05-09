@@ -5,24 +5,24 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
         that = this;
 
     function buildLegend() {
-        var 
+        var
             graphs = config.getGraphs(),
             i, j;
 
         targetElem.empty();
 
         for (i = 0; i < graphs.length; i++) {
-            var 
+            var
                 graph = graphs[i],
                 graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 class="graph-legend-group field-quick-adjust" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
-            
+
             graphTitle.text(graph.label);
             graphTitle.prepend('<span class="glyphicon glyphicon-minus"></span>');
-            
-            for (j = 0; j < graph.fields.length; j++) { 
-                var 
+
+            for (j = 0; j < graph.fields.length; j++) {
+                var
                     field = graph.fields[j],
                     li = $('<li class="graph-legend-field field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>'),
                     nameElem = $('<span class="graph-legend-field-name field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
@@ -40,7 +40,7 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
                 settingsElem.css('background', field.color);
                 fieldList.append(li);
             }
-            
+
             targetElem.append(graphDiv);
         }
 
@@ -72,23 +72,20 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
                selectedGraphIndex    = $(this).attr('graph'),
                selectedFieldIndex    = $(this).attr('field');
 
-           if(!e.altKey) {
-               config.selectedFieldName     = config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex].friendlyName;
-               config.selectedGraphIndex    = selectedGraphIndex;
-               config.selectedFieldIndex    = selectedFieldIndex;
-               if (onNewSelectionChange) {
-                   onNewSelectionChange();
-               }
-           } else { // toggle the grid setting
-               var graphs = config.getGraphs();
-               for(var i=0; i<graphs[selectedGraphIndex].fields.length; i++) {
-                  graphs[selectedGraphIndex].fields[i].grid = ((i==selectedFieldIndex)?(!graphs[selectedGraphIndex].fields[i].grid):false);
-               };
-               if (onNewGraphConfig) {
-                   onNewGraphConfig(graphs);
-               }
-           };
-           e.preventDefault();
+            if (!e.altKey) {
+                const selectedFieldName = config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex].friendlyName;
+                if (config.selectedFieldName != selectedFieldName) {
+                    config.selectedFieldName     = selectedFieldName;
+                    config.selectedGraphIndex    = selectedGraphIndex;
+                    config.selectedFieldIndex    = selectedFieldIndex;
+                   if (onNewSelectionChange) {
+                       onNewSelectionChange();
+                    }
+                } else {
+                   onNewSelectionChange(true);
+                }
+            }
+            e.preventDefault();
         });
 
         // Add a trigger on legend list title; select the graph to expland
@@ -98,11 +95,11 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
 
                var selectedGraph = $(this).attr('graph');
                if(!e.altKey) {
-                   if (onZoomGraph) {                   
+                   if (onZoomGraph) {
                        onZoomGraph(selectedGraph);
                    }
                } else {
-                   if (onExpandGraph) {                   
+                   if (onExpandGraph) {
                        onExpandGraph(selectedGraph);
                    }
                }
@@ -110,9 +107,9 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
         });
 
         // Make the legend dragabble
-        $('.log-graph-legend').sortable( 
+        $('.log-graph-legend').sortable(
             {
-                update: function( event, ui ) { 
+                update: function( event, ui ) {
                             var newOrder = $('.log-graph-legend').sortable('toArray');
                             var newGraphs = [];
                             var oldGraphs = config.getGraphs();
@@ -124,12 +121,12 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
                 cursor: "move",
             }
         );
-        $('.log-graph-legend').disableSelection();        
+        $('.log-graph-legend').disableSelection();
 
         $('.log-close-legend-dialog').on('click', function() {
             that.hide();
         });
-        
+
         $('.log-open-legend-dialog').on('click', function() {
             that.show();
         });
@@ -176,8 +173,8 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
                 if (userSettings.legendUnits) { // if we want the legend to show engineering units
                     value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
                 } else { // raw value
-                    if (value % 1 != 0) { 
-                        value = value.toFixed(2); 
+                    if (value % 1 != 0) {
+                        value = value.toFixed(2);
                     }
                 }
 
@@ -192,8 +189,8 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
                 var i = $(this).attr('graph');
                 var j = $(this).attr('field');
                 var field = graphs[ i ].fields[ j ];
-                var str = 
-                    "Z"  + (field.curve.outputRange * 100).toFixed(0) +
+                var str =
+                    "Z100" +                                        // There are no direct zoom now, set 100%
                     " E" + (field.curve.power * 100).toFixed(0) +
                     " S" + (field.smoothing / 100).toFixed(0);
                 $(this).text(str);
@@ -203,26 +200,26 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
             console.log('Cannot update legend with values');
         }
     };
-    
+
     this.show = function() {
         $('.log-graph-config').show();
         $('.log-open-legend-dialog').hide();
-        
+
         if (onVisibilityChange) {
             onVisibilityChange(false);
         }
     };
-    
+
     this.hide = function() {
         $('.log-graph-config').hide();
         $('.log-open-legend-dialog').show();
-        
+
         if (onVisibilityChange) {
             onVisibilityChange(true);
         }
     };
-    
+
     config.addListener(buildLegend);
-    
+
     buildLegend();
 }
