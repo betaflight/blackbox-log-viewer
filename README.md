@@ -19,15 +19,19 @@ Current blackbox explorer version is built as
 Meaning it can work in both online and offline modes as regular desktop app
 would.
 
-### Web
+### Latest stable version
 
-1. Visit https://blackbox.betaflight.com/
-2. Use the app
+For the latest stable released version visit https://blackbox.betaflight.com/
 
-### Standalone
+### Unstable testing versions
 
-1. Visit https://blackbox.betaflight.com/
-2. Follow the procedure to install PWA on your platform. On MacOS chrome:
+The latest master build is always available at https://master.dev.blackbox.betaflight.com/
+
+**Be aware that these versions are intended for testing / feedback only, and may be buggy or broken. Caution is advised when using these versions.**
+
+### Install the app to be used in offline mode
+
+Follow the procedure to install PWA on your platform. For example on MacOS chrome:
 ![Url bar PWA install](screenshots/url-bar.webp)
 ![PWA install dialog](screenshots/pwa-install-dialog.webp)
 
@@ -64,7 +68,7 @@ performance.
 ### Node setup
 
 We are using [nvm](https://github.com/nvm-sh/nvm) to manage the correct node
-vesion, follow the install instruction there. After which from blackbox directory
+vesion, follow the install instructions there. After which from blackbox directory
 just run:
 
 ```bash
@@ -74,7 +78,7 @@ nvm use
 ### Yarn
 
 For dependency management we are using [yarn](https://yarnpkg.com/), follow the
-instruction there to install it.
+instructions there to install it.
 
 ### Development mode
 
@@ -87,24 +91,26 @@ With `node` and `yarn` setup, to start developing run:
 yarn start
 ```
 
-This will start development server on http://localhost:5173/.
+This will start development server and the Blackbox will be available on http://localhost:5173/.
 
-## Installing Dev Build locally
+### Installing development build locally
 
 If you want to have latest and greatest version installed on your machine from
 the tip of the repository:
-1. First need to build the application:
+
+First need to build the application:
 ```bash
 yarn build
 ```
-2. Start the application in `preview` mode
+Then start the application in `preview` mode
 ```bash
 yarn preview
 ```
-3. Visit http://localhost:4173/
-4. Follow the steps from [Standalone](#standalone)
+Visit http://localhost:4173/ and follow the steps from [Install the app to be used in offline mode](#install-the-app-to-be-used-in-offline-mode)
 
-## Flight video won't load, or jumpy flight video upon export
+## Common problems
+
+### Flight video won't load, or jumpy flight video upon export
 
 Some flight video formats aren't supported by Chrome, so the viewer can't open
 them. You can fix this by re-encoding your video using the free tool
