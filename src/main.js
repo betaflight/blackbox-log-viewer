@@ -1952,7 +1952,7 @@ function BlackboxLogViewer() {
                         e.preventDefault();
                     break;
                     case "W".charCodeAt(0):
-                        if(e.shiftKey) {
+                        if (e.shiftKey) {
                             workspaceMenu.show();
                         }
                     break;
