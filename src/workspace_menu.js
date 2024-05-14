@@ -40,7 +40,7 @@ export function WorkspaceMenu(menuElem, onSwitchWorkspace) {
     }
 
     $(document).keydown( function (e) {
-        if (e.which == 27 && workspace_menu.length>0) {
+        if (e.which === 27 && workspace_menu.length > 0) {
             e.preventDefault();
             hideMenu();
         }
