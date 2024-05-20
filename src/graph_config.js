@@ -44,13 +44,68 @@ export function GraphConfig(graphConfig) {
         }
     };
 
+    this.extendFields = function(flightLog, field) {
+        const matches = field.name.match(/^(.+)\[all\]$/);
+        const logFieldNames = flightLog.getMainFieldNames();
+        const fields = [];
+        if (matches) {
+            const
+                nameRoot = matches[1],
+                nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
+            let     colorIndexOffset = 0;
+
+            for (var k = 0; k < logFieldNames.length; k++) {
+                        if (logFieldNames[k].match(nameRegex)) {
+                            // forceNewCurve must be true for min max computing extended curves.
+                            const forceNewCurve = true;
+                            fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
+                            colorIndexOffset++;
+                        }
+            }
+        } else {
+            // Don't add fields if they don't exist in this log
+            if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
+                fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(field.name, flightLog.getSysConfig().debug_mode)})));
+            }
+        }
+        return fields;
+    }
+
+    var adaptField = function(flightLog, field, colorIndexOffset, forceNewCurve) {
+        const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
+
+        if (field.curve === undefined || forceNewCurve) {
+            field.curve = defaultCurve;
+        } else {
+            if (field.curve.MinMax == undefined)
+                            field.curve.MinMax = defaultCurve.MinMax;
+        }
+
+        if(colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
+            let index;
+            for(index=0; index < GraphConfig.PALETTE.length; index++) {
+                if(GraphConfig.PALETTE[index].color == field.color) break;
+            }
+            field.color = GraphConfig.PALETTE[(index + colorIndexOffset) % GraphConfig.PALETTE.length].color
+        }
+
+        if (field.color === undefined) {
+            field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
+            colorIndex++;
+        }
+
+        if (field.smoothing === undefined) {
+            field.smoothing = GraphConfig.getDefaultSmoothingForField(flightLog, field.name);
+        }
+
+        return field;
+    };
+
     /**
      * Convert the given graph configs to make them appropriate for the given flight log.
      */
-    this.adaptGraphs = function(flightLog, graphs, isNewLog) {
+    this.adaptGraphs = function(flightLog, graphs) {
         var
-            logFieldNames = flightLog.getMainFieldNames(),
-
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
 
@@ -71,63 +126,10 @@ export function GraphConfig(graphConfig) {
                 ),
                 colorIndex = 0;
 
-            for (var j = 0; j < graph.fields.length; j++) {
-                var
-                    field = graph.fields[j],
-                    matches;
-
-                var adaptField = function(field, colorIndexOffset, forceNewCurve) {
-                    const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
-
-                    if (field.curve === undefined || forceNewCurve) {
-                        field.curve = defaultCurve;
-                    }
-                    else {
-                        if (field.curve.MinMax == undefined)
-                            field.curve.MinMax = defaultCurve.MinMax;
-                    }
-
-                    if(colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
-                        var index;
-                        for(index=0; index < GraphConfig.PALETTE.length; index++)
-                            {
-                                if(GraphConfig.PALETTE[index].color == field.color) break;
-                            }
-                        field.color = GraphConfig.PALETTE[(index + colorIndexOffset) % GraphConfig.PALETTE.length].color
-                    }
-
-                    if (field.color === undefined) {
-                        field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
-                        colorIndex++;
-                    }
-
-                    if (field.smoothing === undefined) {
-                        field.smoothing = GraphConfig.getDefaultSmoothingForField(flightLog, field.name);
-                    }
-
-                    return field;
-                };
-
-                if ((matches = field.name.match(/^(.+)\[all\]$/))) {
-                    var
-                        nameRoot = matches[1],
-                        nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$"),
-                        colorIndexOffset = 0;
-
-                    for (var k = 0; k < logFieldNames.length; k++) {
-                        if (logFieldNames[k].match(nameRegex)) {
-                            // forceNewCurve must be true for min max computing extended curves.
-                            let forceNewCurve = true;
-                            newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
-                            colorIndexOffset++;
-                        }
-                    }
-                } else {
-                    // Don't add fields if they don't exist in this log
-                    if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
-                        newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(field.name, flightLog.getSysConfig().debug_mode)})));
-                    }
-                }
+            for (let j = 0; j < graph.fields.length; j++) {
+                const field = graph.fields[j];
+                const fields = this.extendFields(flightLog, field);
+                newGraph.fields = newGraph.fields.concat(fields);
             }
 
             newGraphs.push(newGraph);

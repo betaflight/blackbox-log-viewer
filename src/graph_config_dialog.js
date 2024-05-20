@@ -149,8 +149,27 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.form-control', elem).change( function() {
             var selectedField = {
                 name: $('select.form-control option:selected', elem).val()
-                    };
+                    }, matches;
+			var
+            logFieldNames = flightLog.getMainFieldNames();
+			if ((matches = selectedField.name.match(/^(.+)\[all\]$/))) {
+                    var
+                        nameRoot = matches[1],
+                        nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$"),
+                        colorIndexOffset = 0;
+
+                    for (var k = 0; k < logFieldNames.length; k++) {
+                        if (logFieldNames[k].match(nameRegex)) {
+                            // forceNewCurve must be true for min max computing extended curves.
+                            let forceNewCurve = true;
+                            newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
+                            colorIndexOffset++;
+                        }
+                    }
+                }
             renderSmoothingOptions(elem, activeFlightLog, selectedField);
+			let row = renderField(flightLog, selectedField, color) ;
+			elem.after(row);
             RefreshCharts();
         });
 
