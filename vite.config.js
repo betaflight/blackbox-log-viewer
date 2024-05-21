@@ -40,4 +40,7 @@ export default {
             },
         }),
     ],
+    define: {
+        '__APP_VERSION__': JSON.stringify(pkg.version),
+    },
 }
