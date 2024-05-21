@@ -1446,7 +1446,7 @@ function BlackboxLogViewer() {
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();
 
-            graphConfigDialog.show(flightLog, activeGraphConfig.getGraphs(), graph);
+            graphConfigDialog.show(flightLog, activeGraphConfig, graph);
         });
 
         $(".open-header-dialog").click(function(e) {
