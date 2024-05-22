@@ -38,7 +38,7 @@ import defaultWorkspaceGraphConfigs from './workspaces-ctzsnooze.json';
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
 
-var VIEWER_VERSION = getManifestVersion(); // Current version
+const VIEWER_VERSION = getManifestVersion(); // Current version
 
 // these values set the initial dimensions of a secondary window
 // which always opens at the centre of the user's screen
