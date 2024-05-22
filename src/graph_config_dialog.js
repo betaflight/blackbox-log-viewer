@@ -466,7 +466,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         activeFlightLog = flightLog;
         logGrapher = grapher;
         activeGraphConfig = graphConfig;
-        const config  = activeGraphConfig.getGraphs()
+        const config  = activeGraphConfig.getGraphs();
 
         buildOfferedFieldNamesList(flightLog, config);
 
