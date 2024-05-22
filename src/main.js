@@ -38,8 +38,6 @@ import defaultWorkspaceGraphConfigs from './workspaces-ctzsnooze.json';
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
 
-const VIEWER_VERSION = getManifestVersion(); // Current version
-
 // these values set the initial dimensions of a secondary window
 // which always opens at the centre of the user's screen
 const NEW_WINDOW_WIDTH  = 1000;
@@ -1045,8 +1043,8 @@ function BlackboxLogViewer() {
         });
 
         // Get Latest Version Information
-        $("#viewer-version").text('You are using version ' + VIEWER_VERSION);
-        $(".viewer-version", statusBar).text('v'+VIEWER_VERSION);
+        $("#viewer-version").text('You are using version ' + __APP_VERSION__);
+        $(".viewer-version", statusBar).text('v'+__APP_VERSION__);
         try {
             $.getJSON('https://api.github.com/repos/betaflight/blackbox-log-viewer/releases/latest',{},function(data){
                 latestVersion = data;
