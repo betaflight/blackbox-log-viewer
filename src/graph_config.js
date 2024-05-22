@@ -122,9 +122,8 @@ export function GraphConfig(graphConfig) {
                     // New fields to replace the old ones:
                     {
                         fields:[],
-                    },
-                ),
-                colorIndex = 0;
+                    }
+                );
 
             for (let j = 0; j < graph.fields.length; j++) {
                 const field = graph.fields[j];
