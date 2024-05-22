@@ -3,13 +3,13 @@ import { DSHOT_MIN_VALUE, DSHOT_RANGE, RATES_TYPE, DEBUG_MODE } from "./flightlo
 import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
-    var
+    let
         graphs = graphConfig ? graphConfig : [],
         listeners = [],
         that = this;
 
     function notifyListeners() {
-        for (var i = 0; i < listeners.length; i++) {
+        for (let i = 0; i < listeners.length; i++) {
             listeners[i](that);
         }
     }
@@ -54,7 +54,7 @@ export function GraphConfig(graphConfig) {
                 nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
             let     colorIndexOffset = 0;
 
-            for (var k = 0; k < logFieldNames.length; k++) {
+            for (let k = 0; k < logFieldNames.length; k++) {
                 if (logFieldNames[k].match(nameRegex)) {
                     // forceNewCurve must be true for min max computing extended curves.
                     const forceNewCurve = true;
@@ -71,7 +71,7 @@ export function GraphConfig(graphConfig) {
         return fields;
     }
 
-    var adaptField = function(flightLog, field, colorIndexOffset, forceNewCurve) {
+    let adaptField = function(flightLog, field, colorIndexOffset, forceNewCurve) {
         const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
         let colorIndex = 0;
         if (field.curve === undefined || forceNewCurve) {
@@ -105,12 +105,12 @@ export function GraphConfig(graphConfig) {
      * Convert the given graph configs to make them appropriate for the given flight log.
      */
     this.adaptGraphs = function(flightLog, graphs) {
-        var
+        let
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
 
-        for (var i = 0; i < graphs.length; i++) {
-            var
+        for (let i = 0; i < graphs.length; i++) {
+            let
                 graph = graphs[i],
                 newGraph = $.extend(
                     // Default values for missing properties:
@@ -175,11 +175,11 @@ GraphConfig.PALETTE = [
 GraphConfig.load = function(config) {
     // Upgrade legacy configs to suit the newer standard by translating field names
     if (config) {
-        for (var i = 0; i < config.length; i++) {
-            var graph = config[i];
+        for (let i = 0; i < config.length; i++) {
+            let graph = config[i];
 
-            for (var j = 0; j < graph.fields.length; j++) {
-                var
+            for (let j = 0; j < graph.fields.length; j++) {
+                let
                     field = graph.fields[j],
                     matches;
 
@@ -216,10 +216,10 @@ GraphConfig.load = function(config) {
     };
 
     GraphConfig.getDefaultCurveForField = function(flightLog, fieldName) {
-        var
+        let
             sysConfig = flightLog.getSysConfig();
 
-        var maxDegreesSecond = function(scale) {
+        let maxDegreesSecond = function(scale) {
             switch(sysConfig["rates_type"]){
                 case RATES_TYPE.indexOf('ACTUAL'):
                 case RATES_TYPE.indexOf('QUICK'):
@@ -233,7 +233,7 @@ GraphConfig.load = function(config) {
             }
         }
 
-        var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
+        let getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             let
                 min = Number.MAX_VALUE,
@@ -252,7 +252,7 @@ GraphConfig.load = function(config) {
             return {min:-500, max:500};
         }
 
-        var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
+        let getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
             const mmChartUnits =
@@ -266,7 +266,7 @@ GraphConfig.load = function(config) {
             };
         }
 
-        var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
+        let getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
             let mmChartUnits =
@@ -419,7 +419,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
-                var debugModeName = DEBUG_MODE[sysConfig.debug_mode];
+                let debugModeName = DEBUG_MODE[sysConfig.debug_mode];
                 switch (debugModeName) {
                     case 'CYCLETIME':
                         switch (fieldName) {
@@ -560,7 +560,7 @@ GraphConfig.load = function(config) {
                                         max: 50
                                     }
                                 };
-                            case 'debug[3]': // Vario
+                            case 'debug[3]': // letio
                                 return {
                                     power: 1.0,
                                     MinMax: {
@@ -1347,7 +1347,7 @@ GraphConfig.load = function(config) {
      * Supply an array of strings `graphNames` to only fetch the graph with the given names.
      */
     GraphConfig.getExampleGraphConfigs = function(flightLog, graphNames) {
-        var
+        let
             result = [],
             i, j;
 
@@ -1399,7 +1399,7 @@ GraphConfig.load = function(config) {
         }
 
         for (i = 0; i < EXAMPLE_GRAPHS.length; i++) {
-            var
+            let
                 srcGraph = EXAMPLE_GRAPHS[i],
                 destGraph = {
                     label: srcGraph.label,
@@ -1423,7 +1423,7 @@ GraphConfig.load = function(config) {
             }
 
             for (j = 0; j < srcGraph.fields.length; j++) {
-                var
+                let
                     srcFieldName = srcGraph.fields[j],
                     destField = {
                         name: srcFieldName
