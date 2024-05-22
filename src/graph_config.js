@@ -69,7 +69,7 @@ export function GraphConfig(graphConfig) {
             }
         }
         return fields;
-    }
+    };
 
     let adaptField = function(flightLog, field, colorIndexOffset, forceNewCurve) {
         const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
