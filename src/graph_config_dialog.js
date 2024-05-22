@@ -286,16 +286,24 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));
 
         // Add Field List
-        for (var i = 0; i < graph.fields.length; i++) {
-            var
-                field = graph.fields[i],
+        for (let i = 0; i < graph.fields.length; i++) {
+            let fieldElem;
+            const field = graph.fields[i];
+            const fields = activeGraphConfig.extendFields(activeFlightLog, field);
+            if (fields.length === 1) {
                 fieldElem = renderField(flightLog, field, field.color?(field.color):(GraphConfig.PALETTE[i].color));
-
-            fieldList.append(fieldElem);
+                fieldList.append(fieldElem);
+            } else {
+                let fieldCount = i + 1;
+                for (let i = 0; i < fields.length; ++i) {
+                    fieldElem = renderField(flightLog, fields[i], GraphConfig.PALETTE[fieldCount++].color) ;
+                    fieldList.append(fieldElem);
+                }
+            }
         }
 
         fieldList.on('click', 'button', function(e) {
-            var
+            let
                 parentGraph = $(this).parents('.config-graph');
 
             $(this).parents('.config-graph-field').remove();
