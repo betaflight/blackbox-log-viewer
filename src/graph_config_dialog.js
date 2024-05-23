@@ -18,7 +18,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     function chooseColor(currentSelection) {
         const selectColor = $('<select class="color-picker"></select>');
-            for(let i=0; i<GraphConfig.PALETTE.length; i++) {
+            for(let i = 0; i < GraphConfig.PALETTE.length; i++) {
                 let option = $('<option></option>')
                     .text(GraphConfig.PALETTE[i].name)
                     .attr('value', GraphConfig.PALETTE[i].color)
@@ -38,7 +38,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         const MAX_HEIGHT = 5;
 
         const selectHeight = $('<select class="form-control graph-height"></select>');
-            for(let i=1; i<=MAX_HEIGHT; i++) {
+            for(let i = 1; i <= MAX_HEIGHT; i++) {
                 const option = $('<option></option>')
                     .text(i)
                     .attr('value', i);
@@ -155,7 +155,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 renderSmoothingOptions(elem, activeFlightLog, fields[0]);
             } else {
                 let fieldCount = elem.parent()[0].childElementCount;
-                for (let i = 0; i < fields.length - 1; ++i) {
+                for (let i = 0; i < fields.length - 1; i++) {
                     const row = renderField(flightLog, fields[i], GraphConfig.PALETTE[fieldCount++].color) ;
                     elem.before(row);
                 }
@@ -285,7 +285,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));
 
         // Add Field List
-        for (let i=0; i<graph.fields.length; ++i) {
+        for (let i = 0; i < graph.fields.length; i++) {
             let fieldElem;
             const extendedFields = activeGraphConfig.extendFields(activeFlightLog, graph.fields[i]);
             let fieldCount = i + 1;
@@ -321,7 +321,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         graphList.empty();
 
-        for (let i=0; i<graphs.length; ++i) {
+        for (let i = 0; i < graphs.length; i++) {
             graphList.append(renderGraph(flightLog, i, graphs[i]));
         }
     }
@@ -337,7 +337,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             dividerAfter: true
         });
 
-        for (let i=0; i < exampleGraphs.length; ++i) {
+        for (let i = 0; i < exampleGraphs.length; i++) {
             const li = $('<li><a href="#"></a></li>');
 
             $('a', li)

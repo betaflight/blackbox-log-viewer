@@ -83,7 +83,7 @@ export function GraphConfig(graphConfig) {
 
         if (colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
             let index;
-            for(index=0; index < GraphConfig.PALETTE.length; index++) {
+            for(index = 0; index < GraphConfig.PALETTE.length; index++) {
                 if (GraphConfig.PALETTE[index].color == field.color) break;
             }
             field.color = GraphConfig.PALETTE[(index + colorIndexOffset) % GraphConfig.PALETTE.length].color
