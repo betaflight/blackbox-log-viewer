@@ -131,8 +131,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
             select = $('select.form-control', elem),
             selectedFieldName = field ? field.name : false;
 
-        for (let i = 0; i < offeredFieldNames.length; i++) {
-            select.append(renderFieldOption(offeredFieldNames[i], selectedFieldName));
+        for (const field of offeredFieldNames) {
+            select.append(renderFieldOption(field, selectedFieldName));
         }
 
         // Set the smoothing values
@@ -285,13 +285,12 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));
 
         // Add Field List
-        for (let i = 0; i < graph.fields.length; i++) {
+        for (let i=0; i<graph.fields.length; ++i) {
             let fieldElem;
-            const field = graph.fields[i];
-            const fields = activeGraphConfig.extendFields(activeFlightLog, field);
+            const extendedFields = activeGraphConfig.extendFields(activeFlightLog, graph.fields[i]);
             let fieldCount = i + 1;
-            for (let j = 0; j < fields.length; ++j) {
-                fieldElem = renderField(flightLog, fields[j], GraphConfig.PALETTE[fieldCount++].color) ;
+            for (const extField of extendedFields) {
+                fieldElem = renderField(flightLog, extField, GraphConfig.PALETTE[fieldCount++].color) ;
                 fieldList.append(fieldElem);
             }
         }
@@ -322,7 +321,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         graphList.empty();
 
-        for (let i = 0; i < graphs.length; i++) {
+        for (let i=0; i<graphs.length; ++i) {
             graphList.append(renderGraph(flightLog, i, graphs[i]));
         }
     }
@@ -338,18 +337,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
             dividerAfter: true
         });
 
-        for (let i = 0; i < exampleGraphs.length; i++) {
-            let
-                graph = exampleGraphs[i],
-                li = $('<li><a href="#"></a></li>');
+        for (let i=0; i < exampleGraphs.length; ++i) {
+            const li = $('<li><a href="#"></a></li>');
 
             $('a', li)
-                .text(graph.label)
+                .text(exampleGraphs[i].label)
                 .data('graphIndex', i);
 
             menu.append(li);
 
-            if (graph.dividerAfter) {
+            if (exampleGraphs[i].dividerAfter) {
                 menu.append('<li class="divider"></li>');
             }
         }
@@ -417,11 +414,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         offeredFieldNames = [];
 
-        for (i = 0; i < fieldNames.length; i++) {
+        for (const fieldName of fieldNames) {
             // For fields with multiple bracketed x[0], x[1] versions, add an "[all]" option
-            let
-                fieldName = fieldNames[i],
-                matches = fieldName.match(/^(.+)\[[0-9]+\]$/);
+            const matches = fieldName.match(/^(.+)\[[0-9]+\]$/);
 
             if (BLACKLISTED_FIELDS[fieldName])
                 continue;
@@ -446,14 +441,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
          * the GUI anyway. (This way we can build a config when using a tricopter (which includes a tail servo) and
          * keep that tail servo in the config when we're viewing a quadcopter).
          */
-        for (i = 0; i < config.length; i++) {
-            let
-                graph = config[i];
-
-            for (j = 0; j < graph.fields.length; j++) {
-                let
-                    field = graph.fields[j];
-
+        for (const graph of config) {
+            for (const field of graph.fields) {
                 if (!fieldsSeen[field.name]) {
                     offeredFieldNames.push(field.name);
                 }

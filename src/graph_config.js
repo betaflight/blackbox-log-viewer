@@ -9,8 +9,8 @@ export function GraphConfig(graphConfig) {
         that = this;
 
     function notifyListeners() {
-        for (let i = 0; i < listeners.length; i++) {
-            listeners[i](that);
+        for (const listener of listeners) {
+            listener(that);
         }
     }
 
@@ -54,11 +54,11 @@ export function GraphConfig(graphConfig) {
                 nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
             let     colorIndexOffset = 0;
 
-            for (let k = 0; k < logFieldNames.length; k++) {
-                if (logFieldNames[k].match(nameRegex)) {
+            for (const fieldName of logFieldNames) {
+                if (fieldName.match(nameRegex)) {
                     // forceNewCurve must be true for min max computing extended curves.
                     const forceNewCurve = true;
-                    fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
+                    fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: fieldName, friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(fieldName, flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
                     colorIndexOffset++;
                 }
             }
@@ -105,14 +105,12 @@ export function GraphConfig(graphConfig) {
      * Convert the given graph configs to make them appropriate for the given flight log.
      */
     this.adaptGraphs = function(flightLog, graphs) {
-        let
+        const
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
 
-        for (let i = 0; i < graphs.length; i++) {
-            let
-                graph = graphs[i],
-                newGraph = $.extend(
+        for (const graph of graphs) {
+            const newGraph = $.extend(
                     // Default values for missing properties:
                     {
                         height: 1,
@@ -125,8 +123,7 @@ export function GraphConfig(graphConfig) {
                     },
                 );
 
-            for (let j = 0; j < graph.fields.length; j++) {
-                const field = graph.fields[j];
+            for (const field of graph.fields) {
                 const fields = this.extendFields(flightLog, field);
                 newGraph.fields = newGraph.fields.concat(fields);
             }
@@ -174,15 +171,10 @@ GraphConfig.PALETTE = [
 GraphConfig.load = function(config) {
     // Upgrade legacy configs to suit the newer standard by translating field names
     if (config) {
-        for (let i = 0; i < config.length; i++) {
-            let graph = config[i];
-
-            for (let j = 0; j < graph.fields.length; j++) {
-                let
-                    field = graph.fields[j],
-                    matches;
-
-                if ((matches = field.name.match(/^gyroData(.+)$/))) {
+        for (const graph of config) {
+            for (const field of graph.fields) {
+                const matches = field.name.match(/^gyroData(.+)$/);
+                if (matches) {
                     field.name = "gyroADC" + matches[1];
                 }
             }
@@ -238,8 +230,8 @@ GraphConfig.load = function(config) {
                 min = Number.MAX_VALUE,
                 max = -Number.MAX_VALUE;
 
-            for(let i in arguments) {
-                const mm = flightLog.getMinMaxForFieldDuringAllTime(arguments[i]);
+            for(const argument of arguments) {
+                const mm = flightLog.getMinMaxForFieldDuringAllTime(argument);
                 min = Math.min(mm.min, min);
                 max = Math.max(mm.max, max);
             }
@@ -1409,8 +1401,8 @@ GraphConfig.load = function(config) {
 
             if (graphNames !== undefined) {
                 found = false;
-                for (j = 0; j < graphNames.length; j++) {
-                    if (srcGraph.label == graphNames[j]) {
+                for (const name of graphNames) {
+                    if (srcGraph.label == name[j]) {
                         found = true;
                         break;
                     }
@@ -1421,10 +1413,8 @@ GraphConfig.load = function(config) {
                 }
             }
 
-            for (j = 0; j < srcGraph.fields.length; j++) {
-                let
-                    srcFieldName = srcGraph.fields[j],
-                    destField = {
+            for (const srcFieldName of srcGraph.fields) {
+                const destField = {
                         name: srcFieldName
                     };
 
