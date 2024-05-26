@@ -290,7 +290,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             const extendedFields = activeGraphConfig.extendFields(activeFlightLog, graph.fields[i]);
             let fieldCount = i + 1;
             for (const extField of extendedFields) {
-                fieldElem = renderField(flightLog, extField, GraphConfig.PALETTE[fieldCount++].color) ;
+                fieldElem = renderField(flightLog, extField, extField.color ? (extField.color) : (GraphConfig.PALETTE[fieldCount++].color)) ;
                 fieldList.append(fieldElem);
             }
         }
