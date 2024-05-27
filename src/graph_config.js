@@ -3,10 +3,9 @@ import { DSHOT_MIN_VALUE, DSHOT_RANGE, RATES_TYPE, DEBUG_MODE } from "./flightlo
 import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
-    let
-        graphs = graphConfig ? graphConfig : [],
-        listeners = [],
-        that = this;
+    const listeners = [];
+    const that = this;
+    let graphs = graphConfig ? graphConfig : [];
 
     function notifyListeners() {
         for (const listener of listeners) {
@@ -52,14 +51,13 @@ export function GraphConfig(graphConfig) {
             const
                 nameRoot = matches[1],
                 nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
-            let     colorIndexOffset = 0;
 
             for (const fieldName of logFieldNames) {
                 if (fieldName.match(nameRegex)) {
                     // forceNewCurve must be true for min max computing extended curves.
                     const forceNewCurve = true;
-                    fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: fieldName, friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(fieldName, flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
-                    colorIndexOffset++;
+                    field.color = undefined;
+                    fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: fieldName, friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(fieldName, flightLog.getSysConfig().debug_mode)}), forceNewCurve));
                 }
             }
         } else {
@@ -71,27 +69,13 @@ export function GraphConfig(graphConfig) {
         return fields;
     };
 
-    let adaptField = function(flightLog, field, colorIndexOffset, forceNewCurve) {
+    let adaptField = function(flightLog, field, forceNewCurve) {
         const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
-        let colorIndex = 0;
         if (field.curve === undefined || forceNewCurve) {
             field.curve = defaultCurve;
         } else {
             if (field.curve.MinMax == undefined)
                 field.curve.MinMax = defaultCurve.MinMax;
-        }
-
-        if (colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
-            let index;
-            for(index = 0; index < GraphConfig.PALETTE.length; index++) {
-                if (GraphConfig.PALETTE[index].color == field.color) break;
-            }
-            field.color = GraphConfig.PALETTE[(index + colorIndexOffset) % GraphConfig.PALETTE.length].color
-        }
-
-        if (field.color === undefined) {
-            field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
-            colorIndex++;
         }
 
         if (field.smoothing === undefined) {
@@ -207,7 +191,7 @@ GraphConfig.load = function(config) {
     };
 
     GraphConfig.getDefaultCurveForField = function(flightLog, fieldName) {
-        let
+        const
             sysConfig = flightLog.getSysConfig();
 
         let maxDegreesSecond = function(scale) {
@@ -260,7 +244,7 @@ GraphConfig.load = function(config) {
         let getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            let mmChartUnits =
+            const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
@@ -410,7 +394,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
-                let debugModeName = DEBUG_MODE[sysConfig.debug_mode];
+                const debugModeName = DEBUG_MODE[sysConfig.debug_mode];
                 switch (debugModeName) {
                     case 'CYCLETIME':
                         switch (fieldName) {
@@ -551,7 +535,7 @@ GraphConfig.load = function(config) {
                                         max: 50
                                     }
                                 };
-                            case 'debug[3]': // letio
+                            case 'debug[3]': // vario
                                 return {
                                     power: 1.0,
                                     MinMax: {
@@ -1275,7 +1259,7 @@ GraphConfig.load = function(config) {
         const minTime = WindowCenterTime - WindowWidthTime/2;
         const maxTime = WindowCenterTime + WindowWidthTime/2;
 
-        let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
+        const mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
                 min: -500,
@@ -1302,7 +1286,7 @@ GraphConfig.load = function(config) {
         if (maxTime == false)
             maxTime = flightLog.getMaxTime();
 
-        let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
+        const mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
                 min: -500,
@@ -1319,7 +1303,7 @@ GraphConfig.load = function(config) {
      * @param fieldName Name of the field
      */
     GraphConfig.getMinMaxForFieldDuringAllTime = function(flightLog, fieldName) {
-        let mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
+        const mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
         if (mm.min == Number.MAX_VALUE || mm.max == -Number.MAX_VALUE) {
             return {
                 min: -500,
@@ -1338,10 +1322,7 @@ GraphConfig.load = function(config) {
      * Supply an array of strings `graphNames` to only fetch the graph with the given names.
      */
     GraphConfig.getExampleGraphConfigs = function(flightLog, graphNames) {
-        let
-            result = [],
-            i, j;
-
+        const result = [];
         const EXAMPLE_GRAPHS = [];
 
         if (!flightLog.isFieldDisabled().MOTORS) {
@@ -1389,20 +1370,20 @@ GraphConfig.load = function(config) {
             EXAMPLE_GRAPHS.push({label: "GPS",fields: ["GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course", "GPS_coord[all]"]});
         }
 
-        for (i = 0; i < EXAMPLE_GRAPHS.length; i++) {
-            let
+        for (let i = 0; i < EXAMPLE_GRAPHS.length; i++) {
+            const
                 srcGraph = EXAMPLE_GRAPHS[i],
                 destGraph = {
                     label: srcGraph.label,
                     fields: [],
                     height: srcGraph.height || 1
-                },
-                found;
+                };
+            let found;
 
             if (graphNames !== undefined) {
                 found = false;
                 for (const name of graphNames) {
-                    if (srcGraph.label == name[j]) {
+                    if (srcGraph.label == name) {
                         found = true;
                         break;
                     }
