@@ -492,7 +492,12 @@ export function FlightLog(logData) {
                                 //H Field G name:time,GPS_numSat,GPS_coord[0],GPS_coord[1],GPS_altitude,GPS_speed,GPS_ground_course
                                 frame.shift(); // remove time
                                 for (let i = 0; i < frame.length; i++) {
-                                    lastGPS[i] = frame[i];
+                                    // GPS_altitude is the fourth element (index 3 after shifting the time)
+                                    if (i === 3) {
+                                        lastGPS[i] = frame[i] / 10; // convert GPS_altitude to meters  
+                                    } else {
+                                        lastGPS[i] = frame[i];
+                                    }
                                 }
                             break;
                         }
