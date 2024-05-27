@@ -154,7 +154,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
             if (fields.length === 1) {
                 renderSmoothingOptions(elem, activeFlightLog, fields[0]);
             } else {
-                let colorIndex = $('select.color-picker', elem).prop('selectedIndex')
+                let colorIndex = $('select.color-picker', elem).prop('selectedIndex');
                 for (let i = 0; i < fields.length - 1; i++) {
                     const color = GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
                     const row = renderField(flightLog, fields[i], color) ;
@@ -291,11 +291,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));
 
         // Add Field List
-        for (let i = 0; i < graph.fields.length; i++) {
-            const extendedFields = activeGraphConfig.extendFields(activeFlightLog, graph.fields[i]);
+        for (const field of graph.fields) {
+            const extendedFields = activeGraphConfig.extendFields(activeFlightLog, field);
             let colorIndex = 0;
             for (const extField of extendedFields) {
-                const color = extField.color ?? GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color
+                const color = extField.color ?? GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
                 const fieldElem = renderField(flightLog, extField, color);
                 fieldList.append(fieldElem);
             }

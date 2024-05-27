@@ -5,7 +5,7 @@ import { escapeRegExp } from "./tools";
 export function GraphConfig(graphConfig) {
     const listeners = [];
     const that = this;
-    let graphs = graphConfig ? graphConfig : [];
+    let graphs = graphConfig ?? [];
 
     function notifyListeners() {
         for (const listener of listeners) {
@@ -1370,9 +1370,8 @@ GraphConfig.load = function(config) {
             EXAMPLE_GRAPHS.push({label: "GPS",fields: ["GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course", "GPS_coord[all]"]});
         }
 
-        for (let i = 0; i < EXAMPLE_GRAPHS.length; i++) {
+        for (const srcGraph of EXAMPLE_GRAPHS) {
             const
-                srcGraph = EXAMPLE_GRAPHS[i],
                 destGraph = {
                     label: srcGraph.label,
                     fields: [],
