@@ -2130,6 +2130,18 @@ function BlackboxLogViewer() {
             return false;
         };
 
+        if ("launchQueue" in window) {
+            launchQueue.setConsumer(async (launchParams) => {
+                console.log("Opening files by extension in the desktop:", launchParams);
+                const files = [];
+                for (const fileHandler of launchParams.files) {
+                    console.log("launchQueue file", fileHandler);
+                    files.push(await fileHandler.getFile());
+                }
+                loadFiles(files);
+            });
+        };
+
         prefs.get('videoConfig', function(item) {
             if (item) {
                 videoConfig = item;
