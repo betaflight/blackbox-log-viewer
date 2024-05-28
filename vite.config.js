@@ -37,6 +37,12 @@ export default {
                         type: 'image/png',
                     },
                 ],
+                file_handlers: [{
+                    action: "/",
+                    accept: {
+                      "application/octet-stream": [".bbl", ".bfl"],
+                    },
+                }],
             },
         }),
     ],
