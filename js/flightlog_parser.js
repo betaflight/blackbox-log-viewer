@@ -333,6 +333,7 @@ var FlightLogParser = function(logData) {
             dyn_idle_p_gain: null,
             dyn_idle_i_gain: null,
             dyn_idle_d_gain: null,
+            dyn_idle_start_increase: null,
             dyn_idle_max_increase: null,
             simplified_pids_mode: null,             // Simplified / slider PIDS
             simplified_pi_gain: null,
@@ -735,6 +736,7 @@ var FlightLogParser = function(logData) {
             case "dyn_idle_p_gain":
             case "dyn_idle_i_gain":
             case "dyn_idle_d_gain":
+            case "dyn_idle_start_increase":
             case "dyn_idle_max_increase":
             case "simplified_pids_mode":
             case "simplified_pi_gain":

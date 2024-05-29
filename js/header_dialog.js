@@ -117,6 +117,7 @@ function HeaderDialog(dialog, onSave) {
         {name:'dyn_idle_p_gain'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dyn_idle_i_gain'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'dyn_idle_d_gain'               , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
+        {name:'dyn_idle_start_increase'       , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.5.0', max:'999.9.9'},
         {name:'dyn_idle_max_increase'         , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_pids_mode'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
         {name:'simplified_pi_gain'            , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'4.3.0', max:'999.9.9'},
@@ -821,6 +822,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('dyn_idle_p_gain'          , sysConfig.dyn_idle_p_gain, 0);
         setParameter('dyn_idle_i_gain'          , sysConfig.dyn_idle_i_gain, 0);
         setParameter('dyn_idle_d_gain'          , sysConfig.dyn_idle_d_gain, 0);
+        setParameter('dyn_idle_start_increase'  , sysConfig.dyn_idle_start_increase, 0);
         setParameter('dyn_idle_max_increase'    , sysConfig.dyn_idle_max_increase, 0);
         renderSelect('simplified_pids_mode'         , sysConfig.simplified_pids_mode, SIMPLIFIED_PIDS_MODE);
         setParameter('simplified_pi_gain'           , sysConfig.simplified_pi_gain, 0);
