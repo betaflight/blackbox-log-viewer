@@ -673,7 +673,7 @@ function BlackboxLogViewer() {
         setVideoInTime(false);
         setVideoOutTime(false);
 
-        activeGraphConfig.adaptGraphs(flightLog, graphConfig, true);
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig);
 
         graph.onSeek = function(offset) {
             //Seek faster
@@ -1004,7 +1004,7 @@ function BlackboxLogViewer() {
         lastGraphConfig = graphConfig; // Remember the last configuration.
         graphConfig = newConfig;
         activeGraphConfig.setRedrawChart(noRedraw ? false : true);
-        activeGraphConfig.adaptGraphs(flightLog, graphConfig, false);
+        activeGraphConfig.adaptGraphs(flightLog, graphConfig);
 
         prefs.set('graphConfig', graphConfig);
     }
@@ -1444,7 +1444,7 @@ function BlackboxLogViewer() {
         $(".open-graph-configuration-dialog").click(function(e) {
             e.preventDefault();
 
-            graphConfigDialog.show(flightLog, activeGraphConfig.getGraphs(), graph);
+            graphConfigDialog.show(flightLog, activeGraphConfig, graph);
         });
 
         $(".open-header-dialog").click(function(e) {

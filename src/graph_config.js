@@ -3,14 +3,13 @@ import { DSHOT_MIN_VALUE, DSHOT_RANGE, RATES_TYPE, DEBUG_MODE } from "./flightlo
 import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
-    var
-        graphs = graphConfig ? graphConfig : [],
-        listeners = [],
-        that = this;
+    const listeners = [];
+    const that = this;
+    let graphs = graphConfig ?? [];
 
     function notifyListeners() {
-        for (var i = 0; i < listeners.length; i++) {
-            listeners[i](that);
+        for (const listener of listeners) {
+            listener(that);
         }
     }
 
@@ -44,20 +43,58 @@ export function GraphConfig(graphConfig) {
         }
     };
 
+    this.extendFields = function(flightLog, field) {
+        const matches = field.name.match(/^(.+)\[all\]$/);
+        const logFieldNames = flightLog.getMainFieldNames();
+        const fields = [];
+        if (matches) {
+            const
+                nameRoot = matches[1],
+                nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
+
+            for (const fieldName of logFieldNames) {
+                if (fieldName.match(nameRegex)) {
+                    // forceNewCurve must be true for min max computing extended curves.
+                    const forceNewCurve = true;
+                    field.color = undefined;
+                    fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: fieldName, friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(fieldName, flightLog.getSysConfig().debug_mode)}), forceNewCurve));
+                }
+            }
+        } else {
+            // Don't add fields if they don't exist in this log
+            if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
+                fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(field.name, flightLog.getSysConfig().debug_mode)})));
+            }
+        }
+        return fields;
+    };
+
+    let adaptField = function(flightLog, field, forceNewCurve) {
+        const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
+        if (field.curve === undefined || forceNewCurve) {
+            field.curve = defaultCurve;
+        } else {
+            if (field.curve.MinMax == undefined)
+                field.curve.MinMax = defaultCurve.MinMax;
+        }
+
+        if (field.smoothing === undefined) {
+            field.smoothing = GraphConfig.getDefaultSmoothingForField(flightLog, field.name);
+        }
+
+        return field;
+    };
+
     /**
      * Convert the given graph configs to make them appropriate for the given flight log.
      */
-    this.adaptGraphs = function(flightLog, graphs, isNewLog) {
-        var
-            logFieldNames = flightLog.getMainFieldNames(),
-
+    this.adaptGraphs = function(flightLog, graphs) {
+        const
             // Make copies of graphs into here so we can modify them without wrecking caller's copy
             newGraphs = [];
 
-        for (var i = 0; i < graphs.length; i++) {
-            var
-                graph = graphs[i],
-                newGraph = $.extend(
+        for (const graph of graphs) {
+            const newGraph = $.extend(
                     // Default values for missing properties:
                     {
                         height: 1,
@@ -68,66 +105,11 @@ export function GraphConfig(graphConfig) {
                     {
                         fields:[],
                     },
-                ),
-                colorIndex = 0;
+                );
 
-            for (var j = 0; j < graph.fields.length; j++) {
-                var
-                    field = graph.fields[j],
-                    matches;
-
-                var adaptField = function(field, colorIndexOffset, forceNewCurve) {
-                    const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, field.name);
-
-                    if (field.curve === undefined || forceNewCurve) {
-                        field.curve = defaultCurve;
-                    }
-                    else {
-                        if (field.curve.MinMax == undefined)
-                            field.curve.MinMax = defaultCurve.MinMax;
-                    }
-
-                    if(colorIndexOffset!=null && field.color != undefined) { // auto offset the actual color (to expand [all] selections)
-                        var index;
-                        for(index=0; index < GraphConfig.PALETTE.length; index++)
-                            {
-                                if(GraphConfig.PALETTE[index].color == field.color) break;
-                            }
-                        field.color = GraphConfig.PALETTE[(index + colorIndexOffset) % GraphConfig.PALETTE.length].color
-                    }
-
-                    if (field.color === undefined) {
-                        field.color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
-                        colorIndex++;
-                    }
-
-                    if (field.smoothing === undefined) {
-                        field.smoothing = GraphConfig.getDefaultSmoothingForField(flightLog, field.name);
-                    }
-
-                    return field;
-                };
-
-                if ((matches = field.name.match(/^(.+)\[all\]$/))) {
-                    var
-                        nameRoot = matches[1],
-                        nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$"),
-                        colorIndexOffset = 0;
-
-                    for (var k = 0; k < logFieldNames.length; k++) {
-                        if (logFieldNames[k].match(nameRegex)) {
-                            // forceNewCurve must be true for min max computing extended curves.
-                            let forceNewCurve = true;
-                            newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), name: logFieldNames[k], friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(logFieldNames[k], flightLog.getSysConfig().debug_mode)}), colorIndexOffset, forceNewCurve));
-                            colorIndexOffset++;
-                        }
-                    }
-                } else {
-                    // Don't add fields if they don't exist in this log
-                    if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
-                        newGraph.fields.push(adaptField($.extend({}, field, {curve: $.extend({}, field.curve), friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(field.name, flightLog.getSysConfig().debug_mode)})));
-                    }
-                }
+            for (const field of graph.fields) {
+                const fields = this.extendFields(flightLog, field);
+                newGraph.fields = newGraph.fields.concat(fields);
             }
 
             newGraphs.push(newGraph);
@@ -173,15 +155,10 @@ GraphConfig.PALETTE = [
 GraphConfig.load = function(config) {
     // Upgrade legacy configs to suit the newer standard by translating field names
     if (config) {
-        for (var i = 0; i < config.length; i++) {
-            var graph = config[i];
-
-            for (var j = 0; j < graph.fields.length; j++) {
-                var
-                    field = graph.fields[j],
-                    matches;
-
-                if ((matches = field.name.match(/^gyroData(.+)$/))) {
+        for (const graph of config) {
+            for (const field of graph.fields) {
+                const matches = field.name.match(/^gyroData(.+)$/);
+                if (matches) {
                     field.name = "gyroADC" + matches[1];
                 }
             }
@@ -214,10 +191,10 @@ GraphConfig.load = function(config) {
     };
 
     GraphConfig.getDefaultCurveForField = function(flightLog, fieldName) {
-        var
+        const
             sysConfig = flightLog.getSysConfig();
 
-        var maxDegreesSecond = function(scale) {
+        let maxDegreesSecond = function(scale) {
             switch(sysConfig["rates_type"]){
                 case RATES_TYPE.indexOf('ACTUAL'):
                 case RATES_TYPE.indexOf('QUICK'):
@@ -231,14 +208,14 @@ GraphConfig.load = function(config) {
             }
         }
 
-        var getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
+        let getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
             let
                 min = Number.MAX_VALUE,
                 max = -Number.MAX_VALUE;
 
-            for(let i in arguments) {
-                const mm = flightLog.getMinMaxForFieldDuringAllTime(arguments[i]);
+            for(const argument of arguments) {
+                const mm = flightLog.getMinMaxForFieldDuringAllTime(argument);
                 min = Math.min(mm.min, min);
                 max = Math.max(mm.max, max);
             }
@@ -250,7 +227,7 @@ GraphConfig.load = function(config) {
             return {min:-500, max:500};
         }
 
-        var getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
+        let getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
             const mmChartUnits =
@@ -264,10 +241,10 @@ GraphConfig.load = function(config) {
             };
         }
 
-        var getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
+        let getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
             // added convertation min max values from log file units to friendly chart
-            let mmChartUnits =
+            const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
                 max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
@@ -417,7 +394,7 @@ GraphConfig.load = function(config) {
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
-                var debugModeName = DEBUG_MODE[sysConfig.debug_mode];
+                const debugModeName = DEBUG_MODE[sysConfig.debug_mode];
                 switch (debugModeName) {
                     case 'CYCLETIME':
                         switch (fieldName) {
@@ -558,7 +535,7 @@ GraphConfig.load = function(config) {
                                         max: 50
                                     }
                                 };
-                            case 'debug[3]': // Vario
+                            case 'debug[3]': // vario
                                 return {
                                     power: 1.0,
                                     MinMax: {
@@ -1282,7 +1259,7 @@ GraphConfig.load = function(config) {
         const minTime = WindowCenterTime - WindowWidthTime/2;
         const maxTime = WindowCenterTime + WindowWidthTime/2;
 
-        let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
+        const mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
                 min: -500,
@@ -1309,7 +1286,7 @@ GraphConfig.load = function(config) {
         if (maxTime == false)
             maxTime = flightLog.getMaxTime();
 
-        let mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
+        const mm = flightLog.getMinMaxForFieldDuringTimeInterval(fieldName, minTime, maxTime);
         if (mm == undefined)
             return {
                 min: -500,
@@ -1326,7 +1303,7 @@ GraphConfig.load = function(config) {
      * @param fieldName Name of the field
      */
     GraphConfig.getMinMaxForFieldDuringAllTime = function(flightLog, fieldName) {
-        let mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
+        const mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
         if (mm.min == Number.MAX_VALUE || mm.max == -Number.MAX_VALUE) {
             return {
                 min: -500,
@@ -1345,10 +1322,7 @@ GraphConfig.load = function(config) {
      * Supply an array of strings `graphNames` to only fetch the graph with the given names.
      */
     GraphConfig.getExampleGraphConfigs = function(flightLog, graphNames) {
-        var
-            result = [],
-            i, j;
-
+        const result = [];
         const EXAMPLE_GRAPHS = [];
 
         if (!flightLog.isFieldDisabled().MOTORS) {
@@ -1396,20 +1370,19 @@ GraphConfig.load = function(config) {
             EXAMPLE_GRAPHS.push({label: "GPS",fields: ["GPS_numSat", "GPS_altitude", "GPS_speed", "GPS_ground_course", "GPS_coord[all]"]});
         }
 
-        for (i = 0; i < EXAMPLE_GRAPHS.length; i++) {
-            var
-                srcGraph = EXAMPLE_GRAPHS[i],
+        for (const srcGraph of EXAMPLE_GRAPHS) {
+            const
                 destGraph = {
                     label: srcGraph.label,
                     fields: [],
                     height: srcGraph.height || 1
-                },
-                found;
+                };
+            let found;
 
             if (graphNames !== undefined) {
                 found = false;
-                for (j = 0; j < graphNames.length; j++) {
-                    if (srcGraph.label == graphNames[j]) {
+                for (const name of graphNames) {
+                    if (srcGraph.label == name) {
                         found = true;
                         break;
                     }
@@ -1420,10 +1393,8 @@ GraphConfig.load = function(config) {
                 }
             }
 
-            for (j = 0; j < srcGraph.fields.length; j++) {
-                var
-                    srcFieldName = srcGraph.fields[j],
-                    destField = {
+            for (const srcFieldName of srcGraph.fields) {
+                const destField = {
                         name: srcFieldName
                     };
 

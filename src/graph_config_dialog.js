@@ -13,16 +13,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
         activeFlightLog,
         logGrapher = null,
         prevCfg = null,
+        activeGraphConfig = null,
         cfgMustBeRestored = false;
 
     function chooseColor(currentSelection) {
         const selectColor = $('<select class="color-picker"></select>');
-            for(let i=0; i<GraphConfig.PALETTE.length; i++) {
+            for(let i = 0; i < GraphConfig.PALETTE.length; i++) {
                 let option = $('<option></option>')
                     .text(GraphConfig.PALETTE[i].name)
                     .attr('value', GraphConfig.PALETTE[i].color)
                     .css('color', GraphConfig.PALETTE[i].color);
-                if(currentSelection == GraphConfig.PALETTE[i].color) {
+                if (currentSelection == GraphConfig.PALETTE[i].color) {
                     option.attr('selected', 'selected');
                     selectColor.css('background', GraphConfig.PALETTE[i].color)
                                .css('color', GraphConfig.PALETTE[i].color);
@@ -37,11 +38,11 @@ export function GraphConfigurationDialog(dialog, onSave) {
         const MAX_HEIGHT = 5;
 
         const selectHeight = $('<select class="form-control graph-height"></select>');
-            for(let i=1; i<=MAX_HEIGHT; i++) {
+            for(let i = 1; i <= MAX_HEIGHT; i++) {
                 const option = $('<option></option>')
                     .text(i)
                     .attr('value', i);
-                if(currentSelection == i || (currentSelection==null && i==1)) {
+                if (currentSelection == i || (currentSelection==null && i==1)) {
                     option.attr('selected', 'selected');
                 }
                 selectHeight.append(option);
@@ -52,7 +53,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     // Show/Hide remove all button
      function updateRemoveAllButton() {
-         var graphCount = $('.config-graph').length;
+         const graphCount = $('.config-graph').length;
 
          if (graphCount > 0) {
             $('.config-graphs-remove-all-graphs').show();
@@ -64,16 +65,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     // Renumber the "Graph X" blocks after additions/deletions
     function renumberGraphIndexes() {
-            var graphIndexes = $('.graph-index-number');
-            var graphCount = graphIndexes.length;
-            for (var i = 0; i < graphCount; i++) {
-                    var currentGraphNumber = i+1;
-                    $(graphIndexes[i]).html(currentGraphNumber);
-                }
-            }
+        const graphIndexes = $('.graph-index-number');
+        const graphCount = graphIndexes.length;
+        for (let i = 0; i < graphCount; i++) {
+            let currentGraphNumber = i+1;
+            $(graphIndexes[i]).html(currentGraphNumber);
+        }
+    }
 
     function renderFieldOption(fieldName, selectedName) {
-        var
+        const
             option = $("<option></option>")
                 .text(FlightLogFieldPresenter.fieldNameToFriendly(fieldName, activeFlightLog.getSysConfig().debug_mode))
                 .attr("value", fieldName);
@@ -87,7 +88,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     // Set the current smoothing options for a field
     function renderSmoothingOptions(elem, flightLog, field) {
-        if(elem) {
+        if (elem) {
             // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
             $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
             if (field.curve != null) {
@@ -114,7 +115,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
      * initial selection.
      */
     function renderField(flightLog, field, color) {
-        var
+        const
             elem = $(
                 '<tr class="config-graph-field">'
                     + '<td><select class="form-control"><option value="">(choose a field)</option></select></td>'
@@ -128,18 +129,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 + '</tr>'
             ),
             select = $('select.form-control', elem),
-            selectedFieldName = field ?field.name : false,
-            i;
+            selectedFieldName = field ? field.name : false;
 
-        for (i = 0; i < offeredFieldNames.length; i++) {
-            select.append(renderFieldOption(offeredFieldNames[i], selectedFieldName));
+        for (const field of offeredFieldNames) {
+            select.append(renderFieldOption(field, selectedFieldName));
         }
 
         // Set the smoothing values
         renderSmoothingOptions(elem, flightLog, field);
 
         // Set the line width values
-        $('input[name=linewidth]',elem).val((field.lineWidth)?field.lineWidth:1);
+        $('input[name=linewidth]',elem).val((field.lineWidth) ? field.lineWidth : 1);
 
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
@@ -147,10 +147,28 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         // Add event when selection changed to retrieve the current smoothing settings.
         $('select.form-control', elem).change( function() {
-            var selectedField = {
+            const selectedField = {
                 name: $('select.form-control option:selected', elem).val()
-                    };
-            renderSmoothingOptions(elem, activeFlightLog, selectedField);
+            };
+            const fields = activeGraphConfig.extendFields(activeFlightLog, selectedField);
+            if (fields.length === 1) {
+                renderSmoothingOptions(elem, activeFlightLog, fields[0]);
+            } else {
+                let colorIndex = $('select.color-picker', elem).prop('selectedIndex');
+                for (let i = 0; i < fields.length - 1; i++) {
+                    const color = GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
+                    const row = renderField(flightLog, fields[i], color) ;
+                    elem.before(row);
+                }
+
+                const index = $('select.form-control', elem).prop('selectedIndex');
+                $('select.form-control', elem).prop('selectedIndex', index + fields.length);
+                $('select.form-control', elem).trigger('change');
+
+                const colorPicker = $('select.color-picker', elem);
+                colorPicker.prop('selectedIndex', colorIndex % GraphConfig.PALETTE.length);
+                colorPicker.trigger('change');
+            }
             RefreshCharts();
         });
 
@@ -194,7 +212,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
     }
 
     function renderGraph(flightLog, index, graph) {
-        var
+        const
             graphElem = $(
                 '<li class="config-graph" id="'+index+'">'
                     + '<dl>'
@@ -252,17 +270,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
         $("input", graphElem).val(graph.label);
 
-        var fieldCount = graph.fields.length;
-
         // "Add field" button
         $(".add-field-button", graphElem).click(function(e) {
-            fieldList.append(renderField(flightLog, {}, GraphConfig.PALETTE[fieldCount++].color));
+            const colorIndex = $("tbody", graphElem)[0].childElementCount;
+            const color = GraphConfig.PALETTE[colorIndex % GraphConfig.PALETTE.length].color;
+            fieldList.append(renderField(flightLog, {}, color));
             e.preventDefault();
         });
 
         // "Remove Graph" button
         $(".remove-single-graph-button", graphElem).click(function(e) {
-            var parentGraph = $(this).parents('.config-graph');
+            const parentGraph = $(this).parents('.config-graph');
             parentGraph.remove();
             updateRemoveAllButton();
             RefreshCharts();
@@ -273,17 +291,18 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));
 
         // Add Field List
-        for (var i = 0; i < graph.fields.length; i++) {
-            var
-                field = graph.fields[i],
-                fieldElem = renderField(flightLog, field, field.color?(field.color):(GraphConfig.PALETTE[i].color));
-
-            fieldList.append(fieldElem);
+        for (const field of graph.fields) {
+            const extendedFields = activeGraphConfig.extendFields(activeFlightLog, field);
+            let colorIndex = 0;
+            for (const extField of extendedFields) {
+                const color = extField.color ?? GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
+                const fieldElem = renderField(flightLog, extField, color);
+                fieldList.append(fieldElem);
+            }
         }
 
         fieldList.on('click', 'button', function(e) {
-            var
-                parentGraph = $(this).parents('.config-graph');
+            const parentGraph = $(this).parents('.config-graph');
 
             $(this).parents('.config-graph-field').remove();
 
@@ -302,20 +321,17 @@ export function GraphConfigurationDialog(dialog, onSave) {
     }
 
     function renderGraphs(flightLog, graphs) {
-        var
+        const
             graphList = $(".config-graphs-list", dialog);
 
         graphList.empty();
 
-        for (var i = 0; i < graphs.length; i++) {
+        for (let i = 0; i < graphs.length; i++) {
             graphList.append(renderGraph(flightLog, i, graphs[i]));
         }
     }
 
     function populateExampleGraphs(flightLog, menu) {
-        var
-            i;
-
         menu.empty();
 
         exampleGraphs = GraphConfig.getExampleGraphConfigs(flightLog);
@@ -326,31 +342,25 @@ export function GraphConfigurationDialog(dialog, onSave) {
             dividerAfter: true
         });
 
-        for (i = 0; i < exampleGraphs.length; i++) {
-            var
-                graph = exampleGraphs[i],
-                li = $('<li><a href="#"></a></li>');
+        for (let i = 0; i < exampleGraphs.length; i++) {
+            const li = $('<li><a href="#"></a></li>');
 
             $('a', li)
-                .text(graph.label)
+                .text(exampleGraphs[i].label)
                 .data('graphIndex', i);
 
             menu.append(li);
 
-            if (graph.dividerAfter) {
+            if (exampleGraphs[i].dividerAfter) {
                 menu.append('<li class="divider"></li>');
             }
         }
     }
 
     function convertUIToGraphConfig() {
-        var
-            graphs = [],
-            graph,
-            field;
-
+        const graphs = [];
         $(".config-graph", dialog).each(function() {
-            graph = {
+            const graph = {
                fields: [],
                height: 1
             };
@@ -362,7 +372,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 const fieldName = $("select", this).val();
                 const minimum = $("input[name=MinValue]", this).val();
                 const maximum = $("input[name=MaxValue]", this).val();
-                field = {
+                const field = {
                     name: fieldName,
                     smoothing: parseInt($("input[name=smoothing]", this).val())*100,        // Value 0-100%    = 0-10000uS (higher values are more smooth, 30% is typical)
                     curve: {
@@ -397,19 +407,15 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     // Decide which fields we should offer to the user
     function buildOfferedFieldNamesList(flightLog, config) {
-        var
-            i, j,
-            lastRoot = null,
-            fieldNames = flightLog.getMainFieldNames(),
-            fieldsSeen = {};
+        let     lastRoot = null;
+        const   fieldNames = flightLog.getMainFieldNames(),
+                fieldsSeen = {};
 
         offeredFieldNames = [];
 
-        for (i = 0; i < fieldNames.length; i++) {
+        for (const fieldName of fieldNames) {
             // For fields with multiple bracketed x[0], x[1] versions, add an "[all]" option
-            var
-                fieldName = fieldNames[i],
-                matches = fieldName.match(/^(.+)\[[0-9]+\]$/);
+            const matches = fieldName.match(/^(.+)\[[0-9]+\]$/);
 
             if (BLACKLISTED_FIELDS[fieldName])
                 continue;
@@ -434,14 +440,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
          * the GUI anyway. (This way we can build a config when using a tricopter (which includes a tail servo) and
          * keep that tail servo in the config when we're viewing a quadcopter).
          */
-        for (i = 0; i < config.length; i++) {
-            var
-                graph = config[i];
-
-            for (j = 0; j < graph.fields.length; j++) {
-                var
-                    field = graph.fields[j];
-
+        for (const graph of config) {
+            for (const field of graph.fields) {
                 if (!fieldsSeen[field.name]) {
                     offeredFieldNames.push(field.name);
                 }
@@ -449,10 +449,12 @@ export function GraphConfigurationDialog(dialog, onSave) {
         }
     }
 
-    this.show = function(flightLog, config, grapher) {
+    this.show = function(flightLog, graphConfig, grapher) {
         dialog.modal('show');
         activeFlightLog = flightLog;
         logGrapher = grapher;
+        activeGraphConfig = graphConfig;
+        const config  = activeGraphConfig.getGraphs();
 
         buildOfferedFieldNamesList(flightLog, config);
 
@@ -504,7 +506,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         onSave(convertUIToGraphConfig(), noRedraw);
     }
 
-    var
+    let
         exampleGraphsButton = $(".config-graphs-add"),
         exampleGraphsMenu = $(".config-graphs-add ~ .dropdown-menu"),
         configGraphsList = $('.config-graphs-list');
@@ -520,7 +522,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     exampleGraphsButton.dropdown();
     exampleGraphsMenu.on("click", "a", function(e) {
-        var
+        const
             graph = exampleGraphs[$(this).data("graphIndex")],
             graphElem = renderGraph(activeFlightLog, $(".config-graph", dialog).length, graph);
 
@@ -536,7 +538,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
     });
 
     // Remove all Graphs button
-    var removeAllGraphsButton = $(".config-graphs-remove-all-graphs");
+    const removeAllGraphsButton = $(".config-graphs-remove-all-graphs");
     removeAllGraphsButton.on("click", function() {
         $('.config-graph').remove();
         updateRemoveAllButton();
