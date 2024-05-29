@@ -16,6 +16,7 @@ import { SeekBar } from './seekbar.js';
 import { GpxExporter } from './gpx-exporter.js';
 import { CsvExporter } from './csv-exporter.js';
 import { WorkspaceSelection } from './workspace_selection.js';
+import { WorkspaceMenu } from './workspace_menu.js';
 import { GraphLegend } from './graph_legend.js';
 import { FlightLog } from './flightlog.js';
 import { FlightLogParser } from './flightlog_parser.js';
@@ -33,7 +34,6 @@ import {
 } from './tools.js';
 import { PrefStorage } from './pref_storage.js';
 import { makeScreenshot } from './screenshot.js';
-import defaultWorkspaceGraphConfigs from './workspaces-ctzsnooze.json';
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
@@ -106,6 +106,7 @@ function BlackboxLogViewer() {
 
         graphLegend = null,
         workspaceSelection = null,
+        workspaceMenu = null,
         fieldPresenter = FlightLogFieldPresenter,
 
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
@@ -1068,7 +1069,7 @@ function BlackboxLogViewer() {
             if (item) {
                 workspaceGraphConfigs = upgradeWorkspaceFormat(item);
             } else {
-                workspaceGraphConfigs = defaultWorkspaceGraphConfigs;
+                workspaceGraphConfigs = workspaceMenu.getDefaultWorkspace();
             }
         });
 
@@ -1083,6 +1084,8 @@ function BlackboxLogViewer() {
 
         workspaceSelection = new WorkspaceSelection($(".log-workspace-selection"), workspaceGraphConfigs, onSwitchWorkspace, onSaveWorkspace);
         onSwitchWorkspace(workspaceGraphConfigs, workspaceSelection);
+        
+        workspaceMenu = new WorkspaceMenu($("#default_workspaces_menu"), onSwitchWorkspace);
 
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
@@ -1945,6 +1948,11 @@ function BlackboxLogViewer() {
                             console.log('Workspace feature not functioning');
                         }
                         e.preventDefault();
+                    break;
+                    case "W".charCodeAt(0):
+                        if (e.shiftKey) {
+                            workspaceMenu.show();
+                        }
                     break;
                     case "Z".charCodeAt(0): // Ctrl-Z key to toggle between last graph config and current one - undo
                         try {

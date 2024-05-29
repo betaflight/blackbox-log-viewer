@@ -437,6 +437,11 @@
             <li class="log-workspace-panel">
                 <h4>Workspace</h4>
                 <div class="log-workspace-selection"></div>
+                <div class="flexDiv">
+                    <div class="selectWrapper">
+                        <div class="dropdown-content" id="default_workspaces_menu"></div>
+                    </div>
+                </div>
             </li>
         </ul>
         <div id="screenshot-frame" class="graph-row">
@@ -2517,6 +2522,13 @@
                                             <div class="description">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration
                                                 swapping useful for comparing traces.</div>
                                         </li>
+                                        <li>
+                                            <span class="keys">
+                                                <div class="key">Shift</div>
+                                                <div class="key">W</div>
+                                            </span>
+                                            <div class="description">Show the menu to load default workspace</div>
+                                        </li>
                                     </ul>
                                     <ul>
                                         <li>
@@ -3199,7 +3211,6 @@
     <script src="/js/webm-writer/BlobBuffer.js"></script>
     <script src="/js/webm-writer/WebMWriter.js"></script>
     <script type="module" src="src/main.js"></script>
-
     <dialog class="dialogUpdate">
         <h3>Notice</h4>
         <div class="content">
