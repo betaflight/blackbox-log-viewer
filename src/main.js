@@ -1064,6 +1064,8 @@ function BlackboxLogViewer() {
 
         graphLegend = new GraphLegend($(".log-graph-legend"), activeGraphConfig, onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange, zoomGraphConfig, expandGraphConfig, newGraphConfig);
 
+        workspaceMenu = new WorkspaceMenu($("#default_workspaces_menu"), onSwitchWorkspace);
+
         // initial load of the configuration defaults if we have them
         prefs.get('workspaceGraphConfigs', function(item) {
             if (item) {
@@ -1084,8 +1086,6 @@ function BlackboxLogViewer() {
 
         workspaceSelection = new WorkspaceSelection($(".log-workspace-selection"), workspaceGraphConfigs, onSwitchWorkspace, onSaveWorkspace);
         onSwitchWorkspace(workspaceGraphConfigs, workspaceSelection);
-        
-        workspaceMenu = new WorkspaceMenu($("#default_workspaces_menu"), onSwitchWorkspace);
 
         prefs.get('log-legend-hidden', function(item) {
             if (item) {
