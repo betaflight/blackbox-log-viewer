@@ -90,7 +90,7 @@ function BlackboxLogViewer() {
         videoConfig = {},
 
         // JSON graph configuration:
-        graphConfig = {},
+        graphConfig = null,
 
         offsetCache = [], // Storage for the offset cache (last 20 files)
         currentOffsetCache = {log:null, index:null, video:null, offset:null},
@@ -782,6 +782,10 @@ function BlackboxLogViewer() {
                 alert("Sorry, an error occurred while trying to open this log:\n\n" + err);
                 return;
             }
+            
+            if (!graphConfig) {
+                graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
+            }  
 
             renderLogFileInfo(file);
             renderSeekBarPicker();
@@ -2165,9 +2169,7 @@ function BlackboxLogViewer() {
         prefs.get('graphConfig', function(item) {
             if (item) {
                 graphConfig = GraphConfig.load(item);
-            } else if (flightLog) {
-                graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
-            }            
+            }           
         });
 
         // New workspaces feature; local storage of user configurations
