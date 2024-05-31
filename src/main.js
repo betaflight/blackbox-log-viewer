@@ -2163,11 +2163,11 @@ function BlackboxLogViewer() {
         });
 
         prefs.get('graphConfig', function(item) {
-            graphConfig = GraphConfig.load(item);
-
-            if (!graphConfig && flightLog) {
+            if (item) {
+                graphConfig = GraphConfig.load(item);
+            } else if (flightLog) {
                 graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, ["Motors", "Gyros"]);
-            }
+            }            
         });
 
         // New workspaces feature; local storage of user configurations
