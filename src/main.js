@@ -2177,8 +2177,6 @@ function BlackboxLogViewer() {
             } else {
                 workspaceGraphConfigs = defaultWorkspaceGraphConfigs;
             }
-
-            onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
         });
 
         prefs.get('activeWorkspace', function (id){
@@ -2188,9 +2186,8 @@ function BlackboxLogViewer() {
             else {
                 activeWorkspace = 1
             }
-
-            onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
         });
+        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
 
         // Get the offsetCache buffer
         prefs.get('offsetCache', function(item) {
