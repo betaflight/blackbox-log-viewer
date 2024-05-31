@@ -727,7 +727,7 @@ function BlackboxLogViewer() {
             } else if (isVideo) {
                 loadVideo(file);
             } else if (isWorkspaces) {
-                loadWorkspaces(file)
+                loadWorkspaces(file);
             }
         }
 
@@ -1042,7 +1042,7 @@ function BlackboxLogViewer() {
         $('[data-toggle="tooltip"]').tooltip({trigger: "hover", placement: "auto bottom"}); // initialise tooltips
         $('[data-toggle="dropdown"]').dropdown(); // initialise menus
         $('a.auto-hide-menu').click(function() {
-            let test = $(this).closest('.dropdown').children().first().dropdown("toggle");
+            $(this).closest('.dropdown').children().first().dropdown("toggle");
         });
 
         // Get Latest Version Information
@@ -1078,10 +1078,10 @@ function BlackboxLogViewer() {
 
         prefs.get('activeWorkspace', function (id){
             if (id) {
-                activeWorkspace = id
+                activeWorkspace = id;
             }
             else {
-                activeWorkspace = 1
+                activeWorkspace = 1;
             }
         });
 
@@ -1561,11 +1561,11 @@ function BlackboxLogViewer() {
             if (graph==null && field==null) return false; // no pen specified, just exit
 
             if (graph!=null && field==null) { // save ALL pens within group
-                for (let i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
-                    if (graphConfig[parseInt(graph)].fields[i].default==null) {
-                        graphConfig[parseInt(graph)].fields[i].default = [];
-                        graphConfig[parseInt(graph)].fields[i].default.smoothing   = graphConfig[parseInt(graph)].fields[i].smoothing;
-                        graphConfig[parseInt(graph)].fields[i].default.power       = graphConfig[parseInt(graph)].fields[i].curve.power;
+                for (const configField of graphConfig[parseInt(graph)].fields) {
+                    if (configField.default==null) {
+                        configField.default = [];
+                        configField.default.smoothing   = configField.smoothing;
+                        configField.default.power       = configField.curve.power;
                     }
                 }
                 return '<h4>Stored defaults for all pens</h4>';
@@ -1592,10 +1592,10 @@ function BlackboxLogViewer() {
             if (graph==null && field==null) return false; // no pen specified, just exit
 
             if (graph!=null && field==null) { // restore ALL pens within group
-                for (let i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
-                    if (graphConfig[parseInt(graph)].fields[i].default!=null) {
-                        graphConfig[parseInt(graph)].fields[i].smoothing         = graphConfig[parseInt(graph)].fields[i].default.smoothing;
-                        graphConfig[parseInt(graph)].fields[i].curve.power       = graphConfig[parseInt(graph)].fields[i].default.power;
+                for (const configField of graphConfig[parseInt(graph)].fields) {
+                    if (configField.default!=null) {
+                        configField.smoothing         = configField.default.smoothing;
+                        configField.curve.power       = configField.default.power;
                     } else return false;
                 }
                 return '<h4>Restored defaults for all pens</h4>';
@@ -1627,10 +1627,10 @@ function BlackboxLogViewer() {
 
             let changedValue = '<h4>Smoothing</h4>';
             if (graph!=null && field==null) { // change ALL pens within group
-                for (let i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
-                    graphConfig[parseInt(graph)].fields[i].smoothing += ((delta)?-scroll:+scroll);
-                    graphConfig[parseInt(graph)].fields[i].smoothing = constrain(graphConfig[parseInt(graph)].fields[i].smoothing, range.min, range.max);
-                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[i].smoothing / 100).toFixed(2)+ '%\n';
+                for (const configField of graphConfig[parseInt(graph)].fields) {
+                    configField.smoothing += ((delta)?-scroll:+scroll);
+                    configField.smoothing = constrain(configField.smoothing, range.min, range.max);
+                    changedValue += configField.friendlyName + ' ' + (configField.smoothing / 100).toFixed(2)+ '%\n';
                 }
                 return changedValue;
             }
@@ -1658,10 +1658,10 @@ function BlackboxLogViewer() {
             let changedValue = '<h4></h4>';
             if (graph!=null && field==null) { // change ALL pens within group
                 changedValue += (delta) ? "Zoom out:\n" : "Zoom in:\n";
-                for (let i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
-                    graphConfig[parseInt(graph)].fields[i].curve.MinMax.min *= ((delta) ? zoomScaleOut : zoomScaleIn);
-                    graphConfig[parseInt(graph)].fields[i].curve.MinMax.max *= ((delta) ? zoomScaleOut : zoomScaleIn);
-                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + '\n';
+                for (const configField of graphConfig[parseInt(graph)].fields) {
+                    configField.curve.MinMax.min *= ((delta) ? zoomScaleOut : zoomScaleIn);
+                    configField.curve.MinMax.max *= ((delta) ? zoomScaleOut : zoomScaleIn);
+                    changedValue += configField.friendlyName + '\n';
                 }
                 return changedValue;
             }
@@ -1692,10 +1692,10 @@ function BlackboxLogViewer() {
 
             let changedValue = '<h4>Expo</h4>';
             if (graph!=null && field==null) { // change ALL pens within group
-                for (let i=0; i<graphConfig[parseInt(graph)].fields.length; i++) {
-                    graphConfig[parseInt(graph)].fields[i].curve.power += ((delta)?-scroll:+scroll);
-                    graphConfig[parseInt(graph)].fields[i].curve.power = constrain(graphConfig[parseInt(graph)].fields[i].curve.power, range.min, range.max);
-                    changedValue += graphConfig[parseInt(graph)].fields[i].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[i].curve.power * 100).toFixed(2)+ '%\n';
+                for (const configField of graphConfig[parseInt(graph)].fields) {
+                    configField.curve.power += ((delta)?-scroll:+scroll);
+                    configField.curve.power = constrain(configField.curve.power, range.min, range.max);
+                    changedValue += gconfigField.friendlyName + ' ' + (configField.curve.power * 100).toFixed(2)+ '%\n';
                 }
                 return changedValue;
             }
@@ -2149,7 +2149,7 @@ function BlackboxLogViewer() {
                 }
                 loadFiles(files);
             });
-        };
+        }
 
         prefs.get('videoConfig', function(item) {
             if (item) {
@@ -2194,7 +2194,7 @@ function BlackboxLogViewer() {
             if (item) {
                 offsetCache = item;
             }
-        })
+        });
 
     });
 }
