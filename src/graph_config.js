@@ -47,7 +47,7 @@ export function GraphConfig(graphConfig) {
         const matches = field.name.match(/^(.+)\[all\]$/);
         const logFieldNames = flightLog.getMainFieldNames();
         const fields = [];
-        const setupColor = field.color == undefined ? false : (field.color == -1 ? true : false);
+        const setupColor = field?.color == -1;
         if (matches) {
             const
                 nameRoot = matches[1],
