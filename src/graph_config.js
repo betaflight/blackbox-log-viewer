@@ -47,16 +47,18 @@ export function GraphConfig(graphConfig) {
         const matches = field.name.match(/^(.+)\[all\]$/);
         const logFieldNames = flightLog.getMainFieldNames();
         const fields = [];
+        const setupColor = field?.color == -1;
         if (matches) {
             const
                 nameRoot = matches[1],
                 nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
-
+            let colorIndex = 0;
             for (const fieldName of logFieldNames) {
                 if (fieldName.match(nameRegex)) {
                     // forceNewCurve must be true for min max computing extended curves.
                     const forceNewCurve = true;
-                    field.color = undefined;
+                    const color = GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
+                    field.color = setupColor ? color : undefined;
                     fields.push(adaptField(flightLog, $.extend({}, field, {curve: $.extend({}, field.curve), name: fieldName, friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(fieldName, flightLog.getSysConfig().debug_mode)}), forceNewCurve));
                 }
             }
@@ -1395,7 +1397,8 @@ GraphConfig.load = function(config) {
 
             for (const srcFieldName of srcGraph.fields) {
                 const destField = {
-                        name: srcFieldName
+                        name: srcFieldName,
+                        color: -1,
                     };
 
                 destGraph.fields.push(destField);
