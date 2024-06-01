@@ -291,12 +291,14 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $('select.graph-height', graphElem).replaceWith(chooseHeight(graph.height?(graph.height):1));
 
         // Add Field List
+        let colorIndex = 0;
         for (const field of graph.fields) {
             const extendedFields = activeGraphConfig.extendFields(activeFlightLog, field);
-            let colorIndex = 0;
             for (const extField of extendedFields) {
-                const color = extField.color ?? GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
-                const fieldElem = renderField(flightLog, extField, color);
+                if (!extField.color || extField.color == -1) {
+                    extField.color = GraphConfig.PALETTE[colorIndex++ % GraphConfig.PALETTE.length].color;
+                }
+                const fieldElem = renderField(flightLog, extField, extField.color);
                 fieldList.append(fieldElem);
             }
         }
