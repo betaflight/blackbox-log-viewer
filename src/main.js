@@ -2170,25 +2170,6 @@ function BlackboxLogViewer() {
             }
         });
 
-        // New workspaces feature; local storage of user configurations
-        prefs.get('workspaceGraphConfigs', function(item) {
-            if (item) {
-                workspaceGraphConfigs = upgradeWorkspaceFormat(item);
-            } else {
-                workspaceGraphConfigs = defaultWorkspaceGraphConfigs;
-            }
-        });
-
-        prefs.get('activeWorkspace', function (id){
-            if (id) {
-                activeWorkspace = id
-            }
-            else {
-                activeWorkspace = 1
-            }
-        });
-        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
-
         // Get the offsetCache buffer
         prefs.get('offsetCache', function(item) {
             if (item) {
