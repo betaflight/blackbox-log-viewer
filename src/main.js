@@ -344,7 +344,7 @@ function BlackboxLogViewer() {
     }
 
     function updateCanvasSize() {
-        let
+        const
             width = $(canvas).width(),
             height = $(canvas).height();
 
@@ -360,18 +360,17 @@ function BlackboxLogViewer() {
     }
 
     function renderSeekBarPicker(){
-        let
+        const
             seekBarContainer = $(".seekBar-selection"),
-            seekBarPicker,
+            seekBarPicker = $('<select id="seekbarTypeSelect", class="seekbarTypeSelect">'),
             seekBarItems = [
                 ["avgThrottle", "Average motor throttle"],
                 ["maxRC", "Maximum stick input"],
                 ["maxMotorDiff", "Maximum motor differential"],
             ];
         seekBarContainer.empty();
-        seekBarPicker = $('<select id="seekbarTypeSelect", class="seekbarTypeSelect">');
         seekBarPicker.change(function() {
-            let
+            const
                 activity = flightLog.getActivitySummary(),
                 displayItem = $(this).val();
             seekBarMode = displayItem;
@@ -391,15 +390,14 @@ function BlackboxLogViewer() {
     function renderLogFileInfo(file) {
         $(".log-filename").text(file.name);
 
-        let
+        const
             logIndexContainer = $(".log-index"),
-            logIndexPicker,
             logCount = flightLog.getLogCount();
 
         logIndexContainer.empty();
 
+        const logIndexPicker = $('<select class="log-index form-control no-wheel">');
         if (logCount > 1) {
-            logIndexPicker = $('<select class="log-index form-control no-wheel">');
 
             logIndexPicker.change(function() {
                 selectLog(parseInt($(this).val(), 10));
@@ -411,12 +409,8 @@ function BlackboxLogViewer() {
         }
 
         for (let index = 0; index < logCount; index++) {
-            let
-                logLabel,
-                option, holder,
-                error;
-
-            error = flightLog.getLogError(index);
+            let logLabel;
+            const error = flightLog.getLogError(index);
 
             if (error) {
                 logLabel = error;
@@ -427,7 +421,7 @@ function BlackboxLogViewer() {
             }
 
             if (logCount > 1) {
-                option = $("<option></option>");
+                const option = $("<option></option>");
 
                 option.text((index + 1) + "/" + (flightLog.getLogCount()) + ": " + logLabel);
                 option.attr("value", index);
@@ -437,8 +431,7 @@ function BlackboxLogViewer() {
 
                 logIndexPicker.append(option);
             } else {
-                holder = $('<div class="form-control-static no-wheel"></div>');
-
+                const holder = $('<div class="form-control-static no-wheel"></div>');
                 holder.text(logLabel);
                 logIndexContainer.append(holder);
             }
@@ -475,7 +468,7 @@ function BlackboxLogViewer() {
         **/
 
         // Add log version information to status bar
-        let sysConfig = flightLog.getSysConfig();
+        const sysConfig = flightLog.getSysConfig();
         $('.version', statusBar).text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
                                         ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
         $('.looptime', statusBar).text( stringLoopTime(sysConfig.looptime, sysConfig.pid_process_denom, sysConfig.unsynced_fast_pwm, sysConfig.motor_pwm_rate));
@@ -484,7 +477,7 @@ function BlackboxLogViewer() {
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
         seekBar.setActivityRange(flightLog.getSysConfig().motorOutput[0], flightLog.getSysConfig().motorOutput[1]);
 
-        let
+        const
             activity = flightLog.getActivitySummary();
 
         seekBar.setActivity(activity.times, activity[seekBarMode], activity.hasEvent);
@@ -501,7 +494,7 @@ function BlackboxLogViewer() {
 
     function setGraphState(newState) {
         graphState = newState;
-        let btnLogPlayPause = $(".log-play-pause");
+        const btnLogPlayPause = $(".log-play-pause");
 
         lastRenderTime = false;
 
@@ -743,12 +736,12 @@ function BlackboxLogViewer() {
     }
 
     function loadLogFile(file) {
-        let reader = new FileReader();
+        const reader = new FileReader();
 
         reader.onload = function(e) {
-            let bytes = e.target.result;
+            const bytes = e.target.result;
 
-            let fileContents = String.fromCharCode.apply(null, new Uint8Array(bytes, 0,100));
+            const fileContents = String.fromCharCode.apply(null, new Uint8Array(bytes, 0,100));
 
             if (fileContents.match(/# dump|# diff/i)) { // this is actually a configuration file
                 try{
@@ -884,7 +877,7 @@ function BlackboxLogViewer() {
     }
 
     this.getBookmarks = function() { // get bookmark events
-        let bookmarks = [];
+        const bookmarks = [];
         try {
             if (bookmarkTimes!=null) {
                 for (let i=0; i<=9; i++) {
@@ -918,7 +911,7 @@ function BlackboxLogViewer() {
             data = JSON.stringify(workspaceGraphConfigs, undefined, 4);
         }
 
-        let blob = new Blob([data], {type: 'text/json'}),
+        const blob = new Blob([data], {type: 'text/json'}),
             e    = document.createEvent('MouseEvents'),
             a    = document.createElement('a');
 
@@ -934,7 +927,7 @@ function BlackboxLogViewer() {
         // Check if upgrade is needed
         if (!oldFormat.graphConfig) { return oldFormat }
 
-        let newFormat = [];
+        const newFormat = [];
 
         oldFormat.graphConfig.forEach((element, id) => {
             if (element) {
@@ -957,10 +950,10 @@ function BlackboxLogViewer() {
     }
 
     function loadWorkspaces(file) {
-        let reader = new FileReader();
+        const reader = new FileReader();
 
         reader.onload = function(e) {
-            let data = e.target.result;
+            const data = e.target.result;
             let tmp = JSON.parse(data);
             if (tmp.graphConfig) {
                 window.alert('Old Workspace format. Upgrading...');
@@ -981,7 +974,7 @@ function BlackboxLogViewer() {
                 console.debug("Empty data, nothing to save");
                 return;
             }
-            let blob = new Blob([data], {type: fileType}),
+            const blob = new Blob([data], {type: fileType}),
                 e    = document.createEvent('MouseEvents'),
                 a    = document.createElement('a');
             a.download = file || $(".log-filename").text() + "." + fileExtension;
@@ -1114,8 +1107,7 @@ function BlackboxLogViewer() {
         });
 
         $(".file-open").change(function(e) {
-            let
-                files = e.target.files;
+            const files = e.target.files;
 
             loadFiles(files);
 
@@ -1163,7 +1155,7 @@ function BlackboxLogViewer() {
             if (activeGraphConfig.selectedFieldName != null) {
                 hasAnalyser = !hasAnalyser;
             } else {
-                let graphs = activeGraphConfig.getGraphs();
+                const graphs = activeGraphConfig.getGraphs();
                 if (graphs.length == 0 || graphs[0].fields.length == 0) {
                     hasAnalyser = false;
                 } else {
@@ -1225,7 +1217,7 @@ function BlackboxLogViewer() {
                 if (slow) { scrollTime = (1/60) * 1000000; } // Assume 60Hz video
                 setVideoTime(video.currentTime - scrollTime / 1000000);
             } else {
-                let currentFrame = flightLog.getCurrentFrameAtTime((hasVideo)?video.currentTime:currentBlackboxTime);
+                const currentFrame = flightLog.getCurrentFrameAtTime((hasVideo)?video.currentTime:currentBlackboxTime);
                 if (currentFrame && currentFrame.previous && slow) {
                     setCurrentBlackboxTime(currentFrame.previous[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
                 } else {
@@ -1245,7 +1237,7 @@ function BlackboxLogViewer() {
                 if (slow) { scrollTime = (1/60) * 1000000; } // Assume 60Hz video
                 setVideoTime(video.currentTime + scrollTime / 1000000);
             } else {
-                let currentFrame = flightLog.getCurrentFrameAtTime((hasVideo)?video.currentTime:currentBlackboxTime);
+                const currentFrame = flightLog.getCurrentFrameAtTime((hasVideo)?video.currentTime:currentBlackboxTime);
                 if (currentFrame && currentFrame.next && slow) {
                     setCurrentBlackboxTime(currentFrame.next[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME]);
                 } else {
@@ -1386,7 +1378,7 @@ function BlackboxLogViewer() {
             invalidateGraph();
 
         }
-        let
+        const
             graphConfigDialog = new GraphConfigurationDialog(
                 $("#dlgGraphConfiguration"),
                 function(newConfig, redrawChart) {
@@ -1402,7 +1394,7 @@ function BlackboxLogViewer() {
                         flightLog.setSysConfig(newSysConfig);
 
                         // Save Current Position then re-calculate all the log information
-                        let activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
+                        const activePosition = (hasVideo)?video.currentTime:currentBlackboxTime;
 
                         selectLog(null);
                         if (hasVideo) {
@@ -1543,7 +1535,7 @@ function BlackboxLogViewer() {
         $(window).resize(function() { updateCanvasSize(); /*updateHeaderSize()*/ });
 
         function updateHeaderSize() {
-            let newHeight = $(".video-top-controls").height() - 20; // 23px offset
+            const newHeight = $(".video-top-controls").height() - 20; // 23px offset
             $(".log-graph").css("top", newHeight+"px");
             $(".log-graph-config").css("top", newHeight+"px");
             $(".log-seek-bar").css("top", newHeight+"px");
@@ -1732,7 +1724,7 @@ function BlackboxLogViewer() {
             if (e.which != 2) return; // is it the middle mouse button, no, then ignore
 
             if($(e.target).hasClass('graph-legend-group') || $(e.target).hasClass('graph-legend-field')) {
-                let refreshRequired = restorePenDefaults(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'));
+                const refreshRequired = restorePenDefaults(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'));
 
                 if (refreshRequired) {
                     graph.refreshGraphConfig();
@@ -1752,7 +1744,7 @@ function BlackboxLogViewer() {
         }
 
         if (graph && $(e.target).parents('.modal').length == 0){
-            let delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
+            const delta = Math.max(-1, Math.min(1, (e.originalEvent.wheelDelta)));
             if (delta!=0) {
                 if($(e.target).attr('id') == 'graphCanvas') { // we are scrolling the graph
                     if (delta < 0) { // scroll down (or left)
@@ -1801,7 +1793,7 @@ function BlackboxLogViewer() {
             // Pressing any key hides dropdown menus
             //$(".dropdown-toggle").dropdown("toggle");
 
-            let shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
+            const shifted = (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey);
             if (e.which === 13 && e.target.type === 'text' && $(e.target).parents('.modal').length == 0) {
                 // pressing return on a text field clears the focus.
                 $(e.target).blur();
@@ -1899,7 +1891,7 @@ function BlackboxLogViewer() {
                     case "9".charCodeAt(0):
                         try {
                             if (!e.altKey) { // Workspaces feature
-                                let id = e.which - 48;
+                                const id = e.which - 48;
                                 if (!e.shiftKey) { // retrieve graph configuration from workspace
                                     if (workspaceGraphConfigs[id] != null) {
                                         onSwitchWorkspace(workspaceGraphConfigs, id)
@@ -2058,7 +2050,7 @@ function BlackboxLogViewer() {
             loadeddata: videoLoaded
         });
 
-        let percentageFormat = {
+        const percentageFormat = {
             to: function(value) {
                 return value.toFixed(0) + "%";
             },
@@ -2133,7 +2125,7 @@ function BlackboxLogViewer() {
             const item = e.dataTransfer.items[0];
             const entry = item.webkitGetAsEntry();
             if (entry.isFile) {
-              let file = e.dataTransfer.files[0];
+              const file = e.dataTransfer.files[0];
               loadFiles([file]);
             }
             return false;
@@ -2170,25 +2162,6 @@ function BlackboxLogViewer() {
             }
         });
 
-        // New workspaces feature; local storage of user configurations
-        prefs.get('workspaceGraphConfigs', function(item) {
-            if (item) {
-                workspaceGraphConfigs = upgradeWorkspaceFormat(item);
-            } else {
-                workspaceGraphConfigs = defaultWorkspaceGraphConfigs;
-            }
-        });
-
-        prefs.get('activeWorkspace', function (id){
-            if (id) {
-                activeWorkspace = id
-            }
-            else {
-                activeWorkspace = 1
-            }
-        });
-        onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
-
         // Get the offsetCache buffer
         prefs.get('offsetCache', function(item) {
             if (item) {
@@ -2201,7 +2174,7 @@ function BlackboxLogViewer() {
 
 // Close the dropdowns if not clicking a descendant of the dropdown
 $(document).click(function (e) {
-    let p = $(e.target).closest(".dropdown");
+    const p = $(e.target).closest(".dropdown");
     if (!p.length) {
         $(".dropdown").removeClass("open");
     }
