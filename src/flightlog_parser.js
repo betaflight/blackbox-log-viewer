@@ -1777,7 +1777,7 @@ export function FlightLogParser(logData) {
                         validCount: 0,
                         corruptCount: 0,
                         desyncCount: 0,
-                        field: []
+                        field: [],
                     };
                 }
 
