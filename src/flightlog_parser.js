@@ -1792,18 +1792,18 @@ export function FlightLogParser(logData) {
                     if (frameAccepted) {
                         //Update statistics for this frame type
                         frameTypeStats.bytes += lastFrameSize;
-                        ++frameTypeStats.sizeCount[lastFrameSize];
-                        ++frameTypeStats.validCount;
+                        frameTypeStats.sizeCount[lastFrameSize]++;
+                        frameTypeStats.validCount++;
                     } else {
-                        ++frameTypeStats.desyncCount;
+                        frameTypeStats.desyncCount++;
                     }
                 } else {
                     //The previous frame was corrupt
 
                     //We need to resynchronise before we can deliver another main frame:
                     mainStreamIsValid = false;
-                    ++frameTypeStats.corruptCount;
-                    ++this.stats.totalCorruptFrames;
+                    frameTypeStats.corruptCount++;
+                    this.stats.totalCorruptFrames++;
 
                     /*
                      * Start the search for a frame beginning after the first byte of the previous corrupt frame.
