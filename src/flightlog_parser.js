@@ -1110,6 +1110,7 @@ export function FlightLogParser(logData) {
             mainHistory[0] = mainHistoryRing[2];
         else
             mainHistory[0] = mainHistoryRing[0];
+        return mainStreamIsValid;
     }
 
     /**
@@ -1251,7 +1252,7 @@ export function FlightLogParser(logData) {
             that.onFrameReady(gpsHomeIsValid, lastGPS, frameType, frameStart, frameEnd - frameStart);
         }
 
-        return true;
+        return gpsHomeIsValid;
     }
 
     function completeSlowFrame(frameType, frameStart, frameEnd, raw) {
@@ -1260,6 +1261,7 @@ export function FlightLogParser(logData) {
         if (that.onFrameReady) {
             that.onFrameReady(true, lastSlow, frameType, frameStart, frameEnd - frameStart);
         }
+        return true;
     }
 
     function completeInterframe(frameType, frameStart, frameEnd, raw) {
@@ -1300,6 +1302,7 @@ export function FlightLogParser(logData) {
             else
                 mainHistory[0] = mainHistoryRing[0];
         }
+        return mainStreamIsValid;
     }
 
     /**
@@ -1773,13 +1776,12 @@ export function FlightLogParser(logData) {
                         sizeCount: new Int32Array(256), /* int32 arrays are zero-filled, handy! */
                         validCount: 0,
                         corruptCount: 0,
-                        field: [],
-                        totalCount: 0
+                        desyncCount: 0,
+                        field: []
                     };
                 }
 
                 frameTypeStats = this.stats.frame[lastFrameType.marker];
-                frameTypeStats.totalCount++;
                 // If we see what looks like the beginning of a new frame, assume that the previous frame was valid:
                 if (lastFrameSize <= FLIGHT_LOG_MAX_FRAME_LENGTH && looksLikeFrameCompleted) {
                     var frameAccepted = true;
@@ -1790,22 +1792,18 @@ export function FlightLogParser(logData) {
                     if (frameAccepted) {
                         //Update statistics for this frame type
                         frameTypeStats.bytes += lastFrameSize;
-                        frameTypeStats.sizeCount[lastFrameSize]++;
-                        frameTypeStats.validCount++;
+                        ++frameTypeStats.sizeCount[lastFrameSize];
+                        ++frameTypeStats.validCount;
                     } else {
-                        frameTypeStats.desyncCount = frameTypeStats.desyncCount ? ++frameTypeStats.desyncCount : 1;
+                        ++frameTypeStats.desyncCount;
                     }
                 } else {
                     //The previous frame was corrupt
 
                     //We need to resynchronise before we can deliver another main frame:
                     mainStreamIsValid = false;
-                    frameTypeStats.corruptCount++;
-                    this.stats.totalCorruptFrames++;
-
-                    //Let the caller know there was a corrupt frame (don't give them a pointer to the frame data because it is totally worthless)
-                    if (this.onFrameReady)
-                        this.onFrameReady(false, null, lastFrameType.marker, frameStart, lastFrameSize);
+                    ++frameTypeStats.corruptCount;
+                    ++this.stats.totalCorruptFrames;
 
                     /*
                      * Start the search for a frame beginning after the first byte of the previous corrupt frame.
