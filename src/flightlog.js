@@ -1143,9 +1143,7 @@ export function FlightLog(logData) {
 
     this.getCurrentLogRowsCount = function () {
         const stats = this.getStats(this.getLogIndex());
-        const countI = stats.frame['I'] ? stats.frame['I'].totalCount : 0;
-        const countP = stats.frame['P'] ? stats.frame['P'].totalCount : 0;
-        return countI + countP;
+        return stats.frame['I'].validCount + stats.frame['P'].validCount;
     };
 }
 
