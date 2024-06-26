@@ -8,7 +8,8 @@ const
     MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
     NUM_VS_BINS = 100,
     WARNING_RATE_DIFFERENCE = 0.05,
-    MAX_RPM_VALUE = 10000;
+    MAX_RPM_VELOCITY = 100000,
+    MAX_RPM_VALUE = 1000;
 
 export const GraphSpectrumCalc = {
     _analyserTimeRange : { 
@@ -23,23 +24,27 @@ export const GraphSpectrumCalc = {
     },
     _flightLog : null,
     _sysConfig : null,
+    _prevRPM : [],
+    _prevTime : undefined, 
+    _motorPoles : null,
 };
 
 GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
 
     this._flightLog = flightLog;
     this._sysConfig = sysConfig;
+    this._motorPoles = flightLog.getSysConfig()['motor_poles'];
 
-    var gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
+    const gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
     this._blackBoxRate = gyroRate * this._sysConfig['frameIntervalPNum'] / this._sysConfig['frameIntervalPDenom'];
     if (this._sysConfig.pid_process_denom != null) {
         this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
     }
     this._BetaflightRate = this._blackBoxRate;
 
-    let minTime = this._flightLog.getMinTime(),
-        maxTime = this._flightLog.getMaxTime();
-    let timeRange = maxTime - minTime;
+    const minTime = this._flightLog.getMinTime(),
+          maxTime = this._flightLog.getMaxTime(),
+          timeRange = maxTime - minTime;
 
     const length = flightLog.getCurrentLogRowsCount();
     this._actualeRate = 1e6 * length / timeRange;
@@ -186,9 +191,8 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
 
 GraphSpectrumCalc.dataLoadFrequencyVsRpm = function() {
     let fftData = this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
-    const motorPoles = this._flightLog.getSysConfig()['motor_poles'];
-    fftData.vsRange.max *= 3.333 / motorPoles;
-    fftData.vsRange.min *= 3.333 / motorPoles;
+    fftData.vsRange.max *= 3.333 / this._motorPoles;
+    fftData.vsRange.min *= 3.333 / this._motorPoles;
     return fftData;
 };
 
@@ -307,31 +311,37 @@ GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
 
 GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
-    var allChunks = this._getFlightChunks();
-    let vsIndexes = this._getVsIndexes(vsFieldNames);
+    const allChunks = this._getFlightChunks();
+    const vsIndexes = this._getVsIndexes(vsFieldNames);
 
-    var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-    let vsValues = new Array(vsIndexes.length).fill(null).map(() => new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
+    const samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+    const vsValues = new Array(vsIndexes.length).fill(null).map(() => new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
 
-    var samplesCount = 0;
-    let lastRPM = 0;
+    let samplesCount = 0;
     for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
         var chunk = allChunks[chunkIndex];
         for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
             samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
-
+            const time = chunk.frames[frameIndex][1];
+            const dT = this._prevTime != null ? (time - this._prevTime)/1000000 : undefined;
             for (let i = 0; i < vsIndexes.length; i++) {
-                let vsFieldIx = vsIndexes[i];
+                const vsFieldIx = vsIndexes[i];
                 let value = chunk.frames[frameIndex][vsFieldIx];
                 if (vsFieldNames == FIELD_RPM_NAMES) {
-                    if (value > MAX_RPM_VALUE || value < 0)
-                        value = lastRPM;
-                    lastRPM = value;
+                    if (this._prevRPM[i] != undefined && dT != undefined) {
+                        const veloRPM = (value - this._prevRPM[i]) / dT * 3.333 / this._motorPoles;
+                        const rpmHz = value * 3.333 / this._motorPoles;
+                        if (veloRPM > MAX_RPM_VELOCITY || veloRPM < -MAX_RPM_VELOCITY || rpmHz < 0 || rpmHz > MAX_RPM_VALUE) {
+                            value = this._prevRPM[i];
+                        }
+                    }
                 }
+                this._prevRPM[i] = value;
                 maxValue = Math.max(maxValue, value);
                 minValue = Math.min(minValue, value);
                 vsValues[i][samplesCount] = value;
             }
+            this._prevTime = time;
             samplesCount++;
         }
     }
