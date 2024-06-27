@@ -33,6 +33,8 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
 
     this._flightLog = flightLog;
     this._sysConfig = sysConfig;
+    this._prevRPM = [];
+    this._prevTime = undefined;
     this._motorPoles = flightLog.getSysConfig()['motor_poles'];
 
     const gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
@@ -325,6 +327,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
             for (let i = 0; i < vsIndexes.length; i++) {
                 const vsFieldIx = vsIndexes[i];
                 let value = frame[vsFieldIx];
+                //Drop wrong RPM values
                 if (vsFieldNames == FIELD_RPM_NAMES) {
                     if (this._prevRPM[i] != undefined && dT != undefined) {
                         const veloRPM = (value - this._prevRPM[i]) / dT * 3.333 / this._motorPoles;
@@ -332,9 +335,15 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
                         if (veloRPM > MAX_RPM_VELOCITY || veloRPM < -MAX_RPM_VELOCITY || rpmHz < 0 || rpmHz > MAX_RPM_VALUE) {
                             value = this._prevRPM[i];
                         }
+                    } else {
+                        if (value < 0) {
+                            value = 0;
+                        } else if (value > MAX_RPM_VALUE) {
+                            value = MAX_RPM_VALUE;
+                        }
                     }
+                    this._prevRPM[i] = value;
                 }
-                this._prevRPM[i] = value;
                 maxValue = Math.max(maxValue, value);
                 minValue = Math.min(minValue, value);
                 vsValues[i][samplesCount] = value;
