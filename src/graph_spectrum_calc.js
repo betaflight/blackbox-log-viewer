@@ -8,7 +8,8 @@ const
     MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
     NUM_VS_BINS = 100,
     WARNING_RATE_DIFFERENCE = 0.05,
-    MAX_RPM_VALUE = 10000;
+    MAX_RPM_HZ_VALUE = 800;
+
 
 export const GraphSpectrumCalc = {
     _analyserTimeRange : { 
@@ -23,6 +24,7 @@ export const GraphSpectrumCalc = {
     },
     _flightLog : null,
     _sysConfig : null,
+    _motorPoles : null,
 };
 
 GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
@@ -30,16 +32,17 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
     this._flightLog = flightLog;
     this._sysConfig = sysConfig;
 
-    var gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
+    const gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
+    this._motorPoles = flightLog.getSysConfig()['motor_poles'];
     this._blackBoxRate = gyroRate * this._sysConfig['frameIntervalPNum'] / this._sysConfig['frameIntervalPDenom'];
     if (this._sysConfig.pid_process_denom != null) {
         this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
     }
     this._BetaflightRate = this._blackBoxRate;
 
-    let minTime = this._flightLog.getMinTime(),
-        maxTime = this._flightLog.getMaxTime();
-    let timeRange = maxTime - minTime;
+    const minTime = this._flightLog.getMinTime(),
+          maxTime = this._flightLog.getMaxTime(),
+          timeRange = maxTime - minTime;
 
     const length = flightLog.getCurrentLogRowsCount();
     this._actualeRate = 1e6 * length / timeRange;
@@ -80,17 +83,17 @@ GraphSpectrumCalc.setDataBuffer = function(dataBuffer) {
 
 GraphSpectrumCalc.dataLoadFrequency = function() {
 
-    var flightSamples = this._getFlightSamplesFreq();
+    const flightSamples = this._getFlightSamplesFreq();
 
     if(userSettings.analyserHanning) {
         this._hanningWindow(flightSamples.samples, flightSamples.count);
     }
 
     //calculate fft
-    var fftOutput = this._fft(flightSamples.samples);
+    const fftOutput = this._fft(flightSamples.samples);
 
     // Normalize the result
-    var fftData = this._normalizeFft(fftOutput, flightSamples.samples.length);
+    const fftData = this._normalizeFft(fftOutput, flightSamples.samples.length);
 
     return fftData;
 };
@@ -98,23 +101,23 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
-    let flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue);
+    const flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue);
 
     // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle
     // for each chunk. We use a moving window to get more chunks available.
-    var fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
-    var fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
+    const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
+    const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
 
     let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
      // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
-    let matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength * 2));
+    const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength * 2));
 
-    let numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
+    const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
-    var fft = new FFT.complex(fftChunkLength, false);
-    for (var fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
+    const fft = new FFT.complex(fftChunkLength, false);
+    for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
 
-        let fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
+        const fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
         let fftOutput = new Float64Array(fftChunkLength * 2);
 
         // Hanning window applied to input data
@@ -156,7 +159,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
     // Divide the values from the fft in each row (vs value bin) by the number of samples in the bin
     for (let i = 0; i < NUM_VS_BINS; i++) {
         if (numberSamples[i] > 1) {
-            for (var j = 0; j < matrixFftOutput[i].length; j++) {
+            for (let j = 0; j < matrixFftOutput[i].length; j++) {
                 matrixFftOutput[i][j] /= numberSamples[i];
             }
         }
@@ -166,7 +169,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
     // but after some tests we let the data as is, an we prefer to apply a
     // blur algorithm to the heat map image
 
-    var fftData = {
+    const fftData = {
             fieldIndex   : this._dataBuffer.fieldIndex,
             fieldName    : this._dataBuffer.fieldName,
             fftLength    : fftChunkLength,
@@ -185,10 +188,9 @@ GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
 };
 
 GraphSpectrumCalc.dataLoadFrequencyVsRpm = function() {
-    let fftData = this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
-    const motorPoles = this._flightLog.getSysConfig()['motor_poles'];
-    fftData.vsRange.max *= 3.333 / motorPoles;
-    fftData.vsRange.min *= 3.333 / motorPoles;
+    const fftData = this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
+    fftData.vsRange.max *= 3.333 / this._motorPoles;
+    fftData.vsRange.min *= 3.333 / this._motorPoles;
     return fftData;
 };
 
@@ -251,14 +253,14 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function() {
 
 GraphSpectrumCalc._getFlightChunks = function() {
 
-    var logStart = 0;
+    let logStart = 0;
     if(this._analyserTimeRange.in) {
         logStart = this._analyserTimeRange.in;
     } else {
         logStart = this._flightLog.getMinTime();
     }
 
-    var logEnd = 0;
+    let logEnd = 0;
     if(this._analyserTimeRange.out) {
         logEnd = this._analyserTimeRange.out;
     } else {
@@ -268,23 +270,22 @@ GraphSpectrumCalc._getFlightChunks = function() {
     // Limit size
     logEnd = (logEnd - logStart <= MAX_ANALYSER_LENGTH)? logEnd : logStart + MAX_ANALYSER_LENGTH;
 
-    var allChunks = this._flightLog.getChunksInTimeRange(logStart, logEnd);
+    const allChunks = this._flightLog.getChunksInTimeRange(logStart, logEnd);
 
     return allChunks;
 }
 
 GraphSpectrumCalc._getFlightSamplesFreq = function() {
 
-    var allChunks = this._getFlightChunks();
+    const allChunks = this._getFlightChunks();
 
-    var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+    const samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
 
     // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
-    var samplesCount = 0;
-    for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
-        var chunk = allChunks[chunkIndex];
-        for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
+    let samplesCount = 0;
+    for (const chunk of allChunks) {
+        for (const frame of chunk.frames) {
+            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
             samplesCount++;
         }
     }
@@ -296,7 +297,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
 };
 
 GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
-    let fieldIndexes = [];
+    const fieldIndexes = [];
     for (const fieldName of vsFieldNames) {
         if (Object.hasOwn(this._flightLog.getMainFieldIndexes(), fieldName)) {
             fieldIndexes.push(this._flightLog.getMainFieldIndexByName(fieldName));
@@ -307,32 +308,48 @@ GraphSpectrumCalc._getVsIndexes = function(vsFieldNames) {
 
 GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
-    var allChunks = this._getFlightChunks();
-    let vsIndexes = this._getVsIndexes(vsFieldNames);
+    const allChunks = this._getFlightChunks();
+    const vsIndexes = this._getVsIndexes(vsFieldNames);
 
-    var samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
-    let vsValues = new Array(vsIndexes.length).fill(null).map(() => new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
+    const samples = new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate);
+    const vsValues = new Array(vsIndexes.length).fill(null).map(() => new Float64Array(MAX_ANALYSER_LENGTH / (1000 * 1000) * this._blackBoxRate));
 
-    var samplesCount = 0;
-    let lastRPM = 0;
-    for (var chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
-        var chunk = allChunks[chunkIndex];
-        for (var frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
+    let samplesCount = 0;
+    for (const chunk of allChunks) {
+        for (let frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
             samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
-
             for (let i = 0; i < vsIndexes.length; i++) {
                 let vsFieldIx = vsIndexes[i];
                 let value = chunk.frames[frameIndex][vsFieldIx];
                 if (vsFieldNames == FIELD_RPM_NAMES) {
-                    if (value > MAX_RPM_VALUE || value < 0)
-                        value = lastRPM;
-                    lastRPM = value;
+                    const maxRPM = MAX_RPM_HZ_VALUE * this._motorPoles / 3.333;
+                    if (value > maxRPM) {
+                        value = maxRPM;
+                    }
+                    else if (value < 0) {
+                        value = 0;
+                    }
                 }
-                maxValue = Math.max(maxValue, value);
-                minValue = Math.min(minValue, value);
                 vsValues[i][samplesCount] = value;
             }
             samplesCount++;
+        }
+    }
+
+    // Calculate min max average of the VS values in the chunk what will used by spectrum data definition
+    const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
+    const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
+    for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < samplesCount; fftChunkIndex += fftChunkWindow) {
+        for (const vsValueArray of vsValues) {
+            // Calculate average of the VS values in the chunk
+            let sumVsValues = 0;
+            for (let indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
+                sumVsValues += vsValueArray[indexVs];
+            }
+            // Find min max average of the VS values in the chunk
+            const avgVsValue = sumVsValues / fftChunkLength;
+            maxValue = Math.max(maxValue, avgVsValue);
+            minValue = Math.min(minValue, avgVsValue);
         }
     }
 
@@ -375,11 +392,10 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
     // Loop through all the samples in the chunks and assign them to a sample array.
     let samplesCount = 0;
     let maxSetpoint = 0;
-    for (let chunkIndex = 0; chunkIndex < allChunks.length; chunkIndex++) {
-        const chunk = allChunks[chunkIndex];
-        for (let frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
-            piderror[samplesCount] = chunk.frames[frameIndex][FIELD_PIDERROR_INDEX];
-            setpoint[samplesCount] = chunk.frames[frameIndex][FIELD_SETPOINT_INDEX];
+    for (const chunk of allChunks) {
+        for (const frame of chunk.frames) {
+            piderror[samplesCount] = frame[FIELD_PIDERROR_INDEX];
+            setpoint[samplesCount] = frame[FIELD_SETPOINT_INDEX];
             if (setpoint[samplesCount] > maxSetpoint) {
                 maxSetpoint = setpoint[samplesCount];
             }
@@ -401,7 +417,7 @@ GraphSpectrumCalc._hanningWindow = function(samples, size) {
         size = samples.length;
     }
 
-    for(var i=0; i < size; i++) {
+    for(let i=0; i < size; i++) {
         samples[i] *= 0.5 * (1-Math.cos((2*Math.PI*i)/(size - 1)));
     }
 };
@@ -412,9 +428,9 @@ GraphSpectrumCalc._fft  = function(samples, type) {
         type = 'real';
     }
 
-    var fftLength = samples.length;
-    var fftOutput = new Float64Array(fftLength * 2);
-    var fft = new FFT.complex(fftLength, false);
+    const fftLength = samples.length;
+    const fftOutput = new Float64Array(fftLength * 2);
+    const fft = new FFT.complex(fftLength, false);
 
     fft.simple(fftOutput, samples, type);
 
@@ -432,12 +448,12 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
     }
 
     // Make all the values absolute, and calculate some useful values (max noise, etc.)
-    var maxFrequency = (this._blackBoxRate / 2.0);
-    var noiseLowEndIdx = 100 / maxFrequency * fftLength;
-    var maxNoiseIdx = 0;
-    var maxNoise = 0;
+    const maxFrequency = (this._blackBoxRate / 2.0);
+    const noiseLowEndIdx = 100 / maxFrequency * fftLength;
+    let maxNoiseIdx = 0;
+    let maxNoise = 0;
 
-    for (var i = 0; i < fftLength; i++) {
+    for (let i = 0; i < fftLength; i++) {
         fftOutput[i] = Math.abs(fftOutput[i]);
         if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
             maxNoise = fftOutput[i];
@@ -447,7 +463,7 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
 
     maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
 
-    var fftData = {
+    const fftData = {
         fieldIndex   : this._dataBuffer.fieldIndex,
         fieldName    : this._dataBuffer.fieldName,
         fftLength    : fftLength,
