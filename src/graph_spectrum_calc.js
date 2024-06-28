@@ -8,8 +8,8 @@ const
     MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
     NUM_VS_BINS = 100,
     WARNING_RATE_DIFFERENCE = 0.05,
-    MAX_RPM_VELOCITY = 100000,
-    MAX_RPM_VALUE = 1000;
+    MAX_RPM_HZ_VALUE = 800;
+
 
 export const GraphSpectrumCalc = {
     _analyserTimeRange : { 
@@ -24,8 +24,6 @@ export const GraphSpectrumCalc = {
     },
     _flightLog : null,
     _sysConfig : null,
-    _prevRPM : [],
-    _prevTime : undefined, 
     _motorPoles : null,
 };
 
@@ -33,11 +31,9 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
 
     this._flightLog = flightLog;
     this._sysConfig = sysConfig;
-    this._prevRPM = [];
-    this._prevTime = undefined;
-    this._motorPoles = flightLog.getSysConfig()['motor_poles'];
 
     const gyroRate = (1000000 / this._sysConfig['looptime']).toFixed(0);
+    this._motorPoles = flightLog.getSysConfig()['motor_poles'];
     this._blackBoxRate = gyroRate * this._sysConfig['frameIntervalPNum'] / this._sysConfig['frameIntervalPDenom'];
     if (this._sysConfig.pid_process_denom != null) {
         this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
@@ -320,36 +316,40 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
 
     let samplesCount = 0;
     for (const chunk of allChunks) {
-        for (const frame of chunk.frames) {
-            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
-            const time = frame[1];
-            const dT = this._prevTime != null ? (time - this._prevTime)/1000000 : undefined;
+        for (let frameIndex = 0; frameIndex < chunk.frames.length; frameIndex++) {
+            samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(chunk.frames[frameIndex][this._dataBuffer.fieldIndex]));
             for (let i = 0; i < vsIndexes.length; i++) {
-                const vsFieldIx = vsIndexes[i];
-                let value = frame[vsFieldIx];
-                //Drop wrong RPM values
+                let vsFieldIx = vsIndexes[i];
+                let value = chunk.frames[frameIndex][vsFieldIx];
                 if (vsFieldNames == FIELD_RPM_NAMES) {
-                    if (this._prevRPM[i] != undefined && dT != undefined) {
-                        const veloRPM = (value - this._prevRPM[i]) / dT * 3.333 / this._motorPoles;
-                        const rpmHz = value * 3.333 / this._motorPoles;
-                        if (veloRPM > MAX_RPM_VELOCITY || veloRPM < -MAX_RPM_VELOCITY || rpmHz < 0 || rpmHz > MAX_RPM_VALUE) {
-                            value = this._prevRPM[i];
-                        }
-                    } else {
-                        if (value < 0) {
-                            value = 0;
-                        } else if (value > MAX_RPM_VALUE) {
-                            value = MAX_RPM_VALUE;
-                        }
+                    const maxRPM = MAX_RPM_HZ_VALUE * this._motorPoles / 3.333;
+                    if (value > maxRPM) {
+                        value = maxRPM;
                     }
-                    this._prevRPM[i] = value;
+                    else if (value < 0) {
+                        value = 0;
+                    }
                 }
-                maxValue = Math.max(maxValue, value);
-                minValue = Math.min(minValue, value);
                 vsValues[i][samplesCount] = value;
             }
-            this._prevTime = time;
             samplesCount++;
+        }
+    }
+
+    // Calculate min max average of the VS values in the chunk what will used by spectrum data definition
+    const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
+    const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
+    for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < samplesCount; fftChunkIndex += fftChunkWindow) {
+        for (const vsValueArray of vsValues) {
+            // Calculate average of the VS values in the chunk
+            let sumVsValues = 0;
+            for (let indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
+                sumVsValues += vsValueArray[indexVs];
+            }
+            // Find min max average of the VS values in the chunk
+            const avgVsValue = sumVsValues / fftChunkLength;
+            maxValue = Math.max(maxValue, avgVsValue);
+            minValue = Math.min(minValue, avgVsValue);
         }
     }
 
@@ -365,7 +365,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
         }
     }
 
-    const slicedVsValues = [];
+    let slicedVsValues = [];
     for (const vsValueArray of vsValues) {
         slicedVsValues.push(vsValueArray.slice(0, samplesCount));
     }
