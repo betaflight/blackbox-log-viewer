@@ -1132,30 +1132,179 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
 ) {
   DEBUG_FRIENDLY_FIELD_NAMES = { ...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL };
 
-  if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
-    if (semver.gte(firmwareVersion, "4.1.0")) {
-      DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
-        "debug[all]": "Feedforward [roll]",
-        "debug[0]": "Setpoint Delta [roll]",
-        "debug[1]": "Boost [roll]",
-        "debug[2]": "Boost, clipped [roll]",
-        "debug[3]": "Duplicate Counter [roll]",
-        "debug[4]": "Not Used",
-        "debug[5]": "Not Used",
-        "debug[6]": "Not Used",
-        "debug[7]": "Not Used",
-      };
-      DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
-        "debug[all]": "Feedforward Limit [roll]",
-        "debug[0]": "FF limit input [roll]",
-        "debug[1]": "FF limit input [pitch]",
-        "debug[2]": "FF limited [roll]",
-        "debug[3]": "Not Used",
-        "debug[4]": "Not Used",
-        "debug[5]": "Not Used",
-        "debug[6]": "Not Used",
-        "debug[7]": "Not Used",
-      };
+    DEBUG_FRIENDLY_FIELD_NAMES = {...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL};
+
+    if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
+
+        if (semver.gte(firmwareVersion, '4.1.0')) {
+            DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                'debug[all]':'Feedforward [roll]',
+                'debug[0]':'Setpoint Delta [roll]',
+                'debug[1]':'Boost [roll]',
+                'debug[2]':'Boost, clipped [roll]',
+                'debug[3]':'Duplicate Counter [roll]',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.FF_LIMIT = {
+                'debug[all]':'Feedforward Limit [roll]',
+                'debug[0]':'FF limit input [roll]',
+                'debug[1]':'FF limit input [pitch]',
+                'debug[2]':'FF limited [roll]',
+                'debug[3]':'Not Used',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+        }
+
+        if (semver.gte(firmwareVersion, '4.2.0')) {
+            DEBUG_FRIENDLY_FIELD_NAMES.FF_INTERPOLATED = {
+                'debug[all]':'Feedforward [roll]',
+                'debug[0]':'Setpoint Delta [roll]',
+                'debug[1]':'Acceleration [roll]',
+                'debug[2]':'Acceleration, clipped [roll]',
+                'debug[3]':'Duplicate Counter [roll]',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+        }
+
+        if (semver.gte(firmwareVersion, '4.3.0')) {
+            DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
+                'debug[all]':'Feedforward [roll]',
+                'debug[0]':'Setpoint, un-smoothed [roll]',
+                'debug[1]':'Delta, smoothed [roll]',
+                'debug[2]':'Boost, smoothed [roll]',
+                'debug[3]':'rcCommand Delta [roll]',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD_LIMIT = {
+                'debug[all]':'Feedforward Limit [roll]',
+                'debug[0]':'Feedforward input [roll]',
+                'debug[1]':'Feedforward input [pitch]',
+                'debug[2]':'Feedforward limited [roll]',
+                'debug[3]':'Not Used',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.DYN_IDLE = {
+                'debug[all]':'Dyn Idle',
+                'debug[0]':'Dyn Idle P [roll]',
+                'debug[1]':'Dyn Idle I [roll]',
+                'debug[2]':'Dyn Idle D [roll]',
+                'debug[3]':'Min RPM',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.FFT = {
+                'debug[all]':'Debug FFT',
+                'debug[0]':'Gyro Pre Dyn Notch [dbg-axis]',
+                'debug[1]':'Gyro Post Dyn Notch [dbg-axis]',
+                'debug[2]':'Gyro Downsampled [dbg-axis]',
+                'debug[3]':'Not used',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.FFT_TIME = {
+                'debug[all]':'Debug FFT TIME',
+                'debug[0]':'Active calc step',
+                'debug[1]':'Step duration',
+                'debug[2]':'Not used',
+                'debug[3]':'Not used',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
+                'debug[all]':'Debug FFT FREQ',
+                'debug[0]':'Notch 1 Center Freq [dbg-axis]',
+                'debug[1]':'Notch 2 Center Freq [dbg-axis]',
+                'debug[2]':'Notch 3 Center Freq [dbg-axis]',
+                'debug[3]':'Gyro Pre Dyn Notch [dbg-axis]',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+                'debug[all]':'GPS Rescue Altitude',
+                'debug[0]':'Throttle P',
+                'debug[1]':'Throttle D',
+                'debug[2]':'Altitude',
+                'debug[3]':'Target Altitude',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+        }
+
+        if (semver.gte(firmwareVersion, '4.4.0')) {
+            DEBUG_FRIENDLY_FIELD_NAMES.BARO = {
+                'debug[all]':'Debug Barometer',
+                'debug[0]':'Baro State',
+                'debug[1]':'Baro Pressure',
+                'debug[2]':'Baro Temperature',
+                'debug[3]':'Baro Altitude',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.RTH = {
+                'debug[all]':'RTH Rescue codes',
+                'debug[0]':'Pitch angle, deg',
+                'debug[1]':'Rescue Phase',
+                'debug[2]':'Failure code',
+                'debug[3]':'Failure timers',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+            DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+                'debug[all]':'GPS Rescue throttle PIDs',
+                'debug[0]':'Throttle P',
+                'debug[1]':'Throttle D',
+                'debug[2]':'Altitude',
+                'debug[3]':'Target altitude',
+                'debug[4]':'Not Used',
+                'debug[5]':'Not Used',
+                'debug[6]':'Not Used',
+                'debug[7]':'Not Used',
+            };
+        }
+
+        if (semver.gte(firmwareVersion, '4.6.0')) {
+            // FFT_FREQ updated in firmware #13750
+            DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
+                'debug[all]':'Debug FFT FREQ',
+                'debug[0]':'Gyro Pre Dyn Notch [dbg-axis]',
+                'debug[1]':'Notch 1 Center Freq [dbg-axis]',
+                'debug[2]':'Notch 2 Center Freq [dbg-axis]',
+                'debug[3]':'Notch 3 Center Freq [dbg-axis]',
+                'debug[4]':'Notch 4 Center Freq [dbg-axis]',
+                'debug[5]':'Notch 5 Center Freq [dbg-axis]',
+                'debug[6]':'Notch 6 Center Freq [dbg-axis]',
+                'debug[7]':'Notch 7 Center Freq [dbg-axis]',
+            };
+        }
     }
 
     if (semver.gte(firmwareVersion, "4.2.0")) {
@@ -1287,8 +1436,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Not Used",
       };
     }
-  }
-};
+}
 
 FlightLogFieldPresenter.presentFlags = function (flags, flagNames) {
   let printedFlag = false,
