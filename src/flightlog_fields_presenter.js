@@ -361,14 +361,14 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     },
     'FFT_FREQ' : {
         'debug[all]':'Debug FFT FREQ',
-        'debug[0]':'Center Freq [roll]',
-        'debug[1]':'Center Freq [pitch]',
-        'debug[2]':'Gyro Pre-Dyn [dbg-axis]',
-        'debug[3]':'Gyro Scaled [dbg-axis]',
-        'debug[4]':'Not Used',
-        'debug[5]':'Not Used',
-        'debug[6]':'Not Used',
-        'debug[7]':'Not Used',
+        'debug[0]':'Gyro Pre-DN [dbg-axis]',
+        'debug[1]':'DN1 Center Freq [dbg-axis]',
+        'debug[2]':'DN2 Center Freq [dbg-axis]',
+        'debug[3]':'DN3 Center Freq [dbg-axis]',
+        'debug[4]':'DN4 Center Freq [dbg-axis]',
+        'debug[5]':'DN5 Center Freq [dbg-axis]',
+        'debug[6]':'DN6 Center Freq [dbg-axis]',
+        'debug[7]':'DN7 Center Freq [dbg-axis]',
     },
     'RX_FRSKY_SPI' : {
         'debug[all]':'FrSky SPI Rx',
@@ -1948,7 +1948,7 @@ FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
      * @param fieldName Name of the field
      * @param value Value of the field
      * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
-     */ 
+     */
     FlightLogFieldPresenter.ConvertFieldValue = function(flightLog, fieldName, toFriendly, value) {
         if (value === undefined) {
             return 0;
@@ -2002,7 +2002,7 @@ FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
             case 'eRPM[6]':
             case 'eRPM[7]':
                 let motor_poles = flightLog.getSysConfig()['motor_poles'];
-                return toFriendly ? value * 200 / motor_poles : value * motor_poles / 200; 
+                return toFriendly ? value * 200 / motor_poles : value * motor_poles / 200;
 
 
             case 'axisSum[0]':
@@ -2112,7 +2112,7 @@ FlightLogFieldPresenter.fieldNameToFriendly = function(fieldName, debugMode) {
      * @param fieldName Name of the field
      * @param value Value of the field
      * @param toFriendly If true then convert from log file units to charts, else - from charts units to log file
-     */     
+     */
     FlightLogFieldPresenter.ConvertDebugFieldValue = function(flightLog, fieldName, toFriendly, value) {
         if (flightLog) {
             const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
