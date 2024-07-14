@@ -1,5 +1,5 @@
 export function SeekBar(canvas) {
-    var
+    let
         that = this,
         
         //Times:
@@ -43,7 +43,7 @@ export function SeekBar(canvas) {
     this.onSeek = false;
     
     function seekToDOMPixel(x) {
-        var
+        let
             bounding = canvas.getBoundingClientRect(),
             time; 
 
@@ -117,7 +117,7 @@ export function SeekBar(canvas) {
     };
 
     this.resize = function(width, height) {
-        var ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+        let ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
         
         canvas.width = width * ratio;
         canvas.height = height * ratio;
@@ -165,7 +165,7 @@ export function SeekBar(canvas) {
     };
 
     function rebuildBackground() {
-        var 
+        let 
             x, activityIndex, activity,
             pixelTimeStep, time;
         
@@ -240,7 +240,7 @@ export function SeekBar(canvas) {
                 }
                 
                 if (outTime !== false) {
-                    var 
+                    let 
                         barStartX = (outTime - min) / pixelTimeStep + BAR_INSET;
                     
                     backgroundContext.fillRect(barStartX, 0, canvas.width - barStartX, canvas.height);
@@ -267,7 +267,7 @@ export function SeekBar(canvas) {
         }
         
         //Draw cursor
-        var 
+        let 
             pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2),
             cursorX = (current - min) / pixelTimeStep + BAR_INSET,
             cursorWidth = 0;
@@ -292,7 +292,7 @@ export function SeekBar(canvas) {
             x: Math.max(Math.floor(cursorX - cursorWidth - 1), 0),
             y: 0,
             width: Math.ceil(cursorWidth * 2 + 2),
-            height: canvas.height
+            height: canvas.height,
         };
     };
     

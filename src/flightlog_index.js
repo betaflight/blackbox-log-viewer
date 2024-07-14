@@ -6,14 +6,14 @@ import './decoders';
 
 export function FlightLogIndex(logData) {
     //Private:
-    var 
+    let 
         that = this,
         logBeginOffsets = false,
         logCount = false,
         intraframeDirectories = false;
         
     function buildLogOffsetsIndex() {
-        var 
+        let 
             stream = new ArrayDataStream(logData), 
             i, logStart;
         
@@ -36,12 +36,12 @@ export function FlightLogIndex(logData) {
     }
     
     function buildIntraframeDirectories() {
-        var 
+        let 
             parser = new FlightLogParser(logData, that);
         
         intraframeDirectories = [];
 
-        for (var i = 0; i < that.getLogCount(); i++) {
+        for (let i = 0; i < that.getLogCount(); i++) {
             var 
                 intraIndex = {
                     times: [],
@@ -55,7 +55,7 @@ export function FlightLogIndex(logData) {
                     initialGPS: [],
                     hasEvent: [],
                     minTime: false,
-                    maxTime: false
+                    maxTime: false,
                 },
                 
                 imu = new IMU(),
@@ -77,7 +77,7 @@ export function FlightLogIndex(logData) {
                 parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
                 parsedHeader = true;
             } catch (e) {
-                console.log("Error parsing header of log #" + (i + 1) + ": " + e);
+                console.log(`Error parsing header of log #${  i + 1  }: ${  e}`);
                 intraIndex.error = e;
                 
                 parsedHeader = false;
@@ -99,14 +99,14 @@ export function FlightLogIndex(logData) {
 
                 // Identify motor fields so they can be used to show the activity summary bar
                 for (let j = 0; j < 8; j++) {
-                    if (mainFrameDef.nameToIndex["motor[" + j + "]"] !== undefined) {
-                        motorFields.push(mainFrameDef.nameToIndex["motor[" + j + "]"]);
+                    if (mainFrameDef.nameToIndex[`motor[${  j  }]`] !== undefined) {
+                        motorFields.push(mainFrameDef.nameToIndex[`motor[${  j  }]`]);
                     }
                 }
 
                 for (let j = 0; j < 3; j++) {
-                    if (mainFrameDef.nameToIndex["rcCommand[" + j + "]"] !== undefined) {
-                        maxRCFields.push(mainFrameDef.nameToIndex["rcCommand[" + j + "]"]);
+                    if (mainFrameDef.nameToIndex[`rcCommand[${  j  }]`] !== undefined) {
+                        maxRCFields.push(mainFrameDef.nameToIndex[`rcCommand[${  j  }]`]);
                     } else {
                         console.log("RCField not found");
                     }
@@ -184,7 +184,7 @@ export function FlightLogIndex(logData) {
                                 frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME], 
                                 sysConfig.acc_1G, 
                                 sysConfig.gyroScale, 
-                                magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false
+                                magADC ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]] : false,
                             );
                         break;
                         case 'G':
@@ -247,7 +247,7 @@ export function FlightLogIndex(logData) {
     };
     
     this.saveToJSON = function() {
-        var 
+        let 
             intraframeDirectories = this.getIntraframeDirectories(),
             i, j, 
             resultIndexes = new Array(intraframeDirectories.length);

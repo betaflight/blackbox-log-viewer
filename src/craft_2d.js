@@ -1,5 +1,5 @@
 export function Craft2D(flightLog, canvas, propColors) {
-    var
+    let
         ARM_THICKNESS_MULTIPLIER = 0.18,
         ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER = 1.1,
         
@@ -7,11 +7,11 @@ export function Craft2D(flightLog, canvas, propColors) {
         
         MOTOR_LABEL_SPACING = 10;
 
-    var canvasContext = canvas.getContext("2d")
+    let canvasContext = canvas.getContext("2d");
 
-    var craftParameters = {};
+    let craftParameters = {};
     
-    var customMix;
+    let customMix;
         
         if(userSettings != null) {
             customMix = userSettings.customMix;
@@ -19,20 +19,20 @@ export function Craft2D(flightLog, canvas, propColors) {
             customMix = null;            
         }
 
-    var numMotors; 
+    let numMotors; 
         if(!customMix) {
             numMotors = propColors.length;
         } else {
             numMotors = customMix.motorOrder.length;
         }   
         
-    var shadeColors = [],
+    let shadeColors = [],
 
         craftColor = "rgb(76,76,76)",
         
         armLength, bladeRadius;
 
-    var motorOrder,
+    let motorOrder,
         yawOffset;
         
     // Motor numbering in counter-clockwise order starting from the 3 o'clock position
@@ -69,7 +69,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     function makeColorHalfStrength(color) {
         color = parseInt(color.substring(1), 16);
         
-        return "rgba(" + ((color >> 16) & 0xFF) + "," + ((color >> 8) & 0xFF) + "," + (color & 0xFF) + ",0.5)";
+        return `rgba(${  (color >> 16) & 0xFF  },${  (color >> 8) & 0xFF  },${  color & 0xFF  },0.5)`;
     }
     
         /**
@@ -85,13 +85,13 @@ export function Craft2D(flightLog, canvas, propColors) {
                         x: -1,
                         y: 0,
                         direction: -1,
-                        color: propColors[motorOrder[0]]
+                        color: propColors[motorOrder[0]],
                     }, {
                         x: 1,
                         y: 0,
                         direction: -1,
-                        color: propColors[motorOrder[1]]
-                    }
+                        color: propColors[motorOrder[1]],
+                    },
                 ];
             break;
             case 3:
@@ -100,18 +100,18 @@ export function Craft2D(flightLog, canvas, propColors) {
                         x: 1,
                         y: 0,
                         direction: -1,
-                        color: propColors[motorOrder[0]]
+                        color: propColors[motorOrder[0]],
                     }, {
                         x: -0.71,
                         y: -0.71,
                         direction: -1,
-                        color: propColors[motorOrder[1]]
+                        color: propColors[motorOrder[1]],
                     }, {
                         x: -0.71,
                         y: +0.71,
                         direction: -1,
-                        color: propColors[motorOrder[2]]
-                    }
+                        color: propColors[motorOrder[2]],
+                    },
                 ];
             break;
             case 4: // Classic '+' quad, yawOffset rotates it into an X
@@ -120,37 +120,37 @@ export function Craft2D(flightLog, canvas, propColors) {
                         x: 1, /*0.71,*/
                         y: 0, /*-0.71,*/
                         direction: -1,
-                        color: propColors[motorOrder[1]]
+                        color: propColors[motorOrder[1]],
                     }, 
                     {
                         x: 0, /*-0.71,*/
                         y: -1, /*-0.71,*/
                         direction: 1,
-                        color: propColors[motorOrder[3]]
+                        color: propColors[motorOrder[3]],
                     },
                     {
                         x: -1,/*-0.71,*/
                         y: 0, /*0.71,*/
                         direction: -1,
-                        color: propColors[motorOrder[2]]
+                        color: propColors[motorOrder[2]],
                     }, 
                     {
                         x: 0, /*0.71,*/
                         y: 1, /*0.71,*/
                         direction: 1,
-                        color: propColors[motorOrder[0]]
+                        color: propColors[motorOrder[0]],
                     }, 
                 ];
             break;
             default:
                 craftParameters.motors = [];
             
-                for (var i = 0; i < numMotors; i++) {
+                for (let i = 0; i < numMotors; i++) {
                     craftParameters.motors.push({
                         x: Math.cos(i / numMotors * Math.PI * 2),
                         y: Math.sin(i / numMotors * Math.PI * 2),
                         direction: Math.pow(-1, i),
-                        color: propColors[i]
+                        color: propColors[i],
                     });
                 }
             break;
@@ -160,7 +160,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     }
     
     this.render = function(frame, frameFieldIndexes) {
-        var 
+        let 
             motorIndex,
             sysConfig = flightLog.getSysConfig();
 
@@ -184,7 +184,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     
             canvasContext.lineTo(
                 (armLength * ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER) * craftParameters.motors[i].x,
-                (armLength * ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER) * craftParameters.motors[i].y
+                (armLength * ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER) * craftParameters.motors[i].y,
             );
         }
     
@@ -200,14 +200,14 @@ export function Craft2D(flightLog, canvas, propColors) {
         canvasContext.fill();
     
         for (i = 0; i < numMotors; i++) {
-            var motorValue = frame[frameFieldIndexes["motor[" + motorOrder[i] + "]"]];
+            let motorValue = frame[frameFieldIndexes[`motor[${  motorOrder[i]  }]`]];
             
             canvasContext.save();
             {
                 //Move to the motor center
                 canvasContext.translate(
                     armLength * craftParameters.motors[i].x,
-                    armLength * craftParameters.motors[i].y
+                    armLength * craftParameters.motors[i].y,
                 );
     
                 canvasContext.fillStyle = shadeColors[motorOrder[i]];
@@ -267,7 +267,7 @@ export function Craft2D(flightLog, canvas, propColors) {
             } else {
                 bladeRadius = armLength * 0.6;
             }
-    }
+    };
     
     // Assume we're to fill the entire canvas until we're told otherwise by .resize()
     this.resize(canvas.width, canvas.height);

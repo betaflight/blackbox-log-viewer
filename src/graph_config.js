@@ -29,7 +29,7 @@ export function GraphConfig(graphConfig) {
     let redrawChart = true;
     this.setRedrawChart = function(isRedraw) {
         redrawChart = isRedraw;
-    }
+    };
 
     /**
      * newGraphs is an array of objects like {label: "graph label", height:, fields:[{name: curve:{power:, MinMax:, steps:}, color:, }, ...]}
@@ -51,7 +51,7 @@ export function GraphConfig(graphConfig) {
         if (matches) {
             const
                 nameRoot = matches[1],
-                nameRegex = new RegExp("^" + escapeRegExp(nameRoot) + "\[[0-9]+\]$");
+                nameRegex = new RegExp(`^${  escapeRegExp(nameRoot)  }\[[0-9]+\]$`);
             let colorIndex = 0;
             for (const fieldName of logFieldNames) {
                 if (fieldName.match(nameRegex)) {
@@ -125,7 +125,7 @@ export function GraphConfig(graphConfig) {
     };
 
     this.toggleGraphField = (graphIndex, fieldIndex) => {
-        const item = graphIndex + ":" + fieldIndex;
+        const item = `${graphIndex  }:${  fieldIndex}`;
         if (hiddenGraphFields.has(item)) {
             hiddenGraphFields.delete(item);
         } else {
@@ -134,7 +134,7 @@ export function GraphConfig(graphConfig) {
     };
 
     this.isGraphFieldHidden = (graphIndex, fieldIndex) => {
-        return hiddenGraphFields.has(graphIndex + ":" + fieldIndex);
+        return hiddenGraphFields.has(`${graphIndex  }:${  fieldIndex}`);
     };
 }
 
@@ -150,7 +150,7 @@ GraphConfig.PALETTE = [
     {color: "#d9d9d9", name: "Grey" },
     {color: "#bc80bd", name: "Dark Purple" },
     {color: "#ccebc5", name: "Light Green" },
-    {color: "#ffed6f", name: "Dark Yellow" }
+    {color: "#ffed6f", name: "Dark Yellow" },
 ];
 
 
@@ -161,7 +161,7 @@ GraphConfig.load = function(config) {
             for (const field of graph.fields) {
                 const matches = field.name.match(/^gyroData(.+)$/);
                 if (matches) {
-                    field.name = "gyroADC" + matches[1];
+                    field.name = `gyroADC${  matches[1]}`;
                 }
             }
         }
@@ -208,7 +208,7 @@ GraphConfig.load = function(config) {
                                     flightLog.rcCommandRawToDegreesPerSecond(500,1) * scale,
                                     flightLog.rcCommandRawToDegreesPerSecond(500,2) * scale);
             }
-        }
+        };
 
         let getMinMaxForFields = function(/* fieldName1, fieldName2, ... */) {
             // helper to make a curve scale based on the combined min/max of one or more fields
@@ -227,7 +227,7 @@ GraphConfig.load = function(config) {
             }
 
             return {min:-500, max:500};
-        }
+        };
 
         let getCurveForMinMaxFields = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
@@ -235,13 +235,13 @@ GraphConfig.load = function(config) {
             const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
-                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
+                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max),
             };
             return {
                 power: 1.0,
-                MinMax: mmChartUnits
+                MinMax: mmChartUnits,
             };
-        }
+        };
 
         let getCurveForMinMaxFieldsZeroOffset = function(/* fieldName1, fieldName2, ... */) {
             const mm = getMinMaxForFields.apply(null, arguments);
@@ -249,15 +249,15 @@ GraphConfig.load = function(config) {
             const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
-                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
+                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max),
             };
-            mmChartUnits.max = Math.max(Math.max(Math.abs(mmChartUnits.max), Math.abs(mmChartUnits.min)), 1.0)
+            mmChartUnits.max = Math.max(Math.max(Math.abs(mmChartUnits.max), Math.abs(mmChartUnits.min)), 1.0);
             mmChartUnits.min = -mmChartUnits.max;
             return {
                 power: 1.0,
-                MinMax: mmChartUnits
+                MinMax: mmChartUnits,
             };
-        }
+        };
 
         const gyroScaleMargin = 1.20; // Give a 20% margin for gyro graphs
         const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
@@ -266,7 +266,7 @@ GraphConfig.load = function(config) {
         const mmChartUnits =
             {
                 min: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min),
-                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max)
+                max: FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max),
             };
         try {
             if (fieldName.match(/^motor\[/)) {
@@ -274,8 +274,8 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     MinMax: {
                         min: 0,
-                        max: 100
-                    }
+                        max: 100,
+                    },
                 };
             } else if (fieldName.match(/^eRPM\[/)) {
                 return getCurveForMinMaxFields('eRPM[0]', 'eRPM[1]', 'eRPM[2]', 'eRPM[3]', 'eRPM[4]', 'eRPM[5]', 'eRPM[6]', 'eRPM[7]');
@@ -284,24 +284,24 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     MinMax: {
                         min: 1000,
-                        max: 2000
-                    }
+                        max: 2000,
+                    },
                 };
             } else if (fieldName.match(/^accSmooth\[/)) {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: -16,
-                        max: 16
-                    }
+                        max: 16,
+                    },
                 };
             } else if (fieldName == "rcCommands[3]") { // Throttle scaled
                 return {
                     power: 1.0, /* Make this 1.0 to scale linearly */
                     MinMax: {
                         min: 0,
-                        max: 100
-                    }
+                        max: 100,
+                    },
                 };
             } else if (fieldName.match(/^axisError\[/)  ||     // Gyro, Gyro Scaled, RC Command Scaled and axisError
                        fieldName.match(/^rcCommands\[/) ||     // These use the same scaling as they are in the
@@ -311,88 +311,88 @@ GraphConfig.load = function(config) {
                     power: 1.0,
                     MinMax: {
                         min: -maxDegreesSecond(gyroScaleMargin),
-                        max: maxDegreesSecond(gyroScaleMargin)
-                    }
+                        max: maxDegreesSecond(gyroScaleMargin),
+                    },
                 };
             } else if (fieldName.match(/^axis.+\[/)) {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: -100,
-                        max: 100
-                    }
+                        max: 100,
+                    },
                 };
             } else if (fieldName == "rcCommand[3]") { // Throttle
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 1000,
-                        max: 2000
-                    }
+                        max: 2000,
+                    },
                 };
             } else if (fieldName.match(/^rcCommand\[/)) {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 1000,
-                        max: 2000
-                    }
+                        max: 2000,
+                    },
                 };
             } else if (fieldName == "heading[2]") {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 0,
-                        max: 360
-                    }
+                        max: 360,
+                    },
                 };
             } else if (fieldName.match(/^heading\[/)) {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: -180,
-                        max: 180
-                    }
+                        max: 180,
+                    },
                 };
             } else if (fieldName.match(/^sonar.*/)) {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 0,
-                        max: 400
-                    }
+                        max: 400,
+                    },
                 };
             } else if (fieldName.match(/^rssi.*/)) {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 0,
-                        max: 100
-                    }
+                        max: 100,
+                    },
                 };
             } else if (fieldName == 'GPS_ground_course') {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 0,
-                        max: 360
-                    }
+                        max: 360,
+                    },
                 };
             } else if (fieldName == 'GPS_numSat') {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: 0,
-                        max: 40
-                    }
+                        max: 40,
+                    },
                 };
             } else if (fieldName == 'GPS_speed') {
                 return {
                     power: 1.0,
                     MinMax: {
                         min: -100,
-                        max: 100
-                    }
+                        max: 100,
+                    },
                 };
             } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode!=null) {
 
@@ -405,16 +405,16 @@ GraphConfig.load = function(config) {
                                     power: 1,
                                     MinMax: {
                                         min: 0,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             default:
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 2000
-                                    }
+                                        max: 2000,
+                                    },
                                 };
                         }
                     case 'PIDLOOP':
@@ -422,8 +422,8 @@ GraphConfig.load = function(config) {
                                 power: 1.0,
                                 MinMax: {
                                     min: 0,
-                                    max: 500
-                                }
+                                    max: 500,
+                                },
                             };
                     case 'GYRO':
                     case 'GYRO_FILTERED':
@@ -440,24 +440,24 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
-                                max: maxDegreesSecond(gyroScaleMargin)
-                            }
+                                max: maxDegreesSecond(gyroScaleMargin),
+                            },
                         };
                     case 'ACCELEROMETER':
                         return {
                             power: 1.0,
                             MinMax: {
                                 min: -16,
-                                max: 16
-                            }
+                                max: 16,
+                            },
                         };
                     case 'MIXER':
                         return {
                             power: 1.0,
                             MinMax: {
                                 min: -100,
-                                max: 100
-                            }
+                                max: 100,
+                            },
                         };
                     case 'BATTERY':
                         switch (fieldName) {
@@ -466,16 +466,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 4096
-                                    }
+                                        max: 4096,
+                                    },
                                 };
                             default:
                                 return {
                                     power: 1.0,
                                      MinMax: {
                                         min: 0,
-                                        max: 26
-                                    }
+                                        max: 26,
+                                    },
                                 };
                         }
                     case 'RC_INTERPOLATION':
@@ -493,8 +493,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 1000,
-                                        max: 2000 * gyroScaleMargin
-                                    }
+                                        max: 2000 * gyroScaleMargin,
+                                    },
                                 };
                             case 'debug[1]': // raw RC command derivative
                             case 'debug[2]': // smoothed RC command derivative
@@ -515,8 +515,8 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             MinMax: {
                                 min: -maxDegreesSecond(gyroScaleMargin),
-                                max: maxDegreesSecond(gyroScaleMargin)
-                            }
+                                max: maxDegreesSecond(gyroScaleMargin),
+                            },
                         };
                     case 'ALTITUDE':
                         switch (fieldName) {
@@ -525,8 +525,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             case 'debug[1]': // Baro Alt
                             case 'debug[2]': // GPS Alt
@@ -534,16 +534,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -50,
-                                        max: 50
-                                    }
+                                        max: 50,
+                                    },
                                 };
                             case 'debug[3]': // vario
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -5,
-                                        max: 5
-                                    }
+                                        max: 5,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -557,8 +557,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
-                                        max: maxDegreesSecond(gyroScaleMargin)
-                                    }
+                                        max: maxDegreesSecond(gyroScaleMargin),
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -574,8 +574,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
-                                        max: maxDegreesSecond(gyroScaleMargin)
-                                    }
+                                        max: maxDegreesSecond(gyroScaleMargin),
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -591,8 +591,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
-                                        max: maxDegreesSecond(gyroScaleMargin)
-                                    }
+                                        max: maxDegreesSecond(gyroScaleMargin),
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -602,8 +602,8 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             MinMax: {
                                 min: -100,
-                                max: 100
-                            }
+                                max: 100,
+                            },
                         };
                     case 'ESC_SENSOR_RPM':
                     case 'DSHOT_RPM_TELEMETRY':
@@ -637,16 +637,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -1000,
-                                        max: 1000
-                                    }
+                                        max: 1000,
+                                    },
                                 };
                             case 'debug[3]': // Clip or Count
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -658,8 +658,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -maxDegreesSecond(gyroScaleMargin),
-                                        max: maxDegreesSecond(gyroScaleMargin)
-                                    }
+                                        max: maxDegreesSecond(gyroScaleMargin),
+                                    },
                                 };
                             case 'debug[1]': // feedforward delta element
                             case 'debug[2]': // feedforward boost element
@@ -667,16 +667,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -1000,
-                                        max: 1000
-                                    }
+                                        max: 1000,
+                                    },
                                 };
                             case 'debug[3]': // rcCommand delta
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -10000,
-                                        max: 10000
-                                    }
+                                        max: 10000,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -687,8 +687,8 @@ GraphConfig.load = function(config) {
                             power: 1.0,
                             MinMax: {
                                 min: -300,
-                                max: 300
-                            }
+                                max: 300,
+                            },
                         };
                     case 'BARO':
                         switch (fieldName) {
@@ -697,8 +697,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -20,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             case 'debug[1]': // Baro Temp
                             case 'debug[2]': // Baro Raw
@@ -707,8 +707,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -721,8 +721,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             case 'debug[2]': // Altitude
                             case 'debug[3]': // Target Altitude
@@ -730,8 +730,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -50,
-                                        max: 50
-                                    }
+                                        max: 50,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -745,16 +745,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -1000,
-                                        max: 1000
-                                    }
+                                        max: 1000,
+                                    },
                                 };
                             case 'debug[3]': // in 4.3 and 4.2 is minRPS
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 12000
-                                    }
+                                        max: 12000,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -769,8 +769,8 @@ GraphConfig.load = function(config) {
                                 power: 1.0,
                                 MinMax: {
                                     min: -maxDegreesSecond(gyroScaleMargin * highResolutionScale),
-                                    max: maxDegreesSecond(gyroScaleMargin * highResolutionScale)
-                                }
+                                    max: maxDegreesSecond(gyroScaleMargin * highResolutionScale),
+                                },
                             };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -782,8 +782,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             // debug 1 is Count of Unknown Frames
                             // debug 2 and 3 not used
@@ -800,16 +800,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -256,
-                                        max: 0
-                                    }
+                                        max: 0,
+                                    },
                                 };
                             case 'debug[3]': // LQ percent
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -821,8 +821,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 1000
-                                    }
+                                        max: 1000,
+                                    },
                                 };
                             case 'debug[1]': // ID of late task
                             case 'debug[2]': // task delay time 100us in middle
@@ -830,16 +830,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             case 'debug[3]': // gyro skew 100 = 10us
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -50,
-                                        max: 50
-                                    }
+                                        max: 50,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -852,24 +852,24 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             case 'debug[2]': // total delay in last second
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             case 'debug[3]': // total tasks per second
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 10000
-                                    }
+                                        max: 10000,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -881,8 +881,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             // debug 0 = Lost connection count
                             // debug 1 = RSSI
@@ -908,8 +908,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -20,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             case 'debug[2]': // Velocity in cm/s
                             case 'debug[3]': // Velocity to home in cm/s
@@ -917,8 +917,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -5,
-                                        max: 5
-                                    }
+                                        max: 5,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -930,8 +930,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -100,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             case 'debug[1]': // GPS GroundCourse
                             case 'debug[2]': // Yaw attitude * 10
@@ -941,32 +941,32 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 360
-                                    }
+                                        max: 360,
+                                    },
                                 };
                             case 'debug[5]': // magYaw * 10
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             case 'debug[6]': // roll angle *100
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 180
-                                    }
+                                        max: 180,
+                                    },
                                 };
                             case 'debug[7]': // yaw rate deg/s
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -978,8 +978,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -4000,
-                                        max: 4000
-                                    }
+                                        max: 4000,
+                                    },
                                 };
                             case 'debug[1]': // Rescue Phase
                             case 'debug[2]': // Failure code
@@ -987,16 +987,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             case 'debug[3]': // Failure counters coded
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 4000
-                                    }
+                                        max: 4000,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1009,8 +1009,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -10,
-                                        max: 10
-                                    }
+                                        max: 10,
+                                    },
                                 };
                             case 'debug[2]': // altitude m
                             case 'debug[3]': // Target altitude m
@@ -1018,8 +1018,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -50,
-                                        max: 50
-                                    }
+                                        max: 50,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1032,16 +1032,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             case 'debug[2]': // task interval
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             case 'debug[3]': // Baud rate / resolved packet interval
                             case 'debug[4]': // State*100 + SubState
@@ -1051,24 +1051,24 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -100,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             case 'debug[6]': // ackState
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -10,
-                                        max: 10
-                                    }
+                                        max: 10,
+                                    },
                                 };
                             case 'debug[7]': // Incoming buffer
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -100,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1083,8 +1083,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1099,8 +1099,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1113,8 +1113,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -100,
-                                        max: 100
-                                    }
+                                        max: 100,
+                                    },
                                 };
                             case 'debug[1]': // angle error correction
                             case 'debug[2]': // angle feedforward
@@ -1122,8 +1122,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -500,
-                                        max: 500
-                                    }
+                                        max: 500,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1138,8 +1138,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -200,
-                                        max: 200
-                                    }
+                                        max: 200,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1154,8 +1154,8 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -2000,
-                                        max: 2000
-                                    }
+                                        max: 2000,
+                                    },
                                 };
                             case 'debug[4]': // X Cal
                             case 'debug[5]': // Y Cal
@@ -1164,16 +1164,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -500,
-                                        max: 500
-                                    }
+                                        max: 500,
+                                    },
                                 };
                             case 'debug[7]': // Lambda
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: 0,
-                                        max: 4000
-                                    }
+                                        max: 4000,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1186,24 +1186,24 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -1000,
-                                        max: 1000
-                                    }
+                                        max: 1000,
+                                    },
                                 };
                             case 'debug[2]': // Data Interval
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -10000,
-                                        max: 10000
-                                    }
+                                        max: 10000,
+                                    },
                                 };
                             case 'debug[3]': // Execute Time
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -20,
-                                        max: 20
-                                    }
+                                        max: 20,
+                                    },
                                 };
                             case 'debug[4]': // Bus Busy Check
                             case 'debug[5]': // Read State Check
@@ -1211,16 +1211,16 @@ GraphConfig.load = function(config) {
                                     power: 1.0,
                                     MinMax: {
                                         min: -2,
-                                        max: 2
-                                    }
+                                        max: 2,
+                                    },
                                 };
                             case 'debug[6]': // Time since previous task uS
                                 return {
                                     power: 1.0,
                                     MinMax: {
                                         min: -10000,
-                                        max: 10000
-                                    }
+                                        max: 10000,
+                                    },
                                 };
                             default:
                                 return getCurveForMinMaxFields(fieldName);
@@ -1242,8 +1242,8 @@ GraphConfig.load = function(config) {
                 power: 1.0,
                 MinMax: {
                     min: -500,
-                    max: 500
-                }
+                    max: 500,
+                },
             };
         }
     };
@@ -1265,7 +1265,7 @@ GraphConfig.load = function(config) {
         if (mm == undefined)
             return {
                 min: -500,
-                max: 500
+                max: 500,
             };
 
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
@@ -1292,7 +1292,7 @@ GraphConfig.load = function(config) {
         if (mm == undefined)
             return {
                 min: -500,
-                max: 500
+                max: 500,
             };
 
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
@@ -1309,14 +1309,14 @@ GraphConfig.load = function(config) {
         if (mm.min == Number.MAX_VALUE || mm.max == -Number.MAX_VALUE) {
             return {
                 min: -500,
-                max: 500
+                max: 500,
             };
         }
         
         mm.min = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.min);
         mm.max = FlightLogFieldPresenter.ConvertFieldValue(flightLog, fieldName, true, mm.max);
         return mm;
-    }
+    };
 
     /**
      * Get an array of suggested graph configurations will be usable for the fields available in the given flightlog.
@@ -1377,7 +1377,7 @@ GraphConfig.load = function(config) {
                 destGraph = {
                     label: srcGraph.label,
                     fields: [],
-                    height: srcGraph.height || 1
+                    height: srcGraph.height || 1,
                 };
             let found;
 

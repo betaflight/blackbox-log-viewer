@@ -4,7 +4,7 @@
  * curve = 1.0 is a straight line mapping). 
  */
 export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
-    var
+    let
         curve, inputScale, rawInputScale;
     
     function lookupStraightLine(input) {
@@ -13,7 +13,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
 
     this.lookupRaw = function(input) {
         return (input + offset) * rawInputScale;
-    }
+    };
 
     this.getCurve = function() {
         return {
@@ -23,7 +23,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
             outputRange: outputRange,
             steps: steps,
             };
-    }
+    };
 
     /**
      * An approximation of lookupMathPow by precomputing several expo curve points and interpolating between those
@@ -33,7 +33,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
      * (e.g. the approximation will be too straight near the origin when power < 1.0, but a good fit far from the origin)
      */
     function lookupInterpolatedCurve(input) {
-        var
+        let
             valueInCurve,
             prevStepIndex;
 
@@ -50,7 +50,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
         }
 
         //Straight-line interpolation between the two curve points
-        var 
+        let 
             proportion = valueInCurve - prevStepIndex,
             result = curve[prevStepIndex] + (curve[prevStepIndex + 1] - curve[prevStepIndex]) * proportion;
 
@@ -62,7 +62,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     function lookupMathPow(input) {
         input += offset;
         
-        var 
+        let 
             result = Math.pow(Math.abs(input) / inputRange, power) * outputRange;
         
         if (input < 0)
@@ -83,7 +83,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
         
         this.lookup = lookupStraightLine;
     } else {
-        var 
+        let 
             stepSize = 1.0 / (steps - 1),
             i;
 

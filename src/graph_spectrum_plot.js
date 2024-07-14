@@ -878,7 +878,7 @@ GraphSpectrumPlot._drawRateWarning = function(canvasCtx) {
 
         const actualRate = this._logRateWarning.actualRate.toFixed(0),
               betaflightRate = this._logRateWarning.betaflightRate.toFixed(0);
-        const WarningText = "THE ACTUAL AND CONFIG LOG DATA RATE DIFFERENCE: " + actualRate + " : " + betaflightRate;
+        const WarningText = `THE ACTUAL AND CONFIG LOG DATA RATE DIFFERENCE: ${  actualRate  } : ${  betaflightRate}`;
         const X = canvasCtx.canvas.width/2,
               Y = canvasCtx.canvas.height/12;
         canvasCtx.strokeText(WarningText, X, Y);

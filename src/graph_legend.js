@@ -1,20 +1,20 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 
 export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelectionChange, onHighlightChange, onZoomGraph, onExpandGraph, onNewGraphConfig) {
-    var
+    let
         that = this;
 
     function buildLegend() {
-        var
+        let
             graphs = config.getGraphs(),
             i, j;
 
         targetElem.empty();
 
         for (i = 0; i < graphs.length; i++) {
-            var
+            let
                 graph = graphs[i],
-                graphDiv = $('<div class="graph-legend" id="' + i +'"><h3 class="graph-legend-group field-quick-adjust" graph="' + i + '"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>'),
+                graphDiv = $(`<div class="graph-legend" id="${  i }"><h3 class="graph-legend-group field-quick-adjust" graph="${  i  }"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>`),
                 graphTitle = $("h3", graphDiv),
                 fieldList = $("ul", graphDiv);
 
@@ -22,14 +22,14 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
             graphTitle.prepend('<span class="glyphicon glyphicon-minus"></span>');
 
             for (j = 0; j < graph.fields.length; j++) {
-                var
+                let
                     field = graph.fields[j],
-                    li = $('<li class="graph-legend-field field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></li>'),
-                    nameElem = $('<span class="graph-legend-field-name field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
-                    valueElem = $('<span class="graph-legend-field-value field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j +'"></span>'),
-                    settingsElem = $('<div class="graph-legend-field-settings field-quick-adjust" name="' + field.name + '" graph="' + i + '" field="' + j + '"></div>'),
+                    li = $(`<li class="graph-legend-field field-quick-adjust" name="${  field.name  }" graph="${  i  }" field="${  j }"></li>`),
+                    nameElem = $(`<span class="graph-legend-field-name field-quick-adjust" name="${  field.name  }" graph="${  i  }" field="${  j }"></span>`),
+                    valueElem = $(`<span class="graph-legend-field-value field-quick-adjust" name="${  field.name  }" graph="${  i  }" field="${  j }"></span>`),
+                    settingsElem = $(`<div class="graph-legend-field-settings field-quick-adjust" name="${  field.name  }" graph="${  i  }" field="${  j  }"></div>`),
                     visibilityIcon = config.isGraphFieldHidden(i, j) ? "glyphicon-eye-close" : "glyphicon-eye-open",
-                    visibilityElem = $('<span class="glyphicon ' + visibilityIcon + ' graph-legend-field-visibility" graph="' + i + '" field="' + j + '"></span>');
+                    visibilityElem = $(`<span class="glyphicon ${  visibilityIcon  } graph-legend-field-visibility" graph="${  i  }" field="${  j  }"></span>`);
                 li.append(nameElem);
                 li.append(visibilityElem);
                 li.append(valueElem);
@@ -46,7 +46,7 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
 
         // Add a trigger on legend; highlight the hovered field in plot
         $('.graph-legend-field').on('mouseenter', function(e){
-            $(this).addClass("highlight")
+            $(this).addClass("highlight");
             config.highlightGraphIndex = $(this).attr('graph');
             config.highlightFieldIndex = $(this).attr('field');
             if (onHighlightChange) {
@@ -55,7 +55,7 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
         });
 
         $('.graph-legend-field').on('mouseleave', function(e){
-            $(this).removeClass("highlight")
+            $(this).removeClass("highlight");
             config.highlightGraphIndex = null;
             config.highlightFieldIndex = null;
             if (onHighlightChange) {
@@ -68,7 +68,7 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
 
             if(e.which!=1) return; // only accept left mouse clicks
 
-            var
+            let
                selectedGraphIndex    = $(this).attr('graph'),
                selectedFieldIndex    = $(this).attr('field');
 
@@ -93,7 +93,7 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
 
                if(e.which!=1) return; // only accept left mouse clicks
 
-               var selectedGraph = $(this).attr('graph');
+               let selectedGraph = $(this).attr('graph');
                if(!e.altKey) {
                    if (onZoomGraph) {
                        onZoomGraph(selectedGraph);
@@ -110,16 +110,16 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
         $('.log-graph-legend').sortable(
             {
                 update: function( event, ui ) {
-                            var newOrder = $('.log-graph-legend').sortable('toArray');
-                            var newGraphs = [];
-                            var oldGraphs = config.getGraphs();
-                            for(var i=0; i<newOrder.length; i++) {
+                            let newOrder = $('.log-graph-legend').sortable('toArray');
+                            let newGraphs = [];
+                            let oldGraphs = config.getGraphs();
+                            for(let i=0; i<newOrder.length; i++) {
                                 newGraphs[i] = oldGraphs[newOrder[i]];
                             }
                             onNewGraphConfig(newGraphs);
                       },
                 cursor: "move",
-            }
+            },
         );
         $('.log-graph-legend').disableSelection();
 
@@ -162,13 +162,13 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
     this.updateValues = function (flightLog, frame) {
         try {
             // New function to show values on legend.
-            var currentFlightMode = frame[ flightLog.getMainFieldIndexByName("flightModeFlags") ];
-            var
+            let currentFlightMode = frame[ flightLog.getMainFieldIndexByName("flightModeFlags") ];
+            let
                 graphs = config.getGraphs(),
                 i, j;
 
             $(".graph-legend-field-value").each(function (index, value) {
-                var fieldName = $(this).attr('name');
+                let fieldName = $(this).attr('name');
                 var value = frame[ flightLog.getMainFieldIndexByName(fieldName) ]; // get the raw value from log
                 if (userSettings.legendUnits) { // if we want the legend to show engineering units
                     value = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
@@ -186,13 +186,13 @@ export function GraphLegend(targetElem, config, onVisibilityChange, onNewSelecti
             });
 
             $('.graph-legend-field-settings').each(function (index, value) {
-                var i = $(this).attr('graph');
-                var j = $(this).attr('field');
-                var field = graphs[ i ].fields[ j ];
-                var str =
-                    "Z100" +                                        // There are no direct zoom now, set 100%
-                    " E" + (field.curve.power * 100).toFixed(0) +
-                    " S" + (field.smoothing / 100).toFixed(0);
+                let i = $(this).attr('graph');
+                let j = $(this).attr('field');
+                let field = graphs[ i ].fields[ j ];
+                let str =
+                    `Z100` +                                        // There are no direct zoom now, set 100%
+                    ` E${  (field.curve.power * 100).toFixed(0) 
+                    } S${  (field.smoothing / 100).toFixed(0)}`;
                 $(this).text(str);
             });
 

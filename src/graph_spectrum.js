@@ -11,7 +11,7 @@ const
         ANALYSER_LARGE_HEIGHT_MARGIN  = 20,
         ANALYSER_LARGE_WIDTH_MARGIN   = 20;
 
-var
+let
     that = this,
 
     analyserZoomX = 1.0, /* 100% */
@@ -20,7 +20,7 @@ var
     dataBuffer = {
         fieldIndex: 0,
         curve: 0,
-        fieldName: null
+        fieldName: null,
     },
 
     dataReload = false,
@@ -31,18 +31,18 @@ var
 
     try {
 
-        var isFullscreen = false;
+        let isFullscreen = false;
 
-        var sysConfig = flightLog.getSysConfig();
+        let sysConfig = flightLog.getSysConfig();
         const logRateInfo = GraphSpectrumCalc.initialize(flightLog, sysConfig);
         GraphSpectrumPlot.initialize(analyserCanvas, sysConfig);
         GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
-        var analyserZoomXElem = $("#analyserZoomX");
-        var analyserZoomYElem = $("#analyserZoomY");
+        let analyserZoomXElem = $("#analyserZoomX");
+        let analyserZoomYElem = $("#analyserZoomY");
 
-        var spectrumToolbarElem = $('#spectrumToolbar');
-        var spectrumTypeElem = $("#spectrumTypeSelect");
-        var overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
+        let spectrumToolbarElem = $('#spectrumToolbar');
+        let spectrumTypeElem = $("#spectrumTypeSelect");
+        let overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
 
         this.setFullscreen = function(size) {
             isFullscreen = (size==true);
@@ -60,52 +60,52 @@ var
             return GraphSpectrumCalc.setOutTime(time);;
         };
 
-        var getSize = function () {
+        let getSize = function () {
             if (isFullscreen){
                 return {
                         height: canvas.clientHeight - ANALYSER_LARGE_HEIGHT_MARGIN,
                         width: canvas.clientWidth - ANALYSER_LARGE_WIDTH_MARGIN,
                         left: ANALYSER_LARGE_LEFT_MARGIN,
-                        top: ANALYSER_LARGE_TOP_MARGIN
+                        top: ANALYSER_LARGE_TOP_MARGIN,
                 };
             } else {
                 return {
                     height: canvas.height * parseInt(userSettings.analyser.size) / 100.0,
                     width: canvas.width * parseInt(userSettings.analyser.size) / 100.0,
                     left: (canvas.width * parseInt(userSettings.analyser.left) / 100.0),
-                    top:  (canvas.height * parseInt(userSettings.analyser.top) / 100.0)
+                    top:  (canvas.height * parseInt(userSettings.analyser.top) / 100.0),
                 };
             }
         };
 
        this.resize = function() {
 
-            var newSize = getSize();
+            let newSize = getSize();
 
             // Determine the analyserCanvas location
             GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
             // Recenter the analyser canvas in the bottom left corner
-            var parentElem = $(analyserCanvas).parent();
+            let parentElem = $(analyserCanvas).parent();
 
             $(parentElem).css({
                 left: newSize.left, // (canvas.width  * getSize().left) + "px",
-                top:  newSize.top   // (canvas.height * getSize().top ) + "px"
+                top:  newSize.top,   // (canvas.height * getSize().top ) + "px"
             });
             // place the sliders.
             $("input:first-of-type", parentElem).css({
-                left: (newSize.width - 130) + "px"
+                left: `${newSize.width - 130  }px`,
             });
             $("input:last-of-type", parentElem).css({
-                left: (newSize.width - 20) + "px"
+                left: `${newSize.width - 20  }px`,
             });
             $("#analyserResize", parentElem).css({
-                left: (newSize.width - 28) + "px"
+                left: `${newSize.width - 28  }px`,
             });
 
         };
 
-        var dataLoad = function() {
+        let dataLoad = function() {
 
             GraphSpectrumCalc.setDataBuffer(dataBuffer);
 
@@ -138,7 +138,7 @@ var
             dataBuffer = {
                     fieldIndex: fieldIndex,
                     curve: curve,
-                    fieldName: fieldName
+                    fieldName: fieldName,
             };
 
             // Detect change of selected field.... reload and redraw required.
@@ -195,7 +195,7 @@ var
         spectrumTypeElem.val(userSettings.spectrumType);
 
         spectrumTypeElem.change(function() {
-            var optionSelected = parseInt(spectrumTypeElem.val(), 10);
+            let optionSelected = parseInt(spectrumTypeElem.val(), 10);
 
             if (optionSelected != userSettings.spectrumType) {
                 userSettings.spectrumType = optionSelected;
@@ -218,7 +218,7 @@ var
         GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
         overdrawSpectrumTypeElem.change(function() {
-            var optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
+            let optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
 
             if (optionSelected != userSettings.overdrawSpectrumType) {
                 userSettings.overdrawSpectrumType = optionSelected;
@@ -231,7 +231,7 @@ var
         });
 
         // track frequency under mouse
-        var lastMouseX = 0,
+        let lastMouseX = 0,
             lastMouseY = 0;
 
         function trackFrequency(e, analyser) {
@@ -240,9 +240,9 @@ var
                 // Hide the combo and maximize buttons
                 spectrumToolbarElem.removeClass('non-shift');
 
-                var rect = analyserCanvas.getBoundingClientRect();
-                var mouseX = e.clientX - rect.left;
-                var mouseY = e.clientY - rect.top;
+                let rect = analyserCanvas.getBoundingClientRect();
+                let mouseX = e.clientX - rect.left;
+                let mouseY = e.clientY - rect.top;
                 if (mouseX != lastMouseX || mouseY != lastMouseY) {
                     lastMouseX = mouseX;
                     lastMouseY = mouseY;
@@ -266,6 +266,6 @@ var
         }
 
     } catch (e) {
-        console.log('Failed to create analyser... error:' + e);
+        console.log(`Failed to create analyser... error:${  e}`);
     }
 }

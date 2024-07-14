@@ -4,7 +4,7 @@
  * Supply keyPrefix if you want it automatically prepended to key names.
  */
 export function PrefStorage(keyPrefix) {
-    var
+    let
         LOCALSTORAGE = 0,
         CHROME_STORAGE_LOCAL = 1,
     

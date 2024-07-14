@@ -1,7 +1,7 @@
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 
 export function VideoExportDialog(dialog, onSave) {
-    var
+    let
         DIALOG_MODE_SETTINGS = 0,
         DIALOG_MODE_IN_PROGRESS = 1,
         DIALOG_MODE_COMPLETE = 2,
@@ -26,7 +26,7 @@ export function VideoExportDialog(dialog, onSave) {
 
     function leftPad(value, pad, width) {
         // Coorce value to string
-        value = value + "";
+        value = `${value  }`;
         
         while (value.length < width) {
             value = pad + value;
@@ -45,27 +45,27 @@ export function VideoExportDialog(dialog, onSave) {
         mins = mins % 60;
         
         if (hours) {
-            return hours + ":" + leftPad(mins, "0", 2) + ":" + leftPad(secs, "0", 2);
+            return `${hours  }:${  leftPad(mins, "0", 2)  }:${  leftPad(secs, "0", 2)}`;
         } else {
-            return mins + ":" + leftPad(secs, "0", 2);
+            return `${mins  }:${  leftPad(secs, "0", 2)}`;
         }
     }
     
     function formatFilesize(bytes) {
-        var
+        let
             megs = Math.round(bytes / (1024 * 1024));
         
-        return megs + "MB";
+        return `${megs  }MB`;
     }
     
     function setDialogMode(mode) {
         dialogMode = mode;
         
-        var
+        let
             settingClasses = [
                 "video-export-mode-settings", 
                 "video-export-mode-progress", 
-                "video-export-mode-complete"
+                "video-export-mode-complete",
             ];
         
         dialog
@@ -76,7 +76,7 @@ export function VideoExportDialog(dialog, onSave) {
         $(".video-export-dialog-cancel").toggle(mode != DIALOG_MODE_COMPLETE);
         $(".video-export-dialog-close").toggle(mode == DIALOG_MODE_COMPLETE);
         
-        var 
+        let 
             title = "Export video";
         
         switch (mode) {
@@ -98,7 +98,7 @@ export function VideoExportDialog(dialog, onSave) {
         if (videoConfig.videoDim !== undefined) {
             // Look for a value in the UI which closely matches the stored one (allows for floating point inaccuracy)
             $(".video-dim option").each(function() {
-                var
+                let
                     thisVal = parseFloat($(this).attr('value'));
                 
                 if (Math.abs(videoConfig.videoDim - thisVal) < 0.05) {
@@ -107,15 +107,15 @@ export function VideoExportDialog(dialog, onSave) {
             });
         }
         if (videoConfig.width) {
-            $(".video-resolution").val(videoConfig.width + "x" + videoConfig.height);
+            $(".video-resolution").val(`${videoConfig.width  }x${  videoConfig.height}`);
         }
     }
     
     function convertUIToVideoConfig() {
-        var 
+        let 
             videoConfig = {
                 frameRate: parseFloat($(".video-frame-rate", dialog).val()),
-                videoDim: parseFloat($(".video-dim", dialog).val())
+                videoDim: parseFloat($(".video-dim", dialog).val()),
             },
             resolution;
         
@@ -151,7 +151,7 @@ export function VideoExportDialog(dialog, onSave) {
     };
  
     $(".video-export-dialog-start").click(function(e) {
-        var
+        let
             lastWrittenBytes = 0,
             videoConfig = convertUIToVideoConfig();
         
@@ -163,10 +163,10 @@ export function VideoExportDialog(dialog, onSave) {
                 progressBar.prop('max', frameCount - 1);
                 progressBar.prop('value', frameIndex);
                 
-                progressRenderedFrames.text((frameIndex + 1) + " / " + frameCount + " (" + ((frameIndex + 1) / frameCount * 100).toFixed(1) + "%)");
+                progressRenderedFrames.text(`${frameIndex + 1  } / ${  frameCount  } (${  ((frameIndex + 1) / frameCount * 100).toFixed(1)  }%)`);
                 
                 if (frameIndex > 0) {
-                    var
+                    let
                         elapsedTimeMsec = Date.now() - renderStartTime,
                         estimatedTimeMsec = elapsedTimeMsec * frameCount / frameIndex;
                     
@@ -176,12 +176,12 @@ export function VideoExportDialog(dialog, onSave) {
                         lastEstimatedTimeMsec = lastEstimatedTimeMsec * 0.0 + estimatedTimeMsec * 1.0;
                     }
                     
-                    var
+                    let
                         estimatedRemaining = Math.max(Math.round((lastEstimatedTimeMsec - elapsedTimeMsec) / 1000), 0);
                     
                     progressRemaining.text(formatTime(estimatedRemaining));
                     
-                    var
+                    let
                         writtenBytes = videoRenderer.getWrittenSize(),
                         estimatedBytes = Math.round(frameCount / frameIndex * writtenBytes);
                     
@@ -193,7 +193,7 @@ export function VideoExportDialog(dialog, onSave) {
                         lastWrittenBytes = writtenBytes;
                         
                         if (writtenBytes > 1000000) { // Wait for the first significant chunk to be written (don't use the tiny header as a size estimate)
-                            progressSize.text(formatFilesize(writtenBytes) + " / " + formatFilesize(estimatedBytes));
+                            progressSize.text(`${formatFilesize(writtenBytes)  } / ${  formatFilesize(estimatedBytes)}`);
                             
                             fileSizeWarning.toggle(!videoRenderer.willWriteDirectToDisk() && estimatedBytes >= 475 * 1024 * 1024);
                         }
@@ -202,7 +202,7 @@ export function VideoExportDialog(dialog, onSave) {
             },
             onComplete: function(success, frameCount) {
                 if (success) {
-                    $(".video-export-result").text("Rendered " + frameCount + " frames in " + formatTime(Math.round((Date.now() - renderStartTime) / 1000)));
+                    $(".video-export-result").text(`Rendered ${  frameCount  } frames in ${  formatTime(Math.round((Date.now() - renderStartTime) / 1000))}`);
                     setDialogMode(DIALOG_MODE_COMPLETE);
                 } else {
                     dialog.modal('hide');
@@ -211,7 +211,7 @@ export function VideoExportDialog(dialog, onSave) {
                 if (videoRenderer) {
                     videoRenderer = false;
                 }
-            }
+            },
         });
         
         progressBar.prop('value', 0);
@@ -237,6 +237,6 @@ export function VideoExportDialog(dialog, onSave) {
     
     dialog.modal({
         show: false,
-        backdrop: "static" // Don't allow a click on the backdrop to close the dialog
+        backdrop: "static", // Don't allow a click on the backdrop to close the dialog
     });
 }

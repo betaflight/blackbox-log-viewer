@@ -14,7 +14,7 @@ import {
  * Extend ArrayDataStream with decoders for advanced formats.
  */
 ArrayDataStream.prototype.readTag2_3S32 = function(values) {
-    var 
+    let 
         leadByte,
         byte1, byte2, byte3, byte4,
         i;
@@ -90,7 +90,7 @@ ArrayDataStream.prototype.readTag2_3S32 = function(values) {
 };
 
 ArrayDataStream.prototype.readTag2_3SVariable = function(values) {
-    var 
+    let 
         leadByte, leadByte2, leadByte3,
         byte1, byte2, byte3, byte4,
         i;
@@ -166,7 +166,7 @@ ArrayDataStream.prototype.readTag2_3SVariable = function(values) {
 };
 
 ArrayDataStream.prototype.readTag8_4S16_v1 = function(values) {
-    var
+    let
         selector, combinedChar,
         char1, char2,
         i,
@@ -210,7 +210,7 @@ ArrayDataStream.prototype.readTag8_4S16_v1 = function(values) {
 };
 
 ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
-    var 
+    let 
         selector, i,
         char1, char2,
         buffer,
@@ -278,7 +278,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function(values) {
 };
 
 ArrayDataStream.prototype.readTag8_8SVB = function(values, valueCount) {
-    var 
+    let 
         i, header;
 
     if (valueCount == 1) {

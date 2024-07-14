@@ -4,7 +4,7 @@ import { ExpoCurve } from "./expo";
 import { roundRect } from "./tools";
 
 export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
-    var // inefficient; copied from grapher.js. Font could be a global?
+    let // inefficient; copied from grapher.js. Font could be a global?
 
         DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
 
@@ -25,7 +25,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             stickSurroundRadius: 0,
         };
 
-    var
+    let
         that = this,
         windowCenterTime,
         canvasContext = canvas.getContext("2d"),
@@ -33,7 +33,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             drawSticks: true, 
             stickTrails: false, 
             stickInvertYaw: false, 
-            stickUnits:false 
+            stickUnits:false, 
         },
         sysConfig = flightLog.getSysConfig(),
         pitchStickCurve = new ExpoCurve(0, 0.700, 500 * (sysConfig.rcRate ? sysConfig.rcRate : 100) / 100, 1.0, 10);
@@ -59,24 +59,24 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
 
         // Decide if to show the labels
         // The length of the 2 label texts are roughly 80% of the fontsize times the number of letters. 
-        var labelLength = (userSettings.stickUnits ? 7 : 4);
-        var minWidthForLabels = drawingParams.stickSurroundRadius * 4 + drawingParams.stickSpacing * 2 + 0.8 * labelLength * drawingParams.fontSizeValueLabel * 2;
+        let labelLength = (userSettings.stickUnits ? 7 : 4);
+        let minWidthForLabels = drawingParams.stickSurroundRadius * 4 + drawingParams.stickSpacing * 2 + 0.8 * labelLength * drawingParams.fontSizeValueLabel * 2;
         drawingParams.drawLabels = width > minWidthForLabels;
-    }
+    };
 
     this.render = function (centerFrame, chunks, startFrameIndex, windowCenterTime) {
         if (userSettings.eraseBackground) {
             canvasContext.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        var
+        let
             yawStickMax = 500,
 
             stickColor = "rgba(255,102,102,1.0)",
             stickAreaColor = "rgba(76,76,76,0.2)",
             crosshairColor = "rgba(191,191,191,0.5)";
 
-        var
+        let
             stickPositions = [],
             stickLabel = [];
 
@@ -92,14 +92,14 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                 // we have the data for the stick trails
 
                 //We may start partway through the first chunk:
-                var frameIndex = startFrameIndex;
+                let frameIndex = startFrameIndex;
                 stickLoop:
-                for (var chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-                    var
+                for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+                    let
                         chunk = chunks[chunkIndex];
 
                     for (; frameIndex < chunk.frames.length; frameIndex++) {
-                        var
+                        let
                             frameTime = chunk.frames[frameIndex][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
                             frameStickPositions = [];
 
@@ -114,7 +114,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             }
         }
 
-        var radi = drawingParams.stickSurroundRadius;
+        let radi = drawingParams.stickSurroundRadius;
 
         // Move origin to center of canvas
         canvasContext.translate(canvas.width / 2, canvas.height / 2);
@@ -122,10 +122,10 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         // Move origin to center of left stick
         canvasContext.translate(-drawingParams.stickSpacing - radi, 0);
 
-        canvasContext.font = drawingParams.fontSizeValueLabel + "pt " + DEFAULT_FONT_FACE;
+        canvasContext.font = `${drawingParams.fontSizeValueLabel  }pt ${  DEFAULT_FONT_FACE}`;
 
         //For each stick
-        for (var i = 0; i < 2; i++) {
+        for (let i = 0; i < 2; i++) {
             //Fill in background
             canvasContext.fillStyle = stickAreaColor;
             roundRect(canvasContext, -radi, -radi,
@@ -164,15 +164,15 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                     canvasContext.fillStyle = crosshairColor;
 
                     canvasContext.textAlign = 'center';
-                    canvasContext.fillText('Mode ' + userSettings.stickMode, 0, radi - (drawingParams.fontSizeValueLabel / 2));
+                    canvasContext.fillText(`Mode ${  userSettings.stickMode}`, 0, radi - (drawingParams.fontSizeValueLabel / 2));
                 }
             }
 
             if (userSettings.stickTrails) {
                 //Draw circle to represent stick position trail
-                for (var j = 0; j < stickPositionsTrail.length; j++) {
+                for (let j = 0; j < stickPositionsTrail.length; j++) {
                     canvasContext.beginPath();
-                    canvasContext.fillStyle = "rgba(255,255,255," + (j / stickPositionsTrail.length * 0.05) + ")";
+                    canvasContext.fillStyle = `rgba(255,255,255,${  j / stickPositionsTrail.length * 0.05  })`;
                     canvasContext.arc(stickPositionsTrail[j][i * 2 + 0], stickPositionsTrail[j][i * 2 + 1], Math.abs(radi) / 20, 0, 2 * Math.PI);
                     canvasContext.fill();
                 }
@@ -191,10 +191,10 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
 
         canvasContext.restore();
 
-    }
+    };
 
     function getStickValues(frame, stickPositions, stickLabel, config) {
-        var
+        let
             stickIndex,
             rcCommand = [], rcCommandLabels = [];
 
@@ -207,17 +207,17 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
 
             rcCommand[stickIndex] = frame[rcCommandFields[stickIndex]] / highResolutionScale;
             if (stickLabel != null) {
-                rcCommandLabels[stickIndex] = (rcCommand[stickIndex] * ((stickIndex == 2) ? -1 : 1)) + ""; // correct the value for Yaw being inverted
+                rcCommandLabels[stickIndex] = `${rcCommand[stickIndex] * ((stickIndex == 2) ? -1 : 1)  }`; // correct the value for Yaw being inverted
                 if (userSettings.stickUnits != null) {
                     if (userSettings.stickUnits) {
-                        var currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+                        let currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
                         rcCommandLabels[stickIndex] = FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, flightLog.getMainFieldNames()[rcCommandFields[stickIndex]], frame[rcCommandFields[stickIndex]], currentFlightMode);
                     }
                 }
             }
         }
 
-        var yawValue = ((userSettings.stickInvertYaw) ? 1 : -1) * rcCommand[2];
+        let yawValue = ((userSettings.stickInvertYaw) ? 1 : -1) * rcCommand[2];
         // map the stick positions based upon selected stick mode (default is mode 2)
 
         //Compute the position of the sticks in the range [-1..1] (left stick x, left stick y, right stick x, right stick y)

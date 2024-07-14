@@ -5,7 +5,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 	// Private Variables
     
 	// generate mixer (from Cleanflight Configurator) (note that the mixerConfiguration index starts at 1)
-	var mixerList = [
+	let mixerList = [
 	     {name: 'Tricopter',       model: 'tricopter',    image: 'tri',				defaultMotorOrder: [0, 1, 2], 				defaultYawOffset: -Math.PI / 2},
 	     {name: 'Quad +',          model: 'quad_x',       image: 'quad_p',			defaultMotorOrder: [1, 3, 2, 0], 			defaultYawOffset: 0},
 	     {name: 'Quad X',          model: 'quad_x',       image: 'quad_x',			defaultMotorOrder: [1, 3, 2, 0], 			defaultYawOffset: Math.PI / 4},
@@ -30,13 +30,13 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 	     {name: 'A-tail Quad',     model: 'quad_atail',   image: 'atail_quad',		defaultMotorOrder: [1, 3, 2, 0], 			defaultYawOffset: Math.PI / 4},
 	     {name: 'Custom',          model: 'custom',       image: 'custom',			defaultMotorOrder: [0], 					defaultYawOffset: 0},
 	     {name: 'Custom Airplane', model: 'custom',       image: 'custom',			defaultMotorOrder: [0], 					defaultYawOffset: 0},
-	     {name: 'Custom Tricopter', model: 'custom',      image: 'custom',			defaultMotorOrder: [0, 1, 2], 				defaultYawOffset: -Math.PI / 2}
+	     {name: 'Custom Tricopter', model: 'custom',      image: 'custom',			defaultMotorOrder: [0, 1, 2], 				defaultYawOffset: -Math.PI / 2},
 
 	];
 
 	// Setup Defaults....
 
-	var defaultSettings = {
+	let defaultSettings = {
 		mixerConfiguration : 3, 				// Default to Quad-X
 		customMix 			: null,				// Default to no mixer configuration
 		stickMode 			: 2,				// Default to Mode 2
@@ -69,22 +69,22 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 		craft				: {
 									left  : '15%',	// position from left (as a percentage of width)
 									top   : '48%',  // position from top (as a percentage of height)
-									size  : '40%'   // size (as a percentage of width)
+									size  : '40%',   // size (as a percentage of width)
 							  },
 		sticks				: {
 									left  : '75%',	// position from left (as a percentage of width)
 									top   : '20%',  // position from top (as a percentage of height)
-									size  : '30%'   // size (as a percentage of width)
+									size  : '30%',   // size (as a percentage of width)
 							  },
 		analyser			: {
 									left  : '2%',	// position from left (as a percentage of width)
 									top   : '60%',  // position from top (as a percentage of height)
-									size  : '35%'   // size (as a percentage of width)
+									size  : '35%',   // size (as a percentage of width)
 							  },
 		map			: {
 									left  : '2%',	// position from left (as a percentage of width)
 									top   : '5%',  // position from top (as a percentage of height)
-									size  : '35%'   // size (as a percentage of width)
+									size  : '35%',   // size (as a percentage of width)
 							  },
 	    watermark			: {
 									left  : '3%',	// position from left (as a percentage of width)
@@ -100,22 +100,22 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 							  },
 	};
 
-	var currentSettings = {};
-	var currentLogo = null;
+	let currentSettings = {};
+	let currentLogo = null;
 
     function saveCustomMix() {
 
-		var customMix;
+		let customMix;
 
 		if($(".custom-mixes").is(":checked")) {
     	
-			var motorOrder = new Array(mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder.length);
-			for(var i=0;i<motorOrder.length; i++) {
-				var select_e = $('select.motor_'+mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder[i]+'_');
+			let motorOrder = new Array(mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder.length);
+			for(let i=0;i<motorOrder.length; i++) {
+				let select_e = $(`select.motor_${mixerList[currentSettings.mixerConfiguration-1].defaultMotorOrder[i]}_`);
 				motorOrder[i] = select_e.val();
 			}
 			customMix = {  motorOrder: motorOrder,
-							yawOffset: mixerList[currentSettings.mixerConfiguration-1].defaultYawOffset
+							yawOffset: mixerList[currentSettings.mixerConfiguration-1].defaultYawOffset,
 				  };       
     	} else {
     		customMix = null;
@@ -124,29 +124,29 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     }
     
     function convertUIToSettings() {
-    	var settings = $.extend({}, currentSettings, {
+    	let settings = $.extend({}, currentSettings, {
     			customMix: saveCustomMix(),
-    			sticks:    {top: $('.stick-mode-group input[name="stick-top"]').val() + '%',
-    					   left: $('.stick-mode-group input[name="stick-left"]').val() + '%',
-    					   size: $('.stick-mode-group input[name="stick-size"]').val() + '%', },
-    			craft:     {top: $('.craft-settings input[name="craft-top"]').val() + '%',
-    					   left: $('.craft-settings input[name="craft-left"]').val() + '%',
-    					   size: $('.craft-settings input[name="craft-size"]').val() + '%', },
-				analyser:  {top: $('.analyser-settings input[name="analyser-top"]').val() + '%',
-    					   left: $('.analyser-settings input[name="analyser-left"]').val() + '%',
-    					   size: $('.analyser-settings input[name="analyser-size"]').val() + '%', },
-				map:  	   {top: $('.map-settings input[name="map-top"]').val() + '%',
-    					   left: $('.map-settings input[name="map-left"]').val() + '%',
-    					   size: $('.map-settings input[name="map-size"]').val() + '%', },
-    			watermark: {top: $('.watermark-settings input[name="watermark-top"]').val() + '%',
-					   	   left: $('.watermark-settings input[name="watermark-left"]').val() + '%',
-					   	   size: $('.watermark-settings input[name="watermark-size"]').val() + '%', 
-					   	   transparency: $('.watermark-settings input[name="watermark-transparency"]').val() + '%',
-					   	   logo: currentLogo, },
+    			sticks:    {top: `${$('.stick-mode-group input[name="stick-top"]').val()  }%`,
+    					   left: `${$('.stick-mode-group input[name="stick-left"]').val()  }%`,
+    					   size: `${$('.stick-mode-group input[name="stick-size"]').val()  }%` },
+    			craft:     {top: `${$('.craft-settings input[name="craft-top"]').val()  }%`,
+    					   left: `${$('.craft-settings input[name="craft-left"]').val()  }%`,
+    					   size: `${$('.craft-settings input[name="craft-size"]').val()  }%` },
+				analyser:  {top: `${$('.analyser-settings input[name="analyser-top"]').val()  }%`,
+    					   left: `${$('.analyser-settings input[name="analyser-left"]').val()  }%`,
+    					   size: `${$('.analyser-settings input[name="analyser-size"]').val()  }%` },
+				map:  	   {top: `${$('.map-settings input[name="map-top"]').val()  }%`,
+    					   left: `${$('.map-settings input[name="map-left"]').val()  }%`,
+    					   size: `${$('.map-settings input[name="map-size"]').val()  }%` },
+    			watermark: {top: `${$('.watermark-settings input[name="watermark-top"]').val()  }%`,
+					   	   left: `${$('.watermark-settings input[name="watermark-left"]').val()  }%`,
+					   	   size: `${$('.watermark-settings input[name="watermark-size"]').val()  }%`, 
+					   	   transparency: `${$('.watermark-settings input[name="watermark-transparency"]').val()  }%`,
+					   	   logo: currentLogo },
 				drawWatermark: ($(".watermark").is(":checked")),
-    			laptimer: {top: $('.laptimer-settings input[name="laptimer-top"]').val() + '%',
-					   	   left: $('.laptimer-settings input[name="laptimer-left"]').val() + '%',
-					   	   transparency: $('.laptimer-settings input[name="laptimer-transparency"]').val() + '%', },
+    			laptimer: {top: `${$('.laptimer-settings input[name="laptimer-top"]').val()  }%`,
+					   	   left: `${$('.laptimer-settings input[name="laptimer-left"]').val()  }%`,
+					   	   transparency: `${$('.laptimer-settings input[name="laptimer-transparency"]').val()  }%` },
 				drawLapTimer: ($(".laptimer").is(":checked")),
 				drawGradient: ($(".gradient").is(":checked")),
 				drawVerticalBar: ($(".verticalBar").is(":checked")),
@@ -154,20 +154,20 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     	return settings;
     }
         
-    var availableMotors =[]; // motors that appear in the log file
+    let availableMotors =[]; // motors that appear in the log file
     function getAvailableMotors(flightLog) {
     	
-        var fieldNames = flightLog.getMainFieldNames();
+        let fieldNames = flightLog.getMainFieldNames();
         availableMotors = [];
         
         for (i = 0; i < fieldNames.length; i++) {
-            var matches = fieldNames[i].match(/^(motor\[[0-9]+\])/);
+            let matches = fieldNames[i].match(/^(motor\[[0-9]+\])/);
             if(matches!=null) availableMotors.push(fieldNames[i]);
         };
     }
     
     function renderFieldOption(i, fieldName, selectedName) {
-        var 
+        let 
             option = $("<option></option>")
                 .text(FlightLogFieldPresenter.fieldNameToFriendly(fieldName))
                 .attr("value", i);
@@ -180,40 +180,40 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     }
 
     function buildAvailableMotors(select_e, selectedName) {
-    	for(var i=0; i<availableMotors.length; i++) {
+    	for(let i=0; i<availableMotors.length; i++) {
     		select_e.append(renderFieldOption(i, availableMotors[i], selectedName));
     	};
     }
     
     function buildMotorList(mixerConfiguration) {
-    	var motor_list_e = $('.motorList');
+    	let motor_list_e = $('.motorList');
     	$(motor_list_e).empty(); // clear all the motors
     	if(mixerList[mixerConfiguration-1].defaultMotorOrder.length > availableMotors.length) {
-    		var motors_e = $('<tr>' +
-					'<td colspan="2">' +
-						'<p class="error">' +
-							'Error, you have selected a craft type that required more motors than are available in the log; ' +
-							'There are only a maximum of ' + availableMotors.length + ' motors in the log file; the selection you have chosen requires ' +
-							mixerList[mixerConfiguration-1].defaultMotorOrder.length + ' motors.' +
-						'</p>' +
-					'</td>' +	
-				'</tr>');
+    		var motors_e = $(`<tr>` +
+					`<td colspan="2">` +
+						`<p class="error">` +
+							`Error, you have selected a craft type that required more motors than are available in the log; ` +
+							`There are only a maximum of ${  availableMotors.length  } motors in the log file; the selection you have chosen requires ${ 
+							mixerList[mixerConfiguration-1].defaultMotorOrder.length  } motors.` +
+						`</p>` +
+					`</td>` +	
+				`</tr>`);
         	motor_list_e.append(motors_e);
     	} else {
-	    	for(var i=0; i<mixerList[mixerConfiguration-1].defaultMotorOrder.length; i++) {
-	    		var motors_e = $('<tr>' +
-										'<td colspan="2"><label>Motor ' + (i+1) + '</label><select class="motor_' + i + '_"><!-- list generated here --></select></td>' +	
-									'</tr>');
-	        	var select_e = $('select', motors_e);
+	    	for(let i=0; i<mixerList[mixerConfiguration-1].defaultMotorOrder.length; i++) {
+	    		var motors_e = $(`<tr>` +
+										`<td colspan="2"><label>Motor ${  i+1  }</label><select class="motor_${  i  }_"><!-- list generated here --></select></td>` +	
+									`</tr>`);
+	        	let select_e = $('select', motors_e);
 	        	if(currentSettings.customMix!=null) {
-	        		for(var j=0; j<mixerList[mixerConfiguration-1].defaultMotorOrder.length; j++) {
+	        		for(let j=0; j<mixerList[mixerConfiguration-1].defaultMotorOrder.length; j++) {
 	        			if(mixerList[mixerConfiguration-1].defaultMotorOrder[j] == i) {
-				        	buildAvailableMotors(select_e, 'motor[' + currentSettings.customMix.motorOrder[j] + ']');
+				        	buildAvailableMotors(select_e, `motor[${  currentSettings.customMix.motorOrder[j]  }]`);
 				        	break;
 	        			}
 	        		}
 	        	} else {
-		        	buildAvailableMotors(select_e, 'motor[' + i + ']');
+		        	buildAvailableMotors(select_e, `motor[${  i  }]`);
 	        	}
 	        	motor_list_e.append(motors_e);
 	    	};    	
@@ -223,9 +223,9 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     // Initialisation Code ...
     
     // Setup the mixer list (pretty much cloned from the configurator...)
-    var mixer_list_e = $('select.mixerList');
+    let mixer_list_e = $('select.mixerList');
     for (var i = 0; i < mixerList.length; i++) {
-        mixer_list_e.append('<option value="' + (i + 1) + '">' + mixerList[i].name + '</option>');
+        mixer_list_e.append(`<option value="${  i + 1  }">${  mixerList[i].name  }</option>`);
     }
 
 	function mixerListSelection(val) {
@@ -235,7 +235,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         currentSettings.mixerConfiguration = val;
 
 		if(val>0 && val <= mixerList.length) {
-				$('.mixerPreview img').attr('src', './images/motor_order/' + mixerList[val - 1].image + '.svg');
+				$('.mixerPreview img').attr('src', `./images/motor_order/${  mixerList[val - 1].image  }.svg`);
 			}
         
         buildMotorList(val); // rebuild the motor list based upon the current selection
@@ -248,7 +248,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         currentSettings.stickMode = val;
 
 		if(val>0 && val <= 5) {
-				$('.modePreview img').attr('src', './images/stick_modes/Mode_' + val + '.png');
+				$('.modePreview img').attr('src', `./images/stick_modes/Mode_${  val  }.png`);
 			}
 	}
 
@@ -327,12 +327,12 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     // Load Custom Logo
     function readURL(input) {
         if (input.files && input.files[0]) {
-            var reader = new FileReader();
+            let reader = new FileReader();
             
             reader.onload = function (e) {
                 $('#watermark-logo').attr('src', e.target.result);
                 currentLogo = e.target.result;
-            }
+            };
             
             reader.readAsDataURL(input.files[0]);
         }
@@ -351,7 +351,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 	this.resetToDefaults = function() {
 		currentSettings = $.extend({}, defaultSettings);
 		onSave(currentSettings);
-	}
+	};
 
     
     this.show = function(flightLog, settings) {
@@ -405,10 +405,10 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 
     		// setup the stick mode and dropdowns;
     		$('select.mixerList').val(currentSettings.mixerConfiguration);
-    		$('input:radio[name="stick-mode"]').filter('[value="' + currentSettings.stickMode + '"]').attr('checked', true);
+    		$('input:radio[name="stick-mode"]').filter(`[value="${  currentSettings.stickMode  }"]`).attr('checked', true);
 
-    		$('input:radio[name="speed-mode"]').filter('[value="' + currentSettings.speedUnits + '"]').attr('checked', true);
-    		$('input:radio[name="altitude-mode"]').filter('[value="' + currentSettings.altitudeUnits + '"]').attr('checked', true);
+    		$('input:radio[name="speed-mode"]').filter(`[value="${  currentSettings.speedUnits  }"]`).attr('checked', true);
+    		$('input:radio[name="altitude-mode"]').filter(`[value="${  currentSettings.altitudeUnits  }"]`).attr('checked', true);
 
     		$('.stick-mode-group input[name="stick-top"]').val(parseInt(currentSettings.sticks.top));
     		$('.stick-mode-group input[name="stick-left"]').val(parseInt(currentSettings.sticks.left));

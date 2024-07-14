@@ -30,15 +30,15 @@ export function HeaderDialog(dialog, onSave) {
 	// Private Variables
 
 
-	var that = this; 		// generic pointer back to this function
-	var activeSysConfig;	// pointer to the current system configuration
+	let that = this; 		// generic pointer back to this function
+	let activeSysConfig;	// pointer to the current system configuration
 
 	/** By default, all parameters are shown on the header
 		however, specific firmware version parameters can be hidden
 		by adding them to this variable
 	**/
 
-    var parameterVersion = [
+    let parameterVersion = [
         {name:'dterm_average_count'          , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'0.0.0', max:'2.6.9'},
         {name:'rc_smoothing'                 , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'0.0.0', max:'2.8.9'},
         {name:'dynamic_pterm'                , type:FIRMWARE_TYPE_BETAFLIGHT,  min:'2.6.0', max:'2.7.9'},
@@ -166,7 +166,7 @@ export function HeaderDialog(dialog, onSave) {
 
 	function isParameterValid(name) {
 
-		for(var i=0; i<parameterVersion.length; i++) {
+		for(let i=0; i<parameterVersion.length; i++) {
 			if (parameterVersion[i].name == name && parameterVersion[i].type == activeSysConfig.firmwareType) {
 				return (semver.gte(activeSysConfig.firmwareVersion, parameterVersion[i].min) && semver.lte(activeSysConfig.firmwareVersion, parameterVersion[i].max));
 			}
@@ -175,7 +175,7 @@ export function HeaderDialog(dialog, onSave) {
 	}
 
     function renderOptions(selected, index, list) {
-        var
+        let
             option = $("<option></option>")
                 .text(list[index])
                 .attr("value", index);
@@ -189,13 +189,13 @@ export function HeaderDialog(dialog, onSave) {
 
     function renderSelect(name, selected, list) {
     	// Populate a select drop-down box
-    	var parameterElem = $('.parameter td[name="' + name + '"]');
-    	var selectElem = $('select', parameterElem);
+    	let parameterElem = $(`.parameter td[name="${  name  }"]`);
+    	let selectElem = $('select', parameterElem);
 			selectElem.children().remove(); // clear list
-			for(var i=0; i<list.length; i++) {
+			for(let i=0; i<list.length; i++) {
 				selectElem.append(renderOptions(selected, i, list));
 			}
-			parameterElem.attr('title', 'set '+name+'='+list[selectElem.val()]);
+			parameterElem.attr('title', `set ${name}=${list[selectElem.val()]}`);
 
 			parameterElem.css('display', isParameterValid(name)?('table-cell'):('none'));
 
@@ -208,12 +208,12 @@ export function HeaderDialog(dialog, onSave) {
     }
 
     function setParameter(name, data, decimalPlaces) {
-    	var parameterElem = $('.parameter td[name="' + name + '"]');
-		var nameElem = $('input', parameterElem);
+    	let parameterElem = $(`.parameter td[name="${  name  }"]`);
+		let nameElem = $('input', parameterElem);
 		if(data!=null) {
 			nameElem.val((data/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces));
 			nameElem.attr('decPl', decimalPlaces);
-			parameterElem.attr('title', 'set '+name+'='+data);
+			parameterElem.attr('title', `set ${name}=${data}`);
 			parameterElem.removeClass('missing');
 		} else {
 			parameterElem.addClass('missing');
@@ -223,12 +223,12 @@ export function HeaderDialog(dialog, onSave) {
 	}
 
     function setParameterFloat(name, data, decimalPlaces) {
-        var parameterElem = $('.parameter td[name="' + name + '"]');
-        var nameElem = $('input', parameterElem);
+        let parameterElem = $(`.parameter td[name="${  name  }"]`);
+        let nameElem = $('input', parameterElem);
         if(data!=null) {
             nameElem.val(data.toFixed(decimalPlaces));
             nameElem.attr('decPl', decimalPlaces);
-            parameterElem.attr('title', 'set '+name+'='+data);
+            parameterElem.attr('title', `set ${name}=${data}`);
             parameterElem.removeClass('missing');
         } else {
             parameterElem.addClass('missing');
@@ -239,12 +239,12 @@ export function HeaderDialog(dialog, onSave) {
 
 
 	function setCheckbox(name, data) {
-    	var parameterElem = $('.static-features td[name="' + name + '"]');
-		var nameElem = $('input', parameterElem);
+    	let parameterElem = $(`.static-features td[name="${  name  }"]`);
+		let nameElem = $('input', parameterElem);
 		if(data!=null) {
-			var state = (data == 1);
+			let state = (data == 1);
 			nameElem.prop('checked', state);
-			parameterElem.attr('title', 'set '+name+'='+data);
+			parameterElem.attr('title', `set ${name}=${data}`);
 			nameElem.closest('tr').removeClass('missing');
 		} else {
 			nameElem.closest('tr').addClass('missing');
@@ -253,10 +253,10 @@ export function HeaderDialog(dialog, onSave) {
 	}
 
 	function populatePID(name, data) {
-		var i = 0;
-        var nameElem = $('.pid_tuning .' + name + ' input');
+		let i = 0;
+        let nameElem = $(`.pid_tuning .${  name  } input`);
         nameElem.each(function () {
-			$(this).attr('name', name + '[' + i + ']');
+			$(this).attr('name', `${name  }[${  i  }]`);
 			if(data!=null) {
 				$(this).closest('tr').removeClass('missing');
 				switch (i) {
@@ -314,11 +314,11 @@ export function HeaderDialog(dialog, onSave) {
                         break;
 					}
 				} else $(this).closest('tr').addClass('missing');
-            })
+            });
 	}
 
 	function isFeatureEnabled(name, list, value) {
-		for (var i = 0; i < list.length; i++) {
+		for (let i = 0; i < list.length; i++) {
 			if (list[i].name == name && (value & 1<<list[i].bit)) {
 				return true;
 			}
@@ -328,10 +328,10 @@ export function HeaderDialog(dialog, onSave) {
 
 	function builtFeaturesList(sysConfig) {
 
-		var value = sysConfig.features;
+		let value = sysConfig.features;
 
         // generate features
-        var features = [
+        let features = [
             {bit: 0, group: 'rxMode', mode: 'group', name: 'RX_PPM', description: 'PPM Receiver Selected'},
             {bit: 2, group: 'other', name: 'INFLIGHT_ACC_CAL', description: 'In-flight level calibration'},
             {bit: 3, group: 'rxMode', mode: 'group', name: 'RX_SERIAL', description: 'Serial Receiver Selected'},
@@ -364,25 +364,25 @@ export function HeaderDialog(dialog, onSave) {
 
 		if (semver.gte(sysConfig.firmwareVersion, "2.8.0")) {
 			features.push(
-				{bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'}
+				{bit: 22, group: 'other', name: 'AIRMODE', description: 'Airmode always enabled, set off to use modes'},
 			);
 		}
 
 		if (semver.gte(sysConfig.firmwareVersion, "2.8.0") && !semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
 			features.push(
-				{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'}
+				{bit: 23, group: 'other', name: 'SUPEREXPO_RATES', description: 'Super Expo Mode'},
 			);
 		}
 
         if (semver.gte(sysConfig.firmwareVersion, "2.8.0") && !semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
             features.push(
-                {bit: 18, group: 'other', name: 'ONESHOT125', description: 'Oneshot 125 Enabled'}
+                {bit: 18, group: 'other', name: 'ONESHOT125', description: 'Oneshot 125 Enabled'},
             );
         }
 
 		if (semver.gte(sysConfig.firmwareVersion, "3.0.0")) {
 			features.push(
-				{bit: 18, group: 'other', name: 'OSD', description: 'On Screen Display'}
+				{bit: 18, group: 'other', name: 'OSD', description: 'On Screen Display'},
 			);
 		}
 
@@ -398,47 +398,47 @@ export function HeaderDialog(dialog, onSave) {
             }
 		}
 
-        var radioGroups = [];
+        let radioGroups = [];
 
-        var features_e = $('.features');
+        let features_e = $('.features');
         features_e.children().remove(); // clear list
 
         for (var i = 0; i < features.length; i++) {
             var row_e;
 
-            var feature_tip_html = '';
+            let feature_tip_html = '';
 
             if (features[i].mode === 'group') {
-                row_e = $('<tr><td><input class="feature" id="feature-'
-                        + i
-                        + '" value="'
-                        + features[i].bit
-                        + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
-                        + features[i].name
-                        + '" type="radio" name="'
-                        + features[i].group
-                        + '" bit="' + i + '" /></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span>' + features[i].description + '</span>'
-                        + feature_tip_html + '</td></tr>');
+                row_e = $(`<tr><td><input class="feature" id="feature-${
+                         i
+                         }" value="${
+                         features[i].bit
+                         }" title="feature ${  (value & 1<<features[i].bit)?'':'-'
+                         }${features[i].name
+                         }" type="radio" name="${
+                         features[i].group
+                         }" bit="${  i  }" /></td><td><label for="feature-${
+                         i
+                         }">${
+                         features[i].name
+                         }</label></td><td><span>${  features[i].description  }</span>${
+                         feature_tip_html  }</td></tr>`);
                 radioGroups.push(features[i].group);
             } else {
-                row_e = $('<tr><td><label class="option"><input class="feature '
-                        + i
-                        + ' ios-switch" name="'
-                        + features[i].name
-                        + '" title="feature ' + ((value & 1<<features[i].bit)?'':'-')
-                        + features[i].name
-                        + '" type="checkbox" bit="'+ i +'" /><div><div></div></div></label></td><td><label for="feature-'
-                        + i
-                        + '">'
-                        + features[i].name
-                        + '</label></td><td><span>' + features[i].description + '</span>'
-                        + feature_tip_html + '</td></tr>');
+                row_e = $(`<tr><td><label class="option"><input class="feature ${
+                         i
+                         } ios-switch" name="${
+                         features[i].name
+                         }" title="feature ${  (value & 1<<features[i].bit)?'':'-'
+                         }${features[i].name
+                         }" type="checkbox" bit="${ i }" /><div><div></div></div></label></td><td><label for="feature-${
+                         i
+                         }">${
+                         features[i].name
+                         }</label></td><td><span>${  features[i].description  }</span>${
+                         feature_tip_html  }</td></tr>`);
 
-                var feature_e = row_e.find('input.feature');
+                let feature_e = row_e.find('input.feature');
 
                 feature_e.prop('checked', (value & 1<<features[i].bit));
                 feature_e.data('bit', features[i].bit);
@@ -452,12 +452,12 @@ export function HeaderDialog(dialog, onSave) {
 		}
 
 		for (var i = 0; i < radioGroups.length; i++) {
-			var group = radioGroups[i];
-			var controls_e = $('input[name="' + group + '"].feature');
+			let group = radioGroups[i];
+			let controls_e = $(`input[name="${  group  }"].feature`);
 
 			controls_e.each(function() {
-				var bit = parseInt($(this).attr('value'));
-				var state = (value & 1<<bit);
+				let bit = parseInt($(this).attr('value'));
+				let state = (value & 1<<bit);
 
 				$(this).prop('checked', state);
 			});
@@ -516,13 +516,13 @@ export function HeaderDialog(dialog, onSave) {
 		// Build a table of unknown header entries
 		try {
 			if(unknownHeaders!=0) {
-				var table = $('.unknown table');
-				var elem = '';
+				let table = $('.unknown table');
+				let elem = '';
 				$("tr:not(:first)", table).remove(); // clear the entries (not the first row which has the title bar)
 
-				for(var i=0; i<unknownHeaders.length; i++) {
-					elem += '<tr><td>' + unknownHeaders[i].name + '</td>' +
-								'<td>' + unknownHeaders[i].value + '</td></tr>';
+				for(let i=0; i<unknownHeaders.length; i++) {
+					elem += `<tr><td>${  unknownHeaders[i].name  }</td>` +
+								`<td>${  unknownHeaders[i].value  }</td></tr>`;
 				}
 
 				table.append(elem);
@@ -543,7 +543,7 @@ export function HeaderDialog(dialog, onSave) {
 
       $('h5.modal-title-craft').text((sysConfig['Craft name'] != null) ? ` ${sysConfig['Craft name']}` : '');
 //      $('h5.modal-title-date').text((sysConfig['Firmware date'] != null) ? ` ${sysConfig['Firmware date']}` : '');
-      $('h5.modal-title-revision').text(((sysConfig['Firmware revision'] != null) ? ` ${sysConfig['Firmware revision']}` : '')  + ' - ' + ((sysConfig['Firmware date'] != null) ? ` ${sysConfig['Firmware date']}` : ''));
+      $('h5.modal-title-revision').text(`${(sysConfig['Firmware revision'] != null) ? ` ${sysConfig['Firmware revision']}` : ''   } - ${  (sysConfig['Firmware date'] != null) ? ` ${sysConfig['Firmware date']}` : ''}`);
       $('h5.modal-title-board-info').text((sysConfig['Board information'] != null) ? ` Board : ${sysConfig['Board information']}` : '');
 
 		switch(sysConfig.firmwareType) {
@@ -579,14 +579,14 @@ export function HeaderDialog(dialog, onSave) {
 
 			PID_CONTROLLER_TYPE = ([
 					'LEGACY',
-					'BETAFLIGHT'
-				])
+					'BETAFLIGHT',
+				]);
 		} else {
 			PID_CONTROLLER_TYPE = ([
 					'UNUSED',
 					'MWREWRITE',
-					'LUXFLOAT'
-				])
+					'LUXFLOAT',
+				]);
 		}
 
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
@@ -737,7 +737,7 @@ export function HeaderDialog(dialog, onSave) {
             renderSelect('rcSmoothingMode'              ,sysConfig.rc_smoothing_mode, RC_SMOOTHING_MODE);
             setParameter('rcSmoothingFeedforwardHz'     ,sysConfig.rc_smoothing_feedforward_hz, 0);
             setParameter('rcSmoothingSetpointHz'        ,sysConfig.rc_smoothing_setpoint_hz, 0);
-            setParameter('rcSmoothingAutoFactorSetpoint',sysConfig.rc_smoothing_auto_factor_setpoint, 0)
+            setParameter('rcSmoothingAutoFactorSetpoint',sysConfig.rc_smoothing_auto_factor_setpoint, 0);
             setParameter('rcSmoothingThrottleHz'        ,sysConfig.rc_smoothing_throttle_hz, 0);
             setParameter('rcSmoothingAutoFactorThrottle',sysConfig.rc_smoothing_auto_factor_throttle, 0);
             setParameter('rcSmoothingActiveCutoffsFf'   ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
@@ -954,17 +954,17 @@ export function HeaderDialog(dialog, onSave) {
 
     function convertUIToSysConfig() {
     	console.log('Saving....');
-    	var newSysConfig = {};
+    	let newSysConfig = {};
 
     	// Scan all the parameters
 		$(".parameter input").each(function() {
 			if($(this).val()!=null) {
-				var matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
+				let matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
 				if(matches!=null) { // this is a variable in an array
 					if(newSysConfig[matches[1]]==null) { // array doesn't exist, create it
 						newSysConfig[matches[1]] = [];
 						}
-					var newArray = newSysConfig[matches[1]];
+					let newArray = newSysConfig[matches[1]];
 					if($(this).attr('decPl')!=null) {
 						newArray[matches[2]] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
 					} else {
@@ -992,10 +992,10 @@ export function HeaderDialog(dialog, onSave) {
 		$(".pid_tuning input").each(function() {
 			if($(this).val()!=null) {
 				if($(this).attr('decPl')!=null) {
-					var matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
+					let matches=$(this).attr('name').match(/(.+)\[(\d+)\]/);
 					if(matches!=null) {
 						if(newSysConfig[matches[1]]==null) newSysConfig[matches[1]] = [null, null, null];
-						var newArray = newSysConfig[matches[1]];
+						let newArray = newSysConfig[matches[1]];
 						newArray[matches[2]] = (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
 					} else (parseFloat($(this).val()) * Math.pow(10, $(this).attr('decPl')));
 				} else {
@@ -1005,7 +1005,7 @@ export function HeaderDialog(dialog, onSave) {
 		});
 
 		//Build the features value
-		var newFeatureValue = 0;
+		let newFeatureValue = 0;
 		$(".features td input").each(function() {
             if ($(this).prop('checked')) {
                 newFeatureValue |= (1<<parseInt($(this).attr('bit')));
@@ -1036,7 +1036,7 @@ export function HeaderDialog(dialog, onSave) {
 
         dialog.modal('toggle');
 
-    }
+    };
 
  	// Buttons
 

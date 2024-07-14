@@ -4,7 +4,7 @@
 
 export function IMU(copyFrom) {
     // Constants:
-    var
+    let
         RAD = Math.PI / 180.0,
 
         ROLL = 0,
@@ -44,7 +44,7 @@ export function IMU(copyFrom) {
     // **************************************************
 
     function normalizeVector(src, dest) {
-        var length = Math.sqrt(src.X * src.X + src.Y * src.Y + src.Z * src.Z);
+        let length = Math.sqrt(src.X * src.X + src.Y * src.Y + src.Z * src.Z);
 
         if (length !== 0) {
             dest.X = src.X / length;
@@ -55,7 +55,7 @@ export function IMU(copyFrom) {
 
     function rotateVector(v, delta) {
         // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
-        var
+        let
             v_tmp = {X:v.X, Y:v.Y, Z:v.Z},
             mat = [[0,0,0],[0,0,0],[0,0,0]],
             cosx, sinx, cosy, siny, cosz, sinz,
@@ -91,16 +91,16 @@ export function IMU(copyFrom) {
     // Rotate the accel values into the earth frame and subtract acceleration due to gravity from the result
     function calculateAccelerationInEarthFrame(accSmooth, attitude, acc_1G)
     {
-        var
+        let
             rpy = [
                 -attitude.roll,
                 -attitude.pitch,
-                -attitude.heading
+                -attitude.heading,
             ],
             result = {
                 X: accSmooth[0],
                 Y: accSmooth[1],
-                Z: accSmooth[2]
+                Z: accSmooth[2],
             };
 
         rotateVector(result, rpy);
@@ -112,7 +112,7 @@ export function IMU(copyFrom) {
 
     // Use the craft's estimated roll/pitch to compensate for the roll/pitch of the magnetometer reading
     function calculateHeading(vec, roll, pitch) {
-        var
+        let
             cosineRoll = Math.cos(roll),
             sineRoll = Math.sin(roll),
             cosinePitch = Math.cos(pitch),
@@ -134,7 +134,7 @@ export function IMU(copyFrom) {
      * Using the given raw data, update the IMU state and return the new estimate for the attitude.
      */
     this.updateEstimatedAttitude = function(gyroADC, accSmooth, currentTime, acc_1G, gyroScale, magADC) {
-        var
+        let
             accMag = 0,
             deltaTime,
             scale,
@@ -150,7 +150,7 @@ export function IMU(copyFrom) {
         this.previousTime = currentTime;
 
         // Initialization
-        for (var axis = 0; axis < 3; axis++) {
+        for (let axis = 0; axis < 3; axis++) {
             deltaGyroAngle[axis] = gyroADC[axis] * scale;
 
             accMag += accSmooth[axis] * accSmooth[axis];
@@ -168,10 +168,10 @@ export function IMU(copyFrom) {
             this.estimateGyro.Z = (this.estimateGyro.Z * gyro_cmpf_factor + accSmooth[2]) * INV_GYR_CMPF_FACTOR;
         }
 
-        var
+        let
             attitude = {
                 roll: Math.atan2(this.estimateGyro.Y, this.estimateGyro.Z),
-                pitch: Math.atan2(-this.estimateGyro.X, Math.sqrt(this.estimateGyro.Y * this.estimateGyro.Y + this.estimateGyro.Z * this.estimateGyro.Z))
+                pitch: Math.atan2(-this.estimateGyro.X, Math.sqrt(this.estimateGyro.Y * this.estimateGyro.Y + this.estimateGyro.Z * this.estimateGyro.Z)),
             };
 
         if (false && magADC) { //TODO temporarily disabled
@@ -210,19 +210,19 @@ IMU.prototype.copyStateFrom = function(that) {
     this.estimateGyro = {
         X: that.estimateGyro.X,
         Y: that.estimateGyro.Y,
-        Z: that.estimateGyro.Z
+        Z: that.estimateGyro.Z,
     };
 
     this.estimateMag = {
         X: that.estimateMag.X,
         Y: that.estimateMag.Y,
-        Z: that.estimateMag.Z
+        Z: that.estimateMag.Z,
     };
 
     this.EstN = {
         X: that.EstN.X,
         Y: that.EstN.Y,
-        Z: that.EstN.Z
+        Z: that.EstN.Z,
     };
 
     this.previousTime = that.previousTime;

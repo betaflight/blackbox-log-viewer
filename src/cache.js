@@ -10,15 +10,15 @@
  */
 export function FIFOCache(initialCapacity) {
     //Private:
-    var
+    let
         queue = [],
         items = {};
 
     function removeFromQueue(key) {
-        for (var i = 0; i < queue.length; i++) {
+        for (let i = 0; i < queue.length; i++) {
             if (queue[i] == key) {
                 //Assume there's only one copy to remove:
-                for (var j = i; j < queue.length - 1; j++) {
+                for (let j = i; j < queue.length - 1; j++) {
                     queue[j] = queue[j + 1];
                 }
                 
@@ -36,7 +36,7 @@ export function FIFOCache(initialCapacity) {
      */
     this.recycle = function() {
         if (queue.length > this.capacity) {
-            var 
+            let 
                 key = queue.shift(),
                 result = items[key];
             
@@ -71,7 +71,7 @@ export function FIFOCache(initialCapacity) {
      * expired or had never been stored.
      */
     this.get = function(key) {
-        var item = items[key];
+        let item = items[key];
         
         if (item) {
             removeFromQueue(key);

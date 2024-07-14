@@ -29,7 +29,7 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-    var
+    let
         ADDITIONAL_COMPUTED_FIELD_COUNT = 15, /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/
 
         that = this,
@@ -70,7 +70,7 @@ export function FlightLog(logData) {
      * was encountered.
      */
     this.getLogError = function(logIndex) {
-        var
+        let
             error = logIndexes.getIntraframeDirectory(logIndex).error;
 
         if (error)
@@ -106,7 +106,7 @@ export function FlightLog(logData) {
             for (let i = 0;  i < rawStats.frame.I.field.length; ++i) {
                 rawStats.field[i] = {
                     min: Math.min(rawStats.frame.I.field[i].min, rawStats.frame.P.field[i].min),
-                    max: Math.max(rawStats.frame.I.field[i].max, rawStats.frame.P.field[i].max)
+                    max: Math.max(rawStats.frame.I.field[i].max, rawStats.frame.P.field[i].max),
                 };
             }
 
@@ -160,14 +160,14 @@ export function FlightLog(logData) {
      * Return a coarse summary of throttle position and events across the entire log.
      */
     this.getActivitySummary = function() {
-        var directory = logIndexes.getIntraframeDirectory(logIndex);
+        let directory = logIndexes.getIntraframeDirectory(logIndex);
 
         return {
             times: directory.times,
             avgThrottle: directory.avgThrottle,
             maxMotorDiff: directory.maxMotorDiff,
             maxRC: directory.maxRC,
-            hasEvent: directory.hasEvent
+            hasEvent: directory.hasEvent,
         };
     };
 
@@ -183,7 +183,7 @@ export function FlightLog(logData) {
     };
 
     this.getFrameAtTime = function(startTime) {
-        var
+        let
             chunks = this.getChunksInTimeRange(startTime, startTime),
             chunk = chunks[0];
 
@@ -199,7 +199,7 @@ export function FlightLog(logData) {
     };
 
     this.getSmoothedFrameAtTime = function(startTime) {
-        var
+        let
             chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
             chunk = chunks[0];
 
@@ -215,7 +215,7 @@ export function FlightLog(logData) {
     };
 
     this.getCurrentFrameAtTime = function(startTime) {
-        var
+        let
             chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
             chunk = chunks[0];
 
@@ -286,13 +286,13 @@ export function FlightLog(logData) {
     }
 
     function estimateNumCells() {
-        var
+        let
             i,
             fieldNames = that.getMainFieldNames(),
             sysConfig = that.getSysConfig(),
             found = false;
 
-        var refVoltage;
+        let refVoltage;
         if(firmwareGreaterOrEqual(sysConfig, '3.1.0', '2.0.0')) {
             refVoltage = sysConfig.vbatref;
         } else {
@@ -326,7 +326,7 @@ export function FlightLog(logData) {
      * When the cache misses, this will result in parsing the original log file to create chunks.
      */
     function getChunksInIndexRange(startIndex, endIndex) {
-        var
+        let
             resultChunks = [],
             eventNeedsTimestamp = [];
 
@@ -347,7 +347,7 @@ export function FlightLog(logData) {
             smoothedCache.capacity = chunkCache.capacity;
         }
 
-        for (var chunkIndex = startIndex; chunkIndex <= endIndex; chunkIndex++) {
+        for (let chunkIndex = startIndex; chunkIndex <= endIndex; chunkIndex++) {
             var
                 chunkStartOffset, chunkEndOffset,
                 chunk = chunkCache.get(chunkIndex);
@@ -355,9 +355,9 @@ export function FlightLog(logData) {
             // Did we cache this chunk already?
             if (chunk) {
                 // Use the first event in the chunk to fill in event times at the trailing end of the previous one
-                var frame = chunk.frames[0];
+                let frame = chunk.frames[0];
 
-                for (var i = 0; i < eventNeedsTimestamp.length; i++) {
+                for (let i = 0; i < eventNeedsTimestamp.length; i++) {
                     eventNeedsTimestamp[i].time = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
                 }
                 eventNeedsTimestamp.length = 0;
@@ -390,7 +390,7 @@ export function FlightLog(logData) {
                         index: chunkIndex,
                         frames: [],
                         gapStartsHere: {},
-                        events: []
+                        events: [],
                     };
                 }
 
@@ -405,7 +405,7 @@ export function FlightLog(logData) {
                     lastGPS = parser.frameDefs.G ? iframeDirectory.initialGPS[chunkIndex].slice(0) : [];
 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
-                    var
+                    let
                         destFrame,
                         destFrame_currentIndex;
 
@@ -537,7 +537,7 @@ export function FlightLog(logData) {
      * Each chunk is an array of log frames.
      */
     this.getChunksInTimeRange = function(startTime, endTime) {
-        var
+        let
             startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime),
             endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime);
 
@@ -554,7 +554,7 @@ export function FlightLog(logData) {
 
         maxSmoothing = 0;
 
-        for (var fieldIndex in newSmoothing) {
+        for (let fieldIndex in newSmoothing) {
             if (newSmoothing[fieldIndex] > maxSmoothing) {
                 maxSmoothing = newSmoothing[fieldIndex];
             }
@@ -625,18 +625,18 @@ export function FlightLog(logData) {
         }
 
         for (; destChunkIndex < destChunks.length; sourceChunkIndex++, destChunkIndex++) {
-            var
+            let
                 destChunk = destChunks[destChunkIndex],
                 sourceChunk = sourceChunks[sourceChunkIndex];
 
             if (!destChunk.hasAdditionalFields) {
                 destChunk.hasAdditionalFields = true;
 
-                var
+                let
                     chunkIMU = new IMU(sourceChunks[sourceChunkIndex].initialIMU);
 
-                for (var i = 0; i < sourceChunk.frames.length; i++) {
-                    var
+                for (let i = 0; i < sourceChunk.frames.length; i++) {
+                    let
                         srcFrame = sourceChunk.frames[i],
                         destFrame = destChunk.frames[i],
                         fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
@@ -676,10 +676,10 @@ export function FlightLog(logData) {
                     }
 
                     // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
-                    var currentFlightMode = srcFrame[flightModeFlagsIndex];
+                    let currentFlightMode = srcFrame[flightModeFlagsIndex];
 
                     // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
-                    var fieldIndexRcCommands = fieldIndex;
+                    let fieldIndexRcCommands = fieldIndex;
 
                     if (!that.isFieldDisabled().SETPOINT) {
 
@@ -731,18 +731,18 @@ export function FlightLog(logData) {
          * If we're at the end of the file then we will compute event times for the last chunk, otherwise we'll
          * wait until we have the next chunk to fill in times for this last chunk.
          */
-        var
+        let
             endChunk = processLastChunk ? chunks.length : chunks.length - 1;
 
-        for (var i = 0; i < endChunk; i++) {
-            var chunk = chunks[i];
+        for (let i = 0; i < endChunk; i++) {
+            let chunk = chunks[i];
 
             if (chunk.needsEventTimes) {
                 // What is the time of the next frame after the chunk with the trailing events? We'll use that for the event times
                 var nextTime;
 
                 if (i + 1 < chunks.length) {
-                    var nextChunk = chunks[i + 1];
+                    let nextChunk = chunks[i + 1];
 
                     nextTime = nextChunk.frames[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
                 } else {
@@ -750,7 +750,7 @@ export function FlightLog(logData) {
                     nextTime = chunk.frames[chunk.frames.length - 1][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
                 }
 
-                for (var j = chunk.events.length - 1; j >= 0; j--) {
+                for (let j = chunk.events.length - 1; j >= 0; j--) {
                     if (chunk.events[j].time === undefined)  {
                         chunk.events[j].time = nextTime;
                     } else {
@@ -782,7 +782,7 @@ export function FlightLog(logData) {
      * in the chunks will at least span the range given by [startTime...endTime].
      */
     this.getSmoothedChunksInTimeRange = function(startTime, endTime) {
-        var
+        let
             sourceChunks,
             resultChunks,
             chunkAlreadyDone, allDone,
@@ -791,7 +791,7 @@ export function FlightLog(logData) {
         //if (maxSmoothing == 0) // TODO We can't bail early because we do things like add fields to the chunks at the end
         //    return this.getChunksInTimeRange(startTime, endTime);
 
-        var
+        let
             /*
              * Ensure that the range that the caller asked for can be fully smoothed by expanding the request
              * for source chunks on either side of the range asked for (to smooth the chunks on the edges, we
@@ -828,8 +828,8 @@ export function FlightLog(logData) {
         allDone = true;
 
         //Don't smooth the edge chunks since they can't be fully smoothed
-        for (var i = leadingROChunks; i < sourceChunks.length - trailingROChunks; i++) {
-            var
+        for (let i = leadingROChunks; i < sourceChunks.length - trailingROChunks; i++) {
+            let
                 sourceChunk = sourceChunks[i],
                 resultChunk = smoothedCache.get(sourceChunk.index);
 
@@ -854,7 +854,7 @@ export function FlightLog(logData) {
                             //Copy on top of the recycled array:
                             resultChunk.frames[j].length = sourceChunk.frames[j].length;
 
-                            for (var k = 0; k < sourceChunk.frames[j].length; k++) {
+                            for (let k = 0; k < sourceChunk.frames[j].length; k++) {
                                 resultChunk.frames[j][k] = sourceChunk.frames[j][k];
                             }
                         } else {
@@ -868,7 +868,7 @@ export function FlightLog(logData) {
                         index: sourceChunk.index,
                         frames: new Array(sourceChunk.frames.length),
                         gapStartsHere: sourceChunk.gapStartsHere,
-                        events: sourceChunk.events
+                        events: sourceChunk.events,
                     };
 
                     for (var j = 0; j < resultChunk.frames.length; j++) {
@@ -883,7 +883,7 @@ export function FlightLog(logData) {
         }
 
         if (!allDone) {
-            for (var fieldIndex in fieldSmoothing) {
+            for (let fieldIndex in fieldSmoothing) {
                 var
                     radius = fieldSmoothing[fieldIndex],
 
@@ -928,7 +928,7 @@ export function FlightLog(logData) {
                          * those earlier values.
                          */
                         while (leftFrameIndex > 0 || leftFrameIndex === 0 && leftChunkIndex > 0) {
-                            var
+                            let
                                 oldleftChunkIndex = leftChunkIndex,
                                 oldleftFrameIndex = leftFrameIndex;
 
@@ -1049,11 +1049,11 @@ export function FlightLog(logData) {
         switch (this.getSysConfig().firmwareType) {
             case FIRMWARE_TYPE_BETAFLIGHT:
             case FIRMWARE_TYPE_INAV:
-                $(".open-header-dialog").show()
+                $(".open-header-dialog").show();
                 break;
 
             default:
-                $(".open-header-dialog").hide()
+                $(".open-header-dialog").hide();
                 break;
         }
 
@@ -1091,7 +1091,7 @@ export function FlightLog(logData) {
         }
 
         return {min:min, max:max};
-    }
+    };
 
     /**
      * Function to compute of min and max curve values during time interval.
@@ -1137,7 +1137,7 @@ export function FlightLog(logData) {
         }
         return {
             min: minValue,
-            max: maxValue
+            max: maxValue,
         };
     };
 
@@ -1165,34 +1165,34 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function(value) {
 // Convert rcCommand to degrees per second
 FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, currentFlightMode) {
 
-    var sysConfig = this.getSysConfig();
+    let sysConfig = this.getSysConfig();
 
     if(firmwareGreaterOrEqual(sysConfig, '3.0.0', '2.0.0')) {
 
         const RC_RATE_INCREMENTAL = 14.54;
         const RC_EXPO_POWER = 3;
 
-        var rcInput;
+        let rcInput;
         var that = this;
 
-        var calculateSetpointRate = function(axis, rc) {
+        let calculateSetpointRate = function(axis, rc) {
 
-            var rcCommandf    = rc / 500.0;
-            var rcCommandfAbs = Math.abs(rcCommandf);
+            let rcCommandf    = rc / 500.0;
+            let rcCommandfAbs = Math.abs(rcCommandf);
 
             if (sysConfig["rc_expo"][axis]) {
-                var expof = sysConfig["rc_expo"][axis] / 100;
+                let expof = sysConfig["rc_expo"][axis] / 100;
                 rcCommandf = rcCommandf * Math.pow(rcCommandfAbs, RC_EXPO_POWER) * expof + rcCommandf * (1-expof);
             }
 
-            var rcRate = sysConfig["rc_rates"][axis] / 100.0;
+            let rcRate = sysConfig["rc_rates"][axis] / 100.0;
             if (rcRate > 2.0) {
                 rcRate += RC_RATE_INCREMENTAL * (rcRate - 2.0);
             }
 
-            var angleRate = 200.0 * rcRate * rcCommandf;
+            let angleRate = 200.0 * rcRate * rcCommandf;
             if (sysConfig.rates[axis]) {
-                var rcSuperfactor = 1.0 / (constrain(1.0 - (rcCommandfAbs * (sysConfig.rates[axis] / 100.0)), 0.01, 1.00));
+                let rcSuperfactor = 1.0 / (constrain(1.0 - (rcCommandfAbs * (sysConfig.rates[axis] / 100.0)), 0.01, 1.00));
                 angleRate *= rcSuperfactor;
             }
 
@@ -1202,7 +1202,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
             }
             */
 
-            var limit = sysConfig["rate_limits"][axis];
+            let limit = sysConfig["rate_limits"][axis];
             if (sysConfig.pidController == 0 || limit == null) { /* LEGACY */
                 return  constrain(angleRate * 4.1, -8190.0, 8190.0) >> 2; // Rate limit protection
             } else {
@@ -1217,17 +1217,17 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 
             var that = this;
 
-            var isSuperExpoActive = function() {
-               var FEATURE_SUPEREXPO_RATES = 1 << 23;
+            let isSuperExpoActive = function() {
+               let FEATURE_SUPEREXPO_RATES = 1 << 23;
 
                return (sysConfig.features & FEATURE_SUPEREXPO_RATES);
-            }
+            };
 
-            var calculateRate = function(value, axis) {
-                var angleRate;
+            let calculateRate = function(value, axis) {
+                let angleRate;
 
                 if (isSuperExpoActive()) {
-                    var rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rates[2],100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rates[0],100) / 100.0)));
+                    let rcFactor = (axis === AXIS.YAW) ? (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rates[2],100) / 100.0))) : (Math.abs(value) / (500.0 * (validate(sysConfig.rc_rates[0],100) / 100.0)));
                     rcFactor = 1.0 / (constrain(1.0 - (rcFactor * (validate(sysConfig.rates[axis],100) / 100.0)), 0.01, 1.00));
 
                     angleRate = rcFactor * ((27 * value) / 16.0);
@@ -1244,9 +1244,9 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
 
             var that = this;
 
-            var calculateExpoPlus = function(value, axis) {
-                    var propFactor;
-                    var superExpoFactor;
+            let calculateExpoPlus = function(value, axis) {
+                    let propFactor;
+                    let superExpoFactor;
 
                     if (axis == AXIS.YAW && !that.getSysConfig().superExpoYawMode) {
                         propFactor = 1.0;
@@ -1256,9 +1256,9 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function(value, axis, curre
                     }
 
                     return propFactor;
-                }
+                };
 
-            var superExpoFactor = 1.0/calculateExpoPlus(value, axis);
+            let superExpoFactor = 1.0/calculateExpoPlus(value, axis);
 
 
             if(axis===AXIS.YAW /*YAW*/) {
@@ -1359,7 +1359,7 @@ FlightLog.prototype.getReferenceVoltageMillivolts = function() {
 };
 
 FlightLog.prototype.vbatADCToMillivolts = function(vbatADC) {
-    var
+    let
         ADCVREF = 33;
 
     // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
@@ -1367,7 +1367,7 @@ FlightLog.prototype.vbatADCToMillivolts = function(vbatADC) {
 };
 
 FlightLog.prototype.amperageADCToMillivolts = function(amperageADC) {
-    var
+    let
         ADCVREF = 33,
         millivolts = (amperageADC * ADCVREF * 100) / 4095;
 

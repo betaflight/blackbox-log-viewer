@@ -3,7 +3,7 @@ import {
     signExtend8Bit,
 } from "./tools";
 
-var EOF = -1;
+let EOF = -1;
 
 /*
     * Take an array of unsigned byte data and present it as a stream with various methods
@@ -70,7 +70,7 @@ ArrayDataStream.prototype.peekChar = function() {
  * was invalid).
  */
 ArrayDataStream.prototype.readUnsignedVB = function() {
-    var 
+    let 
         i, b, 
         shift = 0, result = 0;
 
@@ -100,14 +100,14 @@ ArrayDataStream.prototype.readUnsignedVB = function() {
 };
 
 ArrayDataStream.prototype.readSignedVB = function() {
-    var unsigned = this.readUnsignedVB();
+    let unsigned = this.readUnsignedVB();
 
     // Apply ZigZag decoding to recover the signed value
     return (unsigned >>> 1) ^ -(unsigned & 1);
 };
 
 ArrayDataStream.prototype.readString = function(length) {
-    var 
+    let 
         chars = new Array(length),
         i;
     
@@ -119,7 +119,7 @@ ArrayDataStream.prototype.readString = function(length) {
 };
 
 ArrayDataStream.prototype.readS16 = function() {
-    var 
+    let 
         b1 = this.readByte(),
         b2 = this.readByte();
     
@@ -127,7 +127,7 @@ ArrayDataStream.prototype.readS16 = function() {
 };
 
 ArrayDataStream.prototype.readU16 = function() {
-    var 
+    let 
         b1 = this.readByte(),
         b2 = this.readByte();
     
@@ -135,7 +135,7 @@ ArrayDataStream.prototype.readU16 = function() {
 };
 
 ArrayDataStream.prototype.readU32 = function() {
-    var 
+    let 
         b1 = this.readByte(),
         b2 = this.readByte(),
         b3 = this.readByte(),
@@ -153,7 +153,7 @@ ArrayDataStream.prototype.readU32 = function() {
  *          found
  */
 ArrayDataStream.prototype.nextOffsetOf = function(needle) {
-    var i, j;
+    let i, j;
     
     for (i = this.pos; i <= this.end - needle.length; i++) {
         if (this.data[i] == needle[0]) {

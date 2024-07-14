@@ -1,5 +1,5 @@
 import $ from './jquery.js';
-import './vendor.js'
+import './vendor.js';
 import { throttle } from 'throttle-debounce';
 import { MapGrapher } from './graph_map.js';
 import { FlightLogGrapher } from './grapher.js';
@@ -217,18 +217,18 @@ function BlackboxLogViewer() {
                 for (i = 0; i < rowCount; i++) {
                     let
                         row =
-                            "<tr>" +
-                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[i], flightLog.getSysConfig().debug_mode) + '</td>' +
-                            '<td class="raw-value">' + atMost2DecPlaces(frame[i]) + '</td>' +
-                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode) + "</td>",
+                            `<tr>` +
+                            `<td>${  fieldPresenter.fieldNameToFriendly(fieldNames[i], flightLog.getSysConfig().debug_mode)  }</td>` +
+                            `<td class="raw-value">${  atMost2DecPlaces(frame[i])  }</td>` +
+                            `<td>${  fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode)  }</td>`,
 
                         secondColumn = i + rowCount;
 
                     if (secondColumn < fieldNames.length) {
                         row +=
-                            '<td>' + fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn], flightLog.getSysConfig().debug_mode) + '</td>' +
-                            '<td>' + atMost2DecPlaces(frame[secondColumn]) + '</td>' +
-                            '<td>' + fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn], currentFlightMode) + '</td>';
+                            `<td>${  fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn], flightLog.getSysConfig().debug_mode)  }</td>` +
+                            `<td>${  atMost2DecPlaces(frame[secondColumn])  }</td>` +
+                            `<td>${  fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn], currentFlightMode)  }</td>`;
                     }
 
                     row += "</tr>";
@@ -263,13 +263,13 @@ function BlackboxLogViewer() {
 
             // Update flight mode flags on status bar
             $(".flight-mode", statusBar).text(
-                    fieldPresenter.decodeFieldToFriendly(null, 'flightModeFlags', currentFlightMode, null)
+                    fieldPresenter.decodeFieldToFriendly(null, 'flightModeFlags', currentFlightMode, null),
                 );
 
             // update time field on status bar
             $(".graph-time").val(formatTime((currentBlackboxTime-flightLog.getMinTime())/1000, true));
             if (hasMarker) {
-                $(".marker-offset", statusBar).text('Marker Offset ' + formatTime((currentBlackboxTime-markerTime)/1000, true) + 'ms ' + (1000000/(currentBlackboxTime-markerTime)).toFixed(0) + "Hz");
+                $(".marker-offset", statusBar).text(`Marker Offset ${  formatTime((currentBlackboxTime-markerTime)/1000, true)  }ms ${  (1000000/(currentBlackboxTime-markerTime)).toFixed(0)  }Hz`);
             }
 
             // Update the Legend Values
@@ -415,15 +415,15 @@ function BlackboxLogViewer() {
             if (error) {
                 logLabel = error;
             } else {
-                logLabel = formatTime(flightLog.getMinTime(index) / 1000, false)
-                    + " - " + formatTime(flightLog.getMaxTime(index) / 1000 , false)
-                    + " [" + formatTime(Math.ceil((flightLog.getMaxTime(index) - flightLog.getMinTime(index)) / 1000), false) + "]";
+                logLabel = `${formatTime(flightLog.getMinTime(index) / 1000, false)
+                     } - ${  formatTime(flightLog.getMaxTime(index) / 1000 , false)
+                     } [${  formatTime(Math.ceil((flightLog.getMaxTime(index) - flightLog.getMinTime(index)) / 1000), false)  }]`;
             }
 
             if (logCount > 1) {
                 const option = $("<option></option>");
 
-                option.text((index + 1) + "/" + (flightLog.getLogCount()) + ": " + logLabel);
+                option.text(`${index + 1  }/${  flightLog.getLogCount()  }: ${  logLabel}`);
                 option.attr("value", index);
 
                 if (error)
@@ -450,7 +450,7 @@ function BlackboxLogViewer() {
         $(".log-index").val(flightLog.getLogIndex());
 
         if (flightLog.getNumCellsEstimate()) {
-            $(".log-cells").text(flightLog.getNumCellsEstimate() + "S (" + Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2) + "V)");
+            $(".log-cells").text(`${flightLog.getNumCellsEstimate()  }S (${  Number(flightLog.getReferenceVoltageMillivolts() / 1000).toFixed(2)  }V)`);
             $(".log-cells-header,.log-cells").css('display', 'block');
         } else {
             $(".log-cells-header,.log-cells").css('display', 'none');
@@ -469,10 +469,10 @@ function BlackboxLogViewer() {
 
         // Add log version information to status bar
         const sysConfig = flightLog.getSysConfig();
-        $('.version', statusBar).text( ((sysConfig['Craft name']!=null)?(sysConfig['Craft name'] + ' : '):'') +
+        $('.version', statusBar).text( ((sysConfig['Craft name']!=null)?(`${sysConfig['Craft name']  } : `):'') +
                                         ((sysConfig['Firmware revision']!=null)?(sysConfig['Firmware revision']):''));
         $('.looptime', statusBar).text( stringLoopTime(sysConfig.looptime, sysConfig.pid_process_denom, sysConfig.unsynced_fast_pwm, sysConfig.motor_pwm_rate));
-        $('.lograte', statusBar).text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( 'Sample Rate : ' + sysConfig['frameIntervalPNum'] +'/' + sysConfig['frameIntervalPDenom']):''));
+        $('.lograte', statusBar).text( ((sysConfig['frameIntervalPDenom']!=null && sysConfig['frameIntervalPNum']!=null)?( `Sample Rate : ${  sysConfig['frameIntervalPNum'] }/${  sysConfig['frameIntervalPDenom']}`):''));
 
         seekBar.setTimeRange(flightLog.getMinTime(), flightLog.getMaxTime(), currentBlackboxTime);
         seekBar.setActivityRange(flightLog.getSysConfig().motorOutput[0], flightLog.getSysConfig().motorOutput[1]);
@@ -573,7 +573,7 @@ function BlackboxLogViewer() {
             $(".playback-rate-control").val(playbackRate);
         }
 
-        $(".playback-rate-control .noUi-handle").text(playbackRate + '%');
+        $(".playback-rate-control .noUi-handle").text(`${playbackRate  }%`);
     }
 
     function setGraphZoom(zoom, updateUi) {
@@ -594,7 +594,7 @@ function BlackboxLogViewer() {
             $(".graph-zoom-control").val(graphZoom);
         }
 
-        $(".graph-zoom-control .noUi-handle").text(graphZoom + '%');
+        $(".graph-zoom-control .noUi-handle").text(`${graphZoom  }%`);
     }
 
     function showConfigFile(state) {
@@ -644,7 +644,7 @@ function BlackboxLogViewer() {
                 currentOffsetCache.index = logIndex;
             }
         } catch (e) {
-            alert("Error opening log: " + e);
+            alert(`Error opening log: ${  e}`);
             currentOffsetCache.index = null;
             return;
         }
@@ -770,7 +770,7 @@ function BlackboxLogViewer() {
             try {
                 flightLog = new FlightLog(flightLogDataArray);
             } catch (err) {
-                alert("Sorry, an error occurred while trying to open this log:\n\n" + err);
+                alert(`Sorry, an error occurred while trying to open this log:\n\n${  err}`);
                 return;
             }
 
@@ -837,7 +837,7 @@ function BlackboxLogViewer() {
     function reportVideoError(e) {
         let errorMessage = 'Error while loading the video.';
         if (e.currentTarget.error.code) {
-            errorMessage += ' ERROR (' + e.currentTarget.error.code + '): ' + e.currentTarget.error.message;
+            errorMessage += ` ERROR (${  e.currentTarget.error.code  }): ${  e.currentTarget.error.message}`;
         }
         alert(errorMessage);
     }
@@ -872,9 +872,9 @@ function BlackboxLogViewer() {
     this.getMarker = function() { // get marker field
         return {
             state:hasMarker,
-            time:markerTime
+            time:markerTime,
             };
-    }
+    };
 
     this.getBookmarks = function() { // get bookmark events
         const bookmarks = [];
@@ -884,7 +884,7 @@ function BlackboxLogViewer() {
                     if (bookmarkTimes[i]!=null) {
                         bookmarks[i] = {
                             state: (bookmarkTimes[i]!=0),
-                            time:  bookmarkTimes[i]
+                            time:  bookmarkTimes[i],
                             };
                         } else bookmarks[i] = null;
                 }
@@ -893,11 +893,11 @@ function BlackboxLogViewer() {
         } catch(e) {
             return null;
         }
-    }
+    };
 
     this.getBookmarkTimes = function() {
         return bookmarkTimes;
-    }
+    };
 
     // Workspace save/restore to/from file.
     function saveWorkspaces(file) {
@@ -925,7 +925,7 @@ function BlackboxLogViewer() {
 
     function upgradeWorkspaceFormat(oldFormat) {
         // Check if upgrade is needed
-        if (!oldFormat.graphConfig) { return oldFormat }
+        if (!oldFormat.graphConfig) { return oldFormat; }
 
         const newFormat = [];
 
@@ -938,8 +938,8 @@ function BlackboxLogViewer() {
 
                 newFormat[id] = {
                     title: title,
-                    graphConfig: element
-                }
+                    graphConfig: element,
+                };
             }
             else {
                 newFormat[id] = null;
@@ -977,7 +977,7 @@ function BlackboxLogViewer() {
             const blob = new Blob([data], {type: fileType}),
                 e    = document.createEvent('MouseEvents'),
                 a    = document.createElement('a');
-            a.download = file || $(".log-filename").text() + "." + fileExtension;
+            a.download = file || `${$(".log-filename").text()  }.${  fileExtension}`;
             a.href = window.URL.createObjectURL(blob);
             a.dataset.downloadurl =  [fileType, a.download, a.href].join(':');
             e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -1009,11 +1009,11 @@ function BlackboxLogViewer() {
     function onSwitchWorkspace(newWorkspaces, newActiveId) {
         prefs.set('activeWorkspace', newActiveId);
         prefs.set('workspaceGraphConfigs', newWorkspaces);
-        workspaceSelection.setWorkspaces(newWorkspaces)
-        workspaceSelection.setActiveWorkspace(newActiveId)
+        workspaceSelection.setWorkspaces(newWorkspaces);
+        workspaceSelection.setActiveWorkspace(newActiveId);
         if (flightLog && newWorkspaces[newActiveId] && newWorkspaces[newActiveId].graphConfig) {
            newGraphConfig(newWorkspaces[newActiveId].graphConfig);
-           document.getElementById("legend_title").textContent = newWorkspaces[newActiveId].title
+           document.getElementById("legend_title").textContent = newWorkspaces[newActiveId].title;
         }
         activeWorkspace = newActiveId;
     }
@@ -1022,9 +1022,9 @@ function BlackboxLogViewer() {
     function onSaveWorkspace(id, title){
         workspaceGraphConfigs[id] = {
             title: title,
-            graphConfig: graphConfig
+            graphConfig: graphConfig,
         };
-        onSwitchWorkspace(workspaceGraphConfigs, id)
+        onSwitchWorkspace(workspaceGraphConfigs, id);
     }
 
     activeGraphConfig.addListener(function() {
@@ -1039,8 +1039,8 @@ function BlackboxLogViewer() {
         });
 
         // Get Latest Version Information
-        $("#viewer-version").text('You are using version ' + __APP_VERSION__);
-        $(".viewer-version", statusBar).text('v'+__APP_VERSION__);
+        $("#viewer-version").text(`You are using version ${  __APP_VERSION__}`);
+        $(".viewer-version", statusBar).text(`v${__APP_VERSION__}`);
         try {
             $.getJSON('https://api.github.com/repos/betaflight/blackbox-log-viewer/releases/latest',{},function(data){
                 latestVersion = data;
@@ -1383,7 +1383,7 @@ function BlackboxLogViewer() {
                 $("#dlgGraphConfiguration"),
                 function(newConfig, redrawChart) {
                     newGraphConfig(newConfig, redrawChart);
-                }
+                },
             ),
 
             headerDialog = new HeaderDialog(
@@ -1403,7 +1403,7 @@ function BlackboxLogViewer() {
                             setCurrentBlackboxTime(activePosition);
                         }
                     }
-                }
+                },
             ),
 
             keysDialog = new KeysDialog($("#dlgKeysDialog")),
@@ -1434,7 +1434,7 @@ function BlackboxLogViewer() {
                         }
                         updateCanvasSize();
                     }
-                }
+                },
             );
 
         $(".open-graph-configuration-dialog").click(function(e) {
@@ -1466,7 +1466,7 @@ function BlackboxLogViewer() {
         });
 
         for (let i=1; i< 9; i++) { // Loop through all the bookmarks.
-            $('.bookmark-'+i, statusBar).click(function() {
+            $(`.bookmark-${i}`, statusBar).click(function() {
                 setCurrentBlackboxTime(bookmarkTimes[parseInt(this.className.slice(-1))]);
                 invalidateGraph();
             });
@@ -1475,7 +1475,7 @@ function BlackboxLogViewer() {
         $('.bookmark-clear', statusBar).click(function() {
             bookmarkTimes = null;
             for (let i=1; i<=9; i++) {
-                $('.bookmark-'+ i, statusBar).css('visibility', 'hidden' );
+                $(`.bookmark-${ i}`, statusBar).css('visibility', 'hidden' );
             }
             $('.bookmark-clear', statusBar).css('visibility', 'hidden' );
             invalidateGraph();
@@ -1515,7 +1515,7 @@ function BlackboxLogViewer() {
                     flightVideoOffset: videoOffset,
                     hasCraft: userSettings.drawCraft,
                     hasAnalyser: hasAnalyser,
-                    hasSticks: userSettings.drawSticks
+                    hasSticks: userSettings.drawSticks,
                 }, videoConfig);
 
                 e.preventDefault();
@@ -1527,7 +1527,7 @@ function BlackboxLogViewer() {
                 .attr({
                     'data-toggle': 'tooltip',
                     'data-placement': 'bottom',
-                    'title': "Not supported by your browser, use Google Chrome instead"
+                    'title': "Not supported by your browser, use Google Chrome instead",
                 })
                 .tooltip();
         }
@@ -1536,10 +1536,10 @@ function BlackboxLogViewer() {
 
         function updateHeaderSize() {
             const newHeight = $(".video-top-controls").height() - 20; // 23px offset
-            $(".log-graph").css("top", newHeight+"px");
-            $(".log-graph-config").css("top", newHeight+"px");
-            $(".log-seek-bar").css("top", newHeight+"px");
-            $(".log-field-values").css("top", newHeight+"px");
+            $(".log-graph").css("top", `${newHeight}px`);
+            $(".log-graph-config").css("top", `${newHeight}px`);
+            $(".log-seek-bar").css("top", `${newHeight}px`);
+            $(".log-field-values").css("top", `${newHeight}px`);
             invalidateGraph();
         }
 
@@ -1622,14 +1622,14 @@ function BlackboxLogViewer() {
                 for (const configField of graphConfig[parseInt(graph)].fields) {
                     configField.smoothing += ((delta)?-scroll:+scroll);
                     configField.smoothing = constrain(configField.smoothing, range.min, range.max);
-                    changedValue += configField.friendlyName + ' ' + (configField.smoothing / 100).toFixed(2)+ '%\n';
+                    changedValue += `${configField.friendlyName  } ${  (configField.smoothing / 100).toFixed(2) }%\n`;
                 }
                 return changedValue;
             }
             if (graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing, range.min, range.max);
-                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing / 100).toFixed(2) + '%\n';
+                return `${changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName  } ${  (graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing / 100).toFixed(2)  }%\n`;
             }
             return false; // nothing was changed
         }
@@ -1653,7 +1653,7 @@ function BlackboxLogViewer() {
                 for (const configField of graphConfig[parseInt(graph)].fields) {
                     configField.curve.MinMax.min *= ((delta) ? zoomScaleOut : zoomScaleIn);
                     configField.curve.MinMax.max *= ((delta) ? zoomScaleOut : zoomScaleIn);
-                    changedValue += configField.friendlyName + '\n';
+                    changedValue += `${configField.friendlyName  }\n`;
                 }
                 return changedValue;
             }
@@ -1661,7 +1661,7 @@ function BlackboxLogViewer() {
                 graphConfig[parseInt(graph)].fields[field].curve.MinMax.min *= ((delta) ? zoomScaleOut : zoomScaleIn);
                 graphConfig[parseInt(graph)].fields[field].curve.MinMax.max *= ((delta) ? zoomScaleOut : zoomScaleIn);
                 changedValue += (delta) ? "Zoom out:\n" : "Zoom in:\n";
-                changedValue += graphConfig[parseInt(graph)].fields[field].friendlyName + '\n';
+                changedValue += `${graphConfig[parseInt(graph)].fields[field].friendlyName  }\n`;
                 return changedValue;
             }
             return false; // nothing was changed
@@ -1687,14 +1687,14 @@ function BlackboxLogViewer() {
                 for (const configField of graphConfig[parseInt(graph)].fields) {
                     configField.curve.power += ((delta)?-scroll:+scroll);
                     configField.curve.power = constrain(configField.curve.power, range.min, range.max);
-                    changedValue += gconfigField.friendlyName + ' ' + (configField.curve.power * 100).toFixed(2)+ '%\n';
+                    changedValue += `${gconfigField.friendlyName  } ${  (configField.curve.power * 100).toFixed(2) }%\n`;
                 }
                 return changedValue;
             }
             if (graph!=null && field!=null) { // change single pen
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power += ((delta)?-scroll:+scroll);
                 graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power = constrain(graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power, range.min, range.max);
-                return changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName + ' ' + (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100).toFixed(2) + '%\n';;
+                return `${changedValue + graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName  } ${  (graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100).toFixed(2)  }%\n`;;
             }
             return false; // nothing was changed
         }
@@ -1767,13 +1767,13 @@ function BlackboxLogViewer() {
                     let refreshRequired = false;
 
                     if (e.shiftKey) { // change zoom
-                        refreshRequired = changePenZoom(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                        refreshRequired = changePenZoom(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0));
                         e.preventDefault();
                     } else if (e.altKey) { // change Expo
-                        refreshRequired = changePenExpo(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                        refreshRequired = changePenExpo(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0));
                         e.preventDefault();
                     } else if (e.ctrlKey){ // Change smoothing
-                        refreshRequired = changePenSmoothing(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0))
+                        refreshRequired = changePenSmoothing(activeGraphConfig.getGraphs(), $(e.target).attr('graph'), $(e.target).attr('field'), (delta>=0));
                         e.preventDefault();
                     }
 
@@ -1804,7 +1804,7 @@ function BlackboxLogViewer() {
                     case "I".charCodeAt(0):
                         if (!(shifted)) {
                             if (videoExportInTime === currentBlackboxTime) {
-                                setVideoInTime(false)
+                                setVideoInTime(false);
                             } else {
                                 setVideoInTime(currentBlackboxTime);
                             }
@@ -1828,7 +1828,7 @@ function BlackboxLogViewer() {
                         } else { // Add a marker to graph window
                             markerTime = currentBlackboxTime;
                             setMarker(!hasMarker);
-                            $(".marker-offset", statusBar).text('Marker Offset ' + formatTime(0) + 'ms').css('visibility', (hasMarker)?'visible':'hidden');
+                            $(".marker-offset", statusBar).text(`Marker Offset ${  formatTime(0)  }ms`).css('visibility', (hasMarker)?'visible':'hidden');
                             invalidateGraph();
                         }
                         e.preventDefault();
@@ -1894,7 +1894,7 @@ function BlackboxLogViewer() {
                                 const id = e.which - 48;
                                 if (!e.shiftKey) { // retrieve graph configuration from workspace
                                     if (workspaceGraphConfigs[id] != null) {
-                                        onSwitchWorkspace(workspaceGraphConfigs, id)
+                                        onSwitchWorkspace(workspaceGraphConfigs, id);
                                     }
                                 } else { // store configuration to workspace
                                     if (workspaceGraphConfigs[id]) {
@@ -1916,7 +1916,7 @@ function BlackboxLogViewer() {
                                     if (e.which==48) {
                                         bookmarkTimes = null;
                                         for (let i=1; i<=9; i++) {
-                                            $('.bookmark-'+ i, statusBar).css('visibility', 'hidden' );
+                                            $(`.bookmark-${ i}`, statusBar).css('visibility', 'hidden' );
                                         }
                                         $('.bookmark-clear', statusBar).css('visibility', 'hidden' );
                                     } else {
@@ -1926,7 +1926,7 @@ function BlackboxLogViewer() {
                                         } else {
                                              bookmarkTimes[e.which-48] = null;                         // clear the bookmark
                                         }
-                                        $('.bookmark-'+(e.which-48), statusBar).css('visibility', ((bookmarkTimes[e.which-48]!=null)?('visible'):('hidden')) );
+                                        $(`.bookmark-${e.which-48}`, statusBar).css('visibility', ((bookmarkTimes[e.which-48]!=null)?('visible'):('hidden')) );
                                         let countBookmarks = 0;
                                         for (let i=0; i<=9; i++) {
                                             countBookmarks += (bookmarkTimes[i]!=null)?1:0;
@@ -2047,16 +2047,16 @@ function BlackboxLogViewer() {
         $(video).on({
             loadedmetadata: updateCanvasSize,
             error: reportVideoError,
-            loadeddata: videoLoaded
+            loadeddata: videoLoaded,
         });
 
         const percentageFormat = {
             to: function(value) {
-                return value.toFixed(0) + "%";
+                return `${value.toFixed(0)  }%`;
             },
             from: function(value) {
                 return parseFloat(value);
-            }
+            },
         };
 
         $(".playback-rate-control")
@@ -2067,10 +2067,10 @@ function BlackboxLogViewer() {
                 range: {
                     'min': [ PLAYBACK_MIN_RATE ],
                     '50%': [ PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP ],
-                    'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ]
+                    'max': [ PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP ],
                 },
                 tooltips: percentageFormat,
-                format: percentageFormat
+                format: percentageFormat,
             })
             .on("slide", function() {
                 setPlaybackRate(parseFloat($(this).val()), false);
@@ -2079,7 +2079,7 @@ function BlackboxLogViewer() {
                 setPlaybackRate(100, true);
             });
 
-        $(".playback-rate-control .noUi-handle").text( playbackRate + '%');
+        $(".playback-rate-control .noUi-handle").text( `${playbackRate  }%`);
 
         $(".graph-zoom-control")
             .noUiSlider({
@@ -2089,10 +2089,10 @@ function BlackboxLogViewer() {
                 range: {
                     'min': [ GRAPH_MIN_ZOOM ],
                     '50%': [ GRAPH_DEFAULT_ZOOM, GRAPH_ZOOM_STEP ],
-                    'max': [ GRAPH_MAX_ZOOM, GRAPH_ZOOM_STEP ]
+                    'max': [ GRAPH_MAX_ZOOM, GRAPH_ZOOM_STEP ],
                 },
                 tooltips: true,
-                format: percentageFormat
+                format: percentageFormat,
             })
             .on("slide", function() {
                 setGraphZoom(parseFloat($(this).val()), false);
@@ -2151,7 +2151,7 @@ function BlackboxLogViewer() {
                     width: 1280,
                     height: 720,
                     frameRate: 30,
-                    videoDim: 0.4
+                    videoDim: 0.4,
                 };
             }
         });

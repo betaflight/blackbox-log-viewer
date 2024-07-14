@@ -126,8 +126,8 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
     function SetSelectedCurveMinMaxToDefault () {
         const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, selected_field_name);
         const mm = defaultCurve.MinMax;
-        const power = (defaultCurve.power*100).toFixed(0)+'%';
-        const smoothing = (GraphConfig.getDefaultSmoothingForField(flightLog, selected_field_name)/100)+'%';
+        const power = `${(defaultCurve.power*100).toFixed(0)}%`;
+        const smoothing = `${GraphConfig.getDefaultSmoothingForField(flightLog, selected_field_name)/100}%`;
 
         const fieldFriendlyName = $('select.form-control option:selected', selected_curve).text();
         let curve = curvesData[fieldFriendlyName];
@@ -184,7 +184,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
                 curve.checked = true;
-                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                elem = $(`<div><input type="checkbox" checked="true">${  curve.friendly_name  }</input></div>`);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
@@ -315,7 +315,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
                 curve.checked = true;
-                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                elem = $(`<div><input type="checkbox" checked="true">${  curve.friendly_name  }</input></div>`);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
@@ -354,8 +354,8 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
                     const fieldName = $("select", this).val();
                     const defaultCurve = GraphConfig.getDefaultCurveForField(flightLog, fieldName);
                     const mm = defaultCurve.MinMax;
-                    const power = (defaultCurve.power*100).toFixed(0)+'%';
-                    const smoothing = (GraphConfig.getDefaultSmoothingForField(flightLog, fieldName)/100)+'%';
+                    const power = `${(defaultCurve.power*100).toFixed(0)}%`;
+                    const smoothing = `${GraphConfig.getDefaultSmoothingForField(flightLog, fieldName)/100}%`;
                     curve.min = mm.min;
                     curve.max = mm.max;
                     $('input[name=MinValue]',this).val(mm.min.toFixed(1));
@@ -376,7 +376,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
                 curve.checked = true;
-                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                elem = $(`<div><input type="checkbox" checked="true">${  curve.friendly_name  }</input></div>`);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
@@ -466,7 +466,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
             curve.checked = true;
-            elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+            elem = $(`<div><input type="checkbox" checked="true">${  curve.friendly_name  }</input></div>`);
             $('input', elem).click(function (e) {
                 let curve = curvesData[this.parentElement.innerText];
                 curve.checked = this.checked;
@@ -523,7 +523,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
                 curve.checked = true;
-                elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+                elem = $(`<div><input type="checkbox" checked="true">${  curve.friendly_name  }</input></div>`);
                 $('input', elem).click(function (e) {
                     let curve = curvesData[this.parentElement.innerText];
                     curve.checked = this.checked;
@@ -619,7 +619,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         for (const key in curvesData) {
             const curve = curvesData[key];
             curve.checked = true;
-            elem = $('<div><input type="checkbox" checked="true">' + curve.friendly_name + '</input></div>');
+            elem = $(`<div><input type="checkbox" checked="true">${  curve.friendly_name  }</input></div>`);
             $('input', elem).click(function () {
                 let curve = curvesData[this.parentElement.innerText];
                 curve.checked = this.checked;
@@ -775,7 +775,7 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
             max: parseFloat(maximum),
             selected: fieldName == selected_field_name,
             checked: false,
-            save: save
+            save: save,
         };
         curvesData[fieldFriendlyName] = curve;
     });
@@ -819,13 +819,13 @@ export function showMinMaxSetupContextMenu(menu_pos_x, menu_pos_y, selected_fiel
         main_menu.append(elem);
 
         const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
-        elem = $('<div>' + selectedFieldName + ' actions&#9658;</div>');
+        elem = $(`<div>${  selectedFieldName  } actions&#9658;</div>`);
         elem.click(ShowThisCurvesActionSubmenu);
         main_menu.append(elem);
     }
     else {
         const selectedFieldName = $('select.form-control option:selected', selected_curve).text();
-        elem = $('<div class="titleDiv bottomBorder">' + selectedFieldName + ' actions:</div>');
+        elem = $(`<div class="titleDiv bottomBorder">${  selectedFieldName  } actions:</div>`);
         main_menu.append(elem);
         FillThisCurveActionsIntoMenu(main_menu, true);
     }

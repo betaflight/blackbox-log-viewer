@@ -8,14 +8,14 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
         menuElem = null,
         editButton = null,
         workspaces = [],
-        activeId = 1
+        activeId = 1;
 
     function buildUI() {
         
         buttonElem = $('<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>');
         numberSpan = $('<span class="workspace-selector-index">');
         titleSpan = $('<span class="workspace-selector-title">');
-        var caretElem = $('<span class="caret"></span>')
+        let caretElem = $('<span class="caret"></span>');
         
         editButton = $('<span class="glyphicon glyphicon-pencil workspace-selector-editButton" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>');
         editButton.click(editTitle);
@@ -24,7 +24,7 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
         menuElem = $('<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>');
 
         targetElem.empty();
-        targetElem.addClass("dropdown")
+        targetElem.addClass("dropdown");
         targetElem.append(buttonElem);
         targetElem.append(menuElem);
         buttonElem.append(numberSpan);
@@ -38,15 +38,15 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
     function editTitle(e) {
         buttonElem.dropdown("toggle"); // Hack to undrop
         editButton.hide();
-        var inputElem = $('<input type="text" onkeyup="event.preventDefault()">');
+        let inputElem = $('<input type="text" onkeyup="event.preventDefault()">');
         inputElem.click((e) => e.stopPropagation()); // Stop click from closing
         titleSpan.replaceWith(inputElem);
-        inputElem.val(workspaces[activeId]?.title)
+        inputElem.val(workspaces[activeId]?.title);
         inputElem.focus();
         inputElem.on('focusout', () => {
             inputElem.replaceWith(titleSpan);
             editButton.show();
-            onSaveWorkspace(activeId, inputElem.val())
+            onSaveWorkspace(activeId, inputElem.val());
         });
 
         e.preventDefault();
@@ -56,18 +56,18 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
         menuElem.empty();
         // Sort for non-programmers with 1-9 and then 0 last. 
         for (let index = 1; index < 11; index++) {
-            let id = index % 10
+            let id = index % 10;
             let element = workspaces[id % 10];
 
-            var item = $('<li></li>');
-            var link = $('<a href="#"></a>')
+            let item = $('<li></li>');
+            let link = $('<a href="#"></a>');
 
             if (!element) {
                 // item.addClass("disabled");
             }
 
-            var number = $('<span class="workspace-selector-index">').text(id);
-            var title = $('<span class="workspace-selector-title">')
+            let number = $('<span class="workspace-selector-index">').text(id);
+            let title = $('<span class="workspace-selector-title">');
 
             if (!element) {
                 title.text("<empty>");
@@ -85,9 +85,9 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
                 }
             });
 
-            var actionButtons = $('<span class="pull-right"></span>');
+            let actionButtons = $('<span class="pull-right"></span>');
 
-            var saveButton = $('<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>');
+            let saveButton = $('<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>');
             saveButton.click((e) => {
                 if (!element) {
                     onSaveWorkspace(id, UNTITLED);
@@ -105,7 +105,7 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
             link.append(title);
             link.append(actionButtons);
             actionButtons.append(saveButton);
-            item.toggleClass("active", id == activeId)
+            item.toggleClass("active", id == activeId);
             menuElem.append(item);
         }
 
@@ -121,12 +121,12 @@ export function WorkspaceSelection(targetElem, workspaces, onSelectionChange, on
     this.setWorkspaces = function (newWorkspaces) {
         workspaces = newWorkspaces;
         update();
-    }
+    };
 
     this.setActiveWorkspace = function (newId) {
         activeId = newId;
         update();
-    }
+    };
 
     buildUI();
 }

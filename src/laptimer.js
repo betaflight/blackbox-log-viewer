@@ -2,7 +2,7 @@ import { formatTime, roundRect } from "./tools";
 
 export function LapTimer() {
 
-	var lapTime = {
+	let lapTime = {
 			current: null,
 			last:	null,
 			best:	null,
@@ -27,15 +27,15 @@ export function LapTimer() {
 
 	this.drawCanvas = function(canvas, options) {
 		// Draw the LapTimes using a canvas
-		var ctx = canvas.getContext("2d");
+		let ctx = canvas.getContext("2d");
 		
-        var
+        let
 
 			lineHeight		  = 14, //px
 	        DEFAULT_FONT_FACE = "8pt Verdana, Arial, sans-serif",
 			
 	        fgColor = "rgba(191,191,191,1.0)",											// Text and highlights color
-	        bgColor = "rgba(76,76,76," + parseInt(options.laptimer.transparency) / 100.0 + ")",	// background color
+	        bgColor = `rgba(76,76,76,${  parseInt(options.laptimer.transparency) / 100.0  })`,	// background color
 
         	left = canvas.width  * parseInt(options.laptimer.left) / 100.0,
         	top  = canvas.height * parseInt(options.laptimer.top) / 100.0,
@@ -45,7 +45,7 @@ export function LapTimer() {
 		ctx.save(); // Store the current canvas configuration
 		
 		
-		var firstColumnWidth = ctx.measureText("Current").width,
+		let firstColumnWidth = ctx.measureText("Current").width,
         	secondColumn = ctx.measureText("XX:XX.XXX").width,
         	width 		 = margin + firstColumnWidth + margin + secondColumn + margin; // get the size of the box
 
@@ -62,12 +62,12 @@ export function LapTimer() {
         roundRect(ctx, 0, 0, width, lineHeight * (rows - 0.5) , 7, true, true); // draw the bounding box with border
 
 		// Add Title, and current values
-		var currentRow = 1;
+		let currentRow = 1;
 		ctx.textAlign = 'left';
 		ctx.fillStyle = fgColor;	
 
 		// Title
-        ctx.font = "italic " + DEFAULT_FONT_FACE;
+        ctx.font = `italic ${  DEFAULT_FONT_FACE}`;
         ctx.fillText('Lap Timer', margin, lineHeight * currentRow);
 			// Underline
             ctx.beginPath();
@@ -87,7 +87,7 @@ export function LapTimer() {
 		// Laps
 		if(lapTime.laps.length>0) {
 			// Title
-			ctx.font = "italic " + DEFAULT_FONT_FACE;
+			ctx.font = `italic ${  DEFAULT_FONT_FACE}`;
 			ctx.fillText('Laps', margin, lineHeight * currentRow);
 				// Underline
 				ctx.beginPath();
@@ -99,8 +99,8 @@ export function LapTimer() {
 
 			// Each Lap
 			ctx.font = DEFAULT_FONT_FACE;
-			for(var i=0; i<lapTime.laps.length; i++) {
-		        ctx.fillText('Lap ' + (i+1), margin, lineHeight * currentRow); ctx.fillText(formatTime(lapTime.laps[i]   , true)  , margin + firstColumnWidth + margin, lineHeight * currentRow++);
+			for(let i=0; i<lapTime.laps.length; i++) {
+		        ctx.fillText(`Lap ${  i+1}`, margin, lineHeight * currentRow); ctx.fillText(formatTime(lapTime.laps[i]   , true)  , margin + firstColumnWidth + margin, lineHeight * currentRow++);
 			}
 		}
 
@@ -112,7 +112,7 @@ export function LapTimer() {
 
 		if(currentTime!=null && bookmarkTimes!=null) if(bookmarkTimes.length>0) {
 
-			var bookmarkTimesSorted = bookmarkTimes.slice(0);
+			let bookmarkTimesSorted = bookmarkTimes.slice(0);
 			bookmarkTimesSorted.push(maxTime); // add end time
 			bookmarkTimesSorted.sort((a,b)=>a-b); // sort on value (rather than default alphabetically)
 

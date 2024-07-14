@@ -1,18 +1,18 @@
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
 export function hexToFloat(string) {
-    var arr = new Uint32Array(1);
+    let arr = new Uint32Array(1);
     arr[0] = parseInt(string, 16);
     
-    var floatArr = new Float32Array(arr.buffer);
+    let floatArr = new Float32Array(arr.buffer);
     
     return floatArr[0]; 
 }
 
 export function uint32ToFloat(value) {
-    var arr = new Uint32Array(1);
+    let arr = new Uint32Array(1);
     arr[0] = value;
     
-    var floatArr = new Float32Array(arr.buffer);
+    let floatArr = new Float32Array(arr.buffer);
 
     return floatArr[0]; 
 }
@@ -22,9 +22,9 @@ export function asciiArrayToString(arr) {
 }
 
 export function asciiStringToByteArray(s) {
-    var bytes = [];
+    let bytes = [];
     
-    for (var i = 0; i < s.length; i++)
+    for (let i = 0; i < s.length; i++)
         bytes.push(s.charCodeAt(i));
     
     return bytes;
@@ -99,7 +99,7 @@ export function parseCommaSeparatedString(string, length) {
      * returns              if the string does not contain a comma, then the first integer/float/string is returned
      *                      else an Array is returned containing all the values up to the length (if specified)
      ***/
-    var
+    let
         parts = string.split(","),
         result, value;
 
@@ -112,7 +112,7 @@ export function parseCommaSeparatedString(string, length) {
     } else {
         // this really is a list; build an array
         result = new Array(length);
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             if(i<parts.length) {
                 value = (parts[i].indexOf('.'))?parseFloat(parts[i]):parseInt(parts[i], 10);
                 result[i] = isNaN(value) ? parts[i] : value;
@@ -127,13 +127,13 @@ export function parseCommaSeparatedString(string, length) {
 /**
  * Browser Zoom Facilities
 **/
-var zoomLevels = [
-        0.25, 0.33, 0.50, 0.67, 0.75, 0.80, 0.90, 1.00, 1.10, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 4.00, 5.00
+let zoomLevels = [
+        0.25, 0.33, 0.50, 0.67, 0.75, 0.80, 0.90, 1.00, 1.10, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 4.00, 5.00,
     ];
 
 export function zoomIn() {
-    var currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
-    for(var i=0; i<zoomLevels.length; i++) {
+    let currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
+    for(let i=0; i<zoomLevels.length; i++) {
         if(zoomLevels[i] > currentZoom) {
             document.body.style.zoom = zoomLevels[i];
             return;
@@ -142,8 +142,8 @@ export function zoomIn() {
 }
 
 export function zoomOut() {
-    var currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
-    for(var i=zoomLevels.length-1; i>0; i--) {
+    let currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
+    for(let i=zoomLevels.length-1; i>0; i--) {
         if(zoomLevels[i] < currentZoom) {
             document.body.style.zoom = zoomLevels[i];
             return;
@@ -156,7 +156,7 @@ export function zoomOut() {
  * of the next-smaller element (or 0 if `item` is smaller than all values in `list`).
  **/
 export function binarySearchOrPrevious(list, item) {
-    var
+    let
         min = 0,
         max = list.length,
         mid, 
@@ -183,7 +183,7 @@ export function binarySearchOrPrevious(list, item) {
  * of the next-larger element (or the index of the last item if `item` is larger than all values in `list`).
  */
 export function binarySearchOrNext(list, item) {
-    var
+    let
         min = 0,
         max = list.length,
         mid, 
@@ -206,7 +206,7 @@ export function binarySearchOrNext(list, item) {
 }
 
 export function leftPad(string, pad, minLength) {
-    string = "" + string;
+    string = `${  string}`;
     
     while (string.length < minLength)
         string = pad + string;
@@ -216,7 +216,7 @@ export function leftPad(string, pad, minLength) {
 
 export function formatTime(msec, displayMsec) {
 // modify function to allow negative times.
-    var
+    let
         ms, secs, mins, hours;
     
     ms = Math.round(Math.abs(msec));
@@ -230,18 +230,18 @@ export function formatTime(msec, displayMsec) {
     hours = Math.floor(mins / 60);  
     mins %= 60;
     
-    return ((msec<0)?'-':'') + (hours ? leftPad(hours, "0", 2) + ":" : "") + leftPad(mins, "0", 2) + ":" + leftPad(secs, "0", 2)
-        + (displayMsec ? "." + leftPad(ms, "0", 3) : "");
+    return `${((msec<0)?'-':'') + (hours ? `${leftPad(hours, "0", 2)  }:` : "") + leftPad(mins, "0", 2)  }:${  leftPad(secs, "0", 2)
+         }${displayMsec ? `.${  leftPad(ms, "0", 3)}` : ""}`;
 }
 
 export function stringLoopTime(loopTime, pid_process_denom, unsynced_fast_pwm, motor_pwm_rate) {
-    var returnString = '';
+    let returnString = '';
     if(loopTime!=null) {
-        returnString = (loopTime +'\u03BCS (' + parseFloat((1000/loopTime).toFixed(3)) + 'kHz');
+        returnString = (`${loopTime }\u03BCS (${  parseFloat((1000/loopTime).toFixed(3))  }kHz`);
         if(pid_process_denom!=null) {
-            returnString += "/" + (parseFloat((1000/(loopTime*pid_process_denom)).toFixed(3)) +'kHz');
+            returnString += `/${  parseFloat((1000/(loopTime*pid_process_denom)).toFixed(3)) }kHz`;
             if(unsynced_fast_pwm!=null) {
-                returnString += (unsynced_fast_pwm==0)?('/SYNCED') : ( (motor_pwm_rate!=null)?('/' + parseFloat((motor_pwm_rate/1000).toFixed(3)) + "kHz"):('UNSYNCED') ); 
+                returnString += (unsynced_fast_pwm==0)?('/SYNCED') : ( (motor_pwm_rate!=null)?(`/${  parseFloat((motor_pwm_rate/1000).toFixed(3))  }kHz`):('UNSYNCED') ); 
             }
         }
     returnString += ')';
@@ -251,13 +251,13 @@ export function stringLoopTime(loopTime, pid_process_denom, unsynced_fast_pwm, m
 
 export function stringTimetoMsec(input) {
     try {
-            var matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
+            let matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
 
             if(matches.length>2) { // there is a placeholder - either : or .
                 if(matches[3] == ':'){ // time has been entered MM:SS.SSS
-                   return ((matches[1])?-1:1) * (matches[2] * 60 * 1000000 + ((matches[4])?matches[4]:0) * 1000000 + ((matches[5])?(matches[5] + "00").slice(0,3):0) * 1000); 
+                   return ((matches[1])?-1:1) * (matches[2] * 60 * 1000000 + ((matches[4])?matches[4]:0) * 1000000 + ((matches[5])?(`${matches[5]  }00`).slice(0,3):0) * 1000); 
                 } else {
-                   return ((matches[1])?-1:1) * (matches[2] * 1000000 + ((matches[4])?(matches[4] + "00").slice(0,3):0) * 1000);
+                   return ((matches[1])?-1:1) * (matches[2] * 1000000 + ((matches[4])?(`${matches[4]  }00`).slice(0,3):0) * 1000);
                 }
             } else return ((matches[1])?-1:1) * (matches[2] * 1000000);
         } catch(e) {
@@ -283,8 +283,8 @@ export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
     if (typeof radius === 'number') {
       radius = {tl: radius, tr: radius, br: radius, bl: radius};
     } else {
-      var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
-      for (var side in defaultRadius) {
+      let defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+      for (let side in defaultRadius) {
         radius[side] = radius[side] || defaultRadius[side];
       }
     }
@@ -348,21 +348,21 @@ export var mouseNotification = {
         messageClass = messageClass || 'mouseNotification-box';
         margin = margin || 10;
 
-        var mouseNotificationElem = $('#mouse-notification');
+        let mouseNotificationElem = $('#mouse-notification');
         if (mouseNotificationElem.length != 0) {
             clearTimeout(this.timeout);
-            mouseNotificationElem.replaceWith('<div class="' + messageClass + '" id="mouse-notification">' + message  + "</div>");
+            mouseNotificationElem.replaceWith(`<div class="${  messageClass  }" id="mouse-notification">${  message   }</div>`);
         } else {
-            this.elem.append('<div class="' + messageClass + '" id="mouse-notification">' + message + "</div>");
+            this.elem.append(`<div class="${  messageClass  }" id="mouse-notification">${  message  }</div>`);
         }
         this.timeout = setTimeout(function() {
             $('#mouse-notification').remove();
         }, (delay || 1000));
 
-        var popupRect  = $(this.elem).get(0).getBoundingClientRect(); // get the popup metrics
-        var targetRect = $(target).get(0).getBoundingClientRect();
+        let popupRect  = $(this.elem).get(0).getBoundingClientRect(); // get the popup metrics
+        let targetRect = $(target).get(0).getBoundingClientRect();
 
-        var left = 0, top = 0;
+        let left = 0, top = 0;
 
         // reposition the notification;
         if (align != null) { // default is at the mouse position
@@ -400,7 +400,7 @@ export var mouseNotification = {
          */
 
         return true;
-    }
+    },
 };
 
 export function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
@@ -428,7 +428,7 @@ export function getManifestVersion(manifest) {
             manifest = chrome.runtime.getManifest();
         }
 
-        var version = manifest.version_name;
+        let version = manifest.version_name;
         if (!version) {
             version = manifest.version;
         }
@@ -437,7 +437,7 @@ export function getManifestVersion(manifest) {
 
     } catch (error) {
         console.log("manifest does not exist, probably not running nw.js");
-        return "-"
+        return "-";
     }
 }
 

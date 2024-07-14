@@ -90,9 +90,9 @@ export function GraphConfigurationDialog(dialog, onSave) {
     function renderSmoothingOptions(elem, flightLog, field) {
         if (elem) {
             // the smoothing is in uS rather than %, scale the value somewhere between 0 and 10000uS
-            $('input[name=smoothing]',elem).val((field.smoothing!=null)?(field.smoothing/100).toFixed(0)+'%':(GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100)+'%');
+            $('input[name=smoothing]',elem).val((field.smoothing!=null)?`${(field.smoothing/100).toFixed(0)}%`:`${GraphConfig.getDefaultSmoothingForField(flightLog, field.name)/100}%`);
             if (field.curve != null) {
-                $('input[name=power]',elem).val((field.curve.power!=null)?(field.curve.power*100).toFixed(0)+'%':(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100)+'%');
+                $('input[name=power]',elem).val((field.curve.power!=null)?`${(field.curve.power*100).toFixed(0)}%`:`${GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100}%`);
                 if (field.curve.MinMax != null) {
                     $('input[name=MinValue]',elem).val(field.curve.MinMax.min.toFixed(1));
                     $('input[name=MaxValue]',elem).val(field.curve.MinMax.max.toFixed(1));
@@ -103,7 +103,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 }
             } else
             {
-                $('input[name=power]',elem).val((GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)+'%');
+                $('input[name=power]',elem).val(`${(GraphConfig.getDefaultCurveForField(flightLog, field.name).power*100).toFixed(0)}%`);
                 $('input[name=MinValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.min.toFixed(1));
                 $('input[name=MaxValue]',elem).val(GraphConfig.getDefaultCurveForField(flightLog, field.name).MinMax.max.toFixed(1));
             }
@@ -126,7 +126,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
-                + '</tr>'
+                + '</tr>',
             ),
             select = $('select.form-control', elem),
             selectedFieldName = field ? field.name : false;
@@ -148,7 +148,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         // Add event when selection changed to retrieve the current smoothing settings.
         $('select.form-control', elem).change( function() {
             const selectedField = {
-                name: $('select.form-control option:selected', elem).val()
+                name: $('select.form-control option:selected', elem).val(),
             };
             const fields = activeGraphConfig.extendFields(activeFlightLog, selectedField);
             if (fields.length === 1) {
@@ -214,57 +214,57 @@ export function GraphConfigurationDialog(dialog, onSave) {
     function renderGraph(flightLog, index, graph) {
         const
             graphElem = $(
-                '<li class="config-graph" id="'+index+'">'
-                    + '<dl>'
-                        + '<dt><span>'
-                            + '<h4 style="display:inline-block;vertical-align: baseline;"><span class="glyphicon glyphicon-minus"></span>Graph ' + '<span class="graph-index-number">' + (index + 1) + '</span>' + '</h4>'
-                                + '<button type="button" class="btn btn-default btn-sm pull-right remove-single-graph-button" style="display:inline-block;vertical-align: baseline;"><span class="glyphicon glyphicon-trash"></span> Remove graph ' + '</button>'
-                            + '</span></dt>'
-                            + '<dd>'
-                            + '<div class="form-horizontal">'
-                                + '<div class="form-group">'
-                                    + '<label class="col-sm-2 control-label">Axis label</label>'
-                                    + '<div class="col-sm-10">'
-                                        + '<ul class="config-graph-header form-inline list-unstyled">'
-                                            + '<li class="config-graph-header">'
-                                                + '<input class="form-control" type="text" placeholder="Axis label" style="width:92%;">'
-                                                + '<select class="form-control graph-height"></select>'
-                                            + '</li>'
-                                        + '</ul>'
-                                    + '</div>'
-                                + '</div>'
-                                + '<div class="flexDiv">'
-                                    + '<label class="control-label">Fields:</label>'
-                                    + '<div class="selectWrapper">'
-                                        + '<div class="dropdown-content main_menu"></div>'
-                                        + '<div class="dropdown-content sub_menu"></div>'
-                                        + '<div class="dropdown-content sub_menu2"></div>'
-                                    + '</div>'
-                                +'</div>'
-                                + '<div class="form-group config-graph-field-header">'
-                                    + '<div class="col-sm-12">'
-                                        + '<table class="config-graph-field-list">'
-                                            + '<thead>'
-                                                + '<tr name="field-header">'
-                                                    + '<th name="field">Name</th>'
-                                                    + '<th name="smoothing">Smooth</th>'
-                                                    + '<th name="expo">Expo</th>'
-                                                    + '<th name="line">Line</th>'
-                                                    + '<th name="color">Color</th>'
-                                                    + '<th name="MinValue">Minimum</th>'
-                                                    + '<th name="MaxValue">Maximum</th>'
-                                                + '</tr>'
-                                            + '</thead>'
-                                            + '<tbody>'
-                                            + '</tbody>'
-                                        + '</table>'
-                                        + '<button type="button" class="btn btn-default btn-sm add-field-button"><span class="glyphicon glyphicon-plus"></span> Add field</button>'
-                                    + '</div>'
-                                + '</div>'
-                            + '</div>'
-                        + '</dd>'
-                    + '</dl>'
-                + '</li>'
+                `<li class="config-graph" id="${index}">`
+                    + `<dl>`
+                        + `<dt><span>`
+                            + `<h4 style="display:inline-block;vertical-align: baseline;"><span class="glyphicon glyphicon-minus"></span>Graph ` + `<span class="graph-index-number">${  index + 1  }</span>` + `</h4>`
+                                + `<button type="button" class="btn btn-default btn-sm pull-right remove-single-graph-button" style="display:inline-block;vertical-align: baseline;"><span class="glyphicon glyphicon-trash"></span> Remove graph ` + `</button>`
+                            + `</span></dt>`
+                            + `<dd>`
+                            + `<div class="form-horizontal">`
+                                + `<div class="form-group">`
+                                    + `<label class="col-sm-2 control-label">Axis label</label>`
+                                    + `<div class="col-sm-10">`
+                                        + `<ul class="config-graph-header form-inline list-unstyled">`
+                                            + `<li class="config-graph-header">`
+                                                + `<input class="form-control" type="text" placeholder="Axis label" style="width:92%;">`
+                                                + `<select class="form-control graph-height"></select>`
+                                            + `</li>`
+                                        + `</ul>`
+                                    + `</div>`
+                                + `</div>`
+                                + `<div class="flexDiv">`
+                                    + `<label class="control-label">Fields:</label>`
+                                    + `<div class="selectWrapper">`
+                                        + `<div class="dropdown-content main_menu"></div>`
+                                        + `<div class="dropdown-content sub_menu"></div>`
+                                        + `<div class="dropdown-content sub_menu2"></div>`
+                                    + `</div>`
+                                +`</div>`
+                                + `<div class="form-group config-graph-field-header">`
+                                    + `<div class="col-sm-12">`
+                                        + `<table class="config-graph-field-list">`
+                                            + `<thead>`
+                                                + `<tr name="field-header">`
+                                                    + `<th name="field">Name</th>`
+                                                    + `<th name="smoothing">Smooth</th>`
+                                                    + `<th name="expo">Expo</th>`
+                                                    + `<th name="line">Line</th>`
+                                                    + `<th name="color">Color</th>`
+                                                    + `<th name="MinValue">Minimum</th>`
+                                                    + `<th name="MaxValue">Maximum</th>`
+                                                + `</tr>`
+                                            + `</thead>`
+                                            + `<tbody>`
+                                            + `</tbody>`
+                                        + `</table>`
+                                        + `<button type="button" class="btn btn-default btn-sm add-field-button"><span class="glyphicon glyphicon-plus"></span> Add field</button>`
+                                    + `</div>`
+                                + `</div>`
+                            + `</div>`
+                        + `</dd>`
+                    + `</dl>`
+                + `</li>`,
             ),
             fieldList = $(".config-graph-field-list", graphElem);
 
@@ -341,7 +341,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         exampleGraphs.unshift({
             label: "Custom graph",
             fields: [{name:""}],
-            dividerAfter: true
+            dividerAfter: true,
         });
 
         for (let i = 0; i < exampleGraphs.length; i++) {
@@ -364,7 +364,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $(".config-graph", dialog).each(function() {
             const graph = {
                fields: [],
-               height: 1
+               height: 1,
             };
 
             graph.label = $("input[type='text']", this).val();
@@ -381,16 +381,16 @@ export function GraphConfigurationDialog(dialog, onSave) {
                         power: parseInt($("input[name=power]", this).val())/100.0,          // Value 0-100%    = 0-1.0 (lower values exaggerate center values - expo)
                         MinMax: {
                             min: parseFloat(minimum),
-                            max: parseFloat(maximum)
-                        }
+                            max: parseFloat(maximum),
+                        },
                     },
                     default: { // These are used to restore configuration if using mousewheel adjustments
                         smoothing: parseInt($("input[name=smoothing]", this).val())*100,
                         power: parseInt($("input[name=power]", this).val())/100.0,
                         MinMax: {
                             min: parseFloat(minimum),
-                            max: parseFloat(maximum)
-                        }
+                            max: parseFloat(maximum),
+                        },
                     },
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
@@ -426,8 +426,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
                 if (matches[1] != lastRoot) {
                     lastRoot = matches[1];
 
-                    offeredFieldNames.push(lastRoot + "[all]");
-                    fieldsSeen[lastRoot + "[all]"] = true;
+                    offeredFieldNames.push(`${lastRoot  }[all]`);
+                    fieldsSeen[`${lastRoot  }[all]`] = true;
                 }
             } else {
                 lastRoot = null;
@@ -517,8 +517,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
     configGraphsList
         .sortable(
             {
-                cursor: "move"
-            }
+                cursor: "move",
+            },
         )
         .disableSelection();
 

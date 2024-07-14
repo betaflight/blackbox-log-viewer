@@ -23,7 +23,7 @@ import { FlightLogGrapher } from "./grapher";
  *     onProgress - Called periodically with (frameIndex, frameCount) to report progress
  */
 export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, events) {
-    var
+    let
         WORK_CHUNK_SIZE_FOCUSED = 8,
         WORK_CHUNK_SIZE_UNFOCUSED = 32,
         
@@ -100,7 +100,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
         return new Promise(function(resolve, reject) {
             chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: suggestedName, 
                     accepts: [{extensions: ['webm'], description: "WebM video"}]}, function(fileEntry) {
-                var 
+                let 
                     error = chrome.runtime.lastError;
                 
                 if (error) {
@@ -158,7 +158,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
          * I'd dearly like to run the rendering process in a Web Worker, but workers can't use Canvas because
          * it happens to be a DOM element (and Workers aren't allowed access to the DOM). Stupid!
          */
-        var
+        let
             framesToRender = Math.min(workChunkSize, frameCount - frameIndex);
         
         if (cancel) {
@@ -166,7 +166,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
             return;
         }
         
-        var
+        let
             completeChunk = function() {
                 if (events && events.onProgress) {
                     events.onProgress(frameIndex, frameCount);
@@ -193,7 +193,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
             };
         
         if (logParameters.flightVideo) {
-            var 
+            let 
                 renderFrames = function(frameCount) {
                     if (frameCount == 0) {
                         completeChunk();
@@ -204,7 +204,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
                         canvasContext.drawImage(logParameters.flightVideo, 0, 0, videoOptions.width, videoOptions.height);
                         
                         if (videoOptions.videoDim > 0) {
-                            canvasContext.fillStyle = 'rgba(0,0,0,' + videoOptions.videoDim + ')';
+                            canvasContext.fillStyle = `rgba(0,0,0,${  videoOptions.videoDim  })`;
                             
                             canvasContext.fillRect(0, 0, canvas.width, canvas.height);
                         }
@@ -220,7 +220,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
                 
             renderFrames(framesToRender);
         } else {
-            for (var i = 0; i < framesToRender; i++) {
+            for (let i = 0; i < framesToRender; i++) {
                 renderFrame();
             }
             
@@ -247,7 +247,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
         
         installVisibilityHandler();
         
-        var
+        let
             webMOptions = {
                 frameRate: videoOptions.frameRate,
             };
@@ -291,7 +291,7 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
         delete logParameters.flightVideo;
     }
 
-    var options = $.extend({}, userSettings || {}, {eraseBackground : !logParameters.flightVideo, drawEvents : false, fillBackground : !logParameters.flightVideo});
+    let options = $.extend({}, userSettings || {}, {eraseBackground : !logParameters.flightVideo, drawEvents : false, fillBackground : !logParameters.flightVideo});
     
     graph = new FlightLogGrapher(flightLog, logParameters.graphConfig, canvas, stickCanvas, craftCanvas, analyserCanvas, options);
 
@@ -326,13 +326,13 @@ export function FlightLogVideoRenderer(flightLog, logParameters, videoOptions, e
  * Is video rendering supported on this web browser? We require the ability to encode canvases to WebP.
  */
 FlightLogVideoRenderer.isSupported = function() {
-    var
+    let
         canvas = document.createElement('canvas');
     
     canvas.width = 16;
     canvas.height = 16;
     
-    var
+    let
         encoded = canvas.toDataURL('image/webp', {quality: 0.9});
     
     return encoded && encoded.match(/^data:image\/webp;/);
