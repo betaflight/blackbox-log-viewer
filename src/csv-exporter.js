@@ -7,39 +7,47 @@
 
 /**
  * @constructor
- * @param {FlightLog} flightLog 
+ * @param {FlightLog} flightLog
  * @param {ExportOptions} [opts={}]
  */
-export function CsvExporter(flightLog, opts={}) {
+export function CsvExporter(flightLog, opts = {}) {
+  var opts = _.merge(
+    {
+      columnDelimiter: ",",
+      stringDelimiter: '"',
+      quoteStrings: true,
+    },
+    opts
+  );
 
-    var opts = _.merge({
-        columnDelimiter: ",",
-        stringDelimiter: "\"",
-        quoteStrings: true,
-    }, opts);
+  /**
+   * @param {function} success is a callback triggered when export is done
+   */
+  function dump(success) {
+    let frames = _(
+        flightLog.getChunksInTimeRange(
+          flightLog.getMinTime(),
+          flightLog.getMaxTime()
+        )
+      )
+        .map((chunk) => chunk.frames)
+        .value(),
+      worker = new Worker("/js/webworkers/csv-export-worker.js");
 
-    /** 
-     * @param {function} success is a callback triggered when export is done
-     */
-    function dump(success) {
-        let frames = _(flightLog.getChunksInTimeRange(flightLog.getMinTime(), flightLog.getMaxTime()))
-                .map(chunk => chunk.frames).value(),
-            worker = new Worker("/js/webworkers/csv-export-worker.js");
-
-        worker.onmessage = event => {
-            success(event.data);
-            worker.terminate();
-        };
-        worker.postMessage({
-            sysConfig: flightLog.getSysConfig(),
-            fieldNames: flightLog.getMainFieldNames(),
-            frames: frames,
-            opts: opts,
-        });
-    }
-
-    // exposed functions
-    return {
-        dump: dump,
+    worker.onmessage = (event) => {
+      success(event.data);
+      worker.terminate();
     };
-};
+    worker.postMessage({
+      sysConfig: flightLog.getSysConfig(),
+      fieldNames: flightLog.getMainFieldNames(),
+      frames: frames,
+      opts: opts,
+    });
+  }
+
+  // exposed functions
+  return {
+    dump: dump,
+  };
+}

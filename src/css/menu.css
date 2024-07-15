@@ -8,7 +8,6 @@
   --borderColor: #cccccc;
 }
 
-
 .flexDiv {
   display: flex;
   flex-direction: row;
@@ -44,7 +43,9 @@
   width: auto;
 }
 
-.show { display: block;}
+.show {
+  display: block;
+}
 
 .dropdown-content div:hover {
   background-color: #f6f6f6;
@@ -99,4 +100,3 @@
 .minmax-control {
   min-width: 60px;
 }
-
