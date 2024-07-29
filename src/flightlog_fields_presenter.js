@@ -1287,6 +1287,20 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Not Used",
       };
     }
+    if (semver.gte(firmwareVersion, '4.6.0')) {
+      // FFT_FREQ updated in firmware #13750
+      DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
+        'debug[all]':'Debug FFT FREQ',
+        'debug[0]':'Gyro Pre Dyn Notch [dbg-axis]',
+        'debug[1]':'Notch 1 Center Freq [dbg-axis]',
+        'debug[2]':'Notch 2 Center Freq [dbg-axis]',
+        'debug[3]':'Notch 3 Center Freq [dbg-axis]',
+        'debug[4]':'Notch 4 Center Freq [dbg-axis]',
+        'debug[5]':'Notch 5 Center Freq [dbg-axis]',
+        'debug[6]':'Notch 6 Center Freq [dbg-axis]',
+        'debug[7]':'Notch 7 Center Freq [dbg-axis]',
+      };
+    }
   }
 };
 
@@ -1756,13 +1770,20 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             return value.toFixed(0);
         }
       case "FFT_FREQ":
-        switch (fieldName) {
-          case "debug[3]": // gyro pre dyn notch [for gyro debug axis]
-            return `${Math.round(
-              flightLog.gyroRawToDegreesPerSecond(value)
-            )} °/s`;
-          default:
-            return `${value.toFixed(0)} Hz`;
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '4.6.0')) {
+          switch (fieldName) {
+            case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
+              return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
+            default:
+              return value.toFixed(0) + " Hz";
+          }
+        } else {
+          switch (fieldName) {
+            case 'debug[3]': // gyro pre dyn notch [for gyro debug axis]
+              return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
+            default:
+              return value.toFixed(0) + " Hz";
+          }
         }
       case "RTH":
         switch (fieldName) {
@@ -2406,13 +2427,24 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value;
         }
       case "FFT_FREQ":
-        switch (fieldName) {
-          case "debug[3]": // gyro pre dyn notch [for gyro debug axis]
-            return toFriendly
-              ? flightLog.gyroRawToDegreesPerSecond(value)
-              : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
-          default:
-            return value;
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '4.6.0')) {
+          switch (fieldName) {
+            case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
+              return toFriendly
+                ? flightLog.gyroRawToDegreesPerSecond(value)
+                : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+            default:
+              return value;
+          }
+        } else {
+          switch (fieldName) {
+            case "debug[3]": // gyro pre dyn notch [for gyro debug axis]
+              return toFriendly
+                ? flightLog.gyroRawToDegreesPerSecond(value)
+                : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+            default:
+              return value;
+          }
         }
       case "RTH":
         switch (fieldName) {
