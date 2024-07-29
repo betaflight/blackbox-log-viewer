@@ -383,6 +383,12 @@ export function HeaderDialog(dialog, onSave) {
       name: "rc_smoothing_rx_average",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "3.5.0",
+      max: "4.4.999",
+    },
+    {
+      name: "rc_smoothing_rx_smoothed",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "4.5.0",
       max: "999.9.9",
     },
     {

@@ -407,6 +407,7 @@ export function FlightLogParser(logData) {
       rc_smoothing_setpoint_cutoff: "rc_smoothing_setpoint_hz",
       rc_smoothing_throttle_cutoff: "rc_smoothing_throttle_hz",
       rc_smoothing_type: "rc_smoothing_mode",
+      rc_smoothing_rx_smoothed: "rc_smoothing_rx_average",
       rc_yaw_expo: "rcYawExpo",
       rcExpo: "rc_expo",
       rcRate: "rc_rates",
