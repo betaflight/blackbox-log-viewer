@@ -1566,7 +1566,14 @@ export function HeaderDialog(dialog, onSave) {
 
     $(".dshot_bidir_required").toggle(sysConfig.dshot_bidir == 1);
 
-    setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
+    if (semver.gte(activeSysConfig.firmwareVersion, "4.5.0")) {
+      setParameter("rcSmoothingRxSmoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
+      $("#rcSmoothingRxAverage").hide();
+    } else {
+      setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
+      $("#rcSmoothingRxSmoothed").hide();
+    }
+
     renderSelect(
       "rcSmoothingDebugAxis",
       sysConfig.rc_smoothing_debug_axis,
