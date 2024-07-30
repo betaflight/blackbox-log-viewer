@@ -1568,7 +1568,7 @@ export function HeaderDialog(dialog, onSave) {
 
     if (semver.gte(activeSysConfig.firmwareVersion, "4.5.0")) {
       setParameter("rcSmoothingRxSmoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
-      $("#rc_smoothing_rx_smoothed").show();
+      $("#rcSmoothingRxSmoothed").show();
       $("#rcSmoothingRxAverage").hide();
     } else {
       setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
