@@ -1567,13 +1567,13 @@ export function HeaderDialog(dialog, onSave) {
     $(".dshot_bidir_required").toggle(sysConfig.dshot_bidir == 1);
 
     if (semver.gte(activeSysConfig.firmwareVersion, "4.5.0")) {
-      setParameter("rc_smoothing_rx_smoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
+      setParameter("rcSmoothingRxSmoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
       $("#rc_smoothing_rx_smoothed").show();
       $("#rcSmoothingRxAverage").hide();
     } else {
       setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
       $("#rcSmoothingRxAverage").show();
-      $("#rc_smoothing_rx_smoothed").hide();
+      $("#rcSmoothingRxSmoothed").hide();
     }
 
     renderSelect(
