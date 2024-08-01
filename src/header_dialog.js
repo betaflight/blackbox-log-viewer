@@ -383,6 +383,12 @@ export function HeaderDialog(dialog, onSave) {
       name: "rc_smoothing_rx_average",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "3.5.0",
+      max: "4.4.999",
+    },
+    {
+      name: "rc_smoothing_rx_smoothed",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "4.5.0",
       max: "999.9.9",
     },
     {
@@ -1560,7 +1566,16 @@ export function HeaderDialog(dialog, onSave) {
 
     $(".dshot_bidir_required").toggle(sysConfig.dshot_bidir == 1);
 
-    setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
+    if (semver.gte(activeSysConfig.firmwareVersion, "4.5.0")) {
+      setParameter("rcSmoothingRxSmoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
+      $("#rcSmoothingRxSmoothed").show();
+      $("#rcSmoothingRxAverage").hide();
+    } else {
+      setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
+      $("#rcSmoothingRxAverage").show();
+      $("#rcSmoothingRxSmoothed").hide();
+    }
+
     renderSelect(
       "rcSmoothingDebugAxis",
       sysConfig.rc_smoothing_debug_axis,

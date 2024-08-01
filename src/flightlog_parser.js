@@ -314,6 +314,7 @@ export function FlightLogParser(logData) {
       rc_smoothing_throttle_hz: null, // RC Smoothing manual cutoff for throttle
       rc_smoothing_auto_factor_throttle: null, // RC Smoothing cutoff for throttle
       rc_smoothing_active_cutoffs_ff_sp_thr: [null, null, null], // RC Smoothing active cutoffs feedforward, setpoint, throttle
+      rc_smoothing_rx_smoothed: null,
       dyn_notch_count: null, // Number of dynamic notches 4.3
       rpm_filter_fade_range_hz: null, // Fade range for RPM notch filters in Hz
       dyn_idle_p_gain: null,
@@ -650,6 +651,7 @@ export function FlightLogParser(logData) {
       case "rc_smoothing_type":
       case "rc_smoothing_debug_axis":
       case "rc_smoothing_rx_average":
+      case "rc_smoothing_rx_smoothed":
       case "rc_smoothing_mode": // 4.3 rc smoothing stuff
       case "rc_smoothing_auto_factor_setpoint":
       case "rc_smoothing_auto_factor_throttle":
