@@ -279,6 +279,7 @@ var FlightLogParser = function(logData) {
             rc_smoothing_cutoffs:[null, null],      // RC Smoothing input and derivative cutoff
             rc_smoothing_filter_type:[null,null],   // RC Smoothing input and derivative type
             rc_smoothing_rx_average:null,           // RC Smoothing rx average read in ms
+            rc_smoothing_rx_smoothed: null,
             rc_smoothing_debug_axis:null,           // Axis recorded in the debug mode of rc_smoothing
             dterm_filter_type:null,                 // D term filtering type (PT1, BIQUAD, PT2, PT3)
             dterm_filter2_type:null,                // D term 2 filtering type (PT1, BIQUAD, PT2, PT3)
@@ -663,6 +664,7 @@ var FlightLogParser = function(logData) {
             case "rc_smoothing_type":
             case "rc_smoothing_debug_axis":
             case "rc_smoothing_rx_average":
+            case "rc_smoothing_rx_smoothed":
             case "rc_smoothing_mode":  // 4.3 rc smoothing stuff
             case "rc_smoothing_auto_factor_setpoint":
             case "rc_smoothing_auto_factor_throttle":
