@@ -24,13 +24,13 @@ const
 export const GraphSpectrumCalc = {
   _analyserTimeRange : {
       in: 0,
-      out: MAX_ANALYSER_LENGTH
+      out: MAX_ANALYSER_LENGTH,
   },
   _blackBoxRate : 0,
   _dataBuffer : {
       fieldIndex: 0,
       curve: 0,
-      fieldName: null
+      fieldName: null,
   },
   _flightLog : null,
   _sysConfig : null,
@@ -283,7 +283,7 @@ GraphSpectrumCalc._getFlightChunks = function() {
   const allChunks = this._flightLog.getChunksInTimeRange(logStart, logEnd);
 
   return allChunks;
-}
+};
 
 GraphSpectrumCalc._getFlightSamplesFreq = function() {
 
@@ -302,7 +302,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
 
   return {
     samples : samples,
-    count : samplesCount
+    count : samplesCount,
   };
 };
 
@@ -386,7 +386,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
       vsValues : slicedVsValues,
       count  : samplesCount,
       minValue : minValue,
-      maxValue : maxValue
+      maxValue : maxValue,
        };
 };
 
