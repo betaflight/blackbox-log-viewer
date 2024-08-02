@@ -17,11 +17,12 @@ const
   MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
   NUM_VS_BINS = 100,
   WARNING_RATE_DIFFERENCE = 0.05,
-  MAX_RPM_HZ_VALUE = 800;
+  MAX_RPM_HZ_VALUE = 800,
+  MAX_RPM_AXIS_GAP = 1.05;
 
 
 export const GraphSpectrumCalc = {
-  _analyserTimeRange : { 
+  _analyserTimeRange : {
       in: 0,
       out: MAX_ANALYSER_LENGTH
   },
@@ -362,6 +363,8 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     }
   }
 
+  maxValue *= MAX_RPM_AXIS_GAP;
+
   if (minValue > maxValue) {
     if (minValue == Infinity) {  // this should never happen
       minValue = 0;
@@ -383,7 +386,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
       vsValues : slicedVsValues,
       count  : samplesCount,
       minValue : minValue,
-      maxValue : maxValue,
+      maxValue : maxValue
        };
 };
 
