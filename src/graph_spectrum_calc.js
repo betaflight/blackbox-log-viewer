@@ -50,12 +50,10 @@ GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
   }
   this._BetaflightRate = this._blackBoxRate;
 
-  const minTime = this._flightLog.getMinTime(),
-      maxTime = this._flightLog.getMaxTime(),
-      timeRange = maxTime - minTime;
+  const actualLoggedTime = this._flightLog.getActualLoggedTime(),
+        length = flightLog.getCurrentLogRowsCount();
 
-  const length = flightLog.getCurrentLogRowsCount();
-  this._actualeRate = 1e6 * length / timeRange;
+  this._actualeRate = 1e6 * length / actualLoggedTime;
   if (Math.abs(this._BetaflightRate - this._actualeRate) / this._actualeRate > WARNING_RATE_DIFFERENCE)
       this._blackBoxRate = Math.round(this._actualeRate);
 
