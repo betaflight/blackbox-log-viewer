@@ -127,7 +127,7 @@ export function FlightLogIndex(logData) {
           magADC = false;
         }
         
-        let lastTime;
+        let frameTime;
         parser.onFrameReady = function (
           frameValid,
           frame,
@@ -142,8 +142,7 @@ export function FlightLogIndex(logData) {
           switch (frameType) {
             case "P":
             case "I":
-              let frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-              lastTime = frameTime;
+              frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
               if (intraIndex.minTime === false) {
                 intraIndex.minTime = frameTime;
               }
@@ -228,8 +227,8 @@ export function FlightLogIndex(logData) {
               }
 
               if (frame.event == FlightLogEvent.LOGGING_RESUME) {
-                if (lastTime) {
-                  intraIndex.unLoggedTime += frame.data.currentTime - lastTime;
+                if (frameTime) {
+                  intraIndex.unLoggedTime += frame.data.currentTime - frameTime;
                 }
               }
 
