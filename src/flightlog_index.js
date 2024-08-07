@@ -56,6 +56,7 @@ export function FlightLogIndex(logData) {
           hasEvent: [],
           minTime: false,
           maxTime: false,
+          unLoggedTime: 0,
         },
         imu = new IMU(),
         gyroADC,
@@ -125,7 +126,8 @@ export function FlightLogIndex(logData) {
         if (magADC[0] === undefined) {
           magADC = false;
         }
-
+        
+        let lastTime = undefined;
         parser.onFrameReady = function (
           frameValid,
           frame,
@@ -140,9 +142,9 @@ export function FlightLogIndex(logData) {
           switch (frameType) {
             case "P":
             case "I":
-              var frameTime =
+              let frameTime =
                 frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
-
+              lastTime = frameTime;
               if (intraIndex.minTime === false) {
                 intraIndex.minTime = frameTime;
               }
@@ -225,6 +227,13 @@ export function FlightLogIndex(logData) {
               if (frame.event == FlightLogEvent.LOG_END) {
                 sawEndMarker = true;
               }
+
+              if (frame.event == FlightLogEvent.LOGGING_RESUME) {
+                if (lastTime) {
+                  intraIndex.unLoggedTime += frame.data.currentTime - lastTime;
+                }
+              }
+
               break;
             case "S":
               lastSlow = frame.slice(0);
