@@ -132,6 +132,11 @@ export function FlightLog(logData) {
       FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
     ].max;
   };
+  
+  this.getActualLoggedTime = function (logIndex) 
+    const directory = logIndexes.getIntraframeDirectory(logIndex);
+    return directory.maxTime - directory.minTime - directory.unLoggedTime;
+  }
 
   /**
    * Get the flight controller system information that was parsed for the current log file.
