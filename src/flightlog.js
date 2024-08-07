@@ -31,7 +31,7 @@ import {
 export function FlightLog(logData) {
   let ADDITIONAL_COMPUTED_FIELD_COUNT = 15 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/,
     that = this,
-    logIndex = false,
+    logIndex = 0,
     logIndexes = new FlightLogIndex(logData),
     parser = new FlightLogParser(logData),
     iframeDirectory,
@@ -117,26 +117,22 @@ export function FlightLog(logData) {
    * Get the earliest time seen in the log of the given index (in microseconds), or leave off the logIndex
    * argument to fetch details for the current log.
    */
-  this.getMinTime = function (logIndex) {
-    return getRawStats(logIndex).frame["I"].field[
-      FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
-    ].min;
+  this.getMinTime = function () {
+    return logIndexes.getIntraframeDirectory(logIndex).minTime;
   };
 
   /**
    * Get the latest time seen in the log of the given index (in microseconds), or leave off the logIndex
    * argument to fetch details for the current log.
    */
-  this.getMaxTime = function (logIndex) {
-    return getRawStats(logIndex).frame["I"].field[
-      FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
-    ].max;
+  this.getMaxTime = function () {
+    return logIndexes.getIntraframeDirectory(logIndex).maxTime;
   };
   
-  this.getActualLoggedTime = function (logIndex) 
+  this.getActualLoggedTime = function () {
     const directory = logIndexes.getIntraframeDirectory(logIndex);
     return directory.maxTime - directory.minTime - directory.unLoggedTime;
-  }
+  };
 
   /**
    * Get the flight controller system information that was parsed for the current log file.
