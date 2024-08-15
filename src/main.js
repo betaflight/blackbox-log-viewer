@@ -516,15 +516,15 @@ function BlackboxLogViewer() {
         } else {
            $(".log-device-uid-header,.log-device-uid").css('display', 'none');
         }
-        **/
+    **/
 
     // Add log version information to status bar
     const sysConfig = flightLog.getSysConfig();
+
     $(".version", statusBar).text(
-      (sysConfig["Craft name"] != null ? `${sysConfig["Craft name"]} : ` : "") +
-        (sysConfig["Firmware revision"] != null
-          ? sysConfig["Firmware revision"]
-          : "")
+      (sysConfig["Craft name"] != null && sysConfig["Craft name"].length ? `${sysConfig["Craft name"]} : ` : "") +
+      (sysConfig["Firmware revision"] != null ? `${sysConfig["Firmware revision"]}` : "") +
+      (sysConfig.deviceUID != null ? ` (${sysConfig.deviceUID})` : "")
     );
     $(".looptime", statusBar).text(
       stringLoopTime(

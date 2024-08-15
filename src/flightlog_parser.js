@@ -969,7 +969,7 @@ export function FlightLogParser(logData) {
         // Just Add them anyway
         that.sysConfig[fieldName] = fieldValue;
         break;
-      case "Device UID":
+      case "DeviceUID":
         that.sysConfig.deviceUID = fieldValue;
         break;
       default:
