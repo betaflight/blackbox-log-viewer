@@ -629,11 +629,11 @@ export function FlightLogGrapher(
         drawEventLine(
           x,
           labelY,
-          `Flight Mode Change${FlightLogFieldPresenter.presentChangeEvent(
+          FlightLogFieldPresenter.presentChangeEvent(
             event.data.newFlags,
             event.data.lastFlags,
             FLIGHT_LOG_FLIGHT_MODE_NAME
-          )}`,
+          ),
           "rgba(0,0,255,0.75)",
           3
         );
