@@ -1337,12 +1337,16 @@ FlightLogFieldPresenter.presentFlags = function (flags, flagNames) {
 FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(
   flags,
   lastFlags,
-  flagNames
-) {
+  flagNames)
+{
   let eventState = "";
   let found = false;
-
-  for (let i = 0; i < flagNames.length; i++) {
+  const maxModeNumber = 32;   // int has 32 bit only! We have not to roll bit shift 1<<i for i values grate then 31 !!!
+  let modesCount = flagNames.length
+  if (modesCount > maxModeNumber) {
+    modesCount = maxModeNumber;
+  }
+  for (let i = 0; i < modesCount; i++) {
     if ((1 << i) & (flags ^ lastFlags)) {
       // State Changed
       eventState += `|${flagNames[i]} ${(1 << i) & flags ? "ON" : "OFF"}`;
