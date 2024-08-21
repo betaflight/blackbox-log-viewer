@@ -1342,7 +1342,7 @@ FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(
   let eventState = "";
   let found = false;
   const maxModeNumber = 32;   // int has 32 bit only! We have not to roll bit shift 1<<i for i values grate then 31 !!!
-  let modesCount = flagNames.length
+  let modesCount = flagNames.length;
   if (modesCount > maxModeNumber) {
     modesCount = maxModeNumber;
   }
