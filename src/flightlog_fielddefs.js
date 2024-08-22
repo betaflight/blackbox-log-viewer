@@ -134,7 +134,7 @@ export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3 = makeReadOnly([
   "LAUNCHCONTROL",
 ]);
 
-export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_6 = makeReadOnly([
+export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5 = makeReadOnly([
   "ARM",
   "ANGLE",
   "HORIZON",
@@ -532,9 +532,8 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
 
     // Flight mode names
     if (semver.gte(firmwareVersion, "4.6.0")) {
-      FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_6.slice(0);
-    }
-    else {
+      FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
+    } else {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
       if (semver.lt(firmwareVersion, "3.4.0")) {
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
