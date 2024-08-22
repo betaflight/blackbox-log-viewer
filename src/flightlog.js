@@ -117,20 +117,23 @@ export function FlightLog(logData) {
    * Get the earliest time seen in the log of the given index (in microseconds), or leave off the logIndex
    * argument to fetch details for the current log.
    */
-  this.getMinTime = function () {
-    return logIndexes.getIntraframeDirectory(logIndex).minTime;
+  this.getMinTime = function (index) {
+    index = index ?? logIndex;
+    return logIndexes.getIntraframeDirectory(index).minTime;
   };
 
   /**
    * Get the latest time seen in the log of the given index (in microseconds), or leave off the logIndex
    * argument to fetch details for the current log.
    */
-  this.getMaxTime = function () {
-    return logIndexes.getIntraframeDirectory(logIndex).maxTime;
+  this.getMaxTime = function (index) {
+    index = index ?? logIndex;
+    return logIndexes.getIntraframeDirectory(index).maxTime;
   };
   
-  this.getActualLoggedTime = function () {
-    const directory = logIndexes.getIntraframeDirectory(logIndex);
+  this.getActualLoggedTime = function (index) {
+    index = index ?? logIndex;
+    const directory = logIndexes.getIntraframeDirectory(index);
     return directory.maxTime - directory.minTime - directory.unLoggedTime;
   };
 
