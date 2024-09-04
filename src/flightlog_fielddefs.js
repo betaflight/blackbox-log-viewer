@@ -134,6 +134,49 @@ export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3 = makeReadOnly([
   "LAUNCHCONTROL",
 ]);
 
+export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5 = makeReadOnly([
+  "ARM",
+  "ANGLE",
+  "HORIZON",
+  "MAG",
+  "ALTHOLD",
+  "HEADFREE",
+  "PASSTHRU",
+  "FAILSAFE",
+  "GPSRESCUE",
+  "ANTIGRAVITY",
+  "HEADADJ",
+  "CAMSTAB",
+  "BEEPER",
+  "LEDLOW",
+  "CALIB",
+  "OSD",
+  "TELEMETRY",
+  "SERVO1",
+  "SERVO2",
+  "SERVO3",
+  "BLACKBOX",
+  "AIRMODE",
+  "3D",
+  "FPVANGLEMIX",
+  "BLACKBOXERASE",
+  "CAMERA1",
+  "CAMERA2",
+  "CAMERA3",
+  "FLIPOVERAFTERCRASH",
+  "PREARM",
+  "BEEPGPSCOUNT",
+  "VTXPITMODE",
+  "USER1",
+  "USER2",
+  "USER3",
+  "USER4",
+  "PIDAUDIO",
+  "ACROTRAINER",
+  "VTXCONTROLDISABLE",
+  "LAUNCHCONTROL",
+]);
+
 export const FLIGHT_LOG_FEATURES = makeReadOnly([
   "RX_PPM",
   "VBAT",
@@ -488,53 +531,58 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
     // Flight mode names
-    FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
-    if (semver.lt(firmwareVersion, "3.4.0")) {
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSRESCUE"),
-        1
-      );
+    if (semver.gte(firmwareVersion, "4.6.0")) {
+      FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
+    } else {
+      FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
+      if (semver.lt(firmwareVersion, "3.4.0")) {
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSRESCUE"),
+          1
+        );
+      }
+      if (semver.gte(firmwareVersion, "3.5.0")) {
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("RANGEFINDER"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("CAMTRIG"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("LEDMAX"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("LLIGHTS"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GOV"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GTUNE"),
+          1
+        );
+      }
+      if (semver.gte(firmwareVersion, "4.0.0")) {
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("BARO"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSHOME"),
+          1
+        );
+        FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+          FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSHOLD"),
+          1
+        );
+      }
     }
-    if (semver.gte(firmwareVersion, "3.5.0")) {
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("RANGEFINDER"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("CAMTRIG"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("LEDMAX"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("LLIGHTS"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GOV"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GTUNE"),
-        1
-      );
-    }
-    if (semver.gte(firmwareVersion, "4.0.0")) {
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("BARO"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSHOME"),
-        1
-      );
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
-        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSHOLD"),
-        1
-      );
-    }
+    
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
   } else {
     DEBUG_MODE = DEBUG_MODE_COMPLETE;
