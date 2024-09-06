@@ -1639,6 +1639,11 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       }
     case "GPS_ground_course":
       return `${(value / 10).toFixed(1)} °`;
+    
+    case "gpsCartesian[0]":
+    case "gpsCartesian[1]":
+    case "gpsCartesian[2]":
+        return `${value.toFixed(0)} m`;
 
     case "debug[0]":
     case "debug[1]":
