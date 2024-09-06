@@ -1,5 +1,6 @@
 import { FlightLogIndex } from "./flightlog_index";
 import { FlightLogParser } from "./flightlog_parser";
+import { GPS_transform } from "./gps_transform";
 import {
   MAX_MOTOR_NUMBER,
   DSHOT_MIN_VALUE,
@@ -29,7 +30,7 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  let ADDITIONAL_COMPUTED_FIELD_COUNT = 15 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED **/,
+  let ADDITIONAL_COMPUTED_FIELD_COUNT = 18 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord**/,
     that = this,
     logIndex = 0,
     logIndexes = new FlightLogIndex(logData),
@@ -44,7 +45,8 @@ export function FlightLog(logData) {
     // Map from field indexes to smoothing window size in microseconds
     fieldSmoothing = {},
     maxSmoothing = 0,
-    smoothedCache = new FIFOCache(2);
+    smoothedCache = new FIFOCache(2),
+    gpsTransform = null;
 
   //Public fields:
   this.parser = parser;
@@ -130,7 +132,7 @@ export function FlightLog(logData) {
     index = index ?? logIndex;
     return logIndexes.getIntraframeDirectory(index).maxTime;
   };
-  
+
   this.getActualLoggedTime = function (index) {
     index = index ?? logIndex;
     const directory = logIndexes.getIntraframeDirectory(index);
@@ -280,6 +282,9 @@ export function FlightLog(logData) {
     }
     if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().SETPOINT) {
       fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
+    }
+    if (!that.isFieldDisabled().GPS) {
+      fieldNames.push("gpsCartesian[0]", "gpsCartesian[1]", "gpsCartesian[2]"); // GPS coords in cartesian system
     }
 
     fieldNameToIndex = {};
@@ -519,9 +524,7 @@ export function FlightLog(logData) {
                 }
                 break;
               case "H":
-              // TODO
-              // contains coordinates only
-              // should be handled separately
+                gpsTransform = new GPS_transform(frame[0]/10000000, frame[1]/10000000, 0.0, 0.0);
               case "G":
                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
                 // But other data from the G frame can be valid (time, num sats)
@@ -631,6 +634,11 @@ export function FlightLog(logData) {
       fieldNameToIndex["setpoint[2]"],
       fieldNameToIndex["setpoint[3]"],
     ];
+    let gpsCoord = [
+      fieldNameToIndex["GPS_coord[0]"],
+      fieldNameToIndex["GPS_coord[1]"],
+      fieldNameToIndex["GPS_altitude"],
+    ];
 
     const flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"]; // This points to the flightmode data
 
@@ -689,6 +697,11 @@ export function FlightLog(logData) {
     if (!axisPID[0]) {
       axisPID = false;
     }
+
+    if (!gpsCoord[0]) {
+      gpsCoord = false;
+    }
+
 
     sourceChunkIndex = 0;
     destChunkIndex = 0;
@@ -827,6 +840,20 @@ export function FlightLog(logData) {
                   : 0;
               destFrame[fieldIndex++] =
                 destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
+            }
+          }
+
+          // Calculate cartesian coords by GPS
+          if (!that.isFieldDisabled().GPS) {
+            if (gpsTransform && gpsCoord && srcFrame[gpsCoord[0]]) {
+              const gpsCartesian = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]]/10000000, srcFrame[gpsCoord[1]]/10000000, srcFrame[gpsCoord[2]]/10);
+              destFrame[fieldIndex++] = gpsCartesian.x;
+              destFrame[fieldIndex++] = gpsCartesian.y;
+              destFrame[fieldIndex++] = gpsCartesian.z;
+            } else {
+              destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
             }
           }
 
