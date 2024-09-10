@@ -1595,11 +1595,16 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       );
 
     case "flightModeFlags":
-    case "actualFlightModeFlags":
       return FlightLogFieldPresenter.presentFlags(
         value,
         FLIGHT_LOG_FLIGHT_MODE_NAME
       );
+      
+    case "actualFlightModeFlags":
+      return value != 0 ? FlightLogFieldPresenter.presentFlags(
+        value<<1,
+        FLIGHT_LOG_FLIGHT_MODE_NAME
+      ) : "ACRO";
 
     case "stateFlags":
       return FlightLogFieldPresenter.presentFlags(
