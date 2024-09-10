@@ -182,7 +182,7 @@ export function GraphLegend(
     try {
       // New function to show values on legend.
       let currentFlightMode =
-        frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+        frame[flightLog.getMainFieldIndexByName("flightModeFlags")];  //TODO use actualFlightModeFlags for new BF versions
       let graphs = config.getGraphs(),
         i,
         j;

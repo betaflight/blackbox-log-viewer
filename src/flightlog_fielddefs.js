@@ -27,6 +27,7 @@ export const FlightLogEvent = makeReadOnly({
 
   GTUNE_CYCLE_RESULT: 20,
   FLIGHT_MODE: 30,
+  ACTUAL_FLIGHT_MODE: 31,
   TWITCH_TEST: 40, // Feature for latency testing
 
   CUSTOM: 250, // Virtual Event Code - Never part of Log File.

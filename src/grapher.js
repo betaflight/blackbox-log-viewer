@@ -625,7 +625,7 @@ export function FlightLogGrapher(
           2
         );
         break;
-      case FlightLogEvent.FLIGHT_MODE:
+      case FlightLogEvent.ACTUAL_FLIGHT_MODE:
         drawEventLine(
           x,
           labelY,

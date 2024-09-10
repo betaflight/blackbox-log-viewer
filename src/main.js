@@ -198,7 +198,7 @@ function BlackboxLogViewer() {
 
     if (frame) {
       let currentFlightMode =
-        frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+        frame[flightLog.getMainFieldIndexByName("flightModeFlags")];  //TODO: use actualFlightModeFlags for new BF versions
 
       if (hasTable || hasTableOverlay) {
         // Only redraw the table if it is enabled

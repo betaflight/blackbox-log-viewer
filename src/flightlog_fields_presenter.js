@@ -111,7 +111,8 @@ const FRIENDLY_FIELD_NAMES = {
   "magADC[1]": "Compass [Y]",
   "magADC[2]": "Compass [Z]",
 
-  flightModeFlags: "Flight Mode Flags",
+  flightModeFlags: "RC BOX Flight Mode Flags",
+  actualFlightModeFlags: "Flight Mode Flags",
   stateFlags: "State Flags",
   failsafePhase: "Failsafe Phase",
   rxSignalReceived: "RX Signal Received",
@@ -1594,6 +1595,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       );
 
     case "flightModeFlags":
+    case "actualFlightModeFlags":
       return FlightLogFieldPresenter.presentFlags(
         value,
         FLIGHT_LOG_FLIGHT_MODE_NAME
@@ -2238,6 +2240,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
             );
 
     case "flightModeFlags":
+    case "actualFlightModeFlags":
       return value;
 
     case "stateFlags":

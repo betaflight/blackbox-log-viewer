@@ -277,7 +277,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         if (userSettings.stickUnits != null) {
           if (userSettings.stickUnits) {
             let currentFlightMode =
-              frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+              frame[flightLog.getMainFieldIndexByName("flightModeFlags")];  //TODO use actualFlightModeFlags for new BF versions
             rcCommandLabels[stickIndex] =
               FlightLogFieldPresenter.decodeFieldToFriendly(
                 flightLog,

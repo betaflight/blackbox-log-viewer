@@ -1617,6 +1617,7 @@ export function FlightLogParser(logData) {
         lastEvent.time = lastEvent.data.time;
         break;
       case FlightLogEvent.FLIGHT_MODE: // get the flag status change
+      case FlightLogEvent.ACTUAL_FLIGHT_MODE:
         lastEvent.data.newFlags = stream.readUnsignedVB();
         lastEvent.data.lastFlags = stream.readUnsignedVB();
         break;
