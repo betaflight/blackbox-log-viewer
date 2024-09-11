@@ -630,8 +630,8 @@ export function FlightLogGrapher(
           x,
           labelY,
           FlightLogFieldPresenter.presentChangeEvent(
-            event.data.newFlags,
-            event.data.lastFlags,
+            event.data.newFlags<<1,
+            event.data.lastFlags<<1,
             FLIGHT_LOG_FLIGHT_MODE_NAME
           ),
           "rgba(0,0,255,0.75)",
