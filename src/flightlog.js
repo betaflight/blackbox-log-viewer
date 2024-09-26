@@ -30,7 +30,7 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  let ADDITIONAL_COMPUTED_FIELD_COUNT = 18 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord**/,
+  let ADDITIONAL_COMPUTED_FIELD_COUNT = 19 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord**/,
     that = this,
     logIndex = 0,
     logIndexes = new FlightLogIndex(logData),
@@ -284,7 +284,7 @@ export function FlightLog(logData) {
       fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
     }
     if (!that.isFieldDisabled().GPS) {
-      fieldNames.push("gpsCartesian[0]", "gpsCartesian[1]", "gpsCartesian[2]"); // GPS coords in cartesian system
+      fieldNames.push("gpsCartesian[0]", "gpsCartesian[1]", "gpsCartesian[2]", "gpsDistance"); // GPS coords in cartesian system
     }
 
     fieldNameToIndex = {};
@@ -850,7 +850,9 @@ export function FlightLog(logData) {
               destFrame[fieldIndex++] = gpsCartesian.x;
               destFrame[fieldIndex++] = gpsCartesian.y;
               destFrame[fieldIndex++] = gpsCartesian.z;
+              destFrame[fieldIndex++] = Math.sqrt(gpsCartesian.x*gpsCartesian.x + gpsCartesian.z*gpsCartesian.z);
             } else {
+              destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;

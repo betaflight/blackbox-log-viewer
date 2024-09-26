@@ -1643,6 +1643,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "gpsCartesian[0]":
     case "gpsCartesian[1]":
     case "gpsCartesian[2]":
+    case "gpsDistance":
         return `${value.toFixed(0)} m`;
 
     case "debug[0]":
