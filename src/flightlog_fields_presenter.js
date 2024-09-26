@@ -124,6 +124,12 @@ const FRIENDLY_FIELD_NAMES = {
   GPS_altitude: "GPS Altitude ASL",
   GPS_speed: "GPS Speed",
   GPS_ground_course: "GPS Heading",
+  
+  "gpsCartesian[all]": "Positions",
+  "gpsCartesian[0]": "Position X",
+  "gpsCartesian[1]": "Position Y",
+  "gpsCartesian[2]": "Position Z",
+  gpsDistance:     "Home distance",
 };
 
 const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
