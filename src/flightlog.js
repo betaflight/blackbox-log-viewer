@@ -284,7 +284,7 @@ export function FlightLog(logData) {
       fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
     }
     if (!that.isFieldDisabled().GPS) {
-      fieldNames.push("gpsCartesian[0]", "gpsCartesian[1]", "gpsCartesian[2]", "gpsDistance"); // GPS coords in cartesian system
+      fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance"); // GPS coords in cartesian system
     }
 
     fieldNameToIndex = {};
@@ -847,11 +847,11 @@ export function FlightLog(logData) {
           // Calculate cartesian coords by GPS
           if (!that.isFieldDisabled().GPS) {
             if (gpsTransform && gpsCoord && srcFrame[gpsCoord[0]]) {
-              const gpsCartesian = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]]/10000000, srcFrame[gpsCoord[1]]/10000000, srcFrame[gpsCoord[2]]/10);
-              destFrame[fieldIndex++] = gpsCartesian.x;
-              destFrame[fieldIndex++] = gpsCartesian.y;
-              destFrame[fieldIndex++] = gpsCartesian.z;
-              destFrame[fieldIndex++] = Math.sqrt(gpsCartesian.x*gpsCartesian.x + gpsCartesian.z*gpsCartesian.z);
+              const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]]/10000000, srcFrame[gpsCoord[1]]/10000000, srcFrame[gpsCoord[2]]/10);
+              destFrame[fieldIndex++] = gpsCartesianCoords.x;
+              destFrame[fieldIndex++] = gpsCartesianCoords.y;
+              destFrame[fieldIndex++] = gpsCartesianCoords.z;
+              destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x*gpsCartesianCoords.x + gpsCartesianCoords.z*gpsCartesianCoords.z);
             } else {
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
