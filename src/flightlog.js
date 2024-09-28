@@ -524,7 +524,7 @@ export function FlightLog(logData) {
                 }
                 break;
               case "H":
-                const homeAltitude = frame.length > 2 ? frame[2 ] /10 : 0; // will work after BF firmware improvement
+                const homeAltitude = frame.length > 2 ? frame[2] / 10 : 0; // will work after BF firmware improvement
                 gpsTransform = new GPS_transform(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0.0);
                 break;
               case "G":
