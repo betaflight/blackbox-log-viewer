@@ -1,9 +1,5 @@
 export function GPS_transform(Lat0, Lon0, H0, Heading) {
 
-  function rad2deg(rad) {
-    return rad * 180.0 / Math.PI;
-  }
-
   function deg2rad(deg) {
     return deg * Math.PI / 180.0;
   }
@@ -52,7 +48,7 @@ export function GPS_transform(Lat0, Lon0, H0, Heading) {
       y: (N + H)*CosB*SinL,
       z: (N + H - Ecc_2*N) * SinB
     };
-  }
+  };
 
   this.ECEF_BS = function (pos) {
     const PosX1= a11*(pos.x-X0) + a12*(pos.y-Y0) + a13*(pos.z-Z0);
@@ -62,10 +58,10 @@ export function GPS_transform(Lat0, Lon0, H0, Heading) {
       x: c11*PosX1 + c12*PosZ1,
       y: a31*(pos.x-X0) + a32*(pos.y-Y0) + a33*(pos.z-Z0),
       z: c21*PosX1 + c22*PosZ1
-    }
-  }
+    };
+  };
 
   this.WGS_BS = function (Lat, Lon, H) {
     return this.ECEF_BS(this.WGS_ECEF(Lat, Lon, H));
-  }
+  };
 }
