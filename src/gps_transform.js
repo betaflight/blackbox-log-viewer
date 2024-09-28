@@ -46,7 +46,7 @@ export function GPS_transform(Lat0, Lon0, H0, Heading) {
     return {
       x: (N + H)*CosB*CosL,
       y: (N + H)*CosB*SinL,
-      z: (N + H - Ecc_2*N) * SinB
+      z: (N + H - Ecc_2*N) * SinB,
     };
   };
 
@@ -57,7 +57,7 @@ export function GPS_transform(Lat0, Lon0, H0, Heading) {
     return {
       x: c11*PosX1 + c12*PosZ1,
       y: a31*(pos.x-X0) + a32*(pos.y-Y0) + a33*(pos.z-Z0),
-      z: c21*PosX1 + c22*PosZ1
+      z: c21*PosX1 + c22*PosZ1,
     };
   };
 
