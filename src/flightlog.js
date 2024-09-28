@@ -852,7 +852,7 @@ export function FlightLog(logData) {
               destFrame[fieldIndex++] = gpsCartesianCoords.x;
               destFrame[fieldIndex++] = gpsCartesianCoords.y;
               destFrame[fieldIndex++] = gpsCartesianCoords.z;
-              destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x*gpsCartesianCoords.x + gpsCartesianCoords.z*gpsCartesianCoords.z);
+              destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x * gpsCartesianCoords.x + gpsCartesianCoords.z * gpsCartesianCoords.z);
             } else {
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
