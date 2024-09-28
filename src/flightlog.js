@@ -526,6 +526,7 @@ export function FlightLog(logData) {
               case "H":
                 const homeAltitude = frame.length == 3 ? frame[2]*10 : 0;
                 gpsTransform = new GPS_transform(frame[0]/10000000, frame[1]/10000000, homeAltitude, 0.0);
+                break;
               case "G":
                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
                 // But other data from the G frame can be valid (time, num sats)
