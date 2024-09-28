@@ -64,4 +64,5 @@ export function GPS_transform(Lat0, Lon0, H0, Heading) {
   this.WGS_BS = function (Lat, Lon, H) {
     return this.ECEF_BS(this.WGS_ECEF(Lat, Lon, H));
   };
+
 }
