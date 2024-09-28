@@ -524,8 +524,8 @@ export function FlightLog(logData) {
                 }
                 break;
               case "H":
-                const homeAltitude = frame.length > 2 ? frame[2]/10 : 0; // will work after BF firmware improvement
-                gpsTransform = new GPS_transform(frame[0]/10000000, frame[1]/10000000, homeAltitude, 0.0);
+                const homeAltitude = frame.length > 2 ? frame[2 ] /10 : 0; // will work after BF firmware improvement
+                gpsTransform = new GPS_transform(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0.0);
                 break;
               case "G":
                 // The frameValid can be false, when no GPS home (the G frames contains GPS position as diff of GPS Home position).
