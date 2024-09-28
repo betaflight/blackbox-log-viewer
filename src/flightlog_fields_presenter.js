@@ -124,6 +124,12 @@ const FRIENDLY_FIELD_NAMES = {
   GPS_altitude: "GPS Altitude ASL",
   GPS_speed: "GPS Speed",
   GPS_ground_course: "GPS Heading",
+  
+  "gpsCartesianCoords[all]": "GPS Coords",
+  "gpsCartesianCoords[0]": "GPS Coords [X]",
+  "gpsCartesianCoords[1]": "GPS Coords [Y]",
+  "gpsCartesianCoords[2]": "GPS Coords [Z]",
+  gpsDistance:     "GPS Home distance",
 };
 
 const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -1639,6 +1645,12 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       }
     case "GPS_ground_course":
       return `${(value / 10).toFixed(1)} °`;
+    
+    case "gpsCartesianCoords[0]":
+    case "gpsCartesianCoords[1]":
+    case "gpsCartesianCoords[2]":
+    case "gpsDistance":
+        return `${value.toFixed(0)} m`;
 
     case "debug[0]":
     case "debug[1]":

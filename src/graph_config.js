@@ -1537,6 +1537,13 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
         "GPS_coord[all]",
       ],
     });
+    EXAMPLE_GRAPHS.push({
+      label: "GPS Cartesian coords",
+      fields: [
+        "gpsCartesianCoords[all]",
+        "gpsDistance",
+      ],
+    });
   }
 
   for (const srcGraph of EXAMPLE_GRAPHS) {
