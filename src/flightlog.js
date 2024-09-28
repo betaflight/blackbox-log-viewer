@@ -848,7 +848,7 @@ export function FlightLog(logData) {
           // Calculate cartesian coords by GPS
           if (!that.isFieldDisabled().GPS) {
             if (gpsTransform && gpsCoord && srcFrame[gpsCoord[0]]) {
-              const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]]/10000000, srcFrame[gpsCoord[1]]/10000000, srcFrame[gpsCoord[2]]/10);
+              const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]] / 10000000, srcFrame[gpsCoord[1] ] /10000000, srcFrame[gpsCoord[2]] / 10);
               destFrame[fieldIndex++] = gpsCartesianCoords.x;
               destFrame[fieldIndex++] = gpsCartesianCoords.y;
               destFrame[fieldIndex++] = gpsCartesianCoords.z;
