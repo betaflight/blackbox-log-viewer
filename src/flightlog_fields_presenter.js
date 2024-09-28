@@ -127,7 +127,7 @@ const FRIENDLY_FIELD_NAMES = {
   
   "gpsCartesianCoords[all]": "GPS Coords",
   "gpsCartesianCoords[0]": "GPS Coords [X]",
-  "gpsCartesianCoords[1]": "GPS Coords [H]",
+  "gpsCartesianCoords[1]": "GPS Coords [Y]",
   "gpsCartesianCoords[2]": "GPS Coords [Z]",
   gpsDistance:     "GPS Home distance",
 };
