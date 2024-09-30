@@ -30,7 +30,7 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  let ADDITIONAL_COMPUTED_FIELD_COUNT = 19 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord**/,
+  let ADDITIONAL_COMPUTED_FIELD_COUNT = 20 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord**/,
     that = this,
     logIndex = 0,
     logIndexes = new FlightLogIndex(logData),
@@ -284,7 +284,7 @@ export function FlightLog(logData) {
       fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
     }
     if (!that.isFieldDisabled().GPS) {
-      fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance"); // GPS coords in cartesian system
+      fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance", "gpsHomeAzimuth"); // GPS coords in cartesian system
     }
 
     fieldNameToIndex = {};
@@ -854,7 +854,14 @@ export function FlightLog(logData) {
               destFrame[fieldIndex++] = gpsCartesianCoords.y;
               destFrame[fieldIndex++] = gpsCartesianCoords.z;
               destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x * gpsCartesianCoords.x + gpsCartesianCoords.z * gpsCartesianCoords.z);
+
+              let homeAzimuth = Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) * 180 / Math.PI;
+              if (homeAzimuth < 0) {
+                homeAzimuth += 360;
+              }
+              destFrame[fieldIndex++] = homeAzimuth;
             } else {
+              destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
