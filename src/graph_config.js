@@ -1550,6 +1550,7 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
       fields: [
         "gpsCartesianCoords[all]",
         "gpsDistance",
+        "gpsHomeAzimuth",
       ],
     });
   }
