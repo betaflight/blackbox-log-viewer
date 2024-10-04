@@ -30,7 +30,7 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  let ADDITIONAL_COMPUTED_FIELD_COUNT = 20 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord**/,
+  let ADDITIONAL_COMPUTED_FIELD_COUNT = 20 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance and azimuth **/,
     that = this,
     logIndex = 0,
     logIndexes = new FlightLogIndex(logData),
