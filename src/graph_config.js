@@ -476,6 +476,14 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 100,
         },
       };
+    } else if (fieldName == "gpsHomeAzimuth") {
+      return {
+        power: 1.0,
+        MinMax: {
+          min: 0,
+          max: 360,
+        },
+      };
     } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode != null) {
       const debugModeName = DEBUG_MODE[sysConfig.debug_mode];
       switch (debugModeName) {
@@ -1542,6 +1550,7 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
       fields: [
         "gpsCartesianCoords[all]",
         "gpsDistance",
+        "gpsHomeAzimuth",
       ],
     });
   }

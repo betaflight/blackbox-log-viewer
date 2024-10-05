@@ -130,6 +130,7 @@ const FRIENDLY_FIELD_NAMES = {
   "gpsCartesianCoords[1]": "GPS Coords [Y]",
   "gpsCartesianCoords[2]": "GPS Coords [Z]",
   gpsDistance:     "GPS Home distance",
+  gpsHomeAzimuth:     "GPS Home azimuth",
 };
 
 const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -1651,6 +1652,8 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "gpsCartesianCoords[2]":
     case "gpsDistance":
         return `${value.toFixed(0)} m`;
+    case "gpsHomeAzimuth":
+        return `${value.toFixed(1)} °`;
 
     case "debug[0]":
     case "debug[1]":
