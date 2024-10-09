@@ -724,11 +724,11 @@
                                                 <th name="Integral">
                                                     <label>I</label>
                                                 </th>
-                                                <th name="D_Max">
-                                                    <label>D_Max</label>
-                                                </th>
                                                 <th name="Derivative">
                                                     <label>D</label>
+                                                </th>
+                                                <th name="D_Max">
+                                                    <label>D Max</label>
                                                 </th>
                                                 <th name="Feedforward">
                                                     <label>FF</label>
@@ -747,7 +747,7 @@
                                                     <input type="text" name="d" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="d_min_roll" step="1" min="0" max="255" />
+                                                    <input type="text" name="dMax" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
                                                     <input type="text" name="f" step="1" min="0" max="255" />
@@ -766,7 +766,7 @@
                                                     <input type="text" name="d" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="d_min_pitch" step="1" min="0" max="255" />
+                                                    <input type="text" name="dMax" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
                                                     <input type="text" name="f" step="1" min="0" max="255" />
@@ -785,7 +785,7 @@
                                                     <input type="text" name="d" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="d_min_yaw" step="1" min="0" max="255" />
+                                                    <input type="text" name="dMax" step="1" min="0" max="255" />
                                                 </td>
                                                 <td>
                                                     <input type="text" name="f" step="1" min="0" max="255" />
@@ -928,8 +928,8 @@
                                                         <label>D gain</label>
                                                         <input type="text" step="1" min="0" max="200" />
                                                     </td>
-                                                    <td name="simplified_dmax_gain" class="bf-only">
-                                                        <label>Dmax</label>
+                                                    <td name="simplified_d_max_gain" class="bf-only">
+                                                        <label>D Max</label>
                                                         <input type="text" step="1" min="0" max="200" />
                                                     </td>
                                                 </tr>
@@ -995,7 +995,7 @@
                                             </tbody>
                                         </table>
 
-                                        <table id="d_min" class="parameter cf">
+                                        <table id="d_max" class="parameter cf">
                                             <thead>
                                                 <tr>
                                                     <th colspan="5">D Max</th>
@@ -1003,11 +1003,11 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td name="d_min_gain" class="bf-only">
+                                                    <td name="d_max_gain" class="bf-only">
                                                         <label>Gain</label>
                                                         <input type="text" step="1" min="0" max="100" />
                                                     </td>
-                                                    <td name="d_min_advance" class="bf-only">
+                                                    <td name="d_max_advance" class="bf-only">
                                                         <label>Advance</label>
                                                         <input type="text" step="1" min="0" max="200" />
                                                     </td>

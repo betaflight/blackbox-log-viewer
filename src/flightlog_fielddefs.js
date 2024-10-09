@@ -309,7 +309,7 @@ export const DEBUG_MODE_COMPLETE = makeReadOnly([
   "RX_SPECTRUM_SPI",
   "DSHOT_RPM_TELEMETRY",
   "RPM_FILTER",
-  "D_MIN",
+  "D_MAX",
   "AC_CORRECTION",
   "AC_ERROR",
   "DUAL_GYRO_SCALED",
