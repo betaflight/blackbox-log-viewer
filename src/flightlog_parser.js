@@ -284,9 +284,9 @@ export function FlightLogParser(logData) {
       pidSumLimit: null, // PID sum limit
       pidSumLimitYaw: null, // PID sum limit yaw
       use_integrated_yaw: null, // Use integrated yaw
-      d_min: [null, null, null], // D_Min [P, I, D]
-      d_min_gain: null, // D_Min gain - D_Max in 4.3
-      d_min_advance: null, // D_Min advance - D_Max in 4.3
+      d_max: [null, null, null], // D_MAX [ROLL, PITCH, YAW]
+      d_max_gain: null, // D_MAX gain
+      d_max_advance: null, // D_MAX advance
       iterm_relax: null, // ITerm Relax mode
       iterm_relax_type: null, // ITerm Relax type
       iterm_relax_cutoff: null, // ITerm Relax cutoff
@@ -326,7 +326,7 @@ export function FlightLogParser(logData) {
       simplified_pi_gain: null,
       simplified_i_gain: null,
       simplified_d_gain: null,
-      simplified_dmax_gain: null,
+      simplified_d_max_gain: null,
       simplified_feedforward_gain: null,
       simplified_pitch_d_gain: null,
       simplified_pitch_pi_gain: null,
@@ -370,8 +370,8 @@ export function FlightLogParser(logData) {
       dterm_lpf2_static_hz: "dterm_lpf2_hz",
       dterm_setpoint_weight: "dtermSetpointWeight",
       digital_idle_value: "digitalIdleOffset",
-      d_max_gain: "d_min_gain",
-      d_max_advance: "d_min_advance",
+      simplified_dmax_gain: "simplified_d_max_gain",
+      d_max: "d_min",
       dshot_idle_value: "digitalIdleOffset",
       dyn_idle_min_rpm: "dynamic_idle_min_rpm",
       feedforward_transition: "ff_transition",
@@ -696,8 +696,8 @@ export function FlightLogParser(logData) {
       case "anti_gravity_cutoff_hz":
       case "abs_control_gain":
       case "use_integrated_yaw":
-      case "d_min_gain":
-      case "d_min_advance":
+      case "d_max_gain":
+      case "d_max_advance":
       case "dshot_bidir":
       case "gyro_rpm_notch_harmonics":
       case "gyro_rpm_notch_q":
@@ -732,6 +732,7 @@ export function FlightLogParser(logData) {
       case "simplified_i_gain":
       case "simplified_d_gain":
       case "simplified_dmax_gain":
+      case "simplified_d_max_gain":
       case "simplified_feedforward_gain":
       case "simplified_pitch_d_gain":
       case "simplified_pitch_pi_gain":
@@ -869,11 +870,12 @@ export function FlightLogParser(logData) {
         that.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3); //[parseInt(fieldValue, 10), null, null];
         break;
       case "d_min":
-        // Add Dmin values as Derivative numbers to PID array
-        var dMinValues = parseCommaSeparatedString(fieldValue);
-        that.sysConfig["rollPID"].push(dMinValues[0]);
-        that.sysConfig["pitchPID"].push(dMinValues[1]);
-        that.sysConfig["yawPID"].push(dMinValues[2]);
+      case "d_max":
+        // Add D MAX values as Derivative numbers to PID array
+        var dMaxValues = parseCommaSeparatedString(fieldValue);
+        that.sysConfig["rollPID"].push(dMaxValues[0]);
+        that.sysConfig["pitchPID"].push(dMaxValues[1]);
+        that.sysConfig["yawPID"].push(dMaxValues[2]);
         break;
       case "ff_weight":
         // Add feedforward values to the PID array

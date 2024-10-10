@@ -695,8 +695,8 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[6]": "Not Used",
     "debug[7]": "Not Used",
   },
-  D_MIN: {
-    "debug[all]": "D_MIN",
+  D_MAX: {
+    "debug[all]": "D_MAX",
     "debug[0]": "Gyro Factor [roll]",
     "debug[1]": "Setpoint Factor [roll]",
     "debug[2]": "Actual D [roll]",
@@ -1850,7 +1850,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         ).toFixed(0)} hz`;
       case "RPM_FILTER":
         return `${(value * 60).toFixed(0)}rpm / ${value.toFixed(0)} Hz`;
-      case "D_MIN":
+      case "D_MAX":
         switch (fieldName) {
           case "debug[0]": // roll gyro factor
           case "debug[1]": // roll setpoint Factor
@@ -2506,7 +2506,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         return toFriendly ? (value * 200) / pole : (value * pole) / 200;
       case "RPM_FILTER":
         return toFriendly ? value * 60 : value / 60;
-      case "D_MIN":
+      case "D_MAX":
         switch (fieldName) {
           case "debug[0]": // roll gyro factor
           case "debug[1]": // roll setpoint Factor

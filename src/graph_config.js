@@ -707,7 +707,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             "debug[2]",
             "debug[3]"
           );
-        case "D_MIN":
+        case "D_MAX":
           switch (fieldName) {
             case "debug[0]": // roll gyro factor
             case "debug[1]": // roll setpoint Factor

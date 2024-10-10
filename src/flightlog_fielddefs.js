@@ -309,7 +309,7 @@ export const DEBUG_MODE_COMPLETE = makeReadOnly([
   "RX_SPECTRUM_SPI",
   "DSHOT_RPM_TELEMETRY",
   "RPM_FILTER",
-  "D_MIN",
+  "D_MAX",
   "AC_CORRECTION",
   "AC_ERROR",
   "DUAL_GYRO_SCALED",
@@ -520,12 +520,11 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_COMBINED"), 1);
     }
     if (semver.gte(firmwareVersion, "4.3.0")) {
-      DEBUG_MODE.splice(
-        DEBUG_MODE.indexOf("FF_INTERPOLATED"),
-        1,
-        "FEEDFORWARD"
-      );
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_INTERPOLATED"), 1, "FEEDFORWARD");
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_LIMIT"), 1, "FEEDFORWARD_LIMIT");
+    }
+    if (semver.lt(firmwareVersion, "4.6.0")) {
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("D_MAX"), 1, "D_MIN");
     }
 
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
