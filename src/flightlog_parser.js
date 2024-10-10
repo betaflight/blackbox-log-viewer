@@ -284,7 +284,7 @@ export function FlightLogParser(logData) {
       pidSumLimit: null, // PID sum limit
       pidSumLimitYaw: null, // PID sum limit yaw
       use_integrated_yaw: null, // Use integrated yaw
-      d_max: [null, null, null], // D_MAX [P, I, D]
+      d_max: [null, null, null], // D_MAX [ROLL, PITCH, YAW]
       d_max_gain: null, // D_MAX gain
       d_max_advance: null, // D_MAX advance
       iterm_relax: null, // ITerm Relax mode
@@ -370,8 +370,8 @@ export function FlightLogParser(logData) {
       dterm_lpf2_static_hz: "dterm_lpf2_hz",
       dterm_setpoint_weight: "dtermSetpointWeight",
       digital_idle_value: "digitalIdleOffset",
-      d_max_gain: "d_max_gain",
-      d_max_advance: "d_max_advance",
+      simplified_dmax_gain: "simplified_d_max_gain",
+      d_max: "d_min",
       dshot_idle_value: "digitalIdleOffset",
       dyn_idle_min_rpm: "dynamic_idle_min_rpm",
       feedforward_transition: "ff_transition",
@@ -731,6 +731,7 @@ export function FlightLogParser(logData) {
       case "simplified_pi_gain":
       case "simplified_i_gain":
       case "simplified_d_gain":
+      case "simplified_dmax_gain":
       case "simplified_d_max_gain":
       case "simplified_feedforward_gain":
       case "simplified_pitch_d_gain":
@@ -868,6 +869,7 @@ export function FlightLogParser(logData) {
       case "magPID":
         that.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3); //[parseInt(fieldValue, 10), null, null];
         break;
+      case "d_min":
       case "d_max":
         // Add D MAX values as Derivative numbers to PID array
         var dMaxValues = parseCommaSeparatedString(fieldValue);

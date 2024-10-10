@@ -714,7 +714,7 @@
                                         </table>
 
                                         <table id="pid_main" class="pid_tuning">
-                                             <tr class = "pid_labels">
+                                            <tr class = "pid_labels">
                                                 <th name="Blank">
                                                     <label>&nbsp;</label>
                                                 </th>
@@ -724,74 +724,34 @@
                                                 <th name="Integral">
                                                     <label>I</label>
                                                 </th>
-                                                <th name="Derivative">
+                                                <th id="derivativeColumn" name="Derivative">
                                                     <label>D</label>
                                                 </th>
-                                                <th name="D_Max">
+                                                <th id="dMaxColumn" name="D_Max">
                                                     <label>D Max</label>
                                                 </th>
                                                 <th name="Feedforward">
                                                     <label>FF</label>
                                                 </th>
                                             </tr>
-                                            <tr class="rollPID">
-                                                <!-- 0 -->
-                                                <td>Roll</td>
-                                                <td>
-                                                    <input type="text" name="p" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="i" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="dMax" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="f" step="1" min="0" max="255" />
-                                                </td>
-                                            </tr>
-                                            <tr class="pitchPID">
-                                                <!-- 1 -->
-                                                <td>Pitch</td>
-                                                <td>
-                                                    <input type="text" name="p" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="i" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="dMax" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="f" step="1" min="0" max="255" />
-                                                </td>
-                                            </tr>
-                                            <tr class="yawPID">
-                                                <!-- 2 -->
-                                                <td>Yaw</td>
-                                                <td>
-                                                    <input type="text" name="p" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="i" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="dMax" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="f" step="1" min="0" max="255" />
-                                                </td>
-                                            </tr>
+                                            <tbody id="pid_tbody"></tbody>
                                         </table>
+                                        <script>
+                                            const axes = ['Roll', 'Pitch', 'Yaw'];
+                                            const pidTbody = document.getElementById('pid_tbody');
+                                        
+                                            axes.forEach(axis => {
+                                                const row = `<tr class="${axis.toLowerCase()}PID">
+                                                                <td>${axis}</td>
+                                                                <td><input type="text" name="p" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="i" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="d" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="dMax" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="f" step="1" min="0" max="255" /></td>
+                                                            </tr>`;
+                                                pidTbody.innerHTML += row;
+                                            });
+                                        </script>
 
                                         <table id="pid_baro_header" class="parameter cf">
                                         <thead>

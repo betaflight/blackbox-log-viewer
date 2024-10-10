@@ -1708,6 +1708,13 @@ export function HeaderDialog(dialog, onSave) {
       setParameter("rate_limits_pitch", sysConfig.rate_limits[1], 0);
       setParameter("rate_limits_yaw", sysConfig.rate_limits[2], 0);
       $("#rate_limits").show();
+
+      if (semver.lt(activeSysConfig.firmwareVersion, "4.6.0")) {
+        const derivativeColumn = document.getElementById("derivativeColumn");
+        const dMaxColumn = document.getElementById("dMaxColumn");
+        const parent = derivativeColumn.parentNode;
+        parent.insertBefore(dMaxColumn, derivativeColumn); // Меняем местами
+      }
     } else {
       $("#d_max").hide();
       $("#rate_limits").hide();
