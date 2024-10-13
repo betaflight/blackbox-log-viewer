@@ -698,7 +698,7 @@ export function HeaderDialog(dialog, onSave) {
       max: "999.9.9",
     },
     {
-      name: "simplified_dmax_gain",
+      name: "simplified_d_max_gain",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "4.3.0",
       max: "999.9.9",
@@ -1692,24 +1692,31 @@ export function HeaderDialog(dialog, onSave) {
       setParameter("rcSmoothingActiveCutoffsThr", "0", 0);
     }
 
-    // D_MIN and rate_limits
+    // D_MAX and rate_limits
     if (
       activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
       semver.gte(activeSysConfig.firmwareVersion, "4.0.0")
     ) {
-      setParameter("d_min_roll", sysConfig.d_min[0], 0);
-      setParameter("d_min_pitch", sysConfig.d_min[1], 0);
-      setParameter("d_min_yaw", sysConfig.d_min[2], 0);
-      setParameter("d_min_gain", sysConfig.d_min_gain, 0);
-      setParameter("d_min_advance", sysConfig.d_min_advance, 0);
-      $("#d_min").show();
+      setParameter("d_max_roll", sysConfig.d_max[0], 0);
+      setParameter("d_max_pitch", sysConfig.d_max[1], 0);
+      setParameter("d_max_yaw", sysConfig.d_max[2], 0);
+      setParameter("d_max_gain", sysConfig.d_max_gain, 0);
+      setParameter("d_max_advance", sysConfig.d_max_advance, 0);
+      $("#d_max").show();
 
       setParameter("rate_limits_roll", sysConfig.rate_limits[0], 0);
       setParameter("rate_limits_pitch", sysConfig.rate_limits[1], 0);
       setParameter("rate_limits_yaw", sysConfig.rate_limits[2], 0);
       $("#rate_limits").show();
+
+      if (semver.lt(activeSysConfig.firmwareVersion, "4.6.0")) {
+        const derivativeColumn = document.getElementById("derivativeColumn");
+        const dMaxColumn = document.getElementById("dMaxColumn");
+        const parent = derivativeColumn.parentNode;
+        parent.insertBefore(dMaxColumn, derivativeColumn); // Меняем местами
+      }
     } else {
-      $("#d_min").hide();
+      $("#d_max").hide();
       $("#rate_limits").hide();
     }
 
@@ -1823,7 +1830,7 @@ export function HeaderDialog(dialog, onSave) {
     setParameter("simplified_pi_gain", sysConfig.simplified_pi_gain, 0);
     setParameter("simplified_i_gain", sysConfig.simplified_i_gain, 0);
     setParameter("simplified_d_gain", sysConfig.simplified_d_gain, 0);
-    setParameter("simplified_dmax_gain", sysConfig.simplified_dmax_gain, 0);
+    setParameter("simplified_d_max_gain", sysConfig.simplified_d_max_gain, 0);
     setParameter(
       "simplified_feedforward_gain",
       sysConfig.simplified_feedforward_gain,
