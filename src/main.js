@@ -1729,6 +1729,12 @@ function BlackboxLogViewer() {
       $(".btn-video-export").click(function (e) {
         setGraphState(GRAPH_STATE_PAUSED);
 
+        const exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
+          videoConfig = newConfig;
+          
+          prefs.set('videoConfig', newConfig);
+        });
+  
         exportDialog.show(
           flightLog,
           {
