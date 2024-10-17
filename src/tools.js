@@ -484,3 +484,17 @@ export function getManifestVersion(manifest) {
 export function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+export function isChromium() {
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
+  if (!navigator.userAgentData) {
+    console.log(navigator.userAgent);
+    return false;
+  }
+
+  console.log(navigator.userAgentData);
+  // https://learn.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-guidance
+  return navigator.userAgentData.brands.some((brand) => {
+    return brand.brand == "Chromium";
+  });
+}

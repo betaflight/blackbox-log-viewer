@@ -31,6 +31,7 @@ import {
   validate,
   mouseNotification,
   getManifestVersion,
+  isChromium,
 } from "./tools.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
@@ -1728,6 +1729,12 @@ function BlackboxLogViewer() {
     if (FlightLogVideoRenderer.isSupported()) {
       $(".btn-video-export").click(function (e) {
         setGraphState(GRAPH_STATE_PAUSED);
+
+        // Video export is only supported in Chromium based browsers
+        if (!isChromium()) {
+          alert("Video export is only supported in Chromium based browsers.");
+          return;
+        }
 
         const exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
           videoConfig = newConfig;
