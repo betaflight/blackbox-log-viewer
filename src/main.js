@@ -1148,6 +1148,16 @@ function BlackboxLogViewer() {
     CsvExporter(flightLog, options).dump(onSuccess);
   }
 
+  function exportSpectrumToCsv(file, options = {}) {
+    const onSuccess = createExportCallback(
+      "csv",
+      "text/csv",
+      file,
+      performance.now()
+    );
+    graph.getAnalyser().exportSpectrumToCSV(onSuccess, options);
+  }
+
   function exportGpx(file) {
     const onSuccess = createExportCallback(
       "gpx",
@@ -1719,6 +1729,13 @@ function BlackboxLogViewer() {
       exportCsv();
       e.preventDefault();
     });
+
+    $("#btn-spectrum-export").click(function (e) {
+      setGraphState(GRAPH_STATE_PAUSED);
+      exportSpectrumToCsv("bf_spectrum");
+      e.preventDefault();
+    });
+
     $(".btn-gpx-export").click(function (e) {
       setGraphState(GRAPH_STATE_PAUSED);
       exportGpx();
