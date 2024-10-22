@@ -1143,7 +1143,7 @@ function BlackboxLogViewer() {
       "csv",
       "text/csv",
       file,
-      performance.now()
+      performance.now(),
     );
     CsvExporter(flightLog, options).dump(onSuccess);
   }
@@ -1153,7 +1153,7 @@ function BlackboxLogViewer() {
       "csv",
       "text/csv",
       file,
-      performance.now()
+      performance.now(),
     );
     graph.getAnalyser().exportSpectrumToCSV(onSuccess, options);
   }
@@ -1163,7 +1163,7 @@ function BlackboxLogViewer() {
       "gpx",
       "GPX File",
       file,
-      performance.now()
+      performance.now(),
     );
     GpxExporter(flightLog).dump(onSuccess);
   }

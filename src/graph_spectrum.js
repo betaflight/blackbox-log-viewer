@@ -288,7 +288,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     this.exportSpectrumToCSV = function(onSuccess, options) {
       SpectrumExporter(fftData, options).dump(onSuccess);
-    }
+    };
   } catch (e) {
     console.log(`Failed to create analyser... error:${e}`);
   }
