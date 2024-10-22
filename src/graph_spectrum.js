@@ -202,7 +202,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     spectrumTypeElem
       .change(function () {
-        let optionSelected = parseInt(spectrumTypeElem.val(), 10);
+        const optionSelected = parseInt(spectrumTypeElem.val(), 10);
 
         if (optionSelected != userSettings.spectrumType) {
           userSettings.spectrumType = optionSelected;
@@ -225,6 +225,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           "onlyFullScreenException",
           pidErrorVsSetpointSelected
         );
+
+        $("#btn-spectrum-export").attr("disabled", optionSelected != 0);
       })
       .change();
 
