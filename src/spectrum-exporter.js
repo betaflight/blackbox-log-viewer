@@ -33,10 +33,10 @@ export function SpectrumExporter(fftData, opts = {}) {
     worker.postMessage({fftOutput: fftData.fftOutput,
                         blackBoxRate: fftData.blackBoxRate,
                         opts: opts});
-    }
+  }
 
-    // exposed functions
-    return {
-      dump: dump,
-    };
+  // exposed functions
+  return {
+    dump: dump,
+  };
 }
