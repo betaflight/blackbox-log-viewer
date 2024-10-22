@@ -4,7 +4,6 @@ import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
-import { VideoExportDialog } from "./video_export_dialog.js";
 import { UserSettingsDialog } from "./user_settings_dialog.js";
 import { GraphConfigurationDialog } from "./graph_config_dialog.js";
 import { HeaderDialog } from "./header_dialog.js";
@@ -1144,9 +1143,19 @@ function BlackboxLogViewer() {
       "csv",
       "text/csv",
       file,
-      performance.now()
+      performance.now(),
     );
     CsvExporter(flightLog, options).dump(onSuccess);
+  }
+
+  function exportSpectrumToCsv(file, options = {}) {
+    const onSuccess = createExportCallback(
+      "csv",
+      "text/csv",
+      file,
+      performance.now(),
+    );
+    graph.getAnalyser().exportSpectrumToCSV(onSuccess, options);
   }
 
   function exportGpx(file) {
@@ -1154,7 +1163,7 @@ function BlackboxLogViewer() {
       "gpx",
       "GPX File",
       file,
-      performance.now()
+      performance.now(),
     );
     GpxExporter(flightLog).dump(onSuccess);
   }
@@ -1720,6 +1729,13 @@ function BlackboxLogViewer() {
       exportCsv();
       e.preventDefault();
     });
+
+    $("#btn-spectrum-export").click(function (e) {
+      setGraphState(GRAPH_STATE_PAUSED);
+      exportSpectrumToCsv("bf_spectrum");
+      e.preventDefault();
+    });
+
     $(".btn-gpx-export").click(function (e) {
       setGraphState(GRAPH_STATE_PAUSED);
       exportGpx();

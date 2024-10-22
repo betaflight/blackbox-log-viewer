@@ -6,6 +6,7 @@ import {
   SPECTRUM_OVERDRAW_TYPE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
+import { SpectrumExporter } from "./spectrum-exporter";
 
 export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const ANALYSER_LARGE_LEFT_MARGIN = 10,
@@ -95,7 +96,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         left: `${newSize.width - 20}px`,
       });
       $("#analyserResize", parentElem).css({
-        left: `${newSize.width - 28}px`,
+        left: `${newSize.width - 20}px`,
       });
     };
 
@@ -201,7 +202,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     spectrumTypeElem
       .change(function () {
-        let optionSelected = parseInt(spectrumTypeElem.val(), 10);
+        const optionSelected = parseInt(spectrumTypeElem.val(), 10);
 
         if (optionSelected != userSettings.spectrumType) {
           userSettings.spectrumType = optionSelected;
@@ -224,6 +225,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           "onlyFullScreenException",
           pidErrorVsSetpointSelected
         );
+
+        $("#btn-spectrum-export").attr("disabled", optionSelected != 0);
       })
       .change();
 
@@ -282,6 +285,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         prefs.set("userSettings", data);
       });
     }
+
+    this.exportSpectrumToCSV = function(onSuccess, options) {
+      SpectrumExporter(fftData, options).dump(onSuccess);
+    };
   } catch (e) {
     console.log(`Failed to create analyser... error:${e}`);
   }

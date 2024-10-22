@@ -629,10 +629,28 @@ html.has-analyser-fullscreen.has-analyser
   color: black;
 }
 
-.analyser #analyserResize:hover {
-  color: white;
-  cursor: pointer;
-  animation: ease-in 500ms;
+.analyser:hover .non-shift #spectrumExport {
+  opacity: 1;
+  height: auto;
+  transition: opacity 500ms ease-in;
+}
+
+.analyser #spectrumExport {
+  height: 0;
+  width: 200px;
+  overflow: hidden;
+  opacity: 0;
+  left: 270px;
+  float: left;
+  z-index: 9;
+  position: absolute;
+  font-size: 9px;
+}
+
+.analyser #spectrumExport select {
+  border-radius: 3px;
+  padding: 0px 5px;
+  color: black;
 }
 
 .analyser input#analyserZoomX {
