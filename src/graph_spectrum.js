@@ -6,6 +6,7 @@ import {
   SPECTRUM_OVERDRAW_TYPE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
+import { SpectrumExporter } from "./spectrum-exporter";
 
 export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const ANALYSER_LARGE_LEFT_MARGIN = 10,
@@ -95,7 +96,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         left: `${newSize.width - 20}px`,
       });
       $("#analyserResize", parentElem).css({
-        left: `${newSize.width - 28}px`,
+        left: `${newSize.width - 20}px`,
       });
     };
 
@@ -281,6 +282,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         data[name] = value;
         prefs.set("userSettings", data);
       });
+    }
+
+    this.exportSpectrumToCSV = function(onSuccess, options) {
+      SpectrumExporter(fftData, options).dump(onSuccess);
     }
   } catch (e) {
     console.log(`Failed to create analyser... error:${e}`);
