@@ -11,7 +11,7 @@
  * @param {ExportOptions} [opts={}]
  */
 export function SpectrumExporter(fftData, opts = {}) {
-	opts = _.merge(
+  opts = _.merge(
     {
       columnDelimiter: ",",
       quoteStrings: true,
