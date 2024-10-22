@@ -1,5 +1,3 @@
-importScripts("/js/lodash.min.js");
-
 onmessage = function(event) {
   const columnDelimiter = event.data.opts.columnDelimiter;
   const fftOutput = event.data.fftOutput;
