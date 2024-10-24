@@ -637,10 +637,9 @@ html.has-analyser-fullscreen.has-analyser
 
 .analyser #spectrumExport {
   height: 0;
-  width: 200px;
   overflow: hidden;
   opacity: 0;
-  left: 270px;
+  left: 260px;
   float: left;
   z-index: 9;
   position: absolute;
@@ -653,6 +652,29 @@ html.has-analyser-fullscreen.has-analyser
   color: black;
 }
 
+.analyser:hover .non-shift #spectrumImport {
+  opacity: 1;
+  height: auto;
+  transition: opacity 500ms ease-in;
+}
+
+.analyser #spectrumImport {
+  height: 0;
+  width: 55px;
+  overflow: hidden;
+  opacity: 0;
+  left: 310px;
+  float: left;
+  z-index: 9;
+  position: absolute;
+  font-size: 9px;
+}
+
+.analyser #spectrumImport select {
+  border-radius: 3px;
+  padding: 0px 5px;
+  color: black;
+}
 .analyser input#analyserZoomX {
   width: 100px;
   height: 10px;

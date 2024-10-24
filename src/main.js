@@ -1736,6 +1736,11 @@ function BlackboxLogViewer() {
       e.preventDefault();
     });
 
+    $("#btn-spectrum-import").change(function (e) {
+      graph.getAnalyser().importSpectrumFromCSV(e.target.files);
+      e.preventDefault();
+      e.target.value = "";
+    });
     $(".btn-gpx-export").click(function (e) {
       setGraphState(GRAPH_STATE_PAUSED);
       exportGpx();

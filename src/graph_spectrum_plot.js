@@ -57,6 +57,7 @@ GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
   this._logRateWarning = undefined;
   this._zoomX = 1;
   this._zoomY = 1;
+  this._importedSpectrumData = null;
 };
 
 GraphSpectrumPlot.setZoom = function (zoomX, zoomY) {
@@ -89,6 +90,12 @@ GraphSpectrumPlot.setData = function (fftData, spectrumType) {
   this._invalidateDataCache();
 };
 
+GraphSpectrumPlot.setImportedSpectrumData = function (curvesData) {
+  this._importedSpectrumData = curvesData;
+  this._invalidateCache();
+  this._invalidateDataCache();
+  GraphSpectrumPlot.draw();
+};
 GraphSpectrumPlot.setOverdraw = function (overdrawType) {
   this._overdrawType = overdrawType;
   this._invalidateCache();
@@ -187,7 +194,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     "rgba(255,128,128,1.0)"
   );
 
-  canvasCtx.fillStyle = barGradient; //'rgba(0,255,0,0.3)'; //green
+  canvasCtx.fillStyle = barGradient;
 
   const fftScale = HEIGHT / (this._zoomY * 100);
   for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
@@ -196,6 +203,41 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     x += barWidth + 1;
   }
 
+
+  //Draw imported spectrum
+  if (this._importedSpectrumData) {
+    const curvesPonts = this._importedSpectrumData;
+    const pointsCount = curvesPonts.length;
+    const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
+
+    canvasCtx.beginPath();
+    canvasCtx.strokeStyle = "blue";
+    canvasCtx.moveTo(0, HEIGHT);
+    const filterPointsCount = 20;
+    for (let i = 0; i < pointsCount; i++) {
+    // Apply moving average filter at spectrum points to get visible line
+      let filterStartPoint = i - filterPointsCount / 2;
+      if (filterStartPoint < 0) {
+        filterStartPoint = 0;
+      }
+      let filterStopPoint = filterStartPoint + filterPointsCount;
+      if (filterStopPoint > pointsCount) {
+        filterStopPoint = pointsCount;
+        filterStartPoint = filterStopPoint - filterPointsCount;
+        if (filterStartPoint < 0) {
+          filterStartPoint = 0;
+        }
+      }
+      let middleValue = 0;
+      for (let j = filterStartPoint; j < filterStopPoint; j++) {
+        middleValue += curvesPonts[j].value;
+      }
+      middleValue /= filterPointsCount;
+
+      canvasCtx.lineTo(curvesPonts[i].freq * scaleX, HEIGHT - middleValue * fftScale);
+    }
+    canvasCtx.stroke();
+  }
   this._drawAxisLabel(
     canvasCtx,
     this._fftData.fieldName,
