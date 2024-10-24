@@ -313,9 +313,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           alert('Spectrum data import error: ' + e.message);
           return;
         }
-      }
+      };
       reader.readAsText(files[0]);
-    }
+    };
 
   } catch (e) {
     console.log(`Failed to create analyser... error: ${e}`);
