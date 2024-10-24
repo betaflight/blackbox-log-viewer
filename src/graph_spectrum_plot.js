@@ -211,7 +211,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
 
     canvasCtx.beginPath();
-    canvasCtx.strokeStyle = "cyan";
+    canvasCtx.strokeStyle = "blue";
     canvasCtx.moveTo(0, HEIGHT);
     const filterPointsCount = 20;
     for (let i = 0; i < pointsCount; i++) {
