@@ -1308,6 +1308,19 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         'debug[7]':'Notch 7 Center Freq [dbg-axis]',
       };
     }
+    if (semver.gte(firmwareVersion, '4.7.0')) {
+      DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_ALTITUDE = {
+        'debug[all]': 'Autopilot Altitude',
+        'debug[0]': 'Autopilot Throttle',
+        'debug[1]': 'Tilt Multiplier',
+        'debug[2]': 'Zero Altitude cm',
+        'debug[3]': 'Altitude cm',
+        'debug[4]': 'Altitude P',
+        'debug[5]': 'Altitude I',
+        'debug[6]': 'Altitude D',
+        'debug[7]': 'Altitude F',
+      };
+    }
   }
 };
 
