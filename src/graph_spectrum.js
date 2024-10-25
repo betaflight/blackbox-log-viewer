@@ -333,5 +333,5 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   
   this.clearImportedSpectrums = function() {
     GraphSpectrumPlot.clearImportedSpectrums();
-  }
+  };
 }
