@@ -472,13 +472,12 @@
                                 <option value="5">Auto</option>
                             </select>
                         </div>
-                        <div id="spectrumExport" data-toggle="tooltip" title="Export spectrum to CSV">
-                            <button id="btn-spectrum-export" type="button">Export to CSV</button>
+                        <div id="spectrumComparison" data-toggle="tooltip" title="Spectrum comparison">
+                          <button id="btn-spectrum-export" type="button" title="Export spectrum to CSV">Export</button>
+                          <button type="button" onclick="document.getElementById('btn-spectrum-import').click()" title="Import spectrum from CSV">Import</button>
+                          <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
                         </div>
-                        <div id="spectrumImport" data-toggle="tooltip" title="Import spectrum from CSV">
-                            <button type="button" onclick="document.getElementById('btn-spectrum-import').click()">Import from CSV</button>
-                            <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
-                        </div>
+
                         <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
                             <span class="glyphicon glyphicon-resize-full"></span>
                             <span class="glyphicon glyphicon-resize-small"></span>
@@ -745,7 +744,7 @@
                                         <script>
                                             const axes = ['Roll', 'Pitch', 'Yaw'];
                                             const pidTbody = document.getElementById('pid_tbody');
-                                        
+
                                             axes.forEach(axis => {
                                                 const row = `<tr class="${axis.toLowerCase()}PID">
                                                                 <td>${axis}</td>

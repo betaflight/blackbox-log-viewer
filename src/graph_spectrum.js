@@ -226,7 +226,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           pidErrorVsSetpointSelected
         );
 
-        $("#btn-spectrum-export").attr("disabled", optionSelected != 0);
+        $("#spectrumComparison").attr("disabled", optionSelected != 0);
       })
       .change();
 

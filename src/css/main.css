@@ -629,13 +629,13 @@ html.has-analyser-fullscreen.has-analyser
   color: black;
 }
 
-.analyser:hover .non-shift #spectrumExport {
+.analyser:hover .non-shift #spectrumComparison {
   opacity: 1;
   height: auto;
   transition: opacity 500ms ease-in;
 }
 
-.analyser #spectrumExport {
+.analyser #spectrumComparison {
   height: 0;
   overflow: hidden;
   opacity: 0;
@@ -644,37 +644,17 @@ html.has-analyser-fullscreen.has-analyser
   z-index: 9;
   position: absolute;
   font-size: 9px;
+  border: gray;
+  border-style: solid;
+  border-width: 1px;
 }
 
-.analyser #spectrumExport select {
+.analyser #spectrumComparison select {
   border-radius: 3px;
   padding: 0px 5px;
   color: black;
 }
 
-.analyser:hover .non-shift #spectrumImport {
-  opacity: 1;
-  height: auto;
-  transition: opacity 500ms ease-in;
-}
-
-.analyser #spectrumImport {
-  height: 0;
-  width: 55px;
-  overflow: hidden;
-  opacity: 0;
-  left: 310px;
-  float: left;
-  z-index: 9;
-  position: absolute;
-  font-size: 9px;
-}
-
-.analyser #spectrumImport select {
-  border-radius: 3px;
-  padding: 0px 5px;
-  color: black;
-}
 .analyser input#analyserZoomX {
   width: 100px;
   height: 10px;
