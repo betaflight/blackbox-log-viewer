@@ -1731,7 +1731,6 @@ function BlackboxLogViewer() {
     });
 
     $("#btn-spectrum-export").click(function (e) {
-      setGraphState(GRAPH_STATE_PAUSED);
       exportSpectrumToCsv("bf_spectrum");
       e.preventDefault();
     });
@@ -1741,6 +1740,12 @@ function BlackboxLogViewer() {
       e.preventDefault();
       e.target.value = "";
     });
+    
+    $("#btn-spectrum-clear").click(function (e) {
+      graph.getAnalyser().clearImportedSpectrums();
+      e.preventDefault();
+    });
+    
     $(".btn-gpx-export").click(function (e) {
       setGraphState(GRAPH_STATE_PAUSED);
       exportGpx();

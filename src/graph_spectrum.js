@@ -226,7 +226,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           pidErrorVsSetpointSelected
         );
 
-        $("#btn-spectrum-export").attr("disabled", optionSelected != 0);
+        $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
       })
       .change();
 
@@ -289,35 +289,49 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     this.exportSpectrumToCSV = function(onSuccess, options) {
       SpectrumExporter(fftData, options).dump(onSuccess);
     };
+
     this.importSpectrumFromCSV = function(files) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          const stringRows = e.target.result.split("\n");
-
-          const header = stringRows[0].split(",");
-          if (header.length != 2 || header[0] != "freq" || header[1] != "value") {
-            throw new SyntaxError("Wrong spectrum CSV data format");
-          }
-
-          stringRows.shift();
-          const spectrumData = stringRows.map( function(row) {
-            const data = row.split(",");
-            return {
-              freq: parseFloat(data[0]),
-              value: parseFloat(data[1]),
-            };
-          });
-          GraphSpectrumPlot.setImportedSpectrumData(spectrumData);
-        } catch (e) {
-          alert('Spectrum data import error: ' + e.message);
-          return;
+      const maxImportCount = 5;
+      for (const file of files) {
+        if (GraphSpectrumPlot.getImportedSpectrumCount() == maxImportCount) {
+          break;
         }
-      };
-      reader.readAsText(files[0]);
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const stringRows = e.target.result.split("\n");
+
+            const header = stringRows[0].split(",");
+            if (header.length != 2 || header[0] != "freq" || header[1] != "value") {
+              throw new SyntaxError("Wrong spectrum CSV data format");
+            }
+
+            stringRows.shift();
+            const spectrumData = stringRows.map( function(row) {
+              const data = row.split(",");
+              return {
+                freq: parseFloat(data[0]),
+                value: parseFloat(data[1]),
+              };
+            });
+
+            GraphSpectrumPlot.addImportedSpectrumData(spectrumData);
+          } catch (e) {
+            alert('Spectrum data import error: ' + e.message);
+            return;
+          }
+        };
+
+        reader.readAsText(file);
+      }
     };
 
   } catch (e) {
     console.log(`Failed to create analyser... error: ${e}`);
   }
+  
+  this.clearImportedSpectrums = function() {
+    GraphSpectrumPlot.clearImportedSpectrums();
+  };
 }
