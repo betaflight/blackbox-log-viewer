@@ -1307,16 +1307,25 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         'debug[6]':'Notch 6 Center Freq [dbg-axis]',
         'debug[7]':'Notch 7 Center Freq [dbg-axis]',
       };
+      DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_ALTITUDE = {
+        'debug[all]': 'Autopilot Altitude',
+        'debug[0]': 'Autopilot Throttle',
+        'debug[1]': 'Tilt Multiplier',
+        'debug[2]': 'Zero Altitude cm',
+        'debug[3]': 'Altitude cm',
+        'debug[4]': 'Altitude P',
+        'debug[5]': 'Altitude I',
+        'debug[6]': 'Altitude D',
+        'debug[7]': 'Altitude F',
+      };
     }
   }
 };
 
 FlightLogFieldPresenter.presentFlags = function (flags, flagNames) {
   let printedFlag = false,
-    i,
+    i = 0,
     result = "";
-
-  i = 0;
 
   while (flags > 0) {
     if ((flags & 1) != 0) {
