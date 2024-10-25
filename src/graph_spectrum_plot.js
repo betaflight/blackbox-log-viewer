@@ -103,6 +103,9 @@ GraphSpectrumPlot.addImportedSpectrumData = function (curvesData) {
 
 GraphSpectrumPlot.clearImportedSpectrums = function (curvesData) {
   this._importedSpectrumsData.length = 0;
+  this._invalidateCache();
+  this._invalidateDataCache();
+  GraphSpectrumPlot.draw();
 };
 
 GraphSpectrumPlot.setOverdraw = function (overdrawType) {
