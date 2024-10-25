@@ -226,7 +226,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           pidErrorVsSetpointSelected
         );
 
-        $("#spectrumComparison").attr("disabled", optionSelected != 0);
+        $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
       })
       .change();
 
