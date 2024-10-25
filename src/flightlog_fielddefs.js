@@ -526,6 +526,9 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if (semver.lt(firmwareVersion, "4.6.0")) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("D_MAX"), 1, "D_MIN");
     }
+    if (semver.gte(firmwareVersion, "4.6.0")) {
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
+    }
 
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
