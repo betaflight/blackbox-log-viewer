@@ -47,6 +47,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
   },
+  _importedSpectrumsData: [],
 };
 
 GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
@@ -57,7 +58,6 @@ GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
   this._logRateWarning = undefined;
   this._zoomX = 1;
   this._zoomY = 1;
-  this._importedSpectrumData = null;
 };
 
 GraphSpectrumPlot.setZoom = function (zoomX, zoomY) {
@@ -90,12 +90,17 @@ GraphSpectrumPlot.setData = function (fftData, spectrumType) {
   this._invalidateDataCache();
 };
 
-GraphSpectrumPlot.setImportedSpectrumData = function (curvesData) {
-  this._importedSpectrumData = curvesData;
+GraphSpectrumPlot.getImportedSpectrumCount = function () {
+  return this._importedSpectrumsData.length;
+};
+
+GraphSpectrumPlot.addImportedSpectrumData = function (curvesData) {
+  this._importedSpectrumsData.push(curvesData);
   this._invalidateCache();
   this._invalidateDataCache();
   GraphSpectrumPlot.draw();
 };
+
 GraphSpectrumPlot.setOverdraw = function (overdrawType) {
   this._overdrawType = overdrawType;
   this._invalidateCache();
@@ -204,19 +209,27 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   }
 
 
-  //Draw imported spectrum
-  if (this._importedSpectrumData) {
-    const curvesPonts = this._importedSpectrumData;
+  //Draw imported spectrums
+  const curvesColors = [
+    "Blue",
+    "Purple",
+    "DeepPink",
+    "DarkCyan",
+    "Chocolate",
+  ];
+
+  for (let spectrumNum = 0;  spectrumNum < this._importedSpectrumsData.length; spectrumNum++) {
+    const curvesPonts = this._importedSpectrumsData[spectrumNum];
     const pointsCount = curvesPonts.length;
     const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
 
     canvasCtx.beginPath();
-    canvasCtx.strokeStyle = "blue";
+    canvasCtx.strokeStyle = curvesColors[spectrumNum];
     canvasCtx.moveTo(0, HEIGHT);
-    const filterPointsCount = 20;
-    for (let i = 0; i < pointsCount; i++) {
+    const filterPointsCount = 50;
+    for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     // Apply moving average filter at spectrum points to get visible line
-      let filterStartPoint = i - filterPointsCount / 2;
+      let filterStartPoint = pointNum - filterPointsCount / 2;
       if (filterStartPoint < 0) {
         filterStartPoint = 0;
       }
@@ -229,15 +242,16 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
         }
       }
       let middleValue = 0;
-      for (let j = filterStartPoint; j < filterStopPoint; j++) {
-        middleValue += curvesPonts[j].value;
+      for (let i = filterStartPoint; i < filterStopPoint; i++) {
+        middleValue += curvesPonts[i].value;
       }
       middleValue /= filterPointsCount;
 
-      canvasCtx.lineTo(curvesPonts[i].freq * scaleX, HEIGHT - middleValue * fftScale);
+      canvasCtx.lineTo(curvesPonts[pointNum].freq * scaleX, HEIGHT - middleValue * fftScale);
     }
     canvasCtx.stroke();
   }
+
   this._drawAxisLabel(
     canvasCtx,
     this._fftData.fieldName,
