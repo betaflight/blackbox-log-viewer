@@ -1016,10 +1016,11 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
   },
   ATTITUDE: {
     "debug[all]": "Attitude",
-    "debug[0]": "IMU Gain",
-    "debug[1]": "EZ_EF",
-    "debug[2]": "GroundSpeedError",
-    "debug[3]": "VelocityFactor",
+    "debug[0]": "Roll angle",
+    "debug[1]": "Pitch angle",
+    "debug[2]": "Ground speed factor",
+    "debug[3]": "Heading error",
+    "debug[7]": "Error gain",
   },
   VTX_MSP: {
     "debug[all]": "VTX MSP",
@@ -2022,10 +2023,10 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         }
       case "ATTITUDE":
         switch (fieldName) {
-          case "debug[0]": // accADC X
-          case "debug[1]": // accADC Y
-          case "debug[2]": // setpoint Roll
-          case "debug[3]": // setpoint Pitch
+          case "debug[0]": // Roll angle
+          case "debug[1]": // Pitch angle
+          case "debug[3]": // Heading error
+            return `${(value / 10).toFixed(1)} °`;
           default:
             return value.toFixed(0);
         }
@@ -2678,10 +2679,10 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         }
       case "ATTITUDE":
         switch (fieldName) {
-          case "debug[0]": // accADC X
-          case "debug[1]": // accADC Y
-          case "debug[2]": // setpoint Roll
-          case "debug[3]": // setpoint Pitch
+          case "debug[0]": // Roll angle
+          case "debug[1]": // Pitch angle
+          case "debug[3]": // Heading error
+            return toFriendly ? value / 10 : value * 10;
           default:
             return value;
         }
