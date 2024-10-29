@@ -1331,6 +1331,25 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             inputRange: 5000,
             outputRange: 1.0,
           };
+        case "ATTITUDE":
+          switch (fieldName) {
+            case "debug[0]": // Roll angle
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -180,
+                  max: 180,
+                },
+              };
+            case "debug[1]": // Pitch angle
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -90,
+                  max: 90,
+                },
+              }; 
+          }
       }
     }
     // if not found above then
