@@ -1683,7 +1683,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       );
 
     default:
-      return "";
+      return value.toFixed(0);
   }
 };
 
@@ -2077,7 +2077,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
     }
     return value.toFixed(0);
   }
-  return "";
+  return value.toFixed(0);
 };
 
 FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
