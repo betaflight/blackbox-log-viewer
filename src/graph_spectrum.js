@@ -292,11 +292,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     this.importSpectrumFromCSV = function(files) {
       const maxImportCount = 5;
+      let importsLeft = maxImportCount - GraphSpectrumPlot.getImportedSpectrumCount();
+
       for (const file of files) {
-        if (GraphSpectrumPlot.getImportedSpectrumCount() == maxImportCount) {
+        if ((importsLeft--) == 0) {
           break;
         }
-
         const reader = new FileReader();
         reader.onload = function (e) {
           try {
@@ -316,7 +317,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
               };
             });
 
-            GraphSpectrumPlot.addImportedSpectrumData(spectrumData);
+            GraphSpectrumPlot.addImportedSpectrumData(spectrumData, file.name);
           } catch (e) {
             alert('Spectrum data import error: ' + e.message);
             return;
@@ -330,7 +331,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   } catch (e) {
     console.log(`Failed to create analyser... error: ${e}`);
   }
-  
+
   this.clearImportedSpectrums = function() {
     GraphSpectrumPlot.clearImportedSpectrums();
   };

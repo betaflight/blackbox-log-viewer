@@ -94,8 +94,12 @@ GraphSpectrumPlot.getImportedSpectrumCount = function () {
   return this._importedSpectrumsData.length;
 };
 
-GraphSpectrumPlot.addImportedSpectrumData = function (curvesData) {
-  this._importedSpectrumsData.push(curvesData);
+GraphSpectrumPlot.addImportedSpectrumData = function (curvesData, name) {
+  const curve = {
+    points: curvesData,
+    name:   name,
+  };
+  this._importedSpectrumsData.push(curve);
   this._invalidateCache();
   this._invalidateDataCache();
   GraphSpectrumPlot.draw();
@@ -171,8 +175,6 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
-  canvasCtx.lineWidth = 1;
-
   const HEIGHT = canvasCtx.canvas.height - MARGIN;
   const WIDTH = canvasCtx.canvas.width;
   const LEFT = canvasCtx.canvas.left;
@@ -181,6 +183,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const PLOTTED_BUFFER_LENGTH = this._fftData.fftLength / this._zoomX;
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
+  canvasCtx.save();
   canvasCtx.translate(LEFT, TOP);
 
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
@@ -225,12 +228,14 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     "Chocolate",
   ];
 
-  for (let spectrumNum = 0;  spectrumNum < this._importedSpectrumsData.length; spectrumNum++) {
-    const curvesPonts = this._importedSpectrumsData[spectrumNum];
+  const spectrumCount =  this._importedSpectrumsData.length;
+  for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
+    const curvesPonts = this._importedSpectrumsData[spectrumNum].points;
     const pointsCount = curvesPonts.length;
     const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
 
     canvasCtx.beginPath();
+    canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = curvesColors[spectrumNum];
     canvasCtx.moveTo(0, HEIGHT);
     const filterPointsCount = 50;
@@ -257,7 +262,32 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
       canvasCtx.lineTo(curvesPonts[pointNum].freq * scaleX, HEIGHT - middleValue * fftScale);
     }
     canvasCtx.stroke();
+
+    //Legend draw
+    if (this._isFullScreen) {
+      const legendPosX = 0.84 * WIDTH,
+            legendPosY = 0.6 * HEIGHT,
+            rowHeight = 16,
+            padding = 4,
+            legendWidth = 0.13 * WIDTH + padding,
+            legendHeight = spectrumCount * rowHeight + 3 * padding;
+
+      const legendArea = new Path2D();
+      legendArea.rect(legendPosX, legendPosY, legendWidth, legendHeight);
+      canvasCtx.clip(legendArea);
+      canvasCtx.strokeStyle = "gray";
+      canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
+      canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
+      canvasCtx.textAlign = "left";
+      for (let row = 0; row < spectrumCount; row++) {
+        const curvesName = this._importedSpectrumsData[row].name.split('.')[0];
+        const Y = legendPosY + padding + rowHeight * (row + 1);
+        canvasCtx.strokeStyle = curvesColors[row];
+        canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
+      }
+    }
   }
+  canvasCtx.restore();
 
   this._drawAxisLabel(
     canvasCtx,
