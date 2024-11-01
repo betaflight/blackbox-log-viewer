@@ -262,29 +262,29 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
       canvasCtx.lineTo(curvesPonts[pointNum].freq * scaleX, HEIGHT - middleValue * fftScale);
     }
     canvasCtx.stroke();
+  }
 
-    //Legend draw
-    if (this._isFullScreen) {
-      const legendPosX = 0.84 * WIDTH,
-            legendPosY = 0.6 * HEIGHT,
-            rowHeight = 16,
-            padding = 4,
-            legendWidth = 0.13 * WIDTH + padding,
-            legendHeight = spectrumCount * rowHeight + 3 * padding;
+//Legend draw
+  if (this._isFullScreen) {
+    const legendPosX = 0.84 * WIDTH,
+          legendPosY = 0.6 * HEIGHT,
+          rowHeight = 16,
+          padding = 4,
+          legendWidth = 0.13 * WIDTH + padding,
+          legendHeight = spectrumCount * rowHeight + 3 * padding;
 
-      const legendArea = new Path2D();
-      legendArea.rect(legendPosX, legendPosY, legendWidth, legendHeight);
-      canvasCtx.clip(legendArea);
-      canvasCtx.strokeStyle = "gray";
-      canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
-      canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
-      canvasCtx.textAlign = "left";
-      for (let row = 0; row < spectrumCount; row++) {
-        const curvesName = this._importedSpectrumsData[row].name.split('.')[0];
-        const Y = legendPosY + padding + rowHeight * (row + 1);
-        canvasCtx.strokeStyle = curvesColors[row];
-        canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
-      }
+    const legendArea = new Path2D();
+    legendArea.rect(legendPosX, legendPosY, legendWidth, legendHeight);
+    canvasCtx.clip(legendArea);
+    canvasCtx.strokeStyle = "gray";
+    canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
+    canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
+    canvasCtx.textAlign = "left";
+    for (let row = 0; row < spectrumCount; row++) {
+      const curvesName = this._importedSpectrumsData[row].name.split('.')[0];
+      const Y = legendPosY + padding + rowHeight * (row + 1);
+      canvasCtx.strokeStyle = curvesColors[row];
+      canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
     }
   }
   canvasCtx.restore();
