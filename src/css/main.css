@@ -647,6 +647,7 @@ html.has-analyser-fullscreen.has-analyser
   border: gray;
   border-style: solid;
   border-width: 1px;
+  display: flex;
 }
 
 .analyser #spectrumComparison select {
@@ -655,9 +656,11 @@ html.has-analyser-fullscreen.has-analyser
   color: black;
 }
 
-.spectrum-comparasion-button {
-  width: 100%;
+#spectrumComparison button {
+  width: auto;
+  height: auto;
   border-radius: 3px;
+  float: left;
 }
 
 .analyser input#analyserZoomX {
