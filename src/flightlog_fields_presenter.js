@@ -1660,9 +1660,13 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "gpsCartesianCoords[1]":
     case "gpsCartesianCoords[2]":
     case "gpsDistance":
-        return `${value.toFixed(0)} m`;
+      return `${value.toFixed(0)} m`;
     case "gpsHomeAzimuth":
-        return `${value.toFixed(1)} °`;
+      return `${value.toFixed(1)} °`;
+    case "magADC[0]":
+    case "magADC[1]":
+    case "magADC[2]":
+      return `${(value / 10).toFixed(1)} °`;
 
     case "debug[0]":
     case "debug[1]":
@@ -1679,7 +1683,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       );
 
     default:
-      return "";
+      return value.toFixed(0);
   }
 };
 
@@ -2073,7 +2077,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
     }
     return value.toFixed(0);
   }
-  return "";
+  return value.toFixed(0);
 };
 
 FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
@@ -2303,6 +2307,10 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
           return toFriendly ? (value / 100) * 2.2369 : (value * 100) / 2.2369; //mph
       }
     case "GPS_ground_course":
+      return toFriendly ? value / 10 : value * 10;
+    case "magADC[0]":
+    case "magADC[1]":
+    case "magADC[2]":
       return toFriendly ? value / 10 : value * 10;
 
     case "debug[0]":
