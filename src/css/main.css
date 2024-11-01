@@ -658,7 +658,7 @@ html.has-analyser-fullscreen.has-analyser
 
 #spectrumComparison button {
   width: auto;
-  height: 14px;
+  height: auto;
   border-radius: 3px;
   float: left;
 }
