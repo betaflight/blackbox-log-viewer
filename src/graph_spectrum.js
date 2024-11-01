@@ -295,7 +295,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       let importsLeft = maxImportCount - GraphSpectrumPlot.getImportedSpectrumCount();
 
       for (const file of files) {
-        if ((importsLeft--) == 0) {
+        if (importsLeft-- == 0) {
           break;
         }
         const reader = new FileReader();
