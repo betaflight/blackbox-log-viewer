@@ -738,14 +738,14 @@ export function FlightLog(logData) {
               w: 1.0,
             };
             q.w = Math.sqrt(1.0 - (q.x ** 2 + q.y ** 2 + q.z ** 2));
-            const xx = q.x * q.x,
+            const xx = q.x ** 2,
                   xy = q.x * q.y,
                   xz = q.x * q.z,
                   wx = q.w * q.x,
-                  yy = q.y * q.y,
+                  yy = q.y ** 2,
                   yz = q.y * q.z,
                   wy = q.w * q.y,
-                  zz = q.z * q.z,
+                  zz = q.z ** 2,
                   wz = q.w * q.z;
             let roll = Math.atan2((+2.0 * (wx + yz)), (+1.0 - 2.0 * (xx + yy)));
             let pitch = ((0.5 * Math.PI) - Math.acos(+2.0 * (wy - xz)));
