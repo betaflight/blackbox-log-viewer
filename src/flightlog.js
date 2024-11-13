@@ -735,7 +735,7 @@ export function FlightLog(logData) {
               x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
               y: srcFrame[imuQuaternion[1]] / scaleFromFixedInt16,
               z: srcFrame[imuQuaternion[2]] / scaleFromFixedInt16,
-              w: 1.0,
+              w: 0.0,
             };
             const xx = q.x * q.x,
                   xy = q.x * q.y,
