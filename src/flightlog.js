@@ -661,7 +661,6 @@ export function FlightLog(logData) {
 
     let sourceChunkIndex;
     let destChunkIndex;
-    let attitude;
 
     const sysConfig = that.getSysConfig();
 
