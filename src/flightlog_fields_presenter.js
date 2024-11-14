@@ -1294,6 +1294,21 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Not Used",
       };
     }
+
+    if (semver.gte(firmwareVersion, '4.5.0')) {
+      DEBUG_FRIENDLY_FIELD_NAMES.ATTITUDE = {
+        "debug[all]": "Attitude",
+        "debug[0]": "Roll angle",
+        "debug[1]": "Pitch angle",
+        "debug[2]": "Ground speed factor",
+        "debug[3]": "Heading error",
+        "debug[4]": "Velocity to home",
+        "debug[5]": "Ground speed error ratio",
+        "debug[6]": "Pitch forward angle",
+        "debug[7]": "dcmKp gain",
+      };
+    }
+
     if (semver.gte(firmwareVersion, '4.6.0')) {
       // FFT_FREQ updated in firmware #13750
       DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
@@ -2026,10 +2041,14 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         }
       case "ATTITUDE":
         switch (fieldName) {
-          case "debug[0]": // accADC X
-          case "debug[1]": // accADC Y
-          case "debug[2]": // setpoint Roll
-          case "debug[3]": // setpoint Pitch
+          case "debug[0]": // Roll Angle
+          case "debug[1]": // Pitch Angle
+          case "debug[2]": // Ground speed factor
+          case "debug[3]": // Heading error
+          case "debug[4]": // Velocity to home
+          case "debug[5]": // Ground speed error ratio
+          case "debug[6]": // Pitch forward angle
+          case "debug[7]": // dcmKp gain
           default:
             return value.toFixed(0);
         }
@@ -2686,10 +2705,14 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         }
       case "ATTITUDE":
         switch (fieldName) {
-          case "debug[0]": // accADC X
-          case "debug[1]": // accADC Y
-          case "debug[2]": // setpoint Roll
-          case "debug[3]": // setpoint Pitch
+          case "debug[0]": // Roll Angle
+          case "debug[1]": // Pitch Angle
+          case "debug[2]": // Ground speed factor
+          case "debug[3]": // Heading error
+          case "debug[4]": // Velocity to home
+          case "debug[5]": // Ground speed error ratio
+          case "debug[6]": // Pitch forward angle
+          case "debug[7]": // dcmKp gain
           default:
             return value;
         }
