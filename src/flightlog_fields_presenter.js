@@ -1698,7 +1698,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       );
 
     default:
-      return value.toFixed(0);
+      return value?.toFixed(0);
   }
 };
 

@@ -251,7 +251,7 @@ function BlackboxLogViewer() {
         const tpl = _.template(
           "<tr><td><%= name %></td><td><%= min %> (<%= min_raw %>)</td><td><%= max %> (<%= max_raw %>)</td><td><%= mean %> (<%= mean_raw %>)</td></tr>"
         );
-        for (const field of stats) {
+        for (const field of Object.keys(stats)) {
           const stat = stats[field];
           if (stat === undefined) {
             continue;
