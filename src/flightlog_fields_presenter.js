@@ -32,6 +32,11 @@ const FRIENDLY_FIELD_NAMES = {
   "axisF[0]": "PID Feedforward [roll]",
   "axisF[1]": "PID Feedforward [pitch]",
   "axisF[2]": "PID Feedforward [yaw]",
+  
+  "axisS[all]": "PID S",
+  "axisS[0]": "PID S [roll]",
+  "axisS[1]": "PID S [pitch]",
+  "axisS[2]": "PID S [yaw]",
 
   //Virtual field
   "axisSum[all]": "PID Sum",
@@ -1540,6 +1545,9 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "axisF[0]":
     case "axisF[1]":
     case "axisF[2]":
+    case "axisS[0]":
+    case "axisS[1]":
+    case "axisS[2]":
       return `${flightLog.getPIDPercentage(value).toFixed(1)} %`;
 
     case "accSmooth[0]":
@@ -2222,6 +2230,9 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
     case "axisF[0]":
     case "axisF[1]":
     case "axisF[2]":
+    case "axisS[0]":
+    case "axisS[1]":
+    case "axisS[2]":
       return toFriendly
         ? flightLog.getPIDPercentage(value)
         : value / flightLog.getPIDPercentage(1.0);
