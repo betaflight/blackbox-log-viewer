@@ -610,20 +610,13 @@ export function FlightLog(logData) {
    * sourceChunks and destChunks can be the same array.
    */
   function injectComputedFields(sourceChunks, destChunks) {
-    let gyroADC = [
-      fieldNameToIndex["gyroADC[0]"],
-      fieldNameToIndex["gyroADC[1]"],
-      fieldNameToIndex["gyroADC[2]"],
-    ];
-    let accSmooth = [
-      fieldNameToIndex["accSmooth[0]"],
-      fieldNameToIndex["accSmooth[1]"],
-      fieldNameToIndex["accSmooth[2]"],
-    ];
-    let magADC = [
-      fieldNameToIndex["magADC[0]"],
-      fieldNameToIndex["magADC[1]"],
-      fieldNameToIndex["magADC[2]"],
+    let gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
+    let accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
+    let magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
+    let imuQuaternion = [
+      fieldNameToIndex["imuQuaternion[0]"],
+      fieldNameToIndex["imuQuaternion[1]"],
+      fieldNameToIndex["imuQuaternion[2]"],
     ];
     let rcCommand = [
       fieldNameToIndex["rcCommand[0]"],
@@ -668,7 +661,6 @@ export function FlightLog(logData) {
 
     let sourceChunkIndex;
     let destChunkIndex;
-    let attitude;
 
     const sysConfig = that.getSysConfig();
 
@@ -676,7 +668,7 @@ export function FlightLog(logData) {
       return;
     }
 
-    // Do we have mag fields? If not mark that data as absent
+// Do we have mag fields? If not mark that data as absent
     if (!magADC[0]) {
       magADC = false;
     }
@@ -687,6 +679,10 @@ export function FlightLog(logData) {
 
     if (!accSmooth[0]) {
       accSmooth = false;
+    }
+
+    if (!imuQuaternion[0]) {
+      imuQuaternion = false;
     }
 
     if (!rcCommand[0]) {
@@ -726,33 +722,49 @@ export function FlightLog(logData) {
 
       if (!destChunk.hasAdditionalFields) {
         destChunk.hasAdditionalFields = true;
-
-        let chunkIMU = new IMU(sourceChunks[sourceChunkIndex].initialIMU);
+        const chunkIMU = new IMU(sourceChunk.initialIMU);
 
         for (let i = 0; i < sourceChunk.frames.length; i++) {
           let srcFrame = sourceChunk.frames[i],
             destFrame = destChunk.frames[i],
             fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
-          if (!that.isFieldDisabled().GYRO) {
-            //don't calculate attitude if no gyro data
-            attitude = chunkIMU.updateEstimatedAttitude(
-              [
-                srcFrame[gyroADC[0]],
-                srcFrame[gyroADC[1]],
-                srcFrame[gyroADC[2]],
-              ],
-              [
-                srcFrame[accSmooth[0]],
-                srcFrame[accSmooth[1]],
-                srcFrame[accSmooth[2]],
-              ],
-              srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-              sysConfig.acc_1G,
-              sysConfig.gyroScale,
-              magADC
-            );
+          if (imuQuaternion) {
+            const scaleFromFixedInt16 = 0x7FFF; // 0x7FFF = 2^15 - 1
+            const q = {
+              x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
+              y: srcFrame[imuQuaternion[1]] / scaleFromFixedInt16,
+              z: srcFrame[imuQuaternion[2]] / scaleFromFixedInt16,
+              w: 1.0,
+            };
+            q.w = Math.sqrt(1.0 - (q.x ** 2 + q.y ** 2 + q.z ** 2));
+            const xx = q.x ** 2,
+                  xy = q.x * q.y,
+                  xz = q.x * q.z,
+                  wx = q.w * q.x,
+                  yy = q.y ** 2,
+                  yz = q.y * q.z,
+                  wy = q.w * q.y,
+                  zz = q.z ** 2,
+                  wz = q.w * q.z;
+            let roll = Math.atan2((+2.0 * (wx + yz)), (+1.0 - 2.0 * (xx + yy)));
+            let pitch = ((0.5 * Math.PI) - Math.acos(+2.0 * (wy - xz)));
+            let heading = -Math.atan2((+2.0 * (wz + xy)), (+1.0 - 2.0 * (yy + zz)));
+            if (heading < 0) {
+              heading += 2.0 * Math.PI;
+            }
 
+            destFrame[fieldIndex++] = roll;
+            destFrame[fieldIndex++] = pitch;
+            destFrame[fieldIndex++] = heading;
+          } else {
+            const attitude = chunkIMU.updateEstimatedAttitude(
+                    [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
+                    [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
+                    srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
+                    sysConfig.acc_1G,
+                    sysConfig.gyroScale,
+                    magADC);
             destFrame[fieldIndex++] = attitude.roll;
             destFrame[fieldIndex++] = attitude.pitch;
             destFrame[fieldIndex++] = attitude.heading;
