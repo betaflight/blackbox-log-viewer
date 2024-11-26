@@ -1338,6 +1338,56 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         'debug[6]': 'Altitude D',
         'debug[7]': 'Altitude F',
       };
+      DEBUG_FRIENDLY_FIELD_NAMES.TPA = {
+        'debug[all]': 'TPA',
+        'debug[0]': 'TPA Factor',
+        'debug[1]': 'TPA Attitude Roll (Wing)',
+        'debug[2]': 'TPA Attitude Pitch (Wing)',
+        'debug[3]': 'TPA Calculated Throttle (Wing)',
+        'debug[4]': 'TPA Speed (Wing)',
+        'debug[5]': 'TPA Argument (Wing)',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.S_TERM = {
+        'debug[all]': 'S Term',
+        'debug[0]': 'S Term [roll]',
+        'debug[1]': 'S Term [pitch]',
+        'debug[2]': 'S Term [yaw]',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.SPA = {
+        'debug[all': 'SPA',
+        'debug[0]': 'Setpoint PID Attenuation [roll]',
+        'debug[1]': 'Setpoint PID Attenuation [pitch]',
+        'debug[2]': 'Setpoint PID Attenuation [yaw]',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.TASK = {
+        'debug[all]': 'TASK',
+        'debug[0]': 'Value',
+        'debug[1]': 'Rate (Hz)',
+        'debug[2]': 'Max (us)',
+        'debug[3]': 'Average (us)',
+        'debug[4]': 'Estimated execution time (us)',
+        'debug[5]': 'Actual execution time (us)',
+        'debug[6]': 'Difference estimated vs actual',
+        'debug[7]': 'Late count',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.GIMBAL = {
+        'debug[all]': 'Gimbal',
+        'debug[0]': 'Headtracker Roll',
+        'debug[1]': 'Headtracker Pitch',
+        'debug[2]': 'Headtracker Yaw',
+        'debug[3]': 'Gimbal Roll',
+        'debug[4]': 'Gimbal Pitch',
+        'debug[5]': 'Gimbal Yaw',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.WING_SETPOINT = {
+        'debug[all]': 'Wing Setpoint',
+        'debug[0]': 'Current Setpoint [roll]',
+        'debug[1]': 'Adjusted Setpoint [roll]',
+        'debug[2]': 'Current Setpoint [pitch]',
+        'debug[3]': 'Adjusted Setpoint [pitch]',
+        'debug[4]': 'Current Setpoint [yaw]',
+        'debug[5]': 'Adjusted Setpoint [yaw]',
+      };
     }
   }
 };
