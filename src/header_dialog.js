@@ -671,7 +671,7 @@ export function HeaderDialog(dialog, onSave) {
       name: "dyn_idle_start_increase",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "4.5.0",
-      max: "999.9.9",
+      max: "4.5.1",
     },
     {
       name: "dyn_idle_max_increase",
