@@ -323,6 +323,12 @@ export function HeaderDialog(dialog, onSave) {
       name: "digitalIdleOffset",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "3.1.0",
+      max: "4.5.1",
+    },
+    {
+      name: "motor_idle",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "4.6.0",
       max: "999.9.9",
     },
     {
@@ -665,7 +671,7 @@ export function HeaderDialog(dialog, onSave) {
       name: "dyn_idle_start_increase",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "4.5.0",
-      max: "999.9.9",
+      max: "4.5.1",
     },
     {
       name: "dyn_idle_max_increase",
@@ -1783,6 +1789,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect("debug_mode", sysConfig.debug_mode, DEBUG_MODE);
     setParameter("motorOutputLow", sysConfig.motorOutput[0], 0);
     setParameter("motorOutputHigh", sysConfig.motorOutput[1], 0);
+    setParameter("motor_idle", sysConfig.motor_idle, 2);
     setParameter("digitalIdleOffset", sysConfig.digitalIdleOffset, 2);
     renderSelect(
       "antiGravityMode",

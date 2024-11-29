@@ -817,6 +817,7 @@ export function FlightLogParser(logData) {
         }
         break;
 
+      case "motor_idle":
       case "digitalIdleOffset":
         that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
 
