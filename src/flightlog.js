@@ -1747,19 +1747,19 @@ FlightLog.prototype.isFieldDisabled = function () {
   const disabledFields = this.getSysConfig().fields_disabled_mask;
   const disabledFieldsFlags = {
     PID: (disabledFields & (1 << 0)) !== 0,
-      RC_COMMANDS: (disabledFields & (1 << 1)) !== 0,
-      SETPOINT: (disabledFields & (1 << 2)) !== 0,
-      BATTERY: (disabledFields & (1 << 3)) !== 0,
-      MAGNETOMETER: (disabledFields & (1 << 4)) !== 0,
-      ALTITUDE: (disabledFields & (1 << 5)) !== 0,
-      RSSI: (disabledFields & (1 << 6)) !== 0,
-      GYRO: (disabledFields & (1 << 7)) !== 0,
-      ACC: (disabledFields & (1 << 8)) !== 0,
-      DEBUG: (disabledFields & (1 << 9)) !== 0,
-      MOTORS: (disabledFields & (1 << 10)) !== 0,
-      GPS: (disabledFields & (1 << 11)) !== 0,
-      RPM: (disabledFields & (1 << 12)) !== 0,
-      GYROUNFILT: (disabledFields & (1 << 13)) !== 0,
+    RC_COMMANDS: (disabledFields & (1 << 1)) !== 0,
+    SETPOINT: (disabledFields & (1 << 2)) !== 0,
+    BATTERY: (disabledFields & (1 << 3)) !== 0,
+    MAGNETOMETER: (disabledFields & (1 << 4)) !== 0,
+    ALTITUDE: (disabledFields & (1 << 5)) !== 0,
+    RSSI: (disabledFields & (1 << 6)) !== 0,
+    GYRO: (disabledFields & (1 << 7)) !== 0,
+    ACC: (disabledFields & (1 << 8)) !== 0,
+    DEBUG: (disabledFields & (1 << 9)) !== 0,
+    MOTORS: (disabledFields & (1 << 10)) !== 0,
+    GPS: (disabledFields & (1 << 11)) !== 0,
+    RPM: (disabledFields & (1 << 12)) !== 0,
+    GYROUNFILT: (disabledFields & (1 << 13)) !== 0,
   };
 
   if (
