@@ -1745,7 +1745,7 @@ FlightLog.prototype.getFeatures = function (enabledFeatures) {
 
 FlightLog.prototype.isFieldDisabled = function () {
   const disabledFields = this.getSysConfig().fields_disabled_mask;
-  return {
+  const disabledFieldsFlags = {
     PID: (disabledFields & (1 << 0)) !== 0,
     RC_COMMANDS: (disabledFields & (1 << 1)) !== 0,
     SETPOINT: (disabledFields & (1 << 2)) !== 0,
@@ -1761,4 +1761,19 @@ FlightLog.prototype.isFieldDisabled = function () {
     RPM: (disabledFields & (1 << 12)) !== 0,
     GYROUNFILT: (disabledFields & (1 << 13)) !== 0,
   };
+
+  if (
+    this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+    semver.gte(this.getSysConfig().firmwareVersion, "4.6.0")
+  ) {
+    disabledFieldsFlags.ATTITUDE = (disabledFields & (1 << 8)) !== 0;
+    disabledFieldsFlags.ACC = (disabledFields & (1 << 9)) !== 0;
+    disabledFieldsFlags.DEBUG = (disabledFields & (1 << 10)) !== 0;
+    disabledFieldsFlags.MOTORS = (disabledFields & (1 << 11)) !== 0;
+    disabledFieldsFlags.GPS = (disabledFields & (1 << 12)) !== 0;
+    disabledFieldsFlags.RPM = (disabledFields & (1 << 13)) !== 0;
+    disabledFieldsFlags.GYROUNFILT = (disabledFields & (1 << 14)) !== 0;
+  }
+
+  return disabledFieldsFlags;
 };
