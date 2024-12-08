@@ -143,6 +143,7 @@ export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5 = makeReadOnly([
   "HEADFREE",
   "PASSTHRU",
   "FAILSAFE",
+  "POSHOLD",
   "GPSRESCUE",
   "ANTIGRAVITY",
   "HEADADJ",
