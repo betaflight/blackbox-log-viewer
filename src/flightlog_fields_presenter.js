@@ -2179,7 +2179,19 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
           case "debug[4]":
             return `${(value / 1000).toFixed(1)}`;
           default:
-            return value.toFixed(0);
+            return value.toFixed(1);
+        }
+      case "AUTOPILOT_POSITION":
+        switch (fieldName) {
+          case "debug[2]":
+          case "debug[3]":
+          case "debug[4]":
+          case "debug[5]":
+          case "debug[6]":
+          case "debug[7]":
+            return `${(value / 10).toFixed(1)}`;
+          default:
+            return value.toFixed(1);
         }
     }
     return value.toFixed(0);
@@ -2853,6 +2865,18 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           case "debug[3]":
           case "debug[4]":
             return toFriendly ? value / 1000 : value * 1000;
+          default:
+            return value;
+        }
+      case "AUTOPILOT_POSITION":
+        switch (fieldName) {
+          case "debug[2]":
+          case "debug[3]":
+          case "debug[4]":
+          case "debug[5]":
+          case "debug[6]":
+          case "debug[7]":
+            return toFriendly ? value / 10 : value * 10;
           default:
             return value;
         }
