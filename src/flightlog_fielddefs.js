@@ -530,12 +530,14 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     if (semver.gte(firmwareVersion, "4.6.0")) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("RANGEFINDER_QUALITY") + 1, 0, "OPTICALFLOW");
       DEBUG_MODE.push('TPA');
       DEBUG_MODE.push('S_TERM');
       DEBUG_MODE.push('SPA');
       DEBUG_MODE.push('TASK');
       DEBUG_MODE.push('GIMBAL');
       DEBUG_MODE.push('WING_SETPOINT');
+      DEBUG_MODE.push('AUTOPILOT_POSITION');
     }
 
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
