@@ -545,6 +545,10 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     // Flight mode names
     if (semver.gte(firmwareVersion, "4.6.0")) {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("ADXL345"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM303DLHC"), 1);
     } else {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
       if (semver.lt(firmwareVersion, "3.4.0")) {
