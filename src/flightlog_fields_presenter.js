@@ -32,7 +32,7 @@ const FRIENDLY_FIELD_NAMES = {
   "axisF[0]": "PID Feedforward [roll]",
   "axisF[1]": "PID Feedforward [pitch]",
   "axisF[2]": "PID Feedforward [yaw]",
-  
+
   "axisS[all]": "PID S",
   "axisS[0]": "PID S [roll]",
   "axisS[1]": "PID S [pitch]",
@@ -129,7 +129,7 @@ const FRIENDLY_FIELD_NAMES = {
   GPS_altitude: "GPS Altitude ASL",
   GPS_speed: "GPS Speed",
   GPS_ground_course: "GPS Heading",
-  
+
   "gpsCartesianCoords[all]": "GPS Coords",
   "gpsCartesianCoords[0]": "GPS Coords [X]",
   "gpsCartesianCoords[1]": "GPS Coords [Y]",
@@ -1388,6 +1388,26 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         'debug[4]': 'Current Setpoint [yaw]',
         'debug[5]': 'Adjusted Setpoint [yaw]',
       };
+      DEBUG_FRIENDLY_FIELD_NAMES.OPTICALFLOW = {
+        'debug[all]': 'Optical Flow',
+        'debug[0]': 'Quality',
+        'debug[1]': 'Raw flow rates X',
+        'debug[2]': 'Raw flow rates Y',
+        'debug[3]': 'Processed flow rates X',
+        'debug[4]': 'Processed flow rates Y',
+        'debug[5]': 'Delta time',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_POSITION = {
+        'debug[all]': 'Autopilot Position',
+        'debug[0]': 'Distance',
+        'debug[1]': 'GPS Distance',
+        'debug[2]': 'PID Sum EF',
+        'debug[3]': 'Angle',
+        'debug[4]': 'pidP',
+        'debug[5]': 'pidI',
+        'debug[6]': 'pidD',
+        'debug[7]': 'pidA',
+      };
     }
   }
 };
@@ -1728,7 +1748,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       }
     case "GPS_ground_course":
       return `${(value / 10).toFixed(1)} °`;
-    
+
     case "gpsCartesianCoords[0]":
     case "gpsCartesianCoords[1]":
     case "gpsCartesianCoords[2]":
@@ -2151,6 +2171,16 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         return value.toFixed(0);
       case "EZLANDING":
         return `${(value / 100.0).toFixed(2)} %`;
+      case "OPTICALFLOW":
+        switch (fieldName) {
+          case "debug[1]":
+          case "debug[2]":
+          case "debug[3]":
+          case "debug[4]":
+            return `${(value / 1000).toFixed(1)}`;
+          default:
+            return value.toFixed(0);
+        }
     }
     return value.toFixed(0);
   }
@@ -2816,6 +2846,16 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         return value;
       case "DSHOT_TELEMETRY_COUNTS":
         return value;
+      case "OPTICALFLOW":
+        switch (fieldName) {
+          case "debug[1]":
+          case "debug[2]":
+          case "debug[3]":
+          case "debug[4]":
+            return toFriendly ? value / 1000 : value * 1000;
+          default:
+            return value;
+        }
     }
   }
   return value;
