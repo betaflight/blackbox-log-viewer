@@ -376,7 +376,9 @@ export const GYRO_HARDWARE_LPF = makeReadOnly([
 
 export const GYRO_32KHZ_HARDWARE_LPF = makeReadOnly(["NORMAL", "EXPERIMENTAL"]);
 
-export const ACC_HARDWARE = makeReadOnly([
+export let ACC_HARDWARE = [];
+
+export const ACC_HARDWARE_COMPLETE = makeReadOnly([
   "AUTO",
   "NONE",
   "ADXL345",
@@ -502,6 +504,8 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
     semver.gte(firmwareVersion, "3.3.0")
   ) {
+    // ACC hardware names
+    ACC_HARDWARE = ACC_HARDWARE_COMPLETE.slice(0);
     // Debug names
     DEBUG_MODE = DEBUG_MODE_COMPLETE.slice(0);
     DEBUG_MODE.splice(DEBUG_MODE.indexOf("MIXER"), 1);
@@ -528,6 +532,11 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("D_MAX"), 1, "D_MIN");
     }
     if (semver.gte(firmwareVersion, "4.6.0")) {
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("ADXL345"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM303DLHC"), 1);
+
       DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("RANGEFINDER_QUALITY") + 1, 0, "OPTICALFLOW");
@@ -540,15 +549,12 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.push('AUTOPILOT_POSITION');
     }
 
+    ACC_HARDWARE = makeReadOnly(ACC_HARDWARE);
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
     // Flight mode names
     if (semver.gte(firmwareVersion, "4.6.0")) {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
-      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("ADXL345"), 1);
-      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
-      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
-      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM303DLHC"), 1);
     } else {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
       if (semver.lt(firmwareVersion, "3.4.0")) {
