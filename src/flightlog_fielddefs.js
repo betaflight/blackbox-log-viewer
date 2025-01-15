@@ -536,6 +536,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM303DLHC"), 1);
+      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM6DSV16X") + 1, 0, "IIM42653");
 
       DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
