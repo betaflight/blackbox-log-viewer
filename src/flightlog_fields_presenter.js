@@ -2193,6 +2193,16 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
           default:
             return value.toFixed(1);
         }
+      case "TPA":
+        switch (fieldName) {
+          case "debug[1]":
+          case "debug[2]":
+            return `${(value / 10).toFixed(1)} °`;
+          case "debug[4]":
+            return `${(value / 10).toFixed(1)} m/s`;
+          default:
+            return value.toFixed(1);
+        }
     }
     return value.toFixed(0);
   }
@@ -2876,6 +2886,15 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           case "debug[5]":
           case "debug[6]":
           case "debug[7]":
+            return toFriendly ? value / 10 : value * 10;
+          default:
+            return value;
+        }
+      case "TPA":
+        switch (fieldName) {
+          case "debug[1]":
+          case "debug[2]":
+          case "debug[4]":
             return toFriendly ? value / 10 : value * 10;
           default:
             return value;
