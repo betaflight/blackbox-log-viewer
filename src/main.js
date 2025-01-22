@@ -3,6 +3,7 @@ import "./vendor.js";
 import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
+import { VideoExportDialog } from "./video_export_dialog.js";
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 import { UserSettingsDialog } from "./user_settings_dialog.js";
 import { GraphConfigurationDialog } from "./graph_config_dialog.js";
