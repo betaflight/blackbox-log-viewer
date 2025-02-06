@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="src/css/header_dialog.css">
     <link rel="stylesheet" href="src/css/keys_dialog.css">
     <link rel="stylesheet" href="src/css/user_settings_dialog.css">
-
+    <link rel="stylesheet" href="src/css/menu.css">
     <script src="/js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
 
@@ -140,15 +140,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- the changelog floats outside of the page. -->
-        <div id="changelog">
-            <div class="button">
-                <a id="changelog_toggle" href="#">Changelog</a>
-            </div>
-            <div class="wrapper">
-                <iframe src="./changelog.html"></iframe>
             </div>
         </div>
     </div>
@@ -446,6 +437,11 @@
             <li class="log-workspace-panel">
                 <h4>Workspace</h4>
                 <div class="log-workspace-selection"></div>
+                <div class="flexDiv">
+                    <div class="selectWrapper">
+                        <div class="dropdown-content" id="default_workspaces_menu"></div>
+                    </div>
+                </div>
             </li>
         </ul>
         <div id="screenshot-frame" class="graph-row">
@@ -475,6 +471,13 @@
                                 <option value="4">Hide all filters</option>
                                 <option value="5">Auto</option>
                             </select>
+                        </div>
+
+                        <div id="spectrumComparison" data-toggle="tooltip" title="Spectrum comparison">
+                          <button id="btn-spectrum-export" type="button" title="Export spectrum to CSV">Export</button>
+                          <button type="button" onclick="document.getElementById('btn-spectrum-import').click()" title="Import spectrum from CSV">Import</button>
+                          <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
+                          <button type="button" id="btn-spectrum-clear" title="Clear imported spectrums">Clear</button>
                         </div>
 
                         <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
@@ -559,7 +562,7 @@
                     </tr>
                 </tbody>
             </table>
-            
+
             <a href="#log-field-values">
                 <h4>Statistics</h4>
             </a>
@@ -718,7 +721,7 @@
                                         </table>
 
                                         <table id="pid_main" class="pid_tuning">
-                                             <tr class = "pid_labels">
+                                            <tr class = "pid_labels">
                                                 <th name="Blank">
                                                     <label>&nbsp;</label>
                                                 </th>
@@ -728,74 +731,34 @@
                                                 <th name="Integral">
                                                     <label>I</label>
                                                 </th>
-                                                <th name="D_Max">
-                                                    <label>D_Max</label>
-                                                </th>
-                                                <th name="Derivative">
+                                                <th id="derivativeColumn" name="Derivative">
                                                     <label>D</label>
+                                                </th>
+                                                <th id="dMaxColumn" name="D_Max">
+                                                    <label>D Max</label>
                                                 </th>
                                                 <th name="Feedforward">
                                                     <label>FF</label>
                                                 </th>
                                             </tr>
-                                            <tr class="rollPID">
-                                                <!-- 0 -->
-                                                <td>Roll</td>
-                                                <td>
-                                                    <input type="text" name="p" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="i" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d_min_roll" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="f" step="1" min="0" max="255" />
-                                                </td>
-                                            </tr>
-                                            <tr class="pitchPID">
-                                                <!-- 1 -->
-                                                <td>Pitch</td>
-                                                <td>
-                                                    <input type="text" name="p" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="i" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d_min_pitch" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="f" step="1" min="0" max="255" />
-                                                </td>
-                                            </tr>
-                                            <tr class="yawPID">
-                                                <!-- 2 -->
-                                                <td>Yaw</td>
-                                                <td>
-                                                    <input type="text" name="p" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="i" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="d_min_yaw" step="1" min="0" max="255" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="f" step="1" min="0" max="255" />
-                                                </td>
-                                            </tr>
+                                            <tbody id="pid_tbody"></tbody>
                                         </table>
+                                        <script>
+                                            const axes = ['Roll', 'Pitch', 'Yaw'];
+                                            const pidTbody = document.getElementById('pid_tbody');
+
+                                            axes.forEach(axis => {
+                                                const row = `<tr class="${axis.toLowerCase()}PID">
+                                                                <td>${axis}</td>
+                                                                <td><input type="text" name="p" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="i" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="d" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="dMax" step="1" min="0" max="255" /></td>
+                                                                <td><input type="text" name="f" step="1" min="0" max="255" /></td>
+                                                            </tr>`;
+                                                pidTbody.innerHTML += row;
+                                            });
+                                        </script>
 
                                         <table id="pid_baro_header" class="parameter cf">
                                         <thead>
@@ -932,8 +895,8 @@
                                                         <label>D gain</label>
                                                         <input type="text" step="1" min="0" max="200" />
                                                     </td>
-                                                    <td name="simplified_dmax_gain" class="bf-only">
-                                                        <label>Dmax</label>
+                                                    <td name="simplified_d_max_gain" class="bf-only">
+                                                        <label>D Max</label>
                                                         <input type="text" step="1" min="0" max="200" />
                                                     </td>
                                                 </tr>
@@ -999,7 +962,7 @@
                                             </tbody>
                                         </table>
 
-                                        <table id="d_min" class="parameter cf">
+                                        <table id="d_max" class="parameter cf">
                                             <thead>
                                                 <tr>
                                                     <th colspan="5">D Max</th>
@@ -1007,11 +970,11 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td name="d_min_gain" class="bf-only">
+                                                    <td name="d_max_gain" class="bf-only">
                                                         <label>Gain</label>
                                                         <input type="text" step="1" min="0" max="100" />
                                                     </td>
-                                                    <td name="d_min_advance" class="bf-only">
+                                                    <td name="d_max_advance" class="bf-only">
                                                         <label>Advance</label>
                                                         <input type="text" step="1" min="0" max="200" />
                                                     </td>
@@ -1915,9 +1878,13 @@
                                                             <!-- list generated here -->
                                                         </select>
                                                     </td>
-                                                    <td name="rcSmoothingRxAverage">
+                                                    <td name="rcSmoothingRxAverage" id="rcSmoothingRxAverage">
                                                         <label>RX Average (ms)</label>
                                                         <input type="text" step="0.1" min="0"/>
+                                                    </td>
+                                                    <td name="rcSmoothingRxSmoothed" id="rcSmoothingRxSmoothed">
+                                                        <label>RX Smoothed (Hz)</label>
+                                                        <input type="text" step="1" min="0"/>
                                                     </td>
                                                     <td name='rcSmoothingDebugAxis'>
                                                         <label>Debug Axis</label>
@@ -2047,6 +2014,10 @@
                                                         <label>D-Shot Offset %</label>
                                                         <input type="text" step="0.01" min="0" max="1" />
                                                     </td>
+                                                    <td name="motor_idle">
+                                                        <label>Motor idle %</label>
+                                                        <input type="text" step="0.01" min="0" max="1" />
+                                                    </td>
                                                     <td name="motorOutputLow">
                                                         <label>D-Shot Motor Low</label>
                                                         <input type="text" step="10" min="0" max="2047" />
@@ -2093,23 +2064,27 @@
                                                </thead>
                                                     <td name="dynamic_idle_min_rpm">
                                                         <label>Min RPM</label>
-                                                        <input type="text" step="1" min="0" max="100" />
+                                                        <input type="text" step="1" min="0" max="200" />
                                                     </td>
                                                     <td name='dyn_idle_p_gain'>
                                                         <label>P gain</label>
-                                                        <input type="text" step="1" min="0" max="8" />
+                                                        <input type="text" step="1" min="0" max="250" />
                                                     </td>
                                                     <td name='dyn_idle_i_gain'>
                                                         <label>I gain</label>
-                                                        <input type="text" step="1" min="0" max="8" />
+                                                        <input type="text" step="1" min="0" max="250" />
                                                     </td>
                                                     <td name="dyn_idle_d_gain">
                                                         <label>D gain</label>
-                                                        <input type="text" step="1" min="0" max="100" />
+                                                        <input type="text" step="1" min="0" max="250" />
+                                                    </td>
+                                                    <td name='dyn_idle_start_increase'>
+                                                        <label>Start inc</label>
+                                                        <input type="text" step="1" min="0" max="255" />
                                                     </td>
                                                     <td name='dyn_idle_max_increase'>
                                                         <label>Max inc</label>
-                                                        <input type="text" step="1" min="0" max="8" />
+                                                        <input type="text" step="1" min="0" max="255" />
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -2226,7 +2201,7 @@
                                                 </tr>
                                             </tbody>
                                         </table>
- 
+
                                         <table class="parameter cf">
                                             <tbody>
                                                 <tr>
@@ -2512,9 +2487,10 @@
                                                 <div class="key">0</div>
                                                 <div class="normal">to</div>
                                                 <div class="key">9</div>
+                                                <div class="key">S</div>
                                             </span>
                                             <div class="description">Save the current displayed graph configuration to workspace/favourite key 0 through
-                                                9 (this includes all graph smoothing and expo etc.).</div>
+                                                9 (this includes all graph smoothing, expo and min/max values etc.). The Shift-S save the configuration to current workspace.</div>
                                         </li>
                                         <li>
                                             <span class="keys">
@@ -2524,6 +2500,13 @@
                                             </span>
                                             <div class="description">Recall workspace/favourite stored in keys 0 through 9. Very fast graph configuration
                                                 swapping useful for comparing traces.</div>
+                                        </li>
+                                        <li>
+                                            <span class="keys">
+                                                <div class="key">Shift</div>
+                                                <div class="key">W</div>
+                                            </span>
+                                            <div class="description">Show the menu to load default workspace</div>
                                         </li>
                                     </ul>
                                     <ul>
@@ -3207,7 +3190,6 @@
     <script src="/js/webm-writer/BlobBuffer.js"></script>
     <script src="/js/webm-writer/WebMWriter.js"></script>
     <script type="module" src="src/main.js"></script>
-
     <dialog class="dialogUpdate">
         <h3>Notice</h4>
         <div class="content">
