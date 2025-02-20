@@ -738,12 +738,13 @@ export function FlightLog(logData) {
               w: 1.0,
             };
 
-            const m = Math.sqrt(q.x ** 2 + q.y ** 2 + q.z ** 2);
+            let m = q.x ** 2 + q.y ** 2 + q.z ** 2;
             if (m < 1.0) {
                 // reconstruct .w of unit quaternion
                 q.w = Math.sqrt(1.0 - m ** 2);
             } else {                
                 // normalize [0,x,y,z]
+                m = Math.sqrt(m);
                 q.x /= m;
                 q.y /= m;
                 q.z /= m;
