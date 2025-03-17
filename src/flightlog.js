@@ -803,7 +803,7 @@ export function FlightLog(logData) {
                   : 0) +
                   (axisPID[axis][4] !== undefined
                   ? srcFrame[axisPID[axis][4]]
-                  : 0);;
+                  : 0);
 
               // Limit the PID sum by the limits defined in the header
               let pidLimit =
