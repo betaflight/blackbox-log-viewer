@@ -644,18 +644,21 @@ export function FlightLog(logData) {
         fieldNameToIndex["axisI[0]"],
         fieldNameToIndex["axisD[0]"],
         fieldNameToIndex["axisF[0]"],
+        fieldNameToIndex["axisS[0]"],
       ],
       [
         fieldNameToIndex["axisP[1]"],
         fieldNameToIndex["axisI[1]"],
         fieldNameToIndex["axisD[1]"],
         fieldNameToIndex["axisF[1]"],
+        fieldNameToIndex["axisS[1]"],
       ],
       [
         fieldNameToIndex["axisP[2]"],
         fieldNameToIndex["axisI[2]"],
         fieldNameToIndex["axisD[2]"],
         fieldNameToIndex["axisF[2]"],
+        fieldNameToIndex["axisS[2]"],
       ],
     ];
 
@@ -797,7 +800,10 @@ export function FlightLog(logData) {
                   : 0) +
                 (axisPID[axis][3] !== undefined
                   ? srcFrame[axisPID[axis][3]]
-                  : 0);
+                  : 0) +
+                  (axisPID[axis][4] !== undefined
+                  ? srcFrame[axisPID[axis][4]]
+                  : 0);;
 
               // Limit the PID sum by the limits defined in the header
               let pidLimit =
