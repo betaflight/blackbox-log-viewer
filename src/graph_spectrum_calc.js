@@ -113,9 +113,9 @@ GraphSpectrumCalc.dataLoadFrequencyPSD = function() {
   const psd =  this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
   let min = 1e6,
       max = -1e6;
-  for (let i = 0; i < psd.length; i++) {
-      min = Math.min(psd[i], min);
-      max = Math.max(psd[i], max);
+  for (const value of psd) {
+      min = Math.min(value, min);
+      max = Math.max(value, max);
   }
 
   const psdData = {
@@ -526,25 +526,25 @@ GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 
 
 // Compute power scale coef
   let scale = 1;
-  if (scaling = 'density') {
+  if (scaling == 'density') {
     if (userSettings.analyserHanning) {
       const window = Array(n_per_seg).fill(1);
       this._hanningWindow(window, n_per_seg);
       let skSum = 0;
-      for (const i in window) {
-        skSum += window[i] ** 2;
+      for (const value of window) {
+        skSum += value ** 2;
       }
         scale = 1 / (fs * skSum);
     } else {
       scale = 1 / n_per_seg;
     }
-  } else if (scaling = 'spectrum') {
+  } else if (scaling == 'spectrum') {
     if (userSettings.analyserHanning) {
       const window = Array(n_per_seg).fill(1);
       this._hanningWindow(window, n_per_seg);
       let sum = 0;
-      for (const i in window) {
-        sum += window[i];
+      for (const value of window) {
+        sum += value;
       }
       scale = 1 / sum ** 2;
     } else {

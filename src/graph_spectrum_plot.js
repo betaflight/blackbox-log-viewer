@@ -299,7 +299,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     this._fftData.fieldName,
     WIDTH - 4,
     HEIGHT - 6,
-    "right"
+    "right",
   );
   this._drawHorizontalGridLines(
     canvasCtx,
@@ -309,7 +309,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     WIDTH,
     HEIGHT,
     MARGIN,
-    "Hz"
+    "Hz",
   );
 };
 
@@ -319,7 +319,6 @@ GraphSpectrumPlot._drawFrequencyPSDGraph = function (canvasCtx) {
   const LEFT = canvasCtx.canvas.left;
   const TOP = canvasCtx.canvas.top;
 
-  const PLOTTED_BUFFER_LENGTH = this._fftData.psdLength / this._zoomX;
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
   canvasCtx.save();
@@ -351,7 +350,7 @@ GraphSpectrumPlot._drawFrequencyPSDGraph = function (canvasCtx) {
     this._fftData.fieldName,
     WIDTH - 4,
     HEIGHT - 6,
-    "right"
+    "right",
   );
   this._drawHorizontalGridLines(
     canvasCtx,
@@ -361,9 +360,9 @@ GraphSpectrumPlot._drawFrequencyPSDGraph = function (canvasCtx) {
     WIDTH,
     HEIGHT,
     MARGIN,
-    "Hz"
+    "Hz",
   );
-}
+};
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
