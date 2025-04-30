@@ -114,10 +114,8 @@ GraphSpectrumCalc.dataLoadFrequencyPSD = function() {
   let min = 1e6,
       max = -1e6;
   for (let i = 0; i < psd.length; i++) {
-    if (Math.abs(psd[i]) < 200) {   // TODO: this is temporary infinity values filter
       min = Math.min(psd[i], min);
       max = Math.max(psd[i], max);
-    }
   }
 
   const psdData = {
