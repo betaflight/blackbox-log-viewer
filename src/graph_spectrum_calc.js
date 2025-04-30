@@ -107,10 +107,29 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 };
 
 GraphSpectrumCalc.dataLoadFrequencyPSD = function() {
-  const points_per_segment = 4096,
-        overlap_count = 0;
+  const points_per_segment = 512,
+        overlap_count = 256;
   const flightSamples = this._getFlightSamplesFreq(false);
-  return this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
+  const psd =  this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
+  let min = 1e6,
+      max = -1e6;
+  for (let i = 0; i < psd.length; i++) {
+    if (Math.abs(psd[i]) < 200) {   // TODO: this is temporary infinity values filter
+      min = Math.min(psd[i], min);
+      max = Math.max(psd[i], max);
+    }
+  }
+
+  const psdData = {
+    fieldIndex   : this._dataBuffer.fieldIndex,
+    fieldName  : this._dataBuffer.fieldName,
+    psdLength  : psd.length,
+    psdOutput  : psd,
+    blackBoxRate : this._blackBoxRate,
+    minimum: min,
+    maximum: max,
+  };
+  return psdData;
 };
 
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
@@ -547,7 +566,11 @@ GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 
       }
       psdOutput[i] += p;
     }
-    psdOutput[i] = 10 * Math.log10(psdOutput[i] / segmentsCount);
+
+    const min_avg = 1e-5; // limit min value for -50db
+    let avg = psdOutput[i] / segmentsCount;
+    avg = Math.max(avg, min_avg);
+    psdOutput[i] = 10 * Math.log10(avg);
   }
 
   return psdOutput;

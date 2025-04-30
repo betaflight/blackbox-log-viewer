@@ -17,6 +17,7 @@ export const SPECTRUM_TYPE = {
   FREQ_VS_THROTTLE: 1,
   PIDERROR_VS_SETPOINT: 2,
   FREQ_VS_RPM: 3,
+  PSD_VS_FREQUENCY: 4,
 };
 
 export const SPECTRUM_OVERDRAW_TYPE = {
@@ -171,6 +172,10 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
     case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
       this._drawPidErrorVsSetpointGraph(canvasCtx);
       break;
+
+    case SPECTRUM_TYPE.PSD_VS_FREQUENCY:
+      this._drawFrequencyPSDGraph(canvasCtx);
+      break;
   }
 };
 
@@ -307,6 +312,58 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     "Hz"
   );
 };
+
+GraphSpectrumPlot._drawFrequencyPSDGraph = function (canvasCtx) {
+  const HEIGHT = canvasCtx.canvas.height - MARGIN;
+  const WIDTH = canvasCtx.canvas.width;
+  const LEFT = canvasCtx.canvas.left;
+  const TOP = canvasCtx.canvas.top;
+
+  const PLOTTED_BUFFER_LENGTH = this._fftData.psdLength / this._zoomX;
+  const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
+
+  canvasCtx.save();
+  canvasCtx.translate(LEFT, TOP);
+  this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
+
+  const pointsCount = this._fftData.psdLength;
+  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
+  canvasCtx.beginPath();
+  canvasCtx.lineWidth = 1;
+  canvasCtx.strokeStyle = "orange";
+
+  canvasCtx.moveTo(0, 0);
+  const a1 = Math.abs(this._fftData.minimum),
+        a2 = Math.abs(this._fftData.maximum),
+        limit = Math.max(a1, a2);
+  const scaleY = HEIGHT / 2 / limit;
+  for (let pointNum = 0; pointNum < pointsCount; pointNum += 2) {
+    const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
+    const y = HEIGHT / 2 - this._fftData.psdOutput[pointNum] * scaleY;
+    canvasCtx.lineTo(freq * scaleX, y);
+  }
+  canvasCtx.stroke();
+
+  canvasCtx.restore();
+
+  this._drawAxisLabel(
+    canvasCtx,
+    this._fftData.fieldName,
+    WIDTH - 4,
+    HEIGHT - 6,
+    "right"
+  );
+  this._drawHorizontalGridLines(
+    canvasCtx,
+    PLOTTED_BLACKBOX_RATE / 2,
+    LEFT,
+    TOP,
+    WIDTH,
+    HEIGHT,
+    MARGIN,
+    "Hz"
+  );
+}
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
