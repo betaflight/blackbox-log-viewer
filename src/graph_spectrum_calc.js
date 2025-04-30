@@ -106,6 +106,12 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
   return fftData;
 };
 
+GraphSpectrumCalc.dataLoadFrequencyPSD = function() {
+  const points_per_segment = 4096,
+        overlap_count = 0;
+  const flightSamples = this._getFlightSamplesFreq(false);
+  return this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
+};
 
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
@@ -283,7 +289,7 @@ GraphSpectrumCalc._getFlightChunks = function() {
   return allChunks;
 };
 
-GraphSpectrumCalc._getFlightSamplesFreq = function() {
+GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
 
   const allChunks = this._getFlightChunks();
 
@@ -293,7 +299,11 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
   let samplesCount = 0;
   for (const chunk of allChunks) {
     for (const frame of chunk.frames) {
-      samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
+      if (scaled) {
+        samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
+      } else {
+        samples[samplesCount] = frame[this._dataBuffer.fieldIndex];
+      }
       samplesCount++;
     }
   }
@@ -484,4 +494,82 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
   };
 
   return fftData;
+};
+
+/**
+ * Compute PSD for data samples by Welch method follow Python code
+ */
+GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 'density') {
+// Compute FFT for samples segments
+  const fftOutput = this._fft_segmented(samples, n_per_seg, n_overlap);
+
+  const dataCount = fftOutput[0].length;
+  const segmentsCount = fftOutput.length;
+  const psdOutput = new Float64Array(dataCount);
+
+// Compute power scale coef
+  let scale = 1;
+  if (scaling = 'density') {
+    if (userSettings.analyserHanning) {
+      const window = Array(n_per_seg).fill(1);
+      this._hanningWindow(window, n_per_seg);
+      let skSum = 0;
+      for (const i in window) {
+        skSum += window[i] ** 2;
+      }
+        scale = 1 / (fs * skSum);
+    } else {
+      scale = 1 / n_per_seg;
+    }
+  } else if (scaling = 'spectrum') {
+    if (userSettings.analyserHanning) {
+      const window = Array(n_per_seg).fill(1);
+      this._hanningWindow(window, n_per_seg);
+      let sum = 0;
+      for (const i in window) {
+        sum += window[i];
+      }
+      scale = 1 / sum ** 2;
+    } else {
+      scale = 1 / n_per_seg ** 2;
+    }
+  }
+
+// Compute average for scaled power
+  for (let i = 0; i < dataCount; i++) {
+    psdOutput[i] = 0.0;
+    for (let j = 0; j < segmentsCount; j++) {
+      let p = scale * fftOutput[j][i] ** 2;
+      if (dataCount % 2) {
+        p *= 2;
+      } else if (i != dataCount - 1) {
+        p *= 2;
+      }
+      psdOutput[i] += p;
+    }
+    psdOutput[i] = 10 * Math.log10(psdOutput[i] / segmentsCount);
+  }
+
+  return psdOutput;
+};
+
+
+/**
+ * Compute FFT for samples segments by lenghts as n_per_seg with n_overlap overlap points count
+ */
+GraphSpectrumCalc._fft_segmented  = function(samples, n_per_seg, n_overlap) {
+  const samplesCount = samples.length;
+  let output = [];
+  for (let i = 0; i < samplesCount - n_per_seg; i += n_per_seg - n_overlap) {
+    const fftInput = samples.slice(i, i + n_per_seg);
+
+    if (userSettings.analyserHanning) {
+      this._hanningWindow(fftInput, n_per_seg);
+    }
+
+    const fftOutput = this._fft(fftInput);
+    output.push(fftOutput.slice(0, n_per_seg));
+  }
+
+  return output;
 };
