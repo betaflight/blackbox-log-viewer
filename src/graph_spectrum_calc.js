@@ -526,30 +526,26 @@ GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 
 
 // Compute power scale coef
   let scale = 1;
-  if (scaling == 'density') {
-    if (userSettings.analyserHanning) {
-      const window = Array(n_per_seg).fill(1);
-      this._hanningWindow(window, n_per_seg);
+  if (userSettings.analyserHanning) {
+    const window = Array(n_per_seg).fill(1);
+    this._hanningWindow(window, n_per_seg);
+    if (scaling == 'density') {
       let skSum = 0;
       for (const value of window) {
         skSum += value ** 2;
       }
-        scale = 1 / (fs * skSum);
-    } else {
-      scale = 1 / n_per_seg;
-    }
-  } else if (scaling == 'spectrum') {
-    if (userSettings.analyserHanning) {
-      const window = Array(n_per_seg).fill(1);
-      this._hanningWindow(window, n_per_seg);
+      scale = 1 / (fs * skSum);
+    } else if (scaling == 'spectrum') {
       let sum = 0;
       for (const value of window) {
         sum += value;
       }
       scale = 1 / sum ** 2;
-    } else {
-      scale = 1 / n_per_seg ** 2;
     }
+  } else if (scaling == 'density') {
+    scale = 1 / n_per_seg;
+  } else if (scaling == 'spectrum') {
+    scale = 1 / n_per_seg ** 2;
   }
 
 // Compute average for scaled power
