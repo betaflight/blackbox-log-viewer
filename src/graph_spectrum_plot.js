@@ -174,7 +174,7 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
       break;
 
     case SPECTRUM_TYPE.PSD_VS_FREQUENCY:
-      this._drawFrequencyPSDGraph(canvasCtx);
+      this._drawPowerSpectralDensityGraph(canvasCtx);
       break;
   }
 };
@@ -313,7 +313,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   );
 };
 
-GraphSpectrumPlot._drawFrequencyPSDGraph = function (canvasCtx) {
+GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const HEIGHT = canvasCtx.canvas.height - MARGIN;
   const WIDTH = canvasCtx.canvas.width;
   const LEFT = canvasCtx.canvas.left;
@@ -336,7 +336,7 @@ GraphSpectrumPlot._drawFrequencyPSDGraph = function (canvasCtx) {
         a2 = Math.abs(this._fftData.maximum),
         limit = Math.max(a1, a2);
   const scaleY = HEIGHT / 2 / limit;
-  for (let pointNum = 0; pointNum < pointsCount; pointNum += 2) {
+  for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
     const y = HEIGHT / 2 - this._fftData.psdOutput[pointNum] * scaleY;
     canvasCtx.lineTo(freq * scaleX, y);
