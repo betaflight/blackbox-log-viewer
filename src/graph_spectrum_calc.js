@@ -458,27 +458,33 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
     fftLength = fftOutput.length;
   }
 
-  // Make all the values absolute, and calculate some useful values (max noise, etc.)
+  // Make all the values absolute, and calculate some useful values (max noise, etc
+  // The fft output contains complex values (re, im pairs) of two-side spectrum
+  // Compute magnitudes for one spectrum side
+  const magnitudeLength = Math.floor(fftLength / 2);
   const maxFrequency = (this._blackBoxRate / 2.0);
-  const noiseLowEndIdx = 100 / maxFrequency * fftLength;
+  const noiseLowEndIdx = 100 / maxFrequency * magnitudeLength;
+  const magnitudes = new Float64Array(magnitudeLength);
   let maxNoiseIdx = 0;
   let maxNoise = 0;
 
-  for (let i = 0; i < fftLength; i++) {
-    fftOutput[i] = Math.abs(fftOutput[i]);
-    if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
-      maxNoise = fftOutput[i];
+  for (let i = 0; i < magnitudeLength; i++) {
+    const re = fftOutput[2 * i],
+          im = fftOutput[2 * i + 1];
+    magnitudes[i] = Math.hypot(re, im);
+    if (i > noiseLowEndIdx && magnitudes[i] > maxNoise) {
+      maxNoise = magnitudes[i];
       maxNoiseIdx = i;
     }
   }
 
-  maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
+  maxNoiseIdx = maxNoiseIdx / magnitudeLength * maxFrequency;
 
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftLength,
-    fftOutput  : fftOutput,
+    fftLength  : magnitudeLength,
+    fftOutput  : magnitudes,
     maxNoiseIdx  : maxNoiseIdx,
     blackBoxRate : this._blackBoxRate,
   };
