@@ -118,7 +118,8 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
-  const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength * 2));
+  const magnitudeLength = Math.floor(fftChunkLength / 2);
+  const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(magnitudeLength));
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
@@ -135,12 +136,15 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     fft.simple(fftOutput, fftInput, 'real');
 
-    fftOutput = fftOutput.slice(0, fftChunkLength);
 
-    // Use only abs values
-    for (let i = 0; i < fftChunkLength; i++) {
-      fftOutput[i] = Math.abs(fftOutput[i]);
-      maxNoise = Math.max(fftOutput[i], maxNoise);
+    const magnitudes = new Float64Array(magnitudeLength);
+
+    // Compute magnitude
+    for (let i = 0; i < magnitudeLength; i++) {
+      const re = fftOutput[2 * i],
+            im = fftOutput[2 * i + 1];
+      magnitudes[i] = Math.hypot(re, im);
+      maxNoise = Math.max(magnitudes[i], maxNoise);
     }
 
     // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
@@ -158,8 +162,8 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
       numberSamples[vsBinIndex]++;
 
       // add the output from the fft to the row given by the vs value bin index
-      for (let i = 0; i < fftOutput.length; i++) {
-        matrixFftOutput[vsBinIndex][i] += fftOutput[i];
+      for (let i = 0; i < magnitudeLength; i++) {
+        matrixFftOutput[vsBinIndex][i] += magnitudes[i];
       }
     }
   }
@@ -180,7 +184,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftChunkLength,
+    fftLength  : magnitudeLength,
     fftOutput  : matrixFftOutput,
     maxNoise   : maxNoise,
     blackBoxRate : this._blackBoxRate,
