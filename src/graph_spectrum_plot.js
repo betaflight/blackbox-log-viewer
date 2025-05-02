@@ -362,6 +362,16 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     MARGIN,
     "Hz",
   );
+  this._drawVerticalGridLines(
+    canvasCtx,
+    LEFT,
+    TOP,
+    WIDTH,
+    HEIGHT,
+    this._fftData.minimum,
+    this._fftData.maximum,
+    "db/Hz"
+  );
 };
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
