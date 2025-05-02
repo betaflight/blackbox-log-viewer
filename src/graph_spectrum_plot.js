@@ -212,7 +212,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   canvasCtx.fillStyle = barGradient;
 
   const fftScale = HEIGHT / (this._zoomY * 100);
-  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
+  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 5) {
     const barHeight = this._fftData.fftOutput[i] * fftScale;
     canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
     x += barWidth + 1;
