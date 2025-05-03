@@ -332,14 +332,16 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.lineWidth = 1;
   canvasCtx.strokeStyle = "white";
 
+  // Allign y axis range by 10db
+  const dbStep = 10;
+  const minY = Math.floor(this._fftData.minimum / dbStep) * dbStep;
+  const maxY = (Math.floor(this._fftData.maximum / dbStep) + 1) * dbStep;
+  const ticksCount = (maxY - minY) / dbStep;
+  const scaleY = HEIGHT / (maxY - minY);
   canvasCtx.moveTo(0, 0);
-  const minimum = this._fftData.minimum,
-        maximum = this._fftData.maximum,
-        range = maximum - minimum;
-  const scaleY = HEIGHT / range;
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
-    const y = HEIGHT - (this._fftData.psdOutput[pointNum] - minimum) * scaleY;
+    const y = HEIGHT - (this._fftData.psdOutput[pointNum] - minY) * scaleY;
     canvasCtx.lineTo(freq * scaleX, y);
   }
   canvasCtx.stroke();
@@ -367,9 +369,10 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     TOP,
     WIDTH,
     HEIGHT,
-    minimum,
-    maximum,
+    minY,
+    maxY,
     "db/Hz",
+    ticksCount,
   );
 
   canvasCtx.restore();
@@ -1060,22 +1063,22 @@ GraphSpectrumPlot._drawVerticalGridLines = function (
   HEIGHT,
   minValue,
   maxValue,
-  label
+  label,
+  Ticks = 5,
 ) {
-  const TICKS = 5;
 
-  for (let i = 0; i <= TICKS; i++) {
+  for (let i = 0; i <= Ticks; i++) {
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = "rgba(255,255,255,0.25)";
 
-    const verticalPosition = i * (HEIGHT / TICKS);
+    const verticalPosition = i * (HEIGHT / Ticks);
     canvasCtx.moveTo(0, verticalPosition);
     canvasCtx.lineTo(WIDTH, verticalPosition);
 
     canvasCtx.stroke();
     const verticalAxisValue = (
-      (maxValue - minValue) * ((TICKS - i) / TICKS) +
+      (maxValue - minValue) * ((Ticks - i) / Ticks) +
       minValue
     ).toFixed(0);
     let textBaseline;
@@ -1083,7 +1086,7 @@ GraphSpectrumPlot._drawVerticalGridLines = function (
       case 0:
         textBaseline = "top";
         break;
-      case TICKS:
+      case Ticks:
         textBaseline = "bottom";
         break;
       default:
