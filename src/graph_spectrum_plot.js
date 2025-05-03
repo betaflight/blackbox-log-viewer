@@ -17,7 +17,7 @@ export const SPECTRUM_TYPE = {
   FREQ_VS_THROTTLE: 1,
   PIDERROR_VS_SETPOINT: 2,
   FREQ_VS_RPM: 3,
-  PSD_VS_FREQUENCY: 4,
+  POWER_SPECTRAL_DENSITY: 4,
 };
 
 export const SPECTRUM_OVERDRAW_TYPE = {
@@ -173,7 +173,7 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
       this._drawPidErrorVsSetpointGraph(canvasCtx);
       break;
 
-    case SPECTRUM_TYPE.PSD_VS_FREQUENCY:
+    case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
       this._drawPowerSpectralDensityGraph(canvasCtx);
       break;
   }
@@ -315,9 +315,10 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
 
 GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const HEIGHT = canvasCtx.canvas.height - MARGIN;
-  const WIDTH = canvasCtx.canvas.width;
-  const LEFT = canvasCtx.canvas.left;
-  const TOP = canvasCtx.canvas.top;
+  const ACTUAL_MARGIN_LEFT = this._getActualMarginLeft();
+  const WIDTH = canvasCtx.canvas.width - ACTUAL_MARGIN_LEFT;
+  const LEFT = canvasCtx.canvas.offsetLeft + ACTUAL_MARGIN_LEFT;
+  const TOP = canvasCtx.canvas.offsetTop;
 
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
@@ -329,21 +330,19 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
   canvasCtx.beginPath();
   canvasCtx.lineWidth = 1;
-  canvasCtx.strokeStyle = "orange";
+  canvasCtx.strokeStyle = "white";
 
   canvasCtx.moveTo(0, 0);
-  const a1 = Math.abs(this._fftData.minimum),
-        a2 = Math.abs(this._fftData.maximum),
-        limit = Math.max(a1, a2);
-  const scaleY = HEIGHT / 2 / limit;
+  const minimum = this._fftData.minimum,
+        maximum = this._fftData.maximum,
+        range = maximum - minimum;
+  const scaleY = HEIGHT / range;
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
-    const y = HEIGHT / 2 - this._fftData.psdOutput[pointNum] * scaleY;
+    const y = HEIGHT - (this._fftData.psdOutput[pointNum] - minimum) * scaleY;
     canvasCtx.lineTo(freq * scaleX, y);
   }
   canvasCtx.stroke();
-
-  canvasCtx.restore();
 
   this._drawAxisLabel(
     canvasCtx,
@@ -368,10 +367,12 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     TOP,
     WIDTH,
     HEIGHT,
-    this._fftData.minimum,
-    this._fftData.maximum,
-    "db/Hz"
+    minimum,
+    maximum,
+    "db/Hz",
   );
+
+  canvasCtx.restore();
 };
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
@@ -1532,6 +1533,7 @@ GraphSpectrumPlot._getActualMarginLeft = function () {
   switch (this._spectrumType) {
     case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
     case SPECTRUM_TYPE.FREQ_VS_RPM:
+    case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
       actualMarginLeft = this._isFullScreen
         ? MARGIN_LEFT_FULLSCREEN
         : MARGIN_LEFT;

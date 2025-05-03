@@ -106,7 +106,7 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
   return fftData;
 };
 
-GraphSpectrumCalc.dataLoadFrequencyPSD = function() {
+GraphSpectrumCalc.dataLoadPSD = function() {
   const points_per_segment = 512,
         overlap_count = 256;
   const flightSamples = this._getFlightSamplesFreq(false);
