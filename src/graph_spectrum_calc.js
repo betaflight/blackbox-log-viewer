@@ -106,9 +106,15 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
   return fftData;
 };
 
-GraphSpectrumCalc.dataLoadPSD = function() {
-  const points_per_segment = 512,
-        overlap_count = 256;
+GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
+  let points_per_segment = 512;
+  const multipler = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multipler == 0) {
+    points_per_segment = 256;
+  } else if(multipler > 1) {
+    points_per_segment *= 2 ** Math.floor(multipler / 2);
+  }
+  const overlap_count = points_per_segment / 2;
   const flightSamples = this._getFlightSamplesFreq(false);
   const psd =  this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
   let min = 1e6,

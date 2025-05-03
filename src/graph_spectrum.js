@@ -117,7 +117,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           break;
 
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-          fftData = GraphSpectrumCalc.dataLoadPSD();
+          fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
           break;
 
         case SPECTRUM_TYPE.FREQUENCY:
