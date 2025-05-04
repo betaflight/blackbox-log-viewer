@@ -109,17 +109,17 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
 
-  let points_per_segment = 512;
+  let pointsPerSegment = 512;
   const multipler = Math.floor(1 / analyserZoomY); // 0. ... 10
   if (multipler == 0) {
-    points_per_segment = 256;
+    pointsPerSegment = 256;
   } else if(multipler > 1) {
-    points_per_segment *= 2 ** Math.floor(multipler / 2);
+    pointsPerSegment *= 2 ** Math.floor(multipler / 2);
   }
-  points_per_segment = Math.min(points_per_segment, flightSamples.samples.length);
-  const overlap_count = points_per_segment / 2;
+  pointsPerSegment = Math.min(pointsPerSegment, flightSamples.samples.length);
+  const overlapCount = pointsPerSegment / 2;
 
-  const psd =  this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
+  const psd =  this._psd(flightSamples.samples, this._blackBoxRate, pointsPerSegment, overlapCount);
   let min = 1e6,
       max = -1e6;
   for (const value of psd) {
@@ -525,9 +525,9 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
 /**
  * Compute PSD for data samples by Welch method follow Python code
  */
-GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 'density') {
+GraphSpectrumCalc._psd  = function(samples, samplesRate, pointsPerSegment, overlapCount, scaling = 'density') {
 // Compute FFT for samples segments
-  const fftOutput = this._fft_segmented(samples, n_per_seg, n_overlap);
+  const fftOutput = this._fft_segmented(samples, pointsPerSegment, overlapCount);
 
   const dataCount = fftOutput[0].length;
   const segmentsCount = fftOutput.length;
@@ -536,14 +536,14 @@ GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 
 // Compute power scale coef
   let scale = 1;
   if (userSettings.analyserHanning) {
-    const window = Array(n_per_seg).fill(1);
-    this._hanningWindow(window, n_per_seg);
+    const window = Array(pointsPerSegment).fill(1);
+    this._hanningWindow(window, pointsPerSegment);
     if (scaling == 'density') {
       let skSum = 0;
       for (const value of window) {
         skSum += value ** 2;
       }
-      scale = 1 / (fs * skSum);
+      scale = 1 / (samplesRate * skSum);
     } else if (scaling == 'spectrum') {
       let sum = 0;
       for (const value of window) {
@@ -552,9 +552,9 @@ GraphSpectrumCalc._psd  = function(samples, fs, n_per_seg, n_overlap, scaling = 
       scale = 1 / sum ** 2;
     }
   } else if (scaling == 'density') {
-    scale = 1 / n_per_seg;
+    scale = 1 / pointsPerSegment;
   } else if (scaling == 'spectrum') {
-    scale = 1 / n_per_seg ** 2;
+    scale = 1 / pointsPerSegment ** 2;
   }
 
 // Compute average for scaled power
