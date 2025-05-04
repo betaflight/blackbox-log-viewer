@@ -374,6 +374,17 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     "db/Hz",
     ticksCount,
   );
+  this._drawInterestFrequency(
+      canvasCtx,
+      this._fftData.maxNoiseIdx,
+      PLOTTED_BLACKBOX_RATE,
+      "Max motor noise",
+      WIDTH,
+      HEIGHT,
+      15 * 5 + MARGIN,
+      "rgba(255,0,0,0.50)",
+      3,
+    );
 
   canvasCtx.restore();
 };

@@ -119,22 +119,17 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   pointsPerSegment = Math.min(pointsPerSegment, flightSamples.samples.length);
   const overlapCount = pointsPerSegment / 2;
 
-  const psd =  this._psd(flightSamples.samples, this._blackBoxRate, pointsPerSegment, overlapCount);
-  let min = 1e6,
-      max = -1e6;
-  for (const value of psd) {
-      min = Math.min(value, min);
-      max = Math.max(value, max);
-  }
+  const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
 
   const psdData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    psdLength  : psd.length,
-    psdOutput  : psd,
+    psdLength  : psd.psdOutput.length,
+    psdOutput  : psd.psdOutput,
     blackBoxRate : this._blackBoxRate,
-    minimum: min,
-    maximum: max,
+    minimum: psd.min,
+    maximum: psd.max,
+    maxNoiseIdx: psd.maxNoiseIdx,
   };
   return psdData;
 };
@@ -525,7 +520,7 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
 /**
  * Compute PSD for data samples by Welch method follow Python code
  */
-GraphSpectrumCalc._psd  = function(samples, samplesRate, pointsPerSegment, overlapCount, scaling = 'density') {
+GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scaling = 'density') {
 // Compute FFT for samples segments
   const fftOutput = this._fft_segmented(samples, pointsPerSegment, overlapCount);
 
@@ -543,7 +538,7 @@ GraphSpectrumCalc._psd  = function(samples, samplesRate, pointsPerSegment, overl
       for (const value of window) {
         skSum += value ** 2;
       }
-      scale = 1 / (samplesRate * skSum);
+      scale = 1 / (this._blackBoxRate * skSum);
     } else if (scaling == 'spectrum') {
       let sum = 0;
       for (const value of window) {
@@ -558,6 +553,12 @@ GraphSpectrumCalc._psd  = function(samples, samplesRate, pointsPerSegment, overl
   }
 
 // Compute average for scaled power
+  let min = 1e6,
+      max = -1e6;
+  const maxFrequency = (this._blackBoxRate / 2.0);
+  const noiseLowEndIdx = 100 / maxFrequency * dataCount;
+  let maxNoiseIdx = 0;
+  let maxNoise = 0;
   for (let i = 0; i < dataCount; i++) {
     psdOutput[i] = 0.0;
     for (let j = 0; j < segmentsCount; j++) {
@@ -572,9 +573,22 @@ GraphSpectrumCalc._psd  = function(samples, samplesRate, pointsPerSegment, overl
     let avg = psdOutput[i] / segmentsCount;
     avg = Math.max(avg, min_avg);
     psdOutput[i] = 10 * Math.log10(avg);
+    min = Math.min(psdOutput[i], min);
+    max = Math.max(psdOutput[i], max);
+    if (i > noiseLowEndIdx && psdOutput[i] > maxNoise) {
+      maxNoise = psdOutput[i];
+      maxNoiseIdx = i;
+    }
   }
 
-  return psdOutput;
+  const maxNoiseFrequency = maxNoiseIdx / dataCount * maxFrequency;
+
+  return {
+      psdOutput: psdOutput,
+      min: min,
+      max: max,
+      maxNoiseIdx: maxNoiseFrequency,
+    };
 };
 
 
