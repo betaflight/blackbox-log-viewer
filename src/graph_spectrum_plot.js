@@ -1210,8 +1210,8 @@ GraphSpectrumPlot._drawGradientBackground = function (
   );
 
   if (this._isFullScreen) {
-    backgroundGradient.addColorStop(1, "rgba(0,0,0,0.9)");
-    backgroundGradient.addColorStop(0, "rgba(0,0,0,0.7)");
+    backgroundGradient.addColorStop(1, "rgba(0,0,0,1)");
+    backgroundGradient.addColorStop(0, "rgba(0,0,0,0.9)");
   } else {
     backgroundGradient.addColorStop(1, "rgba(255,255,255,0.25)");
     backgroundGradient.addColorStop(0, "rgba(255,255,255,0)");
