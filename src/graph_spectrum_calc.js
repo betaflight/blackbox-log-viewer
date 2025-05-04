@@ -609,12 +609,12 @@ GraphSpectrumCalc._fft_segmented  = function(samples, n_per_seg, n_overlap) {
     }
 
     const fftComplex = this._fft(fftInput);
-  const magnitudes = new Float64Array(n_per_seg / 2);
-  for (let i = 0; i < n_per_seg / 2; i++) {
-    const re = fftComplex[2 * i];
-    const im = fftComplex[2 * i + 1];
-    magnitudes[i] = Math.hypot(re, im);
-  }
+    const magnitudes = new Float64Array(n_per_seg / 2);
+    for (let i = 0; i < n_per_seg / 2; i++) {
+      const re = fftComplex[2 * i];
+      const im = fftComplex[2 * i + 1];
+      magnitudes[i] = Math.hypot(re, im);
+    }
     output.push(magnitudes);
   }
 
