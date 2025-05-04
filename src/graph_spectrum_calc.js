@@ -107,6 +107,8 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 };
 
 GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
+  const flightSamples = this._getFlightSamplesFreq(false);
+
   let points_per_segment = 512;
   const multipler = Math.floor(1 / analyserZoomY); // 0. ... 10
   if (multipler == 0) {
@@ -114,8 +116,9 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   } else if(multipler > 1) {
     points_per_segment *= 2 ** Math.floor(multipler / 2);
   }
+  points_per_segment = Math.min(points_per_segment, flightSamples.samples.length);
   const overlap_count = points_per_segment / 2;
-  const flightSamples = this._getFlightSamplesFreq(false);
+
   const psd =  this._psd(flightSamples.samples, this._blackBoxRate, points_per_segment, overlap_count);
   let min = 1e6,
       max = -1e6;
