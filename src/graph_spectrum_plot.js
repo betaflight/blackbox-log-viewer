@@ -1440,7 +1440,8 @@ GraphSpectrumPlot._drawMousePosition = function (
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY
   ) {
     // Calculate frequency at mouse
     const sampleRate = this._fftData.blackBoxRate / this._zoomX;
