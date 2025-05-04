@@ -556,9 +556,10 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
   let min = 1e6,
       max = -1e6;
   const maxFrequency = (this._blackBoxRate / 2.0);
-  const noiseLowEndIdx = 100 / maxFrequency * dataCount;
+  const noise100HzIdx = 100 / maxFrequency * dataCount;
+  const noise3HzIdx = 3 / maxFrequency * dataCount;
   let maxNoiseIdx = 0;
-  let maxNoise = 0;
+  let maxNoise = -100;
   for (let i = 0; i < dataCount; i++) {
     psdOutput[i] = 0.0;
     for (let j = 0; j < segmentsCount; j++) {
@@ -573,9 +574,11 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
     let avg = psdOutput[i] / segmentsCount;
     avg = Math.max(avg, min_avg);
     psdOutput[i] = 10 * Math.log10(avg);
-    min = Math.min(psdOutput[i], min);
-    max = Math.max(psdOutput[i], max);
-    if (i > noiseLowEndIdx && psdOutput[i] > maxNoise) {
+    if (i > noise3HzIdx) {    // Miss big zero freq magnitude
+      min = Math.min(psdOutput[i], min);
+      max = Math.max(psdOutput[i], max);
+    }
+    if (i > noise100HzIdx && psdOutput[i] > maxNoise) {
       maxNoise = psdOutput[i];
       maxNoiseIdx = i;
     }
