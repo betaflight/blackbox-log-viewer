@@ -376,7 +376,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     HEIGHT,
     minY,
     maxY,
-    "db/Hz",
+    "dBm/Hz",
     ticksCount,
   );
   const offset = 1;
@@ -1480,7 +1480,7 @@ GraphSpectrumPlot._drawMousePosition = function (
         unitLabel = "Hz";
         break;
       case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-        unitLabel = "db/Hz";
+        unitLabel = "dBm/Hz";
         break;
       default:
         unitLabel = null;
