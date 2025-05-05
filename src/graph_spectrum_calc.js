@@ -570,7 +570,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
       psdOutput[i] += p;
     }
 
-    const min_avg = 1e-5; // limit min value for -50db
+    const min_avg = 1e-7; // limit min value for -70db
     let avg = psdOutput[i] / segmentsCount;
     avg = Math.max(avg, min_avg);
     psdOutput[i] = 10 * Math.log10(avg);
