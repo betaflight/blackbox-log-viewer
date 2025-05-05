@@ -381,16 +381,16 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   );
   const offset = 1;
   this._drawInterestFrequency(
-      canvasCtx,
-      this._fftData.maxNoiseIdx,
-      PLOTTED_BLACKBOX_RATE,
-      "Max noise",
-      WIDTH,
-      HEIGHT,
-      15 * offset + MARGIN,
-      "rgba(255,0,0,0.50)",
-      3,
-    );
+    canvasCtx,
+    this._fftData.maxNoiseIdx,
+    PLOTTED_BLACKBOX_RATE,
+    "Max noise",
+    WIDTH,
+    HEIGHT,
+    15 * offset + MARGIN,
+    "rgba(255,0,0,0.50)",
+    3,
+  );
 
   canvasCtx.restore();
 };
