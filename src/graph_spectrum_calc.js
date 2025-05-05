@@ -561,7 +561,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
       psdOutput: new Float64Array(0),
       min: 0,
       max: 0,
-      maxNoiseIdx: 0
+      maxNoiseIdx: 0,
     };
   }
   const maxFrequency = (this._blackBoxRate / 2.0);
