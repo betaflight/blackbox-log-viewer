@@ -381,16 +381,16 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   );
   const offset = 1;
   this._drawInterestFrequency(
-      canvasCtx,
-      this._fftData.maxNoiseIdx,
-      PLOTTED_BLACKBOX_RATE,
-      "Max noise",
-      WIDTH,
-      HEIGHT,
-      15 * offset + MARGIN,
-      "rgba(255,0,0,0.50)",
-      3,
-    );
+    canvasCtx,
+    this._fftData.maxNoiseIdx,
+    PLOTTED_BLACKBOX_RATE,
+    "Max noise",
+    WIDTH,
+    HEIGHT,
+    15 * offset + MARGIN,
+    "rgba(255,0,0,0.50)",
+    3,
+  );
 
   canvasCtx.restore();
 };
@@ -1081,21 +1081,21 @@ GraphSpectrumPlot._drawVerticalGridLines = function (
   minValue,
   maxValue,
   label,
-  Ticks = 5,
+  ticks = 5,
 ) {
 
-  for (let i = 0; i <= Ticks; i++) {
+  for (let i = 0; i <= ticks; i++) {
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = "rgba(255,255,255,0.25)";
 
-    const verticalPosition = i * (HEIGHT / Ticks);
+    const verticalPosition = i * (HEIGHT / ticks);
     canvasCtx.moveTo(0, verticalPosition);
     canvasCtx.lineTo(WIDTH, verticalPosition);
 
     canvasCtx.stroke();
     const verticalAxisValue = (
-      (maxValue - minValue) * ((Ticks - i) / Ticks) +
+      (maxValue - minValue) * ((ticks - i) / ticks) +
       minValue
     ).toFixed(0);
     let textBaseline;
@@ -1103,7 +1103,7 @@ GraphSpectrumPlot._drawVerticalGridLines = function (
       case 0:
         textBaseline = "top";
         break;
-      case Ticks:
+      case ticks:
         textBaseline = "bottom";
         break;
       default:

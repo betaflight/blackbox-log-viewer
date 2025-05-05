@@ -110,11 +110,11 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
 
   let pointsPerSegment = 512;
-  const multipler = Math.floor(1 / analyserZoomY); // 0. ... 10
-  if (multipler == 0) {
+  const multiplier = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multiplier == 0) {
     pointsPerSegment = 256;
-  } else if(multipler > 1) {
-    pointsPerSegment *= 2 ** Math.floor(multipler / 2);
+  } else if(multiplier > 1) {
+    pointsPerSegment *= 2 ** Math.floor(multiplier / 2);
   }
   pointsPerSegment = Math.min(pointsPerSegment, flightSamples.samples.length);
   const overlapCount = Math.floor(pointsPerSegment / 2);
@@ -321,7 +321,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   for (const chunk of allChunks) {
     for (const frame of chunk.frames) {
       if (scaled) {
-        samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
+        samples[samplesCount] = this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]);
       } else {
         samples[samplesCount] = frame[this._dataBuffer.fieldIndex];
       }
@@ -555,6 +555,15 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
 // Compute average for scaled power
   let min = 1e6,
       max = -1e6;
+  // Early exit if no segments were processed
+  if (segmentsCount === 0) {
+    return {
+      psdOutput: new Float64Array(0),
+      min: 0,
+      max: 0,
+      maxNoiseIdx: 0
+    };
+  }
   const maxFrequency = (this._blackBoxRate / 2.0);
   const noise50HzIdx = 50 / maxFrequency * dataCount;
   const noise3HzIdx = 3 / maxFrequency * dataCount;
