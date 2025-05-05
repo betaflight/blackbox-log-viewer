@@ -117,7 +117,7 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
     pointsPerSegment *= 2 ** Math.floor(multipler / 2);
   }
   pointsPerSegment = Math.min(pointsPerSegment, flightSamples.samples.length);
-  const overlapCount = pointsPerSegment / 2;
+  const overlapCount = Math.floor(pointsPerSegment / 2);
 
   const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
 
@@ -556,7 +556,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
   let min = 1e6,
       max = -1e6;
   const maxFrequency = (this._blackBoxRate / 2.0);
-  const noise100HzIdx = 100 / maxFrequency * dataCount;
+  const noise50HzIdx = 50 / maxFrequency * dataCount;
   const noise3HzIdx = 3 / maxFrequency * dataCount;
   let maxNoiseIdx = 0;
   let maxNoise = -100;
@@ -578,7 +578,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
       min = Math.min(psdOutput[i], min);
       max = Math.max(psdOutput[i], max);
     }
-    if (i > noise100HzIdx && psdOutput[i] > maxNoise) {
+    if (i > noise50HzIdx && psdOutput[i] > maxNoise) {
       maxNoise = psdOutput[i];
       maxNoiseIdx = i;
     }
