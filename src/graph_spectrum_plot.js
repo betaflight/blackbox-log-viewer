@@ -379,7 +379,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     "db/Hz",
     ticksCount,
   );
-  const offset = 0;
+  const offset = 1;
   this._drawInterestFrequency(
       canvasCtx,
       this._fftData.maxNoiseIdx,
