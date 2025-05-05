@@ -338,6 +338,11 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const maxY = (Math.floor(this._fftData.maximum / dbStep) + 1) * dbStep;
   const ticksCount = (maxY - minY) / dbStep;
   const scaleY = HEIGHT / (maxY - minY);
+  //Store vsRange for _drawMousePosition
+  this._fftData.vsRange = {
+    min: minY,
+    max: maxY,
+  };
   canvasCtx.moveTo(0, 0);
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
@@ -374,6 +379,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     "db/Hz",
     ticksCount,
   );
+  const offset = 0;
   this._drawInterestFrequency(
       canvasCtx,
       this._fftData.maxNoiseIdx,
@@ -381,7 +387,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
       "Max noise",
       WIDTH,
       HEIGHT,
-      15 * 5 + MARGIN,
+      15 * offset + MARGIN,
       "rgba(255,0,0,0.50)",
       3,
     );
@@ -1472,6 +1478,9 @@ GraphSpectrumPlot._drawMousePosition = function (
         break;
       case SPECTRUM_TYPE.FREQ_VS_RPM:
         unitLabel = "Hz";
+        break;
+      case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+        unitLabel = "db/Hz";
         break;
       default:
         unitLabel = null;
