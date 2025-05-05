@@ -191,6 +191,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+          // Recalculate PSD with updated samples per segment count
+          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+            dataLoad();
+            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          }
           that.refresh();
         })
       )
