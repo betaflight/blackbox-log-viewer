@@ -110,11 +110,11 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
 
   let pointsPerSegment = 512;
-  const multipler = Math.floor(1 / analyserZoomY); // 0. ... 10
-  if (multipler == 0) {
+  const multiplier = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multipiler == 0) {
     pointsPerSegment = 256;
-  } else if(multipler > 1) {
-    pointsPerSegment *= 2 ** Math.floor(multipler / 2);
+  } else if (multiplier > 1) {
+    pointsPerSegment *= 2 ** Math.floor(multiplier / 2);
   }
   pointsPerSegment = Math.min(pointsPerSegment, flightSamples.samples.length);
   const overlapCount = Math.floor(pointsPerSegment / 2);
