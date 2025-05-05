@@ -321,7 +321,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   for (const chunk of allChunks) {
     for (const frame of chunk.frames) {
       if (scaled) {
-        samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
+        samples[samplesCount] = this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]);
       } else {
         samples[samplesCount] = frame[this._dataBuffer.fieldIndex];
       }
