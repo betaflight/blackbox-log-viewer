@@ -555,6 +555,15 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
 // Compute average for scaled power
   let min = 1e6,
       max = -1e6;
+      // Early exit if no segments were processed
+  if (segmentsCount === 0) {
+    return {
+      psdOutput: new Float64Array(0),
+      min: 0,
+      max: 0,
+      maxNoiseIdx: 0
+    };
+  }
   const maxFrequency = (this._blackBoxRate / 2.0);
   const noise50HzIdx = 50 / maxFrequency * dataCount;
   const noise3HzIdx = 3 / maxFrequency * dataCount;
