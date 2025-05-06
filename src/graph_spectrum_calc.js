@@ -610,7 +610,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
 GraphSpectrumCalc._fft_segmented  = function(samples, n_per_seg, n_overlap) {
   const samplesCount = samples.length;
   let output = [];
-  for (let i = 0; i < samplesCount - n_per_seg; i += n_per_seg - n_overlap) {
+  for (let i = 0; i <= samplesCount - n_per_seg; i += n_per_seg - n_overlap) {
     const fftInput = samples.slice(i, i + n_per_seg);
 
     if (userSettings.analyserHanning) {
