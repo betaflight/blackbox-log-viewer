@@ -605,21 +605,21 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
 
 
 /**
- * Compute FFT for samples segments by lenghts as n_per_seg with n_overlap overlap points count
+ * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
  */
-GraphSpectrumCalc._fft_segmented  = function(samples, n_per_seg, n_overlap) {
+GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
   const samplesCount = samples.length;
   let output = [];
-  for (let i = 0; i <= samplesCount - n_per_seg; i += n_per_seg - n_overlap) {
-    const fftInput = samples.slice(i, i + n_per_seg);
+  for (let i = 0; i <= samplesCount - pointsPerSegment; i += pointsPerSegment - overlapCount) {
+    const fftInput = samples.slice(i, i + pointsPerSegment);
 
     if (userSettings.analyserHanning) {
-      this._hanningWindow(fftInput, n_per_seg);
+      this._hanningWindow(fftInput, pointsPerSegment);
     }
 
     const fftComplex = this._fft(fftInput);
-    const magnitudes = new Float64Array(n_per_seg / 2);
-    for (let i = 0; i < n_per_seg / 2; i++) {
+    const magnitudes = new Float64Array(pointsPerSegment / 2);
+    for (let i = 0; i < pointsPerSegment / 2; i++) {
       const re = fftComplex[2 * i];
       const im = fftComplex[2 * i + 1];
       magnitudes[i] = Math.hypot(re, im);
