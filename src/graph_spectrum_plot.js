@@ -502,7 +502,7 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
       if (drawPSD) {
         const min = -40, max = 10; //limit values dBm
         valuePlot = Math.max(this._fftData.fftOutput[j][i], min);
-        valuePlot = Math.min(this._fftData.fftOutput[j][i], max);
+        valuePlot = Math.min(valuePlot, max);
         valuePlot = Math.round((valuePlot - min) * 100 / (max - min));
       } else {
         valuePlot = Math.round(
