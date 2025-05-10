@@ -18,6 +18,8 @@ export const SPECTRUM_TYPE = {
   PIDERROR_VS_SETPOINT: 2,
   FREQ_VS_RPM: 3,
   POWER_SPECTRAL_DENSITY: 4,
+  PSD_VS_THROTTLE: 5,
+  PSD_VS_RPM: 6,
 };
 
 export const SPECTRUM_OVERDRAW_TYPE = {
@@ -167,6 +169,14 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
 
     case SPECTRUM_TYPE.FREQ_VS_RPM:
       this._drawFrequencyVsXGraph(canvasCtx);
+      break;
+
+    case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+      this._drawFrequencyVsXGraph(canvasCtx, true);
+      break;
+
+    case SPECTRUM_TYPE.PSD_VS_RPM:
+      this._drawFrequencyVsXGraph(canvasCtx, true);
       break;
 
     case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
@@ -441,8 +451,9 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false)
     MARGIN_BOTTOM,
     "Hz"
   );
-
-  if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+  
+  if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
+      this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE) {
     this._drawVerticalGridLines(
       canvasCtx,
       LEFT,
@@ -453,7 +464,8 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false)
       this._fftData.vsRange.max,
       "%"
     );
-  } else if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM) {
+  } else if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+             this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
     this._drawVerticalGridLines(
       canvasCtx,
       LEFT,
@@ -486,13 +498,14 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
+      let valuePlot;
       if (drawPSD) {
         const min = -40, max = 10; //limit values dBm
-        let valuePlot = Math.max(this._fftData.fftOutput[j][i], min);
+        valuePlot = Math.max(this._fftData.fftOutput[j][i], min);
         valuePlot = Math.min(this._fftData.fftOutput[j][i], max);
         valuePlot = Math.round((valuePlot - min) * 100 / (max - min));
       } else {
-        const valuePlot = Math.round(
+        valuePlot = Math.round(
           Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
         );
       }
@@ -1455,7 +1468,9 @@ GraphSpectrumPlot._drawMousePosition = function (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
-    this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY
+    this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     // Calculate frequency at mouse
     const sampleRate = this._fftData.blackBoxRate / this._zoomX;
@@ -1482,9 +1497,11 @@ GraphSpectrumPlot._drawMousePosition = function (
     let unitLabel;
     switch (this._spectrumType) {
       case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
+      case SPECTRUM_TYPE.PSD_VS_THROTTLE:
         unitLabel = "%";
         break;
       case SPECTRUM_TYPE.FREQ_VS_RPM:
+      case SPECTRUM_TYPE.PSD_VS_RPM:
         unitLabel = "Hz";
         break;
       case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
@@ -1565,6 +1582,8 @@ GraphSpectrumPlot._getActualMarginLeft = function () {
   switch (this._spectrumType) {
     case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
     case SPECTRUM_TYPE.FREQ_VS_RPM:
+    case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+    case SPECTRUM_TYPE.PSD_VS_RPM:
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
       actualMarginLeft = this._isFullScreen
         ? MARGIN_LEFT_FULLSCREEN
