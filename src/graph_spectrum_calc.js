@@ -112,11 +112,11 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
 
   let pointsPerSegment = 512;
-  const multipiler = Math.floor(1 / analyserZoomY); // 0. ... 10
-  if (multipiler == 0) {
+  const multiplier = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multiplier == 0) {
     pointsPerSegment = 256;
-  } else if (multipiler > 1) {
-    pointsPerSegment *= 2 ** Math.floor(multipiler / 2);
+  } else if (multiplier > 1) {
+    pointsPerSegment *= 2 ** Math.floor(multiplier / 2);
   }
 
   // Use power 2 fft size what is not bigger flightSamples.samples.length
