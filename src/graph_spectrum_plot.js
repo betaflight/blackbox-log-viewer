@@ -395,7 +395,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.restore();
 };
 
-GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
+GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false) {
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
   const ACTUAL_MARGIN_LEFT = this._getActualMarginLeft();
@@ -407,7 +407,7 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
   canvasCtx.translate(LEFT, TOP);
 
   if (this._cachedDataCanvas == null) {
-    this._cachedDataCanvas = this._drawHeatMap();
+    this._cachedDataCanvas = this._drawHeatMap(drawPSD);
   }
 
   canvasCtx.drawImage(this._cachedDataCanvas, 0, 0, WIDTH, HEIGHT);
@@ -467,7 +467,7 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
   }
 };
 
-GraphSpectrumPlot._drawHeatMap = function () {
+GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   const THROTTLE_VALUES_SIZE = 100;
   //The magnitude is greate then seperete Re or Im value up to 1.4=sqrt(2). Therefore the SCALE_HEATMAP is decreased from 1.3 to 1.1
   const SCALE_HEATMAP = 1.1; // Value decided after some tests to be similar to the s
@@ -486,9 +486,16 @@ GraphSpectrumPlot._drawHeatMap = function () {
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
-      const valuePlot = Math.round(
-        Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
-      );
+      if (drawPSD) {
+        const min = -40, max = 10; //limit values dBm
+        let valuePlot = Math.max(this._fftData.fftOutput[j][i], min);
+        valuePlot = Math.min(this._fftData.fftOutput[j][i], max);
+        valuePlot = Math.round((valuePlot - min) * 100 / (max - min));
+      } else {
+        const valuePlot = Math.round(
+          Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
+        );
+      }
 
       // The fillStyle is slow, but I haven't found a way to do this faster...
       canvasCtx.fillStyle = `hsl(360, 100%, ${valuePlot}%)`;
