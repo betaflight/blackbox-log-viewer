@@ -79,7 +79,7 @@ GraphSpectrumCalc.setOutTime = function(time) {
   if ((time - this._analyserTimeRange.in) <= MAX_ANALYSER_LENGTH) {
     this._analyserTimeRange.out = time;
   } else {
-    this._analyserTimeRange.out = analyserTimeRange.in + MAX_ANALYSER_LENGTH;
+    this._analyserTimeRange.out = this._analyserTimeRange.in + MAX_ANALYSER_LENGTH;
   }
   return this._analyserTimeRange.out;
 };
