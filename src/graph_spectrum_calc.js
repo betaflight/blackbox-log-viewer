@@ -106,6 +106,33 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
   return fftData;
 };
 
+GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
+  const flightSamples = this._getFlightSamplesFreq(false);
+
+  let pointsPerSegment = 512;
+  const multipiler = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multipiler == 0) {
+    pointsPerSegment = 256;
+  } else if (multipiler > 1) {
+    pointsPerSegment *= 2 ** Math.floor(multipiler / 2);
+  }
+  pointsPerSegment = Math.min(pointsPerSegment, flightSamples.samples.length);
+  const overlapCount = Math.floor(pointsPerSegment / 2);
+
+  const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
+
+  const psdData = {
+    fieldIndex   : this._dataBuffer.fieldIndex,
+    fieldName  : this._dataBuffer.fieldName,
+    psdLength  : psd.psdOutput.length,
+    psdOutput  : psd.psdOutput,
+    blackBoxRate : this._blackBoxRate,
+    minimum: psd.min,
+    maximum: psd.max,
+    maxNoiseIdx: psd.maxNoiseIdx,
+  };
+  return psdData;
+};
 
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
@@ -283,7 +310,7 @@ GraphSpectrumCalc._getFlightChunks = function() {
   return allChunks;
 };
 
-GraphSpectrumCalc._getFlightSamplesFreq = function() {
+GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
 
   const allChunks = this._getFlightChunks();
 
@@ -293,7 +320,11 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
   let samplesCount = 0;
   for (const chunk of allChunks) {
     for (const frame of chunk.frames) {
-      samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
+      if (scaled) {
+        samples[samplesCount] = this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]);
+      } else {
+        samples[samplesCount] = frame[this._dataBuffer.fieldIndex];
+      }
       samplesCount++;
     }
   }
@@ -484,4 +515,117 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
   };
 
   return fftData;
+};
+
+/**
+ * Compute PSD for data samples by Welch method follow Python code
+ */
+GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scaling = 'density') {
+// Compute FFT for samples segments
+  const fftOutput = this._fft_segmented(samples, pointsPerSegment, overlapCount);
+
+  const dataCount = fftOutput[0].length;
+  const segmentsCount = fftOutput.length;
+  const psdOutput = new Float64Array(dataCount);
+
+// Compute power scale coef
+  let scale = 1;
+  if (userSettings.analyserHanning) {
+    const window = Array(pointsPerSegment).fill(1);
+    this._hanningWindow(window, pointsPerSegment);
+    if (scaling == 'density') {
+      let skSum = 0;
+      for (const value of window) {
+        skSum += value ** 2;
+      }
+      scale = 1 / (this._blackBoxRate * skSum);
+    } else if (scaling == 'spectrum') {
+      let sum = 0;
+      for (const value of window) {
+        sum += value;
+      }
+      scale = 1 / sum ** 2;
+    }
+  } else if (scaling == 'density') {
+    scale = 1 / pointsPerSegment;
+  } else if (scaling == 'spectrum') {
+    scale = 1 / pointsPerSegment ** 2;
+  }
+
+// Compute average for scaled power
+  let min = 1e6,
+      max = -1e6;
+      // Early exit if no segments were processed
+  if (segmentsCount === 0) {
+    return {
+      psdOutput: new Float64Array(0),
+      min: 0,
+      max: 0,
+      maxNoiseIdx: 0,
+    };
+  }
+  const maxFrequency = (this._blackBoxRate / 2.0);
+  const noise50HzIdx = 50 / maxFrequency * dataCount;
+  const noise3HzIdx = 3 / maxFrequency * dataCount;
+  let maxNoiseIdx = 0;
+  let maxNoise = -100;
+  for (let i = 0; i < dataCount; i++) {
+    psdOutput[i] = 0.0;
+    for (let j = 0; j < segmentsCount; j++) {
+      let p = scale * fftOutput[j][i] ** 2;
+      if (i != dataCount - 1) {
+        p *= 2;
+      }
+      psdOutput[i] += p;
+    }
+
+    const min_avg = 1e-7; // limit min value for -70db
+    let avg = psdOutput[i] / segmentsCount;
+    avg = Math.max(avg, min_avg);
+    psdOutput[i] = 10 * Math.log10(avg);
+    if (i > noise3HzIdx) {    // Miss big zero freq magnitude
+      min = Math.min(psdOutput[i], min);
+      max = Math.max(psdOutput[i], max);
+    }
+    if (i > noise50HzIdx && psdOutput[i] > maxNoise) {
+      maxNoise = psdOutput[i];
+      maxNoiseIdx = i;
+    }
+  }
+
+  const maxNoiseFrequency = maxNoiseIdx / dataCount * maxFrequency;
+
+  return {
+      psdOutput: psdOutput,
+      min: min,
+      max: max,
+      maxNoiseIdx: maxNoiseFrequency,
+    };
+};
+
+
+/**
+ * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
+ */
+GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
+  const samplesCount = samples.length;
+  let output = [];
+  for (let i = 0; i <= samplesCount - pointsPerSegment; i += pointsPerSegment - overlapCount) {
+    const fftInput = samples.slice(i, i + pointsPerSegment);
+
+    if (userSettings.analyserHanning) {
+      this._hanningWindow(fftInput, pointsPerSegment);
+    }
+
+    const fftComplex = this._fft(fftInput);
+    const magnitudes = new Float64Array(pointsPerSegment / 2);
+    for (let i = 0; i < pointsPerSegment / 2; i++) {
+      const re = fftComplex[2 * i];
+      const im = fftComplex[2 * i + 1];
+      magnitudes[i] = Math.hypot(re, im);
+    }
+    output.push(magnitudes);
+  }
+
+  return output;
 };
