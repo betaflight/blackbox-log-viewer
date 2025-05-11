@@ -405,6 +405,11 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.restore();
 };
 
+GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
+  const freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.psdOutput.length - 1) );
+  return this._fftData.psdOutput[freqIndex];
+};
+
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false) {
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
@@ -1505,6 +1510,17 @@ GraphSpectrumPlot._drawMousePosition = function (
       );
     }
 
+    if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+      const psdLabel = Math.round(this.getPSDbyFreq(mouseFrequency)).toString() + "dBm/Hz";
+      this._drawAxisLabel(
+            canvasCtx,
+            psdLabel,
+            mouseX - 30,
+            mouseY - 4,
+            "left",
+      );
+    }
+
     // Y axis
     let unitLabel;
     switch (this._spectrumType) {
@@ -1548,7 +1564,7 @@ GraphSpectrumPlot._drawMousePosition = function (
           this._drawAxisLabel(
             canvasCtx,
             label,
-            mouseX - 25,
+            mouseX - 30,
             mouseY - 4,
             "left",
           );
