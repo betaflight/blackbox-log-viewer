@@ -704,7 +704,6 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
     };
 };
 
-
 /**
  * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
  */
