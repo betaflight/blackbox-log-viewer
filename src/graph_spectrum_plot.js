@@ -451,7 +451,7 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false)
     MARGIN_BOTTOM,
     "Hz"
   );
-  
+
   if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
       this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE) {
     this._drawVerticalGridLines(
@@ -522,6 +522,17 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   canvasCtx.filter = "none";
 
   return heatMapCanvas;
+};
+
+GraphSpectrumPlot.getValueFromMatrixFFT  = function(frequency, vsArgument) {
+  const NUM_VS_BINS = 100;  // redefinition of value from graph_spectrum_calc.js module!
+  const matrixFFT = this._fftData;
+  let vsArgumentIndex = Math.round(NUM_VS_BINS * (vsArgument - matrixFFT.vsRange.min) / (matrixFFT.vsRange.max - matrixFFT.vsRange.min));
+  if (vsArgumentIndex === NUM_VS_BINS) {
+    vsArgumentIndex = NUM_VS_BINS - 1;
+  }
+  const freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftOutput[0].length - 1) );
+  return matrixFFT.fftOutput[vsArgumentIndex][freqIndex];
 };
 
 GraphSpectrumPlot._drawPidErrorVsSetpointGraph = function (canvasCtx) {
@@ -1464,6 +1475,7 @@ GraphSpectrumPlot._drawMousePosition = function (
   lineWidth
 ) {
   // X axis
+  let mouseFrequency = 0;
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
@@ -1476,7 +1488,7 @@ GraphSpectrumPlot._drawMousePosition = function (
     const sampleRate = this._fftData.blackBoxRate / this._zoomX;
     const marginLeft = this._getActualMarginLeft();
 
-    const mouseFrequency =
+    mouseFrequency =
       ((mouseX - marginLeft) / WIDTH) *
       (this._fftData.blackBoxRate / this._zoomX / 2);
     if (mouseFrequency >= 0 && mouseFrequency <= sampleRate) {
@@ -1514,12 +1526,12 @@ GraphSpectrumPlot._drawMousePosition = function (
     if (unitLabel !== null) {
       const val_min = this._fftData.vsRange.min;
       const val_max = this._fftData.vsRange.max;
-      const mouseValue = (1 - mouseY / HEIGHT) * (val_max - val_min) + val_min;
-      if (mouseValue >= val_min && mouseValue <= val_max) {
-        const valueLabel = `${mouseValue.toFixed(0)}${unitLabel}`;
+      const vsArgValue = (1 - mouseY / HEIGHT) * (val_max - val_min) + val_min;
+      if (vsArgValue >= val_min && vsArgValue <= val_max) {
+        const valueLabel = `${vsArgValue.toFixed(0)}${unitLabel}`;
         this._drawHorizontalMarkerLine(
           canvasCtx,
-          mouseValue,
+          vsArgValue,
           val_min,
           val_max,
           valueLabel,
@@ -1529,6 +1541,18 @@ GraphSpectrumPlot._drawMousePosition = function (
           stroke,
           lineWidth
         );
+
+        if (this._spectrumType == SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+            this._spectrumType == SPECTRUM_TYPE.PSD_VS_RPM) {
+          const label = Math.round(this.getValueFromMatrixFFT(mouseFrequency, vsArgValue)).toString() + "dBm/Hz";
+          this._drawAxisLabel(
+            canvasCtx,
+            label,
+            mouseX - 25,
+            mouseY - 4,
+            "left",
+          );
+        }
       }
     }
   } else if (this._spectrumType === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT) {
