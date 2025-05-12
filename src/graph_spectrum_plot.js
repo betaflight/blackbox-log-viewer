@@ -1569,8 +1569,8 @@ GraphSpectrumPlot._drawMousePosition = function (
           lineWidth
         );
 
-        if (this._spectrumType == SPECTRUM_TYPE.PSD_VS_THROTTLE ||
-            this._spectrumType == SPECTRUM_TYPE.PSD_VS_RPM) {
+        if (this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+            this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
           const label = Math.round(this.getValueFromMatrixFFT(mouseFrequency, vsArgValue)).toString() + "dBm/Hz";
           this._drawAxisLabel(
             canvasCtx,
