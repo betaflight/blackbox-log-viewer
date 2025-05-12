@@ -406,8 +406,10 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
-  const freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.psdOutput.length - 1) );
-  return this._fftData.psdOutput[freqIndex];
+  let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.psdOutput.length - 1) );
+  freqIndex = Math.min(freqIndex, this._fftData.psdOutput.length - 1);
+  freqIndex = Math.max(freqIndex, 0);
+  return this._fftData.psdOutput.length ? this._fftData.psdOutput[freqIndex] : 0;
 };
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false) {
@@ -536,7 +538,9 @@ GraphSpectrumPlot.getValueFromMatrixFFT  = function(frequency, vsArgument) {
   if (vsArgumentIndex === NUM_VS_BINS) {
     vsArgumentIndex = NUM_VS_BINS - 1;
   }
-  const freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftLength - 1) );
+  let freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftLength - 1));
+  freqIndex = Math.max(freqIndex, 0);
+  freqIndex = Math.min(freqIndex, matrixFFT.fftLength - 1);
   return matrixFFT.fftOutput[vsArgumentIndex][freqIndex];
 };
 
@@ -1275,7 +1279,14 @@ GraphSpectrumPlot._drawInterestFrequency = function (
   stroke,
   lineWidth
 ) {
-  const interestLabel = `${label} ${frequency.toFixed(0)}Hz`;
+
+  let interestLabel = "";
+  if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY && label != "" ) {
+    const psdValue = this.getPSDbyFreq(frequency);
+    interestLabel = `${label}: (${frequency.toFixed(0)}Hz, ${psdValue.toFixed(0)}dBm/Hz)`;
+  } else {
+    interestLabel = `${label} ${frequency.toFixed(0)}Hz`;
+  }
   return this._drawVerticalMarkerLine(
     canvasCtx,
     frequency,
