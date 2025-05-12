@@ -403,7 +403,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   }
 
   return {
-    samples : samples.slice(0, samplesCount),
+    samples : samples,
     count : samplesCount,
   };
 };
