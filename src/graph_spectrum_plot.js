@@ -392,7 +392,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const offset = 1;
   this._drawInterestFrequency(
     canvasCtx,
-    this._fftData.maxNoiseIdx,
+    this._fftData.maxNoiseFrequency,
     PLOTTED_BLACKBOX_RATE,
     "Max noise",
     WIDTH,
@@ -536,7 +536,7 @@ GraphSpectrumPlot.getValueFromMatrixFFT  = function(frequency, vsArgument) {
   if (vsArgumentIndex === NUM_VS_BINS) {
     vsArgumentIndex = NUM_VS_BINS - 1;
   }
-  const freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftOutput[0].length - 1) );
+  const freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftLength - 1) );
   return matrixFFT.fftOutput[vsArgumentIndex][freqIndex];
 };
 
@@ -984,7 +984,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
   if (this._spectrumType === SPECTRUM_TYPE.FREQUENCY) {
     this._drawInterestFrequency(
       canvasCtx,
-      this._fftData.maxNoiseIdx,
+      this._fftData.maxNoiseFrequency,
       PLOTTED_BLACKBOX_RATE,
       "Max noise",
       WIDTH,
