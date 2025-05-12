@@ -1524,11 +1524,11 @@ GraphSpectrumPlot._drawMousePosition = function (
     if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
       const psdLabel = Math.round(this.getPSDbyFreq(mouseFrequency)).toString() + "dBm/Hz";
       this._drawAxisLabel(
-            canvasCtx,
-            psdLabel,
-            mouseX - 30,
-            mouseY - 4,
-            "left",
+        canvasCtx,
+        psdLabel,
+        mouseX - 30,
+        mouseY - 4,
+        "left",
       );
     }
 
