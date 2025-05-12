@@ -136,7 +136,7 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
     blackBoxRate : this._blackBoxRate,
     minimum: psd.min,
     maximum: psd.max,
-    maxNoiseIdx: psd.maxNoiseIdx,
+    maxNoiseFrequency: psd.maxNoiseFrequency,
   };
   return psdData;
 };
@@ -246,11 +246,11 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
 
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
-  let psdLength = 0;
+  const psdLength = Math.floor(fftChunkLength / 2);
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
-  const matrixFftOutput = new Array(NUM_VS_BINS)
+  const matrixPsdOutput = new Array(NUM_VS_BINS)
         .fill(null)
-        .map(() => (new Float64Array(Math.floor(fftChunkLength / 2))).fill(-70));
+        .map(() => (new Float64Array(psdLength)).fill(-70));
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
@@ -258,7 +258,6 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
 
     const fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
     const psd = this._psd(fftInput, fftChunkLength, 0, 'density');
-    psdLength = psd.psdOutput.length;
     maxNoise = Math.max(psd.max, maxNoise);
     // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
     for (const vsValueArray of flightSamples.vsValues) {
@@ -275,8 +274,8 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
       numberSamples[vsBinIndex]++;
 
       // add the output from the fft to the row given by the vs value bin index
-      for (let i = 0; i < psd.psdOutput.length; i++) {
-        matrixFftOutput[vsBinIndex][i] += psd.psdOutput[i];
+      for (let i = 0; i < psdLength; i++) {
+        matrixPsdOutput[vsBinIndex][i] += psd.psdOutput[i];
       }
     }
   }
@@ -284,8 +283,8 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   // Divide the values from the fft in each row (vs value bin) by the number of samples in the bin
   for (let i = 0; i < NUM_VS_BINS; i++) {
     if (numberSamples[i] > 1) {
-      for (let j = 0; j < matrixFftOutput[i].length; j++) {
-        matrixFftOutput[i][j] /= numberSamples[i];
+      for (let j = 0; j < psdLength; j++) {
+        matrixPsdOutput[i][j] /= numberSamples[i];
       }
     }
   }
@@ -298,7 +297,7 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
     fftLength  : psdLength,
-    fftOutput  : matrixFftOutput,
+    fftOutput  : matrixPsdOutput,
     maxNoise   : maxNoise,
     blackBoxRate : this._blackBoxRate,
     vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
@@ -604,14 +603,14 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput) {
     }
   }
 
-  maxNoiseIdx = maxNoiseIdx / magnitudeLength * maxFrequency;
+  const maxNoiseFrequency = maxNoiseIdx / fftLength * maxFrequency;
 
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    fftLength  : magnitudeLength,
-    fftOutput  : magnitudes,
-    maxNoiseIdx  : maxNoiseIdx,
+    fftLength  : fftLength,
+    fftOutput  : fftOutput,
+    maxNoiseFrequency  : maxNoiseFrequency,
     blackBoxRate : this._blackBoxRate,
   };
 
@@ -662,7 +661,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
       psdOutput: new Float64Array(0),
       min: 0,
       max: 0,
-      maxNoiseIdx: 0,
+      maxNoiseFrequency: 0,
     };
   }
   const maxFrequency = (this._blackBoxRate / 2.0);
@@ -700,7 +699,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
       psdOutput: psdOutput,
       min: min,
       max: max,
-      maxNoiseIdx: maxNoiseFrequency,
+      maxNoiseFrequency: maxNoiseFrequency,
     };
 };
 
@@ -708,7 +707,8 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
  * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
  */
 GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
-  const samplesCount = samples.length;
+  const samplesCount = samples.length,
+        fftLength = Math.floor(pointsPerSegment / 2);
   let output = [];
   for (let i = 0; i <= samplesCount - pointsPerSegment; i += pointsPerSegment - overlapCount) {
     const fftInput = samples.slice(i, i + pointsPerSegment);
@@ -718,8 +718,8 @@ GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapC
     }
 
     const fftComplex = this._fft(fftInput);
-    const magnitudes = new Float64Array(pointsPerSegment / 2);
-    for (let i = 0; i < pointsPerSegment / 2; i++) {
+    const magnitudes = new Float64Array(fftLength);
+    for (let i = 0; i < fftLength; i++) {
       const re = fftComplex[2 * i];
       const im = fftComplex[2 * i + 1];
       magnitudes[i] = Math.hypot(re, im);
