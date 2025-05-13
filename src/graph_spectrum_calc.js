@@ -385,7 +385,7 @@ GraphSpectrumCalc._getFlightChunks = function() {
   return allChunks;
 };
 
-GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
+GraphSpectrumCalc._getFlightSamplesFreq = function() {
 
   const allChunks = this._getFlightChunks();
 
@@ -395,11 +395,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   let samplesCount = 0;
   for (const chunk of allChunks) {
     for (const frame of chunk.frames) {
-      if (scaled) {
-        samples[samplesCount] = this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]);
-      } else {
-        samples[samplesCount] = frame[this._dataBuffer.fieldIndex];
-      }
+      samples[samplesCount] = (this._dataBuffer.curve.lookupRaw(frame[this._dataBuffer.fieldIndex]));
       samplesCount++;
     }
   }
