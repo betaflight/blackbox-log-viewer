@@ -490,7 +490,6 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     console.log("Adjusted FreqVsX range due to invalid calculation: min=%f, max=%f", minValue, maxValue);
   }
 
-
   return {
     samples  : samples,
     vsValues : vsValues,
@@ -527,8 +526,8 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
   }
 
   return {
-    piderror: piderror.slice(0, samplesCount),
-    setpoint: setpoint.slice(0, samplesCount),
+    piderror,
+    setpoint,
     maxSetpoint,
     count: samplesCount,
   };
