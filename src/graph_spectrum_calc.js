@@ -205,13 +205,13 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
   // blur algorithm to the heat map image
 
   const fftData = {
-    fieldIndex   : this._dataBuffer.fieldIndex,
-    fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftChunkLength,
-    fftOutput  : matrixFftOutput,
-    maxNoise   : maxNoise,
-    blackBoxRate : this._blackBoxRate,
-    vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
+      fieldIndex   : this._dataBuffer.fieldIndex,
+      fieldName  : this._dataBuffer.fieldName,
+      fftLength  : fftChunkLength,
+      fftOutput  : matrixFftOutput,
+      maxNoise   : maxNoise,
+      blackBoxRate : this._blackBoxRate,
+      vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
   };
 
   return fftData;
@@ -330,7 +330,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   }
 
   return {
-    samples : samples.slice(0, samplesCount),
+    samples : samples,
     count : samplesCount,
   };
 };
@@ -410,14 +410,13 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
   for (const vsValueArray of vsValues) {
     slicedVsValues.push(vsValueArray.slice(0, samplesCount));
   }
-
   return {
-    samples  : samples.slice(0, samplesCount),
-    vsValues : slicedVsValues,
-    count  : samplesCount,
-    minValue : minValue,
-    maxValue : maxValue,
-  };
+      samples  : samples.slice(0, samplesCount),
+      vsValues : slicedVsValues,
+      count  : samplesCount,
+      minValue : minValue,
+      maxValue : maxValue,
+       };
 };
 
 GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
@@ -446,8 +445,8 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
   }
 
   return {
-    piderror: piderror.slice(0, samplesCount),
-    setpoint: setpoint.slice(0, samplesCount),
+    piderror,
+    setpoint,
     maxSetpoint,
     count: samplesCount,
   };
