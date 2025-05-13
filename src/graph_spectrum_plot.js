@@ -193,7 +193,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
 
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
 
-  const barWidth = WIDTH / (PLOTTED_BUFFER_LENGTH / 10) - 1;
+  const barWidth = WIDTH / (PLOTTED_BUFFER_LENGTH / 5) - 1;
   let x = 0;
 
   const barGradient = canvasCtx.createLinearGradient(0, HEIGHT, 0, 0);
@@ -217,7 +217,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   canvasCtx.fillStyle = barGradient;
 
   const fftScale = HEIGHT / (this._zoomY * 100);
-  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
+  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 5) {
     const barHeight = this._fftData.fftOutput[i] * fftScale;
     canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
     x += barWidth + 1;
@@ -469,7 +469,8 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
 
 GraphSpectrumPlot._drawHeatMap = function () {
   const THROTTLE_VALUES_SIZE = 100;
-  const SCALE_HEATMAP = 1.3; // Value decided after some tests to be similar to the scale of frequency graph
+  //The magnitude is greate then seperete Re or Im value up to 1.4=sqrt(2). Therefore the SCALE_HEATMAP is decreased from 1.3 to 1.1
+  const SCALE_HEATMAP = 1.1; // Value decided after some tests to be similar to the s
   // This value will be maximum color
 
   const heatMapCanvas = document.createElement("canvas");
@@ -482,7 +483,7 @@ GraphSpectrumPlot._drawHeatMap = function () {
   const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
 
   // Loop for throttle
-  for (let j = 0; j < 100; j++) {
+  for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
       const valuePlot = Math.round(
