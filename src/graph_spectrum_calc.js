@@ -245,12 +245,15 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     fft.simple(fftOutputComplex, fftInput, 'real');
 
-    // The original code sliced fftOutputComplex (complex) to its first fftChunkLength float values.
-    // This behavior is preserved. fftOutputProcessed will store these abs values.
-    const fftOutputProcessed = new Float64Array(fftChunkLength);
-    for (let i = 0; i < fftChunkLength; i++) {
-      fftOutputProcessed[i] = Math.abs(fftOutputComplex[i]); // This processes Re0, Im0, Re1, Im1 ...
-      maxNoise = Math.max(fftOutputProcessed[i], maxNoise);
+    // Calculate proper complex magnitudes.
+    const bins = fftChunkLength / 2 + 1;
+    const fftOutputProcessed = new Float64Array(bins);
+    for (let bin = 0; bin < bins; bin++) {
+      const re = fftOutputComplex[2 * bin];
+      const im = fftOutputComplex[2 * bin + 1];
+      const mag = Math.hypot(re, im);
+      fftOutputProcessed[bin] = mag;
+      maxNoise = Math.max(maxNoise, mag);
     }
 
     // Calculate a bin index and add the processed fft values to that bin
