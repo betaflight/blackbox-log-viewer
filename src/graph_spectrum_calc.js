@@ -96,18 +96,50 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
   const flightSamples = this._getFlightSamplesFreq();
 
   if (userSettings.analyserHanning) {
-    this._hanningWindow(flightSamples.samples, flightSamples.count);
+    this._hanningWindow(flightSamples.samples, flightSamples.count); // Apply Hann function to actual flightSamples.count values only
   }
 
-  //calculate fft
+  //calculate fft for the all samples
   const fftOutput = this._fft(flightSamples.samples);
 
   // Normalize the result
-  const fftData = this._normalizeFft(fftOutput, flightSamples.samples.length);
+  const fftData = this._normalizeFft(fftOutput);
 
   return fftData;
 };
 
+GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
+  const flightSamples = this._getFlightSamplesFreq(false);
+
+  let pointsPerSegment = 512;
+  const multipiler = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multipiler == 0) {
+    pointsPerSegment = 256;
+  } else if (multipiler > 1) {
+    pointsPerSegment *= 2 ** Math.floor(multipiler / 2);
+  }
+
+  // Use power 2 fft size what is not bigger flightSamples.samples.length
+  if (pointsPerSegment > flightSamples.samples.length) {
+      pointsPerSegment = Math.pow(2, Math.floor(Math.log2(flightSamples.samples.length)));
+  }
+
+  const overlapCount = Math.floor(pointsPerSegment / 2);
+
+  const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
+
+  const psdData = {
+    fieldIndex   : this._dataBuffer.fieldIndex,
+    fieldName  : this._dataBuffer.fieldName,
+    psdLength  : psd.psdOutput.length,
+    psdOutput  : psd.psdOutput,
+    blackBoxRate : this._blackBoxRate,
+    minimum: psd.min,
+    maximum: psd.max,
+    maxNoiseIdx: psd.maxNoiseIdx,
+  };
+  return psdData;
+};
 
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
@@ -115,20 +147,28 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
   // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle
   // for each chunk. We use a moving window to get more chunks available.
-  const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
+  const fftChunkLength = Math.round(this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000);
   const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
+  const fftBufferSize = Math.pow(2, Math.ceil(Math.log2(fftChunkLength)));
 
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
-  const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength * 2));
+  const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftBufferSize * 2));
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
-  const fft = new FFT.complex(fftChunkLength, false);
+
+  const fft = new FFT.complex(fftBufferSize, false);
   for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
 
-    const fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
-    let fftOutput = new Float64Array(fftChunkLength * 2);
+    const fftInput = new Float64Array(fftBufferSize);
+    let fftOutput = new Float64Array(fftBufferSize * 2);
+
+    //TODO: to find method to just resize samples array to fftBufferSize
+    const samples = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
+    for (let i = 0; i < fftChunkLength; i++) {
+      fftInput[i] = samples[i];
+    }
 
     // Hanning window applied to input data
     if (userSettings.analyserHanning) {
@@ -137,10 +177,12 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     fft.simple(fftOutput, fftInput, 'real');
 
-    fftOutput = fftOutput.slice(0, fftChunkLength);
+    fftOutput = fftOutput.slice(0, fftBufferSize); // The fft output contains two side spectrum, we use the first part only to get one side
 
+    // TODO: This is wrong spectrum magnitude calculation as abs of separate complex Re, Im values.
+    // We should use hypot(Re, Im) instead of and return divide by 2 (fftOutput.length / 4) arrays size
     // Use only abs values
-    for (let i = 0; i < fftChunkLength; i++) {
+    for (let i = 0; i < fftBufferSize; i++) {
       fftOutput[i] = Math.abs(fftOutput[i]);
       maxNoise = Math.max(fftOutput[i], maxNoise);
     }
@@ -154,7 +196,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
       }
       // Translate the average vs value to a bin index
       const avgVsValue = sumVsValues / fftChunkLength;
-      let vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
+      let vsBinIndex = Math.round(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
       // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
       if (vsBinIndex === NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
       numberSamples[vsBinIndex]++;
@@ -180,13 +222,13 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
   // blur algorithm to the heat map image
 
   const fftData = {
-      fieldIndex   : this._dataBuffer.fieldIndex,
-      fieldName  : this._dataBuffer.fieldName,
-      fftLength  : fftChunkLength,
-      fftOutput  : matrixFftOutput,
-      maxNoise   : maxNoise,
-      blackBoxRate : this._blackBoxRate,
-      vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
+    fieldIndex   : this._dataBuffer.fieldIndex,
+    fieldName  : this._dataBuffer.fieldName,
+    fftLength  : fftBufferSize,
+    fftOutput  : matrixFftOutput,
+    maxNoise   : maxNoise,
+    blackBoxRate : this._blackBoxRate,
+    vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
   };
 
   return fftData;
@@ -300,8 +342,10 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
     }
   }
 
+  // The FFT input size is power 2 to get maximal performance
+  const fftBufferSize = Math.pow(2, Math.ceil(Math.log2(samplesCount)));
   return {
-    samples : samples,
+    samples : samples.slice(0, fftBufferSize),
     count : samplesCount,
   };
 };
@@ -377,7 +421,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     }
   }
 
-  let slicedVsValues = [];
+  const slicedVsValues = [];
   for (const vsValueArray of vsValues) {
     slicedVsValues.push(vsValueArray.slice(0, samplesCount));
   }
@@ -453,18 +497,16 @@ GraphSpectrumCalc._fft  = function(samples, type) {
 /**
  * Makes all the values absolute and returns the index of maxFrequency found
  */
-GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
-
-  if (!fftLength) {
-    fftLength = fftOutput.length;
-  }
-
+GraphSpectrumCalc._normalizeFft = function(fftOutput) {
+  // The fft output contains two side spectrum, we use the first part only to get one side
+  const  fftLength = fftOutput.length / 2;
   // Make all the values absolute, and calculate some useful values (max noise, etc.)
   const maxFrequency = (this._blackBoxRate / 2.0);
   const noiseLowEndIdx = 100 / maxFrequency * fftLength;
   let maxNoiseIdx = 0;
   let maxNoise = 0;
-
+  // TODO: This is wrong spectrum magnitude calculation as abs of separate complex Re, Im values.
+  // We should use hypot(Re, Im) instead of and return divide by 2 (fftOutput.length / 4) arrays size
   for (let i = 0; i < fftLength; i++) {
     fftOutput[i] = Math.abs(fftOutput[i]);
     if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
