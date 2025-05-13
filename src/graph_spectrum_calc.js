@@ -567,53 +567,41 @@ GraphSpectrumCalc._fft  = function(samples, type) {
  * Makes all the values absolute and returns the index of maxFrequency found
  */
 GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
-  // fftLength is the number of samples input to FFT.
-  // fftOutput is the complex result from _fft.
-  // The original _normalizeFft looped 'fftLength' times assuming 'fftOutput' contained 'fftLength' magnitudes.
-  // This behavior is preserved. If fftOutput from _fft contains N complex values (2N floats),
-  // and fftLength is N, this loop processes N floats from fftOutput, taking their abs value.
+  // Number of usable frequency bins (0 to Nyquist)
+  const bins = Math.floor(fftLength / 2) + 1;  // +1 to include Nyquist bin
+  const magnitudes = new Float64Array(bins);
 
-  // Number of actual magnitudes to consider is fftLength / 2 (approx, up to Nyquist)
-  // However, to match existing behavior where it iterated fftLength times over fftOutput:
-  const iterationLength = fftLength; // Or Math.min(fftLength, fftOutput.length) if fftOutput could be shorter
+  // Calculate magnitudes from complex values
+  for (let bin = 0; bin < bins; bin++) {
+    const re = fftOutput[2 * bin];
+    const im = fftOutput[2 * bin + 1];
+    magnitudes[bin] = Math.hypot(re, im);
+  }
 
-  // Make all the values absolute, and calculate some useful values (max noise, etc.)
+  // Find max noise after low-end cutoff
   const maxFrequency = (this._blackBoxRate / 2.0);
-  // This scaling implies fftLength is the number of points up to Nyquist.
-  // If fftLength is num_samples, then num_points_to_nyquist is num_samples / 2.
-  // To maintain existing scaling logic with fftLength = num_samples:
-  const noiseLowEndIdx = 100 / maxFrequency * (iterationLength / 2); // Adjusted for N/2 bins
+  const noiseLowEndIdx = Math.floor(100 / maxFrequency * bins);
   let maxNoiseIdx = 0;
   let maxNoise = 0;
 
-  // Create a new array for magnitudes if we are to correctly interpret complex fftOutput
-  // For minimal change, we continue the existing pattern of modifying fftOutput in place.
-  // The loop below is likely incorrect for complex fftOutput but is existing behavior.
-  for (let i = 0; i < iterationLength; i++) { // This loop is over first N floats of complex output
-    fftOutput[i] = Math.abs(fftOutput[i]);
-    // The condition for maxNoiseIdx should refer to frequency bins, not raw float indices
-    const currentFreqBin = i / 2; // Approximate, assumes pairs
-    if (currentFreqBin > noiseLowEndIdx && fftOutput[i] > maxNoise) {
-      maxNoise = fftOutput[i];
-      maxNoiseIdx = currentFreqBin; // Store bin index
+  for (let bin = 0; bin < bins; bin++) {
+    if (bin > noiseLowEndIdx && magnitudes[bin] > maxNoise) {
+      maxNoise = magnitudes[bin];
+      maxNoiseIdx = bin;
     }
   }
 
-  // maxNoiseIdx is now a bin index relative to N/2 bins.
-  // Scale this bin index to frequency.
-  maxNoiseIdx = maxNoiseIdx / (iterationLength / 2) * maxFrequency;
+  // Scale bin index to frequency
+  const maxNoiseFreq = maxNoiseIdx / bins * maxFrequency;
 
-
-  const fftData = {
-    fieldIndex   : this._dataBuffer.fieldIndex,
-    fieldName  : this._dataBuffer.fieldName,
-    fftLength  : iterationLength, // Or iterationLength / 2 if this means number of frequency bins
-    fftOutput  : fftOutput.slice(0, iterationLength), // Return the part we processed
-    maxNoiseIdx  : maxNoiseIdx,
-    blackBoxRate : this._blackBoxRate,
+  return {
+    fieldIndex: this._dataBuffer.fieldIndex,
+    fieldName: this._dataBuffer.fieldName,
+    fftLength: bins,  // Return number of frequency bins
+    fftOutput: magnitudes,  // Return the magnitude spectrum
+    maxNoiseIdx: maxNoiseFreq,
+    blackBoxRate: this._blackBoxRate,
   };
-
-  return fftData;
 };
 
 /**
