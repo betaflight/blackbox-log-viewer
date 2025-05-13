@@ -150,7 +150,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
   const fftChunkLength = Math.round(this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000);
   const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
   const fftBufferSize = Math.pow(2, Math.ceil(Math.log2(fftChunkLength)));
-
+  const magnitudeLength = Math.floor(fftBufferSize / 2);
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
   const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftBufferSize * 2));
@@ -178,13 +178,14 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
     fft.simple(fftOutput, fftInput, 'real');
 
     fftOutput = fftOutput.slice(0, fftBufferSize); // The fft output contains two side spectrum, we use the first part only to get one side
-
-    // TODO: This is wrong spectrum magnitude calculation as abs of separate complex Re, Im values.
-    // We should use hypot(Re, Im) instead of and return divide by 2 (fftOutput.length / 4) arrays size
-    // Use only abs values
-    for (let i = 0; i < fftBufferSize; i++) {
-      fftOutput[i] = Math.abs(fftOutput[i]);
-      maxNoise = Math.max(fftOutput[i], maxNoise);
+    const magnitudes = new Float64Array(magnitudeLength);
+    
+//  Compute magnitude
+    for (let i = 0; i < magnitudeLength; i++) {
+      const re = fftOutput[2 * i],
+            im = fftOutput[2 * i + 1];
+      magnitudes[i] = Math.hypot(re, im);
+      maxNoise = Math.max(magnitudes[i], maxNoise);
     }
 
     // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
@@ -198,12 +199,12 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
       const avgVsValue = sumVsValues / fftChunkLength;
       let vsBinIndex = Math.round(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
       // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
-      if (vsBinIndex === NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
+      if (vsBinIndex >= NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
       numberSamples[vsBinIndex]++;
 
       // add the output from the fft to the row given by the vs value bin index
-      for (let i = 0; i < fftOutput.length; i++) {
-        matrixFftOutput[vsBinIndex][i] += fftOutput[i];
+      for (let i = 0; i < magnitudeLength; i++) {
+        matrixFftOutput[vsBinIndex][i] += magnitudes[i];
       }
     }
   }
@@ -224,7 +225,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftBufferSize,
+    fftLength  : magnitudeLength,
     fftOutput  : matrixFftOutput,
     maxNoise   : maxNoise,
     blackBoxRate : this._blackBoxRate,
@@ -395,7 +396,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
   }
 
   // Calculate min max average of the VS values in the chunk what will used by spectrum data definition
-  const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
+  const fftChunkLength = Math.round(this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000);
   const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
   for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < samplesCount; fftChunkIndex += fftChunkWindow) {
     for (const vsValueArray of vsValues) {
@@ -505,28 +506,33 @@ GraphSpectrumCalc._fft  = function(samples, type) {
 GraphSpectrumCalc._normalizeFft = function(fftOutput) {
   // The fft output contains two side spectrum, we use the first part only to get one side
   const  fftLength = fftOutput.length / 2;
-  // Make all the values absolute, and calculate some useful values (max noise, etc.)
+
+  // The fft output contains complex values (re, im pairs) of two-side spectrum
+  // Compute magnitudes for one spectrum side
+  const magnitudeLength = Math.floor(fftLength / 2);
   const maxFrequency = (this._blackBoxRate / 2.0);
-  const noiseLowEndIdx = 100 / maxFrequency * fftLength;
+  const noiseLowEndIdx = 100 / maxFrequency * magnitudeLength;
+  const magnitudes = new Float64Array(magnitudeLength);
   let maxNoiseIdx = 0;
   let maxNoise = 0;
-  // TODO: This is wrong spectrum magnitude calculation as abs of separate complex Re, Im values.
-  // We should use hypot(Re, Im) instead of and return divide by 2 (fftOutput.length / 4) arrays size
-  for (let i = 0; i < fftLength; i++) {
-    fftOutput[i] = Math.abs(fftOutput[i]);
-    if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
-      maxNoise = fftOutput[i];
+
+  for (let i = 0; i < magnitudeLength; i++) {
+    const re = fftOutput[2 * i],
+          im = fftOutput[2 * i + 1];
+    magnitudes[i] = Math.hypot(re, im);
+    if (i > noiseLowEndIdx && magnitudes[i] > maxNoise) {
+      maxNoise = magnitudes[i];
       maxNoiseIdx = i;
     }
   }
 
-  maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
+  maxNoiseIdx = maxNoiseIdx / magnitudeLength * maxFrequency;
 
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftLength,
-    fftOutput  : fftOutput,
+    fftLength  : magnitudeLength,
+    fftOutput  : magnitudes,
     maxNoiseIdx  : maxNoiseIdx,
     blackBoxRate : this._blackBoxRate,
   };
