@@ -665,8 +665,11 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
     psdOutput[i] = 0.0;
     for (let j = 0; j < segmentsCount; j++) {
       let p = scale * fftOutput[j][i] ** 2;
-      if (i != dataCount - 1) {
-        p *= 2;
+      if (i != 0) {
+        const even = dataCount % 2 == 0;
+        if (!even || even && i != dataCount - 1) {
+          p *= 2;
+        }
       }
       psdOutput[i] += p;
     }
