@@ -158,11 +158,8 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
     const fftInput = new Float64Array(fftBufferSize);
     let fftOutput = new Float64Array(fftBufferSize * 2);
 
-    //TODO: to find method to just resize samples array to fftBufferSize
     const samples = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
-    for (let i = 0; i < fftChunkLength; i++) {
-      fftInput[i] = samples[i];
-    }
+    fftInput.set(samples);
 
     // Hanning window applied to input data, without padding zeros
     if (userSettings.analyserHanning) {
