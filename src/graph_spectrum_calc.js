@@ -299,9 +299,12 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
 
 };
 
-GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function(drawPSD = false) {
-  return drawPSD ? this._dataLoadPowerSpectralDensityVsX(FIELD_THROTTLE_NAME, 0, 100) :
-                   this._dataLoadFrequencyVsX(FIELD_THROTTLE_NAME, 0, 100);
+GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
+  return this._dataLoadFrequencyVsX(FIELD_THROTTLE_NAME, 0, 100);
+};
+
+GraphSpectrumCalc.dataLoadPowerSpectralDensityVsThrottle = function() {
+  return this._dataLoadPowerSpectralDensityVsX(FIELD_THROTTLE_NAME, 0, 100);
 };
 
 GraphSpectrumCalc.dataLoadFrequencyVsRpm = function(drawPSD = false) {
