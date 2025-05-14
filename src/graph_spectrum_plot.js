@@ -1,5 +1,6 @@
 import { FILTER_TYPE } from "./flightlog_fielddefs";
 import { constrain } from "./tools";
+import { NUM_VS_BINS } from "./graph_spectrum_calc";
 
 const BLUR_FILTER_PIXEL = 1,
   DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -10,7 +11,9 @@ const BLUR_FILTER_PIXEL = 1,
   MARGIN_LEFT_FULLSCREEN = 35,
   MAX_SETPOINT_DEFAULT = 100,
   PID_ERROR_VERTICAL_CHUNK = 5,
-  ZOOM_X_MAX = 5;
+  ZOOM_X_MAX = 5,
+  MIN_DBM_VALUE = -40,
+  MAX_DBM_VALUE = 10;
 
 export const SPECTRUM_TYPE = {
   FREQUENCY: 0,
@@ -507,10 +510,9 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
     for (let i = 0; i < this._fftData.fftLength; i++) {
       let valuePlot;
       if (drawPSD) {
-        const min = -40, max = 10; //limit values dBm
-        valuePlot = Math.max(this._fftData.fftOutput[j][i], min);
-        valuePlot = Math.min(valuePlot, max);
-        valuePlot = Math.round((valuePlot - min) * 100 / (max - min));
+        valuePlot = Math.max(this._fftData.fftOutput[j][i], MIN_DBM_VALUE);
+        valuePlot = Math.min(valuePlot, MAX_DBM_VALUE);
+        valuePlot = Math.round((valuePlot - MIN_DBM_VALUE) * 100 / (MAX_DBM_VALUE - MIN_DBM_VALUE));
       } else {
         valuePlot = Math.round(
           Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
@@ -532,10 +534,9 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
 };
 
 GraphSpectrumPlot.getValueFromMatrixFFT  = function(frequency, vsArgument) {
-  const NUM_VS_BINS = 100;  // redefinition of value from graph_spectrum_calc.js module!
   const matrixFFT = this._fftData;
   let vsArgumentIndex = Math.round(NUM_VS_BINS * (vsArgument - matrixFFT.vsRange.min) / (matrixFFT.vsRange.max - matrixFFT.vsRange.min));
-  if (vsArgumentIndex === NUM_VS_BINS) {
+  if (vsArgumentIndex >= NUM_VS_BINS) {
     vsArgumentIndex = NUM_VS_BINS - 1;
   }
   let freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftLength - 1));
