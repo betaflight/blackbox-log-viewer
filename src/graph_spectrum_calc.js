@@ -604,8 +604,8 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput) {
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftLength,
-    fftOutput  : fftOutput,
+    fftLength  : magnitudeLength,
+    fftOutput  : magnitudes,
     maxNoiseFrequency  : maxNoiseFrequency,
     blackBoxRate : this._blackBoxRate,
   };
