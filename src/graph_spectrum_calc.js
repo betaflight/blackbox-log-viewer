@@ -91,6 +91,10 @@ GraphSpectrumCalc.setDataBuffer = function(fieldIndex, curve, fieldName) {
   return undefined;
 };
 
+GraphSpectrumCalc.getNearPower2Value = function(size) {
+  return Math.pow(2, Math.ceil(Math.log2(size)));
+};
+
 GraphSpectrumCalc.dataLoadFrequency = function() {
 
   const flightSamples = this._getFlightSamplesFreq();
@@ -110,21 +114,15 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 
 GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
-
-  let pointsPerSegment = 512;
   const multiplier = Math.floor(1 / analyserZoomY); // 0. ... 10
-  if (multiplier == 0) {
-    pointsPerSegment = 256;
-  } else if (multiplier > 1) {
-    pointsPerSegment *= 2 ** Math.floor(multiplier / 2);
-  }
+  let pointsPerSegment = 2 ** (8 + multiplier); //256, 512, 1024 ...
 
   // Use power 2 fft size what is not bigger flightSamples.samples.length
   if (pointsPerSegment > flightSamples.samples.length) {
-      pointsPerSegment = Math.pow(2, Math.floor(Math.log2(flightSamples.samples.length)));
+      pointsPerSegment = this.getNearPower2Value(flightSamples.samples.length);
   }
 
-  const overlapCount = Math.floor(pointsPerSegment / 2);
+  const overlapCount = pointsPerSegment / 2;
 
   const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
 
@@ -144,21 +142,18 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
   const flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue);
-
   // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle
   // for each chunk. We use a moving window to get more chunks available.
   const fftChunkLength = Math.round(this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000);
   const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
-  const fftBufferSize = Math.pow(2, Math.ceil(Math.log2(fftChunkLength)));
+  const fftBufferSize = this.getNearPower2Value(fftChunkLength);
   const magnitudeLength = Math.floor(fftBufferSize / 2);
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
   const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftBufferSize * 2));
-
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
-
-
   const fft = new FFT.complex(fftBufferSize, false);
+
   for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
 
     const fftInput = new Float64Array(fftBufferSize);
@@ -170,7 +165,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
       fftInput[i] = samples[i];
     }
 
-    // Hanning window applied to input data
+    // Hanning window applied to input data, without padding zeros
     if (userSettings.analyserHanning) {
       this._hanningWindow(fftInput, fftChunkLength);
     }
@@ -179,7 +174,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     fftOutput = fftOutput.slice(0, fftBufferSize); // The fft output contains two side spectrum, we use the first part only to get one side
     const magnitudes = new Float64Array(magnitudeLength);
-    
+
 //  Compute magnitude
     for (let i = 0; i < magnitudeLength; i++) {
       const re = fftOutput[2 * i],
@@ -248,9 +243,10 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
   const psdLength = Math.floor(fftChunkLength / 2);
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
+  const backgroundValue = -200;
   const matrixPsdOutput = new Array(NUM_VS_BINS)
         .fill(null)
-        .map(() => (new Float64Array(psdLength)).fill(-100));
+        .map(() => (new Float64Array(psdLength)).fill(backgroundValue));
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
@@ -421,7 +417,7 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   }
 
   // The FFT input size is power 2 to get maximal performance
-  const fftBufferSize = Math.pow(2, Math.ceil(Math.log2(samplesCount)));
+  const fftBufferSize = this.getNearPower2Value(samplesCount);
   return {
     samples : samples.slice(0, fftBufferSize),
     count : samplesCount,
