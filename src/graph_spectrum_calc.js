@@ -15,11 +15,10 @@ const
   FREQ_VS_THR_CHUNK_TIME_MS = 300,
   FREQ_VS_THR_WINDOW_DIVISOR = 6,
   MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
-  NUM_VS_BINS = 100,
   WARNING_RATE_DIFFERENCE = 0.05,
   MAX_RPM_HZ_VALUE = 800,
   MAX_RPM_AXIS_GAP = 1.05;
-
+export const NUM_VS_BINS = 100;
 
 export const GraphSpectrumCalc = {
   _analyserTimeRange : {
@@ -705,7 +704,7 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
 GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
   const samplesCount = samples.length,
         fftLength = Math.floor(pointsPerSegment / 2);
-  let output = [];
+  const output = [];
   for (let i = 0; i <= samplesCount - pointsPerSegment; i += pointsPerSegment - overlapCount) {
     const fftInput = samples.slice(i, i + pointsPerSegment);
 
