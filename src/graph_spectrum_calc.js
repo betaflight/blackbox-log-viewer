@@ -598,7 +598,7 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput) {
     }
   }
 
-  const maxNoiseFrequency = maxNoiseIdx / fftLength * maxFrequency;
+  const maxNoiseFrequency = maxNoiseIdx / magnitudeLength * maxFrequency;
 
   const fftData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
