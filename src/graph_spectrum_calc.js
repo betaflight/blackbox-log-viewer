@@ -188,9 +188,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
       }
       // Translate the average vs value to a bin index
       const avgVsValue = sumVsValues / fftChunkLength;
-      let vsBinIndex = Math.round(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
-      // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
-      if (vsBinIndex >= NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
+      const vsBinIndex = Math.round((NUM_VS_BINS - 1) * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
       numberSamples[vsBinIndex]++;
 
       // add the output from the fft to the row given by the vs value bin index
@@ -260,9 +258,7 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
       }
       // Translate the average vs value to a bin index
       const avgVsValue = sumVsValues / fftChunkLength;
-      let vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
-      // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
-      if (vsBinIndex === NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
+      const vsBinIndex = Math.round((NUM_VS_BINS - 1) * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
       numberSamples[vsBinIndex]++;
 
       // add the output from the fft to the row given by the vs value bin index
