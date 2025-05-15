@@ -237,10 +237,10 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
   const psdLength = Math.floor(fftChunkLength / 2);
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
-  const backgroundValue = -200;
+  const BACKGROUND_PSD_VALUE = -200;
   const matrixPsdOutput = new Array(NUM_VS_BINS)
         .fill(null)
-        .map(() => (new Float64Array(psdLength)).fill(backgroundValue));
+        .map(() => (new Float64Array(psdLength)).fill(BACKGROUND_PSD_VALUE));
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
