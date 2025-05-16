@@ -18,7 +18,8 @@ const
   NUM_VS_BINS = 100,
   WARNING_RATE_DIFFERENCE = 0.05,
   MAX_RPM_HZ_VALUE = 800,
-  MAX_RPM_AXIS_GAP = 1.05;
+  MAX_RPM_AXIS_GAP = 1.05,
+  MIN_FFT_POINTS = 32; // Minimum points for a meaningful FFT
 
 
 export const GraphSpectrumCalc = {
@@ -35,6 +36,24 @@ export const GraphSpectrumCalc = {
   _flightLog : null,
   _sysConfig : null,
   _motorPoles : null,
+
+  _getLargestPowerOfTwoLeq: function(n) {
+    if (n < 1) return 0;
+    let p = 1;
+    while ((p * 2) <= n) {
+        p *= 2;
+    }
+    return p;
+  },
+
+  _getNextPowerOfTwo: function(n) {
+    if (n <= 0) return 1; // Return 1 for non-positive inputs, MIN_FFT_POINTS check will handle later.
+    let p = 1;
+    while (p < n) {
+        p *= 2;
+    }
+    return p;
+  },
 };
 
 GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
@@ -79,7 +98,7 @@ GraphSpectrumCalc.setOutTime = function(time) {
   if ((time - this._analyserTimeRange.in) <= MAX_ANALYSER_LENGTH) {
     this._analyserTimeRange.out = time;
   } else {
-    this._analyserTimeRange.out = analyserTimeRange.in + MAX_ANALYSER_LENGTH;
+    this._analyserTimeRange.out = this._analyserTimeRange.in + MAX_ANALYSER_LENGTH;
   }
   return this._analyserTimeRange.out;
 };
@@ -93,98 +112,194 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
 
   const flightSamples = this._getFlightSamplesFreq();
 
+  // Zero-fill to the next power of two
+  const targetFftLength = this._getNextPowerOfTwo(flightSamples.count);
+
+  if (targetFftLength < MIN_FFT_POINTS || flightSamples.count === 0) { // Also check flightSamples.count to avoid FFT on 0 samples padded to MIN_FFT_POINTS
+    console.warn(`Target FFT length ${targetFftLength} (from ${flightSamples.count} samples) is too small (min ${MIN_FFT_POINTS}). Skipping Frequency analysis.`);
+    return {
+        fieldIndex: this._dataBuffer.fieldIndex,
+        fieldName: this._dataBuffer.fieldName,
+        fftLength: 0,
+        fftOutput: new Float64Array(0),
+        maxNoiseIdx: 0,
+        blackBoxRate: this._blackBoxRate,
+    };
+  }
+
+  const samplesForFft = new Float64Array(targetFftLength);
+  // Copy actual samples, the rest of samplesForFft will be zeros
+  samplesForFft.set(flightSamples.samples.slice(0, flightSamples.count));
+
+
   if (userSettings.analyserHanning) {
-    this._hanningWindow(flightSamples.samples, flightSamples.count);
+    // Apply Hanning window to the entire (potentially zero-padded) block
+    this._hanningWindow(samplesForFft, targetFftLength);
   }
 
   //calculate fft
-  const fftOutput = this._fft(flightSamples.samples);
+  const fftOutput = this._fft(samplesForFft); // samplesForFft has targetFftLength
 
   // Normalize the result
-  const fftData = this._normalizeFft(fftOutput, flightSamples.samples.length);
+  // Pass targetFftLength as the length of the data that underwent FFT
+  const fftData = this._normalizeFft(fftOutput, targetFftLength);
 
   return fftData;
 };
 
+GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
+  const flightSamples = this._getFlightSamplesFreq(false);
+
+  let pointsPerSegment = 512;
+  const multipiler = Math.floor(1 / analyserZoomY); // 0. ... 10
+  if (multipiler == 0) {
+    pointsPerSegment = 256;
+  } else if (multipiler > 1) {
+    pointsPerSegment *= 2 ** Math.floor(multipiler / 2);
+  }
+  // Ensure pointsPerSegment does not exceed available samples, then adjust to power of 2
+  pointsPerSegment = Math.min(pointsPerSegment, flightSamples.count);
+  pointsPerSegment = this._getLargestPowerOfTwoLeq(pointsPerSegment);
+
+  if (pointsPerSegment < MIN_FFT_POINTS) {
+      console.warn(`PSD pointsPerSegment ${pointsPerSegment} is too small (min ${MIN_FFT_POINTS}). Skipping PSD analysis.`);
+      return {
+          fieldIndex: this._dataBuffer.fieldIndex,
+          fieldName: this._dataBuffer.fieldName,
+          psdLength: 0,
+          psdOutput: new Float64Array(0),
+          blackBoxRate: this._blackBoxRate,
+          minimum: 0,
+          maximum: 0,
+          maxNoiseIdx: 0,
+      };
+  }
+
+  const overlapCount = Math.floor(pointsPerSegment / 2);
+  // Use all available samples up to flightSamples.count for Welch method
+  const samplesForPsd = flightSamples.samples.slice(0, flightSamples.count);
+  const psd =  this._psd(samplesForPsd, pointsPerSegment, overlapCount);
+
+  const psdData = {
+    fieldIndex   : this._dataBuffer.fieldIndex,
+    fieldName  : this._dataBuffer.fieldName,
+    psdLength  : psd.psdOutput.length,
+    psdOutput  : psd.psdOutput,
+    blackBoxRate : this._blackBoxRate,
+    minimum: psd.min,
+    maximum: psd.max,
+    maxNoiseIdx: psd.maxNoiseIdx,
+  };
+  return psdData;
+};
 
 GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
 
   const flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue);
 
-  // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle
-  // for each chunk. We use a moving window to get more chunks available.
-  const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
-  const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
+  // Number of actual samples desired for each FFT chunk, based on time
+  const desiredSamplesPerChunk = Math.floor(this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000);
+  // FFT length will be the next power of two from desiredSamplesPerChunk
+  const fftChunkLength = this._getNextPowerOfTwo(desiredSamplesPerChunk);
+
+
+  if (fftChunkLength < MIN_FFT_POINTS || desiredSamplesPerChunk === 0) {
+    console.warn(`FFT chunk length ${fftChunkLength} (from ${desiredSamplesPerChunk} desired samples) for FreqVsX is too small (min ${MIN_FFT_POINTS}). Skipping.`);
+    return {
+        fieldIndex: this._dataBuffer.fieldIndex,
+        fieldName: this._dataBuffer.fieldName,
+        fftLength: 0,
+        fftOutput: new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(0)),
+        maxNoise: 0,
+        blackBoxRate: this._blackBoxRate,
+        vsRange: flightSamples.vsRange || { min: 0, max: 0 },
+    };
+  }
+
+  // Window step for moving window, based on the (padded) FFT chunk length
+  const fftChunkWindowStep = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
 
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
-  const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength * 2));
+   // The length of rows should match the length of the sliced fftOutput (which is fftChunkLength)
+  const matrixFftOutputSums = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength));
 
-  const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
+  const numberSamplesInBin = new Uint32Array(NUM_VS_BINS); // Number of FFT segments contributing to each vs bin
 
-  const fft = new FFT.complex(fftChunkLength, false);
-  for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
+  const fft = new FFT.complex(fftChunkLength, false); // FFT initialized for padded length
 
-    const fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
-    let fftOutput = new Float64Array(fftChunkLength * 2);
+  // Loop through flight samples, taking chunks of 'desiredSamplesPerChunk'
+  // The loop must ensure there are enough samples for 'desiredSamplesPerChunk'
+  for (let fftChunkStartIndex = 0; (fftChunkStartIndex + desiredSamplesPerChunk) <= flightSamples.count; fftChunkStartIndex += fftChunkWindowStep) {
 
-    // Hanning window applied to input data
+    const actualSamplesInChunk = flightSamples.samples.slice(fftChunkStartIndex, fftChunkStartIndex + desiredSamplesPerChunk);
+    const fftInput = new Float64Array(fftChunkLength); // Prepare input array for FFT (zero-padded)
+    fftInput.set(actualSamplesInChunk); // Copy actual samples, rest are zeros
+
+    let fftOutputComplex = new Float64Array(fftChunkLength * 2); // For complex output from FFT.js
+
+    // Hanning window applied to the entire (zero-padded) input block
     if (userSettings.analyserHanning) {
       this._hanningWindow(fftInput, fftChunkLength);
     }
 
-    fft.simple(fftOutput, fftInput, 'real');
+    fft.simple(fftOutputComplex, fftInput, 'real');
 
-    fftOutput = fftOutput.slice(0, fftChunkLength);
-
-    // Use only abs values
-    for (let i = 0; i < fftChunkLength; i++) {
-      fftOutput[i] = Math.abs(fftOutput[i]);
-      maxNoise = Math.max(fftOutput[i], maxNoise);
+    // Calculate proper complex magnitudes.
+    const bins = fftChunkLength / 2 + 1;
+    const fftOutputProcessed = new Float64Array(bins);
+    for (let bin = 0; bin < bins; bin++) {
+      const re = fftOutputComplex[2 * bin];
+      const im = fftOutputComplex[2 * bin + 1];
+      const mag = Math.hypot(re, im);
+      fftOutputProcessed[bin] = mag;
+      maxNoise = Math.max(maxNoise, mag);
     }
 
-    // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
+    // Calculate a bin index and add the processed fft values to that bin
     for (const vsValueArray of flightSamples.vsValues) {
-      // Calculate average of the VS values in the chunk
+      // Calculate average of the VS values over the actual data duration in the chunk
       let sumVsValues = 0;
-      for (let indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
+      for (let indexVs = fftChunkStartIndex; indexVs < fftChunkStartIndex + desiredSamplesPerChunk; indexVs++) {
         sumVsValues += vsValueArray[indexVs];
       }
-      // Translate the average vs value to a bin index
-      const avgVsValue = sumVsValues / fftChunkLength;
+      const avgVsValue = sumVsValues / desiredSamplesPerChunk; // Average over actual samples
+
       let vsBinIndex = Math.floor(NUM_VS_BINS * (avgVsValue - flightSamples.minValue) / (flightSamples.maxValue - flightSamples.minValue));
-      // ensure that avgVsValue == flightSamples.maxValue does not result in an out of bounds access
       if (vsBinIndex === NUM_VS_BINS) { vsBinIndex = NUM_VS_BINS - 1; }
-      numberSamples[vsBinIndex]++;
-
-      // add the output from the fft to the row given by the vs value bin index
-      for (let i = 0; i < fftOutput.length; i++) {
-        matrixFftOutput[vsBinIndex][i] += fftOutput[i];
+      if (vsBinIndex < 0) { vsBinIndex = 0;}
+      if (vsBinIndex >=0 && vsBinIndex < NUM_VS_BINS) { // Ensure valid index before accessing
+          numberSamplesInBin[vsBinIndex]++;
+          for (let i = 0; i < fftOutputProcessed.length; i++) {
+            matrixFftOutputSums[vsBinIndex][i] += fftOutputProcessed[i];
+          }
       }
     }
   }
 
-  // Divide the values from the fft in each row (vs value bin) by the number of samples in the bin
+  const finalMatrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftChunkLength));
+
+  // Average the summed FFT outputs for each bin
   for (let i = 0; i < NUM_VS_BINS; i++) {
-    if (numberSamples[i] > 1) {
-      for (let j = 0; j < matrixFftOutput[i].length; j++) {
-        matrixFftOutput[i][j] /= numberSamples[i];
+    if (numberSamplesInBin[i] > 0) { // Check for > 0 to handle division correctly
+      for (let j = 0; j < fftChunkLength; j++) {
+        finalMatrixFftOutput[i][j] = matrixFftOutputSums[i][j] / numberSamplesInBin[i];
       }
+    } else {
+      // If no samples in this bin, finalMatrixFftOutput[i] remains an array of zeros (or fill with null/NaN if preferred)
+      // Default Float64Array is zero-filled, which is fine.
     }
   }
 
-  // The output data needs to be smoothed, the sampling is not perfect
-  // but after some tests we let the data as is, an we prefer to apply a
-  // blur algorithm to the heat map image
 
   const fftData = {
-      fieldIndex   : this._dataBuffer.fieldIndex,
-      fieldName  : this._dataBuffer.fieldName,
-      fftLength  : fftChunkLength,
-      fftOutput  : matrixFftOutput,
-      maxNoise   : maxNoise,
-      blackBoxRate : this._blackBoxRate,
-      vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
+    fieldIndex   : this._dataBuffer.fieldIndex,
+    fieldName  : this._dataBuffer.fieldName,
+    fftLength  : fftChunkLength, // This is the length of the (padded) data used for matrix rows
+    fftOutput  : finalMatrixFftOutput,
+    maxNoise   : maxNoise,
+    blackBoxRate : this._blackBoxRate,
+    vsRange    : { min: flightSamples.minValue, max: flightSamples.maxValue},
   };
 
   return fftData;
@@ -299,7 +414,8 @@ GraphSpectrumCalc._getFlightSamplesFreq = function() {
   }
 
   return {
-    samples : samples,
+    samples : samples, // Note: This array is oversized, only 'count' elements are valid.
+                      // Slicing (e.g., samples.slice(0, samplesCount)) is done by callers.
     count : samplesCount,
   };
 };
@@ -344,48 +460,55 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     }
   }
 
-  // Calculate min max average of the VS values in the chunk what will used by spectrum data definition
-  const fftChunkLength = this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000;
-  const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
-  for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < samplesCount; fftChunkIndex += fftChunkWindow) {
-    for (const vsValueArray of vsValues) {
-      // Calculate average of the VS values in the chunk
-      let sumVsValues = 0;
-      for (let indexVs = fftChunkIndex; indexVs < fftChunkIndex + fftChunkLength; indexVs++) {
-        sumVsValues += vsValueArray[indexVs];
-      }
-      // Find min max average of the VS values in the chunk
-      const avgVsValue = sumVsValues / fftChunkLength;
-      maxValue = Math.max(maxValue, avgVsValue);
-      minValue = Math.min(minValue, avgVsValue);
-    }
+  // Calculate min/max for VS values based on actual chunk duration, respecting MIN_FFT_POINTS as a minimum window.
+  let samplesPerSegmentForVsAvg = Math.floor(this._blackBoxRate * FREQ_VS_THR_CHUNK_TIME_MS / 1000);
+  // Ensure the segment for averaging is not smaller than MIN_FFT_POINTS, if MIN_FFT_POINTS is meaningful.
+  if (MIN_FFT_POINTS > 0) {
+      samplesPerSegmentForVsAvg = Math.max(samplesPerSegmentForVsAvg, MIN_FFT_POINTS);
   }
+
+
+  const windowStepForVsAvg = Math.round(samplesPerSegmentForVsAvg / FREQ_VS_THR_WINDOW_DIVISOR);
+
+  if (samplesPerSegmentForVsAvg > 0 && windowStepForVsAvg > 0 && samplesCount >= samplesPerSegmentForVsAvg) {
+      for (let segmentStartIndex = 0; segmentStartIndex + samplesPerSegmentForVsAvg <= samplesCount; segmentStartIndex += windowStepForVsAvg) {
+        for (const vsValueArray of vsValues) {
+          let sumVsValues = 0;
+          for (let indexVs = segmentStartIndex; indexVs < segmentStartIndex + samplesPerSegmentForVsAvg; indexVs++) {
+            sumVsValues += vsValueArray[indexVs];
+          }
+          const avgVsValue = sumVsValues / samplesPerSegmentForVsAvg;
+          maxValue = Math.max(maxValue, avgVsValue);
+          minValue = Math.min(minValue, avgVsValue);
+        }
+      }
+  }
+
 
   maxValue *= MAX_RPM_AXIS_GAP;
 
-  if (minValue > maxValue) {
-    if (minValue == Infinity) {  // this should never happen
-      minValue = 0;
-      maxValue = 100;
-      console.log("Invalid minimum value");
+  if (minValue > maxValue || minValue === Infinity || maxValue === -Infinity || samplesCount === 0) {
+    // Fallback if range is invalid or no samples
+    minValue = 0;
+    if (vsFieldNames === FIELD_THROTTLE_NAME) {
+        maxValue = 100;
+    } else if (vsFieldNames === FIELD_RPM_NAMES) {
+        maxValue = MAX_RPM_HZ_VALUE * this._motorPoles / 3.333 * MAX_RPM_AXIS_GAP;
     } else {
-      console.log("Maximum value %f smaller than minimum value %d", maxValue, minValue);
-      minValue = 0;
-      maxValue = 100;
+        maxValue = 100; // Default generic max
     }
+     if (minValue > maxValue) minValue = 0; // Ensure min <= max
+    console.warn("Adjusted FreqVsX range due to invalid calculation or no samples: min=%f, max=%f", minValue, maxValue);
   }
 
-  let slicedVsValues = [];
-  for (const vsValueArray of vsValues) {
-    slicedVsValues.push(vsValueArray.slice(0, samplesCount));
-  }
   return {
-      samples  : samples.slice(0, samplesCount),
-      vsValues : slicedVsValues,
-      count  : samplesCount,
-      minValue : minValue,
-      maxValue : maxValue,
-       };
+    samples  : samples, // Note: This array is oversized. Callers should use .slice(0, count)
+    vsValues : vsValues, // Note: This array is oversized.
+    count  : samplesCount,
+    minValue : minValue,
+    maxValue : maxValue,
+    vsRange: {min: minValue, max: maxValue},
+  };
 };
 
 GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
@@ -414,15 +537,16 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function(axisIndex) {
   }
 
   return {
-    piderror,
-    setpoint,
+    piderror, // Note: oversized
+    setpoint, // Note: oversized
     maxSetpoint,
     count: samplesCount,
   };
 };
 
 GraphSpectrumCalc._hanningWindow = function(samples, size) {
-
+  // Expects 'samples' to be an array of at least 'size' length.
+  // Modifies 'samples' in-place for the first 'size' elements.
   if (!size) {
     size = samples.length;
   }
@@ -433,18 +557,21 @@ GraphSpectrumCalc._hanningWindow = function(samples, size) {
 };
 
 GraphSpectrumCalc._fft  = function(samples, type) {
-
+  // 'samples' is expected to be a Float64Array of power-of-2 length.
   if (!type) {
     type = 'real';
   }
 
   const fftLength = samples.length;
+  // FFT.js complex (Nayuki) for N real inputs produces N/2+1 complex outputs.
+  // The output buffer needs to be large enough for this: (fftLength/2 + 1) * 2 floats.
+  // A buffer of size fftLength*2 is more than enough.
   const fftOutput = new Float64Array(fftLength * 2);
   const fft = new FFT.complex(fftLength, false);
 
   fft.simple(fftOutput, samples, type);
 
-  return fftOutput;
+  return fftOutput; // Contains (fftLength/2 + 1) complex values, i.e., (fftLength/2 + 1)*2 floats.
 };
 
 
@@ -452,35 +579,188 @@ GraphSpectrumCalc._fft  = function(samples, type) {
  * Makes all the values absolute and returns the index of maxFrequency found
  */
 GraphSpectrumCalc._normalizeFft = function(fftOutput, fftLength) {
+  // fftLength is the length of the original (potentially zero-padded) time-domain signal.
+  // fftOutput contains complex FFT results: [Re0, Im0, Re1, Im1, ...].
+  // For a real input of fftLength, there are (fftLength/2 + 1) unique complex values.
+  const bins = Math.floor(fftLength / 2) + 1;
+  const magnitudes = new Float64Array(bins);
 
-  if (!fftLength) {
-    fftLength = fftOutput.length;
+  // Calculate magnitudes from complex values
+  for (let bin = 0; bin < bins; bin++) {
+    const re = fftOutput[2 * bin];
+    const im = fftOutput[2 * bin + 1];
+    magnitudes[bin] = Math.hypot(re, im);
   }
 
-  // Make all the values absolute, and calculate some useful values (max noise, etc.)
+  // Find max noise after low-end cutoff
   const maxFrequency = (this._blackBoxRate / 2.0);
-  const noiseLowEndIdx = 100 / maxFrequency * fftLength;
+  // Avoid division by zero if maxFrequency is 0 (e.g. blackBoxRate is 0)
+  const noiseLowEndIdx = (maxFrequency > 0) ? Math.floor(100 / maxFrequency * bins) : 0;
+
   let maxNoiseIdx = 0;
   let maxNoise = 0;
 
-  for (let i = 0; i < fftLength; i++) {
-    fftOutput[i] = Math.abs(fftOutput[i]);
-    if (i > noiseLowEndIdx && fftOutput[i] > maxNoise) {
-      maxNoise = fftOutput[i];
-      maxNoiseIdx = i;
+  for (let bin = 0; bin < bins; bin++) {
+    // Original logic was > noiseLowEndIdx. If noiseLowEndIdx can be 0, this means all bins are checked.
+    // If we want to exclude DC (bin 0) and very low frequencies, the condition should be robust.
+    // Assuming noiseLowEndIdx is a valid start index for noise search.
+    if (bin > noiseLowEndIdx && magnitudes[bin] > maxNoise) {
+      maxNoise = magnitudes[bin];
+      maxNoiseIdx = bin;
     }
   }
 
-  maxNoiseIdx = maxNoiseIdx / fftLength * maxFrequency;
+  // Scale bin index to frequency
+  // Avoid division by zero if bins is 1 (e.g. fftLength is 0 or 1)
+  const maxNoiseFreq = (bins > 1) ? (maxNoiseIdx / (bins -1) * maxFrequency) : 0;
+  // Note: A common scaling is maxNoiseIdx * (blackBoxRate / fftLength).
+  // bins-1 corresponds to Nyquist. maxFrequency = blackBoxRate / 2.
+  // maxNoiseIdx / (bins-1) * (blackBoxRate/2) = maxNoiseIdx * blackBoxRate / (2*(bins-1))
+  // If bins = fftLength/2+1, then 2*(bins-1) = 2*(fftLength/2) = fftLength. So this is consistent.
 
-  const fftData = {
-    fieldIndex   : this._dataBuffer.fieldIndex,
-    fieldName  : this._dataBuffer.fieldName,
-    fftLength  : fftLength,
-    fftOutput  : fftOutput,
-    maxNoiseIdx  : maxNoiseIdx,
-    blackBoxRate : this._blackBoxRate,
+
+  return {
+    fieldIndex: this._dataBuffer.fieldIndex,
+    fieldName: this._dataBuffer.fieldName,
+    fftLength: bins,  // Return number of frequency bins (magnitudes)
+    fftOutput: magnitudes,  // Return the magnitude spectrum
+    maxNoiseIdx: maxNoiseFreq, // This is now a frequency in Hz
+    blackBoxRate: this._blackBoxRate,
   };
+};
 
-  return fftData;
+/**
+ * Compute PSD for data samples by Welch method follow Python code
+ */
+GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scaling = 'density') {
+// Compute FFT for samples segments
+  const fftOutputSegments = this._fft_segmented(samples, pointsPerSegment, overlapCount);
+
+  if (fftOutputSegments.length === 0 || fftOutputSegments[0].length === 0) {
+    return { psdOutput: new Float64Array(0), min: 0, max: 0, maxNoiseIdx: 0 };
+  }
+
+  const dataCount = fftOutputSegments[0].length; // Number of magnitude points per segment (N/2+1 typically)
+  const segmentsCount = fftOutputSegments.length;
+  const psdOutput = new Float64Array(dataCount);
+
+// Compute power scale coef
+  let scale = 1;
+  if (userSettings.analyserHanning) {
+    const window = Array(pointsPerSegment).fill(1); // Create a dummy window array
+    this._hanningWindow(window, pointsPerSegment); // Apply Hanning values to it
+    if (scaling == 'density') {
+      let skSum = 0;
+      for (const value of window) {
+        skSum += value ** 2;
+      }
+      scale = (this._blackBoxRate * skSum > 0) ? (1 / (this._blackBoxRate * skSum)) : 1;
+    } else if (scaling == 'spectrum') {
+      let sum = 0;
+      for (const value of window) {
+        sum += value;
+      }
+      scale = (sum ** 2 > 0) ? (1 / sum ** 2) : 1;
+    }
+  } else { // No Hanning window
+      if (scaling == 'density') {
+        scale = (this._blackBoxRate * pointsPerSegment > 0) ? (1 / (this._blackBoxRate * pointsPerSegment)) : 1;
+      } else if (scaling == 'spectrum') {
+        scale = (pointsPerSegment ** 2 > 0) ? (1 / pointsPerSegment ** 2) : 1;
+      }
+  }
+
+
+// Compute average for scaled power
+  let min = 1e6,
+      max = -1e6;
+
+  const maxFrequency = (this._blackBoxRate / 2.0);
+  // Avoid division by zero for index calculations
+  const noise50HzIdx = (maxFrequency > 0) ? Math.floor(50 / maxFrequency * dataCount) : 0;
+  const noise3HzIdx = (maxFrequency > 0) ? Math.floor(3 / maxFrequency * dataCount) : 0;
+
+  let maxNoiseIdxBin = 0;
+  let maxNoise = -100; // dB
+  for (let i = 0; i < dataCount; i++) {
+    psdOutput[i] = 0.0;
+    for (let j = 0; j < segmentsCount; j++) {
+      let p_scalar = fftOutputSegments[j][i]; // This is already magnitude from _fft_segmented
+      let p = scale * p_scalar ** 2;
+
+      // One-sided PSD needs doubling for non-DC/Nyquist frequencies.
+      // dataCount here is N/2+1 (number of magnitudes from _fft_segmented).
+      // DC is at index 0. Nyquist is at index dataCount-1.
+      if (i !== 0 && i !== dataCount - 1) {
+         p *= 2;
+      }
+      psdOutput[i] += p;
+    }
+
+    const min_avg = 1e-10;
+    let avg = (segmentsCount > 0) ? (psdOutput[i] / segmentsCount) : 0;
+    avg = Math.max(avg, min_avg);
+    psdOutput[i] = 10 * Math.log10(avg);
+
+    if (i > noise3HzIdx) {
+      min = Math.min(psdOutput[i], min);
+      max = Math.max(psdOutput[i], max);
+    }
+    if (i > noise50HzIdx && psdOutput[i] > maxNoise) {
+      maxNoise = psdOutput[i];
+      maxNoiseIdxBin = i;
+    }
+  }
+  // Scale bin to freq. (dataCount-1) corresponds to Nyquist frequency.
+  const maxNoiseFrequency = (dataCount > 1) ? (maxNoiseIdxBin / (dataCount -1) * maxFrequency) : 0;
+
+  return {
+      psdOutput: psdOutput,
+      min: min,
+      max: max,
+      maxNoiseIdx: maxNoiseFrequency, // This is a frequency in Hz
+    };
+};
+
+
+/**
+ * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
+ */
+GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
+  const samplesCount = samples.length;
+  let output = []; // Array of magnitude arrays
+  if (pointsPerSegment === 0 || samplesCount < pointsPerSegment || pointsPerSegment < MIN_FFT_POINTS) {
+    return output;
+  }
+  // Ensure pointsPerSegment is a power of two for FFT (if not already guaranteed by caller)
+  // This function's caller (dataLoadPSD) already ensures pointsPerSegment is a power of two.
+
+  const step = pointsPerSegment - overlapCount;
+  if (step <= 0) { // Avoid infinite loop if overlap is too large
+      console.warn("PSD segment step is non-positive, review pointsPerSegment and overlapCount.");
+      return output;
+  }
+
+  for (let i = 0; (i + pointsPerSegment) <= samplesCount; i += step) {
+    // Take a copy for windowing and FFT, as _hanningWindow modifies in place
+    const fftInputSegment = samples.slice(i, i + pointsPerSegment);
+
+    if (userSettings.analyserHanning) {
+      this._hanningWindow(fftInputSegment, pointsPerSegment); // Modifies fftInputSegment
+    }
+
+    const fftComplex = this._fft(fftInputSegment); // Returns complex array [re,im,re,im...]
+                                                 // It will have (pointsPerSegment/2 + 1)*2 float values.
+
+    const numMagnitudes = pointsPerSegment / 2 + 1;
+    const magnitudes = new Float64Array(numMagnitudes);
+    for (let k = 0; k < numMagnitudes; k++) {
+      const re = fftComplex[2 * k];
+      const im = fftComplex[2 * k + 1];
+      magnitudes[k] = Math.hypot(re, im);
+    }
+    output.push(magnitudes);
+  }
+
+  return output;
 };
