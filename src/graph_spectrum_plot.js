@@ -1357,7 +1357,9 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
   // frequency2 line
   const offsetByType =
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
       ? 0
       : OFFSET;
   const x2 = this._drawVerticalMarkerLine(
@@ -1379,7 +1381,9 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
 
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     /*
      * It draws a curve:
@@ -1445,7 +1449,9 @@ GraphSpectrumPlot._drawNotchFilter = function (
 
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     canvasCtx.moveTo(cutoffX, 0);
     canvasCtx.lineTo(centerX * 2 - cutoffX, HEIGHT);
