@@ -58,7 +58,7 @@ jobs:
       - name: Set short git commit SHA
         id: vars
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha }})
+          calculatedSha=$(echo ${{ github.event.pull_request.head.sha }} | head -c 8)
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
     
       - name: Deploy to Cloudflare
