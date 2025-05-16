@@ -482,7 +482,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
 
 // Use small top margin for RPM axis only. Because it has bad axis view for throttle
   if (vsFieldNames == FIELD_RPM_NAMES) {
-    maxValue *= 1 + RPM_AXIS_TOP_MARGIN_PERCENT / 100;
+    maxValue += (maxValue - minValue) * RPM_AXIS_TOP_MARGIN_PERCENT / 100;
   }
 
   if (minValue > maxValue) {
