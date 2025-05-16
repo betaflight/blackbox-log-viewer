@@ -17,7 +17,7 @@ const
   MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
   WARNING_RATE_DIFFERENCE = 0.05,
   MAX_RPM_HZ_VALUE = 800,
-  MAX_RPM_AXIS_GAP = 1.05;
+  RPM_AXIS_TOP_MARGIN_PERCENT = 2;
 export const NUM_VS_BINS = 100;
 
 export const GraphSpectrumCalc = {
@@ -480,7 +480,10 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     }
   }
 
-  maxValue *= MAX_RPM_AXIS_GAP;
+// Use small top margin for RPM axis only. Because it has bad axis view for throttle
+  if (vsFieldNames == FIELD_RPM_NAMES) {
+    maxValue *= 1 + RPM_AXIS_TOP_MARGIN_PERCENT / 100;
+  }
 
   if (minValue > maxValue) {
     if (minValue == Infinity) {  // this should never happen
