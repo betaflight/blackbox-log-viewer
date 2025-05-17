@@ -112,8 +112,20 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm();
           break;
 
+        case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+          fftData = GraphSpectrumCalc.dataLoadPowerSpectralDensityVsThrottle();
+          break;
+
+        case SPECTRUM_TYPE.PSD_VS_RPM:
+          fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm(true);
+          break;
+
         case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
           fftData = GraphSpectrumCalc.dataLoadPidErrorVsSetpoint();
+          break;
+
+        case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+          fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
           break;
 
         case SPECTRUM_TYPE.FREQUENCY:
@@ -187,6 +199,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+          // Recalculate PSD with updated samples per segment count
+          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+            dataLoad();
+            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          }
           that.refresh();
         })
       )
