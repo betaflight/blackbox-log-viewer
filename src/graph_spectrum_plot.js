@@ -504,15 +504,24 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
 
   const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
 
+  //Compute the dbm range shift from zoomY as[-30, -20, -10, 0, +10, +20]
+  let dBmRangeShift = Math.floor(1 / this._zoomY) - 1; // -1 ... 9
+  if (dBmRangeShift > 0) {
+    dBmRangeShift = -10 * Math.round(dBmRangeShift / 3); //-10, -20, -30
+  } else if (dBmRangeShift < 0) {
+    dBmRangeShift = -10 * Math.round(dBmRangeShift * 2); //+20
+  }
+  const dBmValueMin = MIN_DBM_VALUE + dBmRangeShift,
+        dBmValueMax = MAX_DBM_VALUE + dBmRangeShift;
   // Loop for throttle
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
       let valuePlot;
       if (drawPSD) {
-        valuePlot = Math.max(this._fftData.fftOutput[j][i], MIN_DBM_VALUE);
-        valuePlot = Math.min(valuePlot, MAX_DBM_VALUE);
-        valuePlot = Math.round((valuePlot - MIN_DBM_VALUE) * 100 / (MAX_DBM_VALUE - MIN_DBM_VALUE));
+        valuePlot = Math.max(this._fftData.fftOutput[j][i], dBmValueMin);
+        valuePlot = Math.min(valuePlot, dBmValueMax);
+        valuePlot = Math.round((valuePlot - dBmValueMin) * 100 / (dBmValueMax - dBmValueMin));
       } else {
         valuePlot = Math.round(
           Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
