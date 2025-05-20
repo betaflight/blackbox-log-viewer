@@ -13,7 +13,8 @@ const BLUR_FILTER_PIXEL = 1,
   PID_ERROR_VERTICAL_CHUNK = 5,
   ZOOM_X_MAX = 5,
   MIN_DBM_VALUE = -40,
-  MAX_DBM_VALUE = 10;
+  MAX_DBM_VALUE = 10,
+  MAX_SPECTRUM_LINE_COUNT = 30000;
 
 export const SPECTRUM_TYPE = {
   FREQUENCY: 0,
@@ -206,9 +207,6 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
 
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
 
-  const barWidth = WIDTH / (PLOTTED_BUFFER_LENGTH / 5) - 1;
-  let x = 0;
-
   const barGradient = canvasCtx.createLinearGradient(0, HEIGHT, 0, 0);
   barGradient.addColorStop(
     constrain(0 / this._zoomY, 0, 1),
@@ -230,12 +228,16 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   canvasCtx.fillStyle = barGradient;
 
   const fftScale = HEIGHT / (this._zoomY * 100);
-  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 5) {
+  // Limit maximal count of drawing line to get good performance
+  const stepData = Math.floor(PLOTTED_BUFFER_LENGTH / MAX_SPECTRUM_LINE_COUNT) + 1;
+  const stepX = WIDTH / (PLOTTED_BUFFER_LENGTH / stepData);
+  const barWidth = Math.max(stepX, 1);
+  let x = 0;
+  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += stepData) {
     const barHeight = this._fftData.fftOutput[i] * fftScale;
     canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-    x += barWidth + 1;
+    x += stepX;
   }
-
 
   //Draw imported spectrums
   const curvesColors = [
