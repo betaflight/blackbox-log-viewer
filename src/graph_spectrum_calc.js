@@ -17,7 +17,8 @@ const
   MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
   WARNING_RATE_DIFFERENCE = 0.05,
   MAX_RPM_HZ_VALUE = 800,
-  RPM_AXIS_TOP_MARGIN_PERCENT = 2;
+  RPM_AXIS_TOP_MARGIN_PERCENT = 2,
+  MIN_SPECTRUM_SAMPLES_COUNT = 2048;
 export const NUM_VS_BINS = 100;
 
 export const GraphSpectrumCalc = {
@@ -412,7 +413,14 @@ GraphSpectrumCalc._getFlightSamplesFreq = function(scaled = true) {
   }
 
   // The FFT input size is power 2 to get maximal performance
-  const fftBufferSize = this.getNearPower2Value(samplesCount);
+  // Limit fft input count for simple spectrum chart to get normal charts plot quality
+  let fftBufferSize;
+  if (scaled && samplesCount < MIN_SPECTRUM_SAMPLES_COUNT) {
+      fftBufferSize = MIN_SPECTRUM_SAMPLES_COUNT;
+  } else {
+    fftBufferSize = this.getNearPower2Value(samplesCount);
+  }
+
   return {
     samples : samples.slice(0, fftBufferSize),
     count : samplesCount,
