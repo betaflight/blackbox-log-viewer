@@ -350,7 +350,10 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   // Allign y axis range by 10db
   const dbStep = 10;
   const minY = Math.floor(this._fftData.minimum / dbStep) * dbStep;
-  const maxY = (Math.floor(this._fftData.maximum / dbStep) + 1) * dbStep;
+  let maxY = (Math.floor(this._fftData.maximum / dbStep) + 1) * dbStep;
+  if (minY == maxY) {
+    maxY = minY + 1;  // prevent divide by zero
+  }
   const ticksCount = (maxY - minY) / dbStep;
   const scaleY = HEIGHT / (maxY - minY);
   //Store vsRange for _drawMousePosition
