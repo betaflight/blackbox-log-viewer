@@ -248,7 +248,7 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
 
     const fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
-    const psd = this._psd(fftInput, fftChunkLength, 0, 'density');
+    const psd = this._psd(fftInput, fftChunkLength, 0, 'density'); // Using the one segment with all chunks fftChunkLength size, it will extended at power at 2 size inside _psd() - _fft_segmented()
     maxNoise = Math.max(psd.max, maxNoise);
     // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
     for (const vsValueArray of flightSamples.vsValues) {
@@ -712,14 +712,25 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
  * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
  */
 GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
-  const samplesCount = samples.length,
-        fftLength = Math.floor(pointsPerSegment / 2);
+  const samplesCount = samples.length;
   const output = [];
+
   for (let i = 0; i <= samplesCount - pointsPerSegment; i += pointsPerSegment - overlapCount) {
-    const fftInput = samples.slice(i, i + pointsPerSegment);
+    let fftInput = samples.slice(i, i + pointsPerSegment);
 
     if (userSettings.analyserHanning) {
       this._hanningWindow(fftInput, pointsPerSegment);
+    }
+
+    let fftLength;
+    if (pointsPerSegment != samplesCount) {
+      fftLength = Math.floor(pointsPerSegment / 2);
+    } else {  // Extend the one segment input on power at 2 size
+      const fftSize = this.getNearPower2Value(pointsPerSegment);
+      const power2Input = new Float64Array(fftSize);
+      power2Input.set(fftInput);
+      fftInput = power2Input;
+      fftLength = fftSize / 2;
     }
 
     const fftComplex = this._fft(fftInput);
