@@ -240,7 +240,7 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   let psdLength = 0;
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
   const BACKGROUND_PSD_VALUE = -200;
-  let matrixPsdOutput = undefined;
+  let matrixPsdOutput;
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
