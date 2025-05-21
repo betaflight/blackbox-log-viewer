@@ -510,11 +510,11 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
 
   //Compute the dbm range shift from zoomY as[-30, -20, -10, 0, +10, +20]
-  let dBmRangeShift = Math.floor(1 / this._zoomY) - 1; // -1 ... 9
-  if (dBmRangeShift > 0) {
-    dBmRangeShift = -10 * Math.round(dBmRangeShift / 3); //-10, -20, -30
-  } else if (dBmRangeShift < 0) {
-    dBmRangeShift = -10 * Math.round(dBmRangeShift * 2); //+20
+  let dBmRangeShift = 0;
+  if (this._zoomY <= 1) {        // [10 ... 0.1]
+    dBmRangeShift = -10 * Math.round((1 / this._zoomY - 1) / 3); //0, -10, -20, -30
+  } else {
+    dBmRangeShift = 10 * Math.round((this._zoomY - 1) / 9 * 2); // 0, 10, 20
   }
   const dBmValueMin = MIN_DBM_VALUE + dBmRangeShift,
         dBmValueMax = MAX_DBM_VALUE + dBmRangeShift;

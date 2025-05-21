@@ -627,6 +627,8 @@ GraphSpectrumCalc._normalizeFft = function(fftOutput) {
 
 /**
  * Compute PSD for data samples by Welch method follow Python code
+ * It is good to use power at 2 values for pointsPerSegment.
+ * For short data length, set pointsPerSegment same samples.length to extend samples count for power at 2 value inside _fft_segmented
  */
 GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scaling = 'density') {
 // Compute FFT for samples segments
@@ -716,6 +718,8 @@ GraphSpectrumCalc._psd  = function(samples, pointsPerSegment, overlapCount, scal
 
 /**
  * Compute FFT for samples segments by lenghts as pointsPerSegment with overlapCount overlap points count
+ * It is good to use power at 2 values for pointsPerSegment.
+ * For short data length, set pointsPerSegment same samples.length to extend samples count for power at 2 value inside _fft_segmented
  */
 GraphSpectrumCalc._fft_segmented  = function(samples, pointsPerSegment, overlapCount) {
   const samplesCount = samples.length;
