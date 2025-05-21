@@ -237,12 +237,10 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   const fftChunkWindow = Math.round(fftChunkLength / FREQ_VS_THR_WINDOW_DIVISOR);
 
   let maxNoise = 0; // Stores the maximum amplitude of the fft over all chunks
-  const psdLength = Math.floor(fftChunkLength / 2);
+  let psdLength = 0;
    // Matrix where each row represents a bin of vs values, and the columns are amplitudes at frequencies
   const BACKGROUND_PSD_VALUE = -200;
-  const matrixPsdOutput = new Array(NUM_VS_BINS)
-        .fill(null)
-        .map(() => (new Float64Array(psdLength)).fill(BACKGROUND_PSD_VALUE));
+  let matrixPsdOutput = undefined;
 
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
 
@@ -251,6 +249,13 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
     const fftInput = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
     const psd = this._psd(fftInput, fftChunkLength, 0, 'density'); // Using the one segment with all chunks fftChunkLength size, it will extended at power at 2 size inside _psd() - _fft_segmented()
     maxNoise = Math.max(psd.max, maxNoise);
+    // The _psd() can extend fft data size. Set psdLength and create matrix by first using
+    if (matrixPsdOutput == undefined) {
+      psdLength = psd.psdOutput.length;
+      matrixPsdOutput = new Array(NUM_VS_BINS)
+        .fill(null)
+        .map(() => (new Float64Array(psdLength)).fill(BACKGROUND_PSD_VALUE));
+    }
     // calculate a bin index and put the fft value in that bin for each field (e.g. eRPM[0], eRPM[1]..) sepparately
     for (const vsValueArray of flightSamples.vsValues) {
       // Calculate average of the VS values in the chunk
