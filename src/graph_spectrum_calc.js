@@ -154,11 +154,10 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
   const matrixFftOutput = new Array(NUM_VS_BINS).fill(null).map(() => new Float64Array(fftBufferSize * 2));
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
   const fft = new FFT.complex(fftBufferSize, false);
+  const fftInput = new Float64Array(fftBufferSize);
+  const fftOutput = new Float64Array(fftBufferSize * 2);
 
   for (let fftChunkIndex = 0; fftChunkIndex + fftChunkLength < flightSamples.samples.length; fftChunkIndex += fftChunkWindow) {
-
-    const fftInput = new Float64Array(fftBufferSize);
-    let fftOutput = new Float64Array(fftBufferSize * 2);
 
     const samples = flightSamples.samples.slice(fftChunkIndex, fftChunkIndex + fftChunkLength);
     fftInput.set(samples);
@@ -170,10 +169,9 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 
     fft.simple(fftOutput, fftInput, 'real');
 
-    fftOutput = fftOutput.slice(0, fftBufferSize); // The fft output contains two side spectrum, we use the first part only to get one side
-    const magnitudes = new Float64Array(magnitudeLength);
-
 //  Compute magnitude
+//  The fftOutput contains two side spectrum, we use the first part only to get one side
+    const magnitudes = new Float64Array(magnitudeLength);
     for (let i = 0; i < magnitudeLength; i++) {
       const re = fftOutput[2 * i],
             im = fftOutput[2 * i + 1];
