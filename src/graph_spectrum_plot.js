@@ -51,6 +51,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _zoomX: 1.0,
   _zoomY: 1.0,
   _shiftPSD: 0,
+  _lowLevelPSD: 0,
   _drawingParams: {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
@@ -84,6 +85,15 @@ GraphSpectrumPlot.setShiftPSD = function (shift) {
   const modifiedShift = this._shiftPSD !== shift;
   if (modifiedShift) {
     this._shiftPSD = shift;
+    this._invalidateCache();
+    this._invalidateDataCache();
+  }
+};
+
+GraphSpectrumPlot.setLowLevelPSD = function (lowLevel) {
+  const modifiedLevel = this._lowLevelPSD !== lowLevel;
+  if (modifiedLevel) {
+    this._lowLevelPSD = lowLevel;
     this._invalidateCache();
     this._invalidateDataCache();
   }
@@ -520,19 +530,24 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
 
   const dBmValueMin = MIN_DBM_VALUE + this._shiftPSD,
-        dBmValueMax = MAX_DBM_VALUE + this._shiftPSD;
+        dBmValueMax = MAX_DBM_VALUE + this._shiftPSD,
+        lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * this._lowLevelPSD;
   // Loop for throttle
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
-      let valuePlot;
+      let valuePlot = this._fftData.fftOutput[j][i];
       if (drawPSD) {
-        valuePlot = Math.max(this._fftData.fftOutput[j][i], dBmValueMin);
+        if (valuePlot < lowLevel) {
+          valuePlot = dBmValueMin;      // Filter low values
+        } else {
+          valuePlot = Math.max(valuePlot, dBmValueMin);
+        }
         valuePlot = Math.min(valuePlot, dBmValueMax);
         valuePlot = Math.round((valuePlot - dBmValueMin) * 100 / (dBmValueMax - dBmValueMin));
       } else {
         valuePlot = Math.round(
-          Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
+          Math.min(valuePlot * fftColorScale, 100)
         );
       }
 
