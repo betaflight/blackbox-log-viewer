@@ -4,6 +4,8 @@ import {
   GraphSpectrumPlot,
   SPECTRUM_TYPE,
   SPECTRUM_OVERDRAW_TYPE,
+  MIN_DBM_VALUE,
+  MAX_DBM_VALUE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
 import { SpectrumExporter } from "./spectrum-exporter";
@@ -30,8 +32,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
     const analyserZoomXElem = $("#analyserZoomX");
     const analyserZoomYElem = $("#analyserZoomY");
-    const analyserShiftPSDElem = $("#analyserShiftPSD");
-    const analyserLowLevelPSDElem = $("#analyserLowLevelPSD");
+    const analyserShiftPSDSlider = $("#analyserShiftPSD");
+    const analyserLowLevelPSDSlider = $("#analyserLowLevelPSD");
+    const analyserMinPSDText = $("#analyserMinPSD");
+    const analyserMaxPSDText = $("#analyserMaxPSD");
+    const analyserLowPSDText = $("#analyserLowPSD");
 
     const spectrumToolbarElem = $("#spectrumToolbar");
     const spectrumTypeElem = $("#spectrumTypeSelect");
@@ -100,6 +105,15 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       });
       $("#analyserResize", parentElem).css({
         left: `${newSize.width - 20}px`,
+      });
+      $("#analyserMaxPSD", parentElem).css({
+        left: `${newSize.width - 50}px`,
+      });
+      $("#analyserMinPSD", parentElem).css({
+        left: `${newSize.width - 50}px`,
+      });
+      $("#analyserLowPSD", parentElem).css({
+        left: `${newSize.width - 120}px`,
       });
     };
 
@@ -210,13 +224,15 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(DEFAULT_ZOOM);
 
-      analyserShiftPSDElem
+      analyserShiftPSDSlider
       .on(
         "input",
         debounce(100, function () {
-          const shift = -parseInt(analyserShiftPSDElem.val());
+          const shift = -parseInt(analyserShiftPSDSlider.val());
           GraphSpectrumPlot.setShiftPSD(shift);
-          analyserLowLevelPSDElem.val(0).trigger("input");
+          analyserLowLevelPSDSlider.val(0).trigger("input");
+          analyserMinPSDText.val(-40 + shift);
+          analyserMaxPSDText.val(10 + shift);
           that.refresh();
         })
       )
@@ -225,12 +241,17 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(0);
 
-      analyserLowLevelPSDElem
+      analyserLowLevelPSDSlider
       .on(
         "input",
         debounce(100, function () {
-          const lowLevel = analyserLowLevelPSDElem.val() / 100;
-          GraphSpectrumPlot.setLowLevelPSD(lowLevel);
+          const lowLevelPercent = analyserLowLevelPSDSlider.val();
+          GraphSpectrumPlot.setLowLevelPSD(lowLevelPercent);
+          const shift = -parseInt(analyserShiftPSDSlider.val());
+          const dBmValueMin = MIN_DBM_VALUE + shift,
+                dBmValueMax = MAX_DBM_VALUE + shift,
+                lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * lowLevelPercent / 100;
+          analyserLowPSDText.val(lowLevel);
           that.refresh();
         })
       )
@@ -268,11 +289,23 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           "onlyFullScreenException",
           pidErrorVsSetpointSelected || psdHeatMapSelected
         );
-        analyserShiftPSDElem.toggleClass(
+        analyserShiftPSDSlider.toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected
         );
-        analyserLowLevelPSDElem.toggleClass(
+        analyserLowLevelPSDSlider.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserMinPSDText.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserMaxPSDText.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserLowPSDText.toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected
         );

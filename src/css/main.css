@@ -695,6 +695,27 @@ html.has-analyser-fullscreen.has-analyser
   top: 30px;
 }
 
+.analyser input#analyserMaxPSD {
+  width: 30px;
+  height: 18px;
+  left: 0px;
+  top: 30px;
+}
+
+.analyser input#analyserMinPSD {
+  width: 30px;
+  height: 18px;
+  left: 0px;
+  top: 110px;
+}
+
+.analyser input#analyserLowPSD {
+  width: 40px;
+  height: 18px;
+  left: 0px;
+  top: 70px;
+}
+
 .analyser input.onlyFullScreen {
   display: none;
   padding: 3px;
