@@ -687,6 +687,14 @@ html.has-analyser-fullscreen.has-analyser
   top: 30px;
 }
 
+.analyser input#analyserLowLevelPSD {
+  width: 10px;
+  height: 100px;
+  -webkit-appearance: slider-vertical;
+  left: 0px;
+  top: 30px;
+}
+
 .analyser input.onlyFullScreen {
   display: none;
   padding: 3px;
