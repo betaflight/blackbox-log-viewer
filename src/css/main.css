@@ -616,7 +616,7 @@ html.has-analyser-fullscreen.has-analyser
   height: 0;
   overflow: hidden;
   opacity: 0;
-  left: 120px;
+  left: 130px;
   float: left;
   z-index: 9;
   position: absolute;
@@ -670,12 +670,50 @@ html.has-analyser-fullscreen.has-analyser
   top: 10px;
   float: right;
 }
+
 .analyser input#analyserZoomY {
   width: 10px;
   height: 100px;
   -webkit-appearance: slider-vertical;
   left: 1085px;
   top: 30px;
+}
+
+.analyser input#analyserShiftPSD {
+  width: 10px;
+  height: 100px;
+  -webkit-appearance: slider-vertical;
+  left: 0px;
+  top: 30px;
+}
+
+.analyser input#analyserLowLevelPSD {
+  width: 10px;
+  height: 100px;
+  -webkit-appearance: slider-vertical;
+  left: 0px;
+  top: 30px;
+}
+
+.analyser input#analyserMaxPSD {
+  width: 30px;
+  height: 18px;
+  left: 0px;
+  top: 30px;
+}
+
+.analyser input#analyserMinPSD {
+  width: 30px;
+  height: 18px;
+  left: 0px;
+  top: 110px;
+}
+
+.analyser input#analyserLowPSD {
+  width: 40px;
+  height: 18px;
+  left: 0px;
+  top: 70px;
 }
 
 .analyser input.onlyFullScreen {

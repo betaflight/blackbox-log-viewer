@@ -4,6 +4,8 @@ import {
   GraphSpectrumPlot,
   SPECTRUM_TYPE,
   SPECTRUM_OVERDRAW_TYPE,
+  MIN_DBM_VALUE,
+  MAX_DBM_VALUE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
 import { SpectrumExporter } from "./spectrum-exporter";
@@ -29,16 +31,21 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   try {
     let isFullscreen = false;
 
-    let sysConfig = flightLog.getSysConfig();
+    const sysConfig = flightLog.getSysConfig();
     const logRateInfo = GraphSpectrumCalc.initialize(flightLog, sysConfig);
     GraphSpectrumPlot.initialize(analyserCanvas, sysConfig);
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
-    let analyserZoomXElem = $("#analyserZoomX");
-    let analyserZoomYElem = $("#analyserZoomY");
+    const analyserZoomXElem = $("#analyserZoomX");
+    const analyserZoomYElem = $("#analyserZoomY");
+    const analyserShiftPSDSlider = $("#analyserShiftPSD");
+    const analyserLowLevelPSDSlider = $("#analyserLowLevelPSD");
+    const analyserMinPSDText = $("#analyserMinPSD");
+    const analyserMaxPSDText = $("#analyserMaxPSD");
+    const analyserLowPSDText = $("#analyserLowPSD");
 
-    let spectrumToolbarElem = $("#spectrumToolbar");
-    let spectrumTypeElem = $("#spectrumTypeSelect");
-    let overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
+    const spectrumToolbarElem = $("#spectrumToolbar");
+    const spectrumTypeElem = $("#spectrumTypeSelect");
+    const overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
 
     this.setFullscreen = function (size) {
       isFullscreen = size == true;
@@ -76,27 +83,42 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.resize = function () {
-      let newSize = getSize();
+      const newSize = getSize();
 
       // Determine the analyserCanvas location
       GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
       // Recenter the analyser canvas in the bottom left corner
-      let parentElem = $(analyserCanvas).parent();
+      const parentElem = $(analyserCanvas).parent();
 
       $(parentElem).css({
         left: newSize.left, // (canvas.width  * getSize().left) + "px",
         top: newSize.top, // (canvas.height * getSize().top ) + "px"
       });
       // place the sliders.
-      $("input:first-of-type", parentElem).css({
+      $("#analyserZoomX", parentElem).css({
         left: `${newSize.width - 130}px`,
       });
-      $("input:last-of-type", parentElem).css({
+      $("#analyserZoomY", parentElem).css({
         left: `${newSize.width - 20}px`,
+      });
+      $("#analyserShiftPSD", parentElem).css({
+        left: `${newSize.width - 20}px`,
+      });
+      $("#analyserLowLevelPSD", parentElem).css({
+        left: `${newSize.width - 130}px`,
       });
       $("#analyserResize", parentElem).css({
         left: `${newSize.width - 20}px`,
+      });
+      $("#analyserMaxPSD", parentElem).css({
+        left: `${newSize.width - 50}px`,
+      });
+      $("#analyserMinPSD", parentElem).css({
+        left: `${newSize.width - 50}px`,
+      });
+      $("#analyserLowPSD", parentElem).css({
+        left: `${newSize.width - 120}px`,
       });
     };
 
@@ -112,8 +134,20 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm();
           break;
 
+        case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+          fftData = GraphSpectrumCalc.dataLoadPowerSpectralDensityVsThrottle();
+          break;
+
+        case SPECTRUM_TYPE.PSD_VS_RPM:
+          fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm(true);
+          break;
+
         case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
           fftData = GraphSpectrumCalc.dataLoadPidErrorVsSetpoint();
+          break;
+
+        case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+          fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
           break;
 
         case SPECTRUM_TYPE.FREQUENCY:
@@ -187,6 +221,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+          // Recalculate PSD with updated samples per segment count
+          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+            dataLoad();
+            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          }
           that.refresh();
         })
       )
@@ -194,6 +233,38 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         $(this).val(DEFAULT_ZOOM).trigger("input");
       })
       .val(DEFAULT_ZOOM);
+
+      analyserShiftPSDSlider
+      .on(
+        "input",
+        debounce(100, function () {
+          const shift = -parseInt(analyserShiftPSDSlider.val());
+          GraphSpectrumPlot.setShiftPSD(shift);
+          analyserLowLevelPSDSlider.val(0).trigger("input");
+          analyserMinPSDText.val(-40 + shift);
+          analyserMaxPSDText.val(10 + shift);
+          that.refresh();
+        })
+      ).dblclick(function () {
+        $(this).val(0).trigger("input");
+      }).val(0);
+
+      analyserLowLevelPSDSlider
+      .on(
+        "input",
+        debounce(100, function () {
+          const lowLevelPercent = analyserLowLevelPSDSlider.val();
+          GraphSpectrumPlot.setLowLevelPSD(lowLevelPercent);
+          const shift = -parseInt(analyserShiftPSDSlider.val());
+          const dBmValueMin = MIN_DBM_VALUE + shift,
+                dBmValueMax = MAX_DBM_VALUE + shift,
+                lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * lowLevelPercent / 100;
+          analyserLowPSDText.val(lowLevel);
+          that.refresh();
+        })
+      ).dblclick(function () {
+        $(this).val(0).trigger("input");
+      }).val(0);
 
     // Spectrum type to show
     userSettings.spectrumType =
@@ -220,10 +291,33 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         // Hide overdraw and zoomY if needed
         const pidErrorVsSetpointSelected =
           optionSelected === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT;
+        const psdHeatMapSelected =
+          optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+          optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected
+          pidErrorVsSetpointSelected || psdHeatMapSelected
+        );
+        analyserShiftPSDSlider.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserLowLevelPSDSlider.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserMinPSDText.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserMaxPSDText.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        analyserLowPSDText.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
         );
 
         $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
@@ -237,7 +331,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
     overdrawSpectrumTypeElem.change(function () {
-      let optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
+      const optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
 
       if (optionSelected != userSettings.overdrawSpectrumType) {
         userSettings.overdrawSpectrumType = optionSelected;
@@ -261,9 +355,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         // Hide the combo and maximize buttons
         spectrumToolbarElem.removeClass("non-shift");
 
-        let rect = analyserCanvas.getBoundingClientRect();
-        let mouseX = e.clientX - rect.left;
-        let mouseY = e.clientY - rect.top;
+        const rect = analyserCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
         if (mouseX != lastMouseX || mouseY != lastMouseY) {
           lastMouseX = mouseX;
           lastMouseY = mouseY;

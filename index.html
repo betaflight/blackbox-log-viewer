@@ -457,8 +457,11 @@
                             <select id="spectrumTypeSelect">
                                 <option value="0">Frequency</option>
                                 <option value="1">Freq. vs Throttle</option>
-                                <option value="3">Freq. vs RPM</option>
-                                <option value="2">Error vs Setpoint</option>
+                                <option value="2">Freq. vs RPM</option>
+                                <option value="3">Power spectral density</option>
+                                <option value="4">PSD vs Throttle</option>
+                                <option value="5">PSD vs RPM</option>
+                                <option value="6">Error vs Setpoint</option>
                             </select>
                         </div>
 
@@ -490,6 +493,17 @@
                     />
                     <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
                     />
+                    <input id="analyserShiftPSD" class="onlyFullScreen" type="range" name="analyserShiftPSD" value="0" min="-50" max="50" step="5"
+                    />
+                    <input id="analyserLowLevelPSD" class="onlyFullScreen" type="range" name="analyserLowLevelPSD" value="0" min="0" max="100" step="5"
+                    />
+                    <input id="analyserMaxPSD" class="onlyFullScreen" type="text" name="analyserMaxPSD" value="10" type="number" readonly
+                    />
+                    <input id="analyserMinPSD" class="onlyFullScreen" type="text" name="analyserMinPSD" value="-40" type="number" readonly
+                    />
+                    <input id="analyserLowPSD" class="onlyFullScreen" type="text" name="analyserLowPSD" value="0" type="number" readonly
+                    />
+
                     <datalist id="analyserZoomXTicks">
                         <option>100</option>
                         <option>200</option>
