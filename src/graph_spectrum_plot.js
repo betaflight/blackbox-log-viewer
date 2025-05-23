@@ -50,6 +50,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _sysConfig: null,
   _zoomX: 1.0,
   _zoomY: 1.0,
+  _shiftPSD: 0,
   _drawingParams: {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
@@ -75,6 +76,15 @@ GraphSpectrumPlot.setZoom = function (zoomX, zoomY) {
   this._invalidateCache();
 
   if (modifiedZoomY) {
+    this._invalidateDataCache();
+  }
+};
+
+GraphSpectrumPlot.setShiftPSD = function (shift) {
+  const modifiedShift = this._shiftPSD !== shift;
+  if (modifiedShift) {
+    this._shiftPSD = shift;
+    this._invalidateCache();
     this._invalidateDataCache();
   }
 };
@@ -509,15 +519,8 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
 
   const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
 
-  //Compute the dbm range shift from zoomY as[-30, -20, -10, 0, +10, +20]
-  let dBmRangeShift = 0;
-  if (this._zoomY <= 1) {        // [10 ... 0.1]
-    dBmRangeShift = -10 * Math.round((1 / this._zoomY - 1) / 3); //0, -10, -20, -30
-  } else {
-    dBmRangeShift = 10 * Math.round((this._zoomY - 1) / 9 * 2); // 0, 10, 20
-  }
-  const dBmValueMin = MIN_DBM_VALUE + dBmRangeShift,
-        dBmValueMax = MAX_DBM_VALUE + dBmRangeShift;
+  const dBmValueMin = MIN_DBM_VALUE + this._shiftPSD,
+        dBmValueMax = MAX_DBM_VALUE + this._shiftPSD;
   // Loop for throttle
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency

@@ -30,6 +30,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
     let analyserZoomXElem = $("#analyserZoomX");
     let analyserZoomYElem = $("#analyserZoomY");
+    const analyserShiftPSDElem = $("#analyserShiftPSD");
 
     let spectrumToolbarElem = $("#spectrumToolbar");
     let spectrumTypeElem = $("#spectrumTypeSelect");
@@ -84,10 +85,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         top: newSize.top, // (canvas.height * getSize().top ) + "px"
       });
       // place the sliders.
-      $("input:first-of-type", parentElem).css({
+      $("#analyserZoomX", parentElem).css({
         left: `${newSize.width - 130}px`,
       });
-      $("input:last-of-type", parentElem).css({
+      $("#analyserZoomY", parentElem).css({
+        left: `${newSize.width - 20}px`,
+      });
+      $("#analyserShiftPSD", parentElem).css({
         left: `${newSize.width - 20}px`,
       });
       $("#analyserResize", parentElem).css({
@@ -202,6 +206,20 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(DEFAULT_ZOOM);
 
+      analyserShiftPSDElem
+      .on(
+        "input",
+        debounce(100, function () {
+          const shift = -parseInt(analyserShiftPSDElem.val());
+          GraphSpectrumPlot.setShiftPSD(shift);
+          that.refresh();
+        })
+      )
+      .dblclick(function () {
+        $(this).val(0).trigger("input");
+      })
+      .val(0);
+
     // Spectrum type to show
     userSettings.spectrumType =
       userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
@@ -223,10 +241,17 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         // Hide overdraw and zoomY if needed
         const pidErrorVsSetpointSelected =
           optionSelected === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT;
+        const psdHeatMapSelected =
+          optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+          optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected
+          pidErrorVsSetpointSelected || psdHeatMapSelected
+        );
+        analyserShiftPSDElem.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
         );
 
         $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
