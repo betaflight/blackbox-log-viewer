@@ -547,9 +547,7 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
         valuePlot = Math.min(valuePlot, dBmValueMax);
         valuePlot = Math.round((valuePlot - dBmValueMin) * 100 / (dBmValueMax - dBmValueMin));
       } else {
-        valuePlot = Math.round(
-          Math.min(valuePlot * fftColorScale, 100)
-        );
+        valuePlot = Math.round(Math.min(valuePlot * fftColorScale, 100));
       }
 
       // The fillStyle is slow, but I haven't found a way to do this faster...
