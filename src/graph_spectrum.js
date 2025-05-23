@@ -243,11 +243,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserMaxPSDText.val(10 + shift);
           that.refresh();
         })
-      )
-      .dblclick(function () {
+      ).dblclick(function () {
         $(this).val(0).trigger("input");
-      })
-      .val(0);
+      }).val(0);
 
       analyserLowLevelPSDSlider
       .on(
@@ -262,11 +260,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserLowPSDText.val(lowLevel);
           that.refresh();
         })
-      )
-      .dblclick(function () {
+      ).dblclick(function () {
         $(this).val(0).trigger("input");
-      })
-      .val(0);
+      }).val(0);
 
     // Spectrum type to show
     userSettings.spectrumType =
