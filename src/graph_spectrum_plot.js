@@ -12,9 +12,10 @@ const BLUR_FILTER_PIXEL = 1,
   MAX_SETPOINT_DEFAULT = 100,
   PID_ERROR_VERTICAL_CHUNK = 5,
   ZOOM_X_MAX = 5,
-  MIN_DBM_VALUE = -40,
-  MAX_DBM_VALUE = 10,
   MAX_SPECTRUM_LINE_COUNT = 30000;
+
+export const MIN_DBM_VALUE = -40,
+  MAX_DBM_VALUE = 10;
 
 export const SPECTRUM_TYPE = {
   FREQUENCY: 0,
@@ -531,7 +532,7 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
 
   const dBmValueMin = MIN_DBM_VALUE + this._shiftPSD,
         dBmValueMax = MAX_DBM_VALUE + this._shiftPSD,
-        lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * this._lowLevelPSD;
+        lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * this._lowLevelPSD / 100;
   // Loop for throttle
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
