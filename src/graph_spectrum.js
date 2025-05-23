@@ -24,18 +24,18 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   try {
     let isFullscreen = false;
 
-    let sysConfig = flightLog.getSysConfig();
+    const sysConfig = flightLog.getSysConfig();
     const logRateInfo = GraphSpectrumCalc.initialize(flightLog, sysConfig);
     GraphSpectrumPlot.initialize(analyserCanvas, sysConfig);
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
-    let analyserZoomXElem = $("#analyserZoomX");
-    let analyserZoomYElem = $("#analyserZoomY");
+    const analyserZoomXElem = $("#analyserZoomX");
+    const analyserZoomYElem = $("#analyserZoomY");
     const analyserShiftPSDElem = $("#analyserShiftPSD");
     const analyserLowLevelPSDElem = $("#analyserLowLevelPSD");
 
-    let spectrumToolbarElem = $("#spectrumToolbar");
-    let spectrumTypeElem = $("#spectrumTypeSelect");
-    let overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
+    const spectrumToolbarElem = $("#spectrumToolbar");
+    const spectrumTypeElem = $("#spectrumTypeSelect");
+    const overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
 
     this.setFullscreen = function (size) {
       isFullscreen = size == true;
@@ -73,13 +73,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.resize = function () {
-      let newSize = getSize();
+      const newSize = getSize();
 
       // Determine the analyserCanvas location
       GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
       // Recenter the analyser canvas in the bottom left corner
-      let parentElem = $(analyserCanvas).parent();
+      const parentElem = $(analyserCanvas).parent();
 
       $(parentElem).css({
         left: newSize.left, // (canvas.width  * getSize().left) + "px",
@@ -288,7 +288,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
     overdrawSpectrumTypeElem.change(function () {
-      let optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
+      const optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
 
       if (optionSelected != userSettings.overdrawSpectrumType) {
         userSettings.overdrawSpectrumType = optionSelected;
@@ -312,9 +312,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         // Hide the combo and maximize buttons
         spectrumToolbarElem.removeClass("non-shift");
 
-        let rect = analyserCanvas.getBoundingClientRect();
-        let mouseX = e.clientX - rect.left;
-        let mouseY = e.clientY - rect.top;
+        const rect = analyserCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
         if (mouseX != lastMouseX || mouseY != lastMouseY) {
           lastMouseX = mouseX;
           lastMouseY = mouseY;
