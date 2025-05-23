@@ -670,11 +670,20 @@ html.has-analyser-fullscreen.has-analyser
   top: 10px;
   float: right;
 }
+
 .analyser input#analyserZoomY {
   width: 10px;
   height: 100px;
   -webkit-appearance: slider-vertical;
   left: 1085px;
+  top: 30px;
+}
+
+.analyser input#analyserShiftPSD {
+  width: 10px;
+  height: 100px;
+  -webkit-appearance: slider-vertical;
+  left: 0px;
   top: 30px;
 }
 
