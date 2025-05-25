@@ -684,7 +684,7 @@ html.has-analyser-fullscreen.has-analyser
   height: 100px;
   -webkit-appearance: slider-vertical;
   left: 0px;
-  top: 30px;
+  top: 48px;
 }
 
 .analyser input#analyserLowLevelPSD {
@@ -692,7 +692,7 @@ html.has-analyser-fullscreen.has-analyser
   height: 100px;
   -webkit-appearance: slider-vertical;
   left: 0px;
-  top: 30px;
+  top: 48px;
 }
 
 .analyser input#analyserMaxPSD {
@@ -706,14 +706,14 @@ html.has-analyser-fullscreen.has-analyser
   width: 30px;
   height: 18px;
   left: 0px;
-  top: 110px;
+  top: 150px;
 }
 
 .analyser input#analyserLowPSD {
   width: 40px;
   height: 18px;
   left: 0px;
-  top: 70px;
+  top: 150px;
 }
 
 .analyser input.onlyFullScreen {

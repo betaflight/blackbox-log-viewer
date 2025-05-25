@@ -107,13 +107,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         left: `${newSize.width - 20}px`,
       });
       $("#analyserMaxPSD", parentElem).css({
-        left: `${newSize.width - 50}px`,
+        left: `${newSize.width - 30}px`,
       });
       $("#analyserMinPSD", parentElem).css({
-        left: `${newSize.width - 50}px`,
+        left: `${newSize.width - 30}px`,
       });
       $("#analyserLowPSD", parentElem).css({
-        left: `${newSize.width - 120}px`,
+        left: `${newSize.width - 145}px`,
       });
     };
 
