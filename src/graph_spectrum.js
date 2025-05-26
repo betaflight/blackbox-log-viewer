@@ -136,7 +136,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           break;
 
         case SPECTRUM_TYPE.PSD_VS_RPM:
-          fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm(true);
+          fftData = GraphSpectrumCalc.dataLoadPowerSpectralDensityVsRpm();
           break;
 
         case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
