@@ -308,9 +308,15 @@ GraphSpectrumCalc.dataLoadPowerSpectralDensityVsThrottle = function() {
   return this._dataLoadPowerSpectralDensityVsX(FIELD_THROTTLE_NAME, 0, 100);
 };
 
-GraphSpectrumCalc.dataLoadFrequencyVsRpm = function(drawPSD = false) {
-  const fftData = drawPSD ? this._dataLoadPowerSpectralDensityVsX(FIELD_RPM_NAMES, 0) :
-                            this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
+GraphSpectrumCalc.dataLoadFrequencyVsRpm = function() {
+  const fftData = this._dataLoadFrequencyVsX(FIELD_RPM_NAMES, 0);
+  fftData.vsRange.max *= 3.333 / this._motorPoles;
+  fftData.vsRange.min *= 3.333 / this._motorPoles;
+  return fftData;
+};
+
+GraphSpectrumCalc.dataLoadPowerSpectralDensityVsRpm = function() {
+  const fftData = this._dataLoadPowerSpectralDensityVsX(FIELD_RPM_NAMES, 0);
   fftData.vsRange.max *= 3.333 / this._motorPoles;
   fftData.vsRange.min *= 3.333 / this._motorPoles;
   return fftData;
