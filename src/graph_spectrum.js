@@ -98,22 +98,22 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         left: `${newSize.width - 20}px`,
       });
       $("#analyserShiftPSD", parentElem).css({
-        left: `${newSize.width - 20}px`,
+        left: `${newSize.width - 60}px`,
       });
       $("#analyserLowLevelPSD", parentElem).css({
-        left: `${newSize.width - 130}px`,
+        left: `${newSize.width - 110}px`,
       });
       $("#analyserResize", parentElem).css({
         left: `${newSize.width - 20}px`,
       });
       $("#analyserMaxPSD", parentElem).css({
-        left: `${newSize.width - 30}px`,
+        left: `${newSize.width - 70}px`,
       });
       $("#analyserMinPSD", parentElem).css({
-        left: `${newSize.width - 30}px`,
+        left: `${newSize.width - 70}px`,
       });
       $("#analyserLowPSD", parentElem).css({
-        left: `${newSize.width - 145}px`,
+        left: `${newSize.width - 125}px`,
       });
     };
 
