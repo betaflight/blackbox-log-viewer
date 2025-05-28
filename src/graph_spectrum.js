@@ -234,7 +234,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserMinPSDText.val(-40 + shift);
           analyserMaxPSDText.val(10 + shift);
           that.refresh();
-        })
+        }),
       ).dblclick(function () {
         $(this).val(0).trigger("input");
       }).val(0);
@@ -251,7 +251,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
                 lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * lowLevelPercent / 100;
           analyserLowPSDText.val(lowLevel);
           that.refresh();
-        })
+        }),
       ).dblclick(function () {
         $(this).val(0).trigger("input");
       }).val(0);
