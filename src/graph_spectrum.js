@@ -283,27 +283,27 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected || psdHeatMapSelected
+          pidErrorVsSetpointSelected || psdHeatMapSelected,
         );
         analyserShiftPSDSlider.toggleClass(
           "onlyFullScreenException",
-          !psdHeatMapSelected
+          !psdHeatMapSelected,
         );
         analyserLowLevelPSDSlider.toggleClass(
           "onlyFullScreenException",
-          !psdHeatMapSelected
+          !psdHeatMapSelected,
         );
         analyserMinPSDText.toggleClass(
           "onlyFullScreenException",
-          !psdHeatMapSelected
+          !psdHeatMapSelected,
         );
         analyserMaxPSDText.toggleClass(
           "onlyFullScreenException",
-          !psdHeatMapSelected
+          !psdHeatMapSelected,
         );
         analyserLowPSDText.toggleClass(
           "onlyFullScreenException",
-          !psdHeatMapSelected
+          !psdHeatMapSelected,
         );
 
         $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
