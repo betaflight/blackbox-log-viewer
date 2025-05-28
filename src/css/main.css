@@ -543,6 +543,12 @@ html.has-analyser-fullscreen.has-analyser
   display: block;
 }
 
+html.has-analyser-fullscreen.has-analyser
+  .analyser
+  label:not(.onlyFullScreenException) {
+  display: block;
+}
+
 #analyser,
 #log-seek-bar {
   z-index: 10;
@@ -679,44 +685,71 @@ html.has-analyser-fullscreen.has-analyser
   top: 30px;
 }
 
-.analyser input#analyserShiftPSD {
-  width: 10px;
-  height: 100px;
-  -webkit-appearance: slider-vertical;
-  left: 0px;
-  top: 48px;
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  opacity: 1;
 }
 
 .analyser input#analyserLowLevelPSD {
-  width: 10px;
-  height: 100px;
-  -webkit-appearance: slider-vertical;
+  width: 50px;
+  height: 20px;
   left: 0px;
-  top: 48px;
+  top: 90px;
 }
 
 .analyser input#analyserMaxPSD {
-  width: 30px;
-  height: 18px;
+  width: 50px;
+  height: 20px;
   left: 0px;
   top: 30px;
 }
 
 .analyser input#analyserMinPSD {
-  width: 30px;
-  height: 18px;
+  width: 50px;
+  height: 20px;
   left: 0px;
-  top: 150px;
+  top: 60px;
 }
 
-.analyser input#analyserLowPSD {
-  width: 40px;
-  height: 18px;
+.analyser label#analyserMaxPSDLabel {
+  position:absolute;
+  color:gray;
+
   left: 0px;
-  top: 150px;
+  top: 30px;
+  font-size: 12px;
+}
+
+.analyser label#analyserMinPSDLabel {
+  position:absolute;
+  color:gray;
+
+  left: 0px;
+  top: 60px;
+  font-size: 12px;
+}
+
+.analyser label#analyserLowLevelPSDLabel {
+  position:absolute;
+  color:gray;
+
+  left: 0px;
+  top: 90px;
+  font-size: 12px;
 }
 
 .analyser input.onlyFullScreen {
+  display: none;
+  padding: 3px;
+  margin-right: 3px;
+  z-index: 9;
+  position: absolute;
+}
+
+.analyser label.onlyFullScreen {
   display: none;
   padding: 3px;
   margin-right: 3px;

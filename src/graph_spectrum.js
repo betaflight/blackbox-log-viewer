@@ -4,8 +4,8 @@ import {
   GraphSpectrumPlot,
   SPECTRUM_TYPE,
   SPECTRUM_OVERDRAW_TYPE,
-  MIN_DBM_VALUE,
-  MAX_DBM_VALUE,
+  DEFAULT_MIN_DBM_VALUE,
+  DEFAULT_MAX_DBM_VALUE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
 import { SpectrumExporter } from "./spectrum-exporter";
@@ -32,11 +32,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
     const analyserZoomXElem = $("#analyserZoomX");
     const analyserZoomYElem = $("#analyserZoomY");
-    const analyserShiftPSDSlider = $("#analyserShiftPSD");
-    const analyserLowLevelPSDSlider = $("#analyserLowLevelPSD");
-    const analyserMinPSDText = $("#analyserMinPSD");
-    const analyserMaxPSDText = $("#analyserMaxPSD");
-    const analyserLowPSDText = $("#analyserLowPSD");
+    const analyserMinPSD = $("#analyserMinPSD");
+    const analyserMaxPSD = $("#analyserMaxPSD");
+    const analyserLowLevelPSD = $("#analyserLowLevelPSD");
+
 
     const spectrumToolbarElem = $("#spectrumToolbar");
     const spectrumTypeElem = $("#spectrumTypeSelect");
@@ -97,23 +96,26 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       $("#analyserZoomY", parentElem).css({
         left: `${newSize.width - 20}px`,
       });
-      $("#analyserShiftPSD", parentElem).css({
-        left: `${newSize.width - 60}px`,
-      });
-      $("#analyserLowLevelPSD", parentElem).css({
-        left: `${newSize.width - 110}px`,
-      });
       $("#analyserResize", parentElem).css({
         left: `${newSize.width - 20}px`,
       });
       $("#analyserMaxPSD", parentElem).css({
-        left: `${newSize.width - 70}px`,
+        left: `${newSize.width - 90}px`,
       });
       $("#analyserMinPSD", parentElem).css({
-        left: `${newSize.width - 70}px`,
+        left: `${newSize.width - 90}px`,
       });
-      $("#analyserLowPSD", parentElem).css({
-        left: `${newSize.width - 125}px`,
+      $("#analyserLowLevelPSD", parentElem).css({
+        left: `${newSize.width - 90}px`,
+      });
+      $("#analyserMaxPSDLabel", parentElem).css({
+        left: `${newSize.width - 150}px`,
+      });
+      $("#analyserMinPSDLabel", parentElem).css({
+        left: `${newSize.width - 150}px`,
+      });
+      $("#analyserLowLevelPSDLabel", parentElem).css({
+        left: `${newSize.width - 155}px`,
       });
     };
 
@@ -224,37 +226,44 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(DEFAULT_ZOOM);
 
-      analyserShiftPSDSlider
+      analyserMinPSD
       .on(
         "input",
         debounce(100, function () {
-          const shift = -parseInt(analyserShiftPSDSlider.val());
-          GraphSpectrumPlot.setShiftPSD(shift);
-          analyserLowLevelPSDSlider.val(0).trigger("input");
-          analyserMinPSDText.val(-40 + shift);
-          analyserMaxPSDText.val(10 + shift);
+          const min = parseInt(analyserMinPSD.val());
+          GraphSpectrumPlot.setMinPSD(min);
+          analyserLowLevelPSD.val(min).trigger("input");
+          analyserLowLevelPSD.prop("min", min);
           that.refresh();
         }),
       ).dblclick(function () {
-        $(this).val(0).trigger("input");
-      }).val(0);
+        $(this).val(DEFAULT_MIN_DBM_VALUE).trigger("input");
+      }).val(DEFAULT_MIN_DBM_VALUE);
 
-      analyserLowLevelPSDSlider
+      analyserMaxPSD
       .on(
         "input",
         debounce(100, function () {
-          const lowLevelPercent = analyserLowLevelPSDSlider.val();
-          GraphSpectrumPlot.setLowLevelPSD(lowLevelPercent);
-          const shift = -parseInt(analyserShiftPSDSlider.val());
-          const dBmValueMin = MIN_DBM_VALUE + shift,
-                dBmValueMax = MAX_DBM_VALUE + shift,
-                lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * lowLevelPercent / 100;
-          analyserLowPSDText.val(lowLevel);
+          const max = parseInt(analyserMaxPSD.val());
+          GraphSpectrumPlot.setMaxPSD(max);
+          analyserLowLevelPSD.prop("max", max);
           that.refresh();
         }),
       ).dblclick(function () {
-        $(this).val(0).trigger("input");
-      }).val(0);
+        $(this).val(DEFAULT_MAX_DBM_VALUE).trigger("input");
+      }).val(DEFAULT_MAX_DBM_VALUE);
+
+      analyserLowLevelPSD
+      .on(
+        "input",
+        debounce(100, function () {
+          const lowLevel = analyserLowLevelPSD.val();
+          GraphSpectrumPlot.setLowLevelPSD(lowLevel);
+          that.refresh();
+        })
+      ).dblclick(function () {
+        $(this).val(analyserMinPSD.val()).trigger("input");
+      }).val(analyserMinPSD.val());
 
     // Spectrum type to show
     userSettings.spectrumType =
@@ -285,23 +294,27 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           "onlyFullScreenException",
           pidErrorVsSetpointSelected || psdHeatMapSelected,
         );
-        analyserShiftPSDSlider.toggleClass(
+        analyserLowLevelPSD.toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
         );
-        analyserLowLevelPSDSlider.toggleClass(
+        analyserMinPSD.toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
         );
-        analyserMinPSDText.toggleClass(
+        analyserMaxPSD.toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
         );
-        analyserMaxPSDText.toggleClass(
+        $("#analyserMaxPSDLabel").toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
         );
-        analyserLowPSDText.toggleClass(
+        $("#analyserMinPSDLabel").toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected
+        );
+        $("#analyserLowLevelPSDLabel").toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
         );

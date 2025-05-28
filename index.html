@@ -493,16 +493,21 @@
                     />
                     <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
                     />
-                    <input id="analyserShiftPSD" class="onlyFullScreen" type="range" name="analyserShiftPSD" value="0" min="-50" max="50" step="5"
+                    <input id="analyserLowLevelPSD" class="onlyFullScreen" type="number" name="analyserLowLevelPSD" value="-40" min="-40" max="10" step="5"
                     />
-                    <input id="analyserLowLevelPSD" class="onlyFullScreen" type="range" name="analyserLowLevelPSD" value="0" min="0" max="100" step="5"
+                    <input id="analyserMaxPSD" class="onlyFullScreen" type="number" name="analyserMaxPSD" value="10" min="-20" max="100" step="5"
                     />
-                    <input id="analyserMaxPSD" class="onlyFullScreen" type="text" name="analyserMaxPSD" value="10" type="number" readonly
+                    <input id="analyserMinPSD" class="onlyFullScreen" type="number" name="analyserMinPSD" value="-40" min="-100" max="20" step="5"
                     />
-                    <input id="analyserMinPSD" class="onlyFullScreen" type="text" name="analyserMinPSD" value="-40" type="number" readonly
-                    />
-                    <input id="analyserLowPSD" class="onlyFullScreen" type="text" name="analyserLowPSD" value="0" type="number" readonly
-                    />
+                    <label id="analyserMaxPSDLabel" name="analyserMaxPSDLabel" class="onlyFullScreen" >
+                      Max&nbsp;dBm
+                    </label>
+                    <label id="analyserMinPSDLabel" name="analyserMinPSDLabel" class="onlyFullScreen" >
+                      Min&nbsp;dBm
+                    </label>
+                    <label id="analyserLowLevelPSDLabel" name="analyserLowLevelPSDLabel" class="onlyFullScreen" >
+                      Limit&nbsp;dBm
+                    </label>
 
                     <datalist id="analyserZoomXTicks">
                         <option>100</option>
