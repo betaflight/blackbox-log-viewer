@@ -21,12 +21,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
     fftData = null,
-    prefs = new PrefStorage(),
-    dataBuffer = {
+    prefs = new PrefStorage();
+  const  dataBuffer = {
       fieldIndex: 0,
       curve: null,
       fieldName: null,
-    };
+  };
 
   try {
     let isFullscreen = false;
@@ -122,9 +122,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       });
     };
 
-    let dataLoad = function () {
+    const dataLoad = function () {
       GraphSpectrumCalc.setDataBuffer(dataBuffer);
-
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
           fftData = GraphSpectrumCalc.dataLoadFrequencyVsThrottle();
@@ -242,7 +241,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserMinPSDText.val(-40 + shift);
           analyserMaxPSDText.val(10 + shift);
           that.refresh();
-        })
+        }),
       ).dblclick(function () {
         $(this).val(0).trigger("input");
       }).val(0);
@@ -259,7 +258,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
                 lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * lowLevelPercent / 100;
           analyserLowPSDText.val(lowLevel);
           that.refresh();
-        })
+        }),
       ).dblclick(function () {
         $(this).val(0).trigger("input");
       }).val(0);
