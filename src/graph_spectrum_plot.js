@@ -14,8 +14,8 @@ const BLUR_FILTER_PIXEL = 1,
   ZOOM_X_MAX = 5,
   MAX_SPECTRUM_LINE_COUNT = 30000;
 
-export const MIN_DBM_VALUE = -40,
-  MAX_DBM_VALUE = 10;
+export const DEFAULT_MIN_DBM_VALUE = -40,
+  DEFAULT_MAX_DBM_VALUE = 10;
 
 export const SPECTRUM_TYPE = {
   FREQUENCY: 0,
@@ -51,8 +51,9 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _sysConfig: null,
   _zoomX: 1.0,
   _zoomY: 1.0,
-  _shiftPSD: 0,
-  _lowLevelPSD: 0,
+  _minPSD: DEFAULT_MIN_DBM_VALUE,
+  _maxPSD: DEFAULT_MAX_DBM_VALUE,
+  _lowLevelPSD: DEFAULT_MIN_DBM_VALUE,
   _drawingParams: {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
@@ -82,10 +83,19 @@ GraphSpectrumPlot.setZoom = function (zoomX, zoomY) {
   }
 };
 
-GraphSpectrumPlot.setShiftPSD = function (shift) {
-  const modifiedShift = this._shiftPSD !== shift;
-  if (modifiedShift) {
-    this._shiftPSD = shift;
+GraphSpectrumPlot.setMinPSD = function (min) {
+  const modified = this._minPSD !== min;
+  if (modified) {
+    this._minPSD = min;
+    this._invalidateCache();
+    this._invalidateDataCache();
+  }
+};
+
+GraphSpectrumPlot.setMaxPSD = function (max) {
+  const modified = this._maxPSD !== max;
+  if (modified) {
+    this._maxPSD = max;
     this._invalidateCache();
     this._invalidateDataCache();
   }
@@ -528,25 +538,21 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   canvasCtx.canvas.width = this._fftData.fftLength;
   canvasCtx.canvas.height = THROTTLE_VALUES_SIZE;
 
-  const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
-
-  const dBmValueMin = MIN_DBM_VALUE + this._shiftPSD,
-        dBmValueMax = MAX_DBM_VALUE + this._shiftPSD,
-        lowLevel = dBmValueMin + (dBmValueMax - dBmValueMin) * this._lowLevelPSD / 100;
   // Loop for throttle
   for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
       let valuePlot = this._fftData.fftOutput[j][i];
       if (drawPSD) {
-        if (valuePlot < lowLevel) {
-          valuePlot = dBmValueMin;      // Filter low values
+        if (valuePlot < this._lowLevelPSD) {
+          valuePlot = this._minPSD;      // Filter low values
         } else {
-          valuePlot = Math.max(valuePlot, dBmValueMin);
+          valuePlot = Math.max(valuePlot, this._minPSD);
         }
-        valuePlot = Math.min(valuePlot, dBmValueMax);
-        valuePlot = Math.round((valuePlot - dBmValueMin) * 100 / (dBmValueMax - dBmValueMin));
+        valuePlot = Math.min(valuePlot, this._maxPSD);
+        valuePlot = Math.round((valuePlot - this._minPSD) * 100 / (this._maxPSD - this._minPSD));
       } else {
+        const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
         valuePlot = Math.round(Math.min(valuePlot * fftColorScale, 100));
       }
 
