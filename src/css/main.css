@@ -685,12 +685,18 @@ html.has-analyser-fullscreen.has-analyser
   top: 30px;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: textfield;
-  -moz-appearance: textfield;
-  appearance: textfield;
-  opacity: 1;
+.analyser input#analyserMinPSD::-webkit-inner-spin-button,
+.analyser input#analyserMinPSD::-webkit-outer-spin-button,
+.analyser input#analyserMaxPSD::-webkit-inner-spin-button,
+.analyser input#analyserMaxPSD::-webkit-outer-spin-button,
+.analyser input#analyserLowLevelPSD::-webkit-inner-spin-button,
+.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button {
+  -webkit-appearance: auto !important;
+  -moz-appearance: auto !important;
+  appearance: auto !important;
+  opacity: 1 !important;
+  height: auto !important;
+  width: auto !important;
 }
 
 .analyser input#analyserLowLevelPSD {
