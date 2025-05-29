@@ -267,7 +267,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           const lowLevel = analyserLowLevelPSD.val();
           GraphSpectrumPlot.setLowLevelPSD(lowLevel);
           that.refresh();
-        })
+        }),
       ).dblclick(function () {
         $(this).val(analyserMinPSD.val()).trigger("input");
       }).val(analyserMinPSD.val());
@@ -330,7 +330,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         );
         $("#analyserMinPSDLabel").toggleClass(
           "onlyFullScreenException",
-          !psdHeatMapSelected
+          !psdHeatMapSelected,
         );
         $("#analyserLowLevelPSDLabel").toggleClass(
           "onlyFullScreenException",
