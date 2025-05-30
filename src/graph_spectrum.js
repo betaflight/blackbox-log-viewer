@@ -213,7 +213,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           that.plotSpectrum(
             dataBuffer.fieldIndex,
             dataBuffer.curve,
-            dataBuffer.fieldName
+            dataBuffer.fieldName,
           );
         }
 
