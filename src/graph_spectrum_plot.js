@@ -1020,7 +1020,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
     }
     offset++; // make some space!
   } catch (e) {
-    console.log("Notch filter fieldName missing");
+    console.warn("Notch filter fieldName missing");
   }
 
   if (this._spectrumType === SPECTRUM_TYPE.FREQUENCY) {

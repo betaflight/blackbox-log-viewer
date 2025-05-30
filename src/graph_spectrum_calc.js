@@ -507,9 +507,9 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function(vsFieldNames, minValue = I
     if (minValue == Infinity) {  // this should never happen
       minValue = 0;
       maxValue = 100;
-      console.log("Invalid minimum value");
+      console.warn("Invalid minimum value");
     } else {
-      console.log("Maximum value %f smaller than minimum value %d", maxValue, minValue);
+      console.warn("Maximum value %f smaller than minimum value %d", maxValue, minValue);
       minValue = 0;
       maxValue = 100;
     }
