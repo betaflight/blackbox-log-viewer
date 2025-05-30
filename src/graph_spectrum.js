@@ -243,8 +243,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserLowLevelPSD.prop("min", min);
           that.refresh();
         }),
-      ).dblclick(function () {
-        $(this).val(DEFAULT_MIN_DBM_VALUE).trigger("input");
+      ).dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(DEFAULT_MIN_DBM_VALUE).trigger("input");
+        }
       }).val(DEFAULT_MIN_DBM_VALUE);
 
       analyserMaxPSD
@@ -256,8 +258,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserLowLevelPSD.prop("max", max);
           that.refresh();
         }),
-      ).dblclick(function () {
-        $(this).val(DEFAULT_MAX_DBM_VALUE).trigger("input");
+      ).dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(DEFAULT_MAX_DBM_VALUE).trigger("input");
+        }
       }).val(DEFAULT_MAX_DBM_VALUE);
 
       analyserLowLevelPSD
@@ -268,8 +272,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           GraphSpectrumPlot.setLowLevelPSD(lowLevel);
           that.refresh();
         }),
-      ).dblclick(function () {
-        $(this).val(analyserMinPSD.val()).trigger("input");
+      ).dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(analyserMinPSD.val()).trigger("input");
+        }
       }).val(analyserMinPSD.val());
 
     // Spectrum type to show
