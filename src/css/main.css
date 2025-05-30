@@ -699,13 +699,6 @@ html.has-analyser-fullscreen.has-analyser
   width: auto !important;
 }
 
-.analyser input#analyserLowLevelPSD {
-  width: 50px;
-  height: 20px;
-  left: 0px;
-  top: 90px;
-}
-
 .analyser input#analyserMaxPSD {
   width: 50px;
   height: 20px;
@@ -717,13 +710,19 @@ html.has-analyser-fullscreen.has-analyser
   width: 50px;
   height: 20px;
   left: 0px;
-  top: 60px;
+  top: 55px;
+}
+
+.analyser input#analyserLowLevelPSD {
+  width: 50px;
+  height: 20px;
+  left: 0px;
+  top: 80px;
 }
 
 .analyser label#analyserMaxPSDLabel {
   position:absolute;
   color:gray;
-
   left: 0px;
   top: 30px;
   font-size: 12px;
@@ -732,18 +731,16 @@ html.has-analyser-fullscreen.has-analyser
 .analyser label#analyserMinPSDLabel {
   position:absolute;
   color:gray;
-
   left: 0px;
-  top: 60px;
+  top: 55px;
   font-size: 12px;
 }
 
 .analyser label#analyserLowLevelPSDLabel {
   position:absolute;
   color:gray;
-
   left: 0px;
-  top: 90px;
+  top: 80px;
   font-size: 12px;
 }
 
