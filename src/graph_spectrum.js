@@ -232,8 +232,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           const min = parseInt(analyserMinPSD.val());
           GraphSpectrumPlot.setMinPSD(min);
-          analyserLowLevelPSD.val(min).trigger("input");
           analyserLowLevelPSD.prop("min", min);
+          analyserMaxPSD.prop("min", min + 5);
+          if (analyserLowLevelPSD.val() < min) {
+            analyserLowLevelPSD.val(min).trigger("input");
+          }
           that.refresh();
         }),
       ).dblclick(function (e) {
@@ -248,7 +251,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           const max = parseInt(analyserMaxPSD.val());
           GraphSpectrumPlot.setMaxPSD(max);
+          analyserMinPSD.prop("max", max - 5);
           analyserLowLevelPSD.prop("max", max);
+          if (analyserLowLevelPSD.val() > max) {
+            analyserLowLevelPSD.val(max).trigger("input");
+          }
           that.refresh();
         }),
       ).dblclick(function (e) {
