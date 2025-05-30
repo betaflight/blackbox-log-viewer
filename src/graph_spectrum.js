@@ -17,15 +17,14 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   let that = this,
     analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
+    dataBuffer = {
+      fieldIndex: 0,
+      curve: 0,
+      fieldName: null,
+    },
     dataReload = false,
     fftData = null,
     prefs = new PrefStorage();
-
-  this.dataBuffer = {
-    fieldIndex: 0,
-    curve: 0,
-    fieldName: null,
-  };
 
   try {
     let isFullscreen = false;
@@ -101,8 +100,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       });
     };
 
-    const dataLoad = function () {
-      GraphSpectrumCalc.setDataBuffer(that.dataBuffer);
+    let dataLoad = function () {
+      GraphSpectrumCalc.setDataBuffer(dataBuffer);
+
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
           fftData = GraphSpectrumCalc.dataLoadFrequencyVsThrottle();
@@ -128,16 +128,19 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Store the data pointers
+      dataBuffer = {
+        fieldIndex: fieldIndex,
+        curve: curve,
+        fieldName: fieldName,
+      };
 
-      that.dataBuffer.fieldIndex = fieldIndex;
-      that.dataBuffer.curve = curve;
-      that.dataBuffer.fieldName = fieldName;
       // Detect change of selected field.... reload and redraw required.
       if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
         dataReload = false;
         dataLoad();
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
+
       that.draw(); // draw the analyser on the canvas....
     };
 
@@ -208,9 +211,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           // Recalculate the data, for the same curve than now, and draw it
           dataReload = true;
           that.plotSpectrum(
-            that.dataBuffer.fieldIndex,
-            that.dataBuffer.curve,
-            that.dataBuffer.fieldName,
+            dataBuffer.fieldIndex,
+            dataBuffer.curve,
+            dataBuffer.fieldName,
           );
         }
 
