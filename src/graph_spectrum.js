@@ -441,7 +441,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
   } catch (e) {
-    console.log(`Failed to create analyser... error: ${e}`);
+    console.error(`Failed to create analyser... error: ${e}`);
   }
 
   this.clearImportedSpectrums = function() {
