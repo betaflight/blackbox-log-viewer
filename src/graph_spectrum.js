@@ -200,7 +200,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserZoomX = analyserZoomXElem.val() / 100;
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
           that.refresh();
-        })
+        }),
       )
       .dblclick(function () {
         $(this).val(DEFAULT_ZOOM).trigger("input");
@@ -219,14 +219,14 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
             GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
           }
           that.refresh();
-        })
+        }),
       )
       .dblclick(function () {
         $(this).val(DEFAULT_ZOOM).trigger("input");
       })
       .val(DEFAULT_ZOOM);
 
-      analyserMinPSD
+    analyserMinPSD
       .on(
         "input",
         debounce(100, function () {
@@ -239,13 +239,15 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           }
           that.refresh();
         }),
-      ).dblclick(function (e) {
+      )
+      .dblclick(function (e) {
         if (e.ctrlKey) {
           $(this).val(DEFAULT_MIN_DBM_VALUE).trigger("input");
         }
-      }).val(DEFAULT_MIN_DBM_VALUE);
+      })
+      .val(DEFAULT_MIN_DBM_VALUE);
 
-      analyserMaxPSD
+    analyserMaxPSD
       .on(
         "input",
         debounce(100, function () {
@@ -258,13 +260,15 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           }
           that.refresh();
         }),
-      ).dblclick(function (e) {
+      )
+      .dblclick(function (e) {
         if (e.ctrlKey) {
           $(this).val(DEFAULT_MAX_DBM_VALUE).trigger("input");
         }
-      }).val(DEFAULT_MAX_DBM_VALUE);
+      })
+      .val(DEFAULT_MAX_DBM_VALUE);
 
-      analyserLowLevelPSD
+    analyserLowLevelPSD
       .on(
         "input",
         debounce(100, function () {
@@ -272,11 +276,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           GraphSpectrumPlot.setLowLevelPSD(lowLevel);
           that.refresh();
         }),
-      ).dblclick(function (e) {
+      )
+      .dblclick(function (e) {
         if (e.ctrlKey) {
           $(this).val(analyserMinPSD.val()).trigger("input");
         }
-      }).val(analyserMinPSD.val());
+      })
+      .val(analyserMinPSD.val());
 
     // Spectrum type to show
     userSettings.spectrumType =
