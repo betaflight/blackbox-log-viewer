@@ -16,17 +16,18 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     ANALYSER_LARGE_HEIGHT_MARGIN = 20,
     ANALYSER_LARGE_WIDTH_MARGIN = 20;
 
-  let that = this,
-    analyserZoomX = 1.0 /* 100% */,
-    analyserZoomY = 1.0 /* 100% */,
-    dataReload = false,
-    fftData = null,
-    prefs = new PrefStorage();
-  const  dataBuffer = {
+  const that = this,
+    dataBuffer = {
       fieldIndex: 0,
       curve: null,
       fieldName: null,
-  };
+    },
+    prefs = new PrefStorage();
+
+  let  analyserZoomX = 1.0 /* 100% */,
+    analyserZoomY = 1.0 /* 100% */,
+    dataReload = false,
+    fftData = null;
 
   try {
     let isFullscreen = false;
@@ -62,7 +63,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       return GraphSpectrumCalc.setOutTime(time);
     };
 
-    let getSize = function () {
+    const getSize = function () {
       if (isFullscreen) {
         return {
           height: canvas.clientHeight - ANALYSER_LARGE_HEIGHT_MARGIN,
