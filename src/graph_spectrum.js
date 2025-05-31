@@ -17,14 +17,14 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   let that = this,
     analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
-    dataBuffer = {
-      fieldIndex: 0,
-      curve: 0,
-      fieldName: null,
-    },
     dataReload = false,
     fftData = null,
-    prefs = new PrefStorage();
+    prefs = new PrefStorage(),
+    dataBuffer = {
+      fieldIndex: 0,
+      curve: null,
+      fieldName: null,
+    };
 
   try {
     let isFullscreen = false;
@@ -128,11 +128,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Store the data pointers
-      dataBuffer = {
-        fieldIndex: fieldIndex,
-        curve: curve,
-        fieldName: fieldName,
-      };
+      dataBuffer.fieldIndex = fieldIndex;
+      dataBuffer.curve = curve;
+      dataBuffer.fieldName = fieldName;
 
       // Detect change of selected field.... reload and redraw required.
       if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
@@ -208,6 +206,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           userSettings.spectrumType = optionSelected;
           saveOneUserSetting("spectrumType", userSettings.spectrumType);
 
+          // Restore dataBuffer if it was corrupted
+          if (!dataBuffer.curve) {
+            dataBuffer.curve = GraphSpectrumCalc._dataBuffer.curve;
+            dataBuffer.fieldName = GraphSpectrumCalc._dataBuffer.fieldName;
+            dataBuffer.fieldIndex = GraphSpectrumCalc._dataBuffer.fieldIndex;
+            console.warn("The dataBuffer was corrupted (set to default zeroes) in FlightLogAnalyser.spectrumTypeElem.change event");
+          }
           // Recalculate the data, for the same curve than now, and draw it
           dataReload = true;
           that.plotSpectrum(

@@ -29,7 +29,7 @@ export const GraphSpectrumCalc = {
   _blackBoxRate : 0,
   _dataBuffer : {
       fieldIndex: 0,
-      curve: 0,
+      curve: null,
       fieldName: null,
   },
   _flightLog : null,
@@ -85,7 +85,9 @@ GraphSpectrumCalc.setOutTime = function(time) {
 };
 
 GraphSpectrumCalc.setDataBuffer = function(dataBuffer) {
-  this._dataBuffer = dataBuffer;
+  this._dataBuffer.curve = dataBuffer.curve;
+  this._dataBuffer.fieldName = dataBuffer.fieldName;
+  this._dataBuffer.fieldIndex = dataBuffer.fieldIndex;
   return undefined;
 };
 
