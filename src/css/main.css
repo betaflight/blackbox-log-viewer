@@ -543,6 +543,12 @@ html.has-analyser-fullscreen.has-analyser
   display: block;
 }
 
+html.has-analyser-fullscreen.has-analyser
+  .analyser
+  label:not(.onlyFullScreenException) {
+  display: block;
+}
+
 #analyser,
 #log-seek-bar {
   z-index: 10;
@@ -616,7 +622,7 @@ html.has-analyser-fullscreen.has-analyser
   height: 0;
   overflow: hidden;
   opacity: 0;
-  left: 120px;
+  left: 130px;
   float: left;
   z-index: 9;
   position: absolute;
@@ -670,6 +676,7 @@ html.has-analyser-fullscreen.has-analyser
   top: 10px;
   float: right;
 }
+
 .analyser input#analyserZoomY {
   width: 10px;
   height: 100px;
@@ -678,7 +685,74 @@ html.has-analyser-fullscreen.has-analyser
   top: 30px;
 }
 
+.analyser input#analyserMinPSD::-webkit-inner-spin-button,
+.analyser input#analyserMinPSD::-webkit-outer-spin-button,
+.analyser input#analyserMaxPSD::-webkit-inner-spin-button,
+.analyser input#analyserMaxPSD::-webkit-outer-spin-button,
+.analyser input#analyserLowLevelPSD::-webkit-inner-spin-button,
+.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button {
+  -webkit-appearance: auto !important;
+  -moz-appearance: auto !important;
+  appearance: auto !important;
+  opacity: 1 !important;
+  height: auto !important;
+  width: auto !important;
+}
+
+.analyser input#analyserMaxPSD {
+  width: 50px;
+  height: 20px;
+  left: 0px;
+  top: 30px;
+}
+
+.analyser input#analyserMinPSD {
+  width: 50px;
+  height: 20px;
+  left: 0px;
+  top: 55px;
+}
+
+.analyser input#analyserLowLevelPSD {
+  width: 50px;
+  height: 20px;
+  left: 0px;
+  top: 80px;
+}
+
+.analyser label#analyserMaxPSDLabel {
+  position:absolute;
+  color:gray;
+  left: 0px;
+  top: 30px;
+  font-size: 12px;
+}
+
+.analyser label#analyserMinPSDLabel {
+  position:absolute;
+  color:gray;
+  left: 0px;
+  top: 55px;
+  font-size: 12px;
+}
+
+.analyser label#analyserLowLevelPSDLabel {
+  position:absolute;
+  color:gray;
+  left: 0px;
+  top: 80px;
+  font-size: 12px;
+}
+
 .analyser input.onlyFullScreen {
+  display: none;
+  padding: 3px;
+  margin-right: 3px;
+  z-index: 9;
+  position: absolute;
+}
+
+.analyser label.onlyFullScreen {
   display: none;
   padding: 3px;
   margin-right: 3px;
