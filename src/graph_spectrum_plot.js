@@ -316,7 +316,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   }
 
 //Legend draw
-  if (this._isFullScreen) {
+  if (this._isFullScreen && spectrumCount > 0) {
     const legendPosX = 0.84 * WIDTH,
           legendPosY = 0.6 * HEIGHT,
           rowHeight = 16,
