@@ -457,8 +457,11 @@
                             <select id="spectrumTypeSelect">
                                 <option value="0">Frequency</option>
                                 <option value="1">Freq. vs Throttle</option>
-                                <option value="3">Freq. vs RPM</option>
-                                <option value="2">Error vs Setpoint</option>
+                                <option value="2">Freq. vs RPM</option>
+                                <option value="3">Power Spectral Density</option>
+                                <option value="4">PSD vs Throttle</option>
+                                <option value="5">PSD vs RPM</option>
+                                <option value="6">Error vs Setpoint</option>
                             </select>
                         </div>
 
@@ -490,6 +493,22 @@
                     />
                     <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
                     />
+                    <input id="analyserLowLevelPSD" class="onlyFullScreen" type="number" name="analyserLowLevelPSD" value="-40" min="-40" max="10" step="5"
+                    />
+                    <input id="analyserMaxPSD" class="onlyFullScreen" type="number" name="analyserMaxPSD" value="10" min="-35" max="100" step="5"
+                    />
+                    <input id="analyserMinPSD" class="onlyFullScreen" type="number" name="analyserMinPSD" value="-40" min="-100" max="5" step="5"
+                    />
+                    <label id="analyserMaxPSDLabel" name="analyserMaxPSDLabel" class="onlyFullScreen" >
+                      Max&nbsp;dBm
+                    </label>
+                    <label id="analyserMinPSDLabel" name="analyserMinPSDLabel" class="onlyFullScreen" >
+                      Min&nbsp;dBm
+                    </label>
+                    <label id="analyserLowLevelPSDLabel" name="analyserLowLevelPSDLabel" class="onlyFullScreen" >
+                      Limit&nbsp;dBm
+                    </label>
+
                     <datalist id="analyserZoomXTicks">
                         <option>100</option>
                         <option>200</option>
