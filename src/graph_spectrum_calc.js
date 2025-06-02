@@ -226,7 +226,6 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function(vsFieldNames, minValue = Infi
 };
 
 GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minValue = Infinity, maxValue = -Infinity) {
-
   const flightSamples = this._getFlightSamplesFreqVsX(vsFieldNames, minValue, maxValue, false);
 
   // We divide it into FREQ_VS_THR_CHUNK_TIME_MS FFT chunks, we calculate the average throttle
