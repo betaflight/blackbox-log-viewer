@@ -296,7 +296,6 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function(vsFieldNames, minV
   };
 
   return psdData;
-
 };
 
 GraphSpectrumCalc.dataLoadFrequencyVsThrottle = function() {
