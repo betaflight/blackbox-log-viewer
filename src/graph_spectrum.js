@@ -19,12 +19,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
     fftData = null,
-    prefs = new PrefStorage(),
-    dataBuffer = {
-      fieldIndex: 0,
-      curve: null,
-      fieldName: null,
-    };
+    prefs = new PrefStorage();
 
   try {
     let isFullscreen = false;
