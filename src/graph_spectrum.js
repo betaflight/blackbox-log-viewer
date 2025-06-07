@@ -19,12 +19,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
     fftData = null,
-    prefs = new PrefStorage(),
-    dataBuffer = {
-      fieldIndex: 0,
-      curve: null,
-      fieldName: null,
-    };
+    prefs = new PrefStorage();
 
   try {
     let isFullscreen = false;
@@ -100,8 +95,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       });
     };
 
-    let dataLoad = function () {
-      GraphSpectrumCalc.setDataBuffer(dataBuffer);
+    const dataLoad = function (fieldIndex, curve, fieldName) {
+      if (fieldIndex > 0 && curve != null && fieldName != null) {
+        GraphSpectrumCalc.setDataBuffer(fieldIndex, curve, fieldName);
+      }
 
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
@@ -127,15 +124,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
            It is only used to record the current curve positions, collect the data and draw the
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
-      // Store the data pointers
-      dataBuffer.fieldIndex = fieldIndex;
-      dataBuffer.curve = curve;
-      dataBuffer.fieldName = fieldName;
-
       // Detect change of selected field.... reload and redraw required.
       if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
         dataReload = false;
-        dataLoad();
+        dataLoad(fieldIndex, curve, fieldName);
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
 
@@ -206,20 +198,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           userSettings.spectrumType = optionSelected;
           saveOneUserSetting("spectrumType", userSettings.spectrumType);
 
-          // Restore dataBuffer if it was corrupted
-          if (!dataBuffer.curve) {
-            dataBuffer.curve = GraphSpectrumCalc._dataBuffer.curve;
-            dataBuffer.fieldName = GraphSpectrumCalc._dataBuffer.fieldName;
-            dataBuffer.fieldIndex = GraphSpectrumCalc._dataBuffer.fieldIndex;
-            console.warn("The dataBuffer was corrupted (set to default zeroes) in FlightLogAnalyser.spectrumTypeElem.change event");
-          }
           // Recalculate the data, for the same curve than now, and draw it
           dataReload = true;
-          that.plotSpectrum(
-            dataBuffer.fieldIndex,
-            dataBuffer.curve,
-            dataBuffer.fieldName,
-          );
+          that.plotSpectrum(-1, null, null); // Update fft data only
         }
 
         // Hide overdraw and zoomY if needed

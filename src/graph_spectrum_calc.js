@@ -84,10 +84,10 @@ GraphSpectrumCalc.setOutTime = function(time) {
   return this._analyserTimeRange.out;
 };
 
-GraphSpectrumCalc.setDataBuffer = function(dataBuffer) {
-  this._dataBuffer.curve = dataBuffer.curve;
-  this._dataBuffer.fieldName = dataBuffer.fieldName;
-  this._dataBuffer.fieldIndex = dataBuffer.fieldIndex;
+GraphSpectrumCalc.setDataBuffer = function(fieldIndex, curve, fieldName) {
+  this._dataBuffer.curve = curve;
+  this._dataBuffer.fieldName = fieldName;
+  this._dataBuffer.fieldIndex = fieldIndex;
   return undefined;
 };
 
