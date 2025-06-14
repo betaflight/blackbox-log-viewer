@@ -141,6 +141,7 @@ export const FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5 = makeReadOnly([
   "MAG",
   "ALTHOLD",
   "HEADFREE",
+  "CHIRP",
   "PASSTHRU",
   "FAILSAFE",
   "POSHOLD",
