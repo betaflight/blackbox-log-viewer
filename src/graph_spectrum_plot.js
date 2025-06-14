@@ -1,5 +1,6 @@
 import { FILTER_TYPE } from "./flightlog_fielddefs";
 import { constrain } from "./tools";
+import { NUM_VS_BINS } from "./graph_spectrum_calc";
 
 const BLUR_FILTER_PIXEL = 1,
   DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -10,13 +11,20 @@ const BLUR_FILTER_PIXEL = 1,
   MARGIN_LEFT_FULLSCREEN = 35,
   MAX_SETPOINT_DEFAULT = 100,
   PID_ERROR_VERTICAL_CHUNK = 5,
-  ZOOM_X_MAX = 5;
+  ZOOM_X_MAX = 5,
+  MAX_SPECTRUM_LINE_COUNT = 30000;
+
+export const DEFAULT_MIN_DBM_VALUE = -40,
+  DEFAULT_MAX_DBM_VALUE = 10;
 
 export const SPECTRUM_TYPE = {
   FREQUENCY: 0,
   FREQ_VS_THROTTLE: 1,
-  PIDERROR_VS_SETPOINT: 2,
-  FREQ_VS_RPM: 3,
+  FREQ_VS_RPM: 2,
+  POWER_SPECTRAL_DENSITY: 3,
+  PSD_VS_THROTTLE: 4,
+  PSD_VS_RPM: 5,
+  PIDERROR_VS_SETPOINT: 6,
 };
 
 export const SPECTRUM_OVERDRAW_TYPE = {
@@ -43,6 +51,9 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _sysConfig: null,
   _zoomX: 1.0,
   _zoomY: 1.0,
+  _minPSD: DEFAULT_MIN_DBM_VALUE,
+  _maxPSD: DEFAULT_MAX_DBM_VALUE,
+  _lowLevelPSD: DEFAULT_MIN_DBM_VALUE,
   _drawingParams: {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
@@ -68,6 +79,33 @@ GraphSpectrumPlot.setZoom = function (zoomX, zoomY) {
   this._invalidateCache();
 
   if (modifiedZoomY) {
+    this._invalidateDataCache();
+  }
+};
+
+GraphSpectrumPlot.setMinPSD = function (min) {
+  const modified = this._minPSD !== min;
+  if (modified) {
+    this._minPSD = min;
+    this._invalidateCache();
+    this._invalidateDataCache();
+  }
+};
+
+GraphSpectrumPlot.setMaxPSD = function (max) {
+  const modified = this._maxPSD !== max;
+  if (modified) {
+    this._maxPSD = max;
+    this._invalidateCache();
+    this._invalidateDataCache();
+  }
+};
+
+GraphSpectrumPlot.setLowLevelPSD = function (lowLevel) {
+  const modifiedLevel = this._lowLevelPSD !== lowLevel;
+  if (modifiedLevel) {
+    this._lowLevelPSD = lowLevel;
+    this._invalidateCache();
     this._invalidateDataCache();
   }
 };
@@ -168,8 +206,20 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
       this._drawFrequencyVsXGraph(canvasCtx);
       break;
 
+    case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+      this._drawFrequencyVsXGraph(canvasCtx, true);
+      break;
+
+    case SPECTRUM_TYPE.PSD_VS_RPM:
+      this._drawFrequencyVsXGraph(canvasCtx, true);
+      break;
+
     case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
       this._drawPidErrorVsSetpointGraph(canvasCtx);
+      break;
+
+    case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+      this._drawPowerSpectralDensityGraph(canvasCtx);
       break;
   }
 };
@@ -187,9 +237,6 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   canvasCtx.translate(LEFT, TOP);
 
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
-
-  const barWidth = WIDTH / (PLOTTED_BUFFER_LENGTH / 10) - 1;
-  let x = 0;
 
   const barGradient = canvasCtx.createLinearGradient(0, HEIGHT, 0, 0);
   barGradient.addColorStop(
@@ -212,12 +259,16 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   canvasCtx.fillStyle = barGradient;
 
   const fftScale = HEIGHT / (this._zoomY * 100);
-  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += 10) {
+  // Limit maximal count of drawing line to get good performance
+  const stepData = Math.floor(PLOTTED_BUFFER_LENGTH / MAX_SPECTRUM_LINE_COUNT) + 1;
+  const stepX = WIDTH / (PLOTTED_BUFFER_LENGTH / stepData);
+  const barWidth = Math.max(stepX, 1);
+  let x = 0;
+  for (let i = 0; i < PLOTTED_BUFFER_LENGTH; i += stepData) {
     const barHeight = this._fftData.fftOutput[i] * fftScale;
     canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-    x += barWidth + 1;
+    x += stepX;
   }
-
 
   //Draw imported spectrums
   const curvesColors = [
@@ -265,7 +316,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   }
 
 //Legend draw
-  if (this._isFullScreen) {
+  if (this._isFullScreen && spectrumCount > 0) {
     const legendPosX = 0.84 * WIDTH,
           legendPosY = 0.6 * HEIGHT,
           rowHeight = 16,
@@ -294,7 +345,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     this._fftData.fieldName,
     WIDTH - 4,
     HEIGHT - 6,
-    "right"
+    "right",
   );
   this._drawHorizontalGridLines(
     canvasCtx,
@@ -304,11 +355,103 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     WIDTH,
     HEIGHT,
     MARGIN,
-    "Hz"
+    "Hz",
   );
 };
 
-GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
+GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
+  const HEIGHT = canvasCtx.canvas.height - MARGIN;
+  const ACTUAL_MARGIN_LEFT = this._getActualMarginLeft();
+  const WIDTH = canvasCtx.canvas.width - ACTUAL_MARGIN_LEFT;
+  const LEFT = canvasCtx.canvas.offsetLeft + ACTUAL_MARGIN_LEFT;
+  const TOP = canvasCtx.canvas.offsetTop;
+
+  const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
+
+  canvasCtx.save();
+  canvasCtx.translate(LEFT, TOP);
+  this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
+
+  const pointsCount = this._fftData.psdLength;
+  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
+  canvasCtx.beginPath();
+  canvasCtx.lineWidth = 1;
+  canvasCtx.strokeStyle = "white";
+
+  // Allign y axis range by 10db
+  const dbStep = 10;
+  const minY = Math.floor(this._fftData.minimum / dbStep) * dbStep;
+  let maxY = (Math.floor(this._fftData.maximum / dbStep) + 1) * dbStep;
+  if (minY == maxY) {
+    maxY = minY + 1;  // prevent divide by zero
+  }
+  const ticksCount = (maxY - minY) / dbStep;
+  const scaleY = HEIGHT / (maxY - minY);
+  //Store vsRange for _drawMousePosition
+  this._fftData.vsRange = {
+    min: minY,
+    max: maxY,
+  };
+  canvasCtx.moveTo(0, 0);
+  for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
+    const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
+    const y = HEIGHT - (this._fftData.psdOutput[pointNum] - minY) * scaleY;
+    canvasCtx.lineTo(freq * scaleX, y);
+  }
+  canvasCtx.stroke();
+
+  this._drawAxisLabel(
+    canvasCtx,
+    this._fftData.fieldName,
+    WIDTH - 4,
+    HEIGHT - 6,
+    "right",
+  );
+  this._drawHorizontalGridLines(
+    canvasCtx,
+    PLOTTED_BLACKBOX_RATE / 2,
+    LEFT,
+    TOP,
+    WIDTH,
+    HEIGHT,
+    MARGIN,
+    "Hz",
+  );
+  this._drawVerticalGridLines(
+    canvasCtx,
+    LEFT,
+    TOP,
+    WIDTH,
+    HEIGHT,
+    minY,
+    maxY,
+    "dBm/Hz",
+    ticksCount,
+  );
+  const offset = 1;
+  this._drawInterestFrequency(
+    canvasCtx,
+    this._fftData.maxNoiseFrequency,
+    PLOTTED_BLACKBOX_RATE,
+    "Max noise",
+    WIDTH,
+    HEIGHT,
+    15 * offset + MARGIN,
+    "rgba(255,0,0,0.50)",
+    3,
+  );
+
+  canvasCtx.restore();
+};
+
+GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
+  let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.psdOutput.length - 1) );
+  freqIndex = Math.min(freqIndex, this._fftData.psdOutput.length - 1);
+  freqIndex = Math.max(freqIndex, 0);
+  return this._fftData.psdOutput.length ? this._fftData.psdOutput[freqIndex] : 0;
+};
+
+GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false) {
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
   const ACTUAL_MARGIN_LEFT = this._getActualMarginLeft();
@@ -320,7 +463,7 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
   canvasCtx.translate(LEFT, TOP);
 
   if (this._cachedDataCanvas == null) {
-    this._cachedDataCanvas = this._drawHeatMap();
+    this._cachedDataCanvas = this._drawHeatMap(drawPSD);
   }
 
   canvasCtx.drawImage(this._cachedDataCanvas, 0, 0, WIDTH, HEIGHT);
@@ -355,7 +498,8 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
     "Hz"
   );
 
-  if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE) {
+  if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
+      this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE) {
     this._drawVerticalGridLines(
       canvasCtx,
       LEFT,
@@ -366,7 +510,8 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
       this._fftData.vsRange.max,
       "%"
     );
-  } else if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM) {
+  } else if (this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+             this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
     this._drawVerticalGridLines(
       canvasCtx,
       LEFT,
@@ -380,9 +525,10 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx) {
   }
 };
 
-GraphSpectrumPlot._drawHeatMap = function () {
+GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   const THROTTLE_VALUES_SIZE = 100;
-  const SCALE_HEATMAP = 1.3; // Value decided after some tests to be similar to the scale of frequency graph
+  //The magnitude is greate then seperete Re or Im value up to 1.4=sqrt(2). Therefore the SCALE_HEATMAP is decreased from 1.3 to 1.1
+  const SCALE_HEATMAP = 1.1; // Value decided after some tests to be similar to the s
   // This value will be maximum color
 
   const heatMapCanvas = document.createElement("canvas");
@@ -392,15 +538,23 @@ GraphSpectrumPlot._drawHeatMap = function () {
   canvasCtx.canvas.width = this._fftData.fftLength;
   canvasCtx.canvas.height = THROTTLE_VALUES_SIZE;
 
-  const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
-
   // Loop for throttle
-  for (let j = 0; j < 100; j++) {
+  for (let j = 0; j < THROTTLE_VALUES_SIZE; j++) {
     // Loop for frequency
     for (let i = 0; i < this._fftData.fftLength; i++) {
-      const valuePlot = Math.round(
-        Math.min(this._fftData.fftOutput[j][i] * fftColorScale, 100)
-      );
+      let valuePlot = this._fftData.fftOutput[j][i];
+      if (drawPSD) {
+        if (valuePlot < this._lowLevelPSD) {
+          valuePlot = this._minPSD;      // Filter low values
+        } else {
+          valuePlot = Math.max(valuePlot, this._minPSD);
+        }
+        valuePlot = Math.min(valuePlot, this._maxPSD);
+        valuePlot = Math.round((valuePlot - this._minPSD) * 100 / (this._maxPSD - this._minPSD));
+      } else {
+        const fftColorScale = 100 / (this._zoomY * SCALE_HEATMAP);
+        valuePlot = Math.round(Math.min(valuePlot * fftColorScale, 100));
+      }
 
       // The fillStyle is slow, but I haven't found a way to do this faster...
       canvasCtx.fillStyle = `hsl(360, 100%, ${valuePlot}%)`;
@@ -414,6 +568,18 @@ GraphSpectrumPlot._drawHeatMap = function () {
   canvasCtx.filter = "none";
 
   return heatMapCanvas;
+};
+
+GraphSpectrumPlot.getValueFromMatrixFFT  = function(frequency, vsArgument) {
+  const matrixFFT = this._fftData;
+  let vsArgumentIndex = Math.round(NUM_VS_BINS * (vsArgument - matrixFFT.vsRange.min) / (matrixFFT.vsRange.max - matrixFFT.vsRange.min));
+  if (vsArgumentIndex >= NUM_VS_BINS) {
+    vsArgumentIndex = NUM_VS_BINS - 1;
+  }
+  let freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftLength - 1));
+  freqIndex = Math.max(freqIndex, 0);
+  freqIndex = Math.min(freqIndex, matrixFFT.fftLength - 1);
+  return matrixFFT.fftOutput[vsArgumentIndex][freqIndex];
 };
 
 GraphSpectrumPlot._drawPidErrorVsSetpointGraph = function (canvasCtx) {
@@ -854,15 +1020,15 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
     }
     offset++; // make some space!
   } catch (e) {
-    console.log("Notch filter fieldName missing");
+    console.warn("Notch filter fieldName missing");
   }
 
   if (this._spectrumType === SPECTRUM_TYPE.FREQUENCY) {
     this._drawInterestFrequency(
       canvasCtx,
-      this._fftData.maxNoiseIdx,
+      this._fftData.maxNoiseFrequency,
       PLOTTED_BLACKBOX_RATE,
-      "Max motor noise",
+      "Max noise",
       WIDTH,
       HEIGHT,
       15 * offset + MARGIN,
@@ -993,22 +1159,22 @@ GraphSpectrumPlot._drawVerticalGridLines = function (
   HEIGHT,
   minValue,
   maxValue,
-  label
+  label,
+  ticks = 5,
 ) {
-  const TICKS = 5;
 
-  for (let i = 0; i <= TICKS; i++) {
+  for (let i = 0; i <= ticks; i++) {
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = "rgba(255,255,255,0.25)";
 
-    const verticalPosition = i * (HEIGHT / TICKS);
+    const verticalPosition = i * (HEIGHT / ticks);
     canvasCtx.moveTo(0, verticalPosition);
     canvasCtx.lineTo(WIDTH, verticalPosition);
 
     canvasCtx.stroke();
     const verticalAxisValue = (
-      (maxValue - minValue) * ((TICKS - i) / TICKS) +
+      (maxValue - minValue) * ((ticks - i) / ticks) +
       minValue
     ).toFixed(0);
     let textBaseline;
@@ -1016,7 +1182,7 @@ GraphSpectrumPlot._drawVerticalGridLines = function (
       case 0:
         textBaseline = "top";
         break;
-      case TICKS:
+      case ticks:
         textBaseline = "bottom";
         break;
       default:
@@ -1129,8 +1295,8 @@ GraphSpectrumPlot._drawGradientBackground = function (
   );
 
   if (this._isFullScreen) {
-    backgroundGradient.addColorStop(1, "rgba(0,0,0,0.9)");
-    backgroundGradient.addColorStop(0, "rgba(0,0,0,0.7)");
+    backgroundGradient.addColorStop(1, "rgba(0,0,0,1)");
+    backgroundGradient.addColorStop(0, "rgba(0,0,0,0.9)");
   } else {
     backgroundGradient.addColorStop(1, "rgba(255,255,255,0.25)");
     backgroundGradient.addColorStop(0, "rgba(255,255,255,0)");
@@ -1151,7 +1317,14 @@ GraphSpectrumPlot._drawInterestFrequency = function (
   stroke,
   lineWidth
 ) {
-  const interestLabel = `${label} ${frequency.toFixed(0)}Hz`;
+
+  let interestLabel = "";
+  if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY && label != "" ) {
+    const psdValue = this.getPSDbyFreq(frequency);
+    interestLabel = `${label}: (${frequency.toFixed(0)}Hz, ${psdValue.toFixed(0)}dBm/Hz)`;
+  } else {
+    interestLabel = `${label} ${frequency.toFixed(0)}Hz`;
+  }
   return this._drawVerticalMarkerLine(
     canvasCtx,
     frequency,
@@ -1221,7 +1394,9 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
   // frequency2 line
   const offsetByType =
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
       ? 0
       : OFFSET;
   const x2 = this._drawVerticalMarkerLine(
@@ -1243,7 +1418,9 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
 
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     /*
      * It draws a curve:
@@ -1309,7 +1486,9 @@ GraphSpectrumPlot._drawNotchFilter = function (
 
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     canvasCtx.moveTo(cutoffX, 0);
     canvasCtx.lineTo(centerX * 2 - cutoffX, HEIGHT);
@@ -1356,16 +1535,20 @@ GraphSpectrumPlot._drawMousePosition = function (
   lineWidth
 ) {
   // X axis
+  let mouseFrequency = 0;
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
-    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM
+    this._spectrumType === SPECTRUM_TYPE.FREQ_VS_RPM ||
+    this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+    this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     // Calculate frequency at mouse
     const sampleRate = this._fftData.blackBoxRate / this._zoomX;
     const marginLeft = this._getActualMarginLeft();
 
-    const mouseFrequency =
+    mouseFrequency =
       ((mouseX - marginLeft) / WIDTH) *
       (this._fftData.blackBoxRate / this._zoomX / 2);
     if (mouseFrequency >= 0 && mouseFrequency <= sampleRate) {
@@ -1382,14 +1565,30 @@ GraphSpectrumPlot._drawMousePosition = function (
       );
     }
 
+    if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+      const psdLabel = Math.round(this.getPSDbyFreq(mouseFrequency)).toString() + "dBm/Hz";
+      this._drawAxisLabel(
+        canvasCtx,
+        psdLabel,
+        mouseX - 30,
+        mouseY - 4,
+        "left",
+      );
+    }
+
     // Y axis
     let unitLabel;
     switch (this._spectrumType) {
       case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
+      case SPECTRUM_TYPE.PSD_VS_THROTTLE:
         unitLabel = "%";
         break;
       case SPECTRUM_TYPE.FREQ_VS_RPM:
+      case SPECTRUM_TYPE.PSD_VS_RPM:
         unitLabel = "Hz";
+        break;
+      case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+        unitLabel = "dBm/Hz";
         break;
       default:
         unitLabel = null;
@@ -1398,12 +1597,12 @@ GraphSpectrumPlot._drawMousePosition = function (
     if (unitLabel !== null) {
       const val_min = this._fftData.vsRange.min;
       const val_max = this._fftData.vsRange.max;
-      const mouseValue = (1 - mouseY / HEIGHT) * (val_max - val_min) + val_min;
-      if (mouseValue >= val_min && mouseValue <= val_max) {
-        const valueLabel = `${mouseValue.toFixed(0)}${unitLabel}`;
+      const vsArgValue = (1 - mouseY / HEIGHT) * (val_max - val_min) + val_min;
+      if (vsArgValue >= val_min && vsArgValue <= val_max) {
+        const valueLabel = `${vsArgValue.toFixed(0)}${unitLabel}`;
         this._drawHorizontalMarkerLine(
           canvasCtx,
-          mouseValue,
+          vsArgValue,
           val_min,
           val_max,
           valueLabel,
@@ -1413,6 +1612,18 @@ GraphSpectrumPlot._drawMousePosition = function (
           stroke,
           lineWidth
         );
+
+        if (this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+            this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
+          const label = Math.round(this.getValueFromMatrixFFT(mouseFrequency, vsArgValue)).toString() + "dBm/Hz";
+          this._drawAxisLabel(
+            canvasCtx,
+            label,
+            mouseX - 30,
+            mouseY - 4,
+            "left",
+          );
+        }
       }
     }
   } else if (this._spectrumType === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT) {
@@ -1466,6 +1677,9 @@ GraphSpectrumPlot._getActualMarginLeft = function () {
   switch (this._spectrumType) {
     case SPECTRUM_TYPE.FREQ_VS_THROTTLE:
     case SPECTRUM_TYPE.FREQ_VS_RPM:
+    case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+    case SPECTRUM_TYPE.PSD_VS_RPM:
+    case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
       actualMarginLeft = this._isFullScreen
         ? MARGIN_LEFT_FULLSCREEN
         : MARGIN_LEFT;

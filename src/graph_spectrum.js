@@ -4,6 +4,8 @@ import {
   GraphSpectrumPlot,
   SPECTRUM_TYPE,
   SPECTRUM_OVERDRAW_TYPE,
+  DEFAULT_MIN_DBM_VALUE,
+  DEFAULT_MAX_DBM_VALUE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
 import { SpectrumExporter } from "./spectrum-exporter";
@@ -14,26 +16,30 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     ANALYSER_LARGE_HEIGHT_MARGIN = 20,
     ANALYSER_LARGE_WIDTH_MARGIN = 20;
 
-  let that = this,
-    analyserZoomX = 1.0 /* 100% */,
+  const that = this,
+    prefs = new PrefStorage();
+  let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
-    fftData = null,
-    prefs = new PrefStorage();
+    fftData = null;
 
   try {
     let isFullscreen = false;
 
-    let sysConfig = flightLog.getSysConfig();
+    const sysConfig = flightLog.getSysConfig();
     const logRateInfo = GraphSpectrumCalc.initialize(flightLog, sysConfig);
     GraphSpectrumPlot.initialize(analyserCanvas, sysConfig);
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
-    let analyserZoomXElem = $("#analyserZoomX");
-    let analyserZoomYElem = $("#analyserZoomY");
+    const analyserZoomXElem = $("#analyserZoomX");
+    const analyserZoomYElem = $("#analyserZoomY");
+    const analyserMinPSD = $("#analyserMinPSD");
+    const analyserMaxPSD = $("#analyserMaxPSD");
+    const analyserLowLevelPSD = $("#analyserLowLevelPSD");
 
-    let spectrumToolbarElem = $("#spectrumToolbar");
-    let spectrumTypeElem = $("#spectrumTypeSelect");
-    let overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
+
+    const spectrumToolbarElem = $("#spectrumToolbar");
+    const spectrumTypeElem = $("#spectrumTypeSelect");
+    const overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
 
     this.setFullscreen = function (size) {
       isFullscreen = size == true;
@@ -51,7 +57,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       return GraphSpectrumCalc.setOutTime(time);
     };
 
-    let getSize = function () {
+    const getSize = function () {
       if (isFullscreen) {
         return {
           height: canvas.clientHeight - ANALYSER_LARGE_HEIGHT_MARGIN,
@@ -71,27 +77,45 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.resize = function () {
-      let newSize = getSize();
+      const newSize = getSize();
 
       // Determine the analyserCanvas location
       GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
       // Recenter the analyser canvas in the bottom left corner
-      let parentElem = $(analyserCanvas).parent();
+      const parentElem = $(analyserCanvas).parent();
 
       $(parentElem).css({
         left: newSize.left, // (canvas.width  * getSize().left) + "px",
         top: newSize.top, // (canvas.height * getSize().top ) + "px"
       });
       // place the sliders.
-      $("input:first-of-type", parentElem).css({
+      $("#analyserZoomX", parentElem).css({
         left: `${newSize.width - 130}px`,
       });
-      $("input:last-of-type", parentElem).css({
+      $("#analyserZoomY", parentElem).css({
         left: `${newSize.width - 20}px`,
       });
       $("#analyserResize", parentElem).css({
         left: `${newSize.width - 20}px`,
+      });
+      $("#analyserMaxPSD", parentElem).css({
+        left: `${newSize.width - 90}px`,
+      });
+      $("#analyserMinPSD", parentElem).css({
+        left: `${newSize.width - 90}px`,
+      });
+      $("#analyserLowLevelPSD", parentElem).css({
+        left: `${newSize.width - 90}px`,
+      });
+      $("#analyserMaxPSDLabel", parentElem).css({
+        left: `${newSize.width - 150}px`,
+      });
+      $("#analyserMinPSDLabel", parentElem).css({
+        left: `${newSize.width - 150}px`,
+      });
+      $("#analyserLowLevelPSDLabel", parentElem).css({
+        left: `${newSize.width - 155}px`,
       });
     };
 
@@ -109,8 +133,20 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           fftData = GraphSpectrumCalc.dataLoadFrequencyVsRpm();
           break;
 
+        case SPECTRUM_TYPE.PSD_VS_THROTTLE:
+          fftData = GraphSpectrumCalc.dataLoadPowerSpectralDensityVsThrottle();
+          break;
+
+        case SPECTRUM_TYPE.PSD_VS_RPM:
+          fftData = GraphSpectrumCalc.dataLoadPowerSpectralDensityVsRpm();
+          break;
+
         case SPECTRUM_TYPE.PIDERROR_VS_SETPOINT:
           fftData = GraphSpectrumCalc.dataLoadPidErrorVsSetpoint();
+          break;
+
+        case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+          fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
           break;
 
         case SPECTRUM_TYPE.FREQUENCY:
@@ -164,7 +200,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           analyserZoomX = analyserZoomXElem.val() / 100;
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
           that.refresh();
-        })
+        }),
       )
       .dblclick(function () {
         $(this).val(DEFAULT_ZOOM).trigger("input");
@@ -177,13 +213,76 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+          // Recalculate PSD with updated samples per segment count
+          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+            dataLoad();
+            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          }
           that.refresh();
-        })
+        }),
       )
       .dblclick(function () {
         $(this).val(DEFAULT_ZOOM).trigger("input");
       })
       .val(DEFAULT_ZOOM);
+
+    analyserMinPSD
+      .on(
+        "input",
+        debounce(100, function () {
+          const min = parseInt(analyserMinPSD.val());
+          GraphSpectrumPlot.setMinPSD(min);
+          analyserLowLevelPSD.prop("min", min);
+          analyserMaxPSD.prop("min", min + 5);
+          if (analyserLowLevelPSD.val() < min) {
+            analyserLowLevelPSD.val(min).trigger("input");
+          }
+          that.refresh();
+        }),
+      )
+      .dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(DEFAULT_MIN_DBM_VALUE).trigger("input");
+        }
+      })
+      .val(DEFAULT_MIN_DBM_VALUE);
+
+    analyserMaxPSD
+      .on(
+        "input",
+        debounce(100, function () {
+          const max = parseInt(analyserMaxPSD.val());
+          GraphSpectrumPlot.setMaxPSD(max);
+          analyserMinPSD.prop("max", max - 5);
+          analyserLowLevelPSD.prop("max", max);
+          if (analyserLowLevelPSD.val() > max) {
+            analyserLowLevelPSD.val(max).trigger("input");
+          }
+          that.refresh();
+        }),
+      )
+      .dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(DEFAULT_MAX_DBM_VALUE).trigger("input");
+        }
+      })
+      .val(DEFAULT_MAX_DBM_VALUE);
+
+    analyserLowLevelPSD
+      .on(
+        "input",
+        debounce(100, function () {
+          const lowLevel = analyserLowLevelPSD.val();
+          GraphSpectrumPlot.setLowLevelPSD(lowLevel);
+          that.refresh();
+        }),
+      )
+      .dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(analyserMinPSD.val()).trigger("input");
+        }
+      })
+      .val(analyserMinPSD.val());
 
     // Spectrum type to show
     userSettings.spectrumType =
@@ -206,10 +305,37 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         // Hide overdraw and zoomY if needed
         const pidErrorVsSetpointSelected =
           optionSelected === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT;
+        const psdHeatMapSelected =
+          optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+          optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected
+          pidErrorVsSetpointSelected || psdHeatMapSelected,
+        );
+        analyserLowLevelPSD.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected,
+        );
+        analyserMinPSD.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected,
+        );
+        analyserMaxPSD.toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected,
+        );
+        $("#analyserMaxPSDLabel").toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected,
+        );
+        $("#analyserMinPSDLabel").toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected,
+        );
+        $("#analyserLowLevelPSDLabel").toggleClass(
+          "onlyFullScreenException",
+          !psdHeatMapSelected,
         );
 
         $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
@@ -223,7 +349,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
     overdrawSpectrumTypeElem.change(function () {
-      let optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
+      const optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
 
       if (optionSelected != userSettings.overdrawSpectrumType) {
         userSettings.overdrawSpectrumType = optionSelected;
@@ -247,9 +373,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         // Hide the combo and maximize buttons
         spectrumToolbarElem.removeClass("non-shift");
 
-        let rect = analyserCanvas.getBoundingClientRect();
-        let mouseX = e.clientX - rect.left;
-        let mouseY = e.clientY - rect.top;
+        const rect = analyserCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
         if (mouseX != lastMouseX || mouseY != lastMouseY) {
           lastMouseX = mouseX;
           lastMouseY = mouseY;
@@ -315,7 +441,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
   } catch (e) {
-    console.log(`Failed to create analyser... error: ${e}`);
+    console.error(`Failed to create analyser... error: ${e}`);
   }
 
   this.clearImportedSpectrums = function() {
