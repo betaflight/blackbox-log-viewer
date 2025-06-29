@@ -4,8 +4,6 @@ import {
   GraphSpectrumPlot,
   SPECTRUM_TYPE,
   SPECTRUM_OVERDRAW_TYPE,
-  DEFAULT_MIN_DBM_VALUE,
-  DEFAULT_MAX_DBM_VALUE,
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
 import { SpectrumExporter } from "./spectrum-exporter";
@@ -17,7 +15,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     ANALYSER_LARGE_WIDTH_MARGIN = 20;
 
   const that = this,
-    prefs = new PrefStorage();
+    prefs = new PrefStorage(),
+    DEFAULT_PSD_HEATMAP_MIN = -40,
+    DEFAULT_PSD_HEATMAP_MAX = 10;
   let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
@@ -232,6 +232,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           const min = parseInt(analyserMinPSD.val());
           GraphSpectrumPlot.setMinPSD(min);
+          saveOneUserSetting("psdHeatmapMin", min);
           analyserLowLevelPSD.prop("min", min);
           analyserMaxPSD.prop("min", min + 5);
           if (analyserLowLevelPSD.val() < min) {
@@ -242,10 +243,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       )
       .dblclick(function (e) {
         if (e.ctrlKey) {
-          $(this).val(DEFAULT_MIN_DBM_VALUE).trigger("input");
+          $(this).val(userSettings.psdHeatmapMin).trigger("input");
         }
       })
-      .val(DEFAULT_MIN_DBM_VALUE);
+      .val(userSettings.psdHeatmapMin ?? DEFAULT_PSD_HEATMAP_MIN)
+      .trigger("input");
 
     analyserMaxPSD
       .on(
@@ -253,6 +255,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           const max = parseInt(analyserMaxPSD.val());
           GraphSpectrumPlot.setMaxPSD(max);
+          saveOneUserSetting("psdHeatmapMax", max);
           analyserMinPSD.prop("max", max - 5);
           analyserLowLevelPSD.prop("max", max);
           if (analyserLowLevelPSD.val() > max) {
@@ -263,10 +266,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       )
       .dblclick(function (e) {
         if (e.ctrlKey) {
-          $(this).val(DEFAULT_MAX_DBM_VALUE).trigger("input");
+          $(this).val(userSettings.psdHeatmapMax).trigger("input");
         }
       })
-      .val(DEFAULT_MAX_DBM_VALUE);
+      .val(userSettings.psdHeatmapMax ?? DEFAULT_PSD_HEATMAP_MAX)
+      .trigger("input");
 
     analyserLowLevelPSD
       .on(
