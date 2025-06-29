@@ -226,6 +226,17 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(DEFAULT_ZOOM);
 
+    if (userSettings.psdHeatmapMin == undefined) {
+      userSettings.psdHeatmapMin = DEFAULT_PSD_HEATMAP_MIN;
+    }
+    GraphSpectrumPlot.setMinPSD(userSettings.psdHeatmapMin);
+    GraphSpectrumPlot.setLowLevelPSD(userSettings.psdHeatmapMin);
+
+    if (userSettings.psdHeatmapMax == undefined) {
+      userSettings.psdHeatmapMax = DEFAULT_PSD_HEATMAP_MAX;
+    }
+    GraphSpectrumPlot.setMaxPSD(userSettings.psdHeatmapMax);
+
     analyserMinPSD
       .on(
         "input",
@@ -246,8 +257,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           $(this).val(userSettings.psdHeatmapMin).trigger("input");
         }
       })
-      .val(userSettings.psdHeatmapMin ?? DEFAULT_PSD_HEATMAP_MIN)
-      .trigger("input");
+      .val(userSettings.psdHeatmapMin);
 
     analyserMaxPSD
       .on(
@@ -269,8 +279,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           $(this).val(userSettings.psdHeatmapMax).trigger("input");
         }
       })
-      .val(userSettings.psdHeatmapMax ?? DEFAULT_PSD_HEATMAP_MAX)
-      .trigger("input");
+      .val(userSettings.psdHeatmapMax);
 
     analyserLowLevelPSD
       .on(
@@ -286,8 +295,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           $(this).val(analyserMinPSD.val()).trigger("input");
         }
       })
-      .val(analyserMinPSD.val())
-      .trigger("input");
+      .val(analyserMinPSD.val());
 
     // Spectrum type to show
     userSettings.spectrumType =
