@@ -213,7 +213,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     analyserHanning: true, // use a hanning window on the analyser sample data
     eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
     spectrumType: 0, // By default, frequency Spectrum
-    overdrawSpectrumType: 0, // By default, show all filters,
+    overdrawSpectrumType: 0, // By default, show all filters
     psdHeatmapMin: -40,
     psdHeatmapMax: 10,
     craft: {

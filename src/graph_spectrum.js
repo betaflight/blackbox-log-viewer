@@ -286,7 +286,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           $(this).val(analyserMinPSD.val()).trigger("input");
         }
       })
-      .val(analyserMinPSD.val());
+      .val(analyserMinPSD.val())
+      .trigger("input");
 
     // Spectrum type to show
     userSettings.spectrumType =

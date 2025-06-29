@@ -48,9 +48,10 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _sysConfig: null,
   _zoomX: 1.0,
   _zoomY: 1.0,
-  _minPSD: -40,
-  _maxPSD: 10,
-  _lowLevelPSD: -40,
+  // _minPSD, _maxPSD, _lowLevelPSD will initialize later in FlightLogAnalyser from stored settings
+  _minPSD: 0,
+  _maxPSD: 0,
+  _lowLevelPSD: 0,
   _drawingParams: {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
