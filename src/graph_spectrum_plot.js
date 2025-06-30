@@ -14,9 +14,6 @@ const BLUR_FILTER_PIXEL = 1,
   ZOOM_X_MAX = 5,
   MAX_SPECTRUM_LINE_COUNT = 30000;
 
-export const DEFAULT_MIN_DBM_VALUE = -40,
-  DEFAULT_MAX_DBM_VALUE = 10;
-
 export const SPECTRUM_TYPE = {
   FREQUENCY: 0,
   FREQ_VS_THROTTLE: 1,
@@ -51,9 +48,10 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _sysConfig: null,
   _zoomX: 1.0,
   _zoomY: 1.0,
-  _minPSD: DEFAULT_MIN_DBM_VALUE,
-  _maxPSD: DEFAULT_MAX_DBM_VALUE,
-  _lowLevelPSD: DEFAULT_MIN_DBM_VALUE,
+  // _minPSD, _maxPSD, _lowLevelPSD will initialize later in FlightLogAnalyser from stored settings
+  _minPSD: 0,
+  _maxPSD: 0,
+  _lowLevelPSD: 0,
   _drawingParams: {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
