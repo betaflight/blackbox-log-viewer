@@ -35,6 +35,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     const analyserMinPSD = $("#analyserMinPSD");
     const analyserMaxPSD = $("#analyserMaxPSD");
     const analyserLowLevelPSD = $("#analyserLowLevelPSD");
+    const analyserSegmentLengthPSD = $("#analyserSegmentLengthPSD");
 
 
     const spectrumToolbarElem = $("#spectrumToolbar");
@@ -116,6 +117,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       });
       $("#analyserLowLevelPSDLabel", parentElem).css({
         left: `${newSize.width - 155}px`,
+      });
+      $("#analyserSegmentLengthPSD", parentElem).css({
+        left: `${newSize.width - 150}px`,
+      });
+      $("#analyserSegmentLengthPSDLabel", parentElem).css({
+        left: `${newSize.width - 150}px`,
       });
     };
 
@@ -319,10 +326,16 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         const psdHeatMapSelected =
           optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
           optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
+        const psdCurveSelected =
+          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected || psdHeatMapSelected,
+          pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected,
+        );
+        analyserSegmentLengthPSD.toggleClass(
+          "onlyFullScreenException",
+          !psdCurveSelected,
         );
         analyserLowLevelPSD.toggleClass(
           "onlyFullScreenException",
@@ -347,6 +360,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         $("#analyserLowLevelPSDLabel").toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
+        );
+        $("#analyserSegmentLengthPSDLabel").toggleClass(
+          "onlyFullScreenException",
+          !psdCurveSelected,
         );
 
 
