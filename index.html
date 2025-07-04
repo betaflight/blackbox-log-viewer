@@ -493,6 +493,8 @@
                     />
                     <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
                     />
+                    <input id="analyserSegmentLengthPSD" class="onlyFullScreen" type="number" name="analyserSegmentLengthPSD" value="512" min="256" step="any"
+                    />
                     <input id="analyserLowLevelPSD" class="onlyFullScreen" type="number" name="analyserLowLevelPSD" value="-40" min="-40" max="10" step="5"
                     />
                     <input id="analyserMaxPSD" class="onlyFullScreen" type="number" name="analyserMaxPSD" value="10" min="-35" max="100" step="5"
@@ -507,6 +509,9 @@
                     </label>
                     <label id="analyserLowLevelPSDLabel" name="analyserLowLevelPSDLabel" class="onlyFullScreen" >
                       Limit&nbsp;dBm
+                    </label>
+                    <label id="analyserSegmentLengthPSDLabel" name="analyserSegmentLengthPSDLabel" class="onlyFullScreen" >
+                      Segments&nbsp;length
                     </label>
 
                     <datalist id="analyserZoomXTicks">
