@@ -220,11 +220,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
-          // Recalculate PSD with updated samples per segment count
-          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
-            dataLoad();
-            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
-          }
           that.refresh();
         }),
       )
@@ -301,6 +296,31 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         }
       })
       .val(analyserMinPSD.val());
+
+    let previousSegLenValue = 512;
+    analyserSegmentLengthPSD
+      .on(
+        "input",
+        function () {
+          const currentValue = parseInt($(this).val());
+          if (currentValue > previousSegLenValue) {
+            previousSegLenValue *= 2;
+          } else {
+            previousSegLenValue /= 2;
+          }
+          $(this).val(previousSegLenValue);
+          // Recalculate PSD with updated samples per segment count
+          dataLoad();
+          GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          that.refresh();
+        },
+      )
+      .dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(userSettings.psdHeatmapMax).trigger("input");
+        }
+      })
+      .val(512);
 
     // Spectrum type to show
     userSettings.spectrumType =
