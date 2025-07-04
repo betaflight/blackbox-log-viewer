@@ -690,7 +690,9 @@ html.has-analyser-fullscreen.has-analyser
 .analyser input#analyserMaxPSD::-webkit-inner-spin-button,
 .analyser input#analyserMaxPSD::-webkit-outer-spin-button,
 .analyser input#analyserLowLevelPSD::-webkit-inner-spin-button,
-.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button {
+.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button,
+.analyser input#analyserSegmentLengthPSD::-webkit-inner-spin-button,
+.analyser input#analyserSegmentLengthPSD::-webkit-outer-spin-button {
   -webkit-appearance: auto !important;
   -moz-appearance: auto !important;
   appearance: auto !important;
@@ -742,6 +744,20 @@ html.has-analyser-fullscreen.has-analyser
   left: 0px;
   top: 80px;
   font-size: 12px;
+}
+
+.analyser input#analyserSegmentLengthPSD {
+  width: 100px;
+  height: 20px;
+  left: 0px;
+  top: 50px;
+}
+
+.analyser label#analyserSegmentLengthPSDLabel {
+  width: 50px;
+  height: 20px;
+  left: 0px;
+  top: 30px;
 }
 
 .analyser input.onlyFullScreen {
