@@ -332,7 +332,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         "keydown",
         function (e) {
           e.preventDefault();
-        }
+        },
       );
 
     // Spectrum type to show
