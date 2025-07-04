@@ -17,7 +17,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const that = this,
     prefs = new PrefStorage(),
     DEFAULT_PSD_HEATMAP_MIN = -40,
-    DEFAULT_PSD_HEATMAP_MAX = 10;
+    DEFAULT_PSD_HEATMAP_MAX = 10,
+    DEFAULT_PSD_SEGMENT_LENGTH = 512;
   let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
@@ -35,6 +36,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     const analyserMinPSD = $("#analyserMinPSD");
     const analyserMaxPSD = $("#analyserMaxPSD");
     const analyserLowLevelPSD = $("#analyserLowLevelPSD");
+    const analyserSegmentLengthPSD = $("#analyserSegmentLengthPSD");
 
 
     const spectrumToolbarElem = $("#spectrumToolbar");
@@ -117,6 +119,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       $("#analyserLowLevelPSDLabel", parentElem).css({
         left: `${newSize.width - 155}px`,
       });
+      $("#analyserSegmentLengthPSD", parentElem).css({
+        left: `${newSize.width - 150}px`,
+      });
+      $("#analyserSegmentLengthPSDLabel", parentElem).css({
+        left: `${newSize.width - 170}px`,
+      });
     };
 
     const dataLoad = function (fieldIndex, curve, fieldName) {
@@ -147,6 +155,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
           fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
+          analyserSegmentLengthPSD.prop("max", fftData.maximalSegmentsLength);
           break;
 
         case SPECTRUM_TYPE.FREQUENCY:
@@ -213,11 +222,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
-          // Recalculate PSD with updated samples per segment count
-          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
-            dataLoad();
-            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
-          }
           that.refresh();
         }),
       )
@@ -246,9 +250,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           saveOneUserSetting("psdHeatmapMin", min);
           analyserLowLevelPSD.prop("min", min);
           analyserMaxPSD.prop("min", min + 5);
-          if (analyserLowLevelPSD.val() < min) {
-            analyserLowLevelPSD.val(min).trigger("input");
-          }
+          analyserLowLevelPSD.val(min).trigger("input");
           that.refresh();
         }),
       )
@@ -297,6 +299,42 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(analyserMinPSD.val());
 
+    let segmentLengthPSD = DEFAULT_PSD_SEGMENT_LENGTH;
+    GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLengthPSD);
+    analyserSegmentLengthPSD
+      .on(
+        "input",
+        function () {
+          const currentValue = parseInt($(this).val());
+          if (currentValue > segmentLengthPSD) {
+            segmentLengthPSD *= 2;
+          } else if (currentValue < segmentLengthPSD){
+            segmentLengthPSD /= 2;
+          }
+          $(this).val(segmentLengthPSD);
+          // Recalculate PSD with updated samples per segment count
+          GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLengthPSD);
+          dataLoad();
+          GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          that.refresh();
+        },
+      )
+      .dblclick(function (e) {
+        if (e.ctrlKey) {
+          segmentLengthPSD = DEFAULT_PSD_SEGMENT_LENGTH;
+          $(this).val(DEFAULT_PSD_SEGMENT_LENGTH).trigger("input");
+        }
+      })
+      .val(DEFAULT_PSD_SEGMENT_LENGTH);
+
+    analyserSegmentLengthPSD
+      .on(
+        "keydown",
+        function (e) {
+          e.preventDefault();
+        },
+      );
+
     // Spectrum type to show
     userSettings.spectrumType =
       userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
@@ -321,10 +359,16 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         const psdHeatMapSelected =
           optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
           optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
+        const psdCurveSelected =
+          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected || psdHeatMapSelected,
+          pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected,
+        );
+        analyserSegmentLengthPSD.toggleClass(
+          "onlyFullScreenException",
+          !psdCurveSelected,
         );
         analyserLowLevelPSD.toggleClass(
           "onlyFullScreenException",
@@ -349,6 +393,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         $("#analyserLowLevelPSDLabel").toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
+        );
+        $("#analyserSegmentLengthPSDLabel").toggleClass(
+          "onlyFullScreenException",
+          !psdCurveSelected,
         );
 
         $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
