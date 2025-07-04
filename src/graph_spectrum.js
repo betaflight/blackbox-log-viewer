@@ -299,21 +299,21 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(analyserMinPSD.val());
 
-    let segmentLenghtPSD = DEFAULT_PSD_SEGMENT_LENGTH;
-    GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLenghtPSD);
+    let segmentLengthPSD = DEFAULT_PSD_SEGMENT_LENGTH;
+    GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLengthPSD);
     analyserSegmentLengthPSD
       .on(
         "input",
         function () {
           const currentValue = parseInt($(this).val());
-          if (currentValue > segmentLenghtPSD) {
-            segmentLenghtPSD *= 2;
-          } else if (currentValue < segmentLenghtPSD){
-            segmentLenghtPSD /= 2;
+          if (currentValue > segmentLengthPSD) {
+            segmentLengthPSD *= 2;
+          } else if (currentValue < segmentLengthPSD){
+            segmentLengthPSD /= 2;
           }
-          $(this).val(segmentLenghtPSD);
+          $(this).val(segmentLengthPSD);
           // Recalculate PSD with updated samples per segment count
-          GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLenghtPSD);
+          GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLengthPSD);
           dataLoad();
           GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
           that.refresh();
@@ -321,7 +321,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       )
       .dblclick(function (e) {
         if (e.ctrlKey) {
-          segmentLenghtPSD = DEFAULT_PSD_SEGMENT_LENGTH;
+          segmentLengthPSD = DEFAULT_PSD_SEGMENT_LENGTH;
           $(this).val(DEFAULT_PSD_SEGMENT_LENGTH).trigger("input");
         }
       })
