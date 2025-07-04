@@ -125,7 +125,7 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
     overlapCount = 0;
   } else {
     pointsPerSegment = this._pointsPerSegmentPSD;
-    overlapCount = pointsPerSegment / 2;
+    overlapCount = pointsPerSegment * 3 / 4;
   }
 
   const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
@@ -139,6 +139,7 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
     minimum: psd.min,
     maximum: psd.max,
     maxNoiseFrequency: psd.maxNoiseFrequency,
+    maximalSegmentsLength: this.getNearPower2Value(flightSamples.samples.length),
   };
   return psdData;
 };
