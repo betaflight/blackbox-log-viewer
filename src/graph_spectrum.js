@@ -246,9 +246,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           saveOneUserSetting("psdHeatmapMin", min);
           analyserLowLevelPSD.prop("min", min);
           analyserMaxPSD.prop("min", min + 5);
-          if (analyserLowLevelPSD.val() < min) {
-            analyserLowLevelPSD.val(min).trigger("input");
-          }
+          analyserLowLevelPSD.val(min).trigger("input");
           that.refresh();
         }),
       )
