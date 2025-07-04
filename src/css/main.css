@@ -754,6 +754,8 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser label#analyserSegmentLengthPSDLabel {
+  position:absolute;
+  color:gray;
   width: 50px;
   height: 20px;
   left: 0px;
