@@ -747,7 +747,7 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser input#analyserSegmentLengthPSD {
-  width: 100px;
+  width: 80px;
   height: 20px;
   left: 0px;
   top: 50px;
@@ -757,7 +757,7 @@ html.has-analyser-fullscreen.has-analyser
   width: 50px;
   height: 20px;
   left: 0px;
-  top: 30px;
+  top: 28px;
 }
 
 .analyser input.onlyFullScreen {
