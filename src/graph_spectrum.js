@@ -17,7 +17,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const that = this,
     prefs = new PrefStorage(),
     DEFAULT_PSD_HEATMAP_MIN = -40,
-    DEFAULT_PSD_HEATMAP_MAX = 10;
+    DEFAULT_PSD_HEATMAP_MAX = 10,
+    DEFAULT_PSD_SEGMENT_LENGTH = 512;
   let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
@@ -122,7 +123,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         left: `${newSize.width - 150}px`,
       });
       $("#analyserSegmentLengthPSDLabel", parentElem).css({
-        left: `${newSize.width - 150}px`,
+        left: `${newSize.width - 170}px`,
       });
     };
 
@@ -297,19 +298,21 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(analyserMinPSD.val());
 
-    let previousSegLenValue = 512;
+    let segmentLenghtPSD = DEFAULT_PSD_SEGMENT_LENGTH;
+    GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLenghtPSD);
     analyserSegmentLengthPSD
       .on(
         "input",
         function () {
           const currentValue = parseInt($(this).val());
-          if (currentValue > previousSegLenValue) {
-            previousSegLenValue *= 2;
-          } else {
-            previousSegLenValue /= 2;
+          if (currentValue > segmentLenghtPSD) {
+            segmentLenghtPSD *= 2;
+          } else if (currentValue < segmentLenghtPSD){
+            segmentLenghtPSD /= 2;
           }
-          $(this).val(previousSegLenValue);
+          $(this).val(segmentLenghtPSD);
           // Recalculate PSD with updated samples per segment count
+          GraphSpectrumCalc.setPointsPerSegmentPSD(segmentLenghtPSD);
           dataLoad();
           GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
           that.refresh();
@@ -317,10 +320,19 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       )
       .dblclick(function (e) {
         if (e.ctrlKey) {
-          $(this).val(userSettings.psdHeatmapMax).trigger("input");
+          segmentLenghtPSD = DEFAULT_PSD_SEGMENT_LENGTH;
+          $(this).val(DEFAULT_PSD_SEGMENT_LENGTH).trigger("input");
         }
       })
-      .val(512);
+      .val(DEFAULT_PSD_SEGMENT_LENGTH);
+
+    analyserSegmentLengthPSD
+      .on(
+        "keydown",
+        function (e) {
+          e.preventDefault();
+        }
+      );
 
     // Spectrum type to show
     userSettings.spectrumType =
