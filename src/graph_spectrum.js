@@ -120,10 +120,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         left: `${newSize.width - 155}px`,
       });
       $("#analyserSegmentLengthPSD", parentElem).css({
-        left: `${newSize.width - 150}px`,
+        left: `${newSize.width - 120}px`,
       });
       $("#analyserSegmentLengthPSDLabel", parentElem).css({
-        left: `${newSize.width - 170}px`,
+        left: `${newSize.width - 135}px`,
       });
     };
 
