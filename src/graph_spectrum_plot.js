@@ -439,7 +439,6 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     3,
   );
 
-  canvasCtx.restore();
 };
 
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
