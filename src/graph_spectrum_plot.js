@@ -370,7 +370,6 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const spectrumCount =  this._importedPSD.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
     const curvesPonts = this._importedPSD._curvesData[spectrumNum].points;
-    const pointsCount = curvesPonts.length;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
