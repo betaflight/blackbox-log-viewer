@@ -9,7 +9,7 @@ export function ImportedCurves(curvesChanged) {
   
   this.curvesCount = function() {
     return this._curvesData.length;
-  }
+  };
 
   this.importCurvesFromCSV = function(files) {
       let importsLeft = maxImportCount - this._curvesData.length;
@@ -71,5 +71,5 @@ export function ImportedCurves(curvesChanged) {
     this.minY = Number.MAX_VALUE;
     this.maxY = -Number.MAX_VALUE;
     curvesChanged();
-  }
+  };
 }

@@ -65,7 +65,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
     "DeepPink",
     "DarkCyan",
     "Chocolate",
-  ]
+  ],
 };
 
 GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
@@ -376,7 +376,6 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
     canvasCtx.moveTo(0, HEIGHT);
-    const filterPointsCount = 100;
     for (const point of curvesPonts) {
       canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
     }
@@ -454,7 +453,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
     canvasCtx.strokeStyle = this.curvesColors[row];
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
-}
+};
 
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
   let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.fftOutput.length - 1) );
