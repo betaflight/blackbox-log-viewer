@@ -330,33 +330,35 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const WIDTH = canvasCtx.canvas.width - ACTUAL_MARGIN_LEFT;
   const LEFT = canvasCtx.canvas.offsetLeft + ACTUAL_MARGIN_LEFT;
   const TOP = canvasCtx.canvas.offsetTop;
-
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
-  canvasCtx.save();
-  canvasCtx.translate(LEFT, TOP);
-  this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
-
-  const pointsCount = this._fftData.fftLength;
-  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
-  canvasCtx.beginPath();
-  canvasCtx.lineWidth = 1;
-  canvasCtx.strokeStyle = "white";
-
   // Allign y axis range by 10db
+  const minimum = Math.min(this._fftData.minimum, this._importedPSD.minY),
+        maximum = Math.max(this._fftData.maximum, this._importedPSD.maxY);
   const dbStep = 10;
-  const minY = Math.floor(this._fftData.minimum / dbStep) * dbStep;
-  let maxY = (Math.floor(this._fftData.maximum / dbStep) + 1) * dbStep;
+  const minY = Math.floor(minimum / dbStep) * dbStep;
+  let maxY = (Math.floor(maximum / dbStep) + 1) * dbStep;
   if (minY == maxY) {
     maxY = minY + 1;  // prevent divide by zero
   }
-  const ticksCount = (maxY - minY) / dbStep;
-  const scaleY = HEIGHT / (maxY - minY);
   //Store vsRange for _drawMousePosition
   this._fftData.vsRange = {
     min: minY,
     max: maxY,
   };
+
+  const ticksCount = (maxY - minY) / dbStep;
+  const pointsCount = this._fftData.fftLength;
+  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
+  const scaleY = HEIGHT / (maxY - minY);
+
+  canvasCtx.save();
+  canvasCtx.translate(LEFT, TOP);
+  this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
+
+  canvasCtx.beginPath();
+  canvasCtx.lineWidth = 1;
+  canvasCtx.strokeStyle = "white";
   canvasCtx.moveTo(0, 0);
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
@@ -364,6 +366,29 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     canvasCtx.lineTo(freq * scaleX, y);
   }
   canvasCtx.stroke();
+
+  const spectrumCount =  this._importedPSD.curvesCount();
+  for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
+    const curvesPonts = this._importedPSD._curvesData[spectrumNum].points;
+    const pointsCount = curvesPonts.length;
+
+    canvasCtx.beginPath();
+    canvasCtx.lineWidth = 1;
+    canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
+    canvasCtx.moveTo(0, HEIGHT);
+    const filterPointsCount = 100;
+    for (const point of curvesPonts) {
+      canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+    }
+    canvasCtx.stroke();
+  }
+
+//Legend draw
+  if (this._isFullScreen && spectrumCount > 0) {
+    canvasCtx.save();
+    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD._curvesData);
+    canvasCtx.restore();
+  }
 
   this._drawAxisLabel(
     canvasCtx,
@@ -405,8 +430,6 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     "rgba(255,0,0,0.50)",
     3,
   );
-
-  canvasCtx.restore();
 };
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
@@ -432,6 +455,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
 }
+
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
   let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.fftOutput.length - 1) );
   freqIndex = Math.min(freqIndex, this._fftData.fftOutput.length - 1);
