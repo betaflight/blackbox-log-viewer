@@ -143,13 +143,6 @@ GraphSpectrumPlot.redraw = function () {
   GraphSpectrumPlot.draw();
 };
 
-GraphSpectrumPlot.clearImportedSpectrums = function (curvesData) {
-  this._importedSpectrumsData.length = 0;
-  this._invalidateCache();
-  this._invalidateDataCache();
-  GraphSpectrumPlot.draw();
-};
-
 GraphSpectrumPlot.setOverdraw = function (overdrawType) {
   this._overdrawType = overdrawType;
   this._invalidateCache();
@@ -344,7 +337,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.translate(LEFT, TOP);
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
 
-  const pointsCount = this._fftData.psdLength;
+  const pointsCount = this._fftData.fftLength;
   const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
   canvasCtx.beginPath();
   canvasCtx.lineWidth = 1;
@@ -367,7 +360,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.moveTo(0, 0);
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
-    const y = HEIGHT - (this._fftData.psdOutput[pointNum] - minY) * scaleY;
+    const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
     canvasCtx.lineTo(freq * scaleX, y);
   }
   canvasCtx.stroke();
@@ -440,10 +433,10 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   }
 }
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
-  let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.psdOutput.length - 1) );
-  freqIndex = Math.min(freqIndex, this._fftData.psdOutput.length - 1);
+  let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.fftOutput.length - 1) );
+  freqIndex = Math.min(freqIndex, this._fftData.fftOutput.length - 1);
   freqIndex = Math.max(freqIndex, 0);
-  return this._fftData.psdOutput.length ? this._fftData.psdOutput[freqIndex] : 0;
+  return this._fftData.fftOutput.length ? this._fftData.fftOutput[freqIndex] : 0;
 };
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false) {

@@ -442,4 +442,3 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     console.error(`Failed to create analyser... error: ${e}`);
   }
 }
-
