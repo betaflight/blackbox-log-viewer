@@ -1,6 +1,7 @@
 import { FILTER_TYPE } from "./flightlog_fielddefs";
 import { constrain } from "./tools";
 import { NUM_VS_BINS } from "./graph_spectrum_calc";
+import { ImportedCurves } from "./graph_imported_curves";
 
 const BLUR_FILTER_PIXEL = 1,
   DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -56,10 +57,20 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
     fontSizeFrameLabel: "6",
     fontSizeFrameLabelFullscreen: "9",
   },
-  _importedSpectrumsData: [],
+  _importedSpectrums: null,
+  _importedPSD: null,
+  curvesColors : [
+    "Blue",
+    "Purple",
+    "DeepPink",
+    "DarkCyan",
+    "Chocolate",
+  ]
 };
 
 GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
+  this._importedSpectrums = new ImportedCurves(() => GraphSpectrumPlot.redraw());
+  this._importedPSD = new ImportedCurves(() => GraphSpectrumPlot.redraw());
   this._canvasCtx = canvas.getContext("2d");
   this._sysConfig = sysConfig;
   this._invalidateCache();
@@ -126,16 +137,7 @@ GraphSpectrumPlot.setData = function (fftData, spectrumType) {
   this._invalidateDataCache();
 };
 
-GraphSpectrumPlot.getImportedSpectrumCount = function () {
-  return this._importedSpectrumsData.length;
-};
-
-GraphSpectrumPlot.addImportedSpectrumData = function (curvesData, name) {
-  const curve = {
-    points: curvesData,
-    name:   name,
-  };
-  this._importedSpectrumsData.push(curve);
+GraphSpectrumPlot.redraw = function () {
   this._invalidateCache();
   this._invalidateDataCache();
   GraphSpectrumPlot.draw();
@@ -268,26 +270,17 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     x += stepX;
   }
 
-  //Draw imported spectrums
-  const curvesColors = [
-    "Blue",
-    "Purple",
-    "DeepPink",
-    "DarkCyan",
-    "Chocolate",
-  ];
-
-  const spectrumCount =  this._importedSpectrumsData.length;
-  for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedSpectrumsData[spectrumNum].points;
+const spectrumCount =  this._importedSpectrums._curvesData.length;
+ for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
+    const curvesPonts = this._importedSpectrums._curvesData[spectrumNum].points;
     const pointsCount = curvesPonts.length;
     const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = curvesColors[spectrumNum];
+    canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
     canvasCtx.moveTo(0, HEIGHT);
-    const filterPointsCount = 50;
+    const filterPointsCount = 100;
     for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     // Apply moving average filter at spectrum points to get visible line
       let filterStartPoint = pointNum - filterPointsCount / 2;
@@ -304,37 +297,18 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
       }
       let middleValue = 0;
       for (let i = filterStartPoint; i < filterStopPoint; i++) {
-        middleValue += curvesPonts[i].value;
+        middleValue += curvesPonts[i].y;
       }
       middleValue /= filterPointsCount;
 
-      canvasCtx.lineTo(curvesPonts[pointNum].freq * scaleX, HEIGHT - middleValue * fftScale);
+      canvasCtx.lineTo(curvesPonts[pointNum].x * scaleX, HEIGHT - middleValue * fftScale);
     }
     canvasCtx.stroke();
   }
 
 //Legend draw
   if (this._isFullScreen && spectrumCount > 0) {
-    const legendPosX = 0.84 * WIDTH,
-          legendPosY = 0.6 * HEIGHT,
-          rowHeight = 16,
-          padding = 4,
-          legendWidth = 0.13 * WIDTH + padding,
-          legendHeight = spectrumCount * rowHeight + 3 * padding;
-
-    const legendArea = new Path2D();
-    legendArea.rect(legendPosX, legendPosY, legendWidth, legendHeight);
-    canvasCtx.clip(legendArea);
-    canvasCtx.strokeStyle = "gray";
-    canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
-    canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
-    canvasCtx.textAlign = "left";
-    for (let row = 0; row < spectrumCount; row++) {
-      const curvesName = this._importedSpectrumsData[row].name.split('.')[0];
-      const Y = legendPosY + padding + rowHeight * (row + 1);
-      canvasCtx.strokeStyle = curvesColors[row];
-      canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
-    }
+    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedSpectrums._curvesData);
   }
   canvasCtx.restore();
 
@@ -442,6 +416,29 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.restore();
 };
 
+GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
+  const spectrumCount =  importedCurves.length,
+    legendPosX = 0.84 * WIDTH,
+    legendPosY = 0.6 * HEIGHT,
+    rowHeight = 16,
+    padding = 4,
+    legendWidth = 0.13 * WIDTH + padding,
+    legendHeight = spectrumCount * rowHeight + 3 * padding,
+    legendArea = new Path2D();
+
+  legendArea.rect(legendPosX, legendPosY, legendWidth, legendHeight);
+  canvasCtx.clip(legendArea);
+  canvasCtx.strokeStyle = "gray";
+  canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
+  canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
+  canvasCtx.textAlign = "left";
+  for (let row = 0; row < spectrumCount; row++) {
+    const curvesName = importedCurves[row].name;
+    const Y = legendPosY + padding + rowHeight * (row + 1);
+    canvasCtx.strokeStyle = this.curvesColors[row];
+    canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
+  }
+}
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
   let freqIndex = Math.round(2 * frequency / this._fftData.blackBoxRate * (this._fftData.psdOutput.length - 1) );
   freqIndex = Math.min(freqIndex, this._fftData.psdOutput.length - 1);
@@ -1753,5 +1750,27 @@ GraphSpectrumPlot._drawRateWarning = function (canvasCtx) {
     canvasCtx.fillText(WarningText, X, Y);
 
     canvasCtx.restore();
+  }
+};
+
+GraphSpectrumPlot.importCurvesFromCSV = function(files) {
+  switch (this._spectrumType) {
+    case SPECTRUM_TYPE.FREQUENCY:
+      this._importedSpectrums.importCurvesFromCSV(files);
+      break;
+    case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+      this._importedPSD.importCurvesFromCSV(files);
+      break;
+  }
+};
+
+GraphSpectrumPlot.removeImportedCurves = function() {
+  switch (this._spectrumType) {
+    case SPECTRUM_TYPE.FREQUENCY:
+      this._importedSpectrums.removeCurves();
+      break;
+    case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+      this._importedPSD.removeCurves();
+      break;
   }
 };

@@ -4,8 +4,8 @@ onmessage = function(event) {
   const spectrumDataLength = fftOutput.length / 2;
   const frequencyStep = 0.5 * event.data.blackBoxRate / spectrumDataLength;
 
-  let outText = "freq" + columnDelimiter + "value" + "\n";
-  for (let index = 0; index < spectrumDataLength; index += 10) {
+  let outText = "x" + columnDelimiter + "y" + "\n";
+  for (let index = 0; index < spectrumDataLength; index++) {
     const frequency = frequencyStep * index;
     outText += frequency.toString() + columnDelimiter + fftOutput[index].toString() + "\n";
   }
