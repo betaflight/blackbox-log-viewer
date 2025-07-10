@@ -426,13 +426,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.getExportedFileName = function() {
-      let fileName = null;
+      let fileName = $(".log-filename").text().split(".")[0];
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQUENCY:
-          fileName = "bf_spectrum";
+          fileName = fileName + "_sp";
           break;
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-          fileName = "bf_psd";
+          fileName = fileName + "_psd";
           break;
       }
       return fileName;
