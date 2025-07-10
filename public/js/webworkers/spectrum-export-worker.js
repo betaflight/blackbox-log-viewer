@@ -1,7 +1,7 @@
 onmessage = function(event) {
   const columnDelimiter = event.data.opts.columnDelimiter;
   const fftOutput = event.data.fftOutput;
-  const spectrumDataLength = fftOutput.length / 2;
+  const spectrumDataLength = fftOutput.length;
   const frequencyStep = 0.5 * event.data.blackBoxRate / spectrumDataLength;
 
   let outText = "x" + columnDelimiter + "y" + "\n";
