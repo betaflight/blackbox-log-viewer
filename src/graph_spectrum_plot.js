@@ -226,7 +226,6 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const PLOTTED_BUFFER_LENGTH = this._fftData.fftLength / this._zoomX;
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
-  canvasCtx.save();
   canvasCtx.translate(LEFT, TOP);
 
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
@@ -263,8 +262,8 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     x += stepX;
   }
 
-const spectrumCount =  this._importedSpectrums._curvesData.length;
- for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
+  const spectrumCount =  this._importedSpectrums.curvesCount();
+  for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
     const curvesPonts = this._importedSpectrums._curvesData[spectrumNum].points;
     const pointsCount = curvesPonts.length;
     const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
@@ -303,7 +302,6 @@ const spectrumCount =  this._importedSpectrums._curvesData.length;
   if (this._isFullScreen && spectrumCount > 0) {
     this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedSpectrums._curvesData);
   }
-  canvasCtx.restore();
 
   this._drawAxisLabel(
     canvasCtx,
@@ -352,7 +350,6 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
   const scaleY = HEIGHT / (maxY - minY);
 
-  canvasCtx.save();
   canvasCtx.translate(LEFT, TOP);
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
 
@@ -383,9 +380,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
 //Legend draw
   if (this._isFullScreen && spectrumCount > 0) {
-    canvasCtx.save();
     this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD._curvesData);
-    canvasCtx.restore();
   }
 
   this._drawAxisLabel(
@@ -440,6 +435,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
     legendHeight = spectrumCount * rowHeight + 3 * padding,
     legendArea = new Path2D();
 
+  canvasCtx.save();
   legendArea.rect(legendPosX, legendPosY, legendWidth, legendHeight);
   canvasCtx.clip(legendArea);
   canvasCtx.strokeStyle = "gray";
@@ -452,6 +448,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
     canvasCtx.strokeStyle = this.curvesColors[row];
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
+  canvasCtx.restore();
 };
 
 GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
