@@ -271,7 +271,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
     canvasCtx.moveTo(0, HEIGHT);
-    const filterPointsCount = 100;
+    const filterPointsCount = 200;
     for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     // Apply moving average filter at spectrum points to get visible line
       let filterStartPoint = pointNum - filterPointsCount / 2;
@@ -426,11 +426,11 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
   const spectrumCount =  importedCurves.length,
-    legendPosX = 0.84 * WIDTH,
-    legendPosY = 0.6 * HEIGHT,
+    legendPosX = WIDTH - 180,
+    legendPosY = 50,
     rowHeight = 16,
     padding = 4,
-    legendWidth = 0.13 * WIDTH + padding,
+    legendWidth = 150 + padding,
     legendHeight = spectrumCount * rowHeight + 3 * padding,
     legendArea = new Path2D();
 
