@@ -261,7 +261,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     x += stepX;
   }
 
-  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
+  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE;
   const spectrumCount =  this._importedSpectrums.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
     const curvesPonts = this._importedSpectrums._curvesData[spectrumNum].points;
@@ -346,7 +346,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
   const ticksCount = (maxY - minY) / dbStep;
   const pointsCount = this._fftData.fftLength;
-  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
+  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE;
   const scaleY = HEIGHT / (maxY - minY);
 
   canvasCtx.translate(LEFT, TOP);
@@ -357,7 +357,10 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.strokeStyle = "white";
   canvasCtx.moveTo(0, 0);
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
-    const freq = PLOTTED_BLACKBOX_RATE / 2 * pointNum / pointsCount;
+    const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
+    if(freq > PLOTTED_BLACKBOX_RATE / 2) {
+      break;
+    }
     const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
     canvasCtx.lineTo(freq * scaleX, y);
   }
@@ -372,6 +375,9 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
     canvasCtx.moveTo(0, HEIGHT);
     for (const point of curvesPonts) {
+      if(point.x > PLOTTED_BLACKBOX_RATE / 2) {
+        break;
+      }
       canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
     }
     canvasCtx.stroke();
