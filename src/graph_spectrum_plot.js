@@ -222,7 +222,6 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const WIDTH = canvasCtx.canvas.width;
   const LEFT = canvasCtx.canvas.left;
   const TOP = canvasCtx.canvas.top;
-
   const PLOTTED_BUFFER_LENGTH = this._fftData.fftLength / this._zoomX;
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
 
@@ -262,11 +261,11 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
     x += stepX;
   }
 
+  const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
   const spectrumCount =  this._importedSpectrums.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
     const curvesPonts = this._importedSpectrums._curvesData[spectrumNum].points;
     const pointsCount = curvesPonts.length;
-    const scaleX = 2 * WIDTH / PLOTTED_BLACKBOX_RATE * this._zoomX;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
@@ -460,7 +459,6 @@ GraphSpectrumPlot.getPSDbyFreq  = function(frequency) {
 
 GraphSpectrumPlot._drawFrequencyVsXGraph = function (canvasCtx, drawPSD = false) {
   const PLOTTED_BLACKBOX_RATE = this._fftData.blackBoxRate / this._zoomX;
-
   const ACTUAL_MARGIN_LEFT = this._getActualMarginLeft();
   const WIDTH = canvasCtx.canvas.width - ACTUAL_MARGIN_LEFT;
   const HEIGHT = canvasCtx.canvas.height - MARGIN_BOTTOM;
