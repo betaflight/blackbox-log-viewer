@@ -231,6 +231,11 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
       top: "60%", // position from top (as a percentage of height)
       size: "35%", // size (as a percentage of width)
     },
+    analyser_legend: {
+      left: "88%", // position from left (as a percentage of width)
+      top: "7%", // position from top (as a percentage of height)
+      width: "10%", // legend width
+    },
     map: {
       left: "2%", // position from left (as a percentage of width)
       top: "5%", // position from top (as a percentage of height)
@@ -300,6 +305,11 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         top: `${$('.analyser-settings input[name="analyser-top"]').val()}%`,
         left: `${$('.analyser-settings input[name="analyser-left"]').val()}%`,
         size: `${$('.analyser-settings input[name="analyser-size"]').val()}%`,
+      },
+      analyser_legend: {
+        top: `${$('.analyser-settings input[name="analyser-legend-top"]').val()}%`,
+        left: `${$('.analyser-settings input[name="analyser-legend-left"]').val()}%`,
+        width: `${$('.analyser-settings input[name="analyser-legend-width"]').val()}%`,
       },
       map: {
         top: `${$('.map-settings input[name="map-top"]').val()}%`,
@@ -648,6 +658,16 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     );
     $('.analyser-settings input[name="analyser-size"]').val(
       parseInt(currentSettings.analyser.size)
+    );
+
+    $('.analyser-settings input[name="analyser-legend-top"]').val(
+      parseInt(currentSettings.analyser_legend.top)
+    );
+    $('.analyser-settings input[name="analyser-legend-left"]').val(
+      parseInt(currentSettings.analyser_legend.left)
+    );
+    $('.analyser-settings input[name="analyser-legend-width"]').val(
+      parseInt(currentSettings.analyser_legend.width)
     );
     $('.map-settings input[name="map-top"]').val(
       parseInt(currentSettings.map.top)

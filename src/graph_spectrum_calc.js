@@ -130,8 +130,8 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const psdData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
     fieldName  : this._dataBuffer.fieldName,
-    psdLength  : psd.psdOutput.length,
-    psdOutput  : psd.psdOutput,
+    fftLength  : psd.psdOutput.length,
+    fftOutput  : psd.psdOutput,
     blackBoxRate : this._blackBoxRate,
     minimum: psd.min,
     maximum: psd.max,
