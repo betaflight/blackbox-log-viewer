@@ -431,6 +431,9 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
+  if (!userSettings?.analyser_legend) {
+    return;
+  }
   const spectrumCount =  importedCurves.length,
     legendPosX = parseInt(userSettings.analyser_legend.left) / 100 * WIDTH,
     legendPosY = parseInt(userSettings.analyser_legend.top) / 100 * HEIGHT,
