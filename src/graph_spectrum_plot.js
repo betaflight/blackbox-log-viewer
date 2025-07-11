@@ -1779,6 +1779,9 @@ GraphSpectrumPlot.importCurvesFromCSV = function(files) {
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
       this._importedPSD.importCurvesFromCSV(files);
       break;
+    default:
+      console.warn(`Import not supported for spectrum type: ${this._spectrumType}`);
+      break;
   }
 };
 
