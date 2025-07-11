@@ -432,11 +432,11 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
   const spectrumCount =  importedCurves.length,
-    legendPosX = WIDTH - 180,
-    legendPosY = 50,
+    legendPosX = parseInt(userSettings.analyser_legend.left) / 100 * WIDTH,
+    legendPosY = parseInt(userSettings.analyser_legend.top) / 100 * HEIGHT,
     rowHeight = 16,
     padding = 4,
-    legendWidth = 150 + padding,
+    legendWidth = parseInt(userSettings.analyser_legend.width) / 100 * WIDTH,
     legendHeight = spectrumCount * rowHeight + 3 * padding,
     legendArea = new Path2D();
 
