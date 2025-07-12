@@ -517,11 +517,6 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         case "GYRO":
         case "GYRO_FILTERED":
         case "GYRO_SCALED":
-        case "DUAL_GYRO":
-        case "DUAL_GYRO_COMBINED":
-        case "DUAL_GYRO_DIFF":
-        case "DUAL_GYRO_RAW":
-        case "DUAL_GYRO_SCALED":
         case "MULTI_GYRO":
         case "MULTI_GYRO_COMBINED":
         case "MULTI_GYRO_DIFF":
