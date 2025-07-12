@@ -283,10 +283,10 @@ export const DEBUG_MODE_COMPLETE = makeReadOnly([
   "FFT_FREQ",
   "RX_FRSKY_SPI",
   "GYRO_RAW", // deprecated
-  "DUAL_GYRO", // deprecated
-  "DUAL_GYRO_RAW",
-  "DUAL_GYRO_COMBINED", // deprecated
-  "DUAL_GYRO_DIFF",
+  "MULTI_GYRO", // was DUAL_GYRO
+  "MULTI_GYRO_RAW", // was DUAL_GYRO_RAW
+  "MULTI_GYRO_COMBINED", // was DUAL_GYRO_COMBINED
+  "MULTI_GYRO_DIFF", // was DUAL_GYRO_DIFF
   "MAX7456_SIGNAL",
   "MAX7456_SPICLOCK",
   "SBUS",
@@ -314,7 +314,7 @@ export const DEBUG_MODE_COMPLETE = makeReadOnly([
   "D_MAX",
   "AC_CORRECTION",
   "AC_ERROR",
-  "DUAL_GYRO_SCALED",
+  "MULTI_GYRO_SCALED", // was DUAL_GYRO_SCALED
   "DSHOT_RPM_ERRORS",
   "CRSF_LINK_STATISTICS_UPLINK",
   "CRSF_LINK_STATISTICS_PWR",
@@ -522,8 +522,8 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_RAW"), 0, "RX_SFHSS_SPI");
     }
     if (semver.gte(firmwareVersion, "4.1.0")) {
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO"), 1);
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_COMBINED"), 1);
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("MULTI_GYRO"), 1);
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("MULTI_GYRO_COMBINED"), 1);
     }
     if (semver.gte(firmwareVersion, "4.3.0")) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_INTERPOLATED"), 1, "FEEDFORWARD");
@@ -606,7 +606,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
         );
       }
     }
-    
+
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
   } else {
     DEBUG_MODE = DEBUG_MODE_COMPLETE;

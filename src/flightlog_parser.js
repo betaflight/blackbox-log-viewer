@@ -446,6 +446,12 @@ export function FlightLogParser(logData) {
       chirp_frequency_start_deci_hz : "chirp_frequency_start_deci_hz",
       chirp_frequency_end_deci_hz : "chirp_frequency_end_deci_hz",
       chirp_time_seconds : "chirp_time_seconds",
+      // DUAL_GYRO to MULTI_GYRO debug mode aliases
+      DUAL_GYRO: "MULTI_GYRO",
+      DUAL_GYRO_RAW: "MULTI_GYRO_RAW", 
+      DUAL_GYRO_COMBINED: "MULTI_GYRO_COMBINED",
+      DUAL_GYRO_DIFF: "MULTI_GYRO_DIFF",
+      DUAL_GYRO_SCALED: "MULTI_GYRO_SCALED",
     },
     frameTypes,
     // Blackbox state:
