@@ -425,8 +425,30 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[6]": "Not Used",
     "debug[7]": "Not Used",
   },
+  MULTI_GYRO: {
+    "debug[all]": "Debug Multi Gyro",
+    "debug[0]": "Gyro 1 Filtered [roll]",
+    "debug[1]": "Gyro 1 Filtered [pitch]",
+    "debug[2]": "Gyro 2 Filtered [roll]",
+    "debug[3]": "Gyro 2 Filtered [pitch]",
+    "debug[4]": "Not Used",
+    "debug[5]": "Not Used",
+    "debug[6]": "Not Used",
+    "debug[7]": "Not Used",
+  },
   DUAL_GYRO_RAW: {
     "debug[all]": "Debug Dual Gyro Raw",
+    "debug[0]": "Gyro 1 Raw [roll]",
+    "debug[1]": "Gyro 1 Raw [pitch]",
+    "debug[2]": "Gyro 2 Raw [roll]",
+    "debug[3]": "Gyro 2 Raw [pitch]",
+    "debug[4]": "Not Used",
+    "debug[5]": "Not Used",
+    "debug[6]": "Not Used",
+    "debug[7]": "Not Used",
+  },
+  MULTI_GYRO_RAW: {
+    "debug[all]": "Debug Multi Gyro Raw",
     "debug[0]": "Gyro 1 Raw [roll]",
     "debug[1]": "Gyro 1 Raw [pitch]",
     "debug[2]": "Gyro 2 Raw [roll]",
@@ -447,8 +469,30 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[6]": "Not Used",
     "debug[7]": "Not Used",
   },
+  MULTI_GYRO_COMBINED: {
+    "debug[all]": "Debug Multi Combined",
+    "debug[0]": "Not Used",
+    "debug[1]": "Gyro Filtered [roll]",
+    "debug[2]": "Gyro Filtered [pitch]",
+    "debug[3]": "Not Used",
+    "debug[4]": "Not Used",
+    "debug[5]": "Not Used",
+    "debug[6]": "Not Used",
+    "debug[7]": "Not Used",
+  },
   DUAL_GYRO_DIFF: {
     "debug[all]": "Debug Dual Gyro Diff",
+    "debug[0]": "Gyro Diff [roll]",
+    "debug[1]": "Gyro Diff [pitch]",
+    "debug[2]": "Gyro Diff [yaw]",
+    "debug[3]": "Not Used",
+    "debug[4]": "Not Used",
+    "debug[5]": "Not Used",
+    "debug[6]": "Not Used",
+    "debug[7]": "Not Used",
+  },
+  MULTI_GYRO_DIFF: {
+    "debug[all]": "Debug Multi Gyro Diff",
     "debug[0]": "Gyro Diff [roll]",
     "debug[1]": "Gyro Diff [pitch]",
     "debug[2]": "Gyro Diff [yaw]",
@@ -735,6 +779,17 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
   },
   DUAL_GYRO_SCALED: {
     "debug[all]": "Dual Gyro Scaled",
+    "debug[0]": "Gyro 1 [roll]",
+    "debug[1]": "Gyro 1 [pitch]",
+    "debug[2]": "Gyro 2 [roll]",
+    "debug[3]": "Gyro 2 [pitch]",
+    "debug[4]": "Not Used",
+    "debug[5]": "Not Used",
+    "debug[6]": "Not Used",
+    "debug[7]": "Not Used",
+  },
+  MULTI_GYRO_SCALED: {
+    "debug[all]": "Multi Gyro Scaled",
     "debug[0]": "Gyro 1 [roll]",
     "debug[1]": "Gyro 1 [pitch]",
     "debug[2]": "Gyro 2 [roll]",
@@ -1840,6 +1895,12 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "DUAL_GYRO_COMBINED":
       case "DUAL_GYRO_DIFF":
       case "DUAL_GYRO_RAW":
+      case "DUAL_GYRO_SCALED":
+      case "MULTI_GYRO":
+      case "MULTI_GYRO_COMBINED":
+      case "MULTI_GYRO_DIFF":
+      case "MULTI_GYRO_RAW":
+      case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
         return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
@@ -2538,6 +2599,12 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
       case "DUAL_GYRO_COMBINED":
       case "DUAL_GYRO_DIFF":
       case "DUAL_GYRO_RAW":
+      case "DUAL_GYRO_SCALED":
+      case "MULTI_GYRO":
+      case "MULTI_GYRO_COMBINED":
+      case "MULTI_GYRO_DIFF":
+      case "MULTI_GYRO_RAW":
+      case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
         return toFriendly
