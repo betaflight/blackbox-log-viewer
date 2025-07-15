@@ -12,7 +12,7 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.importCurvesFromCSV = function(files) {
-      let importsLeft = maxImportCount - this._curvesData.length;
+      const importsLeft = maxImportCount - this._curvesData.length;
 
       for (const file of files) {
         if (importsLeft-- == 0) {
