@@ -550,6 +550,12 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.push('WING_SETPOINT');
       DEBUG_MODE.push('AUTOPILOT_POSITION');
     }
+    if (semver.gte(firmwareVersion, "4.6.0")) {
+      //rename DUAL_GYRO_ to MULTI_GYRO
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_RAW"), 1, "MULTI_GYRO_RAW");
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_DIFF"), 1, "MULTI_GYRO_DIFF");
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_SCALED"), 1, "MULTI_GYRO_SCALED");
+    }
 
     ACC_HARDWARE = makeReadOnly(ACC_HARDWARE);
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
