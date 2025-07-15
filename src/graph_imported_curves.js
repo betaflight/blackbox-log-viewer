@@ -1,7 +1,7 @@
 export function ImportedCurves(curvesChanged) {
   const maxImportCount = 5;
   this._curvesData = [];
-  let _that = this;
+  const _that = this;
   this.minX = Number.MAX_VALUE;
   this.maxX = -Number.MAX_VALUE;
   this.minY = Number.MAX_VALUE;
