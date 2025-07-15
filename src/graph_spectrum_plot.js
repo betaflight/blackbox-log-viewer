@@ -1578,17 +1578,6 @@ GraphSpectrumPlot._drawMousePosition = function (
       );
     }
 
-    if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
-      const psdLabel = Math.round(this.getPSDbyFreq(mouseFrequency)).toString() + "dBm/Hz";
-      this._drawAxisLabel(
-        canvasCtx,
-        psdLabel,
-        mouseX - 30,
-        mouseY - 4,
-        "left",
-      );
-    }
-
     // Y axis
     let unitLabel;
     switch (this._spectrumType) {
@@ -1611,7 +1600,19 @@ GraphSpectrumPlot._drawMousePosition = function (
       const val_min = this._fftData.vsRange.min;
       const val_max = this._fftData.vsRange.max;
       const vsArgValue = (1 - mouseY / HEIGHT) * (val_max - val_min) + val_min;
-      if (vsArgValue >= val_min && vsArgValue <= val_max) {
+
+      if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY && this._importedPSD.curvesCount() == 0) {  // single PSD spectrum
+        const currentPSD = this.getPSDbyFreq(mouseFrequency);
+        const posY = (val_max - currentPSD) / (val_max - val_min) * HEIGHT;
+        const psdLabel = Math.round(currentPSD).toString();
+        this._drawAxisLabel(
+          canvasCtx,
+          psdLabel,
+          mouseX - 30,
+          posY - 4,
+          "left",
+        );
+      } else if (vsArgValue >= val_min && vsArgValue <= val_max) {
         const valueLabel = `${vsArgValue.toFixed(0)}${unitLabel}`;
         this._drawHorizontalMarkerLine(
           canvasCtx,
@@ -1625,18 +1626,26 @@ GraphSpectrumPlot._drawMousePosition = function (
           stroke,
           lineWidth
         );
-
-        if (this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
-            this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
-          const label = Math.round(this.getValueFromMatrixFFT(mouseFrequency, vsArgValue)).toString() + "dBm/Hz";
-          this._drawAxisLabel(
+        if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {    // multiple PSD spectrum
+            this._drawAxisLabel(
             canvasCtx,
-            label,
+            vsArgValue.toFixed(0),
             mouseX - 30,
             mouseY - 4,
             "left",
           );
         }
+      }
+      if (this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+          this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
+        const label = Math.round(this.getValueFromMatrixFFT(mouseFrequency, vsArgValue)).toString() + "dBm/Hz";
+        this._drawAxisLabel(
+          canvasCtx,
+          label,
+          mouseX - 30,
+          mouseY - 4,
+          "left",
+        );
       }
     }
   } else if (this._spectrumType === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT) {
