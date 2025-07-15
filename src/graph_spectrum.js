@@ -351,7 +351,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           !psdHeatMapSelected,
         );
 
-        $("#spectrumComparison").css("visibility", (optionSelected == 0 ? "visible" : "hidden"));
+
+        const showSpectrumsComparisonPanel = optionSelected === SPECTRUM_TYPE.FREQUENCY || optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+        $("#spectrumComparison").css("visibility", (showSpectrumsComparisonPanel ? "visible" : "hidden"));
       })
       .change();
 
@@ -416,48 +418,27 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.importSpectrumFromCSV = function(files) {
-      const maxImportCount = 5;
-      let importsLeft = maxImportCount - GraphSpectrumPlot.getImportedSpectrumCount();
+      GraphSpectrumPlot.importCurvesFromCSV(files);
+    };
 
-      for (const file of files) {
-        if (importsLeft-- == 0) {
+    this.removeImportedSpectrums = function() {
+      GraphSpectrumPlot.removeImportedCurves();
+    };
+
+    this.getExportedFileName = function() {
+      let fileName = $(".log-filename").text().split(".")[0];
+      switch (userSettings.spectrumType) {
+        case SPECTRUM_TYPE.FREQUENCY:
+          fileName = fileName + "_sp";
           break;
-        }
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          try {
-            const stringRows = e.target.result.split("\n");
-
-            const header = stringRows[0].split(",");
-            if (header.length != 2 || header[0] != "freq" || header[1] != "value") {
-              throw new SyntaxError("Wrong spectrum CSV data format");
-            }
-
-            stringRows.shift();
-            const spectrumData = stringRows.map( function(row) {
-              const data = row.split(",");
-              return {
-                freq: parseFloat(data[0]),
-                value: parseFloat(data[1]),
-              };
-            });
-
-            GraphSpectrumPlot.addImportedSpectrumData(spectrumData, file.name);
-          } catch (e) {
-            alert('Spectrum data import error: ' + e.message);
-            return;
-          }
-        };
-
-        reader.readAsText(file);
+        case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+          fileName = fileName + "_psd";
+          break;
       }
+      return fileName;
     };
 
   } catch (e) {
     console.error(`Failed to create analyser... error: ${e}`);
   }
-
-  this.clearImportedSpectrums = function() {
-    GraphSpectrumPlot.clearImportedSpectrums();
-  };
 }

@@ -1149,11 +1149,17 @@ function BlackboxLogViewer() {
     CsvExporter(flightLog, options).dump(onSuccess);
   }
 
-  function exportSpectrumToCsv(file, options = {}) {
+  function exportSpectrumToCsv(options = {}) {
+    const fileName = graph.getAnalyser().getExportedFileName();
+    if (fileName == null) {
+      console.warn("The export is not supported for this spectrum type");
+      return;
+    }
+
     const onSuccess = createExportCallback(
       "csv",
       "text/csv",
-      file,
+      fileName,
       performance.now(),
     );
     graph.getAnalyser().exportSpectrumToCSV(onSuccess, options);
@@ -1732,7 +1738,7 @@ function BlackboxLogViewer() {
     });
 
     $("#btn-spectrum-export").click(function (e) {
-      exportSpectrumToCsv("bf_spectrum");
+      exportSpectrumToCsv();
       e.preventDefault();
     });
 
@@ -1741,12 +1747,12 @@ function BlackboxLogViewer() {
       e.preventDefault();
       e.target.value = "";
     });
-    
+
     $("#btn-spectrum-clear").click(function (e) {
-      graph.getAnalyser().clearImportedSpectrums();
+      graph.getAnalyser().removeImportedSpectrums();
       e.preventDefault();
     });
-    
+
     $(".btn-gpx-export").click(function (e) {
       setGraphState(GRAPH_STATE_PAUSED);
       exportGpx();
