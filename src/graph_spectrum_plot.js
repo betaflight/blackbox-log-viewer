@@ -1614,7 +1614,7 @@ GraphSpectrumPlot._drawMousePosition = function (
           HEIGHT,
           OFFSET,
           stroke,
-          lineWidth
+          lineWidth,
         );
       } else if (vsArgValue >= val_min && vsArgValue <= val_max) {
         const valueLabel = `${vsArgValue.toFixed(0)}${unitLabel}`;

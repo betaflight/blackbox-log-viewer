@@ -661,13 +661,13 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     );
 
     $('.analyser-settings input[name="analyser-legend-top"]').val(
-      parseInt(currentSettings.analyser_legend.top)
+      parseInt(currentSettings.analyser_legend.top),
     );
     $('.analyser-settings input[name="analyser-legend-left"]').val(
-      parseInt(currentSettings.analyser_legend.left)
+      parseInt(currentSettings.analyser_legend.left),
     );
     $('.analyser-settings input[name="analyser-legend-width"]').val(
-      parseInt(currentSettings.analyser_legend.width)
+      parseInt(currentSettings.analyser_legend.width),
     );
     $('.map-settings input[name="map-top"]').val(
       parseInt(currentSettings.map.top)
