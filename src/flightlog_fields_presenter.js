@@ -1397,6 +1397,39 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         'debug[4]': 'Processed flow rates Y',
         'debug[5]': 'Delta time',
       };
+      DEBUG_FRIENDLY_FIELD_NAMES.MULTI_GYRO_RAW = {
+        'debug[all]': 'Debug Multi Gyro Raw',
+        'debug[0]': 'Gyro 1 Raw [roll]',
+        'debug[1]': 'Gyro 1 Raw [pitch]',
+        'debug[2]': 'Gyro 2 Raw [roll]',
+        'debug[3]': 'Gyro 2 Raw [pitch]',
+        'debug[4]': 'Gyro 3 Raw [roll]',
+        'debug[5]': 'Gyro 3 Raw [pitch]',
+        'debug[6]': 'Gyro 4 Raw [roll]',
+        'debug[7]': 'Gyro 4 Raw [pitch]',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.MULTI_GYRO_DIFF = {
+        'debug[all]': 'Debug Multi Gyro Diff',
+        'debug[0]': 'Gyro 1 Diff [roll]',
+        'debug[1]': 'Gyro 1 Diff [pitch]',
+        'debug[2]': 'Gyro 2 Diff [roll]',
+        'debug[3]': 'Gyro 2 Diff [pitch]',
+        'debug[4]': 'Gyro 3 Diff [roll]',
+        'debug[5]': 'Gyro 3 Diff [pitch]',
+        'debug[6]': 'Gyro 4 Diff [roll]',
+        'debug[7]': 'Gyro 4 Diff [pitch]',
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.MULTI_GYRO_SCALED = {
+        'debug[all]': 'Multi Gyro Scaled',
+        'debug[0]': 'Gyro 1 [roll]',
+        'debug[1]': 'Gyro 1 [pitch]',
+        'debug[2]': 'Gyro 2 [roll]',
+        'debug[3]': 'Gyro 2 [pitch]',
+        'debug[4]': 'Gyro 3 [roll]',
+        'debug[5]': 'Gyro 3 [pitch]',
+        'debug[6]': 'Gyro 4 [roll]',
+        'debug[7]': 'Gyro 4 [pitch]',
+      };
       DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_POSITION = {
         'debug[all]': 'Autopilot Position',
         'debug[0]': 'Distance',
@@ -1840,6 +1873,9 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "DUAL_GYRO_COMBINED":
       case "DUAL_GYRO_DIFF":
       case "DUAL_GYRO_RAW":
+      case "MULTI_GYRO_DIFF":
+      case "MULTI_GYRO_RAW":
+      case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
         return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
@@ -2538,6 +2574,9 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
       case "DUAL_GYRO_COMBINED":
       case "DUAL_GYRO_DIFF":
       case "DUAL_GYRO_RAW":
+      case "MULTI_GYRO_DIFF":
+      case "MULTI_GYRO_RAW":
+      case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
         return toFriendly
