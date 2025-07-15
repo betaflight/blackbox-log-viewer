@@ -1603,14 +1603,18 @@ GraphSpectrumPlot._drawMousePosition = function (
 
       if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY && this._importedPSD.curvesCount() == 0) {  // single PSD spectrum
         const currentPSD = this.getPSDbyFreq(mouseFrequency);
-        const posY = (val_max - currentPSD) / (val_max - val_min) * HEIGHT;
-        const psdLabel = Math.round(currentPSD).toString();
-        this._drawAxisLabel(
+        const psdLabel = Math.round(currentPSD).toString() + unitLabel;
+        this._drawHorizontalMarkerLine(
           canvasCtx,
+          currentPSD,
+          val_min,
+          val_max,
           psdLabel,
-          mouseX - 30,
-          posY - 4,
-          "left",
+          WIDTH,
+          HEIGHT,
+          OFFSET,
+          stroke,
+          lineWidth
         );
       } else if (vsArgValue >= val_min && vsArgValue <= val_max) {
         const valueLabel = `${vsArgValue.toFixed(0)}${unitLabel}`;
@@ -1626,15 +1630,6 @@ GraphSpectrumPlot._drawMousePosition = function (
           stroke,
           lineWidth
         );
-        if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {    // multiple PSD spectrum
-            this._drawAxisLabel(
-            canvasCtx,
-            vsArgValue.toFixed(0),
-            mouseX - 30,
-            mouseY - 4,
-            "left",
-          );
-        }
       }
       if (this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
           this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM) {
