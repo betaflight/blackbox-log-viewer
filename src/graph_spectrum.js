@@ -356,7 +356,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         $("#spectrumComparison").css("visibility", (showSpectrumsComparisonPanel ? "visible" : "hidden"));
 
         const showAddSpectrumButton = optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-        $("#btn-spectrum-add").css("display", (showAddSpectrumButton ? "inline" : "none"));
+        $("#btn-spectrum-add").toggle(showAddSpectrumButton);
       })
       .change();
 
