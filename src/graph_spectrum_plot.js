@@ -431,7 +431,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
-  if (!userSettings?.analyser_legend) {
+  if (!userSettings?.analyser_legend?.left || !userSettings?.analyser_legend?.top || !userSettings?.analyser_legend?.width) {
     return;
   }
   const spectrumCount =  importedCurves.length,
@@ -452,7 +452,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   canvasCtx.textAlign = "left";
   for (let row = 0; row < spectrumCount; row++) {
     const curvesName = importedCurves[row].name;
-    const Y = legendPosY + padding + rowHeight * (row + 1);
+    const Y = legendPosY + padding + rowHeight * row + rowHeight/2; // Center text vertically
     canvasCtx.strokeStyle = this.curvesColors[row];
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
