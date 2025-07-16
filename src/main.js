@@ -1737,6 +1737,13 @@ function BlackboxLogViewer() {
       e.preventDefault();
     });
 
+    $("#btn-spectrum-add").click(function (e) {
+      if (hasAnalyser) {
+        graph.getAnalyser().addCurrentSpectrumIntoImport();
+      }
+      e.preventDefault();
+    });
+
     $("#btn-spectrum-export").click(function (e) {
       exportSpectrumToCsv();
       e.preventDefault();
@@ -1771,10 +1778,10 @@ function BlackboxLogViewer() {
 
         const exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
           videoConfig = newConfig;
-          
+
           prefs.set('videoConfig', newConfig);
         });
-  
+
         exportDialog.show(
           flightLog,
           {
