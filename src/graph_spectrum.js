@@ -438,6 +438,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       return fileName;
     };
 
+    this.addCurrentSpectrumIntoImport = function() {
+      GraphSpectrumPlot.addCurrentSpectrumIntoImport();
+    };
+
   } catch (e) {
     console.error(`Failed to create analyser... error: ${e}`);
   }

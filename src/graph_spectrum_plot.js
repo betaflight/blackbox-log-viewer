@@ -1799,3 +1799,10 @@ GraphSpectrumPlot.removeImportedCurves = function() {
       break;
   }
 };
+
+GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
+  if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+    alert("The PSD curve is added into import");
+  }
+};
+

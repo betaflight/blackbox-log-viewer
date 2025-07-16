@@ -2454,6 +2454,12 @@ function BlackboxLogViewer() {
             logJumpEnd();
             e.preventDefault();
             break;
+          case 45:  // Insert key - add current spectrum PSD curve into import list
+            if (hasAnalyser) {
+              graph.getAnalyser().addCurrentSpectrumIntoImport();
+            }
+            e.preventDefault();
+            break;
         }
       }
     });
