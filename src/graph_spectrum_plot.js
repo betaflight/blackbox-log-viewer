@@ -440,7 +440,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
     rowHeight = 16,
     padding = 4,
     legendWidth = parseInt(userSettings.analyser_legend.width) / 100 * WIDTH,
-    legendHeight = spectrumCount * rowHeight + 3 * padding,
+    legendHeight = spectrumCount * rowHeight + padding,
     legendArea = new Path2D();
 
   canvasCtx.save();
