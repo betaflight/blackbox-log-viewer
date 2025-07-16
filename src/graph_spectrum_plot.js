@@ -452,7 +452,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   canvasCtx.textAlign = "left";
   for (let row = 0; row < spectrumCount; row++) {
     const curvesName = importedCurves[row].name;
-    const Y = legendPosY + padding + rowHeight * row + rowHeight/2; // Center text vertically
+    const Y = legendPosY + padding + rowHeight * row + rowHeight / 2; // Center text vertically
     canvasCtx.strokeStyle = this.curvesColors[row];
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
