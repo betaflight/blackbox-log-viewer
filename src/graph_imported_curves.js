@@ -6,7 +6,7 @@ export function ImportedCurves(curvesChanged) {
   this.maxX = -Number.MAX_VALUE;
   this.minY = Number.MAX_VALUE;
   this.maxY = -Number.MAX_VALUE;
-  
+
   this.curvesCount = function() {
     return this._curvesData.length;
   };
@@ -63,6 +63,29 @@ export function ImportedCurves(curvesChanged) {
         reader.readAsText(file);
       }
     };
+
+  this.addCurve = function(points, name) {
+    this._curvesData.push({
+      name: name,
+      points: points,
+    });
+    for (const point of points) {
+      this.minX = Math.min(point.x, _that.minX);
+      this.maxX = Math.max(point.x, _that.maxX);
+      this.minY = Math.min(point.y, _that.minY);
+      this.maxY = Math.max(point.y, _that.maxY);
+    }
+    curvesChanged();
+  }
+
+  this.isNewCurve = function(name) {
+    for (const curve of this._curvesData) {
+      if (curve.name == name) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   this.removeCurves = function() {
     this._curvesData.length = 0;

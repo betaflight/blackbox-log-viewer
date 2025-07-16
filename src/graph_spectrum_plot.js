@@ -1801,8 +1801,19 @@ GraphSpectrumPlot.removeImportedCurves = function() {
 };
 
 GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
-  if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
-    alert("The PSD curve is added into import");
+  if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
+      this._importedPSD.isNewCurve(this._fftData.fieldName)) {
+    const fftLength = this._fftData.fftLength;
+    const frequencyStep = 0.5 * this._fftData.blackBoxRate / fftLength;
+    const points = [];
+    for (let index = 0; index < fftLength; index++) {
+      const frequency = frequencyStep * index;
+      points.push({
+        x: frequency,
+        y: this._fftData.fftOutput[index],
+      });
+    }
+    this._importedPSD.addCurve(points, this._fftData.fieldName);
   }
 };
 
