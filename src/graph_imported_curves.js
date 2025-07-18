@@ -32,7 +32,7 @@ export function ImportedCurves(curvesChanged) {
           const stringRows = e.target.result.split("\n");
 
           const header = stringRows[0].split(",");
-          if (header.length != 2 || header[0] != "x" || header[1] != "y") {
+          if (header.length != 2 || header[0].trim() != "x" || header[1].trim() != "y") {
             throw new SyntaxError("Wrong curves CSV data format");
           }
 
@@ -44,8 +44,8 @@ export function ImportedCurves(curvesChanged) {
 
           const curvesData = stringRows.map( function(row) {
             const data = row.split(","),
-                  x = parseFloat(data[0]),
-                  y = parseFloat(data[1]);
+                  x = parseFloat(data[0].trim()),
+                  y = parseFloat(data[1].trim());
             _that.minX = Math.min(x, _that.minX);
             _that.maxX = Math.max(x, _that.maxX);
             _that.minY = Math.min(y, _that.minY);
