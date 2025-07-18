@@ -1,6 +1,6 @@
 export function ImportedCurves(curvesChanged) {
   const maxImportCount = 5;
-  this._curvesData = [];
+  const _curvesData = [];
   const _that = this;
   this.minX = Number.MAX_VALUE;
   this.maxX = -Number.MAX_VALUE;
@@ -8,11 +8,19 @@ export function ImportedCurves(curvesChanged) {
   this.maxY = -Number.MAX_VALUE;
 
   this.curvesCount = function() {
-    return this._curvesData.length;
+    return _curvesData.length;
+  };
+
+  this.getCurve = function(index) {
+    if (index < _curvesData.length) {
+      return _curvesData[index];
+    } else {
+      throw "The imported curves index has exceeded maximal value"
+    }
   };
 
   this.importCurvesFromCSV = function(files) {
-    let importsLeft = maxImportCount - this._curvesData.length;
+    let importsLeft = maxImportCount - _curvesData.length;
 
     for (const file of files) {
       if (importsLeft-- == 0) {
@@ -52,7 +60,7 @@ export function ImportedCurves(curvesChanged) {
             name: file.name.split('.')[0],
             points: curvesData,
           };
-          _that._curvesData.push(curve);
+          _curvesData.push(curve);
           curvesChanged();
         } catch (e) {
           alert('Curves data import error: ' + e.message);
@@ -66,7 +74,7 @@ export function ImportedCurves(curvesChanged) {
 
   this.addCurve = function(points, name) {
     if (this.curvesCount() < maxImportCount) {
-      this._curvesData.push({
+      _curvesData.push({
         name: name,
         points: points,
       });
@@ -81,7 +89,7 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.isNewCurve = function(name) {
-    for (const curve of this._curvesData) {
+    for (const curve of _curvesData) {
       if (curve.name == name) {
         return false;
       }
@@ -90,7 +98,7 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.removeCurves = function() {
-    this._curvesData.length = 0;
+    _curvesData.length = 0;
     this.minX = Number.MAX_VALUE;
     this.maxX = -Number.MAX_VALUE;
     this.minY = Number.MAX_VALUE;

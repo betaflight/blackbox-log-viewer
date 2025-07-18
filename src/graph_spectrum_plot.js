@@ -264,7 +264,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const scaleX = WIDTH / MAXIMAL_PLOTTED_FREQUENCY;
   const spectrumCount =  this._importedSpectrums.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedSpectrums._curvesData[spectrumNum].points;
+    const curvesPonts = this._importedSpectrums.getCurve(spectrumNum).points;
     const pointsCount = curvesPonts.length;
 
     canvasCtx.beginPath();
@@ -299,7 +299,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
 
 //Legend draw
   if (this._isFullScreen && spectrumCount > 0) {
-    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedSpectrums._curvesData);
+    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedSpectrums);
   }
 
   this._drawAxisLabel(
@@ -368,7 +368,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
   const spectrumCount =  this._importedPSD.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedPSD._curvesData[spectrumNum].points;
+    const curvesPonts = this._importedPSD.getCurve(spectrumNum).points;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
@@ -385,7 +385,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
 //Legend draw
   if (this._isFullScreen && spectrumCount > 0) {
-    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD._curvesData);
+    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD);
   }
 
   this._drawAxisLabel(
@@ -434,7 +434,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   if (!userSettings?.analyser_legend?.left || !userSettings?.analyser_legend?.top || !userSettings?.analyser_legend?.width) {
     return;
   }
-  const spectrumCount =  importedCurves.length,
+  const spectrumCount =  importedCurves.curvesCount(),
     legendPosX = parseInt(userSettings.analyser_legend.left) / 100 * WIDTH,
     legendPosY = parseInt(userSettings.analyser_legend.top) / 100 * HEIGHT,
     rowHeight = 16,
@@ -451,7 +451,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
   canvasCtx.textAlign = "left";
   for (let row = 0; row < spectrumCount; row++) {
-    const curvesName = importedCurves[row].name;
+    const curvesName = importedCurves.getCurve(row).name;
     const Y = legendPosY + padding + rowHeight * row + rowHeight / 2; // Center text vertically
     canvasCtx.strokeStyle = this.curvesColors[row];
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
