@@ -65,17 +65,19 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.addCurve = function(points, name) {
-    this._curvesData.push({
-      name: name,
-      points: points,
-    });
-    for (const point of points) {
-      this.minX = Math.min(point.x, _that.minX);
-      this.maxX = Math.max(point.x, _that.maxX);
-      this.minY = Math.min(point.y, _that.minY);
-      this.maxY = Math.max(point.y, _that.maxY);
+    if (this.curvesCount() < maxImportCount) {
+      this._curvesData.push({
+        name: name,
+        points: points,
+      });
+      for (const point of points) {
+        this.minX = Math.min(point.x, _that.minX);
+        this.maxX = Math.max(point.x, _that.maxX);
+        this.minY = Math.min(point.y, _that.minY);
+        this.maxY = Math.max(point.y, _that.maxY);
+      }
+      curvesChanged();
     }
-    curvesChanged();
   };
 
   this.isNewCurve = function(name) {
