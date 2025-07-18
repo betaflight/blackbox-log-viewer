@@ -217,6 +217,10 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
   }
 };
 
+GraphSpectrumPlot.getCurveColor = function (index) {
+  return this.curvesColors[index % this.curvesColors.length];
+};
+
 GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const HEIGHT = canvasCtx.canvas.height - MARGIN;
   const WIDTH = canvasCtx.canvas.width;
@@ -269,7 +273,7 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
+    canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
     canvasCtx.moveTo(0, HEIGHT);
     const filterPointsCount = 200;
     for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
@@ -372,7 +376,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
+    canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
     canvasCtx.moveTo(0, HEIGHT);
     for (const point of curvesPonts) {
       if(point.x > MAXIMAL_PLOTTED_FREQUENCY) {
@@ -453,7 +457,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   for (let row = 0; row < spectrumCount; row++) {
     const curvesName = importedCurves.getCurve(row).name;
     const Y = legendPosY + padding + rowHeight * row + rowHeight / 2; // Center text vertically
-    canvasCtx.strokeStyle = this.curvesColors[row];
+    canvasCtx.strokeStyle = this.getCurveColor(row);
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
   canvasCtx.restore();
