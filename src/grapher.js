@@ -1240,8 +1240,16 @@ export function FlightLogGrapher(
   };
 
   // Add option toggling
-  this.setDrawAnalyser = function (state) {
+  this.setDrawAnalyser = function (state, ctrlKey = false) {
+    if (state == true && ctrlKey == true) {
+      analyser.prepareSpectrumForImport();
+    }
     options.drawAnalyser = state;
+  };
+
+  // Add option toggling
+  this.hasMultiSpectrumAnalyser = function () {
+    return analyser.isMultiSpectrum();
   };
 
   // Add analyser zoom toggling

@@ -21,7 +21,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
-    fftData = null;
+    fftData = null,
+    addSpectrumToImport = false;
 
   try {
     let isFullscreen = false;
@@ -45,6 +46,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       isFullscreen = size == true;
       GraphSpectrumPlot.setFullScreen(isFullscreen);
       that.resize();
+    };
+
+    this.prepareSpectrumForImport = function () {
+      if (userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+        addSpectrumToImport = true;
+      }
     };
 
     this.setInTime = function (time) {
@@ -166,7 +173,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         dataLoad(fieldIndex, curve, fieldName);
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
-
+      if (addSpectrumToImport == true) {
+        this.addCurrentSpectrumIntoImport();
+        addSpectrumToImport = false;
+      }
       that.draw(); // draw the analyser on the canvas....
     };
 
@@ -443,6 +453,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     this.addCurrentSpectrumIntoImport = function() {
       GraphSpectrumPlot.addCurrentSpectrumIntoImport();
+    };
+
+    this.isMultiSpectrum = function() {
+      return GraphSpectrumPlot.isMultiSpectrum();
     };
 
   } catch (e) {

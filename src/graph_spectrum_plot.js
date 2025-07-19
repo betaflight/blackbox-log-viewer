@@ -1821,3 +1821,7 @@ GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
   }
 };
 
+GraphSpectrumPlot.isMultiSpectrum = function() {
+  return this._importedPSD.curvesCount() > 0;
+};
+
