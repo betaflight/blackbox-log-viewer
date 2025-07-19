@@ -961,9 +961,10 @@ function BlackboxLogViewer() {
     updateCanvasSize();
   }
 
-  function onLegendSelectionChange(toggleAnalizer) {
-    hasAnalyser = toggleAnalizer ? !hasAnalyser : true;
-    graph.setDrawAnalyser(hasAnalyser);
+  function onLegendSelectionChange(toggleAnalizer, ctrlKey) {
+    const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
+    hasAnalyser = toggleAnalizer ? !hasAnalyser || lockAnalyserHide : true;      // Do not hide analyser when ctrlKey is pressed or it has much spectrums
+    graph.setDrawAnalyser(hasAnalyser, ctrlKey);
     html.toggleClass("has-analyser", hasAnalyser);
     prefs.set("hasAnalyser", hasAnalyser);
     invalidateGraph();
@@ -1737,6 +1738,13 @@ function BlackboxLogViewer() {
       e.preventDefault();
     });
 
+    $("#btn-spectrum-add").click(function (e) {
+      if (hasAnalyser) {
+        graph.getAnalyser().addCurrentSpectrumIntoImport();
+      }
+      e.preventDefault();
+    });
+
     $("#btn-spectrum-export").click(function (e) {
       exportSpectrumToCsv();
       e.preventDefault();
@@ -1771,10 +1779,10 @@ function BlackboxLogViewer() {
 
         const exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
           videoConfig = newConfig;
-          
+
           prefs.set('videoConfig', newConfig);
         });
-  
+
         exportDialog.show(
           flightLog,
           {
@@ -2452,6 +2460,12 @@ function BlackboxLogViewer() {
             break;
           case 35: // end - goto end of log
             logJumpEnd();
+            e.preventDefault();
+            break;
+          case 45:  // Insert key - add current spectrum PSD curve into import list
+            if (hasAnalyser) {
+              graph.getAnalyser().addCurrentSpectrumIntoImport();
+            }
             e.preventDefault();
             break;
         }
