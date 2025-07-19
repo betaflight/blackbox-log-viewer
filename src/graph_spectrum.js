@@ -173,7 +173,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         dataLoad(fieldIndex, curve, fieldName);
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
-      if (addSpectrumToImport == true) {
+      if (addSpectrumToImport) {
         this.addCurrentSpectrumIntoImport();
         addSpectrumToImport = false;
       }

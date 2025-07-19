@@ -1241,7 +1241,7 @@ export function FlightLogGrapher(
 
   // Add option toggling
   this.setDrawAnalyser = function (state, ctrlKey = false) {
-    if (state == true && ctrlKey == true) {
+    if (state && ctrlKey) {
       analyser.prepareSpectrumForImport();
     }
     options.drawAnalyser = state;
