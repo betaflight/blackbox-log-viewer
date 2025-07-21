@@ -1738,13 +1738,6 @@ function BlackboxLogViewer() {
       e.preventDefault();
     });
 
-    $("#btn-spectrum-add").click(function (e) {
-      if (hasAnalyser) {
-        graph.getAnalyser().addCurrentSpectrumIntoImport();
-      }
-      e.preventDefault();
-    });
-
     $("#btn-spectrum-export").click(function (e) {
       exportSpectrumToCsv();
       e.preventDefault();
@@ -2460,12 +2453,6 @@ function BlackboxLogViewer() {
             break;
           case 35: // end - goto end of log
             logJumpEnd();
-            e.preventDefault();
-            break;
-          case 45:  // Insert key - add current spectrum PSD curve into import list
-            if (hasAnalyser) {
-              graph.getAnalyser().addCurrentSpectrumIntoImport();
-            }
             e.preventDefault();
             break;
         }
