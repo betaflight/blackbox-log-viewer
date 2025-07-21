@@ -1245,7 +1245,7 @@ export function FlightLogGrapher(
       if (ctrlKey) {
         analyser.prepareSpectrumForImport();
       } else if (this.hasMultiSpectrumAnalyser()) {
-        analyser.removeImportedSpectrums();     // Remove imported spectrums by simple mouse click at the curves legend
+        analyser.removeImportedSpectrums();     // Remove imported spectrums by simple mouse click at the any curves legend
       }
     }
 
