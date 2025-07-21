@@ -60,6 +60,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _importedSpectrums: null,
   _importedPSD: null,
   curvesColors : [
+    "White",
     "Blue",
     "Purple",
     "DeepPink",
