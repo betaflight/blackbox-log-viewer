@@ -1241,9 +1241,14 @@ export function FlightLogGrapher(
 
   // Add option toggling
   this.setDrawAnalyser = function (state, ctrlKey = false) {
-    if (state && ctrlKey) {
-      analyser.prepareSpectrumForImport();
+    if (state) {
+      if (ctrlKey) {
+        analyser.prepareSpectrumForImport();
+      } else if (this.hasMultiSpectrumAnalyser()) {
+        analyser.removeImportedSpectrums();     // Remove imported spectrums by simple mouse click at the curves legend
+      }
     }
+
     options.drawAnalyser = state;
   };
 
