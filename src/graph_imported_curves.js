@@ -1,5 +1,5 @@
 export function ImportedCurves(curvesChanged) {
-  const maxImportCount = 6;
+  const maxImportCount = 6;   // This value is limited by legends size and curves colors visibility. Maybe increased, if it will need for users
   const _curvesData = [];
   const _that = this;
   this.minX = Number.MAX_VALUE;

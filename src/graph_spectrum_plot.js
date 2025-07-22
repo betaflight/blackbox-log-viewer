@@ -60,7 +60,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _importedSpectrums: null,
   _importedPSD: null,
   curvesColors : [
-    "White",
+    "White",  // The first imported curve duplicates existing main curve, therefore it must have same white color
     "Blue",
     "Purple",
     "DeepPink",
