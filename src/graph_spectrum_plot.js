@@ -378,7 +378,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
-    canvasCtx.moveTo(0, HEIGHT);
+    canvasCtx.moveTo(0, 0);
     for (const point of curvesPonts) {
       if(point.x > MAXIMAL_PLOTTED_FREQUENCY) {
         break;
