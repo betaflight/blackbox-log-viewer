@@ -15,7 +15,7 @@ export function ImportedCurves(curvesChanged) {
     if (index < _curvesData.length) {
       return _curvesData[index];
     } else {
-      throw new IndexError("The imported curves index has exceeded maximal value");
+      throw new RangeError("The imported curves index has exceeded maximal value");
     }
   };
 
