@@ -349,6 +349,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     max: maxY,
   };
 
+  const mainCurveColor = this.getCurveColor(0); // The main curve must have color like the first imported curves - White.
   const ticksCount = (maxY - minY) / dbStep;
   const pointsCount = this._fftData.fftLength;
   const scaleX = WIDTH / MAXIMAL_PLOTTED_FREQUENCY;
@@ -359,7 +360,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
   canvasCtx.beginPath();
   canvasCtx.lineWidth = 1;
-  canvasCtx.strokeStyle = "white";
+  canvasCtx.strokeStyle = mainCurveColor;
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
     if(freq > MAXIMAL_PLOTTED_FREQUENCY) {
