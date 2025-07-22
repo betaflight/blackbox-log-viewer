@@ -445,15 +445,18 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
-  if (userSettings?.analyser_legend?.left == null || userSettings?.analyser_legend?.top == null || userSettings?.analyser_legend?.width == null) {
+  const left = parseFloat(userSettings?.analyser_legend?.left);
+  const top = parseFloat(userSettings?.analyser_legend?.top);
+  const width = parseFloat(userSettings?.analyser_legend?.width);
+  if (!Number.isFinite(left) || !Number.isFinite(top) || !Number.isFinite(width)) {
     return;
   }
   const spectrumCount =  importedCurves.curvesCount(),
-    legendPosX = parseInt(userSettings.analyser_legend.left) / 100 * WIDTH,
-    legendPosY = parseInt(userSettings.analyser_legend.top) / 100 * HEIGHT,
+    legendPosX = left / 100 * WIDTH,
+    legendPosY = top / 100 * HEIGHT,
     rowHeight = 16,
     padding = 4,
-    legendWidth = parseInt(userSettings.analyser_legend.width) / 100 * WIDTH,
+    legendWidth = width / 100 * WIDTH,
     legendHeight = spectrumCount * rowHeight + padding,
     legendArea = new Path2D();
 
