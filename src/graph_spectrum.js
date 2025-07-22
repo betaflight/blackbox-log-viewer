@@ -163,13 +163,17 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       }
     };
 
+    this.shouldAddCurrentSpectrumBeforeReload = function () {
+      return addSpectrumToImport && fftData != null && !this.isMultiSpectrum() && !dataReload;
+    };
+
     /* This function is called from the canvas drawing routines within grapher.js
            It is only used to record the current curve positions, collect the data and draw the
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Detect change of selected field.... reload and redraw required.
       if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
-        if (addSpectrumToImport && fftData != null && !this.isMultiSpectrum() && !dataReload) {
+        if (this.shouldAddCurrentSpectrumBeforeReload()) {
           this.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
         }
         dataReload = false;
