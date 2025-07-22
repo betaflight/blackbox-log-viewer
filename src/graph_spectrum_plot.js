@@ -1800,7 +1800,7 @@ GraphSpectrumPlot.importCurvesFromCSV = function(files) {
       break;
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
       if (this._importedPSD.curvesCount() === 0) {
-        this.addCurrentSpectrumIntoImport();
+        this.addCurrentSpectrumIntoImport(); // Add current main spectrum to import for the first imported file to have same behavior like first Ctrl+Mouse click selection.
       }
       this._importedPSD.importCurvesFromCSV(files);
       break;
