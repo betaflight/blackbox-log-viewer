@@ -360,14 +360,17 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.beginPath();
   canvasCtx.lineWidth = 1;
   canvasCtx.strokeStyle = "white";
-  canvasCtx.moveTo(0, 0);
   for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
     const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
     if(freq > MAXIMAL_PLOTTED_FREQUENCY) {
       break;
     }
     const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
-    canvasCtx.lineTo(freq * scaleX, y);
+    if (pointNum == 0) {
+      canvasCtx.moveTo(freq * scaleX, y);
+    } else {
+      canvasCtx.lineTo(freq * scaleX, y);
+    }
   }
   canvasCtx.stroke();
 
@@ -378,12 +381,17 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
-    canvasCtx.moveTo(0, 0);
+    let isFirstPoint = true;
     for (const point of curvesPoints) {
-      if(point.x > MAXIMAL_PLOTTED_FREQUENCY) {
+      if (point.x > MAXIMAL_PLOTTED_FREQUENCY) {
         break;
       }
-      canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+      if (isFirstPoint) {
+        canvasCtx.moveTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+        isFirstPoint = false;
+      } else {
+        canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+      }
     }
     canvasCtx.stroke();
   }
