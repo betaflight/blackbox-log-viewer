@@ -32,7 +32,7 @@ export function ImportedCurves(curvesChanged) {
           const stringRows = e.target.result.split("\n");
 
           const header = stringRows[0].split(",");
-          if (header.length != 2 || header[0].trim() != "x" || header[1].trim() != "y") {
+          if (header.length !== 2 || header[0].trim() !== "x" || header[1].trim() !== "y") {
             throw new SyntaxError("Wrong curves CSV data format");
           }
 
@@ -90,7 +90,7 @@ export function ImportedCurves(curvesChanged) {
 
   this.isNewCurve = function(name) {
     for (const curve of _curvesData) {
-      if (curve.name == name) {
+      if (curve.name === name) {
         return false;
       }
     }

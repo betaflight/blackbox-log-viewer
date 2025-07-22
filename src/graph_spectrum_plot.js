@@ -366,7 +366,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
       break;
     }
     const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
-    if (pointNum == 0) {
+    if (pointNum === 0) {
       canvasCtx.moveTo(freq * scaleX, y);
     } else {
       canvasCtx.lineTo(freq * scaleX, y);
@@ -1794,7 +1794,7 @@ GraphSpectrumPlot.importCurvesFromCSV = function(files) {
       this._importedSpectrums.importCurvesFromCSV(files);
       break;
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-      if (this._importedPSD.curvesCount() == 0) {
+      if (this._importedPSD.curvesCount() === 0) {
         this.addCurrentSpectrumIntoImport();
       }
       this._importedPSD.importCurvesFromCSV(files);
