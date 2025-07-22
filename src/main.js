@@ -963,7 +963,15 @@ function BlackboxLogViewer() {
 
   function onLegendSelectionChange(toggleAnalizer, ctrlKey) {
     const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
-    hasAnalyser = toggleAnalizer ? !hasAnalyser || lockAnalyserHide : true;      // Do not hide analyser when ctrlKey is pressed or it has many spectrums
+    if (toggleAnalizer) {
+      if (lockAnalyserHide) {
+        hasAnalyser = true; // Do not hide analyser when ctrlKey is pressed or it has many spectrums
+      } else {
+        hasAnalyser = !hasAnalyser; // Toggle the analyser state
+      }
+    } else {
+      hasAnalyser = true; // Default to true when toggleAnalizer is false
+    }
     graph.setDrawAnalyser(hasAnalyser, ctrlKey);
     html.toggleClass("has-analyser", hasAnalyser);
     prefs.set("hasAnalyser", hasAnalyser);
