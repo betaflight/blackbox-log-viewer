@@ -170,7 +170,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       // Detect change of selected field.... reload and redraw required.
       if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
         if (addSpectrumToImport && fftData != null && !this.isMultiSpectrum() && !dataReload) {
-          this.addCurrentSpectrumIntoImport();  //The main curve is added into imported list when the second curve is selected for comparison
+          this.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
         }
         dataReload = false;
         dataLoad(fieldIndex, curve, fieldName);
