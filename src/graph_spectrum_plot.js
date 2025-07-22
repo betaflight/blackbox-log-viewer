@@ -463,6 +463,7 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
   canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
   canvasCtx.textAlign = "left";
+  canvasCtx.textBaseline = "middle"; // Ensure proper vertical centering
   for (let row = 0; row < spectrumCount; row++) {
     const curvesName = importedCurves.getCurve(row).name;
     const Y = legendPosY + padding + rowHeight * row + rowHeight / 2; // Center text vertically
