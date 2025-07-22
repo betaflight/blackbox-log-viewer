@@ -269,8 +269,8 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const scaleX = WIDTH / MAXIMAL_PLOTTED_FREQUENCY;
   const spectrumCount =  this._importedSpectrums.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedSpectrums.getCurve(spectrumNum).points;
-    const pointsCount = curvesPonts.length;
+    const curvesPoints = this._importedSpectrums.getCurve(spectrumNum).points;
+    const pointsCount = curvesPoints.length;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
@@ -293,11 +293,11 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
       }
       let middleValue = 0;
       for (let i = filterStartPoint; i < filterStopPoint; i++) {
-        middleValue += curvesPonts[i].y;
+        middleValue += curvesPoints[i].y;
       }
       middleValue /= filterPointsCount;
 
-      canvasCtx.lineTo(curvesPonts[pointNum].x * scaleX, HEIGHT - middleValue * fftScale);
+      canvasCtx.lineTo(curvesPoints[pointNum].x * scaleX, HEIGHT - middleValue * fftScale);
     }
     canvasCtx.stroke();
   }
@@ -373,13 +373,13 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 
   const spectrumCount =  this._importedPSD.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedPSD.getCurve(spectrumNum).points;
+    const curvesPoints = this._importedPSD.getCurve(spectrumNum).points;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
     canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
     canvasCtx.moveTo(0, 0);
-    for (const point of curvesPonts) {
+    for (const point of curvesPoints) {
       if(point.x > MAXIMAL_PLOTTED_FREQUENCY) {
         break;
       }
@@ -436,7 +436,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
-  if (!userSettings?.analyser_legend?.left || !userSettings?.analyser_legend?.top || !userSettings?.analyser_legend?.width) {
+  if (userSettings?.analyser_legend?.left == null || userSettings?.analyser_legend?.top == null || userSettings?.analyser_legend?.width == null) {
     return;
   }
   const spectrumCount =  importedCurves.curvesCount(),

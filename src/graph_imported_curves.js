@@ -79,10 +79,10 @@ export function ImportedCurves(curvesChanged) {
         points: points,
       });
       for (const point of points) {
-        this.minX = Math.min(point.x, _that.minX);
-        this.maxX = Math.max(point.x, _that.maxX);
-        this.minY = Math.min(point.y, _that.minY);
-        this.maxY = Math.max(point.y, _that.maxY);
+        this.minX = Math.min(point.x, this.minX);
+        this.maxX = Math.max(point.x, this.maxX);
+        this.minY = Math.min(point.y, this.minY);
+        this.maxY = Math.max(point.y, this.maxY);
       }
       curvesChanged();
     }
