@@ -1839,6 +1839,9 @@ GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
 };
 
 GraphSpectrumPlot.isMultiSpectrum = function() {
-  return this._importedPSD.curvesCount() > 0;
+  return !this._importedPSD.isEmpty();
 };
 
+GraphSpectrumPlot.isImportedCurvesMaxCount = function() {
+  return this._importedPSD.isFull();
+};

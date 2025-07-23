@@ -105,4 +105,12 @@ export function ImportedCurves(curvesChanged) {
     this.maxY = -Number.MAX_VALUE;
     curvesChanged();
   };
+
+  this.isFull = function() {
+    return this.curvesCount() === maxImportCount;
+  };
+
+  this.isEmpty = function() {
+    return this.curvesCount() === 0;
+  };
 }

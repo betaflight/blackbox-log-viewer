@@ -172,7 +172,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Detect change of selected field.... reload and redraw required.
-      if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
+      const isMaxCountOfImportedPSD = GraphSpectrumPlot.isImportedCurvesMaxCount() && userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+      const shouldReload = fftData == null ||
+                           fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD || // Lock spectrum data reload while PSD curves import is full
+                           dataReload;
+      if (shouldReload) {
         if (this.shouldAddCurrentSpectrumBeforeReload()) {
           this.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
         }
