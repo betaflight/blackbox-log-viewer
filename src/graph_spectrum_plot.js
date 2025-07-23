@@ -1827,7 +1827,7 @@ GraphSpectrumPlot.removeImportedCurves = function() {
 
 GraphSpectrumPlot.isNewComparedCurve = function(name) {
   return this._importedPSD.isNewCurve(name);
-}
+};
 
 GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
   if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
@@ -1848,9 +1848,7 @@ GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
 
 GraphSpectrumPlot.removeComparedCurve = function(name) {
   this._importedPSD.removeCurve(name);
-  if (this._importedPSD.curvesCount() == 1 && this._importedPSD.getCurve(0).name !== this._fftData.fieldName) {
-  }
-}
+};
 
 GraphSpectrumPlot.isMultiSpectrum = function() {
   return !this._importedPSD.isEmpty();
