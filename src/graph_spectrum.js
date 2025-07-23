@@ -173,19 +173,26 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Detect change of selected field.... reload and redraw required.
       const isMaxCountOfImportedPSD = GraphSpectrumPlot.isImportedCurvesMaxCount() && userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-      const shouldReload = fftData == null ||
-                           fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD || // Lock spectrum data reload while PSD curves import is full
-                           dataReload;
+      let shouldReload = fftData == null ||
+                         fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD || // Lock spectrum data reload while PSD curves import is full
+                         dataReload;
+
+      if (addSpectrumToImport && !GraphSpectrumPlot.isNewComparedCurve(fieldName)) {
+        GraphSpectrumPlot.removeComparedCurve(fieldName);
+        addSpectrumToImport = false;
+        shouldReload = false;   // Do not load if spectrum was deleted
+      }
+
       if (shouldReload) {
         if (this.shouldAddCurrentSpectrumBeforeReload()) {
-          this.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
+          GraphSpectrumPlot.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
         }
         dataReload = false;
         dataLoad(fieldIndex, curve, fieldName);
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
       if (addSpectrumToImport) {
-        this.addCurrentSpectrumIntoImport();
+        GraphSpectrumPlot.addCurrentSpectrumIntoImport();
         addSpectrumToImport = false;
       }
       that.draw(); // draw the analyser on the canvas....
@@ -460,10 +467,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           break;
       }
       return fileName;
-    };
-
-    this.addCurrentSpectrumIntoImport = function() {
-      GraphSpectrumPlot.addCurrentSpectrumIntoImport();
     };
 
     this.isMultiSpectrum = function() {

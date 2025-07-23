@@ -358,25 +358,29 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.translate(LEFT, TOP);
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
 
-  canvasCtx.beginPath();
-  canvasCtx.lineWidth = 1;
-  canvasCtx.strokeStyle = mainCurveColor;
-  for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
-    const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
-    if(freq > MAXIMAL_PLOTTED_FREQUENCY) {
-      break;
-    }
-    const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
-    if (pointNum === 0) {
-      canvasCtx.moveTo(freq * scaleX, y);
-    } else {
-      canvasCtx.lineTo(freq * scaleX, y);
-    }
-  }
-  canvasCtx.stroke();
+  const comparedSpectrumCount =  this._importedPSD.curvesCount();
 
-  const spectrumCount =  this._importedPSD.curvesCount();
-  for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
+  if (comparedSpectrumCount === 0) {  // Draw main spectrum curve when there are no spectrums comparison only
+    canvasCtx.beginPath();
+    canvasCtx.lineWidth = 1;
+    canvasCtx.strokeStyle = mainCurveColor;
+    for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
+      const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
+      if(freq > MAXIMAL_PLOTTED_FREQUENCY) {
+        break;
+      }
+      const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
+      if (pointNum === 0) {
+        canvasCtx.moveTo(freq * scaleX, y);
+      } else {
+        canvasCtx.lineTo(freq * scaleX, y);
+      }
+    }
+    canvasCtx.stroke();
+  }
+
+
+  for (let spectrumNum = 0;  spectrumNum < comparedSpectrumCount; spectrumNum++) {
     const curvesPoints = this._importedPSD.getCurve(spectrumNum).points;
 
     canvasCtx.beginPath();
@@ -398,7 +402,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   }
 
 //Legend draw
-  if (this._isFullScreen && spectrumCount > 0) {
+  if (this._isFullScreen && comparedSpectrumCount > 0) {
     this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD);
   }
 
@@ -1821,9 +1825,13 @@ GraphSpectrumPlot.removeImportedCurves = function() {
   }
 };
 
+GraphSpectrumPlot.isNewComparedCurve = function(name) {
+  return this._importedPSD.isNewCurve(name);
+}
+
 GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
   if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
-      this._importedPSD.isNewCurve(this._fftData.fieldName)) {
+      this.isNewComparedCurve(this._fftData.fieldName)) {
     const fftLength = this._fftData.fftLength;
     const frequencyStep = 0.5 * this._fftData.blackBoxRate / fftLength;
     const points = [];
@@ -1837,6 +1845,12 @@ GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
     this._importedPSD.addCurve(points, this._fftData.fieldName);
   }
 };
+
+GraphSpectrumPlot.removeComparedCurve = function(name) {
+  this._importedPSD.removeCurve(name);
+  if (this._importedPSD.curvesCount() == 1 && this._importedPSD.getCurve(0).name !== this._fftData.fieldName) {
+  }
+}
 
 GraphSpectrumPlot.isMultiSpectrum = function() {
   return !this._importedPSD.isEmpty();
