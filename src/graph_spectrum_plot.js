@@ -1813,10 +1813,10 @@ GraphSpectrumPlot.importCurvesFromCSV = function(files) {
 GraphSpectrumPlot.removeImportedCurves = function() {
   switch (this._spectrumType) {
     case SPECTRUM_TYPE.FREQUENCY:
-      this._importedSpectrums.removeCurves();
+      this._importedSpectrums.removeAllCurves();
       break;
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-      this._importedPSD.removeCurves();
+      this._importedPSD.removeAllCurves();
       break;
   }
 };

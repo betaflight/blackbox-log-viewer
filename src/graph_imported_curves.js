@@ -72,18 +72,52 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
+  const getCurveRange = function(points) {
+    let minX = Number.MAX_VALUE,
+        maxX = -Number.MAX_VALUE,
+        minY = Number.MAX_VALUE,
+        maxY = -Number.MAX_VALUE;
+    for (const point of points) {
+      minX = Math.min(point.x, minX);
+      maxX = Math.max(point.x, maxX);
+      minY = Math.min(point.y, minY);
+      maxY = Math.max(point.y, maxY);
+    }
+    return {
+      minX: minX,
+      maxX: maxX,
+      minY: minY,
+      maxY: maxY,
+    };
+  };
+
+  const computeGlobalCurvesRange = function () {
+    _that.minX = Number.MAX_VALUE;
+    _that.maxX = -Number.MAX_VALUE;
+    _that.minY = Number.MAX_VALUE;
+    _that.maxY = -Number.MAX_VALUE;
+    for (const curve of _curvesData) {
+      _that.minX = Math.min(curve.range.minX, _that.minX);
+      _that.maxX = Math.max(curve.range.maxX, _that.maxX);
+      _that.minY = Math.min(curve.range.minY, _that.minY);
+      _that.maxY = Math.max(curve.range.maxY, _that.maxY);
+    }
+  };
+
   this.addCurve = function(points, name) {
     if (this.curvesCount() < maxImportCount) {
+      const range = getCurveRange(points);
       _curvesData.push({
         name: name,
         points: points,
+        range: range,
       });
-      for (const point of points) {
-        this.minX = Math.min(point.x, this.minX);
-        this.maxX = Math.max(point.x, this.maxX);
-        this.minY = Math.min(point.y, this.minY);
-        this.maxY = Math.max(point.y, this.maxY);
-      }
+
+      this.minX = Math.min(range.minX, this.minX);
+      this.maxX = Math.max(range.maxX, this.maxX);
+      this.minY = Math.min(range.minY, this.minY);
+      this.maxY = Math.max(range.maxY, this.maxY);
+
       curvesChanged();
     }
   };
@@ -97,13 +131,21 @@ export function ImportedCurves(curvesChanged) {
     return true;
   };
 
-  this.removeCurves = function() {
+  this.removeAllCurves = function() {
     _curvesData.length = 0;
-    this.minX = Number.MAX_VALUE;
-    this.maxX = -Number.MAX_VALUE;
-    this.minY = Number.MAX_VALUE;
-    this.maxY = -Number.MAX_VALUE;
+    computeGlobalCurvesRange();
     curvesChanged();
+  };
+
+  this.removeCurve = function(name) {
+    for (let index = 0; index < _curvesData.length; index++) {
+      if (_curvesData[index].name === name) {
+        _curvesData.splice(index, 1);
+        computeGlobalCurvesRange();
+        curvesChanged();
+        break;
+      }
+    }
   };
 
   this.isFull = function() {
