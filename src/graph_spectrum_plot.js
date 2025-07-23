@@ -60,6 +60,7 @@ export const GraphSpectrumPlot = window.GraphSpectrumPlot || {
   _importedSpectrums: null,
   _importedPSD: null,
   curvesColors : [
+    "White",  // The first imported curve duplicates existing main curve, therefore it must have same white color
     "Blue",
     "Purple",
     "DeepPink",
@@ -217,6 +218,10 @@ GraphSpectrumPlot._drawGraph = function (canvasCtx) {
   }
 };
 
+GraphSpectrumPlot.getCurveColor = function (index) {
+  return this.curvesColors[index % this.curvesColors.length];
+};
+
 GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const HEIGHT = canvasCtx.canvas.height - MARGIN;
   const WIDTH = canvasCtx.canvas.width;
@@ -264,12 +269,12 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
   const scaleX = WIDTH / MAXIMAL_PLOTTED_FREQUENCY;
   const spectrumCount =  this._importedSpectrums.curvesCount();
   for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedSpectrums._curvesData[spectrumNum].points;
-    const pointsCount = curvesPonts.length;
+    const curvesPoints = this._importedSpectrums.getCurve(spectrumNum).points;
+    const pointsCount = curvesPoints.length;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
+    canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
     canvasCtx.moveTo(0, HEIGHT);
     const filterPointsCount = 200;
     for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
@@ -288,18 +293,18 @@ GraphSpectrumPlot._drawFrequencyGraph = function (canvasCtx) {
       }
       let middleValue = 0;
       for (let i = filterStartPoint; i < filterStopPoint; i++) {
-        middleValue += curvesPonts[i].y;
+        middleValue += curvesPoints[i].y;
       }
       middleValue /= filterPointsCount;
 
-      canvasCtx.lineTo(curvesPonts[pointNum].x * scaleX, HEIGHT - middleValue * fftScale);
+      canvasCtx.lineTo(curvesPoints[pointNum].x * scaleX, HEIGHT - middleValue * fftScale);
     }
     canvasCtx.stroke();
   }
 
 //Legend draw
   if (this._isFullScreen && spectrumCount > 0) {
-    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedSpectrums._curvesData);
+    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedSpectrums);
   }
 
   this._drawAxisLabel(
@@ -344,6 +349,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     max: maxY,
   };
 
+  const mainCurveColor = this.getCurveColor(0); // The main curve must have color like the first imported curves - White.
   const ticksCount = (maxY - minY) / dbStep;
   const pointsCount = this._fftData.fftLength;
   const scaleX = WIDTH / MAXIMAL_PLOTTED_FREQUENCY;
@@ -352,40 +358,52 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   canvasCtx.translate(LEFT, TOP);
   this._drawGradientBackground(canvasCtx, WIDTH, HEIGHT);
 
-  canvasCtx.beginPath();
-  canvasCtx.lineWidth = 1;
-  canvasCtx.strokeStyle = "white";
-  canvasCtx.moveTo(0, 0);
-  for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
-    const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
-    if(freq > MAXIMAL_PLOTTED_FREQUENCY) {
-      break;
-    }
-    const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
-    canvasCtx.lineTo(freq * scaleX, y);
-  }
-  canvasCtx.stroke();
+  const comparedSpectrumCount =  this._importedPSD.curvesCount();
 
-  const spectrumCount =  this._importedPSD.curvesCount();
-  for (let spectrumNum = 0;  spectrumNum < spectrumCount; spectrumNum++) {
-    const curvesPonts = this._importedPSD._curvesData[spectrumNum].points;
+  if (comparedSpectrumCount === 0) {  // Draw main spectrum curve when there are no spectrums comparison only
+    canvasCtx.beginPath();
+    canvasCtx.lineWidth = 1;
+    canvasCtx.strokeStyle = mainCurveColor;
+    for (let pointNum = 0; pointNum < pointsCount; pointNum++) {
+      const freq = this._fftData.blackBoxRate / 2 * pointNum / pointsCount;
+      if(freq > MAXIMAL_PLOTTED_FREQUENCY) {
+        break;
+      }
+      const y = HEIGHT - (this._fftData.fftOutput[pointNum] - minY) * scaleY;
+      if (pointNum === 0) {
+        canvasCtx.moveTo(freq * scaleX, y);
+      } else {
+        canvasCtx.lineTo(freq * scaleX, y);
+      }
+    }
+    canvasCtx.stroke();
+  }
+
+
+  for (let spectrumNum = 0;  spectrumNum < comparedSpectrumCount; spectrumNum++) {
+    const curvesPoints = this._importedPSD.getCurve(spectrumNum).points;
 
     canvasCtx.beginPath();
     canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = this.curvesColors[spectrumNum];
-    canvasCtx.moveTo(0, HEIGHT);
-    for (const point of curvesPonts) {
-      if(point.x > MAXIMAL_PLOTTED_FREQUENCY) {
+    canvasCtx.strokeStyle = this.getCurveColor(spectrumNum);
+    let isFirstPoint = true;
+    for (const point of curvesPoints) {
+      if (point.x > MAXIMAL_PLOTTED_FREQUENCY) {
         break;
       }
-      canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+      if (isFirstPoint) {
+        canvasCtx.moveTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+        isFirstPoint = false;
+      } else {
+        canvasCtx.lineTo(point.x * scaleX, HEIGHT - (point.y -  minY) * scaleY);
+      }
     }
     canvasCtx.stroke();
   }
 
 //Legend draw
-  if (this._isFullScreen && spectrumCount > 0) {
-    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD._curvesData);
+  if (this._isFullScreen && comparedSpectrumCount > 0) {
+    this._drawLegend(canvasCtx, WIDTH, HEIGHT, this._importedPSD);
   }
 
   this._drawAxisLabel(
@@ -431,16 +449,19 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
 };
 
 GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurves) {
-  if (!userSettings?.analyser_legend) {
+  const left = parseFloat(userSettings?.analyser_legend?.left);
+  const top = parseFloat(userSettings?.analyser_legend?.top);
+  const width = parseFloat(userSettings?.analyser_legend?.width);
+  if (!Number.isFinite(left) || !Number.isFinite(top) || !Number.isFinite(width)) {
     return;
   }
-  const spectrumCount =  importedCurves.length,
-    legendPosX = parseInt(userSettings.analyser_legend.left) / 100 * WIDTH,
-    legendPosY = parseInt(userSettings.analyser_legend.top) / 100 * HEIGHT,
+  const spectrumCount =  importedCurves.curvesCount(),
+    legendPosX = left / 100 * WIDTH,
+    legendPosY = top / 100 * HEIGHT,
     rowHeight = 16,
     padding = 4,
-    legendWidth = parseInt(userSettings.analyser_legend.width) / 100 * WIDTH,
-    legendHeight = spectrumCount * rowHeight + 3 * padding,
+    legendWidth = width / 100 * WIDTH,
+    legendHeight = spectrumCount * rowHeight + padding,
     legendArea = new Path2D();
 
   canvasCtx.save();
@@ -450,10 +471,11 @@ GraphSpectrumPlot._drawLegend = function (canvasCtx, WIDTH, HEIGHT, importedCurv
   canvasCtx.strokeRect(legendPosX, legendPosY, legendWidth, legendHeight);
   canvasCtx.font = `${this._drawingParams.fontSizeFrameLabelFullscreen}pt ${DEFAULT_FONT_FACE}`;
   canvasCtx.textAlign = "left";
+  canvasCtx.textBaseline = "middle"; // Ensure proper vertical centering
   for (let row = 0; row < spectrumCount; row++) {
-    const curvesName = importedCurves[row].name;
-    const Y = legendPosY + padding + rowHeight * (row + 1);
-    canvasCtx.strokeStyle = this.curvesColors[row];
+    const curvesName = importedCurves.getCurve(row).name;
+    const Y = legendPosY + padding + rowHeight * row + rowHeight / 2; // Center text vertically
+    canvasCtx.strokeStyle = this.getCurveColor(row);
     canvasCtx.strokeText(curvesName, legendPosX + padding, Y);
   }
   canvasCtx.restore();
@@ -1781,6 +1803,9 @@ GraphSpectrumPlot.importCurvesFromCSV = function(files) {
       this._importedSpectrums.importCurvesFromCSV(files);
       break;
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
+      if (this._importedPSD.curvesCount() === 0) {
+        this.addCurrentSpectrumIntoImport(); // Add current main spectrum to import for the first imported file to have same behavior like first Ctrl+Mouse click selection.
+      }
       this._importedPSD.importCurvesFromCSV(files);
       break;
     default:
@@ -1792,10 +1817,43 @@ GraphSpectrumPlot.importCurvesFromCSV = function(files) {
 GraphSpectrumPlot.removeImportedCurves = function() {
   switch (this._spectrumType) {
     case SPECTRUM_TYPE.FREQUENCY:
-      this._importedSpectrums.removeCurves();
+      this._importedSpectrums.removeAllCurves();
       break;
     case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-      this._importedPSD.removeCurves();
+      this._importedPSD.removeAllCurves();
       break;
   }
+};
+
+GraphSpectrumPlot.isNewComparedCurve = function(name) {
+  return this._importedPSD.isNewCurve(name);
+};
+
+GraphSpectrumPlot.addCurrentSpectrumIntoImport = function() {
+  if (this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
+      this.isNewComparedCurve(this._fftData.fieldName)) {
+    const fftLength = this._fftData.fftLength;
+    const frequencyStep = 0.5 * this._fftData.blackBoxRate / fftLength;
+    const points = [];
+    for (let index = 0; index < fftLength; index++) {
+      const frequency = frequencyStep * index;
+      points.push({
+        x: frequency,
+        y: this._fftData.fftOutput[index],
+      });
+    }
+    this._importedPSD.addCurve(points, this._fftData.fieldName);
+  }
+};
+
+GraphSpectrumPlot.removeComparedCurve = function(name) {
+  this._importedPSD.removeCurve(name);
+};
+
+GraphSpectrumPlot.isMultiSpectrum = function() {
+  return !this._importedPSD.isEmpty();
+};
+
+GraphSpectrumPlot.isImportedCurvesMaxCount = function() {
+  return this._importedPSD.isFull();
 };

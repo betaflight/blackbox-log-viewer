@@ -21,7 +21,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
-    fftData = null;
+    fftData = null,
+    addSpectrumForComparison = false;
 
   try {
     let isFullscreen = false;
@@ -45,6 +46,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       isFullscreen = size == true;
       GraphSpectrumPlot.setFullScreen(isFullscreen);
       that.resize();
+    };
+
+    this.prepareSpectrumForComparison = function () {
+      if (userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
+        addSpectrumForComparison = true;
+      }
     };
 
     this.setInTime = function (time) {
@@ -156,17 +163,38 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       }
     };
 
+    this.shouldAddCurrentSpectrumBeforeReload = function () {
+      return addSpectrumForComparison && fftData !== null && !this.isMultiSpectrum() && !dataReload;
+    };
+
     /* This function is called from the canvas drawing routines within grapher.js
            It is only used to record the current curve positions, collect the data and draw the
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Detect change of selected field.... reload and redraw required.
-      if (fftData == null || fieldIndex != fftData.fieldIndex || dataReload) {
+      const isMaxCountOfImportedPSD = GraphSpectrumPlot.isImportedCurvesMaxCount() && userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+      let shouldReload = fftData == null ||
+                         fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD || // Lock spectrum data reload while PSD curves import is full
+                         dataReload;
+
+      if (addSpectrumForComparison && !GraphSpectrumPlot.isNewComparedCurve(fieldName)) {
+        GraphSpectrumPlot.removeComparedCurve(fieldName);
+        addSpectrumForComparison = false;
+        shouldReload = false;   // Do not load if spectrum was deleted
+      }
+
+      if (shouldReload) {
+        if (this.shouldAddCurrentSpectrumBeforeReload()) {
+          GraphSpectrumPlot.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
+        }
         dataReload = false;
         dataLoad(fieldIndex, curve, fieldName);
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
-
+      if (addSpectrumForComparison) {
+        GraphSpectrumPlot.addCurrentSpectrumIntoImport();
+        addSpectrumForComparison = false;
+      }
       that.draw(); // draw the analyser on the canvas....
     };
 
@@ -354,6 +382,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
         const showSpectrumsComparisonPanel = optionSelected === SPECTRUM_TYPE.FREQUENCY || optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
         $("#spectrumComparison").css("visibility", (showSpectrumsComparisonPanel ? "visible" : "hidden"));
+
+        const showAddSpectrumButton = optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+        $("#btn-spectrum-add").toggle(showAddSpectrumButton);
       })
       .change();
 
@@ -436,6 +467,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           break;
       }
       return fileName;
+    };
+
+    this.isMultiSpectrum = function() {
+      return GraphSpectrumPlot.isMultiSpectrum();
     };
 
   } catch (e) {

@@ -961,9 +961,18 @@ function BlackboxLogViewer() {
     updateCanvasSize();
   }
 
-  function onLegendSelectionChange(toggleAnalizer) {
-    hasAnalyser = toggleAnalizer ? !hasAnalyser : true;
-    graph.setDrawAnalyser(hasAnalyser);
+  function onLegendSelectionChange(toggleAnalizer, ctrlKey) {
+    const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
+    if (toggleAnalizer) {
+      if (lockAnalyserHide) {
+        hasAnalyser = true; // Do not hide analyser when ctrlKey is pressed or it has many spectrums
+      } else {
+        hasAnalyser = !hasAnalyser; // Toggle the analyser state
+      }
+    } else {
+      hasAnalyser = true; // Default to true when toggleAnalizer is false
+    }
+    graph.setDrawAnalyser(hasAnalyser, ctrlKey);
     html.toggleClass("has-analyser", hasAnalyser);
     prefs.set("hasAnalyser", hasAnalyser);
     invalidateGraph();
@@ -1771,10 +1780,10 @@ function BlackboxLogViewer() {
 
         const exportDialog = new VideoExportDialog($("#dlgVideoExport"), function(newConfig) {
           videoConfig = newConfig;
-          
+
           prefs.set('videoConfig', newConfig);
         });
-  
+
         exportDialog.show(
           flightLog,
           {

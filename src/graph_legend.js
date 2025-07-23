@@ -101,10 +101,10 @@ export function GraphLegend(
           config.selectedGraphIndex = selectedGraphIndex;
           config.selectedFieldIndex = selectedFieldIndex;
           if (onNewSelectionChange) {
-            onNewSelectionChange();
+            onNewSelectionChange(false, e.ctrlKey);
           }
         } else {
-          onNewSelectionChange(true);
+          onNewSelectionChange(true, e.ctrlKey);
         }
       }
       e.preventDefault();
