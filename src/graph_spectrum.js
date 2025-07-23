@@ -164,7 +164,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.shouldAddCurrentSpectrumBeforeReload = function () {
-      return addSpectrumForComparison && fftData != null && !this.isMultiSpectrum() && !dataReload;
+      return addSpectrumForComparison && fftData !== null && !this.isMultiSpectrum() && !dataReload;
     };
 
     /* This function is called from the canvas drawing routines within grapher.js

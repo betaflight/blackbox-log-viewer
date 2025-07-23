@@ -1,5 +1,5 @@
 export function ImportedCurves(curvesChanged) {
-  const maxImportCount = 6;   // This value is limited by legends size and curves colors visibility. May be increased if needed by users
+  const MAX_IMPORT_COUNT = 6;   // This value is limited by legends size and curves colors visibility. May be increased if needed by users
   const _curvesData = [];
   const _that = this;
   this.minX = Number.MAX_VALUE;
@@ -20,7 +20,7 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.importCurvesFromCSV = function(files) {
-    let importsLeft = maxImportCount - _curvesData.length;
+    let importsLeft = MAX_IMPORT_COUNT - _curvesData.length;
 
     for (const file of files) {
       if (importsLeft-- == 0) {
@@ -105,7 +105,7 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.addCurve = function(points, name) {
-    if (this.curvesCount() < maxImportCount) {
+    if (this.curvesCount() < MAX_IMPORT_COUNT) {
       const range = getCurveRange(points);
       _curvesData.push({
         name: name,
@@ -149,7 +149,7 @@ export function ImportedCurves(curvesChanged) {
   };
 
   this.isFull = function() {
-    return this.curvesCount() === maxImportCount;
+    return this.curvesCount() === MAX_IMPORT_COUNT;
   };
 
   this.isEmpty = function() {
