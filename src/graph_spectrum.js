@@ -22,7 +22,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
     fftData = null,
-    addSpectrumToImport = false;
+    addSpectrumForComparison = false;
 
   try {
     let isFullscreen = false;
@@ -48,9 +48,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.resize();
     };
 
-    this.prepareSpectrumForImport = function () {
+    this.prepareSpectrumForComparison = function () {
       if (userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
-        addSpectrumToImport = true;
+        addSpectrumForComparison = true;
       }
     };
 
@@ -164,7 +164,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.shouldAddCurrentSpectrumBeforeReload = function () {
-      return addSpectrumToImport && fftData != null && !this.isMultiSpectrum() && !dataReload;
+      return addSpectrumForComparison && fftData != null && !this.isMultiSpectrum() && !dataReload;
     };
 
     /* This function is called from the canvas drawing routines within grapher.js
@@ -177,9 +177,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
                          fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD || // Lock spectrum data reload while PSD curves import is full
                          dataReload;
 
-      if (addSpectrumToImport && !GraphSpectrumPlot.isNewComparedCurve(fieldName)) {
+      if (addSpectrumForComparison && !GraphSpectrumPlot.isNewComparedCurve(fieldName)) {
         GraphSpectrumPlot.removeComparedCurve(fieldName);
-        addSpectrumToImport = false;
+        addSpectrumForComparison = false;
         shouldReload = false;   // Do not load if spectrum was deleted
       }
 
@@ -191,9 +191,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         dataLoad(fieldIndex, curve, fieldName);
         GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
       }
-      if (addSpectrumToImport) {
+      if (addSpectrumForComparison) {
         GraphSpectrumPlot.addCurrentSpectrumIntoImport();
-        addSpectrumToImport = false;
+        addSpectrumForComparison = false;
       }
       that.draw(); // draw the analyser on the canvas....
     };

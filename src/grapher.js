@@ -1243,7 +1243,7 @@ export function FlightLogGrapher(
   this.setDrawAnalyser = function (state, ctrlKey = false) {
     if (state) {
       if (ctrlKey) {
-        analyser.prepareSpectrumForImport();
+        analyser.prepareSpectrumForComparison();
       } else if (this.hasMultiSpectrumAnalyser()) {
         analyser.removeImportedSpectrums();     // Remove imported spectrums by simple mouse click at the any curves legend
       }
