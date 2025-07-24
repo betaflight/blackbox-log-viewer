@@ -122,7 +122,6 @@
 .user-settings-dialog input[type="number"]::-webkit-outer-spin-button
 {
   -webkit-appearance: auto !important;
-  -moz-appearance: auto !important;
   appearance: auto !important;
   opacity: 1 !important;
   height: auto !important;
