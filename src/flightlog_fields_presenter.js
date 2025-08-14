@@ -2313,7 +2313,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "FEEDFORWARD_LIMIT":
         switch (fieldName) {
           case "debug[0]": // jitter attenuator percent
-            return `${(value / 100).toFixed(2)} %`;
+            return `${value.toFixed(0)} %`;
           // case "debug[1]": max setpoint rate for the axis
           // case "debug[2]": setpoint
           // case "debug[3]": feedforward
