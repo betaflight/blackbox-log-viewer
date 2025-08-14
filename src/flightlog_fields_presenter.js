@@ -2766,9 +2766,8 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           // case "debug[2]": // setpoint cutoff Hz
           // case "debug[3]": // throttle cutoff Hz
           // case "debug[5]": // smoothed Rx Rate Hz, without steps
-          //  return `${value.toFixed(0)} Hz`;
           case "debug[4]": // Feedforward PT1K range 0-1000 show as 0.mmm
-=          return toFriendly ? value / 1000 : value * 1000;
+            return toFriendly ? value / 1000 : value * 1000;
           // debug 6 is outlier count 0-3
           // debug 7 is valid count 0-3
           default:
