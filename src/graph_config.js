@@ -603,7 +603,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 power: 1.0,
                 MinMax: {
                   min: 0,
-                  max: 20,
+                  max: 50, // put them at the very bottom
                 },
               };            
             default:
@@ -830,7 +830,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 power: 1.0,
                 MinMax: {
                   min: 0,
-                  max: 100,
+                  max: 1000,
                 },
               };
             case "debug[1]": // Max setpoint rate for axis
@@ -843,20 +843,13 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 },
               };
             case "debug[3]": // feedforward
-              return {
-                power: 1.0,
-                MinMax: {
-                  min: -50,
-                  max: 50,
-                },
-              };
             case "debug[4]": // setpoint speed unsmoothed
             case "debug[5]": // setpoint speed smoothed
               return {
                 power: 1.0,
                 MinMax: {
-                  min: -100,
-                  max: 100,
+                  min: -200,
+                  max: 200,
                 },
               };
             case "debug[6]": // pt1K 0-1
