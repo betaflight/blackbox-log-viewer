@@ -2089,8 +2089,8 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
                   max: 30,
                 },
               };
-            case "debug[2]" // IsRateValid boolean
-            case "debug[7]" // isReceivingSignal boolean
+            case "debug[2]": // IsRateValid boolean
+            case "debug[7]": // isReceivingSignal boolean
               return {
                 power: 1.0,
                 MinMax: {
@@ -2098,8 +2098,8 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
                   max: 10,
                 },
               };
-            case "debug[4]" // Rx Rate
-            case "debug[5]" // Smoothed Rx Rate
+            case "debug[4]": // Rx Rate
+            case "debug[5]": // Smoothed Rx Rate
               return {
                 power: 1.0,
                 MinMax: {
@@ -2107,7 +2107,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
                   max: 1200,
                 },
               };
-            case "debug[6]" // LQ
+            case "debug[6]": // LQ
               return {
                 power: 1.0,
                 MinMax: {
