@@ -2076,16 +2076,48 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         return `${(value / 10).toFixed(1)} °/s`;
       case "AC_ERROR":
         return `${(value / 10).toFixed(1)} °`;
-      case "RX_TIMING":
-        switch (fieldName) {
-          case "debug[0]": // Packet interval us/10
-          case "debug[3]": // Constrained packet interval us/10
-            return `${(value / 100).toFixed(2)} ms`;
-          case "debug[1]": // Packet time stamp us/100, divide by 10 to ms
-            return `${(value / 10).toFixed(2)} ms`;
-          default:
-            return value.toFixed(0);
-        }
+        case "RX_TIMING":
+          switch (fieldName) {
+            case "debug[0]": // interval in ms
+            case "debug[3]": // constrained interval in ms
+            case "debug[1]": // Frame time stamp us/100
+              return {
+                // start at bottom, scale up to 30ms
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 30,
+                },
+              };
+            case "debug[2]" // IsRateValid boolean
+            case "debug[7]" // isReceivingSignal boolean
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 10,
+                },
+              };
+            case "debug[4]" // Rx Rate
+            case "debug[5]" // Smoothed Rx Rate
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1200,
+                },
+              };
+            case "debug[6]" // LQ
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 100,
+                },
+              };
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
       case "GHST":
         switch (fieldName) {
           // debug 0 is CRC error count 0 to int16_t
