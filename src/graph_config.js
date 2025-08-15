@@ -965,17 +965,43 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "RX_TIMING":
           switch (fieldName) {
-            case "debug[0]": // CRC 0 to max int16_t
+            case "debug[0]": // interval in ms
+            case "debug[1]": // Frame time stamp us/100
+            case "debug[3]": // constrained interval in ms
               return {
-                // start at bottom, scale up to 20ms
+                // start at bottom, scale up to 30ms
                 power: 1.0,
                 MinMax: {
                   min: 0,
-                  max: 20,
+                  max: 30,
                 },
               };
-            // debug 1 is Count of Unknown Frames
-            // debug 2 and 3 not used
+            case "debug[2]" // IsRateValid boolean
+            case "debug[7]" // isReceivingSignal boolean
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 10,
+                },
+              };
+            case "debug[4]" // Rx Rate
+            case "debug[5]" // Smoothed Rx Rate
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1200,
+                },
+              };
+            case "debug[6]" // LQ
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 100,
+                },
+              };
             default:
               return getCurveForMinMaxFields(fieldName);
           }
