@@ -782,23 +782,23 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               return {
                 power: 1.0,
                 MinMax: {
-                  min: -1000,
-                  max: 1000,
+                  min: -200,
+                  max: 200,
                 },
               };
-            case "debug[3]": // rcCommand delta
+            case "debug[3]": // rcCommand deltaAbs
               return {
                 power: 1.0,
                 MinMax: {
-                  min: -10000,
-                  max: 10000,
+                  min: 0,
+                  max: 100,
                 },
               };
             case "debug[4]": // Jitter Attenuator
               return {
                 power: 1.0,
                 MinMax: {
-                  min: 0,
+                  min: -100,
                   max: 100,
                 },
               };
@@ -829,8 +829,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               return {
                 power: 1.0,
                 MinMax: {
-                  min: 0,
-                  max: 1000,
+                  min: -100,
+                  max: 100,
                 },
               };
             case "debug[1]": // Max setpoint rate for axis
