@@ -802,7 +802,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   max: 100,
                 },
               };
-            case "debug[5]" // Packet Duplicate boolean
+            case "debug[5]": // Packet Duplicate boolean
               return {
                 power: 1.0,
                 MinMax: {
@@ -810,8 +810,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   max: 10,
                 },
               };
-            case "debug[6]" // Yaw feedforward
-            case "debug[7]" // Yaw feedforward hold element
+            case "debug[6]": // Yaw feedforward
+            case "debug[7]": // Yaw feedforward hold element
               return {
                 power: 1.0,
                 MinMax: {
