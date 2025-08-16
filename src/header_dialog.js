@@ -623,7 +623,7 @@ export function HeaderDialog(dialog, onSave) {
       name: "rc_smoothing_active_cutoffs_ff",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "4.3.0",
-      max: "999.9.9",
+      max: "4.5.999",
     },
     {
       name: "rc_smoothing_active_cutoffs_sp",
@@ -1572,6 +1572,21 @@ export function HeaderDialog(dialog, onSave) {
 
     $(".dshot_bidir_required").toggle(sysConfig.dshot_bidir == 1);
 
+    // RC Smoothing
+    if (activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
+      if (semver.gte(activeSysConfig.firmwareVersion, "4.6.0")) {
+        $("#rcSmoothingFeedforwardHz").hide();
+        $("#rcSmoothingActiveCutoffsFf").hide();
+        setParameter("rcSmoothingActiveCutoffsSp", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
+        setParameter("rcSmoothingActiveCutoffsThr", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1], 0);
+      } else if (semver.gte(activeSysConfig.firmwareVersion, "4.3.0")) {
+        setParameter("rcSmoothingFeedforwardHz", sysConfig.rc_smoothing_feedforward_hz, 0);
+        setParameter("rcSmoothingActiveCutoffsFf", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
+        setParameter("rcSmoothingActiveCutoffsSp", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1], 0);
+        setParameter("rcSmoothingActiveCutoffsThr", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[2], 0);
+      }
+    }
+
     if (semver.gte(activeSysConfig.firmwareVersion, "4.5.0")) {
       setParameter("rcSmoothingRxSmoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
       $("#rcSmoothingRxSmoothed").show();
@@ -1598,11 +1613,6 @@ export function HeaderDialog(dialog, onSave) {
         RC_SMOOTHING_MODE
       );
       setParameter(
-        "rcSmoothingFeedforwardHz",
-        sysConfig.rc_smoothing_feedforward_hz,
-        0
-      );
-      setParameter(
         "rcSmoothingSetpointHz",
         sysConfig.rc_smoothing_setpoint_hz,
         0
@@ -1620,21 +1630,6 @@ export function HeaderDialog(dialog, onSave) {
       setParameter(
         "rcSmoothingAutoFactorThrottle",
         sysConfig.rc_smoothing_auto_factor_throttle,
-        0
-      );
-      setParameter(
-        "rcSmoothingActiveCutoffsFf",
-        sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0],
-        0
-      );
-      setParameter(
-        "rcSmoothingActiveCutoffsSp",
-        sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1],
-        0
-      );
-      setParameter(
-        "rcSmoothingActiveCutoffsThr",
-        sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[2],
         0
       );
     } else if (
