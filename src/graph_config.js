@@ -577,17 +577,35 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "RC_SMOOTHING":
           switch (fieldName) {
-            case "debug[0]": // raw RC command
+            case "debug[0]": // current Rx Rate Hz
+            case "debug[1]": // smoothed but stepped Rx Rate Hz
+            case "debug[2]": // setpoint cutoff Hz
+            case "debug[3]": // throttle cutoff Hz
+            case "debug[5]": // smoothed Rx Rate Hz, without steps
               return {
                 power: 1.0,
                 MinMax: {
-                  min: 1000,
-                  max: 2000 * gyroScaleMargin,
+                  min: 0,
+                  max: 1200,
                 },
               };
-            case "debug[1]": // raw RC command derivative
-            case "debug[2]": // smoothed RC command derivative
-              return getCurveForMinMaxFieldsZeroOffset("debug[1]", "debug[2]");
+            case "debug[4]": // pt1K 0-1
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1,
+                },
+              };            
+            case "debug[6]": // outlier count 0-3
+            case "debug[7]": // valid count 0-3
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 50, // put them at the very bottom
+                },
+              };            
             default:
               return getCurveForMinMaxFields(fieldName);
           }
@@ -751,7 +769,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "FEEDFORWARD": // replaces FF_INTERPOLATED in 4.3
           switch (fieldName) {
-            case "debug[0]": // in 4.3 is interpolated setpoint
+            case "debug[0]": // in 4.3 is interpolated setpoint, now un-smoothed setpoint
               return {
                 power: 1.0,
                 MinMax: {
@@ -764,16 +782,41 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               return {
                 power: 1.0,
                 MinMax: {
-                  min: -1000,
-                  max: 1000,
+                  min: -200,
+                  max: 200,
                 },
               };
-            case "debug[3]": // rcCommand delta
+            case "debug[3]": // rcCommand deltaAbs
               return {
                 power: 1.0,
                 MinMax: {
-                  min: -10000,
-                  max: 10000,
+                  min: 0,
+                  max: 100,
+                },
+              };
+            case "debug[4]": // Jitter Attenuator
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -100,
+                  max: 100,
+                },
+              };
+            case "debug[5]": // Packet Duplicate boolean
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 10,
+                },
+              };
+            case "debug[6]": // Yaw feedforward
+            case "debug[7]": // Yaw feedforward hold element
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -200,
+                  max: 200,
                 },
               };
             default:
@@ -781,13 +824,53 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "FF_LIMIT":
         case "FEEDFORWARD_LIMIT":
-          return {
-            power: 1.0,
-            MinMax: {
-              min: -300,
-              max: 300,
-            },
-          };
+          switch (fieldName) {
+            case "debug[0]": // Jitter Attenuator
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -100,
+                  max: 100,
+                },
+              };
+            case "debug[1]": // Max setpoint rate for axis
+            case "debug[2]": // Setpoint
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -maxDegreesSecond(gyroScaleMargin),
+                  max: maxDegreesSecond(gyroScaleMargin),
+                },
+              };
+            case "debug[3]": // feedforward
+            case "debug[4]": // setpoint speed unsmoothed
+            case "debug[5]": // setpoint speed smoothed
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: -200,
+                  max: 200,
+                },
+              };
+            case "debug[6]": // pt1K 0-1
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1,
+                },
+              };            
+            case "debug[7]": // smoothed Rx Rate Hz
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1200,
+                },
+              };            
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
         case "BARO":
           switch (fieldName) {
             case "debug[0]": // Baro state 0-10
@@ -875,17 +958,43 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "RX_TIMING":
           switch (fieldName) {
-            case "debug[0]": // CRC 0 to max int16_t
+            case "debug[0]": // interval in ms
+            case "debug[1]": // Frame time stamp us/100
+            case "debug[3]": // constrained interval in ms
               return {
-                // start at bottom, scale up to 20ms
+                // start at bottom, scale up to 30ms
                 power: 1.0,
                 MinMax: {
                   min: 0,
-                  max: 20,
+                  max: 30,
                 },
               };
-            // debug 1 is Count of Unknown Frames
-            // debug 2 and 3 not used
+            case "debug[2]": // IsRateValid boolean
+            case "debug[7]": // isReceivingSignal boolean
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 10,
+                },
+              };
+            case "debug[4]": // Rx Rate
+            case "debug[5]": // Smoothed Rx Rate
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1200,
+                },
+              };
+            case "debug[6]": // LQ
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 100,
+                },
+              };
             default:
               return getCurveForMinMaxFields(fieldName);
           }

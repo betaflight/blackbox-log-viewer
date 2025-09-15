@@ -1441,6 +1441,50 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         'debug[6]': 'pidD',
         'debug[7]': 'pidA',
       };
+    DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
+        "debug[all]": "Feedforward [debug_axis]",
+        "debug[0]": "Setpoint, un-smoothed",
+        "debug[1]": "Delta, smoothed",
+        "debug[2]": "Boost, smoothed",
+        "debug[3]": "rcCommand Delta",
+        "debug[4]": "Jitter Attenuator",
+        "debug[5]": "Duplicate Flag",
+        "debug[6]": "Yaw FF BaseAmt",
+        "debug[7]": "Yaw FF HoldAmt",
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD_LIMIT = {
+        "debug[all]": "Feedforward Limit",
+        "debug[0]": "Jitter Attenuator",
+        "debug[1]": "MaxRcRate [debugAxis]",
+        "debug[2]": "Setpoint",
+        "debug[3]": "Feedforward",
+        "debug[4]": "Setpoint Speed",
+        "debug[5]": "Setpoint Speed Smoothed",
+        "debug[6]": "FF PT1K",
+        "debug[7]": "Rx Rate",
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.RX_TIMING = {
+        "debug[all]": "Receiver Timing",
+        "debug[0]": "Frame Interval",
+        "debug[1]": "Frame TimeStamp",
+        "debug[2]": "Is Rate Valid",
+        "debug[3]": "Interval Constrained",
+        "debug[4]": "Rx Rate",
+        "debug[5]": "Smoothed Rx Rate",
+        "debug[6]": "LQ Percent",
+        "debug[7]": "Is Receiving Signal",
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.RC_SMOOTHING = {
+        "debug[all]": "Debug RC Smoothing",
+        "debug[0]": "Rx Rate Current",
+        "debug[1]": "Rx Rate For Cutoffs",
+        "debug[2]": "Cutoff Hz",
+        "debug[3]": "Throttle Cutoff Hz",
+        "debug[4]": "FF Smoothing PT1K",
+        "debug[5]": "Smoothed Rx Rate",
+        "debug[6]": "Outlier Count",
+        "debug[7]": "Valid Count",
+      };
     }
   }
 };
@@ -1967,18 +2011,26 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         }
       case "RC_SMOOTHING":
         switch (fieldName) {
-          case "debug[0]":
-            return `${(value + 1500).toFixed(0)} us`;
-          case "debug[3]": // rx frame rate [us]
-            return `${(value / 1000).toFixed(1)} ms`;
+          case "debug[0]": // current Rx Rate Hz
+          case "debug[1]": // smoothed but stepped Rx Rate Hz
+          case "debug[2]": // setpoint cutoff Hz
+          case "debug[3]": // throttle cutoff Hz
+          case "debug[5]": // smoothed Rx Rate Hz, without steps
+            return `${value.toFixed(0)} Hz`;
+          case "debug[4]": // Feedforward PT1k range 0-1000 show as 0.nnn
+            return `${(value / 1000).toFixed(3)}`;
+          // debug 6 is outlier count 0-3
+          // debug 7 is valid count 0-3
           default:
             return value.toFixed(0);
         }
       case "RC_SMOOTHING_RATE":
         switch (fieldName) {
-          case "debug[0]": // current frame rate [us]
-          case "debug[2]": // average frame rate [us]
+          case "debug[0]": // current Rx Interval [us]
             return `${(value / 1000).toFixed(2)} ms`;
+          case "debug[2]": // smoothed Rx Rate [Hz]
+            return `${value.toFixed(0)} Hz`;
+          // case "debug[3]": // flag to update smoothing
           default:
             return value.toFixed(0);
         }
@@ -2026,9 +2078,17 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         return `${(value / 10).toFixed(1)} °`;
       case "RX_TIMING":
         switch (fieldName) {
-          case "debug[0]": // Frame delta us/10
-          case "debug[1]": // Frame age us/10
+          case "debug[0]": // Packet interval us/10
+          case "debug[3]": // Constrained packet interval us/10
             return `${(value / 100).toFixed(2)} ms`;
+          case "debug[1]": // Packet time stamp us/100, divide by 10 to ms
+            return `${(value / 10).toFixed(1)} ms`;
+          case "debug[4]": // Rx Rate Hz
+          case "debug[5]": // Smoothed Rx RateHz
+            return `${value.toFixed(0)} Hz`;
+          case "debug[6]": // LQ Percent
+          case "debug[2]": // isRateValid boolean
+          case "debug[7]": // Is Receiving Signal boolean
           default:
             return value.toFixed(0);
         }
@@ -2238,6 +2298,39 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             return `${(value / 10).toFixed(1)} m/s`;
           default:
             return value.toFixed(1);
+        }
+      case "FEEDFORWARD":
+        switch (fieldName) {
+          case "debug[0]": // setpoint
+            return `${value.toFixed(0)} °/s`;
+          case "debug[1]": // setpoint speed
+            return `${value.toFixed(0)} °/s/s`;
+          // case "debug[2]": feedforward boost
+          case "debug[3]": // rcCommand Delta integer * 10
+            return `${(value / 10).toFixed(1)}`;
+          case "debug[4]": // jitter attenuator percent
+            return `${value.toFixed(0)} %`;
+          // case "debug[5]": boolean packet duplicate
+          // case "debug[6]": yaw feedforward
+          // case "debug[7]": yaw feedforward hold element
+          default:
+            return value.toFixed(0);
+        }
+      case "FEEDFORWARD_LIMIT":
+        switch (fieldName) {
+          case "debug[0]": // jitter attenuator percent
+            return `${value.toFixed(0)} %`;
+          // case "debug[1]": max setpoint rate for the axis
+          // case "debug[2]": setpoint
+          // case "debug[3]": feedforward
+          // case "debug[4]": setpoint speed un-smoothed
+          // case "debug[5]": setpoint speed smoothed
+          case "debug[6]": // feedforward smoothing PT1K * 1000
+            return `${(value / 1000).toFixed(3)}`;
+          case "debug[7]":   // smoothed RxRateHz
+            return `${value.toFixed(0)} Hz`;
+          default:
+            return value.toFixed(0);
         }
     }
     return value.toFixed(0);
@@ -2674,18 +2767,24 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         }
       case "RC_SMOOTHING":
         switch (fieldName) {
-          case "debug[0]":
-            return toFriendly ? value + 1500 : value - 1500; // us
-          case "debug[3]": // rx frame rate [us]
-            return toFriendly ? value / 1000 : value * 1000; //  ms
+          // case "debug[0]": // current Rx Rate Hz
+          // case "debug[1]": // smoothed but stepped Rx Rate Hz
+          // case "debug[2]": // setpoint cutoff Hz
+          // case "debug[3]": // throttle cutoff Hz
+          // case "debug[5]": // smoothed Rx Rate Hz, without steps
+          case "debug[4]": // Feedforward PT1K range 0-1000 show as 0.mmm
+            return toFriendly ? value / 1000 : value * 1000;
+          // debug 6 is outlier count 0-3
+          // debug 7 is valid count 0-3
           default:
             return value;
         }
       case "RC_SMOOTHING_RATE":
         switch (fieldName) {
           case "debug[0]": // current frame rate [us]
-          case "debug[2]": // average frame rate [us]
             return toFriendly ? value / 1000 : value * 1000; // ms
+          case "debug[2]": // smoothed RxRate [Hz]
+          case "debug[3]": // boolean indicating need to update smoothing
           default:
             return value;
         }
@@ -2728,9 +2827,16 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         return toFriendly ? value / 10 : value * 10; // °
       case "RX_TIMING":
         switch (fieldName) {
-          case "debug[0]": // Frame delta us/10
-          case "debug[1]": // Frame age us/10
+          case "debug[0]": // packet interval in hundredths of ms
+          case "debug[3]": // constrained packet interval in hundredths of ms
             return toFriendly ? value / 100 : value * 100; //ms
+          case "debug[1]": // Frame time stamp us/100
+            return toFriendly ? value / 10 : value * 10; //ms
+          // debug 2 is isRateValid boolean
+          // debug 4 is current Rx Rate, Hz
+          // debug 5 is smoothed Rx Rate, Hz
+          // debug 6 is link quality
+          // debug 7 is isReceivingSignal boolean
           default:
             return value;
         }
@@ -2935,6 +3041,34 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           case "debug[2]":
           case "debug[4]":
             return toFriendly ? value / 10 : value * 10;
+          default:
+            return value;
+        }
+      case "FEEDFORWARD":
+        switch (fieldName) {
+          // case "debug[0]": // setpoint
+          // case "debug[1]": // setpoint speed
+          // case "debug[2]": //feedforward boost
+          case "debug[3]":    // rcCommand Delta integer * 10
+            return toFriendly ? value / 10 : value * 10;
+          // case "debug[4]": // jitter attenuator percent
+          // case "debug[5]": // boolean indicating packet duplicate
+          // case "debug[6]": // yaw feedforward
+          // case "debug[7]": // yaw feedforward hold element
+          default:
+            return value;
+        }
+      case "FEEDFORWARD_LIMIT":
+        switch (fieldName) {
+          // case "debug[0]": // jitter attenuator percent
+          // case "debug[1]": // max setpoint rate for the axis
+          // case "debug[2]": // setpoint
+          // case "debug[3]": // feedforward
+          // case "debug[4]": // setpoint speed un-smoothed
+          // case "debug[5]": // setpoint speed smoothed
+          case "debug[6]": //feedforward smoothing PT1K * 1000 show as 0.nnn
+            return toFriendly ? value / 1000 : value * 1000;
+          // case "debug[7]": // smoothed RxRateHz
           default:
             return value;
         }
