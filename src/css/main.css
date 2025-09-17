@@ -678,11 +678,13 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser input#analyserZoomY {
-  width: 10px;
-  height: 100px;
-  -webkit-appearance: slider-vertical;
+  width: 100px;
+  height: 10px;
   left: 1085px;
-  top: 30px;
+  top: 130px;
+  float: right;
+  transform: rotate(-90deg);
+  transform-origin: left top;
 }
 
 .analyser input#analyserMinPSD::-webkit-inner-spin-button,
