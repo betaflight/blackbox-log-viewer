@@ -683,7 +683,7 @@ html.has-analyser-fullscreen.has-analyser
   left: 1085px;
   top: 130px;
   float: right;
-  transform: rotate(-90grad);
+  transform: rotate(-90deg);
   transform-origin: left top;
 }
 
