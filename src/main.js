@@ -2582,3 +2582,6 @@ $(document).click(function (e) {
 $(document).off(".data-api");
 
 globalThis.blackboxLogViewer = new BlackboxLogViewer();
+if (typeof window !== "undefined") {
+  window.blackboxLogViewer = globalThis.blackboxLogViewer;
+}
