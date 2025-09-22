@@ -2095,7 +2095,7 @@ function BlackboxLogViewer() {
       }
     });
 
-    $(document).on("mousewheel", function (e) {
+    $(document).on("wheel", function (e) {
       if ($(e.target).hasClass("no-wheel")) {
         // prevent mousewheel scrolling on non scrollable elements.
         e.preventDefault();
