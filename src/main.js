@@ -1885,11 +1885,12 @@ function BlackboxLogViewer() {
         const gi = Number.parseInt(graph, 10);
         const fi = Number.parseInt(field, 10);
         // restore single pen
-        if (graphConfig[gi].fields[fi].default != null) {
-          graphConfig[gi].fields[fi].smoothing = graphConfig[gi].fields[fi].default.smoothing;
-          graphConfig[gi].fields[fi].curve.power = graphConfig[gi].fields[fi].default.power;
-          return "<h4>Restored defaults for single pen</h4>";
-        } else return false;
+        if (graphConfig[gi].fields[fi].default == null) {
+          return false; // no defaults stored
+        }
+        graphConfig[gi].fields[fi].smoothing = graphConfig[gi].fields[fi].default.smoothing;
+        graphConfig[gi].fields[fi].curve.power = graphConfig[gi].fields[fi].default.power;
+        return "<h4>Restored defaults for single pen</h4>";
       }
       return false; // nothing was changed
     }
@@ -2314,10 +2315,8 @@ function BlackboxLogViewer() {
                     } else {
                       bookmarkTimes[e.which - 48] = null; // clear the bookmark
                     }
-                    $(`.bookmark-${e.which - 48}`, statusBar).css(
-                      "visibility",
-                      bookmarkTimes[e.which - 48] === null ? "hidden" : "visible"
-                    );
+                    $(`.bookmark-${e.which - 48}`, statusBar)
+                      .css("visibility", bookmarkTimes[e.which - 48] === null ? "hidden" : "visible");
                     let countBookmarks = 0;
                     for (let i = 0; i <= 9; i++) {
                       countBookmarks += bookmarkTimes[i] === null ? 0 : 1;
