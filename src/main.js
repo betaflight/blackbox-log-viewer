@@ -2316,10 +2316,10 @@ function BlackboxLogViewer() {
                       bookmarkTimes[e.which - 48] = null; // clear the bookmark
                     }
                     $(`.bookmark-${e.which - 48}`, statusBar)
-                      .css("visibility", bookmarkTimes[e.which - 48] === null ? "hidden" : "visible");
+                      .css("visibility", bookmarkTimes[e.which - 48] == null ? "hidden" : "visible");
                     let countBookmarks = 0;
-                    for (let i = 0; i <= 9; i++) {
-                      countBookmarks += bookmarkTimes[i] === null ? 0 : 1;
+                    for (let i = 0; i < 10; i++) {
+                      countBookmarks += bookmarkTimes[i] == null ? 0 : 1;
                     }
                     $(".bookmark-clear", statusBar).css(
                       "visibility",
