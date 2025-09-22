@@ -438,7 +438,7 @@ function BlackboxLogViewer() {
     );
     if (logCount > 1) {
       logIndexPicker.change(function () {
-        selectLog(parseInt($(this).val(), 10));
+        selectLog(Number.parseInt($(this).val(), 10));
         if (graph) {
           hasAnalyserFullscreen
             ? html.addClass("has-analyser-fullscreen")
@@ -1714,7 +1714,7 @@ function BlackboxLogViewer() {
       // Loop through all the bookmarks.
       $(`.bookmark-${i}`, statusBar).click(function () {
         setCurrentBlackboxTime(
-          bookmarkTimes[parseInt(this.className.slice(-1))]
+          bookmarkTimes[Number.parseInt(this.className.slice(-1))]
         );
         invalidateGraph();
       });
@@ -1837,7 +1837,7 @@ function BlackboxLogViewer() {
 
       if (graph != null && field == null) {
         // save ALL pens within group
-        for (const configField of graphConfig[parseInt(graph)].fields) {
+        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
           if (configField.default == null) {
             configField.default = [];
             configField.default.smoothing = configField.smoothing;
@@ -1849,15 +1849,15 @@ function BlackboxLogViewer() {
       if (graph != null && field != null) {
         // restore single pen
         if (
-          graphConfig[parseInt(graph)].fields[parseInt(field)].default == null
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default == null
         ) {
-          graphConfig[parseInt(graph)].fields[parseInt(field)].default = [];
-          graphConfig[parseInt(graph)].fields[
-            parseInt(field)
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default = [];
+          graphConfig[Number.parseInt(graph)].fields[
+            Number.parseInt(field)
           ].default.smoothing =
-            graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing;
-          graphConfig[parseInt(graph)].fields[parseInt(field)].default.power =
-            graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power;
+            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing;
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default.power =
+            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power;
           return "<h4>Stored defaults for single pen</h4>";
         }
       }
@@ -1875,7 +1875,7 @@ function BlackboxLogViewer() {
 
       if (graph != null && field == null) {
         // restore ALL pens within group
-        for (const configField of graphConfig[parseInt(graph)].fields) {
+        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
           if (configField.default != null) {
             configField.smoothing = configField.default.smoothing;
             configField.curve.power = configField.default.power;
@@ -1886,14 +1886,14 @@ function BlackboxLogViewer() {
       if (graph != null && field != null) {
         // restore single pen
         if (
-          graphConfig[parseInt(graph)].fields[parseInt(field)].default != null
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default != null
         ) {
-          graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing =
-            graphConfig[parseInt(graph)].fields[
-              parseInt(field)
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing =
+            graphConfig[Number.parseInt(graph)].fields[
+              Number.parseInt(field)
             ].default.smoothing;
-          graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power =
-            graphConfig[parseInt(graph)].fields[parseInt(field)].default.power;
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power =
+            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default.power;
           return "<h4>Restored defaults for single pen</h4>";
         } else return false;
       }
@@ -1918,7 +1918,7 @@ function BlackboxLogViewer() {
       let changedValue = "<h4>Smoothing</h4>";
       if (graph != null && field == null) {
         // change ALL pens within group
-        for (const configField of graphConfig[parseInt(graph)].fields) {
+        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
           configField.smoothing += delta ? -scroll : +scroll;
           configField.smoothing = constrain(
             configField.smoothing,
@@ -1933,20 +1933,20 @@ function BlackboxLogViewer() {
       }
       if (graph != null && field != null) {
         // change single pen
-        graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing += delta
+        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing += delta
           ? -scroll
           : +scroll;
-        graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing =
+        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing =
           constrain(
-            graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing,
+            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing,
             range.min,
             range.max
           );
         return `${
           changedValue +
-          graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].friendlyName
         } ${(
-          graphConfig[parseInt(graph)].fields[parseInt(field)].smoothing / 100
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing / 100
         ).toFixed(2)}%\n`;
       }
       return false; // nothing was changed
@@ -1969,7 +1969,7 @@ function BlackboxLogViewer() {
       if (graph != null && field == null) {
         // change ALL pens within group
         changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
-        for (const configField of graphConfig[parseInt(graph)].fields) {
+        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
           configField.curve.MinMax.min *= delta ? zoomScaleOut : zoomScaleIn;
           configField.curve.MinMax.max *= delta ? zoomScaleOut : zoomScaleIn;
           changedValue += `${configField.friendlyName}\n`;
@@ -1978,15 +1978,15 @@ function BlackboxLogViewer() {
       }
       if (graph != null && field != null) {
         // change single pen
-        graphConfig[parseInt(graph)].fields[field].curve.MinMax.min *= delta
+        graphConfig[Number.parseInt(graph)].fields[field].curve.MinMax.min *= delta
           ? zoomScaleOut
           : zoomScaleIn;
-        graphConfig[parseInt(graph)].fields[field].curve.MinMax.max *= delta
+        graphConfig[Number.parseInt(graph)].fields[field].curve.MinMax.max *= delta
           ? zoomScaleOut
           : zoomScaleIn;
         changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
         changedValue += `${
-          graphConfig[parseInt(graph)].fields[field].friendlyName
+          graphConfig[Number.parseInt(graph)].fields[field].friendlyName
         }\n`;
         return changedValue;
       }
@@ -2011,7 +2011,7 @@ function BlackboxLogViewer() {
       let changedValue = "<h4>Expo</h4>";
       if (graph != null && field == null) {
         // change ALL pens within group
-        for (const configField of graphConfig[parseInt(graph)].fields) {
+        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
           configField.curve.power += delta ? -scroll : +scroll;
           configField.curve.power = constrain(
             configField.curve.power,
@@ -2026,19 +2026,19 @@ function BlackboxLogViewer() {
       }
       if (graph != null && field != null) {
         // change single pen
-        graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power +=
+        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power +=
           delta ? -scroll : +scroll;
-        graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power =
+        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power =
           constrain(
-            graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power,
+            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power,
             range.min,
             range.max
           );
         return `${
           changedValue +
-          graphConfig[parseInt(graph)].fields[parseInt(field)].friendlyName
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].friendlyName
         } ${(
-          graphConfig[parseInt(graph)].fields[parseInt(field)].curve.power * 100
+          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power * 100
         ).toFixed(2)}%\n`;
       }
       return false; // nothing was changed
@@ -2110,14 +2110,14 @@ function BlackboxLogViewer() {
             if (delta < 0) {
               // scroll down (or left)
               if (e.altKey || e.shiftKey) {
-                setGraphZoom(graphZoom - 10.0 - (e.altKey ? 15.0 : 0.0), true);
+                setGraphZoom(graphZoom - 10 - (e.altKey ? 15 : 0), true);
               } else {
                 logJumpBack(0.1 /*10%*/);
               }
             } else {
               // scroll up or right
               if (e.altKey || e.shiftKey) {
-                setGraphZoom(graphZoom + 10.0 + (e.altKey ? 15.0 : 0.0), true);
+                setGraphZoom(graphZoom + 10 + (e.altKey ? 15 : 0), true);
               } else {
                 logJumpForward(0.1 /*10%*/);
               }
@@ -2198,7 +2198,7 @@ function BlackboxLogViewer() {
         $(e.target).parents(".modal").length == 0
       ) {
         switch (e.which) {
-          case "I".charCodeAt(0):
+          case "I".codePointAt(0):
             if (!shifted) {
               if (videoExportInTime === currentBlackboxTime) {
                 setVideoInTime(false);
@@ -2209,7 +2209,7 @@ function BlackboxLogViewer() {
 
             e.preventDefault();
             break;
-          case "O".charCodeAt(0):
+          case "O".codePointAt(0):
             if (!shifted) {
               if (videoExportOutTime === currentBlackboxTime) {
                 setVideoOutTime(false);
@@ -2219,7 +2219,7 @@ function BlackboxLogViewer() {
             }
             e.preventDefault();
             break;
-          case "M".charCodeAt(0):
+          case "M".codePointAt(0):
             if (e.altKey) {
               // adjust the video sync offset and remove marker
               logSmartSync();
@@ -2235,7 +2235,7 @@ function BlackboxLogViewer() {
             e.preventDefault();
             break;
 
-          case "C".charCodeAt(0):
+          case "C".codePointAt(0):
             if (!shifted) {
               showValueTable(false); // hide the values table if shown
               showConfigFile(); // toggle the config file popup
@@ -2243,7 +2243,7 @@ function BlackboxLogViewer() {
             }
             break;
 
-          case "A".charCodeAt(0):
+          case "A".codePointAt(0):
             if (!shifted) {
               if (activeGraphConfig.selectedFieldName != null) {
                 hasAnalyser = !hasAnalyser;
@@ -2266,14 +2266,14 @@ function BlackboxLogViewer() {
             }
             break;
 
-          case "H".charCodeAt(0):
+          case "H".codePointAt(0):
             if (!shifted) {
               headerDialog.show(flightLog.getSysConfig());
               e.preventDefault();
             }
             break;
 
-          case "T".charCodeAt(0):
+          case "T".codePointAt(0):
             if (!shifted) {
               showValueTable();
               showConfigFile(false); // hide the config file (if shown)
@@ -2283,16 +2283,16 @@ function BlackboxLogViewer() {
             break;
 
           // Workspace shortcuts
-          case "0".charCodeAt(0):
-          case "1".charCodeAt(0):
-          case "2".charCodeAt(0):
-          case "3".charCodeAt(0):
-          case "4".charCodeAt(0):
-          case "5".charCodeAt(0):
-          case "6".charCodeAt(0):
-          case "7".charCodeAt(0):
-          case "8".charCodeAt(0):
-          case "9".charCodeAt(0):
+          case "0".codePointAt(0):
+          case "1".codePointAt(0):
+          case "2".codePointAt(0):
+          case "3".codePointAt(0):
+          case "4".codePointAt(0):
+          case "5".codePointAt(0):
+          case "6".codePointAt(0):
+          case "7".codePointAt(0):
+          case "8".codePointAt(0):
+          case "9".codePointAt(0):
             try {
               if (!e.altKey) {
                 // Workspaces feature
@@ -2339,11 +2339,11 @@ function BlackboxLogViewer() {
                     }
                     $(`.bookmark-${e.which - 48}`, statusBar).css(
                       "visibility",
-                      bookmarkTimes[e.which - 48] != null ? "visible" : "hidden"
+                      bookmarkTimes[e.which - 48] === null ? "hidden" : "visible"
                     );
                     let countBookmarks = 0;
                     for (let i = 0; i <= 9; i++) {
-                      countBookmarks += bookmarkTimes[i] != null ? 1 : 0;
+                      countBookmarks += bookmarkTimes[i] === null ? 0 : 1;
                     }
                     $(".bookmark-clear", statusBar).css(
                       "visibility",
@@ -2358,12 +2358,12 @@ function BlackboxLogViewer() {
             }
             e.preventDefault();
             break;
-          case "W".charCodeAt(0):
+          case "W".codePointAt(0):
             if (e.shiftKey) {
               workspaceMenu.show();
             }
             break;
-          case "Z".charCodeAt(0): // Ctrl-Z key to toggle between last graph config and current one - undo
+          case "Z".codePointAt(0): // Ctrl-Z key to toggle between last graph config and current one - undo
             try {
               if (e.ctrlKey) {
                 if (lastGraphConfig != null) {
@@ -2380,7 +2380,7 @@ function BlackboxLogViewer() {
             e.preventDefault();
             break;
 
-          case "S".charCodeAt(0): // S key to toggle between last graph smooth and none
+          case "S".codePointAt(0): // S key to toggle between last graph smooth and none
             try {
               if (!shifted) {
                 toggleOverrideStatus(
@@ -2402,7 +2402,7 @@ function BlackboxLogViewer() {
             e.preventDefault();
             break;
 
-          case "X".charCodeAt(0): // S key to toggle between last graph smooth and none
+          case "X".codePointAt(0): // S key to toggle between last graph smooth and none
             try {
               if (!shifted) {
                 toggleOverrideStatus("graphExpoOverride", "has-expo-override");
@@ -2414,7 +2414,7 @@ function BlackboxLogViewer() {
             e.preventDefault();
             break;
 
-          case "G".charCodeAt(0): // S key to toggle between last graph smooth and none
+          case "G".codePointAt(0): // S key to toggle between last graph smooth and none
             try {
               if (!shifted) {
                 toggleOverrideStatus("graphGridOverride", "has-grid-override");
@@ -2427,13 +2427,13 @@ function BlackboxLogViewer() {
             break;
 
           // Toolbar shortcuts
-          case " ".charCodeAt(0): // start/stop playback
+          case " ".codePointAt(0): // start/stop playback
             logPlayPause();
             e.preventDefault();
             break;
           case 37: // left arrow (normal scroll, shifted zoom out)
             if (e.shiftKey) {
-              setGraphZoom(graphZoom - 10.0 - (e.altKey ? 15.0 : 0.0), true);
+              setGraphZoom(graphZoom - 10 - (e.altKey ? 15 : 0), true);
             } else {
               logJumpBack(null, e.altKey);
             }
@@ -2441,7 +2441,7 @@ function BlackboxLogViewer() {
             break;
           case 39: // right arrow (normal scroll, shifted zoom in)
             if (e.shiftKey) {
-              setGraphZoom(graphZoom + 10.0 + (e.altKey ? 15.0 : 0.0), true);
+              setGraphZoom(graphZoom + 10 + (e.altKey ? 15 : 0), true);
             } else {
               logJumpForward(null, e.altKey);
             }
@@ -2478,7 +2478,7 @@ function BlackboxLogViewer() {
         return `${value.toFixed(0)}%`;
       },
       from: function (value) {
-        return parseFloat(value);
+        return Number.parseFloat(value);
       },
     };
 
@@ -2496,7 +2496,7 @@ function BlackboxLogViewer() {
         format: percentageFormat,
       })
       .on("slide", function () {
-        setPlaybackRate(parseFloat($(this).val()), false);
+        setPlaybackRate(Number.parseFloat($(this).val()), false);
       })
       .dblclick(function () {
         setPlaybackRate(100, true);
@@ -2518,7 +2518,7 @@ function BlackboxLogViewer() {
         format: percentageFormat,
       })
       .on("slide", function () {
-        setGraphZoom(parseFloat($(this).val()), false);
+        setGraphZoom(Number.parseFloat($(this).val()), false);
       })
       .dblclick(function () {
         setGraphZoom(100, true);
@@ -2534,7 +2534,7 @@ function BlackboxLogViewer() {
 
     /* drag and drop support */
 
-    window.ondragover = function (e) {
+    globalThis.ondragover = function (e) {
       // prevent default behavior from changing page on dropped file
       // NOTE: ondrop events WILL NOT WORK if you do not "preventDefault" in the ondragover event!!
       e.preventDefault();
@@ -2542,7 +2542,7 @@ function BlackboxLogViewer() {
       return false;
     };
 
-    window.ondrop = function (e) {
+    globalThis.ondrop = function (e) {
       e.preventDefault();
 
       const item = e.dataTransfer.items[0];
@@ -2554,7 +2554,7 @@ function BlackboxLogViewer() {
       return false;
     };
 
-    if ("launchQueue" in window) {
+    if ("launchQueue" in globalThis) {
       launchQueue.setConsumer(async (launchParams) => {
         console.log("Opening files by extension in the desktop:", launchParams);
         const files = [];
@@ -2605,4 +2605,4 @@ $(document).click(function (e) {
 // Bootstrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
 $(document).off(".data-api");
 
-window.blackboxLogViewer = new BlackboxLogViewer();
+globalThis.blackboxLogViewer = new BlackboxLogViewer();
