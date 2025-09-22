@@ -1836,8 +1836,9 @@ function BlackboxLogViewer() {
       if (graph == null && field == null) return false; // no pen specified, just exit
 
       if (graph != null && field == null) {
+        const gi = Number.parseInt(graph, 10);
         // save ALL pens within group
-        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
+        for (const configField of graphConfig[gi].fields) {
           if (configField.default == null) {
             configField.default = [];
             configField.default.smoothing = configField.smoothing;
@@ -1847,17 +1848,13 @@ function BlackboxLogViewer() {
         return "<h4>Stored defaults for all pens</h4>";
       }
       if (graph != null && field != null) {
+        const gi = Number.parseInt(graph, 10);
+        const fi = Number.parseInt(field, 10);
         // restore single pen
-        if (
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default == null
-        ) {
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default = [];
-          graphConfig[Number.parseInt(graph)].fields[
-            Number.parseInt(field)
-          ].default.smoothing =
-            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing;
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default.power =
-            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power;
+        if (graphConfig[gi].fields[fi].default == null) {
+          graphConfig[gi].fields[fi].default = [];
+          graphConfig[gi].fields[fi].default.smoothing = graphConfig[gi].fields[fi].smoothing;
+          graphConfig[gi].fields[fi].default.power = graphConfig[gi].fields[fi].curve.power;
           return "<h4>Stored defaults for single pen</h4>";
         }
       }
@@ -1874,8 +1871,9 @@ function BlackboxLogViewer() {
       if (graph == null && field == null) return false; // no pen specified, just exit
 
       if (graph != null && field == null) {
+        const gi = Number.parseInt(graph, 10);
         // restore ALL pens within group
-        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
+        for (const configField of graphConfig[gi].fields) {
           if (configField.default != null) {
             configField.smoothing = configField.default.smoothing;
             configField.curve.power = configField.default.power;
@@ -1884,16 +1882,12 @@ function BlackboxLogViewer() {
         return "<h4>Restored defaults for all pens</h4>";
       }
       if (graph != null && field != null) {
+        const gi = Number.parseInt(graph, 10);
+        const fi = Number.parseInt(field, 10);
         // restore single pen
-        if (
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default != null
-        ) {
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing =
-            graphConfig[Number.parseInt(graph)].fields[
-              Number.parseInt(field)
-            ].default.smoothing;
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power =
-            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].default.power;
+        if (graphConfig[gi].fields[fi].default != null) {
+          graphConfig[gi].fields[fi].smoothing = graphConfig[gi].fields[fi].default.smoothing;
+          graphConfig[gi].fields[fi].curve.power = graphConfig[gi].fields[fi].default.power;
           return "<h4>Restored defaults for single pen</h4>";
         } else return false;
       }
@@ -1917,37 +1911,30 @@ function BlackboxLogViewer() {
 
       let changedValue = "<h4>Smoothing</h4>";
       if (graph != null && field == null) {
+        const gi = Number.parseInt(graph, 10);
         // change ALL pens within group
-        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
+        for (const configField of graphConfig[gi].fields) {
           configField.smoothing += delta ? -scroll : +scroll;
           configField.smoothing = constrain(
             configField.smoothing,
             range.min,
             range.max
           );
-          changedValue += `${configField.friendlyName} ${(
-            configField.smoothing / 100
-          ).toFixed(2)}%\n`;
+          changedValue += `${configField.friendlyName} ${(configField.smoothing / 100).toFixed(2)}%\n`;
         }
         return changedValue;
       }
       if (graph != null && field != null) {
+        const gi = Number.parseInt(graph, 10);
+        const fi = Number.parseInt(field, 10);
         // change single pen
-        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing += delta
-          ? -scroll
-          : +scroll;
-        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing =
-          constrain(
-            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing,
-            range.min,
-            range.max
-          );
-        return `${
-          changedValue +
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].friendlyName
-        } ${(
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].smoothing / 100
-        ).toFixed(2)}%\n`;
+        graphConfig[gi].fields[fi].smoothing += delta ? -scroll : +scroll;
+        graphConfig[gi].fields[fi].smoothing = constrain(
+          graphConfig[gi].fields[fi].smoothing,
+          range.min,
+          range.max
+        );
+        return `${changedValue + graphConfig[gi].fields[fi].friendlyName} ${(graphConfig[gi].fields[fi].smoothing / 100).toFixed(2)}%\n`;
       }
       return false; // nothing was changed
     }
@@ -1967,9 +1954,10 @@ function BlackboxLogViewer() {
         zoomScaleIn = 1.0 / zoomScaleOut;
       let changedValue = "<h4></h4>";
       if (graph != null && field == null) {
+        const gi = Number.parseInt(graph, 10);
         // change ALL pens within group
         changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
-        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
+        for (const configField of graphConfig[gi].fields) {
           configField.curve.MinMax.min *= delta ? zoomScaleOut : zoomScaleIn;
           configField.curve.MinMax.max *= delta ? zoomScaleOut : zoomScaleIn;
           changedValue += `${configField.friendlyName}\n`;
@@ -1977,17 +1965,12 @@ function BlackboxLogViewer() {
         return changedValue;
       }
       if (graph != null && field != null) {
+        const gi = Number.parseInt(graph, 10);
         // change single pen
-        graphConfig[Number.parseInt(graph)].fields[field].curve.MinMax.min *= delta
-          ? zoomScaleOut
-          : zoomScaleIn;
-        graphConfig[Number.parseInt(graph)].fields[field].curve.MinMax.max *= delta
-          ? zoomScaleOut
-          : zoomScaleIn;
+        graphConfig[gi].fields[field].curve.MinMax.min *= delta ? zoomScaleOut : zoomScaleIn;
+        graphConfig[gi].fields[field].curve.MinMax.max *= delta ? zoomScaleOut : zoomScaleIn;
         changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
-        changedValue += `${
-          graphConfig[Number.parseInt(graph)].fields[field].friendlyName
-        }\n`;
+        changedValue += `${graphConfig[gi].fields[field].friendlyName}\n`;
         return changedValue;
       }
       return false; // nothing was changed
@@ -2010,36 +1993,30 @@ function BlackboxLogViewer() {
 
       let changedValue = "<h4>Expo</h4>";
       if (graph != null && field == null) {
+        const gi = Number.parseInt(graph, 10);
         // change ALL pens within group
-        for (const configField of graphConfig[Number.parseInt(graph)].fields) {
+        for (const configField of graphConfig[gi].fields) {
           configField.curve.power += delta ? -scroll : +scroll;
           configField.curve.power = constrain(
             configField.curve.power,
             range.min,
             range.max
           );
-          changedValue += `${gconfigField.friendlyName} ${(
-            configField.curve.power * 100
-          ).toFixed(2)}%\n`;
+          changedValue += `${configField.friendlyName} ${(configField.curve.power * 100).toFixed(2)}%\n`;
         }
         return changedValue;
       }
       if (graph != null && field != null) {
+        const gi = Number.parseInt(graph, 10);
+        const fi = Number.parseInt(field, 10);
         // change single pen
-        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power +=
-          delta ? -scroll : +scroll;
-        graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power =
-          constrain(
-            graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power,
-            range.min,
-            range.max
-          );
-        return `${
-          changedValue +
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].friendlyName
-        } ${(
-          graphConfig[Number.parseInt(graph)].fields[Number.parseInt(field)].curve.power * 100
-        ).toFixed(2)}%\n`;
+        graphConfig[gi].fields[fi].curve.power += delta ? -scroll : +scroll;
+        graphConfig[gi].fields[fi].curve.power = constrain(
+          graphConfig[gi].fields[fi].curve.power,
+          range.min,
+          range.max
+        );
+        return `${changedValue + graphConfig[gi].fields[fi].friendlyName} ${(graphConfig[gi].fields[fi].curve.power * 100).toFixed(2)}%\n`;
       }
       return false; // nothing was changed
     }
