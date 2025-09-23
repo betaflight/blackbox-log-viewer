@@ -1782,7 +1782,7 @@ FlightLog.prototype.isFieldDisabled = function () {
 
   if (
     this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
-    semver.gte(this.getSysConfig().firmwareVersion, "4.6.0")
+    semver.gte(this.getSysConfig().firmwareVersion, "2025.12.0")
   ) {
     disabledFieldsFlags.ATTITUDE = (disabledFields & (1 << 8)) !== 0;
     disabledFieldsFlags.ACC = (disabledFields & (1 << 9)) !== 0;

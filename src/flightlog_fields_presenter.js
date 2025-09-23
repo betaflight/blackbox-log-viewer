@@ -1314,7 +1314,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
       };
     }
 
-    if (semver.gte(firmwareVersion, '4.6.0')) {
+    if (semver.gte(firmwareVersion, '2025.12.0')) {
       // FFT_FREQ updated in firmware #13750
       DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
         'debug[all]':'Debug FFT FREQ',
@@ -1975,7 +1975,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             return value.toFixed(0);
         }
       case "FFT_FREQ":
-        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '4.6.0')) {
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '2025.12.0')) {
           switch (fieldName) {
             case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
               return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
@@ -2727,7 +2727,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value;
         }
       case "FFT_FREQ":
-        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '4.6.0')) {
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '2025.12.0')) {
           switch (fieldName) {
             case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
               return toFriendly
