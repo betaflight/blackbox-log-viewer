@@ -1312,6 +1312,17 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[6]": "Pitch forward angle",
         "debug[7]": "dcmKp gain",
       };
+      DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+        "debug[all]": "GPS Rescue throttle PIDs",
+        "debug[0]": "Throttle P",
+        "debug[1]": "Throttle D",
+        "debug[2]": "Altitude",
+        "debug[3]": "Target altitude",
+        "debug[4]": "Throttle I",
+        "debug[5]": "Tilt adjustment",
+        "debug[6]": "Throttle D before lp smoothing",
+        "debug[7]": "Throttle adjustment",
+      };
     }
 
     if (semver.gte(firmwareVersion, '2025.12.0')) {
