@@ -960,11 +960,8 @@ export function FlightLogParser(logData) {
             $("html").removeClass("isINAV");
           }
 
-          that.sysConfig.firmware = parseFloat(
-            `${matches[2]}.${matches[3]}`
-          ).toFixed(1);
-          that.sysConfig.firmwarePatch =
-            matches[5] != null ? parseInt(matches[5]) : "0";
+          that.sysConfig.firmware = `${parseInt(matches[2])}.${parseInt(matches[3])}`;
+          that.sysConfig.firmwarePatch = matches[5] != null ? parseInt(matches[5]) : "0";
           that.sysConfig.firmwareVersion = `${that.sysConfig.firmware}.${that.sysConfig.firmwarePatch}`;
         } else {
           /*

@@ -529,10 +529,10 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_INTERPOLATED"), 1, "FEEDFORWARD");
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_LIMIT"), 1, "FEEDFORWARD_LIMIT");
     }
-    if (semver.lt(firmwareVersion, "4.6.0")) {
+    if (semver.lt(firmwareVersion, "2025.12.0")) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("D_MAX"), 1, "D_MIN");
     }
-    if (semver.gte(firmwareVersion, "4.6.0")) {
+    if (semver.gte(firmwareVersion, "2025.12.0")) {
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("ADXL345"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
@@ -550,7 +550,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.push('WING_SETPOINT');
       DEBUG_MODE.push('AUTOPILOT_POSITION');
     }
-    if (semver.gte(firmwareVersion, "4.6.0")) {
+    if (semver.gte(firmwareVersion, "2025.12.0")) {
       //rename DUAL_GYRO_ to MULTI_GYRO
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_RAW"), 1, "MULTI_GYRO_RAW");
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_DIFF"), 1, "MULTI_GYRO_DIFF");
@@ -561,7 +561,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
     // Flight mode names
-    if (semver.gte(firmwareVersion, "4.6.0")) {
+    if (semver.gte(firmwareVersion, "2025.12.0")) {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
     } else {
       FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
