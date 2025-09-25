@@ -1252,7 +1252,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Not Used",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
-        "debug[all]": "GPS Rescue Altitude",
+        "debug[all]": "GPS Rescue Throttle PID",
         "debug[0]": "Throttle P",
         "debug[1]": "Throttle D",
         "debug[2]": "Altitude",
@@ -1287,17 +1287,6 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[6]": "Not Used",
         "debug[7]": "Not Used",
       };
-      DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
-        "debug[all]": "GPS Rescue throttle PIDs",
-        "debug[0]": "Throttle P",
-        "debug[1]": "Throttle D",
-        "debug[2]": "Altitude",
-        "debug[3]": "Target altitude",
-        "debug[4]": "Not Used",
-        "debug[5]": "Not Used",
-        "debug[6]": "Not Used",
-        "debug[7]": "Not Used",
-      };
     }
 
     if (semver.gte(firmwareVersion, '4.5.0')) {
@@ -1311,6 +1300,17 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[5]": "Ground speed error ratio",
         "debug[6]": "Pitch forward angle",
         "debug[7]": "dcmKp gain",
+      };
+      DEBUG_FRIENDLY_FIELD_NAMES.GPS_RESCUE_THROTTLE_PID = {
+        "debug[all]": "GPS Rescue throttle PID",
+        "debug[0]": "Throttle P",
+        "debug[1]": "Throttle D",
+        "debug[2]": "Altitude",
+        "debug[3]": "Target altitude",
+        "debug[4]": "Throttle I",
+        "debug[5]": "Tilt adjustment",
+        "debug[6]": "Throttle D before lp smoothing",
+        "debug[7]": "Throttle adjustment",
       };
     }
 
@@ -2152,7 +2152,9 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "GPS_RESCUE_THROTTLE_PID":
         switch (fieldName) {
           case "debug[0]": // Throttle P added uS
-          case "debug[1]": // Throttle D added * uS
+          case "debug[1]": // Throttle D added uS
+          case "debug[4]": // Throttle I added uS
+          case "debug[6]": // Throttle D before lp smoothing uS
             return `${value.toFixed(0)} uS`;
           case "debug[2]": // current altitude in m
           case "debug[3]": // TARGET altitude in m
@@ -2901,6 +2903,8 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         switch (fieldName) {
           case "debug[0]": // Throttle P added uS
           case "debug[1]": // Throttle D added * uS
+          case "debug[4]": // Throttle I added uS
+          case "debug[6]": // Throttle D before lp smoothing uS
             return value; // ' uS';
           case "debug[2]": // current altitude in m
           case "debug[3]": // TARGET altitude in m
