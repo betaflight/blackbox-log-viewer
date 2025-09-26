@@ -379,7 +379,7 @@ export const GYRO_32KHZ_HARDWARE_LPF = makeReadOnly(["NORMAL", "EXPERIMENTAL"]);
 
 export let ACC_HARDWARE = [];
 
-export const ACC_HARDWARE_COMPLETE = makeReadOnly([
+const ACC_HARDWARE_COMPLETE = makeReadOnly([
   "AUTO",
   "NONE",
   "ADXL345",
@@ -417,7 +417,9 @@ export const BARO_HARDWARE = makeReadOnly([
   "2SMPB_02B",
 ]);
 
-export const MAG_HARDWARE = makeReadOnly([
+export let MAG_HARDWARE = [];
+
+export const MAG_HARDWARE_COMPLETE = makeReadOnly([
   "AUTO",
   "NONE",
   "HMC5883",
@@ -505,10 +507,12 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
     semver.gte(firmwareVersion, "3.3.0")
   ) {
-    // ACC hardware names
+    // Hardware names
     ACC_HARDWARE = ACC_HARDWARE_COMPLETE.slice(0);
+    MAG_HARDWARE = MAG_HARDWARE_COMPLETE.slice(0);
     // Debug names
     DEBUG_MODE = DEBUG_MODE_COMPLETE.slice(0);
+
     DEBUG_MODE.splice(DEBUG_MODE.indexOf("MIXER"), 1);
     DEBUG_MODE.splice(DEBUG_MODE.indexOf("AIRMODE"), 1);
     DEBUG_MODE.splice(DEBUG_MODE.indexOf("VELOCITY"), 1);
@@ -529,6 +533,10 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_INTERPOLATED"), 1, "FEEDFORWARD");
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_LIMIT"), 1, "FEEDFORWARD_LIMIT");
     }
+    if (semver.gte(firmwareVersion, "4.5.0")) {
+      MAG_HARDWARE.splice(MAG_HARDWARE.indexOf("LIS3MDL"), 0, "LIS2MDL");
+      MAG_HARDWARE.push("IST8310");
+    }
     if (semver.lt(firmwareVersion, "2025.12.0")) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("D_MAX"), 1, "D_MIN");
     }
@@ -538,6 +546,8 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM303DLHC"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM6DSV16X") + 1, 0, "IIM42653");
+
+      MAG_HARDWARE.push("QMC5883P");
 
       DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
@@ -558,6 +568,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     }
 
     ACC_HARDWARE = makeReadOnly(ACC_HARDWARE);
+    MAG_HARDWARE = makeReadOnly(MAG_HARDWARE);
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);
 
     // Flight mode names
