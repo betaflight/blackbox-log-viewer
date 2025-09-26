@@ -419,7 +419,7 @@ export const BARO_HARDWARE = makeReadOnly([
 
 export let MAG_HARDWARE = [];
 
-export const MAG_HARDWARE_COMPLETE = makeReadOnly([
+const MAG_HARDWARE_COMPLETE = makeReadOnly([
   "AUTO",
   "NONE",
   "HMC5883",
