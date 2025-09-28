@@ -539,6 +539,12 @@ export function HeaderDialog(dialog, onSave) {
       name: "gyro_to_use",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "4.3.0",
+      max: "4.5.9",
+    },
+    {
+      name: "gyro_enabled_bitmask",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "2025.12.0",
       max: "9999.9.9",
     },
     {
@@ -863,6 +869,27 @@ export function HeaderDialog(dialog, onSave) {
       nameElem.val(data.toFixed(decimalPlaces));
       nameElem.attr("decPl", decimalPlaces);
       parameterElem.attr("title", `set ${name}=${data}`);
+      parameterElem.removeClass("missing");
+    } else {
+      parameterElem.addClass("missing");
+    }
+    parameterElem.css(
+      "display",
+      isParameterValid(name) ? "table-cell" : "none"
+    );
+  }
+
+  function setBitmaskParameter(name, data, totalBits = 8) {
+    let parameterElem = $(`.parameter td[name="${name}"]`);
+    let nameElem = $("input", parameterElem);
+    if (data != null) {
+      // Convert number to binary string with leading zeros
+      const binaryString = data.toString(2).padStart(totalBits, '0');
+      // Display as "3 (0b00000011)" format
+      const displayValue = `${data} (${binaryString})`;
+      nameElem.val(displayValue);
+      nameElem.attr("readonly", true); // Make it readonly since it shows formatted bitmask
+      parameterElem.attr("title", `Bitmask value: ${data} (binary: ${binaryString})`);
       parameterElem.removeClass("missing");
     } else {
       parameterElem.addClass("missing");
@@ -1938,6 +1965,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect("baro_hardware", sysConfig.baro_hardware, BARO_HARDWARE);
     renderSelect("mag_hardware", sysConfig.mag_hardware, MAG_HARDWARE);
     renderSelect("gyro_to_use", sysConfig.gyro_to_use, GYRO_TO_USE);
+    setBitmaskParameter("gyro_enabled_bitmask", sysConfig.gyro_enabled_bitmask, 8);
     setParameter("motor_poles", sysConfig.motor_poles, 0);
 
     /* Booleans */

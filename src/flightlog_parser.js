@@ -299,6 +299,7 @@ export function FlightLogParser(logData) {
       fields_disabled_mask: null,
       vbat_sag_compensation: null,
       gyro_to_use: null,
+      gyro_enabled_bitmask: null,
       dynamic_idle_min_rpm: null,
       motor_poles: 1,
       ff_transition: null,
@@ -743,6 +744,7 @@ export function FlightLogParser(logData) {
       case "fields_disabled_mask":
       case "motor_pwm_protocol":
       case "gyro_to_use":
+      case "gyro_enabled_bitmask":
       case "dynamic_idle_min_rpm":
       case "dyn_idle_p_gain":
       case "dyn_idle_i_gain":
