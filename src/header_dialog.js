@@ -885,9 +885,11 @@ export function HeaderDialog(dialog, onSave) {
     if (data != null) {
       // Convert number to binary string with leading zeros
       const binaryString = data.toString(2).padStart(totalBits, '0');
-      // Display as "3 (0b00000011)" format
+      // Display as "3 (00000011)" format
       const displayValue = `${data} (${binaryString})`;
       nameElem.val(displayValue);
+      // Store the raw integer value for round-trip saving
+      nameElem.data("raw-value", data);
       nameElem.attr("readonly", true); // Make it readonly since it shows formatted bitmask
       parameterElem.attr("title", `Bitmask value: ${data} (binary: ${binaryString})`);
       parameterElem.removeClass("missing");
@@ -2026,6 +2028,9 @@ export function HeaderDialog(dialog, onSave) {
           if ($(this).attr("decPl") != null) {
             newArray[matches[2]] =
               parseFloat($(this).val()) * Math.pow(10, $(this).attr("decPl"));
+          } else if ($(this).data("raw-value") != null) {
+            // Use raw value for bitmask parameters
+            newArray[matches[2]] = $(this).data("raw-value");
           } else {
             newArray[matches[2]] = $(this).val() == "on" ? 1 : 0;
           }
@@ -2034,6 +2039,9 @@ export function HeaderDialog(dialog, onSave) {
           if ($(this).attr("decPl") != null) {
             newSysConfig[$(this).attr("name")] =
               parseFloat($(this).val()) * Math.pow(10, $(this).attr("decPl"));
+          } else if ($(this).data("raw-value") != null) {
+            // Use raw value for bitmask parameters
+            newSysConfig[$(this).attr("name")] = $(this).data("raw-value");
           } else {
             newSysConfig[$(this).attr("name")] = $(this).val() == "on" ? 1 : 0;
           }
