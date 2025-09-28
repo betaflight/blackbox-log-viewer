@@ -894,6 +894,11 @@ export function HeaderDialog(dialog, onSave) {
       parameterElem.attr("title", `Bitmask value: ${data} (binary: ${binaryString})`);
       parameterElem.removeClass("missing");
     } else {
+      // Clear all bitmask state when data is null
+      nameElem.val(""); // Clear the input value
+      nameElem.removeData("raw-value"); // Remove stored raw value
+      nameElem.prop("readonly", false); // Make input editable again
+      parameterElem.removeAttr("title"); // Clear tooltip
       parameterElem.addClass("missing");
     }
     parameterElem.css(
