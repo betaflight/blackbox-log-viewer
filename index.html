@@ -778,7 +778,7 @@
                                             const axes = ['Roll', 'Pitch', 'Yaw'];
                                             const pidTbody = document.getElementById('pid_tbody');
 
-                                            axes.forEach(axis => {
+                                            for (const axis of axes) {
                                                 const row = `<tr class="${axis.toLowerCase()}PID">
                                                                 <td>${axis}</td>
                                                                 <td><input type="text" name="p" step="1" min="0" max="255" /></td>
@@ -788,7 +788,7 @@
                                                                 <td><input type="text" name="f" step="1" min="0" max="255" /></td>
                                                             </tr>`;
                                                 pidTbody.innerHTML += row;
-                                            });
+                                            }
                                         </script>
 
                                         <table id="pid_baro_header" class="parameter cf">
@@ -1516,7 +1516,11 @@
                                                             <!-- list generated here -->
                                                         </select>
                                                     </td>
-                                                   <td name='gyro_hardware_lpf'>
+                                                    <td name='gyro_enabled_bitmask'>
+                                                        <label>Gyro enable mask</label>
+                                                        <input type="text" step="1" min="1" max="255" />
+                                                    </td>
+                                                    <td name='gyro_hardware_lpf'>
                                                         <label>Hardware gyro LPF</label>
                                                         <select>
                                                             <!-- list generated here -->

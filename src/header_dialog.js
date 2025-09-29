@@ -539,6 +539,12 @@ export function HeaderDialog(dialog, onSave) {
       name: "gyro_to_use",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "4.3.0",
+      max: "4.5.9",
+    },
+    {
+      name: "gyro_enabled_bitmask",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "2025.12.0",
       max: "9999.9.9",
     },
     {
@@ -866,6 +872,34 @@ export function HeaderDialog(dialog, onSave) {
       parameterElem.removeClass("missing");
     } else {
       parameterElem.addClass("missing");
+    }
+    parameterElem.css(
+      "display",
+      isParameterValid(name) ? "table-cell" : "none",
+    );
+  }
+
+  function setBitmaskParameter(name, data, totalBits = 8) {
+    let parameterElem = $(`.parameter td[name="${name}"]`);
+    let nameElem = $("input", parameterElem);
+    if (data == null) {
+      // Clear all bitmask state when data is null
+      nameElem.val(""); // Clear the input value
+      nameElem.removeData("raw-value"); // Remove stored raw value
+      nameElem.prop("readonly", false); // Make input editable again
+      parameterElem.removeAttr("title"); // Clear tooltip
+      parameterElem.addClass("missing");
+    } else {
+      // Convert number to binary string with leading zeros
+      const binaryString = data.toString(2).padStart(totalBits, '0');
+      // Display as "3 (00000011)" format
+      const displayValue = `${data} (${binaryString})`;
+      nameElem.val(displayValue);
+      // Store the raw integer value for round-trip saving
+      nameElem.data("raw-value", data);
+      nameElem.attr("readonly", true); // Make it readonly since it shows formatted bitmask
+      parameterElem.attr("title", `Bitmask value: ${data} (binary: ${binaryString})`);
+      parameterElem.removeClass("missing");
     }
     parameterElem.css(
       "display",
@@ -1363,9 +1397,9 @@ export function HeaderDialog(dialog, onSave) {
 
     let PID_CONTROLLER_TYPE = [];
     if (
-      (sysConfig.firmware >= 3.0 &&
+      (sysConfig.firmware >= 3 &&
         sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) ||
-      (sysConfig.firmware >= 2.0 &&
+      (sysConfig.firmware >= 2 &&
         sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT)
     ) {
       PID_CONTROLLER_TYPE = ["LEGACY", "BETAFLIGHT"];
@@ -1713,8 +1747,7 @@ export function HeaderDialog(dialog, onSave) {
       if (semver.lt(activeSysConfig.firmwareVersion, "2025.12.0")) {
         const derivativeColumn = document.getElementById("derivativeColumn");
         const dMaxColumn = document.getElementById("dMaxColumn");
-        const parent = derivativeColumn.parentNode;
-        parent.insertBefore(dMaxColumn, derivativeColumn); // Меняем местами
+        derivativeColumn.before(dMaxColumn); // Меняем местами
       }
     } else {
       $("#d_max").hide();
@@ -1938,6 +1971,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect("baro_hardware", sysConfig.baro_hardware, BARO_HARDWARE);
     renderSelect("mag_hardware", sysConfig.mag_hardware, MAG_HARDWARE);
     renderSelect("gyro_to_use", sysConfig.gyro_to_use, GYRO_TO_USE);
+    setBitmaskParameter("gyro_enabled_bitmask", sysConfig.gyro_enabled_bitmask, 8);
     setParameter("motor_poles", sysConfig.motor_poles, 0);
 
     /* Booleans */
@@ -1998,6 +2032,9 @@ export function HeaderDialog(dialog, onSave) {
           if ($(this).attr("decPl") != null) {
             newArray[matches[2]] =
               parseFloat($(this).val()) * Math.pow(10, $(this).attr("decPl"));
+          } else if ($(this).data("raw-value") != null) {
+            // Use raw value for bitmask parameters
+            newArray[matches[2]] = $(this).data("raw-value");
           } else {
             newArray[matches[2]] = $(this).val() == "on" ? 1 : 0;
           }
@@ -2006,6 +2043,9 @@ export function HeaderDialog(dialog, onSave) {
           if ($(this).attr("decPl") != null) {
             newSysConfig[$(this).attr("name")] =
               parseFloat($(this).val()) * Math.pow(10, $(this).attr("decPl"));
+          } else if ($(this).data("raw-value") != null) {
+            // Use raw value for bitmask parameters
+            newSysConfig[$(this).attr("name")] = $(this).data("raw-value");
           } else {
             newSysConfig[$(this).attr("name")] = $(this).val() == "on" ? 1 : 0;
           }
