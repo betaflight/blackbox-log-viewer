@@ -533,7 +533,7 @@ export function FlightLogParser(logData) {
    */
   function translateFieldName(fieldName) {
     let translation = translationValues[fieldName];
-    if (typeof translation !== "undefined") {
+    if (translation !== undefined) {
       return translation;
     } else {
       return fieldName;
@@ -823,7 +823,7 @@ export function FlightLogParser(logData) {
         ) {
           that.sysConfig[fieldName] = parseInt(fieldValue, 10);
         } else {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
+          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
         }
         break;
 
@@ -837,13 +837,13 @@ export function FlightLogParser(logData) {
         ) {
           that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
         } else {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
+          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
         }
         break;
 
       case "motor_idle":
       case "digitalIdleOffset":
-        that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100.0;
+        that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
 
       /**  Cleanflight Only log headers **/
       case "dterm_cut_hz":
@@ -984,7 +984,7 @@ export function FlightLogParser(logData) {
           } else {
             // Cleanflight 1.x and others
             that.sysConfig.firmwareVersion = "0.0.0";
-            that.sysConfig.firmware = 0.0;
+            that.sysConfig.firmware = 0;
             that.sysConfig.firmwarePatch = 0;
           }
         }
@@ -1085,10 +1085,8 @@ export function FlightLogParser(logData) {
           min: frame[i],
         };
       } else {
-        fieldStats[i].max =
-          frame[i] > fieldStats[i].max ? frame[i] : fieldStats[i].max;
-        fieldStats[i].min =
-          frame[i] < fieldStats[i].min ? frame[i] : fieldStats[i].min;
+        fieldStats[i].max = Math.max(frame[i], fieldStats[i].max);
+        fieldStats[i].min = Math.min(frame[i], fieldStats[i].min);
       }
     }
   }
@@ -1446,7 +1444,7 @@ export function FlightLogParser(logData) {
          * save space for positive values). So we need to convert those very large unsigned values into their
          * corresponding 32-bit signed values.
          */
-        value = (value | 0) + that.sysConfig.minthrottle;
+        value = Math.trunc(value) + that.sysConfig.minthrottle;
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR:
         /*
@@ -1455,7 +1453,7 @@ export function FlightLogParser(logData) {
          * save space for positive values). So we need to convert those very large unsigned values into their
          * corresponding 32-bit signed values.
          */
-        value = (value | 0) + (that.sysConfig.motorOutput[0] | 0); // motorOutput[0] is the min motor output
+        value = Math.trunc(value) + Math.trunc(that.sysConfig.motorOutput[0]); // motorOutput[0] is the min motor output
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_1500:
         value += 1500;
@@ -1675,13 +1673,13 @@ export function FlightLogParser(logData) {
         break;
       case FlightLogEvent.AUTOTUNE_TARGETS:
         //Convert the angles from decidegrees back to plain old degrees for ease of use
-        lastEvent.data.currentAngle = stream.readS16() / 10.0;
+        lastEvent.data.currentAngle = stream.readS16() / 10;
 
         lastEvent.data.targetAngle = stream.readS8();
         lastEvent.data.targetAngleAtPeak = stream.readS8();
 
-        lastEvent.data.firstPeakAngle = stream.readS16() / 10.0;
-        lastEvent.data.secondPeakAngle = stream.readS16() / 10.0;
+        lastEvent.data.firstPeakAngle = stream.readS16() / 10;
+        lastEvent.data.secondPeakAngle = stream.readS16() / 10;
         break;
       case FlightLogEvent.GTUNE_CYCLE_RESULT:
         lastEvent.data.axis = stream.readU8();

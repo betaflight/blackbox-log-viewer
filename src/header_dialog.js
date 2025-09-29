@@ -875,14 +875,21 @@ export function HeaderDialog(dialog, onSave) {
     }
     parameterElem.css(
       "display",
-      isParameterValid(name) ? "table-cell" : "none"
+      isParameterValid(name) ? "table-cell" : "none",
     );
   }
 
   function setBitmaskParameter(name, data, totalBits = 8) {
     let parameterElem = $(`.parameter td[name="${name}"]`);
     let nameElem = $("input", parameterElem);
-    if (data != null) {
+    if (data == null) {
+      // Clear all bitmask state when data is null
+      nameElem.val(""); // Clear the input value
+      nameElem.removeData("raw-value"); // Remove stored raw value
+      nameElem.prop("readonly", false); // Make input editable again
+      parameterElem.removeAttr("title"); // Clear tooltip
+      parameterElem.addClass("missing");
+    } else {
       // Convert number to binary string with leading zeros
       const binaryString = data.toString(2).padStart(totalBits, '0');
       // Display as "3 (00000011)" format
@@ -893,13 +900,6 @@ export function HeaderDialog(dialog, onSave) {
       nameElem.attr("readonly", true); // Make it readonly since it shows formatted bitmask
       parameterElem.attr("title", `Bitmask value: ${data} (binary: ${binaryString})`);
       parameterElem.removeClass("missing");
-    } else {
-      // Clear all bitmask state when data is null
-      nameElem.val(""); // Clear the input value
-      nameElem.removeData("raw-value"); // Remove stored raw value
-      nameElem.prop("readonly", false); // Make input editable again
-      parameterElem.removeAttr("title"); // Clear tooltip
-      parameterElem.addClass("missing");
     }
     parameterElem.css(
       "display",
@@ -1397,9 +1397,9 @@ export function HeaderDialog(dialog, onSave) {
 
     let PID_CONTROLLER_TYPE = [];
     if (
-      (sysConfig.firmware >= 3.0 &&
+      (sysConfig.firmware >= 3 &&
         sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) ||
-      (sysConfig.firmware >= 2.0 &&
+      (sysConfig.firmware >= 2 &&
         sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT)
     ) {
       PID_CONTROLLER_TYPE = ["LEGACY", "BETAFLIGHT"];
@@ -1747,8 +1747,7 @@ export function HeaderDialog(dialog, onSave) {
       if (semver.lt(activeSysConfig.firmwareVersion, "2025.12.0")) {
         const derivativeColumn = document.getElementById("derivativeColumn");
         const dMaxColumn = document.getElementById("dMaxColumn");
-        const parent = derivativeColumn.parentNode;
-        parent.insertBefore(dMaxColumn, derivativeColumn); // Меняем местами
+        derivativeColumn.before(dMaxColumn); // Меняем местами
       }
     } else {
       $("#d_max").hide();
