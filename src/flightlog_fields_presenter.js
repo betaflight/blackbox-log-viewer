@@ -1134,6 +1134,13 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[4]": "Stick Limit",
     "debug[5]": "Speed Limit",
   },
+  MAVLINK_TELEMETRY: {
+    "debug[all]": "MAVLink telemetry",
+    "debug[0]": "Should send telemetry",
+    "debug[1]": "Actual free TX buffers space",
+    "debug[2]": "Estimated free TX buffers space",
+    "debug[3]": "Telemetries call counter",
+  },
 };
 
 let DEBUG_FRIENDLY_FIELD_NAMES = null;

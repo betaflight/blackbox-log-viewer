@@ -596,7 +596,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   min: 0,
                   max: 1,
                 },
-              };            
+              };
             case "debug[6]": // outlier count 0-3
             case "debug[7]": // valid count 0-3
               return {
@@ -605,7 +605,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   min: 0,
                   max: 50, // put them at the very bottom
                 },
-              };            
+              };
             default:
               return getCurveForMinMaxFields(fieldName);
           }
@@ -859,7 +859,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   min: 0,
                   max: 1,
                 },
-              };            
+              };
             case "debug[7]": // smoothed Rx Rate Hz
               return {
                 power: 1.0,
@@ -867,7 +867,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   min: 0,
                   max: 1200,
                 },
-              };            
+              };
             default:
               return getCurveForMinMaxFields(fieldName);
           }
@@ -1449,6 +1449,36 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 MinMax: {
                   min: -180,
                   max: 180,
+                },
+              };
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
+        case "MAVLINK_TELEMETRY":
+          switch (fieldName) {
+            case "debug[0]":
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 1,
+                },
+              };
+            case "debug[1]":
+            case "debug[2]":
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 100,
+                },
+              };
+            case "debug[3]":
+              return {
+                power: 1.0,
+                MinMax: {
+                  min: 0,
+                  max: 50,
                 },
               };
             default:
