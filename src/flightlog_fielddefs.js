@@ -559,9 +559,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.push('GIMBAL');
       DEBUG_MODE.push('WING_SETPOINT');
       DEBUG_MODE.push('AUTOPILOT_POSITION');
-      DEBUG_MODE.push('CHIRP');
-      DEBUG_MODE.push('FLASH_TEST_PRBS');
-      DEBUG_MODE.push('MAVLINK_TELEMETRY');
+      DEBUG_MODE.push('CHIRP', 'FLASH_TEST_PRBS', 'MAVLINK_TELEMETRY');
     }
     if (semver.gte(firmwareVersion, "2025.12.0")) {
       //rename DUAL_GYRO_ to MULTI_GYRO

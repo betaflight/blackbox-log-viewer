@@ -1458,7 +1458,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]":
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1,
@@ -1467,7 +1467,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]":
             case "debug[2]":
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -1475,7 +1475,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]":
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 50,
