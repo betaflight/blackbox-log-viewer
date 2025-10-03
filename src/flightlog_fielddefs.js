@@ -553,17 +553,17 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("RANGEFINDER_QUALITY") + 1, 0, "OPTICALFLOW");
       DEBUG_MODE.push(
-				'TPA',
-				'S_TERM',
-				'SPA',
-				'TASK',
-				'GIMBAL',
-				'WING_SETPOINT',
-				'AUTOPILOT_POSITION',
-				'CHIRP',
-				'FLASH_TEST_PRBS',
-				'MAVLINK_TELEMETRY',
-			);
+        'TPA',
+        'S_TERM',
+        'SPA',
+        'TASK',
+        'GIMBAL',
+        'WING_SETPOINT',
+        'AUTOPILOT_POSITION',
+        'CHIRP',
+        'FLASH_TEST_PRBS',
+        'MAVLINK_TELEMETRY',
+      );
     }
     if (semver.gte(firmwareVersion, "2025.12.0")) {
       //rename DUAL_GYRO_ to MULTI_GYRO
