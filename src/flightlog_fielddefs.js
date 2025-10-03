@@ -552,14 +552,18 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("RANGEFINDER_QUALITY") + 1, 0, "OPTICALFLOW");
-      DEBUG_MODE.push('TPA');
-      DEBUG_MODE.push('S_TERM');
-      DEBUG_MODE.push('SPA');
-      DEBUG_MODE.push('TASK');
-      DEBUG_MODE.push('GIMBAL');
-      DEBUG_MODE.push('WING_SETPOINT');
-      DEBUG_MODE.push('AUTOPILOT_POSITION');
-      DEBUG_MODE.push('CHIRP', 'FLASH_TEST_PRBS', 'MAVLINK_TELEMETRY');
+      DEBUG_MODE.push(
+				'TPA',
+				'S_TERM',
+				'SPA',
+				'TASK',
+				'GIMBAL',
+				'WING_SETPOINT',
+				'AUTOPILOT_POSITION',
+				'CHIRP',
+				'FLASH_TEST_PRBS',
+				'MAVLINK_TELEMETRY',
+			);
     }
     if (semver.gte(firmwareVersion, "2025.12.0")) {
       //rename DUAL_GYRO_ to MULTI_GYRO
@@ -624,7 +628,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
         );
       }
     }
-    
+
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
   } else {
     DEBUG_MODE = DEBUG_MODE_COMPLETE;
