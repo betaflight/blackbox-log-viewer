@@ -2,7 +2,10 @@
 
 [![Latest version](https://img.shields.io/github/v/release/betaflight/blackbox-log-viewer)](https://github.com/betaflight/blackbox-log-viewer/releases)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer)
+[![Build](https://img.shields.io/github/actions/workflow/status/betaflight/blackbox-log-viewer/deploy.yml?branch=master)](https://github.com/betaflight/blackbox-log-viewer/actions/workflows/deploy.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Join us on Discord!](https://img.shields.io/discord/868013470023548938)](https://discord.gg/n4E6ak4u3c)
+
 
 ![Main explorer interface](screenshots/main-interface.jpg)
 
