@@ -348,13 +348,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(DEFAULT_PSD_SEGMENT_LENGTH_POWER);
 
-    analyserSegmentLengthPowerAt2
-      .on(
-        "keydown",
-        function (e) {
-          e.preventDefault();
-        },
-      );
     // Spectrum type to show
     userSettings.spectrumType =
       userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
