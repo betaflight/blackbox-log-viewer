@@ -335,7 +335,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         "input",
         function () {
           // Recalculate PSD with updated samples per segment count
-          GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** parseInt($(this).val()));
+          GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** Number.parseInt($(this).val()));
           dataLoad();
           GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
           that.refresh();
