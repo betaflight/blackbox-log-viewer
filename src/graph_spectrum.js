@@ -329,7 +329,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(analyserMinPSD.val());
 
-    let segmentLengthPower2 = DEFAULT_PSD_SEGMENT_LENGTH_POWER;
     GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** DEFAULT_PSD_SEGMENT_LENGTH_POWER);
     analyserSegmentLengthPowerAt2
       .on(
