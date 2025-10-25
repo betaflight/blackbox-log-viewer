@@ -333,13 +333,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     analyserSegmentLengthPowerAt2
       .on(
         "input",
-        function () {
+        debounce(100, function () {
           // Recalculate PSD with updated samples per segment count
           GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** Number.parseInt($(this).val()));
           dataLoad();
           GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
           that.refresh();
-        },
+        }),
       )
       .dblclick(function (e) {
         if (e.ctrlKey) {
