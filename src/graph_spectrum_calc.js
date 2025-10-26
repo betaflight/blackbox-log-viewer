@@ -35,6 +35,7 @@ export const GraphSpectrumCalc = {
   _flightLog : null,
   _sysConfig : null,
   _motorPoles : null,
+  _pointsPerSegmentPSD : 64,
 };
 
 GraphSpectrumCalc.initialize = function(flightLog, sysConfig) {
@@ -112,20 +113,21 @@ GraphSpectrumCalc.dataLoadFrequency = function() {
   return fftData;
 };
 
+GraphSpectrumCalc.setPointsPerSegmentPSD = function(pointsCount) {
+  this._pointsPerSegmentPSD = pointsCount;
+};
+
 GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
-  const multiplier = Math.floor(1 / analyserZoomY); // 0. ... 10
-  let pointsPerSegment = 2 ** (8 + multiplier); //256, 512, 1024 ...
-
-  let overlapCount;
-  if (pointsPerSegment > flightSamples.samples.length) {
-      pointsPerSegment = flightSamples.samples.length;  // Use actual sample length. It will transform to power at 2 value inside the _psd() - fft_segmented
-      overlapCount = 0;
-  } else {
-    overlapCount = pointsPerSegment / 2;
-  }
-
-  const psd =  this._psd(flightSamples.samples, pointsPerSegment, overlapCount);
+  const totalCount = flightSamples.count; // actual samples, not padded length
+  let pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);
+  // Non-overlapping when single full-segment; otherwise 75% overlap
+  const overlapCount = (pointsPerSegment === totalCount) ? 0 : Math.floor(pointsPerSegment * 3 / 4);
+  // Avoid bias from zero-padded tail
+  const samplesForPsd = (flightSamples.samples.length === totalCount)
+    ? flightSamples.samples
+    : flightSamples.samples.slice(0, totalCount);
+  const psd = this._psd(samplesForPsd, pointsPerSegment, overlapCount);
 
   const psdData = {
     fieldIndex   : this._dataBuffer.fieldIndex,
@@ -136,6 +138,7 @@ GraphSpectrumCalc.dataLoadPSD = function(analyserZoomY) {
     minimum: psd.min,
     maximum: psd.max,
     maxNoiseFrequency: psd.maxNoiseFrequency,
+    maximalSegmentsLength: this.getNearPower2Value(totalCount),
   };
   return psdData;
 };
