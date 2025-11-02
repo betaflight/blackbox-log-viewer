@@ -28,7 +28,7 @@ For the latest stable released version visit https://blackbox.betaflight.com/
 
 ### Unstable testing versions
 
-The latest master build is always available at https://master.dev.blackbox.betaflight.com/
+The latest master build is always available at https://master.blackbox.betaflight.com/
 
 **Be aware that these versions are intended for testing / feedback only, and may be buggy or broken. Caution is advised when using these versions.**
 
