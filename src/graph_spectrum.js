@@ -17,7 +17,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const that = this,
     prefs = new PrefStorage(),
     DEFAULT_PSD_HEATMAP_MIN = -40,
-    DEFAULT_PSD_HEATMAP_MAX = 10;
+    DEFAULT_PSD_HEATMAP_MAX = 10,
+    DEFAULT_PSD_SEGMENT_LENGTH_POWER = 9;
   let analyserZoomX = 1.0 /* 100% */,
     analyserZoomY = 1.0 /* 100% */,
     dataReload = false,
@@ -36,6 +37,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     const analyserMinPSD = $("#analyserMinPSD");
     const analyserMaxPSD = $("#analyserMaxPSD");
     const analyserLowLevelPSD = $("#analyserLowLevelPSD");
+    const analyserSegmentLengthPowerAt2 = $("#analyserSegmentLengthPowerAt2");
 
 
     const spectrumToolbarElem = $("#spectrumToolbar");
@@ -124,6 +126,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       $("#analyserLowLevelPSDLabel", parentElem).css({
         left: `${newSize.width - 155}px`,
       });
+      $("#analyserSegmentLengthPowerAt2", parentElem).css({
+        left: `${newSize.width - 57}px`,
+      });
+      $("#analyserSegmentLengthPowerAt2Label", parentElem).css({
+        left: `${newSize.width - 135}px`,
+      });
     };
 
     const dataLoad = function (fieldIndex, curve, fieldName) {
@@ -154,6 +162,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
           fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
+          if (fftData.maximalSegmentsLength > 0) {
+            analyserSegmentLengthPowerAt2.prop("max", Math.ceil(Math.log2(fftData.maximalSegmentsLength)));
+          }
           break;
 
         case SPECTRUM_TYPE.FREQUENCY:
@@ -241,11 +252,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         debounce(100, function () {
           analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
           GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
-          // Recalculate PSD with updated samples per segment count
-          if (userSettings.spectrumType == SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY) {
-            dataLoad();
-            GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
-          }
           that.refresh();
         }),
       )
@@ -325,6 +331,25 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(analyserMinPSD.val());
 
+    GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** DEFAULT_PSD_SEGMENT_LENGTH_POWER);
+    analyserSegmentLengthPowerAt2
+      .on(
+        "input",
+        debounce(100, function () {
+          // Recalculate PSD with updated samples per segment count
+          GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** Number.parseInt($(this).val()));
+          dataLoad();
+          GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+          that.refresh();
+        }),
+      )
+      .dblclick(function (e) {
+        if (e.ctrlKey) {
+          $(this).val(DEFAULT_PSD_SEGMENT_LENGTH_POWER).trigger("input");
+        }
+      })
+      .val(DEFAULT_PSD_SEGMENT_LENGTH_POWER);
+
     // Spectrum type to show
     userSettings.spectrumType =
       userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
@@ -349,10 +374,16 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         const psdHeatMapSelected =
           optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
           optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
+        const psdCurveSelected =
+          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
         overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
         analyserZoomYElem.toggleClass(
           "onlyFullScreenException",
-          pidErrorVsSetpointSelected || psdHeatMapSelected,
+          pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected,
+        );
+        analyserSegmentLengthPowerAt2.toggleClass(
+          "onlyFullScreenException",
+          !psdCurveSelected,
         );
         analyserLowLevelPSD.toggleClass(
           "onlyFullScreenException",
@@ -377,6 +408,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         $("#analyserLowLevelPSDLabel").toggleClass(
           "onlyFullScreenException",
           !psdHeatMapSelected,
+        );
+        $("#analyserSegmentLengthPowerAt2Label").toggleClass(
+          "onlyFullScreenException",
+          !psdCurveSelected,
         );
 
 
