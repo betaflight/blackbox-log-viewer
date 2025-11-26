@@ -855,7 +855,7 @@
           }
         ],
         "height": 1,
-        "label": "Custom graph"
+        "label": "Roll"
       },
       {
         "fields": [
@@ -888,12 +888,12 @@
             },
             "grid": false,
             "lineWidth": 1,
-            "name": "rcCommands[0]",
+            "name": "rcCommands[1]",
             "smoothing": 0
           }
         ],
         "height": 1,
-        "label": "Custom graph"
+        "label": "Pitch"
       }
     ],
     "title": "GyroSetpoint"
