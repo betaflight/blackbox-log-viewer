@@ -1138,8 +1138,12 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[all]": "MAVLink telemetry",
     "debug[0]": "Should send telemetry",
     "debug[1]": "Actual free TX buffers space",
-    "debug[2]": "Estimated free TX buffers space",
-    "debug[3]": "Telemetries call counter",
+    "debug[2]": "Status counter",
+    "debug[3]": "RC chan. counter",
+    "debug[4]": "GPS pos. counter",
+    "debug[5]": "Attitude (ex.1) counter",
+    "debug[6]": "Heartbeat (ex.2) counter",
+    "debug[7]": "Battery (ex.3) counter",
   },
 };
 
