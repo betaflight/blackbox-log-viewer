@@ -30,7 +30,7 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  let ADDITIONAL_COMPUTED_FIELD_COUNT = 20 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance and azimuth **/,
+  let ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/,
     that = this,
     logIndex = 0,
     logIndexes = new FlightLogIndex(logData),
@@ -286,6 +286,7 @@ export function FlightLog(logData) {
     }
     if (!that.isFieldDisabled().GPS) {
       fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance", "gpsHomeAzimuth"); // GPS coords in cartesian system
+      fieldNames.push("gpsTrajectoryTiltAngle"); // trajectory tilt angle
     }
 
     fieldNameToIndex = {};
@@ -636,6 +637,11 @@ export function FlightLog(logData) {
       fieldNameToIndex["GPS_coord[1]"],
       fieldNameToIndex["GPS_altitude"],
     ];
+    let gpsVelNED = [
+      fieldNameToIndex["GPS_velned[0]"],
+      fieldNameToIndex["GPS_velned[1]"],
+      fieldNameToIndex["GPS_velned[2]"],
+    ];
 
     const flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"]; // This points to the flightmode data
 
@@ -705,6 +711,9 @@ export function FlightLog(logData) {
       gpsCoord = false;
     }
 
+    if (!gpsVelNED[0]) {
+      gpsVelNED = false;
+    }
 
     sourceChunkIndex = 0;
     destChunkIndex = 0;
@@ -877,7 +886,7 @@ export function FlightLog(logData) {
             }
           }
 
-          // Calculate cartesian coords by GPS
+          // Calculate cartesian coords, azimuth and trajectory tilt angle by GPS
           if (!that.isFieldDisabled().GPS) {
             if (gpsTransform && gpsCoord && srcFrame[gpsCoord[0]]) {
               const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]] / 10000000, srcFrame[gpsCoord[1]] / 10000000, srcFrame[gpsCoord[2]] / 10);
@@ -896,6 +905,19 @@ export function FlightLog(logData) {
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
               destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
+            }
+
+            // Calculate trajectory tilt angle by NED GPS velocity
+            if (gpsVelNED) {
+              const Vn = srcFrame[gpsVelNED[0]],
+                    Ve = srcFrame[gpsVelNED[1]],
+                    Vd = srcFrame[gpsVelNED[2]];
+              const velocity = Math.sqrt(Vn * Vn + Ve * Ve + Vd * Vd);
+              const minVelo = 1;
+              const trajectoryTiltAngle = velocity > minVelo ? -Math.asin(Vd / velocity) * 180.0 / Math.PI : 0; // [degree], if velo is up then >0
+              destFrame[fieldIndex++] = trajectoryTiltAngle;
+            } else {
               destFrame[fieldIndex++] = 0;
             }
           }
