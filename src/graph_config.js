@@ -490,6 +490,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         MinMax: {
           min: -25,
           max: 25,
+        }
+      }
     } else if (fieldName == "gpsTrajectoryTiltAngle") {
       return {
         power: 1.0,
