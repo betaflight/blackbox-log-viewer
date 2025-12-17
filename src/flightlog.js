@@ -746,7 +746,7 @@ export function FlightLog(logData) {
             if (m < 1.0) {
                 // reconstruct .w of unit quaternion
                 q.w = Math.sqrt(1.0 - m);
-            } else {                
+            } else {
                 // normalize [0,x,y,z]
                 m = Math.sqrt(m);
                 q.x /= m;
