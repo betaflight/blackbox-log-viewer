@@ -130,6 +130,11 @@ const FRIENDLY_FIELD_NAMES = {
   GPS_speed: "GPS Speed",
   GPS_ground_course: "GPS Heading",
 
+  "GPS_velned[all]": "GPS NED velocities",
+  "GPS_velned[0]": "North velocity",
+  "GPS_velned[1]": "East velocity",
+  "GPS_velned[2]": "Down velocity",
+
   "gpsCartesianCoords[all]": "GPS Coords",
   "gpsCartesianCoords[0]": "GPS Coords [X]",
   "gpsCartesianCoords[1]": "GPS Coords [Y]",
@@ -1833,6 +1838,11 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "GPS_ground_course":
       return `${(value / 10).toFixed(1)} °`;
 
+    case "GPS_velned[0]":
+    case "GPS_velned[1]":
+    case "GPS_velned[2]":
+      return `${(value / 100).toFixed(1)} m/s`;
+
     case "gpsCartesianCoords[0]":
     case "gpsCartesianCoords[1]":
     case "gpsCartesianCoords[2]":
@@ -2578,6 +2588,10 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
       }
     case "GPS_ground_course":
       return toFriendly ? value / 10 : value * 10;
+    case "GPS_velned[0]":
+    case "GPS_velned[1]":
+    case "GPS_velned[2]":
+      return toFriendly ? value / 100 : value * 100;
     case "magADC[0]":
     case "magADC[1]":
     case "magADC[2]":

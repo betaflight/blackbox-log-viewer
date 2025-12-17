@@ -484,6 +484,14 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 360,
         },
       };
+    } else if (fieldName.match(/^GPS_velned\[/)) {
+      return {
+        power: 1.0,
+        MinMax: {
+          min: -25,
+          max: 25,
+        },
+      };
     } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode != null) {
       const debugModeName = DEBUG_MODE[sysConfig.debug_mode];
       switch (debugModeName) {
