@@ -266,7 +266,7 @@ export function FlightLog(logData) {
     }
 
     // Add names for our ADDITIONAL_COMPUTED_FIELDS
-    if (!that.isFieldDisabled().GYRO) {
+    if ((!(that.isFieldDisabled().GYRO || that.isFieldDisabled().ACC)) || !that.isFieldDisabled().ATTITUDE) {
       fieldNames.push("heading[0]", "heading[1]", "heading[2]");
     }
     if (!that.isFieldDisabled().PID) {
@@ -772,7 +772,7 @@ export function FlightLog(logData) {
             destFrame[fieldIndex++] = roll;
             destFrame[fieldIndex++] = pitch;
             destFrame[fieldIndex++] = heading;
-          } else {
+          } else if (gyroADC && accSmooth) {
             const attitude = chunkIMU.updateEstimatedAttitude(
                     [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
                     [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
