@@ -914,8 +914,12 @@ export function FlightLog(logData) {
                     Ve = srcFrame[gpsVelNED[1]],
                     Vd = srcFrame[gpsVelNED[2]];
               const velocity = Math.sqrt(Vn * Vn + Ve * Ve + Vd * Vd);
-              const minVelo = 1;
-              const trajectoryTiltAngle = velocity > minVelo ? -Math.asin(Vd / velocity) * 180.0 / Math.PI : 0; // [degree], if velo is up then >0
+              const minVelo = 5;  // 5cm/s limit to prevent division by zero and miss tiny noise values
+              let trajectoryTiltAngle = 0;
+              if (velocity > minVelo) {
+                const angleSin = Math.max(-1, Math.min(1, Vd / velocity));
+                trajectoryTiltAngle = -Math.asin(angleSin) * 180.0 / Math.PI; // [degree], if velo is up then >0
+              }
               destFrame[fieldIndex++] = trajectoryTiltAngle;
             } else {
               destFrame[fieldIndex++] = 0;
