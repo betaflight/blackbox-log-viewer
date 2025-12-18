@@ -913,7 +913,7 @@ export function FlightLog(logData) {
               const Vn = srcFrame[gpsVelNED[0]],
                     Ve = srcFrame[gpsVelNED[1]],
                     Vd = srcFrame[gpsVelNED[2]];
-              const velocity = Math.sqrt(Vn * Vn + Ve * Ve + Vd * Vd);
+              const velocity = Math.hypot(Vn, Ve, Vd);
               const minVelo = 5;  // 5cm/s limit to prevent division by zero and miss tiny noise values
               let trajectoryTiltAngle = 0;
               if (velocity > minVelo) {
