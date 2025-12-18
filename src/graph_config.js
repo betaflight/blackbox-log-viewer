@@ -1708,6 +1708,7 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
         "GPS_altitude",
         "GPS_speed",
         "GPS_ground_course",
+        "gpsTrajectoryTiltAngle",
         "GPS_coord[all]",
       ],
     });
