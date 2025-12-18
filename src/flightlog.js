@@ -918,7 +918,7 @@ export function FlightLog(logData) {
               let trajectoryTiltAngle = 0;
               if (velocity > minVelo) {
                 const angleSin = Math.max(-1, Math.min(1, Vd / velocity));
-                trajectoryTiltAngle = -Math.asin(angleSin) * 180.0 / Math.PI; // [degree], if velo is up then >0
+                trajectoryTiltAngle = -Math.asin(angleSin) * 180 / Math.PI; // [degree], if velo is up then >0
               }
               destFrame[fieldIndex++] = trajectoryTiltAngle;
             } else {
