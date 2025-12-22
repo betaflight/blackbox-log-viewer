@@ -285,7 +285,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       ),
     };
     return {
-      power: 1.0,
+      power: 1,
       MinMax: mmChartUnits,
     };
   };
@@ -310,11 +310,11 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
       mmChartUnits.max = Math.max(
         Math.max(Math.abs(mmChartUnits.max), Math.abs(mmChartUnits.min)),
-        1.0
+        1
       );
       mmChartUnits.min = -mmChartUnits.max;
       return {
-        power: 1.0,
+        power: 1,
         MinMax: mmChartUnits,
       };
     };
@@ -340,7 +340,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
   try {
     if (fieldName.match(/^motor\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 100,
@@ -359,7 +359,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       );
     } else if (fieldName.match(/^servo\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 1000,
           max: 2000,
@@ -367,7 +367,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^accSmooth\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: -16,
           max: 16,
@@ -376,7 +376,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     } else if (fieldName == "rcCommands[3]") {
       // Throttle scaled
       return {
-        power: 1.0 /* Make this 1.0 to scale linearly */,
+        power: 1 /* Make this 1 to scale linearly */,
         MinMax: {
           min: 0,
           max: 100,
@@ -389,7 +389,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       fieldName.match(/^gyroUnfilt\[/)
     ) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: -maxDegreesSecond(gyroScaleMargin),
           max: maxDegreesSecond(gyroScaleMargin),
@@ -397,7 +397,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^axis.+\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: -100,
           max: 100,
@@ -406,7 +406,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     } else if (fieldName == "rcCommand[3]") {
       // Throttle
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 1000,
           max: 2000,
@@ -414,7 +414,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^rcCommand\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 1000,
           max: 2000,
@@ -422,7 +422,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName == "heading[2]") {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 360,
@@ -430,7 +430,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^heading\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: -180,
           max: 180,
@@ -438,7 +438,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^sonar.*/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 400,
@@ -446,7 +446,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^rssi.*/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 100,
@@ -454,7 +454,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName == "GPS_ground_course") {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 360,
@@ -462,7 +462,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName == "GPS_numSat") {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 40,
@@ -470,7 +470,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName == "GPS_speed") {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: -100,
           max: 100,
@@ -478,7 +478,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName == "gpsHomeAzimuth") {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: 0,
           max: 360,
@@ -486,10 +486,18 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       };
     } else if (fieldName.match(/^GPS_velned\[/)) {
       return {
-        power: 1.0,
+        power: 1,
         MinMax: {
           min: -25,
           max: 25,
+        },
+      };
+    } else if (fieldName == "gpsTrajectoryTiltAngle") {
+      return {
+        power: 1,
+        MinMax: {
+          min: -90,
+          max: 90,
         },
       };
     } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode != null) {
@@ -507,7 +515,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             default:
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 2000,
@@ -516,7 +524,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "PIDLOOP":
           return {
-            power: 1.0,
+            power: 1,
             MinMax: {
               min: 0,
               max: 500,
@@ -534,7 +542,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         case "AC_CORRECTION":
         case "AC_ERROR":
           return {
-            power: 1.0,
+            power: 1,
             MinMax: {
               min: -maxDegreesSecond(gyroScaleMargin),
               max: maxDegreesSecond(gyroScaleMargin),
@@ -542,7 +550,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           };
         case "ACCELEROMETER":
           return {
-            power: 1.0,
+            power: 1,
             MinMax: {
               min: -16,
               max: 16,
@@ -550,7 +558,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           };
         case "MIXER":
           return {
-            power: 1.0,
+            power: 1,
             MinMax: {
               min: -100,
               max: 100,
@@ -560,7 +568,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": //Raw Value (0-4095)
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 4096,
@@ -568,7 +576,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             default:
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 26,
@@ -591,7 +599,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[3]": // throttle cutoff Hz
             case "debug[5]": // smoothed Rx Rate Hz, without steps
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1200,
@@ -599,7 +607,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[4]": // pt1K 0-1
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1,
@@ -608,7 +616,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[6]": // outlier count 0-3
             case "debug[7]": // valid count 0-3
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 50, // put them at the very bottom
@@ -627,7 +635,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "ANGLERATE":
           return {
-            power: 1.0,
+            power: 1,
             MinMax: {
               min: -maxDegreesSecond(gyroScaleMargin),
               max: maxDegreesSecond(gyroScaleMargin),
@@ -637,7 +645,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // GPS Trust
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -646,7 +654,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // Baro Alt
             case "debug[2]": // GPS Alt
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -50,
                   max: 50,
@@ -654,7 +662,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // vario
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -5,
                   max: 5,
@@ -669,7 +677,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // post-dyn notch gyro [for gyro debug axis]
             case "debug[2]": // pre-dyn notch gyro downsampled for FFT [for gyro debug axis]
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -maxDegreesSecond(gyroScaleMargin),
                   max: maxDegreesSecond(gyroScaleMargin),
@@ -690,7 +698,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               );
             case "debug[3]": // pre-dyn notch gyro [for gyro debug axis]
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -maxDegreesSecond(gyroScaleMargin),
                   max: maxDegreesSecond(gyroScaleMargin),
@@ -707,7 +715,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // gyro scaled [for selected axis]
             case "debug[3]": // pre-dyn notch gyro [for selected axis]
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -maxDegreesSecond(gyroScaleMargin),
                   max: maxDegreesSecond(gyroScaleMargin),
@@ -718,7 +726,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "FFT_TIME":
           return {
-            power: 1.0,
+            power: 1,
             MinMax: {
               min: -100,
               max: 100,
@@ -758,7 +766,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // AccelerationModified
             case "debug[2]": // Acceleration
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -1000,
                   max: 1000,
@@ -766,7 +774,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // Clip or Count
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 20,
@@ -779,7 +787,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // in 4.3 is interpolated setpoint, now un-smoothed setpoint
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -maxDegreesSecond(gyroScaleMargin),
                   max: maxDegreesSecond(gyroScaleMargin),
@@ -788,7 +796,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // feedforward delta element
             case "debug[2]": // feedforward boost element
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -796,7 +804,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // rcCommand deltaAbs
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -804,7 +812,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[4]": // Jitter Attenuator
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -100,
                   max: 100,
@@ -812,7 +820,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[5]": // Packet Duplicate boolean
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 10,
@@ -821,7 +829,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[6]": // Yaw feedforward
             case "debug[7]": // Yaw feedforward hold element
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -835,7 +843,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // Jitter Attenuator
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -100,
                   max: 100,
@@ -844,7 +852,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // Max setpoint rate for axis
             case "debug[2]": // Setpoint
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -maxDegreesSecond(gyroScaleMargin),
                   max: maxDegreesSecond(gyroScaleMargin),
@@ -854,7 +862,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[4]": // setpoint speed unsmoothed
             case "debug[5]": // setpoint speed smoothed
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -862,7 +870,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[6]": // pt1K 0-1
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1,
@@ -870,7 +878,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[7]": // smoothed Rx Rate Hz
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1200,
@@ -883,7 +891,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // Baro state 0-10
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -20,
                   max: 20,
@@ -893,7 +901,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // Baro Raw
             case "debug[3]": // Baro smoothed
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -907,7 +915,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // Throttle P uS added
             case "debug[1]": // Throttle D uS added
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -916,7 +924,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // Altitude
             case "debug[3]": // Target Altitude
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -50,
                   max: 50,
@@ -931,7 +939,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // in 4.3 is dyn idle I
             case "debug[2]": // in 4.3 is dyn idle D
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -1000,
                   max: 1000,
@@ -939,7 +947,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // in 4.3 and 4.2 is minRPS
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 12000,
@@ -955,7 +963,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // After RPM
             case "debug[3]": // After all but Dyn Notch
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -maxDegreesSecond(gyroScaleMargin * highResolutionScale),
                   max: maxDegreesSecond(gyroScaleMargin * highResolutionScale),
@@ -971,7 +979,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[3]": // constrained interval in ms
               return {
                 // start at bottom, scale up to 30ms
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 30,
@@ -980,7 +988,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // IsRateValid boolean
             case "debug[7]": // isReceivingSignal boolean
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 10,
@@ -989,7 +997,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[4]": // Rx Rate
             case "debug[5]": // Smoothed Rx Rate
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1200,
@@ -997,7 +1005,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[6]": // LQ
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -1013,7 +1021,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               return getCurveForMinMaxFieldsZeroOffset(fieldName);
             case "debug[2]": // RSSI
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -256,
                   max: 0,
@@ -1021,7 +1029,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // LQ percent
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -1034,7 +1042,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // Gyro task cycle us * 10 so 1250 = 125us
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 1000,
@@ -1043,7 +1051,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // ID of late task
             case "debug[2]": // task delay time 100us in middle
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 200,
@@ -1051,7 +1059,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // gyro skew 100 = 10us
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -50,
                   max: 50,
@@ -1065,7 +1073,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // % CPU Busy
             case "debug[1]": // late tasks per second
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -1073,7 +1081,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[2]": // total delay in last second
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -1081,7 +1089,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // total tasks per second
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 10000,
@@ -1094,7 +1102,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[2]": // Uplink LQ
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 100,
@@ -1121,7 +1129,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // Pitch P deg * 100
             case "debug[1]": // Pitch D deg * 100
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -20,
                   max: 20,
@@ -1130,7 +1138,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // Velocity in cm/s
             case "debug[3]": // Velocity to home in cm/s
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -5,
                   max: 5,
@@ -1143,7 +1151,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // Groundspeed cm/s
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -100,
                   max: 100,
@@ -1154,7 +1162,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[3]": // Angle to home * 10
             case "debug[4]": // magYaw * 10
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 360,
@@ -1162,7 +1170,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[5]": // magYaw * 10
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 20,
@@ -1170,7 +1178,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[6]": // roll angle *100
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 180,
@@ -1178,7 +1186,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[7]": // yaw rate deg/s
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 200,
@@ -1191,7 +1199,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // Pitch angle, deg * 100
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -4000,
                   max: 4000,
@@ -1200,7 +1208,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // Rescue Phase
             case "debug[2]": // Failure code
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 20,
@@ -1208,7 +1216,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // Failure counters coded
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 4000,
@@ -1222,7 +1230,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // velocity to home cm/s
             case "debug[1]": // target velocity cm/s
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -10,
                   max: 10,
@@ -1231,7 +1239,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // altitude m
             case "debug[3]": // Target altitude m
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -50,
                   max: 50,
@@ -1245,7 +1253,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // GPS flight model
             case "debug[1]": // Nav Data interval
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -1253,7 +1261,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[2]": // task interval
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -1264,7 +1272,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               return getCurveForMinMaxFields(fieldName);
             case "debug[5]": // ExecuteTimeUs
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -100,
                   max: 100,
@@ -1272,7 +1280,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[6]": // ackState
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -10,
                   max: 10,
@@ -1280,7 +1288,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[7]": // Incoming buffer
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -100,
                   max: 100,
@@ -1296,7 +1304,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // hDOP
             case "debug[3]": // vDOP
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -1312,7 +1320,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]":
             case "debug[3]":
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -1326,7 +1334,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // angle target
             case "debug[3]": // angle achieved
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -100,
                   max: 100,
@@ -1335,7 +1343,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // angle error correction
             case "debug[2]": // angle feedforward
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -500,
                   max: 500,
@@ -1351,7 +1359,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]":
             case "debug[3]":
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -200,
                   max: 200,
@@ -1367,7 +1375,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[2]": // Z
             case "debug[3]": // Field
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -2000,
                   max: 2000,
@@ -1377,7 +1385,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[5]": // Y Cal
             case "debug[6]": // Z Cal
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -500,
                   max: 500,
@@ -1385,7 +1393,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[7]": // Lambda
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: 0,
                   max: 4000,
@@ -1399,7 +1407,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[0]": // Task Rate
             case "debug[1]": // Data Rate
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -1000,
                   max: 1000,
@@ -1407,7 +1415,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[2]": // Data Interval
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -10000,
                   max: 10000,
@@ -1415,7 +1423,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[3]": // Execute Time
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -20,
                   max: 20,
@@ -1424,7 +1432,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[4]": // Bus Busy Check
             case "debug[5]": // Read State Check
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -2,
                   max: 2,
@@ -1432,7 +1440,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               };
             case "debug[6]": // Time since previous task uS
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -10000,
                   max: 10000,
@@ -1444,16 +1452,16 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         case "EZLANDING":
           return {
             offset: -5000,
-            power: 1.0,
+            power: 1,
             inputRange: 5000,
-            outputRange: 1.0,
+            outputRange: 1,
           };
         case "ATTITUDE":
           switch (fieldName) {
             case "debug[0]": // Roll angle
             case "debug[1]": // Pitch angle
               return {
-                power: 1.0,
+                power: 1,
                 MinMax: {
                   min: -180,
                   max: 180,
@@ -1496,7 +1504,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     return getCurveForMinMaxFields(fieldName);
   } catch (e) {
     return {
-      power: 1.0,
+      power: 1,
       MinMax: {
         min: -500,
         max: 500,
@@ -1700,6 +1708,7 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
         "GPS_altitude",
         "GPS_speed",
         "GPS_ground_course",
+        "gpsTrajectoryTiltAngle",
         "GPS_coord[all]",
       ],
     });
