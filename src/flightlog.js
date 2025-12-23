@@ -1805,6 +1805,9 @@ FlightLog.prototype.isFieldDisabled = function () {
     GPS: (disabledFields & (1 << 11)) !== 0,
     RPM: (disabledFields & (1 << 12)) !== 0,
     GYROUNFILT: (disabledFields & (1 << 13)) !== 0,
+    // Define newer firmware fields as disabled by default to prevent undefined behavior in older firmware
+    ATTITUDE: true,
+    SERVO: true,
   };
 
   if (
