@@ -1023,18 +1023,22 @@
                                         <table class="parameter cf">
                                             <thead>
                                                 <tr>
-                                                    <th colspan="5">TPA and Airmode</th>
+                                                    <th colspan="5">TPA, Airmode, Thrust Linear</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td name="tpa_rate">
-                                                        <label>TPA amount</label>
+                                                        <label>TPA Rate</label>
                                                         <input type="text" step="1" min="0" max="100" />
                                                     </td>
                                                     <td name="tpa-breakpoint">
                                                         <label>TPA Breakpoint</label>
                                                         <input type="text" step="10" min="1000" max="2000" />
+                                                    </td>
+                                                    <td name="thrust_linear" class="bf-only">
+                                                        <label>Thrust Linear</label>
+                                                        <input type="text" step="1" min="0" max="100" />
                                                     </td>
                                                     <td name="airmode_activate_throttle" class="bf-only">
                                                         <label>Airmode Activate</label>
@@ -2251,7 +2255,7 @@
                                                    <tr>
                                                     <th scope="row" colspan="6">Curves and range</th>
                                                    </tr>
-                                               </thead>
+                                                </thead>
                                                     <td name="thrMid">
                                                         <label>Throttle Mid</label>
                                                         <input type="text" step="0.01" min="0" max="1" />
