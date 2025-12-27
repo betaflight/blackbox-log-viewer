@@ -140,6 +140,12 @@ export function HeaderDialog(dialog, onSave) {
       max: "9999.9.9",
     },
     {
+      name: "thrust_linear",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "4.0.0",
+      max: "9999.9.9",
+    },
+    {
       name: "dterm_lpf2_hz",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "3.4.0",
