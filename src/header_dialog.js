@@ -140,6 +140,12 @@ export function HeaderDialog(dialog, onSave) {
       max: "9999.9.9",
     },
     {
+      name: "thrust_linear",
+      type: FIRMWARE_TYPE_BETAFLIGHT,
+      min: "4.0.0",
+      max: "9999.9.9",
+    },
+    {
       name: "dterm_lpf2_hz",
       type: FIRMWARE_TYPE_BETAFLIGHT,
       min: "3.4.0",
@@ -1475,6 +1481,7 @@ export function HeaderDialog(dialog, onSave) {
     setParameter("currentMeterScale", sysConfig.currentMeterScale, 0);
     setParameter("thrMid", sysConfig.thrMid, 2);
     setParameter("thrExpo", sysConfig.thrExpo, 2);
+    setParameter("thrust_linear", sysConfig.thrust_linear, 0);
     setParameter("tpa_rate", sysConfig.tpa_rate, 2);
     setParameter("tpa-breakpoint", sysConfig.tpa_breakpoint, 0);
     setParameter("superExpoFactor", sysConfig.superExpoFactor, 2);
