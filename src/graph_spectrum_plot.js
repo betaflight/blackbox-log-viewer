@@ -1474,7 +1474,7 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
       const throttle = i / (NUMBER_OF_POINTS - 1);
       const y = HEIGHT - HEIGHT * throttle;
 
-      const expof = expo !== undefined ? expo / 10 : 0;
+      const expof = (expo ?? 0) / 10;
       const curve = throttle * (1 - throttle) * expof + throttle;
       const frequency = (frequency2 - frequency1) * curve + frequency1;
 
