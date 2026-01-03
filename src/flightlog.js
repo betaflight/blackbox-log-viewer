@@ -266,8 +266,8 @@ export function FlightLog(logData) {
     }
 
     // Add names for our ADDITIONAL_COMPUTED_FIELDS
-    // Add heading fields when: ATTITUDE enabled (quaternion available) OR both GYRO and ACC enabled (IMU estimation available)
-    if ((!that.isFieldDisabled().GYRO && !that.isFieldDisabled().ACC) || !that.isFieldDisabled().ATTITUDE) {
+    // Add heading fields when: ATTITUDE enabled (added 2025.12 / quaternion available) OR both GYRO and ACC enabled (IMU estimation available)
+    if ((!that.isFieldDisabled().GYRO && !that.isFieldDisabled().ACC) || that.isFieldDisabled().ATTITUDE === false) {
       fieldNames.push("heading[0]", "heading[1]", "heading[2]");
     }
     if (!that.isFieldDisabled().PID) {
