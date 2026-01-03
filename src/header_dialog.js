@@ -1281,22 +1281,46 @@ export function HeaderDialog(dialog, onSave) {
     const value = sysConfig.fields_disabled_mask;
 
     // generate features
-    const fields = [
-      { name: "PIDs", description: "All axis PID values" },
-      { name: "RC Commands", description: "All axis RC Commands" },
-      { name: "Setpoint", description: "All axis setpoints" },
-      { name: "Battery", description: "Vbat and current values" },
-      { name: "Magnetometer", description: "" },
-      { name: "Altitude", description: "Barometer and rangefinder" },
-      { name: "RSSI", description: "" },
-      { name: "Filtered Gyroscope", description: "Filtered gyro data" },
-      { name: "Accelerometer", description: "Raw accelerometer data" },
-      { name: "Debug", description: "Debug values" },
-      { name: "Motors", description: "Motors and tricopter servo values" },
-      { name: "GPS", description: "All GPS-related values" },
-      { name: "RPM", description: "Angular velocity for all motors" },
-      { name: "Unfiltered Gyroscope", description: "Unfiltered gyro data" },
-    ];
+
+    const fields = [];
+
+    if (semver.gte(sysConfig.firmwareVersion, "2025.12.0")) {
+      fields.push(
+        { name: "PIDs", description: "All axis PID values" },
+        { name: "RC Commands", description: "All axis RC Commands" },
+        { name: "Setpoint", description: "All axis setpoints" },
+        { name: "Battery", description: "Vbat and current values" },
+        { name: "Magnetometer", description: "" },
+        { name: "Altitude", description: "Barometer and rangefinder" },
+        { name: "RSSI", description: "" },
+        { name: "Filtered Gyroscope", description: "Filtered gyro data" },
+        { name: "Attitude", description: "Attitude data" },
+        { name: "Accelerometer", description: "Raw accelerometer data" },
+        { name: "Debug", description: "Debug values" },
+        { name: "Motors", description: "Motors and tricopter servo values" },
+        { name: "GPS", description: "All GPS-related values" },
+        { name: "RPM", description: "Angular velocity for all motors" },
+        { name: "Unfiltered Gyroscope", description: "Unfiltered gyro data" },
+        { name: "Servos", description: "All servo output values" },
+      );
+    } else {
+      fields.push(
+        { name: "PIDs", description: "All axis PID values" },
+        { name: "RC Commands", description: "All axis RC Commands" },
+        { name: "Setpoint", description: "All axis setpoints" },
+        { name: "Battery", description: "Vbat and current values" },
+        { name: "Magnetometer", description: "" },
+        { name: "Altitude", description: "Barometer and rangefinder" },
+        { name: "RSSI", description: "" },
+        { name: "Filtered Gyroscope", description: "Filtered gyro data" },
+        { name: "Accelerometer", description: "Raw accelerometer data" },
+        { name: "Debug", description: "Debug values" },
+        { name: "Motors", description: "Motors and tricopter servo values" },
+        { name: "GPS", description: "All GPS-related values" },
+        { name: "RPM", description: "Angular velocity for all motors" },
+        { name: "Unfiltered Gyroscope", description: "Unfiltered gyro data" },
+      );
+    }
 
     const fieldsList_e = $(".fields_list").empty();
 
