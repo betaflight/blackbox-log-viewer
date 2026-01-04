@@ -266,8 +266,8 @@ export function FlightLog(logData) {
     }
 
     // Add names for our ADDITIONAL_COMPUTED_FIELDS
-    // Add heading fields when: ATTITUDE enabled (quaternion available) OR both GYRO and ACC enabled (IMU estimation available)
-    if ((!that.isFieldDisabled().GYRO && !that.isFieldDisabled().ACC) || !that.isFieldDisabled().ATTITUDE) {
+    // Add heading fields when: ATTITUDE enabled (added 2025.12 / quaternion available) OR both GYRO and ACC enabled (IMU estimation available)
+    if ((!that.isFieldDisabled().GYRO && !that.isFieldDisabled().ACC) || that.isFieldDisabled().ATTITUDE === false) {
       fieldNames.push("heading[0]", "heading[1]", "heading[2]");
     }
     if (!that.isFieldDisabled().PID) {
@@ -1790,30 +1790,19 @@ FlightLog.prototype.getFeatures = function (enabledFeatures) {
 
 FlightLog.prototype.isFieldDisabled = function () {
   const disabledFields = this.getSysConfig().fields_disabled_mask;
-  const disabledFieldsFlags = {
-    PID: (disabledFields & (1 << 0)) !== 0,
-    RC_COMMANDS: (disabledFields & (1 << 1)) !== 0,
-    SETPOINT: (disabledFields & (1 << 2)) !== 0,
-    BATTERY: (disabledFields & (1 << 3)) !== 0,
-    MAGNETOMETER: (disabledFields & (1 << 4)) !== 0,
-    ALTITUDE: (disabledFields & (1 << 5)) !== 0,
-    RSSI: (disabledFields & (1 << 6)) !== 0,
-    GYRO: (disabledFields & (1 << 7)) !== 0,
-    ACC: (disabledFields & (1 << 8)) !== 0,
-    DEBUG: (disabledFields & (1 << 9)) !== 0,
-    MOTORS: (disabledFields & (1 << 10)) !== 0,
-    GPS: (disabledFields & (1 << 11)) !== 0,
-    RPM: (disabledFields & (1 << 12)) !== 0,
-    GYROUNFILT: (disabledFields & (1 << 13)) !== 0,
-    // Define newer firmware fields as disabled by default to prevent undefined behavior in older firmware
-    ATTITUDE: true,
-    SERVO: true,
-  };
-
+  const disabledFieldsFlags = {};
   if (
     this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
-    semver.gte(this.getSysConfig().firmwareVersion, "2025.12.0")
+    firmwareGreaterOrEqual(this.getSysConfig(), "2025.12.0")
   ) {
+    disabledFieldsFlags.PID = (disabledFields & (1 << 0)) !== 0;
+    disabledFieldsFlags.RC_COMMANDS = (disabledFields & (1 << 1)) !== 0;
+    disabledFieldsFlags.SETPOINT = (disabledFields & (1 << 2)) !== 0;
+    disabledFieldsFlags.BATTERY = (disabledFields & (1 << 3)) !== 0;
+    disabledFieldsFlags.MAGNETOMETER = (disabledFields & (1 << 4)) !== 0;
+    disabledFieldsFlags.ALTITUDE = (disabledFields & (1 << 5)) !== 0;
+    disabledFieldsFlags.RSSI = (disabledFields & (1 << 6)) !== 0;
+    disabledFieldsFlags.GYRO = (disabledFields & (1 << 7)) !== 0;
     disabledFieldsFlags.ATTITUDE = (disabledFields & (1 << 8)) !== 0;
     disabledFieldsFlags.ACC = (disabledFields & (1 << 9)) !== 0;
     disabledFieldsFlags.DEBUG = (disabledFields & (1 << 10)) !== 0;
@@ -1822,7 +1811,21 @@ FlightLog.prototype.isFieldDisabled = function () {
     disabledFieldsFlags.RPM = (disabledFields & (1 << 13)) !== 0;
     disabledFieldsFlags.GYROUNFILT = (disabledFields & (1 << 14)) !== 0;
     disabledFieldsFlags.SERVO = (disabledFields & (1 << 15)) !== 0;
+  } else {
+    disabledFieldsFlags.PID = (disabledFields & (1 << 0)) !== 0;
+    disabledFieldsFlags.RC_COMMANDS = (disabledFields & (1 << 1)) !== 0;
+    disabledFieldsFlags.SETPOINT = (disabledFields & (1 << 2)) !== 0;
+    disabledFieldsFlags.BATTERY = (disabledFields & (1 << 3)) !== 0;
+    disabledFieldsFlags.MAGNETOMETER = (disabledFields & (1 << 4)) !== 0;
+    disabledFieldsFlags.ALTITUDE = (disabledFields & (1 << 5)) !== 0;
+    disabledFieldsFlags.RSSI = (disabledFields & (1 << 6)) !== 0;
+    disabledFieldsFlags.GYRO = (disabledFields & (1 << 7)) !== 0;
+    disabledFieldsFlags.ACC = (disabledFields & (1 << 8)) !== 0;
+    disabledFieldsFlags.DEBUG = (disabledFields & (1 << 9)) !== 0;
+    disabledFieldsFlags.MOTORS = (disabledFields & (1 << 10)) !== 0;
+    disabledFieldsFlags.GPS = (disabledFields & (1 << 11)) !== 0;
+    disabledFieldsFlags.RPM = (disabledFields & (1 << 12)) !== 0;
+    disabledFieldsFlags.GYROUNFILT = (disabledFields & (1 << 13)) !== 0;
   }
-
   return disabledFieldsFlags;
 };
