@@ -824,6 +824,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
         canvasCtx,
         this._sysConfig.gyro_lowpass_dyn_hz[0],
         this._sysConfig.gyro_lowpass_dyn_hz[1],
+        this._sysConfig.gyro_lowpass_dyn_expo,
         MAXIMAL_PLOTTED_FREQUENCY,
         label,
         WIDTH,
@@ -973,6 +974,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
           canvasCtx,
           this._sysConfig.dterm_lpf_dyn_hz[0],
           this._sysConfig.dterm_lpf_dyn_hz[1],
+          this._sysConfig.dterm_lpf_dyn_expo,
           MAXIMAL_PLOTTED_FREQUENCY,
           label,
           WIDTH,
@@ -1404,6 +1406,7 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
   canvasCtx,
   frequency1,
   frequency2,
+  expo,
   maximalFrequency,
   label,
   WIDTH,
@@ -1460,22 +1463,22 @@ GraphSpectrumPlot._drawLowpassDynFilter = function (
     this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
   ) {
     /*
-     * It draws a curve:
-     *      frequency = (throttle - (throttle * throttle * throttle) / 3.0f) * 1.5f;
-     * but need to scale the 1.5f using the max value of the dyn filter
+     * It draws a real betaflight filters curve with expo
      */
-    const scale = frequency2 / (maximalFrequency);
+    const scaleX = WIDTH / maximalFrequency;
     const NUMBER_OF_POINTS = this._isFullScreen ? 30 : 10;
 
     let startPlot = false;
     const points = [];
-    for (let i = 1; i <= NUMBER_OF_POINTS; i++) {
-      const throttle = (1 / NUMBER_OF_POINTS) * i;
+    for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+      const throttle = i / (NUMBER_OF_POINTS - 1);
       const y = HEIGHT - HEIGHT * throttle;
 
-      const frequency =
-        (throttle - (throttle * throttle * throttle) / 3) * (1.5 * scale);
-      const x = WIDTH * frequency;
+      const expof = (expo ?? 0) / 10;
+      const curve = throttle * (1 - throttle) * expof + throttle;
+      const frequency = (frequency2 - frequency1) * curve + frequency1;
+
+      const x = scaleX * frequency;
 
       if (x >= x1) {
         if (startPlot === false) {
