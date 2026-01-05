@@ -680,6 +680,8 @@ export function FlightLog(logData) {
         fieldNameToIndex["axisS[2]"],
       ],
     ];
+    
+    const numSatIndex = fieldNameToIndex["GPS_numSat"];
 
     let sourceChunkIndex;
     let destChunkIndex;
@@ -900,17 +902,26 @@ export function FlightLog(logData) {
 
           // Calculate cartesian coords, azimuth and trajectory tilt angle by GPS
           if (gpsTransform && gpsCoord) {
-            const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]] / 10000000, srcFrame[gpsCoord[1]] / 10000000, srcFrame[gpsCoord[2]] / 10);
-            destFrame[fieldIndex++] = gpsCartesianCoords.x;
-            destFrame[fieldIndex++] = gpsCartesianCoords.y;
-            destFrame[fieldIndex++] = gpsCartesianCoords.z;
-            destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x * gpsCartesianCoords.x + gpsCartesianCoords.z * gpsCartesianCoords.z);
+            const numSat = numSatIndex ? srcFrame[numSatIndex] : 0;
+            if (numSat > 3) {
+              const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]] / 10000000, srcFrame[gpsCoord[1]] / 10000000, srcFrame[gpsCoord[2]] / 10);
+              destFrame[fieldIndex++] = gpsCartesianCoords.x;
+              destFrame[fieldIndex++] = gpsCartesianCoords.y;
+              destFrame[fieldIndex++] = gpsCartesianCoords.z;
+              destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x * gpsCartesianCoords.x + gpsCartesianCoords.z * gpsCartesianCoords.z);
 
-            let homeAzimuth = Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) * 180 / Math.PI;
-            if (homeAzimuth < 0) {
-              homeAzimuth += 360;
+              let homeAzimuth = Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) * 180 / Math.PI;
+              if (homeAzimuth < 0) {
+                homeAzimuth += 360;
+              }
+              destFrame[fieldIndex++] = homeAzimuth;
+            } else {
+              destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
+              destFrame[fieldIndex++] = 0;
             }
-            destFrame[fieldIndex++] = homeAzimuth;
           }
 
           // Calculate trajectory tilt angle by NED GPS velocity
