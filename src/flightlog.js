@@ -289,14 +289,16 @@ export function FlightLog(logData) {
       fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
     }
 
-    if (fieldNames.includes("GPS_coord[0]")) {
-      // GPS coords in cartesian system
-      fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance", "gpsHomeAzimuth");
-    }
+    if (!that.isFieldDisabled().GPS) {
+      if (fieldNames.includes("GPS_coord[0]")) {
+        // GPS coords in cartesian system
+        fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance", "gpsHomeAzimuth");
+      }
 
-    if (fieldNames.includes("GPS_velned[0]")) {
-      // GPS trajectory tilt angle
-      fieldNames.push("gpsTrajectoryTiltAngle");
+      if (fieldNames.includes("GPS_velned[0]")) {
+        // GPS trajectory tilt angle
+        fieldNames.push("gpsTrajectoryTiltAngle");
+      }
     }
 
     fieldNameToIndex = {};
