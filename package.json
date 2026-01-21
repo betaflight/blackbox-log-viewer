@@ -30,7 +30,7 @@
     "jquery-ui": "^1.13.2",
     "leaflet": "^1.9.3",
     "leaflet-marker-rotation": "^0.4.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "prettier": "^2.8.1",
     "throttle-debounce": "^5.0.0",
     "vite": "^5.4.21",
