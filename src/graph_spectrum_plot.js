@@ -609,9 +609,9 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
 GraphSpectrumPlot.getValueFromMatrixFFT  = function(frequency, vsArgument) {
   const matrixFFT = this._fftData;
   let vsArgumentIndex = Math.round(NUM_VS_BINS * (vsArgument - matrixFFT.vsRange.min) / (matrixFFT.vsRange.max - matrixFFT.vsRange.min));
-  if (vsArgumentIndex >= NUM_VS_BINS) {
-    vsArgumentIndex = NUM_VS_BINS - 1;
-  }
+  vsArgumentIndex = Math.max(vsArgumentIndex, 0);
+  vsArgumentIndex = Math.min(vsArgumentIndex, NUM_VS_BINS - 1);
+
   let freqIndex = Math.round(2 * frequency / matrixFFT.blackBoxRate * (matrixFFT.fftLength - 1));
   freqIndex = Math.max(freqIndex, 0);
   freqIndex = Math.min(freqIndex, matrixFFT.fftLength - 1);
@@ -1575,7 +1575,21 @@ GraphSpectrumPlot._drawMousePosition = function (
   lineWidth
 ) {
   // X axis
+
+
+  const marginLeft = this._getActualMarginLeft();
+
+  // Hide mouse cursor in the left-down corner position
+  const mouseCursorOffLimit = 5;
+  if (mouseY > HEIGHT + mouseCursorOffLimit && mouseX < marginLeft - mouseCursorOffLimit) {
+    return;
+  }
+
+  mouseX = Math.max(mouseX, marginLeft);
+  mouseY = Math.min(mouseY, HEIGHT);
+
   let mouseFrequency = 0;
+
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||
     this._spectrumType === SPECTRUM_TYPE.FREQ_VS_THROTTLE ||
@@ -1586,7 +1600,6 @@ GraphSpectrumPlot._drawMousePosition = function (
   ) {
     // Calculate frequency at mouse
     const maximalFrequency = 0.5 * this._fftData.blackBoxRate / this._zoomX;
-    const marginLeft = this._getActualMarginLeft();
 
     mouseFrequency = ((mouseX - marginLeft) / WIDTH) * maximalFrequency;
     if (mouseFrequency >= 0 && mouseFrequency <= maximalFrequency) {
@@ -1672,8 +1685,6 @@ GraphSpectrumPlot._drawMousePosition = function (
     const dataLimits = this._drawPidErrorVsSetpointGraphProcessData();
 
     // X axis. Calculate deg/sec at mouse
-    const marginLeft = this._getActualMarginLeft();
-
     const mouseDegreesSecond =
       ((mouseX - marginLeft) / WIDTH) * dataLimits.currentDrawMaxSetpoint;
     const interestLabel = `${mouseDegreesSecond.toFixed(0)}deg/sec`;
