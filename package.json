@@ -23,7 +23,7 @@
   "dependencies": {
     "Leaflet.MultiOptionsPolyline": "hgoebl/Leaflet.MultiOptionsPolyline",
     "bootstrap": "~3.4.1",
-    "eslint": "^8.24.0",
+    "eslint": "^9.26.0",
     "eslint-config-prettier": "^8.5.0",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.7.1",
