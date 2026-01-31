@@ -1408,7 +1408,7 @@ export function HeaderDialog(dialog, onSave) {
         $(".header-dialog-toggle").hide(); // selection button is not required
         break;
       default:
-        $(".header-dialog-toggle").text("Cleanflight");
+        $(".header-dialog-toggle").text("Legacy");
 
         // Toggle Button
         $(".header-dialog-toggle").show(); // Selection button is required
@@ -1420,7 +1420,7 @@ export function HeaderDialog(dialog, onSave) {
           } else {
             $("html").removeClass("isBF");
             $("html").addClass("isCF");
-            $(".header-dialog-toggle").text("Cleanflight");
+            $(".header-dialog-toggle").text("Legacy");
           }
         });
     }

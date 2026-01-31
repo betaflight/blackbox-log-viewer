@@ -845,12 +845,12 @@ export function FlightLogParser(logData) {
       case "digitalIdleOffset":
         that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
 
-      /**  Cleanflight Only log headers **/
+      /**  Legacy firmware log headers **/
       case "dterm_cut_hz":
       case "acc_cut_hz":
         that.sysConfig[fieldName] = parseInt(fieldValue, 10);
         break;
-      /** End of cleanflight only log headers **/
+      /** End of legacy firmware log headers **/
 
       case "superExpoFactor":
         if (stringHasComma(fieldValue)) {
@@ -935,9 +935,9 @@ export function FlightLogParser(logData) {
       case "gyro.scale":
       case "gyro_scale":
         that.sysConfig.gyroScale = hexToFloat(fieldValue);
-        /* Baseflight uses a gyroScale that'll give radians per microsecond as output, whereas Cleanflight produces degrees
-         * per second and leaves the conversion to radians per us to the IMU. Let's just convert Cleanflight's scale to
-         * match Baseflight so we can use Baseflight's IMU for both: */
+        /* Legacy firmware uses a gyroScale that'll give radians per microsecond as output, whereas modern firmware produces degrees
+         * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
+         * match the legacy format so we can use a consistent IMU for all firmware types: */
         if (
           that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
           that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
@@ -982,7 +982,7 @@ export function FlightLogParser(logData) {
             $("html").removeClass("isBF");
             $("html").addClass("isINAV");
           } else {
-            // Cleanflight 1.x and others
+            // Legacy firmware versions
             that.sysConfig.firmwareVersion = "0.0.0";
             that.sysConfig.firmware = 0;
             that.sysConfig.firmwarePatch = 0;

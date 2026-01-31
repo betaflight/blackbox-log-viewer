@@ -3,7 +3,7 @@ import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 export function UserSettingsDialog(dialog, onLoad, onSave) {
   // Private Variables
 
-  // generate mixer (from Cleanflight Configurator) (note that the mixerConfiguration index starts at 1)
+  // generate mixer (note that the mixerConfiguration index starts at 1)
   let mixerList = [
     {
       name: "Tricopter",

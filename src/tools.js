@@ -443,7 +443,7 @@ export function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
    *
    * sysConfig            System config structure
    * bf_version           Betaflight version to check, e.g. '3.1.0' (string)
-   * cf_version           Cleanflight version to check, e.g. '2.3.0' (optional, string)
+   * cf_version           Legacy firmware version to check, e.g. '2.3.0' (optional, string)
    *
    * returns              True when firmware version is higher or equal to requested version
    *                      False when firmware version is lower than the requested version

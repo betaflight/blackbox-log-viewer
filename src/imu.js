@@ -1,5 +1,5 @@
 /**
- * This IMU code is used for attitude estimation, and is directly derived from Baseflight's imu.c.
+ * This IMU code is used for attitude estimation, and is derived from legacy flight controller firmware.
  */
 
 export function IMU(copyFrom) {
