@@ -13,6 +13,7 @@ import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
 import { ExpoCurve } from "./expo";
 import { leftPad, formatTime } from "./tools";
+import { ThemeColors } from "./theme_colors";
 
 export function FlightLogGrapher(
   flightLog,
@@ -288,7 +289,7 @@ export function FlightLogGrapher(
 
   function drawFrameLabel(frameIndex, timeMsec) {
     canvasContext.font = `${drawingParams.fontSizeFrameLabel}pt ${DEFAULT_FONT_FACE}`;
-    canvasContext.fillStyle = "rgba(255,255,255,0.65)";
+    canvasContext.fillStyle = ThemeColors.getGraphTextSecondary();
 
     if (frameLabelTextWidthFrameNumber == null)
       frameLabelTextWidthFrameNumber =
@@ -440,7 +441,7 @@ export function FlightLogGrapher(
 
   //Draw an origin line for a graph (at the origin and spanning the window)
   function drawAxisLine() {
-    canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
+    canvasContext.strokeStyle = ThemeColors.getGraphAxis();
     canvasContext.lineWidth = 1;
     canvasContext.setLineDash([5]); // Make the center line a dash
     canvasContext.beginPath();
@@ -477,7 +478,7 @@ export function FlightLogGrapher(
       GRID_INTERVAL = (1 / GRID_LINES) * (max - min),
       yScale = -plotHeight / 2;
 
-    canvasContext.strokeStyle = "rgba(255,255,255,0.5)"; // Grid Color
+    canvasContext.strokeStyle = ThemeColors.getGraphGrid(); // Grid Color
     canvasContext.setLineDash([1, 10]); // Make the grid line a dash
     canvasContext.lineWidth = 1;
     canvasContext.beginPath();
@@ -511,7 +512,7 @@ export function FlightLogGrapher(
 
   function drawAxisLabel(axisLabel, y) {
     canvasContext.font = `${drawingParams.fontSizeAxisLabel}pt ${DEFAULT_FONT_FACE}`;
-    canvasContext.fillStyle = "rgba(255,255,255,0.9)";
+    canvasContext.fillStyle = ThemeColors.getGraphText();
     canvasContext.textAlign = "right";
 
     canvasContext.fillText(axisLabel, canvas.width - 8, y ? y : -8);
@@ -697,7 +698,7 @@ export function FlightLogGrapher(
         if (events[j].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
           // Avoid setting the font if we don't draw any events
           if (shouldSetFont) {
-            canvasContext.fillStyle = "rgba(255, 255, 255, 0.8)";
+            canvasContext.fillStyle = ThemeColors.getGraphText();
             canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;
             shouldSetFont = false;
           }
@@ -712,7 +713,7 @@ export function FlightLogGrapher(
     let markerEvent = blackboxLogViewer.getMarker();
     let bookmarkEvents = blackboxLogViewer.getBookmarks();
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
-      canvasContext.fillStyle = "rgba(255, 255, 255, 0.8)";
+      canvasContext.fillStyle = ThemeColors.getGraphText();
       canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;
       shouldSetFont = false;
     }
@@ -819,7 +820,7 @@ export function FlightLogGrapher(
         (inMarkerX !== false && inMarkerX >= 0 && inMarkerX <= canvas.width) ||
         (outMarkerX !== false && outMarkerX >= 0 && outMarkerX <= canvas.width)
       ) {
-        canvasContext.strokeStyle = "rgb(200,200,200)";
+        canvasContext.strokeStyle = ThemeColors.getGraphText();
         canvasContext.lineWidth = 4;
 
         if (
@@ -923,9 +924,9 @@ export function FlightLogGrapher(
     windowEndTime = windowStartTime + windowWidthMicros;
 
     if (options.eraseBackground) {
-      // Work-around: The webm-writer does not like transparent backgrounds. Fill canvas with black.
+      // Work-around: The webm-writer does not like transparent backgrounds. Fill canvas with graph background color.
       if (options.fillBackground) {
-        canvasContext.fillStyle = "black";
+        canvasContext.fillStyle = ThemeColors.getGraphBackground();
         canvasContext.fillRect(0, 0, canvas.width, canvas.height);
       } else {
         canvasContext.clearRect(0, 0, canvas.width, canvas.height);
@@ -1188,6 +1189,12 @@ export function FlightLogGrapher(
   this.destroy = function () {
     $(canvas).off("mousedown", onMouseDown);
     $(canvas).off("touchstart", onTouchStart);
+  };
+
+  this.refreshTheme = function () {
+    // Clear the theme color cache and trigger a redraw
+    ThemeColors.clearCache();
+    // The next render will use the new theme colors
   };
 
   this.setGraphZoom = function (zoom) {

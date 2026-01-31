@@ -1,3 +1,5 @@
+import { ThemeColors } from "./theme_colors";
+
 export function SeekBar(canvas) {
   let that = this,
     //Times:
@@ -20,17 +22,37 @@ export function SeekBar(canvas) {
     outTime = false,
     backgroundValid = false,
     dirtyRegion = false,
-    BACKGROUND_STYLE = "#eee",
-    EVENT_BAR_STYLE = "#8d8",
-    ACTIVITY_BAR_STYLE = "rgba(170,170,255, 0.9)",
-    OUTSIDE_EXPORT_RANGE_STYLE = "rgba(100, 100, 100, 0.5)",
-    // Suggested to be the same as that used by the graph's center mark in order to tie them together
-    CURSOR_STYLE = "rgba(255, 64, 64, 0.75)",
-    CURSOR_STYLE_WINDOW = "rgba(255, 65, 64, 0.15)",
     //Current time cursor:
     CURSOR_WIDTH = 1,
     // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
     BAR_INSET = CURSOR_WIDTH;
+
+  // Theme-aware color functions
+  function getBackgroundStyle() {
+    return ThemeColors.getGraphBackground();
+  }
+
+  function getEventBarStyle() {
+    return "#8d8"; // Green color works in both themes
+  }
+
+  function getActivityBarStyle() {
+    return ThemeColors.isDarkTheme()
+      ? "rgba(200,200,255, 0.9)"
+      : "rgba(170,170,255, 0.9)";
+  }
+
+  function getOutsideExportRangeStyle() {
+    return "rgba(100, 100, 100, 0.5)"; // Dimming overlay works in both themes
+  }
+
+  function getCursorStyle() {
+    return "rgba(255, 64, 64, 0.75)"; // Red cursor works in both themes
+  }
+
+  function getCursorStyleWindow() {
+    return "rgba(255, 65, 64, 0.15)"; // Red window overlay works in both themes
+  }
 
   this.onSeek = false;
 
@@ -164,7 +186,7 @@ export function SeekBar(canvas) {
   function rebuildBackground() {
     let x, activityIndex, activity, pixelTimeStep, time;
 
-    backgroundContext.fillStyle = BACKGROUND_STYLE;
+    backgroundContext.fillStyle = getBackgroundStyle();
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
 
     if (max > min) {
@@ -172,7 +194,7 @@ export function SeekBar(canvas) {
 
       if (activityTime.length) {
         //Draw events
-        backgroundContext.strokeStyle = EVENT_BAR_STYLE;
+        backgroundContext.strokeStyle = getEventBarStyle();
         backgroundContext.beginPath();
 
         time = min;
@@ -202,7 +224,7 @@ export function SeekBar(canvas) {
         backgroundContext.stroke();
 
         //Draw activity bars
-        backgroundContext.strokeStyle = ACTIVITY_BAR_STYLE;
+        backgroundContext.strokeStyle = getActivityBarStyle();
         backgroundContext.beginPath();
 
         time = min;
@@ -236,7 +258,7 @@ export function SeekBar(canvas) {
 
       // Paint in/out region
       if (inTime !== false || outTime !== false) {
-        backgroundContext.fillStyle = OUTSIDE_EXPORT_RANGE_STYLE;
+        backgroundContext.fillStyle = getOutsideExportRangeStyle();
 
         if (inTime !== false) {
           backgroundContext.fillRect(
@@ -295,7 +317,7 @@ export function SeekBar(canvas) {
       cursorWidth = currentWindow / 2 / pixelTimeStep;
     }
 
-    canvasContext.fillStyle = CURSOR_STYLE;
+    canvasContext.fillStyle = getCursorStyle();
     if (cursorWidth < CURSOR_WIDTH) {
       cursorWidth = CURSOR_WIDTH;
       canvasContext.fillRect(
@@ -312,7 +334,7 @@ export function SeekBar(canvas) {
         canvas.height
       );
 
-      canvasContext.fillStyle = CURSOR_STYLE_WINDOW; // paint window
+      canvasContext.fillStyle = getCursorStyleWindow(); // paint window
       canvasContext.fillRect(
         cursorX - cursorWidth,
         0,

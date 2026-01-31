@@ -1,6 +1,9 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "bootstrap/dist/css/bootstrap-theme.min.css";
 @import "leaflet/dist/leaflet.css";
+@import "./theme.css";
+@import "./bootstrap-theme-overrides.css";
+@import "./nouislider-theme.css";
 
 body {
   padding-bottom: 2em;
@@ -20,7 +23,7 @@ a:hover {
 a.disabled {
   pointer-events: none;
   cursor: default;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* Add an extended wide size to the page container for large monitors */
@@ -338,7 +341,7 @@ html:not(.has-log):not(.has-video) .header-pane {
 .log-close-legend-dialog {
   float: right;
   font-size: 14px;
-  color: #bbb;
+  color: var(--text-secondary);
   position: relative;
   top: -10px;
   cursor: pointer;
@@ -346,7 +349,7 @@ html:not(.has-log):not(.has-video) .header-pane {
 
 .log-open-legend-dialog {
   float: right;
-  color: #bbb;
+  color: var(--text-secondary);
   padding-right: 14px;
   padding-top: 8px;
   font-size: 14px;
@@ -367,12 +370,12 @@ html:not(.has-log):not(.has-video) .header-pane {
   position: relative;
   -webkit-flex-grow: 1;
   flex-grow: 1;
-  background-color: black;
+  background-color: var(--graph-background);
 }
 
 .log-graph-config {
-  background-color: #222;
-  color: #bbb;
+  background-color: var(--surface-100);
+  color: var(--text-secondary);
   padding: 1em;
 
   min-width: 135px;
@@ -403,7 +406,7 @@ html.has-log .log-graph-config {
 
 .config-graph {
   margin: 0.5em 0;
-  background-color: white;
+  background-color: var(--surface-0);
 }
 
 .config-graph dd {
@@ -490,7 +493,7 @@ html.has-log .log-graph-config {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: var(--graph-background);
 }
 
 #craftCanvas,
@@ -576,7 +579,7 @@ html.has-analyser-fullscreen.has-analyser
   transition: opacity 500ms ease-in;
 }
 .analyser #analyserResize {
-  color: #bbb;
+  color: var(--text-secondary);
   height: 0;
   overflow: hidden;
   opacity: 0;
@@ -595,7 +598,7 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser #spectrumType {
-  color: #bbb;
+  color: var(--text-secondary);
   height: 0;
   overflow: hidden;
   opacity: 0;
@@ -609,7 +612,7 @@ html.has-analyser-fullscreen.has-analyser
 .analyser #spectrumType select {
   border-radius: 3px;
   padding: 0px 5px;
-  color: black;
+  color: var(--text-primary);
 }
 
 .analyser:hover .non-shift #overdrawSpectrumType {
@@ -632,7 +635,7 @@ html.has-analyser-fullscreen.has-analyser
 .analyser #overdrawSpectrumType select {
   border-radius: 3px;
   padding: 0px 5px;
-  color: black;
+  color: var(--text-primary);
 }
 
 .analyser:hover .non-shift #spectrumComparison {
@@ -659,7 +662,7 @@ html.has-analyser-fullscreen.has-analyser
 .analyser #spectrumComparison select {
   border-radius: 3px;
   padding: 0px 5px;
-  color: black;
+  color: var(--text-primary);
 }
 
 #spectrumComparison button {
@@ -815,7 +818,7 @@ html.has-analyser-fullscreen.has-analyser
 .log-seek-bar #seekbarTypeSelect select {
   border-radius: 3px;
   padding: 0px 5px;
-  color: black;
+  color: var(--text-primary);
 }
 
 .log-graph video {
@@ -841,7 +844,7 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .configuration-file li:nth-child(even) {
-  background-color: #ebf3f7;
+  background-color: var(--surface-100);
 }
 
 .log-field-values .raw-value {
@@ -850,13 +853,13 @@ html.has-analyser-fullscreen.has-analyser
 
 .log-field-values table,
 .log-field-values h4 {
-  background-color: #ffffff;
+  background-color: var(--surface-0);
   overflow-y: auto;
   height: 20px;
 }
 
 .log-field-values tr:nth-child(even) {
-  background-color: #ebf3f7;
+  background-color: var(--surface-100);
 }
 
 html.has-table-overlay .log-field-values {
@@ -867,7 +870,7 @@ html.has-table-overlay .log-field-values {
   display: block;
   padding: 9px;
   font-size: small;
-  background-color: white;
+  background-color: var(--surface-0);
   border: black;
   /*z-index: 10;*/
   bottom: 80px;
@@ -882,18 +885,18 @@ html:not(.has-marker) .marker-offset {
 }
 
 .configuration-changed {
-  background-color: #f2dede;
+  background-color: var(--error-transparent-2);
 }
 
 .configuration-file h3 {
-  background-color: #d9edf7;
+  background-color: var(--primary-transparent-2);
   margin-top: 2px;
   padding: 5px;
 }
 
 .configuration-close {
   float: right;
-  color: #bbb;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
@@ -903,7 +906,7 @@ html.has-config .configuration-file {
   left: 15px;
   width: calc(100% - 30px);
   padding: 9px;
-  background-color: white;
+  background-color: var(--surface-0);
   border: black;
   /* z-index: 10; */
   bottom: 80px;
@@ -937,7 +940,7 @@ html.has-config .configuration-list {
 
 .graph-legend-field-settings {
   font-size: 8px;
-  color: black;
+  color: var(--text-primary);
   opacity: 0.8;
   font-weight: bold;
   padding-left: 0.3em;
@@ -976,7 +979,7 @@ html.has-video .log-graph video {
   height: 100%;
 }
 html.has-video #graphCanvas {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: transparent;
 }
 
 html .view-video,
@@ -986,7 +989,7 @@ html .view-table,
 html .view-analyser,
 html .view-analyser-sticks,
 html .view-analyser-fullscreen {
-  color: black;
+  color: var(--text-primary);
 }
 
 html.has-analyser-sticks.isBF .view-analyser-sticks,
@@ -996,7 +999,7 @@ html.has-table.isBF .view-table,
 html.has-sticks.isBF .view-sticks,
 html.has-craft.isBF .view-craft,
 html:not(.video-hidden).isBF .view-video {
-  color: rgba(158, 100, 0, 1);
+  color: var(--primary-500);
 }
 
 html.has-analyser-sticks.isCF .view-analyser-sticks,
@@ -1006,7 +1009,7 @@ html.has-table.isCF .view-table,
 html.has-sticks.isCF .view-sticks,
 html.has-craft.isCF .view-craft,
 html:not(.video-hidden).isCF .view-video {
-  color: rgba(0, 162, 63, 1);
+  color: var(--success-500);
 }
 
 html.has-analyser-sticks.isINAV .view-analyser-sticks,
@@ -1016,7 +1019,7 @@ html.has-table.isINAV .view-table,
 html.has-sticks.isINAV .view-sticks,
 html.has-craft.isINAV .view-craft,
 html:not(.video-hidden).isINAV .view-video {
-  color: rgba(8, 80, 172, 1);
+  color: var(--info-500);
 }
 
 html:not(.has-analyser-fullscreen) .glyphicon-resize-small {
@@ -1044,7 +1047,7 @@ html:not(.has-analyser) .view-analyser-fullscreen {
 
 .video-top-controls h4 {
   font-size: 11px;
-  color: #757575;
+  color: var(--text-secondary);
   margin-top: 7px;
   margin-bottom: 4px;
   font-weight: bold;
@@ -1194,7 +1197,7 @@ html.has-log .video-top-controls {
   top: 50px;
   position: fixed;
   z-index: 10;
-  background-color: white;
+  background-color: var(--surface-0);
   width: 100%;
   min-width: 1390px;
   white-space: nowrap;
@@ -1308,7 +1311,7 @@ progress {
 }
 
 .navbar-inverse .navbar-brand {
-  color: #eaeaea;
+  color: var(--text-primary);
 }
 
 .navbar {
@@ -1323,12 +1326,12 @@ progress {
 }
 
 .btn-nobg {
-  color: #bbb;
+  color: var(--text-secondary);
   background: none;
 }
 
 .btn-nobg:hover {
-  color: white;
+  color: var(--text-inverse);
   text-shadow: 1px 1px 2px gray, 0 0 5px blue, 0 0 10px white;
 }
 
@@ -1426,8 +1429,8 @@ html.has-log .navbar-static-top {
   height: 20px;
   line-height: 20px;
   padding: 0 10px 0 10px;
-  border-top: 1px solid #7d7d79;
-  background-color: #bfbeb5;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--surface-200);
 }
 
 html:not(.has-log) #status-bar {
@@ -1450,7 +1453,7 @@ html:not(.has-gps) .btn-gpx-export {
 #status-bar .bookmark-8,
 #status-bar .bookmark-9 {
   background-color: red;
-  color: white;
+  color: var(--text-inverse);
   /* padding-left: 5px; */
   /* padding-right: 0; */
   width: 20px;
@@ -1468,7 +1471,7 @@ html:not(.has-gps) .btn-gpx-export {
 
 #status-bar .bookmark-clear {
   background-color: blue;
-  color: white;
+  color: var(--text-inverse);
   padding-left: 0;
   padding-right: 0;
   width: 60px;
@@ -1551,17 +1554,17 @@ input[type="checkbox"].bigswitch.ios-switch + div {
 /* Green Track */
 input[type="checkbox"].green.ios-switch:checked + div,
 html.isCF input[type="checkbox"].ios-switch:checked + div {
-  background-color: #00e359;
-  border: 1px solid rgba(0, 162, 63, 1);
-  box-shadow: inset 0 0 0 10px rgba(0, 227, 89, 1);
+  background-color: var(--success-500);
+  border: 1px solid var(--success-600);
+  box-shadow: inset 0 0 0 10px var(--success-400);
 }
 
 /* Orange Track */
 input[type="checkbox"].orange.ios-switch:checked + div,
 html.isBF input[type="checkbox"].ios-switch:checked + div {
-  background-color: #ffc638;
-  border: 1px solid rgba(158, 100, 0, 1);
-  box-shadow: inset 0 0 0 10px rgba(224, 168, 0, 1);
+  background-color: var(--primary-500);
+  border: 1px solid var(--primary-600);
+  box-shadow: inset 0 0 0 10px var(--primary-400);
 }
 
 /* Normal Knob */
@@ -1586,7 +1589,7 @@ input[type="checkbox"].ios-switch + div > div {
 input[type="checkbox"].ios-switch:checked + div > div {
   -webkit-transform: translate3d(20px, 0, 0);
   -moz-transform: translate3d(20px, 0, 0);
-  background-color: #ffffff;
+  background-color: var(--surface-0);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172, 1);
 }
 
@@ -1661,13 +1664,13 @@ html.isINAV .log-graph-config h3 span {
 
 div#lap-timer {
   position: absolute;
-  background-color: rgb(34, 34, 34);
+  background-color: var(--surface-100);
   z-index: 10;
   top: 5%;
   left: calc(90% - 233px);
   border-radius: 5px;
   padding: 5px;
-  color: #bbb;
+  color: var(--text-secondary);
   border: thin solid;
 }
 
@@ -1697,7 +1700,7 @@ div#lap-timer td:first-child {
  Bootstrap Tooltip Overrides
 */
 .tooltip {
-  --tooltip-color: #363636;
+  --tooltip-color: var(--surface-800);
 }
 .tooltip-inner {
   background-color: var(--tooltip-color);
@@ -1751,21 +1754,21 @@ div#lap-timer td:first-child {
   word-wrap: normal;
   z-index: 10;
   padding: 4px;
-  color: white;
-  background-color: #363636;
+  color: var(--text-inverse);
+  background-color: var(--surface-800);
   border: 2px;
   border-radius: 3px;
 }
 
 dialog {
-  background-color: white;
+  background-color: var(--surface-0);
   padding: 1em;
   height: auto;
   margin: auto auto;
   position: absolute;
   width: 50%;
   border-radius: 3px;
-  border: 1px solid silver;
+  border: 1px solid var(--border-color);
 }
 
 dialog h3 {
@@ -1782,9 +1785,9 @@ dialog h3 {
   margin-top: 8px;
   margin-bottom: 8px;
   margin-right: 10px;
-  background-color: #ffbb00;
+  background-color: var(--primary-500);
   border-radius: 3px;
-  border: 1px solid #dba718;
+  border: 1px solid var(--primary-600);
   color: #000;
   font-family: "open_sansbold", Arial;
   font-size: 12px;

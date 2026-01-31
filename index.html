@@ -627,7 +627,7 @@
     </div>
     <!-- Log Scroll bar -->
     <div id="log-seek-bar" class="log-seek-bar">
-        <canvas width="200" height="100"></canvas>
+        <canvas id="seekbarCanvas" width="200" height="100"></canvas>
         <span id="seekbarToolbar" class="non-shift">
             <div id="seekbarType" class="seekBar-selection" data-toggle="tooltip" title="Value to plot">
             </div>
@@ -3232,6 +3232,23 @@
                                             </div>
                                             <span>Show the vertical timebar.</span>
                                         </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gui_box grey top-spacer dark-mode-settings">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">Dark Mode</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <div>
+                                        <label>Theme</label>
+                                        <div>
+                                            <input type="radio" name="dark-mode" value="2" checked> Auto (follow system setting)</input>
+                                            <br>
+                                            <input type="radio" name="dark-mode" value="1"> Off (always light)</input>
+                                            <br>
+                                            <input type="radio" name="dark-mode" value="0"> On (always dark)</input>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

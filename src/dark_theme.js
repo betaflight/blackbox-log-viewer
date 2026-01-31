@@ -1,0 +1,179 @@
+/**
+ * Dark Theme Manager
+ *
+ * This module manages the application's dark mode feature.
+ * It supports three modes:
+ * - ON (0): Always use dark theme
+ * - OFF (1): Always use light theme
+ * - AUTO (2): Follow system preference via prefers-color-scheme
+ *
+ * The theme preference is stored via PrefStorage and persists across sessions.
+ * When the theme changes, the dark-theme class is toggled on the body element,
+ * triggering CSS variable overrides and causing canvas elements to redraw.
+ */
+
+export const DarkTheme = {
+  // Preference key name
+  configName: 'darkTheme',
+
+  // Theme modes
+  modes: {
+    ON: 0,
+    OFF: 1,
+    AUTO: 2
+  },
+
+  // Current mode setting (default to AUTO to match betaflight-configurator)
+  currentMode: 2,
+
+  // Reference to prefs storage
+  prefs: null,
+
+  // Current enabled state
+  enabled: false,
+
+  // Media query for system preference
+  mediaQuery: null,
+
+  /**
+   * Initialize the dark theme system
+   * @param {PrefStorage} prefsStorage - The preference storage instance
+   */
+  init: function(prefsStorage) {
+    this.prefs = prefsStorage;
+
+    // Load saved preference
+    this.prefs.get(this.configName, (value) => {
+      if (value !== null && typeof value === 'number') {
+        this.currentMode = value;
+      } else {
+        // Default to AUTO mode if no preference saved
+        this.currentMode = this.modes.AUTO;
+        this.prefs.set(this.configName, this.currentMode);
+      }
+
+      // Apply the theme based on loaded preference
+      this.apply();
+    });
+
+    // Set up system preference monitoring for AUTO mode
+    if (window.matchMedia) {
+      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      // Modern browsers
+      if (this.mediaQuery.addEventListener) {
+        this.mediaQuery.addEventListener('change', () => {
+          if (this.currentMode === this.modes.AUTO) {
+            this.apply();
+          }
+        });
+      }
+      // Older browsers
+      else if (this.mediaQuery.addListener) {
+        this.mediaQuery.addListener(() => {
+          if (this.currentMode === this.modes.AUTO) {
+            this.apply();
+          }
+        });
+      }
+    }
+  },
+
+  /**
+   * Set the theme mode and save to preferences
+   * @param {number} mode - One of the modes (ON, OFF, AUTO)
+   * @param {function} callback - Optional callback after theme is applied
+   */
+  setMode: function(mode, callback) {
+    if (mode !== this.modes.ON && mode !== this.modes.OFF && mode !== this.modes.AUTO) {
+      console.error('Invalid dark theme mode:', mode);
+      return;
+    }
+
+    this.currentMode = mode;
+
+    if (this.prefs) {
+      this.prefs.set(this.configName, mode);
+    }
+
+    this.apply();
+
+    // Notify the application that theme has changed so canvas can redraw
+    if (window.blackboxLogViewer && window.blackboxLogViewer.refreshGraph) {
+      window.blackboxLogViewer.refreshGraph();
+    }
+
+    if (callback) {
+      callback();
+    }
+  },
+
+  /**
+   * Apply the current theme mode
+   */
+  apply: function() {
+    const shouldUseDark = this.shouldUseDarkTheme();
+
+    if (shouldUseDark) {
+      this.applyDark();
+    } else {
+      this.applyNormal();
+    }
+  },
+
+  /**
+   * Apply dark theme
+   */
+  applyDark: function() {
+    document.body.classList.add('dark-theme');
+    this.enabled = true;
+  },
+
+  /**
+   * Apply light theme (remove dark theme)
+   */
+  applyNormal: function() {
+    document.body.classList.remove('dark-theme');
+    this.enabled = false;
+  },
+
+  /**
+   * Determine if dark theme should be active based on current mode
+   * @returns {boolean} True if dark theme should be enabled
+   */
+  shouldUseDarkTheme: function() {
+    switch (this.currentMode) {
+      case this.modes.ON:
+        return true;
+
+      case this.modes.OFF:
+        return false;
+
+      case this.modes.AUTO:
+        if (this.mediaQuery) {
+          return this.mediaQuery.matches;
+        }
+        // Fallback if matchMedia not supported
+        return false;
+
+      default:
+        return false;
+    }
+  },
+
+  /**
+   * Check if dark theme is currently enabled
+   * @returns {boolean} True if dark theme is active
+   */
+  isEnabled: function() {
+    return this.enabled;
+  },
+
+  /**
+   * Get the current mode
+   * @returns {number} Current mode (ON, OFF, or AUTO)
+   */
+  getMode: function() {
+    return this.currentMode;
+  }
+};

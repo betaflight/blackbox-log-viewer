@@ -35,6 +35,8 @@ import {
 } from "./tools.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
+import { DarkTheme } from "./dark_theme.js";
+import { ThemeColors } from "./theme_colors.js";
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
@@ -1026,6 +1028,15 @@ function BlackboxLogViewer() {
     return bookmarkTimes;
   };
 
+  this.refreshGraph = function () {
+    // Called when the theme changes to refresh canvas colors
+    if (graph !== null) {
+      ThemeColors.clearCache();
+      graph.refreshTheme();
+      invalidateGraph();
+    }
+  };
+
   // Workspace save/restore to/from file.
   function saveWorkspaces(file) {
     let data; // Data to save
@@ -1225,6 +1236,9 @@ function BlackboxLogViewer() {
   });
 
   $(function () {
+    // Initialize dark theme
+    DarkTheme.init(prefs);
+
     $('[data-toggle="tooltip"]').tooltip({
       trigger: "hover",
       placement: "auto bottom",
@@ -1668,6 +1682,11 @@ function BlackboxLogViewer() {
           globalThis.userSettings = newSettings;
 
           prefs.set("userSettings", newSettings);
+
+          // Apply dark mode setting
+          if (newSettings.darkMode !== undefined) {
+            DarkTheme.setMode(newSettings.darkMode);
+          }
 
           // refresh the craft model
           if (graph != null) {

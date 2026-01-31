@@ -36,7 +36,7 @@
 }
 
 .user-settings-dialog .watermark-group input[type="file"] {
-  color: #7d7d7d;
+  color: var(--text-secondary);
   margin: 2px;
 }
 
@@ -106,7 +106,7 @@
   font-style: normal;
   font-family: "open_sansregular", Arial;
   line-height: 19px;
-  color: #7d7d7d;
+  color: var(--text-secondary);
   font-size: 11px;
   display: inline;
   margin-left: 2px;

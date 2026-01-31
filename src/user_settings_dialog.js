@@ -194,6 +194,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     legendUnits: true, // Show units on legend?
     speedUnits: 1, // Default speed mode = m/s
     altitudeUnits: 1, // Default altitude mode = meters
+    darkMode: 2, // Dark mode: 0=On, 1=Off, 2=Auto (default)
     gapless: false,
     drawCraft: "3D",
     hasCraft: true,
@@ -326,6 +327,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         logo: currentLogo,
       },
       drawWatermark: $(".watermark").is(":checked"),
+      darkMode: parseInt($('input[name="dark-mode"]:checked').val()),
       laptimer: {
         top: `${$('.laptimer-settings input[name="laptimer-top"]').val()}%`,
         left: `${$('.laptimer-settings input[name="laptimer-left"]').val()}%`,
@@ -630,6 +632,10 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
       .attr("checked", true);
     $('input:radio[name="altitude-mode"]')
       .filter(`[value="${currentSettings.altitudeUnits}"]`)
+      .attr("checked", true);
+
+    $('input:radio[name="dark-mode"]')
+      .filter(`[value="${currentSettings.darkMode}"]`)
       .attr("checked", true);
 
     $('.stick-mode-group input[name="stick-top"]').val(
