@@ -291,11 +291,9 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 
   function convertUIToSettings() {
     // Safely parse darkMode with fallback to current or default value
-    let darkModeValue = parseInt($('input[name="dark-mode"]:checked').val());
-    if (isNaN(darkModeValue)) {
-      darkModeValue = currentSettings.darkMode !== undefined
-        ? currentSettings.darkMode
-        : defaultSettings.darkMode;
+    let darkModeValue = Number.parseInt($('input[name="dark-mode"]:checked').val());
+    if (Number.isNaN(darkModeValue)) {
+      darkModeValue = currentSettings.darkMode ?? defaultSettings.darkMode;
     }
 
     let settings = $.extend({}, currentSettings, {

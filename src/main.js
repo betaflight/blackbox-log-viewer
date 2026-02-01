@@ -1035,6 +1035,9 @@ function BlackboxLogViewer() {
       graph.refreshTheme();
       invalidateGraph();
     }
+    if (seekBar !== null && typeof seekBar.refreshTheme === 'function') {
+      seekBar.refreshTheme();
+    }
   };
 
   // Workspace save/restore to/from file.
@@ -2601,6 +2604,6 @@ $(document).click(function (e) {
 $(document).off(".data-api");
 
 globalThis.blackboxLogViewer = new BlackboxLogViewer();
-if (typeof globalThis.window !== "undefined") {
+if (globalThis.window !== undefined) {
   globalThis.window.blackboxLogViewer = globalThis.blackboxLogViewer;
 }

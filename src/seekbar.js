@@ -1,5 +1,32 @@
 import { ThemeColors } from "./theme_colors";
 
+// Theme-aware color functions
+function getBackgroundStyle() {
+  return ThemeColors.getGraphBackground();
+}
+
+function getEventBarStyle() {
+  return "#8d8"; // Green color works in both themes
+}
+
+function getActivityBarStyle() {
+  return ThemeColors.isDarkTheme()
+    ? "rgba(200,200,255, 0.9)"
+    : "rgba(170,170,255, 0.9)";
+}
+
+function getOutsideExportRangeStyle() {
+  return "rgba(100, 100, 100, 0.5)"; // Dimming overlay works in both themes
+}
+
+function getCursorStyle() {
+  return "rgba(255, 64, 64, 0.75)"; // Red cursor works in both themes
+}
+
+function getCursorStyleWindow() {
+  return "rgba(255, 65, 64, 0.15)"; // Red window overlay works in both themes
+}
+
 export function SeekBar(canvas) {
   let that = this,
     //Times:
@@ -26,33 +53,6 @@ export function SeekBar(canvas) {
     CURSOR_WIDTH = 1,
     // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
     BAR_INSET = CURSOR_WIDTH;
-
-  // Theme-aware color functions
-  function getBackgroundStyle() {
-    return ThemeColors.getGraphBackground();
-  }
-
-  function getEventBarStyle() {
-    return "#8d8"; // Green color works in both themes
-  }
-
-  function getActivityBarStyle() {
-    return ThemeColors.isDarkTheme()
-      ? "rgba(200,200,255, 0.9)"
-      : "rgba(170,170,255, 0.9)";
-  }
-
-  function getOutsideExportRangeStyle() {
-    return "rgba(100, 100, 100, 0.5)"; // Dimming overlay works in both themes
-  }
-
-  function getCursorStyle() {
-    return "rgba(255, 64, 64, 0.75)"; // Red cursor works in both themes
-  }
-
-  function getCursorStyleWindow() {
-    return "rgba(255, 65, 64, 0.15)"; // Red window overlay works in both themes
-  }
 
   this.onSeek = false;
 
@@ -359,6 +359,11 @@ export function SeekBar(canvas) {
   this.setOutTime = function (newOutTime) {
     outTime = newOutTime;
     invalidateBackground();
+  };
+
+  this.refreshTheme = function () {
+    invalidateBackground();
+    that.repaint();
   };
 
   background.width = canvas.width;

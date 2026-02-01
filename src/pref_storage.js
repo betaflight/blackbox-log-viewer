@@ -1,12 +1,14 @@
 /**
- * A local key/value store for JSON-encodable values. Supports localStorage and chrome.storage.local backends.
+ * A local key/value store for JSON-encodable values. Supports localStorage, chrome.storage.local, and in-memory backends.
  *
  * Supply keyPrefix if you want it automatically prepended to key names.
  */
 export function PrefStorage(keyPrefix) {
   let LOCALSTORAGE = 0,
     CHROME_STORAGE_LOCAL = 1,
-    mode;
+    MEMORY = 2,
+    mode,
+    memoryStorage = {};
 
   /**
    * Fetch the value with the given name, calling the onGet handler (possibly asynchronously) with the retrieved
@@ -19,9 +21,11 @@ export function PrefStorage(keyPrefix) {
       case LOCALSTORAGE:
         var parsed = null;
 
-        try {
-          parsed = JSON.parse(globalThis.localStorage[name]);
-        } catch (e) {}
+        if (globalThis.localStorage) {
+          try {
+            parsed = JSON.parse(globalThis.localStorage[name]);
+          } catch (e) {}
+        }
 
         onGet(parsed);
         break;
@@ -29,6 +33,9 @@ export function PrefStorage(keyPrefix) {
         chrome.storage.local.get(name, function (data) {
           onGet(data[name]);
         });
+        break;
+      case MEMORY:
+        onGet(memoryStorage[name] !== undefined ? memoryStorage[name] : null);
         break;
     }
   };
@@ -41,7 +48,13 @@ export function PrefStorage(keyPrefix) {
 
     switch (mode) {
       case LOCALSTORAGE:
-        globalThis.localStorage[name] = JSON.stringify(value);
+        if (globalThis.localStorage) {
+          try {
+            globalThis.localStorage[name] = JSON.stringify(value);
+          } catch (e) {
+            // Storage quota exceeded or other error - fail silently
+          }
+        }
         break;
       case CHROME_STORAGE_LOCAL:
         var data = {};
@@ -50,13 +63,29 @@ export function PrefStorage(keyPrefix) {
 
         chrome.storage.local.set(data);
         break;
+      case MEMORY:
+        memoryStorage[name] = value;
+        break;
     }
   };
 
+  // Determine which storage backend to use
   if (globalThis.chrome && globalThis.chrome.storage && globalThis.chrome.storage.local) {
     mode = CHROME_STORAGE_LOCAL;
+  } else if (globalThis.localStorage) {
+    // Verify localStorage is actually usable (may be disabled in some browsers)
+    try {
+      const testKey = '__pref_storage_test__';
+      globalThis.localStorage.setItem(testKey, 'test');
+      globalThis.localStorage.removeItem(testKey);
+      mode = LOCALSTORAGE;
+    } catch (e) {
+      // localStorage exists but isn't usable (e.g., private browsing mode)
+      mode = MEMORY;
+    }
   } else {
-    mode = LOCALSTORAGE;
+    // No persistent storage available, fall back to in-memory storage
+    mode = MEMORY;
   }
 
   keyPrefix = keyPrefix || "";

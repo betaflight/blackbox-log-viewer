@@ -20,7 +20,7 @@ export const DarkTheme = {
   modes: {
     ON: 0,
     OFF: 1,
-    AUTO: 2
+    AUTO: 2,
   },
 
   // Current mode setting (default to AUTO to match betaflight-configurator)
@@ -44,10 +44,17 @@ export const DarkTheme = {
 
     // Load saved preference
     this.prefs.get(this.configName, (value) => {
-      if (value !== null && typeof value === 'number') {
+      // Validate the persisted mode value
+      const allowedModes = Object.values(this.modes);
+      if (
+        value !== null &&
+        typeof value === 'number' &&
+        Number.isFinite(value) &&
+        allowedModes.includes(value)
+      ) {
         this.currentMode = value;
       } else {
-        // Default to AUTO mode if no preference saved
+        // Default to AUTO mode if no valid preference saved
         this.currentMode = this.modes.AUTO;
         this.prefs.set(this.configName, this.currentMode);
       }
@@ -103,7 +110,7 @@ export const DarkTheme = {
       globalThis.blackboxLogViewer.refreshGraph();
     }
 
-    if (callback) {
+    if (typeof callback === 'function') {
       callback();
     }
   },

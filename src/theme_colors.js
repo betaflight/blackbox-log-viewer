@@ -241,5 +241,5 @@ export const ThemeColors = {
    */
   getInputBorder: function() {
     return this.getCSSVariable('--input-border');
-  }
+  },
 };

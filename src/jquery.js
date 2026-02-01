@@ -13,7 +13,7 @@ if (typeof globalThis !== "undefined") {
   globalThis.$ = $;
 }
 
-if (typeof globalThis.window !== "undefined") {
+if (globalThis.window !== undefined) {
   globalThis.window.jQuery = $;
   globalThis.window.$ = $;
 }
