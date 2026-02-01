@@ -57,8 +57,8 @@ export const DarkTheme = {
     });
 
     // Set up system preference monitoring for AUTO mode
-    if (window.matchMedia) {
-      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (globalThis.matchMedia) {
+      this.mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)');
 
       // Modern browsers
       if (this.mediaQuery.addEventListener) {
@@ -99,8 +99,8 @@ export const DarkTheme = {
     this.apply();
 
     // Notify the application that theme has changed so canvas can redraw
-    if (window.blackboxLogViewer && window.blackboxLogViewer.refreshGraph) {
-      window.blackboxLogViewer.refreshGraph();
+    if (globalThis.blackboxLogViewer && globalThis.blackboxLogViewer.refreshGraph) {
+      globalThis.blackboxLogViewer.refreshGraph();
     }
 
     if (callback) {

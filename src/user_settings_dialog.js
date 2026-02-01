@@ -290,6 +290,14 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
   }
 
   function convertUIToSettings() {
+    // Safely parse darkMode with fallback to current or default value
+    let darkModeValue = parseInt($('input[name="dark-mode"]:checked').val());
+    if (isNaN(darkModeValue)) {
+      darkModeValue = currentSettings.darkMode !== undefined
+        ? currentSettings.darkMode
+        : defaultSettings.darkMode;
+    }
+
     let settings = $.extend({}, currentSettings, {
       customMix: saveCustomMix(),
       sticks: {
@@ -327,7 +335,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         logo: currentLogo,
       },
       drawWatermark: $(".watermark").is(":checked"),
-      darkMode: parseInt($('input[name="dark-mode"]:checked').val()),
+      darkMode: darkModeValue,
       laptimer: {
         top: `${$('.laptimer-settings input[name="laptimer-top"]').val()}%`,
         left: `${$('.laptimer-settings input[name="laptimer-left"]').val()}%`,

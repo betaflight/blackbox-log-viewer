@@ -12,7 +12,7 @@ export function makeScreenshot() {
       .text()
       .replace(".", "_")}-${timestamp}.png`;
   html2canvas(el).then((canvas) => {
-    window.canv = canvas;
+    globalThis.canv = canvas;
     let anchor = document.createElement("a");
     anchor.download = defaultFilename;
     anchor.href = canvas.toDataURL();

@@ -162,7 +162,7 @@ export function FlightLogVideoRenderer(
   function finishRender() {
     videoWriter.complete().then(function (webM) {
       if (webM) {
-        window.saveAs(webM, "video.webm");
+        globalThis.saveAs(webM, "video.webm");
       }
 
       notifyCompletion(true, frameIndex);

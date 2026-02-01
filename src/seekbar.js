@@ -132,7 +132,7 @@ export function SeekBar(canvas) {
   };
 
   this.resize = function (width, height) {
-    let ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+    let ratio = globalThis.devicePixelRatio ? globalThis.devicePixelRatio : 1;
 
     canvas.width = width * ratio;
     canvas.height = height * ratio;
