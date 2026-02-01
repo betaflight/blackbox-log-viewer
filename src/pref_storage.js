@@ -35,7 +35,7 @@ export function PrefStorage(keyPrefix) {
         });
         break;
       case MEMORY:
-        onGet(memoryStorage[name] !== undefined ? memoryStorage[name] : null);
+        onGet(memoryStorage[name] ?? null);
         break;
     }
   };
@@ -52,7 +52,8 @@ export function PrefStorage(keyPrefix) {
           try {
             globalThis.localStorage[name] = JSON.stringify(value);
           } catch (e) {
-            // Storage quota exceeded or other error - fail silently
+            // Storage quota exceeded or other error
+            console.warn('Failed to save to localStorage:', e.message);
           }
         }
         break;
@@ -70,7 +71,7 @@ export function PrefStorage(keyPrefix) {
   };
 
   // Determine which storage backend to use
-  if (globalThis.chrome && globalThis.chrome.storage && globalThis.chrome.storage.local) {
+  if (globalThis.chrome?.storage?.local) {
     mode = CHROME_STORAGE_LOCAL;
   } else if (globalThis.localStorage) {
     // Verify localStorage is actually usable (may be disabled in some browsers)
@@ -81,6 +82,7 @@ export function PrefStorage(keyPrefix) {
       mode = LOCALSTORAGE;
     } catch (e) {
       // localStorage exists but isn't usable (e.g., private browsing mode)
+      console.warn('localStorage is not available, falling back to in-memory storage:', e.message);
       mode = MEMORY;
     }
   } else {

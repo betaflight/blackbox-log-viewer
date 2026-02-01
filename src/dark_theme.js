@@ -106,9 +106,7 @@ export const DarkTheme = {
     this.apply();
 
     // Notify the application that theme has changed so canvas can redraw
-    if (globalThis.blackboxLogViewer && globalThis.blackboxLogViewer.refreshGraph) {
-      globalThis.blackboxLogViewer.refreshGraph();
-    }
+    globalThis.blackboxLogViewer?.refreshGraph?.();
 
     if (typeof callback === 'function') {
       callback();
@@ -182,5 +180,5 @@ export const DarkTheme = {
    */
   getMode: function() {
     return this.currentMode;
-  }
+  },
 };
