@@ -1,0 +1,583 @@
+/**
+ * Bootstrap 3 Theme Overrides
+ *
+ * Overrides Bootstrap 3 styling to match betaflight-configurator color scheme.
+ * Also provides dark mode support via dark-theme class on body element.
+ */
+
+/* ===== BUTTONS - LIGHT MODE ===== */
+/* Remove Bootstrap gradients and apply betaflight colors */
+.btn {
+  background-image: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  transition: all ease 0.2s;
+  font-weight: 600;
+}
+
+.btn-default {
+  background-color: var(--primary-500);
+  border-color: var(--primary-600);
+  color: #000;
+}
+
+.btn-default:hover,
+.btn-default:focus,
+.btn-default:active {
+  background-color: var(--primary-400);
+  border-color: var(--primary-600);
+  color: #000;
+  background-image: none !important;
+}
+
+.btn-default:active {
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35) !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-500);
+  border-color: var(--primary-600);
+  color: #000;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--primary-400);
+  border-color: var(--primary-600);
+  color: #000;
+  background-image: none !important;
+}
+
+.btn-primary:active {
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35) !important;
+}
+
+.btn-success {
+  background-color: var(--success-500);
+  border-color: var(--success-600);
+  color: #000;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+  background-color: var(--success-400);
+  border-color: var(--success-600);
+  color: #000;
+  background-image: none !important;
+}
+
+.btn-danger {
+  background-color: var(--error-500);
+  border-color: var(--error-600);
+  color: #fff;
+}
+
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active {
+  background-color: var(--error-400);
+  border-color: var(--error-600);
+  color: #fff;
+  background-image: none !important;
+}
+
+.btn-warning {
+  background-color: var(--warning-500);
+  border-color: var(--warning-600);
+  color: #000;
+}
+
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:active {
+  background-color: var(--warning-400);
+  border-color: var(--warning-600);
+  color: #000;
+  background-image: none !important;
+}
+
+.btn-info {
+  background-color: var(--info-500);
+  border-color: var(--info-600);
+  color: #fff;
+}
+
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active {
+  background-color: var(--info-400);
+  border-color: var(--info-600);
+  color: #fff;
+  background-image: none !important;
+}
+
+/* Disabled buttons */
+.btn-default.disabled,
+.btn-default[disabled],
+.btn-primary.disabled,
+.btn-primary[disabled],
+.btn-success.disabled,
+.btn-success[disabled],
+.btn-danger.disabled,
+.btn-danger[disabled],
+.btn-warning.disabled,
+.btn-warning[disabled],
+.btn-info.disabled,
+.btn-info[disabled] {
+  background-color: var(--surface-400);
+  border-color: var(--surface-500);
+  color: var(--surface-900);
+  opacity: 1;
+  cursor: not-allowed;
+  background-image: none !important;
+}
+
+/* ===== BUTTONS - DARK MODE ===== */
+body.dark-theme {
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+}
+
+/* Dark mode buttons keep the same colors as light mode for consistency */
+/* Only disabled state changes */
+body.dark-theme .btn-default.disabled,
+body.dark-theme .btn-default[disabled],
+body.dark-theme .btn-primary.disabled,
+body.dark-theme .btn-primary[disabled],
+body.dark-theme .btn-success.disabled,
+body.dark-theme .btn-success[disabled],
+body.dark-theme .btn-danger.disabled,
+body.dark-theme .btn-danger[disabled],
+body.dark-theme .btn-warning.disabled,
+body.dark-theme .btn-warning[disabled],
+body.dark-theme .btn-info.disabled,
+body.dark-theme .btn-info[disabled] {
+  background-color: var(--surface-400);
+  border-color: var(--surface-500);
+  color: var(--text-muted);
+}
+
+/* Panels */
+body.dark-theme .panel {
+  background-color: var(--surface-100);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .panel-default {
+  border-color: var(--border-color);
+}
+
+body.dark-theme .panel-default > .panel-heading {
+  background-color: var(--surface-200);
+  background-image: none !important;
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark-theme .panel-body {
+  background-color: var(--surface-100);
+  color: var(--text-primary);
+}
+
+body.dark-theme .panel-footer {
+  background-color: var(--surface-200);
+  border-top-color: var(--border-color);
+}
+
+/* Forms */
+body.dark-theme .form-control,
+body.dark-theme input[type="text"],
+body.dark-theme input[type="number"],
+body.dark-theme input[type="email"],
+body.dark-theme input[type="password"],
+body.dark-theme input[type="search"],
+body.dark-theme input[type="tel"],
+body.dark-theme input[type="url"],
+body.dark-theme input[type="date"],
+body.dark-theme input[type="time"],
+body.dark-theme select,
+body.dark-theme textarea {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+body.dark-theme .form-control:focus,
+body.dark-theme input[type="text"]:focus,
+body.dark-theme input[type="number"]:focus,
+body.dark-theme input[type="email"]:focus,
+body.dark-theme input[type="password"]:focus,
+body.dark-theme input[type="search"]:focus,
+body.dark-theme input[type="tel"]:focus,
+body.dark-theme input[type="url"]:focus,
+body.dark-theme input[type="date"]:focus,
+body.dark-theme input[type="time"]:focus,
+body.dark-theme select:focus,
+body.dark-theme textarea:focus {
+  border-color: var(--primary-500);
+  background-color: var(--surface-50);
+  color: var(--text-primary);
+}
+
+body.dark-theme .form-control:disabled,
+body.dark-theme .form-control[readonly],
+body.dark-theme input:disabled,
+body.dark-theme select:disabled,
+body.dark-theme textarea:disabled,
+body.dark-theme input[readonly],
+body.dark-theme select[readonly],
+body.dark-theme textarea[readonly] {
+  background-color: var(--input-bg-disabled);
+  color: var(--text-muted);
+}
+
+/* Number input spinner buttons */
+body.dark-theme input[type="number"]::-webkit-inner-spin-button,
+body.dark-theme input[type="number"]::-webkit-outer-spin-button {
+  filter: invert(1);
+  opacity: 0.8;
+}
+
+body.dark-theme input[type="number"]:hover::-webkit-inner-spin-button,
+body.dark-theme input[type="number"]:hover::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* Input groups */
+body.dark-theme .input-group-addon {
+  background-color: var(--surface-200);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Navbar */
+body.dark-theme .navbar-inverse {
+  background-color: var(--surface-100);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .navbar-inverse .navbar-brand {
+  color: var(--text-primary);
+}
+
+body.dark-theme .navbar-inverse .navbar-brand:hover,
+body.dark-theme .navbar-inverse .navbar-brand:focus {
+  color: var(--primary-500);
+}
+
+body.dark-theme .navbar-inverse .navbar-nav > li > a {
+  color: var(--text-primary);
+}
+
+body.dark-theme .navbar-inverse .navbar-nav > li > a:hover,
+body.dark-theme .navbar-inverse .navbar-nav > li > a:focus {
+  color: var(--primary-500);
+  background-color: var(--surface-200);
+}
+
+body.dark-theme .navbar-inverse .navbar-nav > .active > a {
+  background-color: var(--surface-300);
+  color: var(--text-primary);
+}
+
+body.dark-theme .navbar-inverse .navbar-toggle {
+  border-color: var(--border-color);
+}
+
+body.dark-theme .navbar-inverse .navbar-toggle:hover,
+body.dark-theme .navbar-inverse .navbar-toggle:focus {
+  background-color: var(--surface-200);
+}
+
+body.dark-theme .navbar-inverse .navbar-collapse {
+  border-color: var(--border-color);
+}
+
+/* Modals */
+body.dark-theme .modal-content {
+  background-color: var(--surface-0);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark-theme .modal-header {
+  border-bottom-color: var(--border-color);
+  background-color: var(--surface-100);
+}
+
+body.dark-theme .modal-footer {
+  border-top-color: var(--border-color);
+  background-color: var(--surface-100);
+}
+
+body.dark-theme .modal-title {
+  color: var(--text-primary);
+}
+
+body.dark-theme .close {
+  color: var(--text-primary);
+  opacity: 0.6;
+}
+
+body.dark-theme .close:hover,
+body.dark-theme .close:focus {
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+/* Dropdowns */
+body.dark-theme .dropdown-menu {
+  background-color: var(--surface-100);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .dropdown-menu > li > a {
+  color: var(--text-primary);
+}
+
+body.dark-theme .dropdown-menu > li > a:hover,
+body.dark-theme .dropdown-menu > li > a:focus {
+  background-color: var(--surface-200);
+  color: var(--text-primary);
+}
+
+body.dark-theme .dropdown-menu > .active > a,
+body.dark-theme .dropdown-menu > .active > a:hover,
+body.dark-theme .dropdown-menu > .active > a:focus {
+  background-color: var(--primary-500);
+  color: var(--text-inverse);
+}
+
+body.dark-theme .dropdown-menu > .disabled > a,
+body.dark-theme .dropdown-menu > .disabled > a:hover,
+body.dark-theme .dropdown-menu > .disabled > a:focus {
+  color: var(--text-muted);
+}
+
+body.dark-theme .dropdown-header {
+  color: var(--text-secondary);
+}
+
+/* Tables */
+body.dark-theme .table {
+  color: var(--text-primary);
+}
+
+body.dark-theme .table > thead > tr > th,
+body.dark-theme .table > tbody > tr > th,
+body.dark-theme .table > tfoot > tr > th {
+  border-color: var(--border-color);
+  background-color: var(--surface-200);
+}
+
+body.dark-theme .table > thead > tr > td,
+body.dark-theme .table > tbody > tr > td,
+body.dark-theme .table > tfoot > tr > td {
+  border-color: var(--border-color);
+}
+
+body.dark-theme .table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--surface-50);
+}
+
+body.dark-theme .table-hover > tbody > tr:hover {
+  background-color: var(--surface-100);
+}
+
+body.dark-theme .table-bordered {
+  border-color: var(--border-color);
+}
+
+body.dark-theme .table-bordered > thead > tr > th,
+body.dark-theme .table-bordered > tbody > tr > th,
+body.dark-theme .table-bordered > tfoot > tr > th,
+body.dark-theme .table-bordered > thead > tr > td,
+body.dark-theme .table-bordered > tbody > tr > td,
+body.dark-theme .table-bordered > tfoot > tr > td {
+  border-color: var(--border-color);
+}
+
+/* Jumbotron */
+body.dark-theme .jumbotron {
+  background-color: var(--surface-100);
+  color: var(--text-primary);
+}
+
+/* Alerts */
+body.dark-theme .alert {
+  border-color: var(--border-color);
+}
+
+body.dark-theme .alert-success {
+  background-color: var(--success-transparent-2);
+  border-color: var(--success-600);
+  color: var(--success-400);
+}
+
+body.dark-theme .alert-info {
+  background-color: var(--primary-transparent-2);
+  border-color: var(--primary-600);
+  color: var(--primary-400);
+}
+
+body.dark-theme .alert-warning {
+  background-color: var(--warning-transparent-2);
+  border-color: var(--warning-600);
+  color: var(--warning-400);
+}
+
+body.dark-theme .alert-danger {
+  background-color: var(--error-transparent-2);
+  border-color: var(--error-600);
+  color: var(--error-400);
+}
+
+/* Wells */
+body.dark-theme .well {
+  background-color: var(--surface-100);
+  border-color: var(--border-color);
+}
+
+/* List groups */
+body.dark-theme .list-group-item {
+  background-color: var(--surface-0);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark-theme .list-group-item.active {
+  background-color: var(--primary-500);
+  border-color: var(--primary-600);
+}
+
+body.dark-theme .list-group-item:hover,
+body.dark-theme .list-group-item:focus {
+  background-color: var(--surface-100);
+}
+
+/* Progress bars */
+body.dark-theme .progress {
+  background-color: var(--surface-200);
+}
+
+/* Pagination */
+body.dark-theme .pagination > li > a,
+body.dark-theme .pagination > li > span {
+  background-color: var(--surface-0);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark-theme .pagination > li > a:hover,
+body.dark-theme .pagination > li > span:hover,
+body.dark-theme .pagination > li > a:focus,
+body.dark-theme .pagination > li > span:focus {
+  background-color: var(--surface-100);
+  border-color: var(--border-color);
+  color: var(--primary-500);
+}
+
+body.dark-theme .pagination > .active > a,
+body.dark-theme .pagination > .active > span {
+  background-color: var(--primary-500);
+  border-color: var(--primary-600);
+}
+
+body.dark-theme .pagination > .disabled > a,
+body.dark-theme .pagination > .disabled > span {
+  background-color: var(--surface-100);
+  color: var(--text-muted);
+}
+
+/* Breadcrumbs */
+body.dark-theme .breadcrumb {
+  background-color: var(--surface-100);
+}
+
+body.dark-theme .breadcrumb > li + li:before {
+  color: var(--text-muted);
+}
+
+/* Labels and Badges */
+body.dark-theme .label-default {
+  background-color: var(--surface-400);
+}
+
+body.dark-theme .badge {
+  background-color: var(--surface-400);
+}
+
+/* Popovers */
+body.dark-theme .popover {
+  background-color: var(--surface-0);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .popover-title {
+  background-color: var(--surface-100);
+  border-bottom-color: var(--border-color);
+}
+
+/* Tooltips */
+body.dark-theme .tooltip-inner {
+  background-color: var(--surface-800);
+  color: var(--text-inverse);
+}
+
+/* Navs */
+body.dark-theme .nav-tabs {
+  border-bottom-color: var(--border-color);
+}
+
+body.dark-theme .nav-tabs > li > a {
+  color: var(--text-primary);
+}
+
+body.dark-theme .nav-tabs > li > a:hover {
+  background-color: var(--surface-100);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .nav-tabs > li.active > a,
+body.dark-theme .nav-tabs > li.active > a:hover,
+body.dark-theme .nav-tabs > li.active > a:focus {
+  background-color: var(--surface-0);
+  border-color: var(--border-color);
+  border-bottom-color: transparent;
+  color: var(--text-primary);
+}
+
+body.dark-theme .nav-pills > li > a {
+  color: var(--text-primary);
+}
+
+body.dark-theme .nav-pills > li > a:hover,
+body.dark-theme .nav-pills > li > a:focus {
+  background-color: var(--surface-100);
+}
+
+body.dark-theme .nav-pills > li.active > a,
+body.dark-theme .nav-pills > li.active > a:hover,
+body.dark-theme .nav-pills > li.active > a:focus {
+  background-color: var(--primary-500);
+  color: var(--text-inverse);
+}
+
+/* Carousel */
+body.dark-theme .carousel-control {
+  color: var(--text-inverse);
+}
+
+body.dark-theme .carousel-indicators li {
+  border-color: var(--border-color);
+}
+
+body.dark-theme .carousel-indicators .active {
+  background-color: var(--primary-500);
+}
+
+body.dark-theme .carousel-caption {
+  color: var(--text-inverse);
+}

@@ -24,7 +24,7 @@
         <div class="container">
             <div class="jumbotron">
                 <h1>Welcome to the Enhanced Blackbox Explorer!</h1>
-                <p>This tool allows you to view and analyze logs created by Cleanflight's and Betaflight's Blackbox feature.</p>
+                <p>This tool allows you to view and analyze logs created by Betaflight's Blackbox feature.</p>
                 <span class="btn btn-primary btn-lg btn-file" data-toggle="tooltip" title="Start by opening a log or video file"> Open log file/video
                     <input type="file" class="file-open" accept=".bbl,.txt,.cfl,.bfl,.log,.avi,.mov,.mp4,.mpeg,.json" multiple />
                 </span>
@@ -41,13 +41,11 @@
                         <div class="panel-body">
                             <p>
                                 The Blackbox feature is built in to
-                                <a href="https://github.com/cleanflight/cleanflight" target="_blank" rel="noopener noreferrer">Cleanflight</a> and
-                                <a href="https://github.com/betaflight/betaflight/releases" target="_blank" rel="noopener noreferrer">Betaflight</a>, and is supported on most of CF's flight controllers (Naze32, CC3D, SPRacingF3,
-                                etc.).
+                                <a href="https://github.com/betaflight/betaflight/releases" target="_blank" rel="noopener noreferrer">Betaflight</a> and is supported on most modern flight controllers (HAKRC F405, SpeedyBee F405, Mamba F722, etc.).
                             </p>
                             <p>
                                 To get started with Blackbox recording, read
-                                <a href="https://github.com/betaflight/betaflight/blob/master/docs/Blackbox.md" target="_blank" rel="noopener noreferrer">Cleanflight and Betaflight's Blackbox feature documentation</a>.
+                                <a href="https://github.com/betaflight/betaflight/blob/master/docs/Blackbox.md" target="_blank" rel="noopener noreferrer">Betaflight's Blackbox feature documentation</a>.
                             </p>
                             <p>
                                 Already have a log recorded? View
@@ -82,10 +80,7 @@
                                     <a href="http://www.rcgroups.com/forums/showthread.php?t=2386267" target="_blank" rel="noopener noreferrer">Blackbox log analyzation/help thread</a> on RCGroups.com
                                 </li>
                                 <li>
-                                    <a href="https://github.com/cleanflight/cleanflight/blob/master/docs/PID%20tuning.md" target="_blank" rel="noopener noreferrer">Cleanflight and Betaflight's PID tuning documentation</a>
-                                </li>
-                                <li>
-                                    <a href="http://www.rcgroups.com/forums/showthread.php?t=2249574" target="_blank" rel="noopener noreferrer">Cleanflight support topic</a> on RCGroups.com
+                                    <a href="https://github.com/betaflight/betaflight/blob/master/docs/PID-Tuning.md" target="_blank" rel="noopener noreferrer">Betaflight's PID tuning documentation</a>
                                 </li>
                                 <li>
                                     <a href="http://www.rcgroups.com/forums/showthread.php?t=2464844" target="_blank" rel="noopener noreferrer">Betaflight support topic</a> on RCGroups.com
@@ -627,7 +622,7 @@
     </div>
     <!-- Log Scroll bar -->
     <div id="log-seek-bar" class="log-seek-bar">
-        <canvas width="200" height="100"></canvas>
+        <canvas id="seekbarCanvas" width="200" height="100"></canvas>
         <span id="seekbarToolbar" class="non-shift">
             <div id="seekbarType" class="seekBar-selection" data-toggle="tooltip" title="Value to plot">
             </div>
@@ -2317,7 +2312,7 @@
                     <div class="clear-both"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default header-dialog-toggle" data-toggle="tooltip" title="Change the header display for the respective firmware type">Cleanflight</button>
+                    <button type="button" class="btn btn-default header-dialog-toggle" data-toggle="tooltip" title="Change the header display for the respective firmware type">Betaflight</button>
                     <button type="button" class="btn btn-default header-dialog-cancel" data-dismiss="modal" data-toggle="tooltip" title="Close without saving changes">Close</button>
                     <button type="button" class="btn btn-primary header-dialog-save" style="display:none;" data-dismiss="modal" data-toggle="tooltip"
                         title="Close and save changes">Save changes</button>
@@ -3232,6 +3227,23 @@
                                             </div>
                                             <span>Show the vertical timebar.</span>
                                         </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gui_box grey top-spacer dark-mode-settings">
+                                <div class="gui_box_titlebar">
+                                    <div class="spacer_box_title">Dark Mode</div>
+                                </div>
+                                <div class="spacer_box">
+                                    <div>
+                                        <label>Theme</label>
+                                        <div>
+                                            <input type="radio" name="dark-mode" value="2" checked> Auto (follow system setting)</input>
+                                            <br>
+                                            <input type="radio" name="dark-mode" value="1"> Off (always light)</input>
+                                            <br>
+                                            <input type="radio" name="dark-mode" value="0"> On (always dark)</input>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

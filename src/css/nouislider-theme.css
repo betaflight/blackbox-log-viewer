@@ -1,0 +1,53 @@
+/**
+ * noUiSlider Theme Overrides
+ *
+ * Overrides the default noUiSlider colors to match betaflight-configurator theme
+ */
+
+/* Slider base styling */
+.noUi-target {
+  background-color: var(--surface-400);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+}
+
+/* Slider connect (filled portion) */
+.noUi-connect {
+  background-color: var(--primary-500);
+}
+
+/* Slider handle */
+.noUi-handle {
+  background-color: var(--primary-500);
+  border: 1px solid var(--primary-600);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.noUi-handle:hover {
+  background-color: var(--primary-400);
+}
+
+.noUi-handle:active {
+  background-color: var(--primary-400);
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.35);
+}
+
+/* Handle tooltip */
+.noUi-tooltip {
+  background-color: var(--surface-800);
+  border: none;
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+/* Dark mode adjustments */
+body.dark-theme .noUi-target {
+  background-color: var(--surface-400);
+  border-color: var(--border-color);
+}
+
+body.dark-theme .noUi-tooltip {
+  background-color: var(--surface-800);
+  color: var(--text-inverse);
+}

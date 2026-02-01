@@ -20,7 +20,7 @@ export function PrefStorage(keyPrefix) {
         var parsed = null;
 
         try {
-          parsed = JSON.parse(window.localStorage[name]);
+          parsed = JSON.parse(globalThis.localStorage[name]);
         } catch (e) {}
 
         onGet(parsed);
@@ -41,7 +41,7 @@ export function PrefStorage(keyPrefix) {
 
     switch (mode) {
       case LOCALSTORAGE:
-        window.localStorage[name] = JSON.stringify(value);
+        globalThis.localStorage[name] = JSON.stringify(value);
         break;
       case CHROME_STORAGE_LOCAL:
         var data = {};
@@ -53,7 +53,7 @@ export function PrefStorage(keyPrefix) {
     }
   };
 
-  if (window.chrome && window.chrome.storage && window.chrome.storage.local) {
+  if (globalThis.chrome && globalThis.chrome.storage && globalThis.chrome.storage.local) {
     mode = CHROME_STORAGE_LOCAL;
   } else {
     mode = LOCALSTORAGE;

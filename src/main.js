@@ -35,6 +35,8 @@ import {
 } from "./tools.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
+import { DarkTheme } from "./dark_theme.js";
+import { ThemeColors } from "./theme_colors.js";
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
@@ -54,7 +56,7 @@ const INITIAL_APP_PAGE = "index.html";
 function BlackboxLogViewer() {
   function supportsRequiredAPIs() {
     return (
-      window.File && window.FileReader && window.FileList && Modernizr.canvas
+      globalThis.File && globalThis.FileReader && globalThis.FileList && Modernizr.canvas
     );
   }
 
@@ -146,7 +148,7 @@ function BlackboxLogViewer() {
 
   // TODO: Figure out if we can open the same file in a new window
   function createNewBlackboxWindow(fileToOpen) {
-    window.open(window.location.href, "_blank").focus();
+    globalThis.open(globalThis.location.href, "_blank").focus();
   }
 
   function blackboxTimeFromVideoTime() {
@@ -1026,6 +1028,15 @@ function BlackboxLogViewer() {
     return bookmarkTimes;
   };
 
+  this.refreshGraph = function () {
+    // Called when the theme changes to refresh canvas colors
+    if (graph !== null) {
+      ThemeColors.clearCache();
+      graph.refreshTheme();
+      invalidateGraph();
+    }
+  };
+
   // Workspace save/restore to/from file.
   function saveWorkspaces(file) {
     let data; // Data to save
@@ -1042,13 +1053,13 @@ function BlackboxLogViewer() {
       a = document.createElement("a");
 
     a.download = file;
-    a.href = window.URL.createObjectURL(blob);
+    a.href = globalThis.URL.createObjectURL(blob);
     a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
     e.initMouseEvent(
       "click",
       true,
       false,
-      window,
+      globalThis,
       0,
       0,
       0,
@@ -1098,12 +1109,12 @@ function BlackboxLogViewer() {
       const data = e.target.result;
       let tmp = JSON.parse(data);
       if (tmp.graphConfig) {
-        window.alert("Old Workspace format. Upgrading...");
+        globalThis.alert("Old Workspace format. Upgrading...");
         tmp = upgradeWorkspaceFormat(tmp);
       }
       workspaceGraphConfigs = tmp;
       onSwitchWorkspace(workspaceGraphConfigs, 1);
-      window.alert("Workspaces Loaded");
+      globalThis.alert("Workspaces Loaded");
     };
 
     reader.readAsText(file);
@@ -1124,13 +1135,13 @@ function BlackboxLogViewer() {
         e = document.createEvent("MouseEvents"),
         a = document.createElement("a");
       a.download = file || `${$(".log-filename").text()}.${fileExtension}`;
-      a.href = window.URL.createObjectURL(blob);
+      a.href = globalThis.URL.createObjectURL(blob);
       a.dataset.downloadurl = [fileType, a.download, a.href].join(":");
       e.initMouseEvent(
         "click",
         true,
         false,
-        window,
+        globalThis,
         0,
         0,
         0,
@@ -1225,6 +1236,9 @@ function BlackboxLogViewer() {
   });
 
   $(function () {
+    // Initialize dark theme
+    DarkTheme.init(prefs);
+
     $('[data-toggle="tooltip"]').tooltip({
       trigger: "hover",
       placement: "auto bottom",
@@ -1668,6 +1682,11 @@ function BlackboxLogViewer() {
           globalThis.userSettings = newSettings;
 
           prefs.set("userSettings", newSettings);
+
+          // Apply dark mode setting
+          if (newSettings.darkMode !== undefined) {
+            DarkTheme.setMode(newSettings.darkMode);
+          }
 
           // refresh the craft model
           if (graph != null) {
@@ -2582,6 +2601,6 @@ $(document).click(function (e) {
 $(document).off(".data-api");
 
 globalThis.blackboxLogViewer = new BlackboxLogViewer();
-if (typeof window !== "undefined") {
-  window.blackboxLogViewer = globalThis.blackboxLogViewer;
+if (typeof globalThis.window !== "undefined") {
+  globalThis.window.blackboxLogViewer = globalThis.blackboxLogViewer;
 }

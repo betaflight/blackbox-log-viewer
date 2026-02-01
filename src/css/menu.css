@@ -31,7 +31,7 @@
   left: 0;
   right: 0;
   overflow: visible;
-  background: #ffffff;
+  background: var(--surface-0);
   z-index: 300;
   min-width: fit-content;
 }
@@ -48,7 +48,7 @@
 }
 
 .dropdown-content div:hover {
-  background-color: #f6f6f6;
+  background-color: var(--button-bg);
 }
 
 .dropdown-content div:active {
@@ -92,7 +92,7 @@
   color: var(--textSecondary);
 }
 .menu-button {
-  background-color: #f6f6f6;
+  background-color: var(--button-bg);
   font-weight: 700;
   border: 1px solid black;
   border-radius: 3px;

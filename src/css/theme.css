@@ -1,0 +1,158 @@
+/**
+ * Theme System - CSS Variables
+ * Based on betaflight-configurator's color scheme and dark mode implementation
+ *
+ * This file defines all color variables used throughout the application.
+ * Light mode colors are defined on :root, dark mode overrides are on body.dark-theme
+ */
+
+:root {
+  /* Primary Colors - Betaflight Orange/Amber */
+  --primary-50: #fffbe8;
+  --primary-100: #fff5d3;
+  --primary-200: #ffeba9;
+  --primary-300: #ffdf76;
+  --primary-400: #ffd03d;
+  --primary-500: #ffa724;
+  --primary-600: #e69400;
+  --primary-700: #cc8200;
+  --primary-800: #a86700;
+  --primary-900: #7a4600;
+  --primary-950: #5c2f00;
+
+  /* Surface Colors - Light Mode (HSL for easy adjustments) */
+  --surface-0: hsl(0, 0%, 100%);   /* Pure white */
+  --surface-50: hsl(0, 0%, 98%);   /* Almost white */
+  --surface-100: hsl(0, 0%, 95%);  /* Light gray */
+  --surface-200: hsl(0, 0%, 92%);
+  --surface-300: hsl(0, 0%, 84%);
+  --surface-400: hsl(0, 0%, 75%);
+  --surface-500: hsl(0, 0%, 65%);
+  --surface-600: hsl(0, 0%, 55%);
+  --surface-700: hsl(0, 0%, 45%);
+  --surface-800: hsl(0, 0%, 40%);
+  --surface-900: hsl(0, 0%, 30%);
+  --surface-950: hsl(0, 0%, 20%);
+
+  /* Text Colors - Light Mode */
+  --text-primary: hsl(0, 0%, 10%);    /* Nearly black */
+  --text-secondary: hsl(0, 0%, 40%);  /* Medium gray */
+  --text-muted: hsl(0, 0%, 60%);      /* Light gray */
+  --text-inverse: hsl(0, 0%, 95%);    /* For dark backgrounds */
+
+  /* Graph/Canvas Colors - Light Mode */
+  --graph-background: #000000;          /* Black background for graphs */
+  --graph-grid: rgba(255, 255, 255, 0.15);
+  --graph-text: rgba(255, 255, 255, 0.9);
+  --graph-text-secondary: rgba(255, 255, 255, 0.65);
+  --graph-axis: rgba(255, 255, 255, 0.5);
+
+  /* UI Element Colors - Light Mode */
+  --border-color: #cccccc;
+  --border-color-light: #e0e0e0;
+  --border-color-dark: #999999;
+
+  --button-bg: var(--primary-500);
+  --button-bg-hover: var(--primary-400);
+  --button-border: var(--primary-600);
+  --button-text: #000;
+
+  --input-bg: #ffffff;
+  --input-bg-disabled: #f5f5f5;
+  --input-border: #cccccc;
+  --input-border-focus: var(--primary-500);
+  --input-text: var(--text-primary);
+
+  --dialog-bg: #d8d8d8;
+  --dialog-title-bg: #808080;
+  --dialog-title-text: #ffffff;
+
+  /* Status/Semantic Colors (same in both themes) */
+  --success-400: #90f042;
+  --success-500: #70e212;
+  --success-600: #5cb10f;
+
+  --error-400: #ee2b55;
+  --error-500: #e2123f;
+  --error-600: #c10f36;
+
+  --warning-400: #ff8533;
+  --warning-500: #ff6600;
+  --warning-600: #e65c00;
+
+  --info-400: #66b3ff;
+  --info-500: #3399ff;
+  --info-600: #0080ff;
+
+  /* Transparency Variants */
+  --primary-transparent-1: rgba(255, 167, 36, 0.1);
+  --primary-transparent-2: rgba(255, 167, 36, 0.2);
+  --primary-transparent-3: rgba(255, 167, 36, 0.3);
+  --primary-transparent-4: rgba(255, 167, 36, 0.4);
+
+  --success-transparent-1: rgba(112, 226, 18, 0.1);
+  --success-transparent-2: rgba(112, 226, 18, 0.2);
+  --success-transparent-3: rgba(112, 226, 18, 0.3);
+  --success-transparent-4: rgba(112, 226, 18, 0.4);
+
+  --error-transparent-1: rgba(226, 18, 63, 0.1);
+  --error-transparent-2: rgba(226, 18, 63, 0.2);
+  --error-transparent-3: rgba(226, 18, 63, 0.3);
+  --error-transparent-4: rgba(226, 18, 63, 0.4);
+
+  /* Legacy Compatibility (mapping old color names to new system) */
+  --switcherysecond: var(--surface-400);
+  --primary-action: var(--success-500);
+  --primary-action-border: var(--success-600);
+  --primary-action-hover: var(--success-400);
+}
+
+/**
+ * Dark Theme Overrides
+ * Applied when body has 'dark-theme' class
+ * Only surface colors and text colors change; primary and semantic colors remain consistent
+ */
+body.dark-theme {
+  /* Surface Colors - Dark Mode (inverted lightness) */
+  --surface-0: hsl(0, 0%, 4%);     /* Very dark background */
+  --surface-50: hsl(0, 0%, 8%);
+  --surface-100: #181818;           /* Betaflight's dark gray */
+  --surface-200: hsl(0, 0%, 13%);
+  --surface-300: hsl(0, 0%, 15%);
+  --surface-400: hsl(0, 0%, 20%);
+  --surface-500: hsl(0, 0%, 24%);
+  --surface-600: hsl(0, 0%, 35%);
+  --surface-700: hsl(0, 0%, 45%);
+  --surface-800: hsl(0, 0%, 60%);
+  --surface-900: hsl(0, 0%, 70%);
+  --surface-950: hsl(0, 0%, 80%);
+
+  /* Text Colors - Dark Mode (light text on dark background) */
+  --text-primary: hsl(0, 0%, 95%);    /* Off-white */
+  --text-secondary: hsl(0, 0%, 70%);  /* Medium light gray */
+  --text-muted: hsl(0, 0%, 50%);      /* Mid gray */
+  --text-inverse: hsl(0, 0%, 10%);    /* For light backgrounds */
+
+  /* Graph/Canvas Colors - Dark Mode */
+  --graph-background: #1a1a1a;          /* Dark gray background for graphs */
+  --graph-grid: rgba(255, 255, 255, 0.2);
+  --graph-text: rgba(255, 255, 255, 0.95);
+  --graph-text-secondary: rgba(255, 255, 255, 0.75);
+  --graph-axis: rgba(255, 255, 255, 0.6);
+
+  /* UI Element Colors - Dark Mode */
+  --border-color: #404040;
+  --border-color-light: #505050;
+  --border-color-dark: #303030;
+
+  /* Buttons keep primary orange color in dark mode for consistency */
+  --input-bg: #1a1a1a;
+  --input-bg-disabled: #252525;
+  --input-border: #404040;
+
+  --dialog-bg: #2a2a2a;
+  --dialog-title-bg: #1a1a1a;
+  --dialog-title-text: var(--text-primary);
+
+  /* Primary and semantic colors remain unchanged in dark mode for consistent branding */
+}

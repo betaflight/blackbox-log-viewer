@@ -13,9 +13,9 @@ if (typeof globalThis !== "undefined") {
   globalThis.$ = $;
 }
 
-if (typeof window !== "undefined") {
-  window.jQuery = $;
-  window.$ = $;
+if (typeof globalThis.window !== "undefined") {
+  globalThis.window.jQuery = $;
+  globalThis.window.$ = $;
 }
 
 if (typeof global !== "undefined") {

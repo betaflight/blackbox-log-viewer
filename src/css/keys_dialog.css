@@ -1,10 +1,10 @@
 .keys-dialog .parameter th {
-  background-color: #828885;
+  background-color: var(--surface-400);
   padding: 4px;
-  border-left: 0 solid #ccc;
-  border-bottom: 1px solid #ccc;
+  border-left: 0 solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   font-weight: bold;
-  color: white;
+  color: var(--text-inverse);
   text-align: left;
 }
 
@@ -58,7 +58,7 @@
 
 .keys-dialog .key {
   margin: 3px;
-  background-color: beige;
+  background-color: var(--surface-200);
   display: inline-block;
   border-radius: 8px;
   border-style: groove;
@@ -78,7 +78,7 @@
 .keys-dialog div.description {
   flex: 1;
   padding-left: 10px;
-  color: #7d7d7d;
+  color: var(--text-secondary);
   text-align: justify;
   position: relative;
   align-self: center;
@@ -91,14 +91,14 @@
 }
 
 .keys-dialog .noline td {
-  border: 0 solid #ccc;
+  border: 0 solid var(--border-color);
 }
 
 .keys-dialog .gui_box span {
   font-style: normal;
   font-family: "open_sansregular", Arial, sans-serif;
   line-height: 19px;
-  color: #7d7d7d;
+  color: var(--text-secondary);
   font-size: 11px;
   text-align: left;
   min-width: 165px;
