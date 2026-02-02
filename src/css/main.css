@@ -1047,10 +1047,34 @@ html:not(.has-analyser) .view-analyser-fullscreen {
 
 .video-top-controls h4 {
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   margin-top: 7px;
   margin-bottom: 4px;
   font-weight: bold;
+}
+
+/* Ensure glyphicon icons in buttons and links are visible */
+.video-top-controls .glyphicon {
+  color: var(--button-text) !important;
+}
+
+.video-top-controls .btn .glyphicon,
+.video-top-controls button .glyphicon {
+  color: var(--button-text) !important;
+}
+
+.video-top-controls a .glyphicon,
+.video-top-controls .dropdown-menu .glyphicon {
+  color: var(--button-text) !important;
+}
+
+.video-top-controls .btn-default .glyphicon,
+.video-top-controls .view-config .glyphicon,
+.video-top-controls .view-table .glyphicon,
+.video-top-controls .view-craft .glyphicon,
+.video-top-controls .view-sticks .glyphicon,
+.video-top-controls .view-analyser .glyphicon {
+  color: var(--button-text) !important;
 }
 
 html.has-log .video-top-controls > li.log-view-panel,

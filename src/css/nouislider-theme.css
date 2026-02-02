@@ -24,6 +24,10 @@
   cursor: pointer;
 }
 
+.noUi-horizontal .noUi-handle {
+  color: var(--button-text);
+}
+
 .noUi-handle:hover {
   background-color: var(--primary-400);
 }
@@ -35,9 +39,9 @@
 
 /* Handle tooltip */
 .noUi-tooltip {
-  background-color: var(--surface-800);
+  background-color: var(--primary-500);
   border: none;
-  color: var(--text-inverse);
+  color: var(--button-text);
   font-weight: 600;
 }
 
@@ -47,7 +51,11 @@ body.dark-theme .noUi-target {
   border-color: var(--border-color);
 }
 
+body.dark-theme .noUi-horizontal .noUi-handle {
+  color: var(--button-text);
+}
+
 body.dark-theme .noUi-tooltip {
-  background-color: var(--surface-800);
-  color: var(--text-inverse);
+  background-color: var(--primary-500);
+  color: var(--button-text);
 }
