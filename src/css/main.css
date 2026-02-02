@@ -1053,7 +1053,12 @@ html:not(.has-analyser) .view-analyser-fullscreen {
   font-weight: bold;
 }
 
-/* Ensure glyphicon icons in buttons and links are visible */
+/* Global glyphicon color - theme-aware default for all icons */
+.glyphicon {
+  color: var(--text-primary);
+}
+
+/* Ensure glyphicon icons in video-top-controls buttons are black (for orange button backgrounds) */
 .video-top-controls .glyphicon {
   color: var(--button-text) !important;
 }

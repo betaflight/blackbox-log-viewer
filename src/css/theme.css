@@ -146,6 +146,8 @@ body.dark-theme {
   --border-color-dark: #303030;
 
   /* Buttons keep primary orange color in dark mode for consistency */
+  --button-text: #000;  /* Black text still works on orange buttons in dark mode */
+
   --input-bg: #1a1a1a;
   --input-bg-disabled: #252525;
   --input-border: #404040;
