@@ -40,7 +40,6 @@ jobs:
   # Prepare branch name for deployment
   prepare_branch:
     name: Prepare Branch Name
-    needs: build
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.branch_name.outputs.BRANCH }}
