@@ -33,7 +33,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug_build: false
-      commit_ref: ${{ github.event.release.target_commitish }}
+      commit_ref: ${{ github.ref }}
 
   prepare_environment:
     name: Prepare Environment Name

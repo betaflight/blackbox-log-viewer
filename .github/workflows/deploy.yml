@@ -23,7 +23,7 @@ jobs:
           else
             COMMIT_REF=${{ github.event.pull_request.head.sha }}
           fi
-          echo "COMMIT_REF=$COMMIT_REF" >> $GITHUB_OUTPUT
+          echo "commit_ref=$COMMIT_REF" >> $GITHUB_OUTPUT
 
           # Set a simple output to confirm the value
           echo "EVENT: ${{ github.event_name }}, COMMIT_REF=$COMMIT_REF"
@@ -35,7 +35,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       debug_build: ${{ github.event_name == 'pull_request_target' || github.event_name == 'pull_request' }}
-      commit_ref: ${{ needs.commit_reference.outputs.COMMIT_REF }}
+      commit_ref: ${{ needs.commit_reference.outputs.commit_ref }}
 
   # Prepare branch name for deployment
   prepare_branch:
@@ -86,6 +86,6 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-             Preview URL: ${{ steps.deploy.outputs.deployment_alias_url }}
+             Preview URL: ${{ needs.deploy.outputs.deployment_alias_url }}
           comment-tag: 'Preview URL'
           mode: recreate
