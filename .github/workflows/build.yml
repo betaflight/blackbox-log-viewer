@@ -1,0 +1,48 @@
+name: 'Build'
+
+on:
+  workflow_call:
+# DEFINE INPUTS THE WORKFLOW ACCEPTS
+    inputs:
+      commit_ref:
+        description: 'The git SHA to checkout'
+        required: true
+        type: string
+      debug_build:
+        description: 'Specifies if it is a debug build or a release build'
+        default: true
+        required: false
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.commit_ref }}
+          persist-credentials: false  # Don't persist GitHub token
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules/
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Install node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+
+      - run: npm install yarn -g
+      - run: yarn install
+      - run: yarn build
+
+      - name: Upload build artifact
+        id: dist_upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist
