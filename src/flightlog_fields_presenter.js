@@ -1503,6 +1503,12 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Valid Count",
       };
     }
+    if (semver.gte(firmwareVersion, "2026.6.0")) {
+      DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE = {
+        ...DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE,
+        "debug[4]": "Avg System Load %",
+      };
+    }
   }
 };
 
@@ -1945,6 +1951,9 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
+        if (fieldName === "debug[4]") {
+          return `${value.toFixed(0)} %`; // Avg System Load %
+        }
         return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
       case "ANGLERATE":
         return `${value.toFixed(0)} °/s`;
@@ -2701,6 +2710,9 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
       case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
+        if (fieldName === "debug[4]") {
+          return value; // Avg System Load %
+        }
         return toFriendly
           ? flightLog.gyroRawToDegreesPerSecond(value)
           : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
