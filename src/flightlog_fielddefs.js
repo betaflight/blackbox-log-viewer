@@ -570,7 +570,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_SCALED"), 1, "MULTI_GYRO_SCALED");
     }
     if (semver.gte(firmwareVersion, "2026.6.0")) {
-      DEBUG_MODE.push("OPTICALFLOW_POS", "POSITION_SOURCE", "AUTOPILOT_PID");
+      DEBUG_MODE.push("AUTOPILOT_PID");
     }
 
     ACC_HARDWARE = makeReadOnly(ACC_HARDWARE);
