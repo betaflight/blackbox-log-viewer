@@ -1949,12 +1949,10 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
-        switch (fieldName) {
-          case "debug[4]": // Avg System Load %
-            return `${value.toFixed(0)} %`;
-          default:
-            return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
+        if (fieldName === "debug[4]") {
+          return `${value.toFixed(0)} %`; // Avg System Load %
         }
+        return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
       case "ANGLERATE":
         return `${value.toFixed(0)} °/s`;
       case "ESC_SENSOR":
@@ -2710,14 +2708,12 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
       case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
-        switch (fieldName) {
-          case "debug[4]": // Avg System Load %
-            return value;
-          default:
-            return toFriendly
-              ? flightLog.gyroRawToDegreesPerSecond(value)
-              : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+        if (fieldName === "debug[4]") {
+          return value; // Avg System Load %
         }
+        return toFriendly
+          ? flightLog.gyroRawToDegreesPerSecond(value)
+          : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
       case "ANGLERATE":
         return value; // °/s;
       case "ESC_SENSOR":
