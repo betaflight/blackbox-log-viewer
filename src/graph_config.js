@@ -969,6 +969,14 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   max: maxDegreesSecond(gyroScaleMargin * highResolutionScale),
                 },
               };
+            case "debug[4]": // Avg System Load %
+              return {
+                power: 1,
+                MinMax: {
+                  min: 0,
+                  max: 100,
+                },
+              };
             default:
               return getCurveForMinMaxFields(fieldName);
           }

@@ -1503,6 +1503,10 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Valid Count",
       };
     }
+    if (semver.gte(firmwareVersion, "2026.6.0")) {
+      DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE["debug[4]"] =
+        "Avg System Load %";
+    }
   }
 };
 
@@ -1945,7 +1949,12 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
-        return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
+        switch (fieldName) {
+          case "debug[4]": // Avg System Load %
+            return `${value.toFixed(0)} %`;
+          default:
+            return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
+        }
       case "ANGLERATE":
         return `${value.toFixed(0)} °/s`;
       case "ESC_SENSOR":
@@ -2701,9 +2710,14 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
       case "MULTI_GYRO_SCALED":
       case "NOTCH":
       case "GYRO_SAMPLE":
-        return toFriendly
-          ? flightLog.gyroRawToDegreesPerSecond(value)
-          : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+        switch (fieldName) {
+          case "debug[4]": // Avg System Load %
+            return value;
+          default:
+            return toFriendly
+              ? flightLog.gyroRawToDegreesPerSecond(value)
+              : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
+        }
       case "ANGLERATE":
         return value; // °/s;
       case "ESC_SENSOR":
