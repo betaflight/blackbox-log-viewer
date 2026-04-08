@@ -1504,8 +1504,10 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
       };
     }
     if (semver.gte(firmwareVersion, "2026.6.0")) {
-      DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE["debug[4]"] =
-        "Avg System Load %";
+      DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE = {
+        ...DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE,
+        "debug[4]": "Avg System Load %",
+      };
     }
   }
 };
