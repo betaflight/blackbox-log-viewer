@@ -46,7 +46,7 @@ function verifyChunkIndexes(_chunks) {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  const ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/;
+  const ADDITIONAL_COMPUTED_FIELD_COUNT = 24; /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle, PSAS Sum **/
   let logIndex = 0;
   const logIndexes = new FlightLogIndex(logData);
   const parser = new FlightLogParser(logData);
@@ -304,6 +304,12 @@ export function FlightLog(logData) {
     }
 
     addComputedFieldNames(this.isFieldDisabled());
+
+    if (fieldNames.includes("PSAS_pitch[0]") ||
+        fieldNames.includes("PSAS_roll[0]") ||
+        fieldNames.includes("PSAS_yaw[0]")) {
+        fieldNames.push("psasSum[0]", "psasSum[1]", "psasSum[2]");
+    }
 
     fieldNameToIndex = {};
     for (let i = 0; i < fieldNames.length; i++) {
@@ -870,6 +876,39 @@ export function FlightLog(logData) {
   };
 
   /**
+   * Compute sum of plane SAS channels components.
+   * Writes 3 field to destFrame at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computePlaneSasSum = (srcFrame, destFrame, fieldIndex, psasData) => {
+    let psasRollSum = 0;
+    for (const rollDataIndex of psasData[AXIS.ROLL]) {
+      if (rollDataIndex != undefined) {
+        psasRollSum += srcFrame[rollDataIndex];
+      }
+    }
+    destFrame[fieldIndex++] = psasRollSum;
+
+    let psasPitchSum = 0;
+    for (const pitchDataIndex of psasData[AXIS.PITCH]) {
+      if (pitchDataIndex != undefined) {
+        psasPitchSum += srcFrame[pitchDataIndex];
+      }
+    }
+    destFrame[fieldIndex++] = psasPitchSum;
+
+    let psasYawSum = 0;
+    for (const yawDataIndex of psasData[AXIS.YAW]) {
+      if (yawDataIndex != undefined) {
+        psasYawSum += srcFrame[yawDataIndex];
+      }
+    }
+    destFrame[fieldIndex++] = psasYawSum;
+
+    return fieldIndex;
+  };
+
+  /**
    * Resolve field indices from fieldNameToIndex for computed field injection.
    * Sets arrays to false when the primary field is absent.
    */
@@ -887,6 +926,25 @@ export function FlightLog(logData) {
       [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"], fieldNameToIndex["axisS[1]"]],
       [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"], fieldNameToIndex["axisS[2]"]],
     ];
+    let psasData = [
+      [
+        fieldNameToIndex["PSAS_roll[0]"],
+        fieldNameToIndex["PSAS_roll[1]"],
+      ],
+      [
+        fieldNameToIndex["PSAS_pitch[0]"],
+        fieldNameToIndex["PSAS_pitch[1]"],
+        fieldNameToIndex["PSAS_pitch[2]"],
+        fieldNameToIndex["PSAS_pitch[3]"],
+        fieldNameToIndex["PSAS_pitch[4]"],
+      ],
+      [
+        fieldNameToIndex["PSAS_yaw[0]"],
+        fieldNameToIndex["PSAS_yaw[1]"],
+        fieldNameToIndex["PSAS_yaw[2]"],
+        fieldNameToIndex["PSAS_yaw[3]"],
+      ],
+    ];
 
     if (!magADC[0]) { magADC = false; }
     if (!gyroADC[0]) { gyroADC = false; }
@@ -897,10 +955,13 @@ export function FlightLog(logData) {
     if (!axisPID[0]) { axisPID = false; }
     if (!gpsCoord[0]) { gpsCoord = false; }
     if (!gpsVelNED[0]) { gpsVelNED = false; }
+    if (!psasData[0][0] && !psasData[1][0] && !psasData[2][0]) {
+        psasData = false;
+    }
 
     return {
       gyroADC, accSmooth, magADC, imuQuaternion, rcCommand, setpoint,
-      gpsCoord, gpsVelNED, axisPID,
+      gpsCoord, gpsVelNED, axisPID, psasData,
       numSatIndex: fieldNameToIndex["GPS_numSat"],
       flightModeFlagsIndex: fieldNameToIndex["flightModeFlags"],
       sysConfig: this.getSysConfig(),
@@ -944,6 +1005,10 @@ export function FlightLog(logData) {
 
     if (ctx.gpsVelNED) {
       fieldIndex = computeTrajectoryTilt(srcFrame, destFrame, fieldIndex, ctx.gpsVelNED);
+    }
+
+    if (ctx.psasData) {
+      fieldIndex = computePlaneSasSum(srcFrame, destFrame, fieldIndex, ctx.psasData);
     }
 
     destFrame.splice(fieldIndex);

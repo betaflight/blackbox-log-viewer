@@ -607,7 +607,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       );
     }
     if (semver.gte(firmwareVersion, "2026.6.0")) {
-      DEBUG_MODE.push("AUTOPILOT_PID", "POSITION_NAV", "PLANE_SAS");
+      DEBUG_MODE.push("AUTOPILOT_PID", "POSITION_NAV", "AUTOPILOT_STOP", "PLANE_SAS");
     }
 
     ACC_HARDWARE = makeReadOnly(ACC_HARDWARE);

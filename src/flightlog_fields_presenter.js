@@ -163,6 +163,12 @@ const FRIENDLY_FIELD_NAMES = {
   "PSAS_yaw[1]": "PSAS yaw Damping",
   "PSAS_yaw[2]": "PSAS yaw Stability",
   "PSAS_yaw[3]": "PSAS yaw roll cross link",
+
+  //Virtual field
+  "psasSum[all]": "PSAS Sum",
+  "psasSum[0]": "PSAS Sum [roll]",
+  "psasSum[1]": "PSAS Sum [pitch]",
+  "psasSum[2]": "PSAS Sum [yaw]",
 };
 
 const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -1913,6 +1919,9 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "PSAS_yaw[1]":
     case "PSAS_yaw[2]":
     case "PSAS_yaw[3]":
+    case "psasSum[0]":
+    case "psasSum[1]":
+    case "psasSum[2]":
       return `${(value / 10).toFixed(1)} %`;
 
     case "debug[0]":
@@ -2421,7 +2430,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             return `${value.toFixed(1) / 10} %`;
           case "debug[2]":
           case "debug[6]":
-            return `${value.toFixed(1) / 100}`;
+            return `${value.toFixed(2) / 100}`;
           case "debug[3]":
           case "debug[4]":
           case "debug[5]":
@@ -2686,6 +2695,9 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
     case "PSAS_yaw[1]":
     case "PSAS_yaw[2]":
     case "PSAS_yaw[3]":
+    case "psasSum[0]":
+    case "psasSum[1]":
+    case "psasSum[2]":
       return toFriendly ? value / 10 : value * 10;
 
     case "debug[0]":
