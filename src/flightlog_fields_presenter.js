@@ -146,6 +146,23 @@ const FRIENDLY_FIELD_NAMES = {
   gpsDistance: "GPS Home distance",
   gpsHomeAzimuth: "GPS Home azimuth",
   gpsTrajectoryTiltAngle: "GPS Traject. tilt angle",
+
+  "PSAS_pitch[all]": "PSAS Pitch",
+  "PSAS_pitch[0]": "PSAS pitch Pilot",
+  "PSAS_pitch[1]": "PSAS pitch Damping",
+  "PSAS_pitch[2]": "PSAS pitch Stability",
+  "PSAS_pitch[3]": "PSAS pitch controller I",
+  "PSAS_pitch[4]": "PSAS pitch controller P",
+
+  "PSAS_roll[all]": "PSAS Roll",
+  "PSAS_roll[0]": "PSAS roll Pilot",
+  "PSAS_roll[1]": "PSAS roll Damping",
+
+  "PSAS_yaw[all]": "PSAS Yaw",
+  "PSAS_yaw[0]": "PSAS yaw Pilot",
+  "PSAS_yaw[1]": "PSAS yaw Damping",
+  "PSAS_yaw[2]": "PSAS yaw Stability",
+  "PSAS_yaw[3]": "PSAS yaw roll cross link",
 };
 
 const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
@@ -1155,6 +1172,17 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[6]": "Heartbeat (ex.2) counter",
     "debug[7]": "Battery (ex.3) counter",
   },
+  PLANE_SAS: {
+    "debug[all]": "Plane SAS",
+    "debug[0]": "Pitch Sum",
+    "debug[1]": "Pitch I",
+    "debug[2]": "Lift coefficient",
+    "debug[3]": "Accel Z required",
+    "debug[4]": "Accel Z delta",
+    "debug[5]": "Accel Z P",
+    "debug[6]": "Lift coeff delta",
+    "debug[7]": "AoA limiter is on",
+  },
 };
 
 let DEBUG_FRIENDLY_FIELD_NAMES = null;
@@ -1874,6 +1902,19 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "magADC[2]":
       return `${(value / 10).toFixed(1)} °`;
 
+    case "PSAS_pitch[0]":
+    case "PSAS_pitch[1]":
+    case "PSAS_pitch[2]":
+    case "PSAS_pitch[3]":
+    case "PSAS_pitch[4]":
+    case "PSAS_roll[0]":
+    case "PSAS_roll[1]":
+    case "PSAS_yaw[0]":
+    case "PSAS_yaw[1]":
+    case "PSAS_yaw[2]":
+    case "PSAS_yaw[3]":
+      return `${(value / 10).toFixed(1)} %`;
+
     case "debug[0]":
     case "debug[1]":
     case "debug[2]":
@@ -2373,8 +2414,22 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
           default:
             return value.toFixed(0);
         }
+      case "PLANE_SAS":
+        switch (fieldName) {
+          case "debug[0]":
+          case "debug[1]":
+            return `${value.toFixed(1) / 10} %`;
+          case "debug[2]":
+          case "debug[6]":
+            return `${value.toFixed(1) / 100}`;
+          case "debug[3]":
+          case "debug[4]":
+          case "debug[5]":
+            return `${value.toFixed(1) / 10}`;
+          default:
+            return value.toFixed(0);
+      }
     }
-    return value.toFixed(0);
   }
   return value.toFixed(0);
 };
@@ -2618,6 +2673,19 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
     case "magADC[0]":
     case "magADC[1]":
     case "magADC[2]":
+      return toFriendly ? value / 10 : value * 10;
+
+    case "PSAS_pitch[0]":
+    case "PSAS_pitch[1]":
+    case "PSAS_pitch[2]":
+    case "PSAS_pitch[3]":
+    case "PSAS_pitch[4]":
+    case "PSAS_roll[0]":
+    case "PSAS_roll[1]":
+    case "PSAS_yaw[0]":
+    case "PSAS_yaw[1]":
+    case "PSAS_yaw[2]":
+    case "PSAS_yaw[3]":
       return toFriendly ? value / 10 : value * 10;
 
     case "debug[0]":
@@ -3121,6 +3189,20 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           case "debug[6]": //feedforward smoothing PT1K * 1000 show as 0.nnn
             return toFriendly ? value / 1000 : value * 1000;
           // case "debug[7]": // smoothed RxRateHz
+          default:
+            return value;
+        }
+      case "PLANE_SAS":
+        switch (fieldName) {
+          case "debug[0]":
+          case "debug[1]":
+          case "debug[3]":
+          case "debug[4]":
+          case "debug[5]":
+            return toFriendly ? value / 10 : value * 10;
+          case "debug[2]":
+          case "debug[6]":
+            return toFriendly ? value / 100 : value * 100;
           default:
             return value;
         }
