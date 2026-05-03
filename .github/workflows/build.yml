@@ -32,6 +32,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
+      - name: Ensure npm lockfile uses HTTPS URLs (not SSH)
+        run: sed -i 's|git+ssh://git@github.com/|git+https://github.com/|g' package-lock.json
       - run: npm ci
       - name: Build
         run: npm run build
