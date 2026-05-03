@@ -21,8 +21,7 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
-    "Leaflet.MultiOptionsPolyline": "git+https://github.com/hgoebl/Leaflet.MultiOptionsPolyline.git",
-    "bootstrap": "~3.4.1",
+    "bootstrap": "^5.3.8",
     "eslint": "^9.26.0",
     "eslint-config-prettier": "^8.5.0",
     "html2canvas": "^1.0.0-rc.5",
@@ -30,11 +29,12 @@
     "jquery-ui": "^1.13.2",
     "leaflet": "^1.9.3",
     "leaflet-marker-rotation": "^0.4.0",
+    "Leaflet.MultiOptionsPolyline": "git+https://github.com/hgoebl/Leaflet.MultiOptionsPolyline.git",
     "lodash": "^4.18.1",
     "prettier": "^2.8.1",
     "throttle-debounce": "^5.0.0",
     "vite": "^6.4.2",
-    "vite-plugin-pwa": "^0.21.2"
+    "vite-plugin-pwa": "^0.19.8"
   },
   "devDependencies": {
     "inflection": "1.12.0"
