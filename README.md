@@ -88,9 +88,10 @@ bundled with Node.js.
 We are using [vite](https://vitejs.dev/) for development setup. It provides
 bundling and various optimisations like hot module reloading.
 
-With `node` setup, to start developing run:
+With `node` setup, first install dependencies, then start developing:
 
 ```bash
+npm install
 npm start
 ```
 
