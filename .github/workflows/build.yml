@@ -29,17 +29,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/
-          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: node_modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install node.js
         uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
 
-      - run: npm install yarn -g
-      - run: yarn install
+      - run: npm ci
       - name: Build
-        run: yarn build
+        run: npm run build
         env:
           DEBUG_BUILD: ${{ inputs.debug_build }}
 

@@ -78,20 +78,20 @@ just run:
 nvm use
 ```
 
-### Yarn
+### npm
 
-For dependency management we are using [yarn](https://yarnpkg.com/), follow the
-instructions there to install it.
+For dependency management we use [npm](https://www.npmjs.com/), which comes
+bundled with Node.js.
 
 ### Development mode
 
 We are using [vite](https://vitejs.dev/) for development setup. It provides
 bundling and various optimisations like hot module reloading.
 
-With `node` and `yarn` setup, to start developing run:
+With `node` setup, to start developing run:
 
 ```bash
-yarn start
+npm start
 ```
 
 This will start development server and the Blackbox will be available on http://localhost:5173/.
@@ -103,11 +103,11 @@ the tip of the repository:
 
 First need to build the application:
 ```bash
-yarn build
+npm run build
 ```
 Then start the application in `preview` mode
 ```bash
-yarn preview
+npm run preview
 ```
 Visit http://localhost:4173/ and follow the steps from [Install the app to be used in offline mode](#install-the-app-to-be-used-in-offline-mode)
 
