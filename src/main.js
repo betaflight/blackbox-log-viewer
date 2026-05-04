@@ -723,12 +723,6 @@ function BlackboxLogViewer() {
     }
 
     playbackStore.playbackRate = playbackRate;
-
-    if (updateUi) {
-      $(".playback-rate-control").val(playbackRate);
-    }
-
-    $(".playback-rate-control .noUi-handle").text(`${playbackRate}%`);
   }
 
   function setGraphZoom(zoom, updateUi) {
@@ -748,12 +742,6 @@ function BlackboxLogViewer() {
 
     graphStore.graphZoom = graphZoom;
     graphStore.lastGraphZoom = lastGraphZoom;
-
-    if (updateUi) {
-      $(".graph-zoom-control").val(graphZoom);
-    }
-
-    $(".graph-zoom-control .noUi-handle").text(`${graphZoom}%`);
   }
 
   function showConfigFile(state) {
@@ -2341,53 +2329,7 @@ function BlackboxLogViewer() {
       },
     };
 
-    $(".playback-rate-control")
-      .noUiSlider({
-        start: playbackRate,
-        connect: false,
-        step: PLAYBACK_RATE_STEP,
-        range: {
-          min: [PLAYBACK_MIN_RATE],
-          "50%": [PLAYBACK_DEFAULT_RATE, PLAYBACK_RATE_STEP],
-          max: [PLAYBACK_MAX_RATE, PLAYBACK_RATE_STEP],
-        },
-        tooltips: percentageFormat,
-        format: percentageFormat,
-      })
-      .on("slide", function () {
-        setPlaybackRate(Number.parseFloat($(this).val()), false);
-      })
-      .dblclick(function () {
-        setPlaybackRate(100, true);
-      });
-
-    $(".playback-rate-control .noUi-handle").text(`${playbackRate}%`);
-
-    $(".graph-zoom-control")
-      .noUiSlider({
-        start: graphZoom,
-        connect: false,
-        step: GRAPH_ZOOM_STEP,
-        range: {
-          min: [GRAPH_MIN_ZOOM],
-          "50%": [GRAPH_DEFAULT_ZOOM, GRAPH_ZOOM_STEP],
-          max: [GRAPH_MAX_ZOOM, GRAPH_ZOOM_STEP],
-        },
-        tooltips: true,
-        format: percentageFormat,
-      })
-      .on("slide", function () {
-        setGraphZoom(Number.parseFloat($(this).val()), false);
-      })
-      .dblclick(function () {
-        setGraphZoom(100, true);
-      });
-
-    $(".navbar-toggle").click(function (e) {
-      $(".navbar-collapse").collapse("toggle");
-
-      e.preventDefault();
-    });
+    // Speed/Zoom sliders and navbar toggle wired via Vue
 
     seekBar.onSeek = setCurrentBlackboxTime;
 
@@ -2525,6 +2467,8 @@ function BlackboxLogViewer() {
     that.toggleGrid = function () {
       toggleOverrideStatus("graphGridOverride", "has-grid-override");
     };
+    that.setPlaybackRate = function (rate) { setPlaybackRate(rate, false); };
+    that.setGraphZoom = function (zoom) { setGraphZoom(zoom, false); };
     that.logSyncHere = function () { logSyncHere(); };
     that.logSyncBack = function () { logSyncBack(); };
     that.logSyncForward = function () { logSyncForward(); };

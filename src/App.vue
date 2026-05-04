@@ -45,6 +45,12 @@
         />
       </Teleport>
 
+      <Teleport to="#vue-speed-panel">
+        <SpeedPanel @rate-change="onRateChange" />
+      </Teleport>
+      <Teleport to="#vue-zoom-panel">
+        <ZoomPanel @zoom-change="onZoomChange" />
+      </Teleport>
       <Teleport to="#vue-time-panel">
         <TimePanel @time-change="onTimeChange" />
       </Teleport>
@@ -98,6 +104,8 @@ import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
 import PlaybackControls from "./components/PlaybackControls.vue";
 import TimePanel from "./components/TimePanel.vue";
+import SpeedPanel from "./components/SpeedPanel.vue";
+import ZoomPanel from "./components/ZoomPanel.vue";
 import SyncPanel from "./components/SyncPanel.vue";
 import StatusBar from "./components/StatusBar.vue";
 import GraphCanvas from "./components/GraphCanvas.vue";
@@ -190,6 +198,14 @@ function onToggleAnalyser() {
 
 function onToggleMap() {
   getLegacy()?.toggleMap?.();
+}
+
+function onRateChange(rate) {
+  getLegacy()?.setPlaybackRate?.(rate);
+}
+
+function onZoomChange(zoom) {
+  getLegacy()?.setGraphZoom?.(zoom);
 }
 
 function onSyncBack() {

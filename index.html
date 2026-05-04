@@ -24,60 +24,8 @@
         <ul class="video-top-controls list-unstyled">
             <div id="vue-view-controls"></div>
             <div id="vue-playback"></div>
-            <li class="log-playback-rate-panel">
-                <h4>Speed</h4>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <div class="btn-group playback-rate">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="playback-rate">
-                                    Speed
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="playback-rate">
-                                    <li>
-                                        <div class="pull-right">
-                                            <div class="panel-body">
-                                                <div class="playback-rate-control btn-group btn-group-vertical"></div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="playback-rate-expanded">
-                            <div class="playback-rate-control btn-group btn-group-vertical" data-toggle="tooltip" title="Directly set the playback speed"></div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li class="log-chart-zoom-panel">
-                <h4>Zoom</h4>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <div class="btn-group zoom-menu">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="zoom-menu">
-                                    Zoom
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="zoom-menu">
-                                    <li>
-                                        <div class="pull-right">
-                                            <div class="panel-body">
-                                                <div class="graph-zoom-control btn-group btn-group-vertical"></div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="graph-zoom-expanded">
-                            <div class="graph-zoom-control btn-group btn-group-vertical" data-toggle="tooltip" title="Directly set the zoom level"></div>
-                        </div>
-                    </div>
-                </div>
-            </li>
+            <div id="vue-speed-panel"></div>
+            <div id="vue-zoom-panel"></div>
             <div id="vue-time-panel"></div>
             <div id="vue-sync-panel"></div>
             <li class="log-workspace-panel">
