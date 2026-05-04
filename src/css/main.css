@@ -106,7 +106,7 @@ a.disabled {
 
   .graph-row,
   .log-field-values {
-    top: 86px !important;
+    top: 130px !important;
   }
 }
 
@@ -158,7 +158,7 @@ a.disabled {
   }
 
   div.graph-row {
-    top: 70px !important;
+    top: 115px !important;
   }
 
   div.navbar-logo .log-filename {
@@ -965,7 +965,7 @@ html.has-log .graph-row {
   display: -webkit-flex;
   display: flex;
   position: fixed;
-  top: 100px;
+  top: 130px;
   width: calc(100% - 30px);
   bottom: 80px;
 }
@@ -1037,7 +1037,7 @@ html:not(.has-analyser) .view-analyser-fullscreen {
   visibility: hidden;
 }
 
-.video-top-controls > li {
+.video-top-controls li {
   display: inline-block;
   margin-right: 17px;
   vertical-align: top;
@@ -1050,6 +1050,36 @@ html:not(.has-analyser) .view-analyser-fullscreen {
   margin-top: 7px;
   margin-bottom: 4px;
   font-weight: bold;
+}
+
+/* Controls bar shared styles */
+.controls-slider {
+  width: 80px;
+  accent-color: var(--primary-500);
+}
+
+.controls-value {
+  display: inline-block;
+  min-width: 42px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-family: monospace;
+  text-align: center;
+  background-color: var(--primary-500);
+  color: var(--button-text);
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.controls-input {
+  width: 90px;
+  padding: 3px 6px;
+  font-size: 12px;
+  font-family: monospace;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 3px;
+  color: var(--text-primary);
 }
 
 /* Global glyphicon color - theme-aware default for all icons */
@@ -1081,23 +1111,23 @@ html:not(.has-analyser) .view-analyser-fullscreen {
   color: var(--button-text) !important;
 }
 
-html.has-log .video-top-controls > li.log-view-panel,
-html.has-log .video-top-controls > li.log-chart-zoom-panel,
-html.has-log .video-top-controls > li.log-chart-time-panel {
+html.has-log .video-top-controls li.log-view-panel,
+html.has-log .video-top-controls li.log-chart-zoom-panel,
+html.has-log .video-top-controls li.log-chart-time-panel {
   display: inline-block;
   /* overflow-y: hidden; */
 }
 
-.video-top-controls > li.log-view-panel,
-.video-top-controls > li.log-chart-zoom-panel,
-.video-top-controls > li.log-chart-time-panel {
+.video-top-controls li.log-view-panel,
+.video-top-controls li.log-chart-zoom-panel,
+.video-top-controls li.log-chart-time-panel {
   display: none;
 }
 
-.video-top-controls > .log-sync-panel {
+.video-top-controls .log-sync-panel {
   display: none;
 }
-html.has-video.has-log .video-top-controls > .log-sync-panel {
+html.has-video.has-log .video-top-controls .log-sync-panel {
   display: inline-block;
 }
 html .video-jump-start,
@@ -1222,7 +1252,8 @@ html.has-log .log-graph {
 
 html.has-video .video-top-controls,
 html.has-log .video-top-controls {
-  top: 50px;
+  top: 80px;
+  padding-top: 6px;
   position: fixed;
   z-index: 10;
   background-color: var(--surface-0);
@@ -1464,8 +1495,16 @@ html.has-log .navbar-static-top {
   background-color: var(--surface-200);
 }
 
-html:not(.has-log) #status-bar {
+html:not(.has-log) #status-bar,
+html:not(.has-log) .vue-statusbar {
   display: none;
+}
+
+.vue-statusbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
 }
 
 html:not(.has-gps) .view-map,

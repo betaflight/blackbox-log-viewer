@@ -1,67 +1,65 @@
 <template>
   <li class="log-playback-panel">
     <h4>Playback</h4>
-    <div>
-      <div class="flex items-center gap-0.5">
-        <UButton
-          v-if="logStore.hasVideo"
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-skip-back"
-          size="xs"
-          title="Jump to start of video"
-          @click="$emit('video-jump-start')"
-        />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-skip-back"
-          size="xs"
-          title="Jump to start of log"
-          @click="$emit('jump-start')"
-        />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-step-back"
-          size="xs"
-          title="Jump back"
-          @click="$emit('step-back')"
-        />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          :icon="playbackStore.isPlaying() ? 'i-lucide-pause' : 'i-lucide-play'"
-          size="sm"
-          title="Play/Pause"
-          @click="$emit('play-pause')"
-        />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-step-forward"
-          size="xs"
-          title="Jump forward"
-          @click="$emit('step-forward')"
-        />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-skip-forward"
-          size="xs"
-          title="Jump to end of log"
-          @click="$emit('jump-end')"
-        />
-        <UButton
-          v-if="logStore.hasVideo"
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-skip-forward"
-          size="xs"
-          title="Jump to end of video"
-          @click="$emit('video-jump-end')"
-        />
-      </div>
+    <div class="flex items-center gap-1">
+      <UButton
+        v-if="logStore.hasVideo"
+        variant="solid"
+        color="primary"
+        icon="i-lucide-skip-back"
+        size="sm"
+        title="Jump to start of video"
+        @click="$emit('video-jump-start')"
+      />
+      <UButton
+        variant="solid"
+        color="primary"
+        icon="i-lucide-skip-back"
+        size="sm"
+        title="Jump to start of log"
+        @click="$emit('jump-start')"
+      />
+      <UButton
+        variant="solid"
+        color="primary"
+        icon="i-lucide-step-back"
+        size="sm"
+        title="Jump back"
+        @click="$emit('step-back')"
+      />
+      <UButton
+        variant="solid"
+        color="primary"
+        :icon="playbackStore.isPlaying() ? 'i-lucide-pause' : 'i-lucide-play'"
+        size="sm"
+        title="Play/Pause"
+        @click="$emit('play-pause')"
+      />
+      <UButton
+        variant="solid"
+        color="primary"
+        icon="i-lucide-step-forward"
+        size="sm"
+        title="Jump forward"
+        @click="$emit('step-forward')"
+      />
+      <UButton
+        variant="solid"
+        color="primary"
+        icon="i-lucide-skip-forward"
+        size="sm"
+        title="Jump to end of log"
+        @click="$emit('jump-end')"
+      />
+      <UButton
+        v-if="logStore.hasVideo"
+        variant="solid"
+        color="primary"
+        icon="i-lucide-skip-forward"
+        size="sm"
+        title="Jump to end of video"
+        @click="$emit('video-jump-end')"
+      />
     </div>
   </li>
 </template>

@@ -3,7 +3,7 @@
     <div id="blackbox-app">
       <!-- Teleported into legacy DOM layout -->
       <Teleport to="#vue-welcome">
-        <WelcomePage />
+        <WelcomePage @files-selected="onFilesSelected" />
       </Teleport>
       <Teleport to="#vue-navbar">
         <AppToolbar

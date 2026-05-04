@@ -16,17 +16,17 @@
 <body>
     <!-- Vue teleport targets -->
     <div id="vue-welcome"></div>
-    <div id="vue-navbar"></div>
+    <div id="vue-navbar" class="navbar-static-top" style="z-index: 100"></div>
     <!-- Main Page -->
     <div class="container-fluid main-pane">
         <ul class="video-top-controls list-unstyled">
-            <div id="vue-view-controls"></div>
-            <div id="vue-playback"></div>
-            <div id="vue-speed-panel"></div>
-            <div id="vue-zoom-panel"></div>
-            <div id="vue-time-panel"></div>
-            <div id="vue-sync-panel"></div>
-            <div id="vue-workspace-panel"></div>
+            <div id="vue-view-controls" style="display: contents"></div>
+            <div id="vue-playback" style="display: contents"></div>
+            <div id="vue-speed-panel" style="display: contents"></div>
+            <div id="vue-zoom-panel" style="display: contents"></div>
+            <div id="vue-time-panel" style="display: contents"></div>
+            <div id="vue-sync-panel" style="display: contents"></div>
+            <div id="vue-workspace-panel" style="display: contents"></div>
         </ul>
         <div id="screenshot-frame" class="graph-row">
             <div class="log-graph">
@@ -206,7 +206,7 @@
         </span>
     </div>
     <!-- Vue Status Bar -->
-    <div id="vue-statusbar"></div>
+    <div id="vue-statusbar" class="vue-statusbar"></div>
 
     <!-- Scripts -->
     <script src="/js/complex.js"></script>

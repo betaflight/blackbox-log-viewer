@@ -4,7 +4,7 @@
     <div class="flex items-center gap-1">
       <input
         type="range"
-        class="w-20 accent-primary"
+        class="controls-slider"
         :min="1"
         :max="1000"
         :step="1"
@@ -13,7 +13,7 @@
         @input="$emit('zoom-change', Number($event.target.value))"
         @dblclick="$emit('zoom-change', 100)"
       />
-      <span class="text-xs font-mono text-neutral-400 min-w-10 text-center">
+      <span class="controls-value">
         {{ graphStore.graphZoom }}%
       </span>
     </div>

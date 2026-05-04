@@ -2,28 +2,28 @@
   <!-- View panel -->
   <li class="log-view-panel">
     <h4>View</h4>
-    <div class="flex items-center gap-0.5">
+    <div class="flex items-center gap-1">
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-home"
-        size="xs"
+        size="sm"
         title="View graph"
         @click="$emit('view-config')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-info"
-        size="xs"
+        size="sm"
         title="View log header (H)"
         @click="$emit('open-header')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-table"
-        size="xs"
+        size="sm"
         title="View table (T)"
         @click="$emit('toggle-table')"
       />
@@ -32,44 +32,44 @@
   <!-- Overlay panel -->
   <li class="log-overlay-panel">
     <h4>Overlay</h4>
-    <div class="flex items-center gap-0.5">
+    <div class="flex items-center gap-1">
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-film"
-        size="xs"
+        size="sm"
         title="Video"
         @click="$emit('toggle-video')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-plane"
-        size="xs"
+        size="sm"
         title="Craft"
         @click="$emit('toggle-craft')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-gamepad-2"
-        size="xs"
+        size="sm"
         title="Sticks"
         @click="$emit('toggle-sticks')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-bar-chart-3"
-        size="xs"
+        size="sm"
         title="Analyser (A)"
         @click="$emit('toggle-analyser')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-map-pin"
-        size="xs"
+        size="sm"
         title="Map"
         @click="$emit('toggle-map')"
       />

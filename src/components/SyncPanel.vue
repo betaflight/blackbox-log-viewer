@@ -3,41 +3,41 @@
     <h4>Log sync</h4>
     <div class="flex items-center gap-1">
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-step-back"
-        size="xs"
+        size="sm"
         title="Move log earlier"
         @click="$emit('sync-back')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-align-start-vertical"
-        size="xs"
+        size="sm"
         title="Start log here"
         @click="$emit('sync-here')"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-step-forward"
-        size="xs"
+        size="sm"
         title="Move log later"
         @click="$emit('sync-forward')"
       />
       <input
         type="text"
-        class="w-16 px-1 py-0.5 text-sm bg-neutral-800 border border-neutral-600 rounded text-white font-mono"
+        class="controls-input w-16"
         :value="appStore.videoOffsetDisplay"
         title="Enter a time offset"
         @change="$emit('offset-change', $event.target.value)"
       />
       <UButton
-        variant="ghost"
-        color="neutral"
+        variant="solid"
+        color="primary"
         icon="i-lucide-align-center-vertical"
-        size="xs"
+        size="sm"
         title="Smart Sync (Alt+M)"
         @click="$emit('smart-sync')"
       />

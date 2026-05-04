@@ -2,7 +2,6 @@
   <li class="log-workspace-panel">
     <h4>Workspace</h4>
 
-    <!-- Workspace selector dropdown -->
     <UDropdownMenu :items="workspaceItems" class="w-full">
       <UButton
         variant="outline"
@@ -17,20 +16,6 @@
         <span v-else class="opacity-50">No workspace</span>
       </UButton>
     </UDropdownMenu>
-
-    <!-- Default workspaces menu -->
-    <div class="mt-1">
-      <UDropdownMenu :items="defaultItems">
-        <UButton
-          size="xs"
-          variant="ghost"
-          class="text-xs opacity-70 w-full"
-          trailing-icon="i-lucide-chevron-down"
-        >
-          Presets
-        </UButton>
-      </UDropdownMenu>
-    </div>
   </li>
 </template>
 
@@ -83,23 +68,23 @@ const workspaceItems = computed(() => {
     });
   }
 
-  return [switchItems, saveItems];
-});
-
-const defaultItems = computed(() => [
-  [
+  const presetItems = [
     {
-      label: "Ctzsnooze",
+      label: "Preset: Ctzsnooze",
+      icon: "i-lucide-layout-template",
       onSelect() {
         emit("apply-default", 1);
       },
     },
     {
-      label: "SupaflyFPV",
+      label: "Preset: SupaflyFPV",
+      icon: "i-lucide-layout-template",
       onSelect() {
         emit("apply-default", 2);
       },
     },
-  ],
-]);
+  ];
+
+  return [switchItems, saveItems, presetItems];
+});
 </script>

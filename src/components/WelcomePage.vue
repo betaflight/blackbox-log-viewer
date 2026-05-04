@@ -5,7 +5,7 @@
       <p class="text-lg text-neutral-600 dark:text-neutral-400 mb-6">
         Analyze logs created by Betaflight's Blackbox feature.
       </p>
-      <LogFileInput size="lg" label="Open log file/video" />
+      <LogFileInput size="lg" label="Open log file/video" @files-selected="$emit('files-selected', $event)" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl w-full">
@@ -60,5 +60,6 @@
 import { useLogStore } from "../stores/log.js";
 import LogFileInput from "./LogFileInput.vue";
 
+defineEmits(["files-selected"]);
 const logStore = useLogStore();
 </script>

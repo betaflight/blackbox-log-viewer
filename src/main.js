@@ -91,7 +91,6 @@ function BlackboxLogViewer() {
     flightLog,
     flightLogDataArray,
     graph = null,
-    latestVersion,
     prefs = new PrefStorage(),
     configuration = null, // is their an associated dump file ?
     configurationDefaults = new ConfigurationDefaults(prefs), // configuration defaults
@@ -1313,17 +1312,6 @@ function BlackboxLogViewer() {
 
     // Version information
     appStore.statusViewerVersion = `v${__APP_VERSION__}`;
-    try {
-      $.getJSON(
-        "https://api.github.com/repos/betaflight/blackbox-log-viewer/releases/latest",
-        {},
-        function (data) {
-          latestVersion = data;
-        },
-      );
-    } catch (e) {
-      console.log("Cannot get latest version information");
-    }
 
     graphLegend = new GraphLegend(
       $(".log-graph-legend"),
