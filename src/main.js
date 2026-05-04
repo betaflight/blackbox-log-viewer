@@ -6,7 +6,6 @@ import { FlightLogGrapher } from "./grapher.js";
 import { VideoExportDialog } from "./video_export_dialog.js";
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 import { defaultUserSettings } from "./user_settings_data.js";
-import { GraphConfigurationDialog } from "./graph_config_dialog.js";
 import { HeaderDialog } from "./header_dialog.js";
 import { SimpleStats } from "./simple-stats.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
@@ -1717,13 +1716,7 @@ function BlackboxLogViewer() {
       }
       invalidateGraph();
     }
-    const graphConfigDialog = new GraphConfigurationDialog(
-        $("#dlgGraphConfiguration"),
-        function (newConfig, redrawChart) {
-          newGraphConfig(newConfig, redrawChart);
-        },
-      ),
-      headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function (
+    const headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function (
         newSysConfig,
       ) {
         if (newSysConfig != null) {
@@ -1758,7 +1751,7 @@ function BlackboxLogViewer() {
     $(".open-graph-configuration-dialog").click(function (e) {
       e.preventDefault();
 
-      graphConfigDialog.show(flightLog, activeGraphConfig, graph);
+      globalThis.vueApp.graphConfigDialogOpen = true;
     });
 
     $(".open-header-dialog").click(function (e) {
@@ -2660,6 +2653,11 @@ function BlackboxLogViewer() {
   // Bridge API — expose key functions for Vue components during migration
   this.loadFiles = loadFiles;
   this.invalidateGraph = invalidateGraph;
+  this.flightLog = flightLog;
+  this.activeGraphConfig = activeGraphConfig;
+  this.newGraphConfig = function (newConfig, redrawChart) {
+    newGraphConfig(newConfig, redrawChart);
+  };
   this.saveUserSettings = function (newSettings) {
     globalThis.userSettings = newSettings;
     prefs.set("userSettings", newSettings);

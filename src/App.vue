@@ -32,6 +32,13 @@
         :settings="currentUserSettings"
         @save="onSaveSettings"
       />
+      <GraphConfigDialog
+        v-model:open="graphConfigDialogOpen"
+        :flightLog="currentFlightLog"
+        :graphConfig="currentGraphConfig"
+        @save="onGraphConfigSave"
+        @update="onGraphConfigUpdate"
+      />
     </div>
   </UApp>
 </template>
@@ -46,12 +53,16 @@ import GraphCanvas from "./components/GraphCanvas.vue";
 import SeekBarCanvas from "./components/SeekBarCanvas.vue";
 import KeysDialog from "./components/KeysDialog.vue";
 import UserSettingsDialog from "./components/UserSettingsDialog.vue";
+import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
 const keysDialogOpen = ref(false);
 const settingsDialogOpen = ref(false);
+const graphConfigDialogOpen = ref(false);
 const currentUserSettings = computed(() => globalThis.userSettings || {});
+const currentFlightLog = computed(() => getLegacy()?.flightLog ?? null);
+const currentGraphConfig = computed(() => getLegacy()?.activeGraphConfig ?? null);
 
 // Bridge helper — access legacy BlackboxLogViewer instance
 function getLegacy() {
@@ -112,9 +123,18 @@ function onSaveSettings(newSettings) {
   getLegacy()?.saveUserSettings?.(newSettings);
 }
 
+function onGraphConfigSave(newConfig) {
+  getLegacy()?.newGraphConfig?.(newConfig, true);
+}
+
+function onGraphConfigUpdate(newConfig) {
+  getLegacy()?.newGraphConfig?.(newConfig, false);
+}
+
 // Expose for external access during migration
 defineExpose({
   keysDialogOpen,
   settingsDialogOpen,
+  graphConfigDialogOpen,
 });
 </script>
