@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineExpose } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 const container = ref(null);
 const graphCanvas = ref(null);

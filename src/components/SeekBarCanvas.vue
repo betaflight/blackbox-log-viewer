@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineExpose } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 defineProps({
   height: {

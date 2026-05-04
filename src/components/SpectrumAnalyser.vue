@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, defineExpose } from "vue";
+import { ref } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 
 const graphStore = useGraphStore();
