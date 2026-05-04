@@ -21,7 +21,7 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
-    "Leaflet.MultiOptionsPolyline": "hgoebl/Leaflet.MultiOptionsPolyline",
+    "Leaflet.MultiOptionsPolyline": "git+https://github.com/hgoebl/Leaflet.MultiOptionsPolyline.git",
     "bootstrap": "~3.4.1",
     "eslint": "^9.26.0",
     "eslint-config-prettier": "^8.5.0",
