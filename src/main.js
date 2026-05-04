@@ -3,7 +3,6 @@ import "./vendor.js";
 import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
-import { VideoExportDialog } from "./video_export_dialog.js";
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 import { defaultUserSettings } from "./user_settings_data.js";
 import { SimpleStats } from "./simple-stats.js";
@@ -1820,54 +1819,6 @@ function BlackboxLogViewer() {
       e.preventDefault();
     });
 
-    if (FlightLogVideoRenderer.isSupported()) {
-      $(".btn-video-export").click(function (e) {
-        setGraphState(GRAPH_STATE_PAUSED);
-
-        // Video export is only supported in Chromium based browsers
-        if (!isChromium()) {
-          alert("Video export is only supported in Chromium based browsers.");
-          return;
-        }
-
-        const exportDialog = new VideoExportDialog(
-          $("#dlgVideoExport"),
-          function (newConfig) {
-            videoConfig = newConfig;
-
-            prefs.set("videoConfig", newConfig);
-          },
-        );
-
-        exportDialog.show(
-          flightLog,
-          {
-            graphConfig: activeGraphConfig,
-            inTime: videoExportInTime,
-            outTime: videoExportOutTime,
-            flightVideo: hasVideo && viewVideo ? video.cloneNode() : false,
-            flightVideoOffset: videoOffset,
-            hasCraft: userSettings.drawCraft,
-            hasAnalyser: hasAnalyser,
-            hasSticks: userSettings.drawSticks,
-          },
-          videoConfig,
-        );
-
-        e.preventDefault();
-      });
-    } else {
-      $(".btn-video-export")
-        .addClass("disabled")
-        .css("pointer-events", "all !important")
-        .attr({
-          "data-toggle": "tooltip",
-          "data-placement": "bottom",
-          title: "Not supported by your browser, use Google Chrome instead",
-        })
-        .tooltip();
-    }
-
     $(window).resize(function () {
       updateCanvasSize(); /*updateHeaderSize()*/
     });
@@ -2656,35 +2607,26 @@ function BlackboxLogViewer() {
     setGraphState(GRAPH_STATE_PAUSED);
     saveWorkspaces();
   };
-  this.openVideoExport = function () {
-    if (!FlightLogVideoRenderer.isSupported()) return;
-    if (!isChromium()) {
-      alert("Video export is only supported in Chromium based browsers.");
-      return;
-    }
+  this.pauseForExport = function () {
     setGraphState(GRAPH_STATE_PAUSED);
-    const exportDialog = new VideoExportDialog(
-      $("#dlgVideoExport"),
-      function (newConfig) {
-        videoConfig = newConfig;
-        prefs.set("videoConfig", newConfig);
-      },
-    );
-    exportDialog.show(
-      flightLog,
-      {
-        graphConfig: activeGraphConfig,
-        inTime: videoExportInTime,
-        outTime: videoExportOutTime,
-        flightVideo: hasVideo && viewVideo ? video.cloneNode() : false,
-        flightVideoOffset: videoOffset,
-        hasCraft: userSettings.drawCraft,
-        hasAnalyser: hasAnalyser,
-        hasSticks: userSettings.drawSticks,
-      },
-      videoConfig,
-    );
   };
+  this.getVideoExportParams = function () {
+    return {
+      graphConfig: activeGraphConfig,
+      inTime: videoExportInTime,
+      outTime: videoExportOutTime,
+      flightVideo: hasVideo && viewVideo ? video.cloneNode() : false,
+      flightVideoOffset: videoOffset,
+      hasCraft: userSettings.drawCraft,
+      hasAnalyser: hasAnalyser,
+      hasSticks: userSettings.drawSticks,
+    };
+  };
+  this.saveVideoConfig = function (newConfig) {
+    videoConfig = newConfig;
+    prefs.set("videoConfig", newConfig);
+  };
+  Object.defineProperty(this, "videoConfig", { get: () => videoConfig });
   this.openNewWindow = function () {
     createNewBlackboxWindow();
   };

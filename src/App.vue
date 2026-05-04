@@ -50,6 +50,13 @@
         v-model:open="headerDialogOpen"
         :sysConfig="currentSysConfig"
       />
+      <VideoExportDialog
+        v-model:open="videoExportDialogOpen"
+        :flightLog="currentFlightLog"
+        :logParameters="videoExportParams"
+        :videoConfig="currentVideoConfig"
+        @save-config="onSaveVideoConfig"
+      />
     </div>
   </UApp>
 </template>
@@ -66,6 +73,7 @@ import KeysDialog from "./components/KeysDialog.vue";
 import UserSettingsDialog from "./components/UserSettingsDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
+import VideoExportDialog from "./components/VideoExportDialog.vue";
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
@@ -73,10 +81,13 @@ const keysDialogOpen = ref(false);
 const settingsDialogOpen = ref(false);
 const graphConfigDialogOpen = ref(false);
 const headerDialogOpen = ref(false);
+const videoExportDialogOpen = ref(false);
 const currentUserSettings = computed(() => globalThis.userSettings || {});
 const currentFlightLog = computed(() => getLegacy()?.flightLog ?? null);
 const currentGraphConfig = computed(() => getLegacy()?.activeGraphConfig ?? null);
 const currentSysConfig = computed(() => getLegacy()?.flightLog?.getSysConfig?.() ?? null);
+const videoExportParams = computed(() => getLegacy()?.getVideoExportParams?.() ?? null);
+const currentVideoConfig = computed(() => getLegacy()?.videoConfig ?? null);
 
 // Bridge helper — access legacy BlackboxLogViewer instance
 function getLegacy() {
@@ -104,7 +115,8 @@ function onExportGpx() {
 }
 
 function onExportVideo() {
-  getLegacy()?.openVideoExport?.();
+  getLegacy()?.pauseForExport?.();
+  videoExportDialogOpen.value = true;
 }
 
 function onExportWorkspaces() {
@@ -151,6 +163,10 @@ function onGraphConfigUpdate(newConfig) {
   getLegacy()?.newGraphConfig?.(newConfig, false);
 }
 
+function onSaveVideoConfig(cfg) {
+  getLegacy()?.saveVideoConfig?.(cfg);
+}
+
 function onGotoBookmark(index) {
   // Legacy bookmark navigation — dispatch click on the bookmark element
   document
@@ -164,5 +180,6 @@ defineExpose({
   settingsDialogOpen,
   graphConfigDialogOpen,
   headerDialogOpen,
+  videoExportDialogOpen,
 });
 </script>
