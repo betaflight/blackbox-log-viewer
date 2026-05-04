@@ -19,3 +19,7 @@ npm-debug.log*
 # Nuxt UI auto-generated
 auto-imports.d.ts
 components.d.ts
+
+# Internal docs
+CLAUDE.md
+plan.md
