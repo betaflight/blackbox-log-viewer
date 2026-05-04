@@ -5,6 +5,9 @@ export const useAppStore = defineStore("app", () => {
   const legendHidden = ref(false);
   const viewVideo = ref(true);
 
+  // Filename of loaded log (pushed from legacy code)
+  const logFilename = ref("");
+
   // Status bar display strings (pushed from legacy code)
   const statusVersion = ref("-");
   const statusCells = ref("");
@@ -25,6 +28,7 @@ export const useAppStore = defineStore("app", () => {
   return {
     legendHidden,
     viewVideo,
+    logFilename,
     statusVersion,
     statusCells,
     statusLooptime,

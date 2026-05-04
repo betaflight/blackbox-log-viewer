@@ -487,6 +487,7 @@ function BlackboxLogViewer() {
 
   function renderLogFileInfo(file) {
     $(".log-filename").text(file.name);
+    appStore.logFilename = file.name;
 
     const logIndexContainer = $(".log-index"),
       logCount = flightLog.getLogCount();
@@ -1640,8 +1641,7 @@ function BlackboxLogViewer() {
         // adjust the video sync offset and remove marker
         try {
           setVideoOffset(
-            videoOffset +
-              stringTimetoMsec($(".marker-offset", statusBar).text()) / 1000000,
+            videoOffset + (currentBlackboxTime - markerTime) / 1000000,
             true,
           );
         } catch (e) {
@@ -2643,6 +2643,50 @@ function BlackboxLogViewer() {
   this.activeGraphConfig = activeGraphConfig;
   this.newGraphConfig = function (newConfig, redrawChart) {
     newGraphConfig(newConfig, redrawChart);
+  };
+  this.exportCsv = function () {
+    setGraphState(GRAPH_STATE_PAUSED);
+    exportCsv();
+  };
+  this.exportGpx = function () {
+    setGraphState(GRAPH_STATE_PAUSED);
+    exportGpx();
+  };
+  this.exportWorkspaces = function () {
+    setGraphState(GRAPH_STATE_PAUSED);
+    saveWorkspaces();
+  };
+  this.openVideoExport = function () {
+    if (!FlightLogVideoRenderer.isSupported()) return;
+    if (!isChromium()) {
+      alert("Video export is only supported in Chromium based browsers.");
+      return;
+    }
+    setGraphState(GRAPH_STATE_PAUSED);
+    const exportDialog = new VideoExportDialog(
+      $("#dlgVideoExport"),
+      function (newConfig) {
+        videoConfig = newConfig;
+        prefs.set("videoConfig", newConfig);
+      },
+    );
+    exportDialog.show(
+      flightLog,
+      {
+        graphConfig: activeGraphConfig,
+        inTime: videoExportInTime,
+        outTime: videoExportOutTime,
+        flightVideo: hasVideo && viewVideo ? video.cloneNode() : false,
+        flightVideoOffset: videoOffset,
+        hasCraft: userSettings.drawCraft,
+        hasAnalyser: hasAnalyser,
+        hasSticks: userSettings.drawSticks,
+      },
+      videoConfig,
+    );
+  };
+  this.openNewWindow = function () {
+    createNewBlackboxWindow();
   };
   this.saveUserSettings = function (newSettings) {
     globalThis.userSettings = newSettings;

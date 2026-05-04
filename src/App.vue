@@ -1,19 +1,27 @@
 <template>
   <UApp>
     <div id="blackbox-app">
-      <!--
-        Phase 6: Activating Vue components incrementally.
-        Components bridge to legacy BlackboxLogViewer via globalThis.blackboxLogViewer.
-      -->
-      <AppToolbar
-        v-show="false"
-        @files-selected="onFilesSelected"
-        @open-settings="onOpenSettings"
-        @open-keys="onOpenKeys"
-        @export-csv="onExportCsv"
-        @export-gpx="onExportGpx"
-      />
-      <WelcomePage v-show="false" />
+      <!-- Teleported into legacy DOM layout -->
+      <Teleport to="#vue-welcome">
+        <WelcomePage />
+      </Teleport>
+      <Teleport to="#vue-navbar">
+        <AppToolbar
+          @files-selected="onFilesSelected"
+          @open-settings="onOpenSettings"
+          @open-keys="onOpenKeys"
+          @export-csv="onExportCsv"
+          @export-gpx="onExportGpx"
+          @export-video="onExportVideo"
+          @export-workspaces="onExportWorkspaces"
+          @new-window="onNewWindow"
+        />
+      </Teleport>
+      <Teleport to="#vue-statusbar">
+        <StatusBar @goto-bookmark="onGotoBookmark" />
+      </Teleport>
+
+      <!-- Still hidden — kept for future phases -->
       <PlaybackControls
         v-show="false"
         @jump-start="onJumpStart"
@@ -23,7 +31,6 @@
       />
       <GraphCanvas v-show="false" ref="graphCanvasRef" />
       <SeekBarCanvas v-show="false" ref="seekBarRef" />
-      <StatusBar v-show="false" />
 
       <!-- Dialogs -->
       <KeysDialog v-model:open="keysDialogOpen" />
@@ -89,15 +96,23 @@ function onOpenKeys() {
 }
 
 function onExportCsv() {
-  document
-    .querySelector(".btn-csv-export")
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.exportCsv?.();
 }
 
 function onExportGpx() {
-  document
-    .querySelector(".btn-gpx-export")
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.exportGpx?.();
+}
+
+function onExportVideo() {
+  getLegacy()?.openVideoExport?.();
+}
+
+function onExportWorkspaces() {
+  getLegacy()?.exportWorkspaces?.();
+}
+
+function onNewWindow() {
+  getLegacy()?.openNewWindow?.();
 }
 
 function onJumpStart() {
@@ -125,8 +140,6 @@ function onStepForward() {
 }
 
 function onSaveSettings(newSettings) {
-  // Delegate to legacy save handler which updates globalThis.userSettings,
-  // persists to prefs, applies dark mode, and refreshes the graph
   getLegacy()?.saveUserSettings?.(newSettings);
 }
 
@@ -136,6 +149,13 @@ function onGraphConfigSave(newConfig) {
 
 function onGraphConfigUpdate(newConfig) {
   getLegacy()?.newGraphConfig?.(newConfig, false);
+}
+
+function onGotoBookmark(index) {
+  // Legacy bookmark navigation — dispatch click on the bookmark element
+  document
+    .querySelector(`.bookmark-${index + 1}`)
+    ?.dispatchEvent(new Event("click"));
 }
 
 // Expose for external access during migration
