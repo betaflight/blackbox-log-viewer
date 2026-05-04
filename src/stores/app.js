@@ -16,6 +16,8 @@ export const useAppStore = defineStore("app", () => {
   const statusFlightMode = ref("-");
   const statusMarkerOffset = ref("00:00.000");
   const statusViewerVersion = ref("-");
+  const graphTimeDisplay = ref("1.0");
+  const videoOffsetDisplay = ref("+0.0");
 
   function setLegendHidden(hidden) {
     legendHidden.value = hidden;
@@ -36,6 +38,8 @@ export const useAppStore = defineStore("app", () => {
     statusFlightMode,
     statusMarkerOffset,
     statusViewerVersion,
+    graphTimeDisplay,
+    videoOffsetDisplay,
     setLegendHidden,
     setViewVideo,
   };

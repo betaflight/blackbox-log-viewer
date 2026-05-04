@@ -226,12 +226,12 @@ function BlackboxLogViewer() {
      * Round to 2 dec places for display and put a plus at the start for positive values to emphasize the fact it's
      * an offset
      */
-    $(".video-offset").val(
+    const videoOffsetDisplay =
       (videoOffset >= 0 ? "+" : "") +
-        (videoOffset.toFixed(3) != videoOffset
-          ? videoOffset.toFixed(3)
-          : videoOffset),
-    );
+      (videoOffset.toFixed(3) != videoOffset
+        ? videoOffset.toFixed(3)
+        : videoOffset);
+    appStore.videoOffsetDisplay = videoOffsetDisplay;
 
     playbackStore.videoOffset = videoOffset;
     if (withRefresh) invalidateGraph();
@@ -357,10 +357,12 @@ function BlackboxLogViewer() {
       $(".flight-mode", statusBar).text(flightModeText);
       appStore.statusFlightMode = flightModeText;
 
-      // update time field on status bar
-      $(".graph-time").val(
-        formatTime((currentBlackboxTime - flightLog.getMinTime()) / 1000, true),
+      // update time field
+      const graphTimeText = formatTime(
+        (currentBlackboxTime - flightLog.getMinTime()) / 1000,
+        true,
       );
+      appStore.graphTimeDisplay = graphTimeText;
       if (hasMarker) {
         const markerText = `Marker Offset ${formatTime(
           (currentBlackboxTime - markerTime) / 1000,
@@ -1516,21 +1518,17 @@ function BlackboxLogViewer() {
     let logSyncHere = function () {
       setVideoOffset(video.currentTime, true);
     };
-    $(".log-sync-here").click(logSyncHere);
 
     let logSyncBack = function () {
       setVideoOffset(videoOffset - 1 / 15, true);
     };
-    $(".log-sync-back").click(logSyncBack);
 
     let logSyncForward = function () {
       setVideoOffset(videoOffset + 1 / 15, true);
     };
-    $(".log-sync-forward").click(logSyncForward);
 
     let logSmartSync = function () {
       if (hasMarker && hasVideo && hasLog) {
-        // adjust the video sync offset and remove marker
         try {
           setVideoOffset(
             videoOffset + (currentBlackboxTime - markerTime) / 1000000,
@@ -1541,37 +1539,11 @@ function BlackboxLogViewer() {
         }
       }
       setMarker(!hasMarker);
-      $(".marker-offset", statusBar).css(
-        "visibility",
-        hasMarker ? "visible" : "hidden",
-      );
       invalidateGraph();
     };
-    $(".log-smart-sync").click(logSmartSync);
+    // Sync controls wired via Vue SyncPanel bridge
 
-    $(".video-offset").change(function () {
-      let offset = parseFloat(this.value);
-
-      if (!isNaN(offset)) {
-        setVideoOffset(offset, true);
-      }
-    });
-
-    // Add user configurable start time
-    $(".graph-time").change(function () {
-      // the log is offset by the minTime
-      let newTime = stringTimetoMsec($(".graph-time").val());
-
-      if (!isNaN(newTime)) {
-        if (hasVideo) {
-          setVideoTime(newTime / 1000000 + videoOffset);
-        } else {
-          newTime += flightLog.getMinTime();
-          setCurrentBlackboxTime(newTime);
-        }
-        invalidateGraph();
-      }
-    });
+    // Time input wired via Vue TimePanel bridge
 
     function expandGraphConfig(index) {
       // Put each of the fields into a separate graph
@@ -2552,6 +2524,26 @@ function BlackboxLogViewer() {
     };
     that.toggleGrid = function () {
       toggleOverrideStatus("graphGridOverride", "has-grid-override");
+    };
+    that.logSyncHere = function () { logSyncHere(); };
+    that.logSyncBack = function () { logSyncBack(); };
+    that.logSyncForward = function () { logSyncForward(); };
+    that.logSmartSync = function () { logSmartSync(); };
+    that.setVideoOffsetValue = function (val) {
+      const offset = parseFloat(val);
+      if (!isNaN(offset)) setVideoOffset(offset, true);
+    };
+    that.setGraphTime = function (timeStr) {
+      let newTime = stringTimetoMsec(timeStr);
+      if (!isNaN(newTime)) {
+        if (hasVideo) {
+          setVideoTime(newTime / 1000000 + videoOffset);
+        } else {
+          newTime += flightLog.getMinTime();
+          setCurrentBlackboxTime(newTime);
+        }
+        invalidateGraph();
+      }
     };
   });
 

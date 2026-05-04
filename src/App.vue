@@ -45,6 +45,19 @@
         />
       </Teleport>
 
+      <Teleport to="#vue-time-panel">
+        <TimePanel @time-change="onTimeChange" />
+      </Teleport>
+      <Teleport to="#vue-sync-panel">
+        <SyncPanel
+          @sync-back="onSyncBack"
+          @sync-forward="onSyncForward"
+          @sync-here="onSyncHere"
+          @smart-sync="onSmartSync"
+          @offset-change="onOffsetChange"
+        />
+      </Teleport>
+
       <!-- Still hidden — kept for future phases -->
       <GraphCanvas v-show="false" ref="graphCanvasRef" />
       <SeekBarCanvas v-show="false" ref="seekBarRef" />
@@ -84,6 +97,8 @@ import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
 import PlaybackControls from "./components/PlaybackControls.vue";
+import TimePanel from "./components/TimePanel.vue";
+import SyncPanel from "./components/SyncPanel.vue";
 import StatusBar from "./components/StatusBar.vue";
 import GraphCanvas from "./components/GraphCanvas.vue";
 import SeekBarCanvas from "./components/SeekBarCanvas.vue";
@@ -175,6 +190,30 @@ function onToggleAnalyser() {
 
 function onToggleMap() {
   getLegacy()?.toggleMap?.();
+}
+
+function onSyncBack() {
+  getLegacy()?.logSyncBack?.();
+}
+
+function onSyncForward() {
+  getLegacy()?.logSyncForward?.();
+}
+
+function onSyncHere() {
+  getLegacy()?.logSyncHere?.();
+}
+
+function onSmartSync() {
+  getLegacy()?.logSmartSync?.();
+}
+
+function onOffsetChange(val) {
+  getLegacy()?.setVideoOffsetValue?.(val);
+}
+
+function onTimeChange(timeStr) {
+  getLegacy()?.setGraphTime?.(timeStr);
 }
 
 function onPlayPause() {

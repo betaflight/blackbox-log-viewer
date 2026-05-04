@@ -78,70 +78,8 @@
                     </div>
                 </div>
             </li>
-            <li class="log-chart-time-panel small-screen">
-                <h4>Time</h4>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <input type="text" class="form-control graph-time" value="1.0" size="8" data-toggle="tooltip" title="Enter a time to jump to">
-                    </div>
-                </div>
-            </li>
-            <li class="log-sync-panel">
-                <h4>Log sync</h4>
-                <div class="form-inline">
-                    <div class="form-group">
-                        <div class="btn-group sync-menu">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="sync-menu">
-                                    Sync
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="sync-menu">
-                                    <li>
-                                        <div class="pull-right">
-                                            <div class="panel-body">
-                                                Sync
-                                                <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
-                                                    <span class="glyphicon glyphicon-step-backward"></span>
-                                                </button>
-                                                <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" title="Enter a time offset">
-                                                <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
-                                                    <span class="glyphicon glyphicon-step-forward"></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="log-sync-here auto-hide-menu" data-toggle="tooltip" title="Set the log start to this video frame">
-                                            <span class="glyphicon glyphicon-object-align-left"></span> Start Log Here
-                                        </a>
-                                    </li>
-                                    <li class="has-marker">
-                                        <a href="#" class="log-smart-sync auto-hide-menu" data-toggle="tooltip" title="Set the marked position to here...">
-                                            <span class="glyphicon glyphicon-object-align-vertical"></span> Smart Sync
-                                            <span class="pull-right">&#x2325;M</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="log-sync-expanded">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-default log-sync-back" data-toggle="tooltip" title="Move log earlier">
-                                    <span class="glyphicon glyphicon-step-backward"></span>
-                                </button>
-                                <button type="button" class="btn btn-default log-sync-here" data-toggle="tooltip" title="Start log here">
-                                    <span class="glyphicon glyphicon-object-align-left"></span>
-                                </button>
-                                <button type="button" class="btn btn-default log-sync-forward" data-toggle="tooltip" title="Move log later">
-                                    <span class="glyphicon glyphicon-step-forward"></span>
-                                </button>
-                            </div>
-                            <input type="text" class="form-control video-offset" value="+0.0" size="7" data-toggle="tooltip" title="Enter a time offset">
-                        </div>
-                    </div>
-                </div>
-            </li>
+            <div id="vue-time-panel"></div>
+            <div id="vue-sync-panel"></div>
             <li class="log-workspace-panel">
                 <h4>Workspace</h4>
                 <div class="log-workspace-selection"></div>
