@@ -23,16 +23,25 @@
         @step-back="onStepBack"
         @step-forward="onStepForward"
       />
+      <!-- Phase 4: Canvas wrapper components -->
+      <GraphCanvas v-show="false" ref="graphCanvasRef" />
+      <SeekBarCanvas v-show="false" ref="seekBarRef" />
       <StatusBar v-show="false" />
     </div>
   </UApp>
 </template>
 
 <script setup>
+import { ref } from "vue";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import PlaybackControls from "./components/PlaybackControls.vue";
 import StatusBar from "./components/StatusBar.vue";
+import GraphCanvas from "./components/GraphCanvas.vue";
+import SeekBarCanvas from "./components/SeekBarCanvas.vue";
+
+const graphCanvasRef = ref(null);
+const seekBarRef = ref(null);
 
 // Event stubs — will bridge to legacy code or replace it
 function onFilesSelected(files) {
