@@ -36,6 +36,12 @@ import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
 import { DarkTheme } from "./dark_theme.js";
 import { ThemeColors } from "./theme_colors.js";
+import pinia from "./pinia_instance.js";
+import { useLogStore } from "./stores/log.js";
+import { useGraphStore } from "./stores/graph.js";
+import { usePlaybackStore } from "./stores/playback.js";
+import { useWorkspaceStore } from "./stores/workspace.js";
+import { useAppStore } from "./stores/app.js";
 
 // TODO: this is a hack, once we move to web fix this
 globalThis.userSettings = null;
@@ -148,6 +154,56 @@ function BlackboxLogViewer() {
     lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
     mapGrapher = new MapGrapher();
 
+  // --- Pinia store sync ---
+  // Initialize stores outside Vue component context using the shared Pinia instance.
+  // Legacy code remains the driver; we push state changes into stores so Vue components
+  // can reactively consume them.
+  const logStore = useLogStore(pinia);
+  const graphStore = useGraphStore(pinia);
+  const playbackStore = usePlaybackStore(pinia);
+  const workspaceStore = useWorkspaceStore(pinia);
+  const appStore = useAppStore(pinia);
+
+  function syncToStores() {
+    // Log
+    logStore.flightLog = flightLog ?? null;
+    logStore.flightLogDataArray = flightLogDataArray ?? null;
+    logStore.currentBlackboxTime = currentBlackboxTime;
+    logStore.hasLog = hasLog;
+    logStore.hasVideo = hasVideo;
+    logStore.videoURL = videoURL;
+
+    // Graph
+    graphStore.graphZoom = graphZoom;
+    graphStore.lastGraphZoom = lastGraphZoom;
+    graphStore.hasTable = hasTable;
+    graphStore.hasTableOverlay = hasTableOverlay;
+    graphStore.hasAnalyser = !!hasAnalyser;
+    graphStore.hasAnalyserFullscreen = !!hasAnalyserFullscreen;
+    graphStore.hasAnalyserSticks = !!hasAnalyserSticks;
+    graphStore.hasMap = !!hasMap;
+    graphStore.hasMarker = hasMarker;
+    graphStore.hasConfig = hasConfig;
+    graphStore.hasConfigOverlay = hasConfigOverlay;
+    graphStore.isFullscreen = isFullscreen;
+    graphStore.markerTime = markerTime;
+    graphStore.seekBarMode = seekBarMode;
+
+    // Playback
+    playbackStore.graphState = graphState;
+    playbackStore.playbackRate = playbackRate;
+    playbackStore.videoOffset = videoOffset;
+    playbackStore.videoExportInTime = videoExportInTime;
+    playbackStore.videoExportOutTime = videoExportOutTime;
+
+    // Workspace
+    workspaceStore.activeWorkspace = activeWorkspace;
+    workspaceStore.bookmarkTimes = [...bookmarkTimes];
+
+    // App
+    appStore.viewVideo = viewVideo;
+  }
+
   // TODO: Figure out if we can open the same file in a new window
   function createNewBlackboxWindow(fileToOpen) {
     globalThis.open(globalThis.location.href, "_blank").focus();
@@ -178,6 +234,7 @@ function BlackboxLogViewer() {
           : videoOffset),
     );
 
+    playbackStore.videoOffset = videoOffset;
     if (withRefresh) invalidateGraph();
   }
 
@@ -377,6 +434,7 @@ function BlackboxLogViewer() {
   }
 
   function invalidateGraph() {
+    syncToStores();
     if (!animationFrameIsQueued) {
       animationFrameIsQueued = true;
       requestAnimationFrame(animationLoop);
@@ -598,6 +656,7 @@ function BlackboxLogViewer() {
         break;
     }
 
+    syncToStores();
     invalidateGraph();
   }
 
@@ -611,6 +670,7 @@ function BlackboxLogViewer() {
       currentBlackboxTime = newTime;
     }
 
+    logStore.currentBlackboxTime = currentBlackboxTime;
     invalidateGraph();
   }
 
@@ -655,6 +715,8 @@ function BlackboxLogViewer() {
       }
     }
 
+    playbackStore.playbackRate = playbackRate;
+
     if (updateUi) {
       $(".playback-rate-control").val(playbackRate);
     }
@@ -676,6 +738,9 @@ function BlackboxLogViewer() {
         invalidateGraph();
       }
     }
+
+    graphStore.graphZoom = graphZoom;
+    graphStore.lastGraphZoom = lastGraphZoom;
 
     if (updateUi) {
       $(".graph-zoom-control").val(graphZoom);
@@ -796,6 +861,7 @@ function BlackboxLogViewer() {
 
     setGraphState(GRAPH_STATE_PAUSED);
     setGraphZoom(graphZoom, true);
+    syncToStores();
   }
 
   function loadFileMessage(fileName) {
@@ -897,6 +963,7 @@ function BlackboxLogViewer() {
       currentOffsetCache.index = null; // and clear the index
 
       hasLog = true;
+      logStore.hasLog = true;
       html.toggleClass("has-log", hasLog);
       html.toggleClass("has-table", hasTable);
       html.toggleClass("has-craft", userSettings.drawCraft);
@@ -952,6 +1019,7 @@ function BlackboxLogViewer() {
     hasVideo = true;
     html.toggleClass("has-video", hasVideo);
 
+    syncToStores();
     setGraphState(GRAPH_STATE_PAUSED);
     invalidateGraph();
   }
@@ -1356,6 +1424,7 @@ function BlackboxLogViewer() {
     // New View Controls
     $(".view-video").click(function () {
       viewVideo = !viewVideo;
+      appStore.viewVideo = viewVideo;
       html.toggleClass("video-hidden", !viewVideo);
     });
 
@@ -1413,6 +1482,7 @@ function BlackboxLogViewer() {
 
     $(".view-map").click(function () {
       hasMap = !hasMap;
+      graphStore.hasMap = hasMap;
       html.toggleClass("has-map", hasMap);
       prefs.set("hasMap", hasMap);
       if (flightLog.hasGpsData()) {
