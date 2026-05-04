@@ -22,8 +22,6 @@
   "license": "GPL-3.0",
   "dependencies": {
     "bootstrap": "~3.4.1",
-    "eslint": "^9.26.0",
-    "eslint-config-prettier": "^8.5.0",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.7.1",
     "jquery-ui": "^1.13.2",
@@ -34,6 +32,10 @@
     "throttle-debounce": "^5.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
     "prettier": "^3.8.3",
     "vite": "^7.3.2",
     "vite-plugin-pwa": "^1.0.3"
