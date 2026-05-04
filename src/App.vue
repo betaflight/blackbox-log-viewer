@@ -21,6 +21,18 @@
         <StatusBar @goto-bookmark="onGotoBookmark" />
       </Teleport>
 
+      <Teleport to="#vue-view-controls">
+        <ViewControls
+          @view-config="onViewConfig"
+          @open-header="onOpenHeader"
+          @toggle-table="onToggleTable"
+          @toggle-video="onToggleVideo"
+          @toggle-craft="onToggleCraft"
+          @toggle-sticks="onToggleSticks"
+          @toggle-analyser="onToggleAnalyser"
+          @toggle-map="onToggleMap"
+        />
+      </Teleport>
       <Teleport to="#vue-playback">
         <PlaybackControls
           @jump-start="onJumpStart"
@@ -70,6 +82,7 @@
 import { ref, computed } from "vue";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
+import ViewControls from "./components/ViewControls.vue";
 import PlaybackControls from "./components/PlaybackControls.vue";
 import StatusBar from "./components/StatusBar.vue";
 import GraphCanvas from "./components/GraphCanvas.vue";
@@ -130,6 +143,38 @@ function onExportWorkspaces() {
 
 function onNewWindow() {
   getLegacy()?.openNewWindow?.();
+}
+
+function onViewConfig() {
+  getLegacy()?.viewConfig?.();
+}
+
+function onOpenHeader() {
+  headerDialogOpen.value = true;
+}
+
+function onToggleTable() {
+  getLegacy()?.toggleTable?.();
+}
+
+function onToggleVideo() {
+  getLegacy()?.toggleVideo?.();
+}
+
+function onToggleCraft() {
+  getLegacy()?.toggleCraft?.();
+}
+
+function onToggleSticks() {
+  getLegacy()?.toggleSticks?.();
+}
+
+function onToggleAnalyser() {
+  getLegacy()?.toggleAnalyser?.();
+}
+
+function onToggleMap() {
+  getLegacy()?.toggleMap?.();
 }
 
 function onPlayPause() {

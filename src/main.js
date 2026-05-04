@@ -56,6 +56,8 @@ const INNER_BOUNDS_HEIGHT = 480;
 const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
+  const that = this;
+
   function supportsRequiredAPIs() {
     return (
       globalThis.File &&
@@ -1425,105 +1427,7 @@ function BlackboxLogViewer() {
       e.target.value = "";
     });
 
-    // New View Controls
-    $(".view-video").click(function () {
-      viewVideo = !viewVideo;
-      appStore.viewVideo = viewVideo;
-      html.toggleClass("video-hidden", !viewVideo);
-    });
-
-    $(".view-craft").click(function () {
-      userSettings.drawCraft = !userSettings.drawCraft;
-      html.toggleClass("has-craft", userSettings.drawCraft);
-      saveOneUserSetting("drawCraft", userSettings.drawCraft);
-    });
-
-    $(".view-sticks").click(function () {
-      userSettings.drawSticks = !userSettings.drawSticks;
-      graph.setDrawSticks(userSettings.drawSticks);
-      html.toggleClass("has-sticks", userSettings.drawSticks);
-      saveOneUserSetting("drawSticks", userSettings.drawSticks);
-      invalidateGraph();
-    });
-
-    $(".view-table").click(function () {
-      showValueTable();
-      showConfigFile(false); // hide the config file
-      /*
-            hasTable = !hasTable;
-            html.toggleClass("has-table", hasTable);
-            prefs.set('hasTable', hasTable);
-            */
-    });
-
-    $(".view-config").click(function () {
-      showValueTable(false); // hide the table
-      showConfigFile();
-    });
-
-    $(".view-analyser").click(function () {
-      // Show the latest graph selected (if any) or the first in the list.
-      if (activeGraphConfig.selectedFieldName != null) {
-        hasAnalyser = !hasAnalyser;
-      } else {
-        const graphs = activeGraphConfig.getGraphs();
-        if (graphs.length == 0 || graphs[0].fields.length == 0) {
-          hasAnalyser = false;
-        } else {
-          activeGraphConfig.selectedFieldName =
-            graphs[0].fields[0].friendlyName;
-          activeGraphConfig.selectedGraphIndex = 0;
-          activeGraphConfig.selectedFieldIndex = 0;
-          hasAnalyser = true;
-        }
-      }
-
-      graph.setDrawAnalyser(hasAnalyser);
-      html.toggleClass("has-analyser", hasAnalyser);
-      prefs.set("hasAnalyser", hasAnalyser);
-      invalidateGraph();
-    });
-
-    $(".view-map").click(function () {
-      hasMap = !hasMap;
-      graphStore.hasMap = hasMap;
-      html.toggleClass("has-map", hasMap);
-      prefs.set("hasMap", hasMap);
-      if (flightLog.hasGpsData()) {
-        mapGrapher.initialize(userSettings);
-      }
-    });
-
-    $(".view-analyser-fullscreen").click(function () {
-      if (hasAnalyser) {
-        hasAnalyserFullscreen = !hasAnalyserFullscreen;
-      } else hasAnalyserFullscreen = false;
-      hasAnalyserFullscreen
-        ? html.addClass("has-analyser-fullscreen")
-        : html.removeClass("has-analyser-fullscreen");
-      graph.setAnalyser(hasAnalyserFullscreen);
-      invalidateGraph();
-    });
-
-    $(".view-zoom-in").click(function () {
-      zoomIn();
-    });
-
-    $(".view-zoom-out").click(function () {
-      zoomOut();
-    });
-
-    $(".toggle-smoothing").click(function () {
-      toggleOverrideStatus("graphSmoothOverride", "has-smoothing-override");
-    });
-
-    $(".toggle-expo").click(function () {
-      toggleOverrideStatus("graphExpoOverride", "has-expo-override");
-    });
-
-    $(".toggle-grid").click(function () {
-      toggleOverrideStatus("graphGridOverride", "has-grid-override");
-    });
+    // View controls wired via Vue ViewControls bridge
 
     let logJumpBack = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
@@ -2574,6 +2478,81 @@ function BlackboxLogViewer() {
         offsetCache = item;
       }
     });
+
+    // View toggle bridges (must be inside $(function) scope)
+    that.toggleVideo = function () {
+      viewVideo = !viewVideo;
+      appStore.viewVideo = viewVideo;
+      html.toggleClass("video-hidden", !viewVideo);
+    };
+    that.toggleCraft = function () {
+      userSettings.drawCraft = !userSettings.drawCraft;
+      html.toggleClass("has-craft", userSettings.drawCraft);
+      saveOneUserSetting("drawCraft", userSettings.drawCraft);
+    };
+    that.toggleSticks = function () {
+      userSettings.drawSticks = !userSettings.drawSticks;
+      graph.setDrawSticks(userSettings.drawSticks);
+      html.toggleClass("has-sticks", userSettings.drawSticks);
+      saveOneUserSetting("drawSticks", userSettings.drawSticks);
+      invalidateGraph();
+    };
+    that.toggleTable = function () {
+      showValueTable();
+      showConfigFile(false);
+    };
+    that.viewConfig = function () {
+      showValueTable(false);
+      showConfigFile();
+    };
+    that.toggleAnalyser = function () {
+      if (activeGraphConfig.selectedFieldName != null) {
+        hasAnalyser = !hasAnalyser;
+      } else {
+        const graphs = activeGraphConfig.getGraphs();
+        if (graphs.length == 0 || graphs[0].fields.length == 0) {
+          hasAnalyser = false;
+        } else {
+          activeGraphConfig.selectedFieldName =
+            graphs[0].fields[0].friendlyName;
+          activeGraphConfig.selectedGraphIndex = 0;
+          activeGraphConfig.selectedFieldIndex = 0;
+          hasAnalyser = true;
+        }
+      }
+      graph.setDrawAnalyser(hasAnalyser);
+      html.toggleClass("has-analyser", hasAnalyser);
+      prefs.set("hasAnalyser", hasAnalyser);
+      invalidateGraph();
+    };
+    that.toggleMap = function () {
+      hasMap = !hasMap;
+      graphStore.hasMap = hasMap;
+      html.toggleClass("has-map", hasMap);
+      prefs.set("hasMap", hasMap);
+      if (flightLog.hasGpsData()) {
+        mapGrapher.initialize(userSettings);
+      }
+    };
+    that.toggleAnalyserFullscreen = function () {
+      if (hasAnalyser) {
+        hasAnalyserFullscreen = !hasAnalyserFullscreen;
+      } else hasAnalyserFullscreen = false;
+      hasAnalyserFullscreen
+        ? html.addClass("has-analyser-fullscreen")
+        : html.removeClass("has-analyser-fullscreen");
+      graph.setAnalyser(hasAnalyserFullscreen);
+      invalidateGraph();
+    };
+    that.toggleSmoothing = function () {
+      toggleOverrideStatus("graphSmoothOverride", "has-smoothing-override");
+    };
+    that.toggleExpo = function () {
+      toggleOverrideStatus("graphExpoOverride", "has-expo-override");
+    };
+    that.toggleGrid = function () {
+      toggleOverrideStatus("graphGridOverride", "has-grid-override");
+    };
   });
 
   // Bridge API — expose key functions for Vue components during migration
@@ -2616,6 +2595,7 @@ function BlackboxLogViewer() {
     prefs.set("videoConfig", newConfig);
   };
   Object.defineProperty(this, "videoConfig", { get: () => videoConfig });
+  // Playback
   this.logPlayPause = function () {
     logPlayPause();
   };
