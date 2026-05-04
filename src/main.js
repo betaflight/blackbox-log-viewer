@@ -1551,9 +1551,7 @@ function BlackboxLogViewer() {
 
       setGraphState(GRAPH_STATE_PAUSED);
     };
-    $(".log-jump-back").click(function () {
-      logJumpBack(false);
-    });
+    // Playback buttons wired via Vue PlaybackControls bridge
 
     let logJumpForward = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
@@ -1581,27 +1579,20 @@ function BlackboxLogViewer() {
 
       setGraphState(GRAPH_STATE_PAUSED);
     };
-    $(".log-jump-forward").click(function () {
-      logJumpForward(false);
-    });
-
     let logJumpStart = function () {
       setCurrentBlackboxTime(flightLog.getMinTime());
       setGraphState(GRAPH_STATE_PAUSED);
     };
-    $(".log-jump-start").click(logJumpStart);
 
     let logJumpEnd = function () {
       setCurrentBlackboxTime(flightLog.getMaxTime());
       setGraphState(GRAPH_STATE_PAUSED);
     };
-    $(".log-jump-end").click(logJumpEnd);
 
     let videoJumpStart = function () {
       setVideoTime(0);
       setGraphState(GRAPH_STATE_PAUSED);
     };
-    $(".video-jump-start").click(videoJumpStart);
 
     let videoJumpEnd = function () {
       if (video.duration) {
@@ -1609,7 +1600,6 @@ function BlackboxLogViewer() {
         setGraphState(GRAPH_STATE_PAUSED);
       }
     };
-    $(".video-jump-end").click(videoJumpEnd);
 
     let logPlayPause = function () {
       if (graphState == GRAPH_STATE_PAUSED) {
@@ -1618,7 +1608,6 @@ function BlackboxLogViewer() {
         setGraphState(GRAPH_STATE_PAUSED);
       }
     };
-    $(".log-play-pause").click(logPlayPause);
 
     let logSyncHere = function () {
       setVideoOffset(video.currentTime, true);
@@ -2627,6 +2616,27 @@ function BlackboxLogViewer() {
     prefs.set("videoConfig", newConfig);
   };
   Object.defineProperty(this, "videoConfig", { get: () => videoConfig });
+  this.logPlayPause = function () {
+    logPlayPause();
+  };
+  this.logJumpBack = function () {
+    logJumpBack(false);
+  };
+  this.logJumpForward = function () {
+    logJumpForward(false);
+  };
+  this.logJumpStart = function () {
+    logJumpStart();
+  };
+  this.logJumpEnd = function () {
+    logJumpEnd();
+  };
+  this.videoJumpStart = function () {
+    videoJumpStart();
+  };
+  this.videoJumpEnd = function () {
+    videoJumpEnd();
+  };
   this.openNewWindow = function () {
     createNewBlackboxWindow();
   };

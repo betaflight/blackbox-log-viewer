@@ -21,14 +21,19 @@
         <StatusBar @goto-bookmark="onGotoBookmark" />
       </Teleport>
 
+      <Teleport to="#vue-playback">
+        <PlaybackControls
+          @jump-start="onJumpStart"
+          @jump-end="onJumpEnd"
+          @step-back="onStepBack"
+          @step-forward="onStepForward"
+          @play-pause="onPlayPause"
+          @video-jump-start="onVideoJumpStart"
+          @video-jump-end="onVideoJumpEnd"
+        />
+      </Teleport>
+
       <!-- Still hidden — kept for future phases -->
-      <PlaybackControls
-        v-show="false"
-        @jump-start="onJumpStart"
-        @jump-end="onJumpEnd"
-        @step-back="onStepBack"
-        @step-forward="onStepForward"
-      />
       <GraphCanvas v-show="false" ref="graphCanvasRef" />
       <SeekBarCanvas v-show="false" ref="seekBarRef" />
 
@@ -127,28 +132,32 @@ function onNewWindow() {
   getLegacy()?.openNewWindow?.();
 }
 
+function onPlayPause() {
+  getLegacy()?.logPlayPause?.();
+}
+
 function onJumpStart() {
-  document
-    .querySelector(".log-jump-start")
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.logJumpStart?.();
 }
 
 function onJumpEnd() {
-  document
-    .querySelector(".log-jump-end")
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.logJumpEnd?.();
 }
 
 function onStepBack() {
-  document
-    .querySelector(".log-jump-back")
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.logJumpBack?.();
 }
 
 function onStepForward() {
-  document
-    .querySelector(".log-jump-forward")
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.logJumpForward?.();
+}
+
+function onVideoJumpStart() {
+  getLegacy()?.videoJumpStart?.();
+}
+
+function onVideoJumpEnd() {
+  getLegacy()?.videoJumpEnd?.();
 }
 
 function onSaveSettings(newSettings) {

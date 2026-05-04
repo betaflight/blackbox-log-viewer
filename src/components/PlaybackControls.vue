@@ -1,75 +1,85 @@
 <template>
-  <div class="flex items-center gap-2 px-4 py-1">
-    <!-- Playback buttons -->
-    <div class="flex items-center gap-1">
-      <UButton
-        variant="ghost"
-        color="neutral"
-        icon="i-lucide-skip-back"
-        size="xs"
-        @click="$emit('jump-start')"
-      />
-      <UButton
-        variant="ghost"
-        color="neutral"
-        icon="i-lucide-step-back"
-        size="xs"
-        @click="$emit('step-back')"
-      />
-      <UButton
-        variant="ghost"
-        color="neutral"
-        :icon="playbackStore.isPlaying() ? 'i-lucide-pause' : 'i-lucide-play'"
-        size="sm"
-        @click="playbackStore.togglePlayPause()"
-      />
-      <UButton
-        variant="ghost"
-        color="neutral"
-        icon="i-lucide-step-forward"
-        size="xs"
-        @click="$emit('step-forward')"
-      />
-      <UButton
-        variant="ghost"
-        color="neutral"
-        icon="i-lucide-skip-forward"
-        size="xs"
-        @click="$emit('jump-end')"
-      />
+  <li class="log-playback-panel">
+    <h4>Playback</h4>
+    <div>
+      <div class="flex items-center gap-0.5">
+        <UButton
+          v-if="logStore.hasVideo"
+          variant="ghost"
+          color="neutral"
+          icon="i-lucide-skip-back"
+          size="xs"
+          title="Jump to start of video"
+          @click="$emit('video-jump-start')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
+          icon="i-lucide-skip-back"
+          size="xs"
+          title="Jump to start of log"
+          @click="$emit('jump-start')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
+          icon="i-lucide-step-back"
+          size="xs"
+          title="Jump back"
+          @click="$emit('step-back')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
+          :icon="playbackStore.isPlaying() ? 'i-lucide-pause' : 'i-lucide-play'"
+          size="sm"
+          title="Play/Pause"
+          @click="$emit('play-pause')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
+          icon="i-lucide-step-forward"
+          size="xs"
+          title="Jump forward"
+          @click="$emit('step-forward')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
+          icon="i-lucide-skip-forward"
+          size="xs"
+          title="Jump to end of log"
+          @click="$emit('jump-end')"
+        />
+        <UButton
+          v-if="logStore.hasVideo"
+          variant="ghost"
+          color="neutral"
+          icon="i-lucide-skip-forward"
+          size="xs"
+          title="Jump to end of video"
+          @click="$emit('video-jump-end')"
+        />
+      </div>
     </div>
-
-    <!-- Time display -->
-    <span class="text-sm font-mono text-neutral-400 min-w-24 text-center">
-      {{ formattedTime }}
-    </span>
-
-    <!-- Speed -->
-    <div class="flex items-center gap-1">
-      <span class="text-xs text-neutral-500">Speed</span>
-      <span class="text-sm font-mono min-w-12 text-center">
-        {{ playbackStore.playbackRate }}%
-      </span>
-    </div>
-  </div>
+  </li>
 </template>
 
 <script setup>
-import { computed } from "vue";
 import { usePlaybackStore } from "../stores/playback.js";
 import { useLogStore } from "../stores/log.js";
 
-defineEmits(["jump-start", "jump-end", "step-back", "step-forward"]);
+defineEmits([
+  "jump-start",
+  "jump-end",
+  "step-back",
+  "step-forward",
+  "play-pause",
+  "video-jump-start",
+  "video-jump-end",
+]);
 
 const playbackStore = usePlaybackStore();
 const logStore = useLogStore();
-
-const formattedTime = computed(() => {
-  const elapsed = logStore.currentBlackboxTime - logStore.minTime;
-  const totalMs = Math.abs(elapsed / 1000);
-  const minutes = Math.floor(totalMs / 60000);
-  const seconds = Math.floor((totalMs % 60000) / 1000);
-  const ms = Math.floor(totalMs % 1000);
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
-});
 </script>
