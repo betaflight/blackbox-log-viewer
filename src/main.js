@@ -6,7 +6,6 @@ import { FlightLogGrapher } from "./grapher.js";
 import { VideoExportDialog } from "./video_export_dialog.js";
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 import { defaultUserSettings } from "./user_settings_data.js";
-import { HeaderDialog } from "./header_dialog.js";
 import { SimpleStats } from "./simple-stats.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
@@ -1716,28 +1715,8 @@ function BlackboxLogViewer() {
       }
       invalidateGraph();
     }
-    const headerDialog = new HeaderDialog($("#dlgHeaderDialog"), function (
-        newSysConfig,
-      ) {
-        if (newSysConfig != null) {
-          prefs.set("lastHeaderData", newSysConfig);
-          flightLog.setSysConfig(newSysConfig);
-
-          // Save Current Position then re-calculate all the log information
-          const activePosition = hasVideo
-            ? video.currentTime
-            : currentBlackboxTime;
-
-          selectLog(null);
-          if (hasVideo) {
-            setVideoTime(activePosition);
-          } else {
-            setCurrentBlackboxTime(activePosition);
-          }
-        }
-      }),
-      // Initialize user settings from prefs (replaces legacy UserSettingsDialog onLoad)
-      userSettingsInitialized = (function () {
+    // Initialize user settings from prefs (replaces legacy UserSettingsDialog onLoad)
+    const userSettingsInitialized = (function () {
         prefs.get("userSettings", function (item) {
           if (item) {
             globalThis.userSettings = { ...defaultUserSettings, ...item };
@@ -1755,8 +1734,9 @@ function BlackboxLogViewer() {
     });
 
     $(".open-header-dialog").click(function (e) {
-      headerDialog.show(flightLog.getSysConfig());
       e.preventDefault();
+
+      globalThis.vueApp.headerDialogOpen = true;
     });
 
     $(".open-keys-dialog").click(function (e) {
@@ -2323,7 +2303,7 @@ function BlackboxLogViewer() {
 
           case "H".codePointAt(0):
             if (!shifted) {
-              headerDialog.show(flightLog.getSysConfig());
+              globalThis.vueApp.headerDialogOpen = true;
               e.preventDefault();
             }
             break;
