@@ -27,12 +27,17 @@
 
       <!-- Dialogs -->
       <KeysDialog v-model:open="keysDialogOpen" />
+      <UserSettingsDialog
+        v-model:open="settingsDialogOpen"
+        :settings="currentUserSettings"
+        @save="onSaveSettings"
+      />
     </div>
   </UApp>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import PlaybackControls from "./components/PlaybackControls.vue";
@@ -40,10 +45,13 @@ import StatusBar from "./components/StatusBar.vue";
 import GraphCanvas from "./components/GraphCanvas.vue";
 import SeekBarCanvas from "./components/SeekBarCanvas.vue";
 import KeysDialog from "./components/KeysDialog.vue";
+import UserSettingsDialog from "./components/UserSettingsDialog.vue";
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
 const keysDialogOpen = ref(false);
+const settingsDialogOpen = ref(false);
+const currentUserSettings = computed(() => globalThis.userSettings || {});
 
 // Bridge helper — access legacy BlackboxLogViewer instance
 function getLegacy() {
@@ -55,10 +63,7 @@ function onFilesSelected(files) {
 }
 
 function onOpenSettings() {
-  // Legacy settings dialog uses Bootstrap modal
-  document
-    .querySelector(".open-user-settings-dialog")
-    ?.dispatchEvent(new Event("click"));
+  settingsDialogOpen.value = true;
 }
 
 function onOpenKeys() {
@@ -101,8 +106,15 @@ function onStepForward() {
     ?.dispatchEvent(new Event("click"));
 }
 
+function onSaveSettings(newSettings) {
+  // Delegate to legacy save handler which updates globalThis.userSettings,
+  // persists to prefs, applies dark mode, and refreshes the graph
+  getLegacy()?.saveUserSettings?.(newSettings);
+}
+
 // Expose for external access during migration
 defineExpose({
   keysDialogOpen,
+  settingsDialogOpen,
 });
 </script>

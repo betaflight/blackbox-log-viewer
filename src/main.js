@@ -5,7 +5,7 @@ import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
 import { VideoExportDialog } from "./video_export_dialog.js";
 import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
-import { UserSettingsDialog } from "./user_settings_dialog.js";
+import { defaultUserSettings } from "./user_settings_data.js";
 import { GraphConfigurationDialog } from "./graph_config_dialog.js";
 import { HeaderDialog } from "./header_dialog.js";
 import { SimpleStats } from "./simple-stats.js";
@@ -1673,41 +1673,17 @@ function BlackboxLogViewer() {
           }
         }
       }),
-      userSettingsDialog = new UserSettingsDialog(
-        $("#dlgUserSettings"),
-        function (defaultSettings) {
-          // onLoad
-          prefs.get("userSettings", function (item) {
-            if (item) {
-              globalThis.userSettings = $.extend({}, defaultSettings, item);
-            } else {
-              globalThis.userSettings = defaultSettings;
-            }
-          });
-        },
-        function (newSettings) {
-          // onSave
-          globalThis.userSettings = newSettings;
-
-          prefs.set("userSettings", newSettings);
-
-          // Apply dark mode setting
-          if (newSettings.darkMode !== undefined) {
-            DarkTheme.setMode(newSettings.darkMode);
+      // Initialize user settings from prefs (replaces legacy UserSettingsDialog onLoad)
+      userSettingsInitialized = (function () {
+        prefs.get("userSettings", function (item) {
+          if (item) {
+            globalThis.userSettings = { ...defaultUserSettings, ...item };
+          } else {
+            globalThis.userSettings = { ...defaultUserSettings };
           }
-
-          // refresh the craft model
-          if (graph != null) {
-            graph.refreshOptions(newSettings);
-            graph.refreshLogo();
-            graph.initializeCraftModel();
-            if (flightLog.hasGpsData()) {
-              mapGrapher.setUserSettings(newSettings);
-            }
-            updateCanvasSize();
-          }
-        },
-      );
+        });
+        return true;
+      })();
 
     $(".open-graph-configuration-dialog").click(function (e) {
       e.preventDefault();
@@ -1729,7 +1705,7 @@ function BlackboxLogViewer() {
     $(".open-user-settings-dialog").click(function (e) {
       e.preventDefault();
 
-      userSettingsDialog.show(flightLog, userSettings);
+      globalThis.vueApp.settingsDialogOpen = true;
     });
 
     $(".marker-offset", statusBar).click(function (e) {
@@ -2614,6 +2590,24 @@ function BlackboxLogViewer() {
   // Bridge API — expose key functions for Vue components during migration
   this.loadFiles = loadFiles;
   this.invalidateGraph = invalidateGraph;
+  this.saveUserSettings = function (newSettings) {
+    globalThis.userSettings = newSettings;
+    prefs.set("userSettings", newSettings);
+
+    if (newSettings.darkMode !== undefined) {
+      DarkTheme.setMode(newSettings.darkMode);
+    }
+
+    if (graph != null) {
+      graph.refreshOptions(newSettings);
+      graph.refreshLogo();
+      graph.initializeCraftModel();
+      if (flightLog.hasGpsData()) {
+        mapGrapher.setUserSettings(newSettings);
+      }
+      updateCanvasSize();
+    }
+  };
 }
 
 // Close the dropdowns if not clicking a descendant of the dropdown
