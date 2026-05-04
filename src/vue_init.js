@@ -5,4 +5,8 @@ import "./css/tailwind.css";
 
 const app = createApp(App);
 app.use(pinia);
-app.mount("#vue-app");
+
+const vm = app.mount("#vue-app");
+
+// Expose Vue app instance for legacy code bridge
+globalThis.vueApp = vm;

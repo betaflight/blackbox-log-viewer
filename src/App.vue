@@ -2,10 +2,8 @@
   <UApp>
     <div id="blackbox-app">
       <!--
-        Phase 3: Vue component scaffolding.
-        These components are rendered but hidden while the legacy jQuery UI
-        is still active. They will be activated incrementally as we migrate
-        each section of the UI.
+        Phase 6: Activating Vue components incrementally.
+        Components bridge to legacy BlackboxLogViewer via globalThis.blackboxLogViewer.
       -->
       <AppToolbar
         v-show="false"
@@ -23,10 +21,12 @@
         @step-back="onStepBack"
         @step-forward="onStepForward"
       />
-      <!-- Phase 4: Canvas wrapper components -->
       <GraphCanvas v-show="false" ref="graphCanvasRef" />
       <SeekBarCanvas v-show="false" ref="seekBarRef" />
       <StatusBar v-show="false" />
+
+      <!-- Dialogs -->
+      <KeysDialog v-model:open="keysDialogOpen" />
     </div>
   </UApp>
 </template>
@@ -39,44 +39,70 @@ import PlaybackControls from "./components/PlaybackControls.vue";
 import StatusBar from "./components/StatusBar.vue";
 import GraphCanvas from "./components/GraphCanvas.vue";
 import SeekBarCanvas from "./components/SeekBarCanvas.vue";
+import KeysDialog from "./components/KeysDialog.vue";
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
+const keysDialogOpen = ref(false);
 
-// Event stubs — will bridge to legacy code or replace it
+// Bridge helper — access legacy BlackboxLogViewer instance
+function getLegacy() {
+  return globalThis.blackboxLogViewer;
+}
+
 function onFilesSelected(files) {
-  // TODO: bridge to legacy file loading
+  getLegacy()?.loadFiles(files);
 }
 
 function onOpenSettings() {
-  // TODO: bridge to legacy settings dialog
+  // Legacy settings dialog uses Bootstrap modal
+  document
+    .querySelector(".open-user-settings-dialog")
+    ?.dispatchEvent(new Event("click"));
 }
 
 function onOpenKeys() {
-  // TODO: bridge to legacy keys dialog
+  keysDialogOpen.value = true;
 }
 
 function onExportCsv() {
-  // TODO: bridge to legacy CSV export
+  document
+    .querySelector(".btn-csv-export")
+    ?.dispatchEvent(new Event("click"));
 }
 
 function onExportGpx() {
-  // TODO: bridge to legacy GPX export
+  document
+    .querySelector(".btn-gpx-export")
+    ?.dispatchEvent(new Event("click"));
 }
 
 function onJumpStart() {
-  // TODO: bridge to legacy jump-to-start
+  document
+    .querySelector(".log-jump-start")
+    ?.dispatchEvent(new Event("click"));
 }
 
 function onJumpEnd() {
-  // TODO: bridge to legacy jump-to-end
+  document
+    .querySelector(".log-jump-end")
+    ?.dispatchEvent(new Event("click"));
 }
 
 function onStepBack() {
-  // TODO: bridge to legacy step-back
+  document
+    .querySelector(".log-jump-back")
+    ?.dispatchEvent(new Event("click"));
 }
 
 function onStepForward() {
-  // TODO: bridge to legacy step-forward
+  document
+    .querySelector(".log-jump-forward")
+    ?.dispatchEvent(new Event("click"));
 }
+
+// Expose for external access during migration
+defineExpose({
+  keysDialogOpen,
+});
 </script>

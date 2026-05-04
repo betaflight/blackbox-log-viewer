@@ -2612,6 +2612,10 @@ function BlackboxLogViewer() {
       }
     });
   });
+
+  // Bridge API — expose key functions for Vue components during migration
+  this.loadFiles = loadFiles;
+  this.invalidateGraph = invalidateGraph;
 }
 
 // Close the dropdowns if not clicking a descendant of the dropdown
