@@ -8,7 +8,6 @@ import { FlightLogVideoRenderer } from "./flightlog_video_renderer.js";
 import { UserSettingsDialog } from "./user_settings_dialog.js";
 import { GraphConfigurationDialog } from "./graph_config_dialog.js";
 import { HeaderDialog } from "./header_dialog.js";
-import { KeysDialog } from "./keys_dialog.js";
 import { SimpleStats } from "./simple-stats.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
@@ -1674,7 +1673,6 @@ function BlackboxLogViewer() {
           }
         }
       }),
-      keysDialog = new KeysDialog($("#dlgKeysDialog")),
       userSettingsDialog = new UserSettingsDialog(
         $("#dlgUserSettings"),
         function (defaultSettings) {
@@ -1725,7 +1723,7 @@ function BlackboxLogViewer() {
     $(".open-keys-dialog").click(function (e) {
       e.preventDefault();
 
-      keysDialog.show();
+      globalThis.vueApp.keysDialogOpen = true;
     });
 
     $(".open-user-settings-dialog").click(function (e) {
