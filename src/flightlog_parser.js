@@ -439,17 +439,17 @@ export function FlightLogParser(logData) {
       tpa_low_breakpoint: "tpa_low_breakpoint",
       tpa_low_always: "tpa_low_always",
       mixer_type: "mixer_type",
-      chirp_lag_freq_hz : "chirp_lag_freq_hz",
-      chirp_lead_freq_hz : "chirp_lead_freq_hz",
-      chirp_amplitude_roll : "chirp_amplitude_roll",
-      chirp_amplitude_pitch : "chirp_amplitude_pitch",
-      chirp_amplitude_yaw : "chirp_amplitude_yaw",
-      chirp_frequency_start_deci_hz : "chirp_frequency_start_deci_hz",
-      chirp_frequency_end_deci_hz : "chirp_frequency_end_deci_hz",
-      chirp_time_seconds : "chirp_time_seconds",
+      chirp_lag_freq_hz: "chirp_lag_freq_hz",
+      chirp_lead_freq_hz: "chirp_lead_freq_hz",
+      chirp_amplitude_roll: "chirp_amplitude_roll",
+      chirp_amplitude_pitch: "chirp_amplitude_pitch",
+      chirp_amplitude_yaw: "chirp_amplitude_yaw",
+      chirp_frequency_start_deci_hz: "chirp_frequency_start_deci_hz",
+      chirp_frequency_end_deci_hz: "chirp_frequency_end_deci_hz",
+      chirp_time_seconds: "chirp_time_seconds",
       // MULTI_GYRO to DUAL_GYRO debug mode aliases
       multi_gyro: "dual_gyro",
-      multi_gyro_raw: "dual_gyro_raw", 
+      multi_gyro_raw: "dual_gyro_raw",
       multi_gyro_combined: "dual_gyro_combined",
       multi_gyro_diff: "dual_gyro_diff",
       multi_gyro_scaled: "dual_gyro_scaled",
@@ -490,7 +490,7 @@ export function FlightLogParser(logData) {
   let completeSysConfig = $.extend(
     {},
     defaultSysConfig,
-    defaultSysConfigExtension
+    defaultSysConfigExtension,
   );
   this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
 
@@ -575,10 +575,10 @@ export function FlightLogParser(logData) {
     lineEnd = stream.pos;
 
     fieldName = asciiArrayToString(
-      stream.data.subarray(lineStart, separatorPos)
+      stream.data.subarray(lineStart, separatorPos),
     );
     fieldValue = asciiArrayToString(
-      stream.data.subarray(separatorPos + 1, lineEnd)
+      stream.data.subarray(separatorPos + 1, lineEnd),
     );
 
     // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
@@ -963,7 +963,8 @@ export function FlightLogParser(logData) {
           }
 
           that.sysConfig.firmware = `${parseInt(matches[2])}.${parseInt(matches[3])}`;
-          that.sysConfig.firmwarePatch = matches[5] != null ? parseInt(matches[5]) : "0";
+          that.sysConfig.firmwarePatch =
+            matches[5] != null ? parseInt(matches[5]) : "0";
           that.sysConfig.firmwareVersion = `${that.sysConfig.firmware}.${that.sysConfig.firmwarePatch}`;
         } else {
           /*
@@ -1118,7 +1119,7 @@ export function FlightLogParser(logData) {
         countIntentionallySkippedFramesTo(
           mainHistory[0][
             FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
-          ]
+          ],
         );
 
       lastMainFrameIteration =
@@ -1141,7 +1142,7 @@ export function FlightLogParser(logData) {
         mainHistory[0],
         frameType,
         frameStart,
-        frameEnd - frameStart
+        frameEnd - frameStart,
       );
 
     // Rotate history buffers
@@ -1186,7 +1187,7 @@ export function FlightLogParser(logData) {
     previous,
     previous2,
     skippedFrames,
-    raw
+    raw,
   ) {
     let predictor = frameDef.predictor,
       encoding = frameDef.encoding,
@@ -1228,7 +1229,7 @@ export function FlightLogParser(logData) {
                 values[j],
                 current,
                 previous,
-                previous2
+                previous2,
               );
 
             continue;
@@ -1244,7 +1245,7 @@ export function FlightLogParser(logData) {
                 values[j],
                 current,
                 previous,
-                previous2
+                previous2,
               );
 
             continue;
@@ -1260,7 +1261,7 @@ export function FlightLogParser(logData) {
                 values[j],
                 current,
                 previous,
-                previous2
+                previous2,
               );
 
             continue;
@@ -1281,7 +1282,7 @@ export function FlightLogParser(logData) {
                 values[j],
                 current,
                 previous,
-                previous2
+                previous2,
               );
 
             continue;
@@ -1302,7 +1303,7 @@ export function FlightLogParser(logData) {
           value,
           current,
           previous,
-          previous2
+          previous2,
         );
         i++;
       }
@@ -1327,7 +1328,7 @@ export function FlightLogParser(logData) {
         gpsHomeHistory[0],
         frameType,
         frameStart,
-        frameEnd - frameStart
+        frameEnd - frameStart,
       );
     }
 
@@ -1345,7 +1346,7 @@ export function FlightLogParser(logData) {
         lastGPS,
         frameType,
         frameStart,
-        frameEnd - frameStart
+        frameEnd - frameStart,
       );
     }
 
@@ -1361,7 +1362,7 @@ export function FlightLogParser(logData) {
         lastSlow,
         frameType,
         frameStart,
-        frameEnd - frameStart
+        frameEnd - frameStart,
       );
     }
     return true;
@@ -1403,7 +1404,7 @@ export function FlightLogParser(logData) {
         mainHistory[0],
         frameType,
         frameStart,
-        frameEnd - frameStart
+        frameEnd - frameStart,
       );
 
     if (mainStreamIsValid) {
@@ -1431,7 +1432,7 @@ export function FlightLogParser(logData) {
     value,
     current,
     previous,
-    previous2
+    previous2,
   ) {
     switch (predictor) {
       case FLIGHT_LOG_FIELD_PREDICTOR_0:
@@ -1580,7 +1581,7 @@ export function FlightLogParser(logData) {
       previous,
       previous2,
       lastSkippedFrames,
-      raw
+      raw,
     );
   }
 
@@ -1622,7 +1623,7 @@ export function FlightLogParser(logData) {
           lastEvent,
           frameType,
           frameStart,
-          frameEnd - frameStart
+          frameEnd - frameStart,
         );
       }
 
@@ -1775,7 +1776,7 @@ export function FlightLogParser(logData) {
     let completeSysConfig = $.extend(
       {},
       defaultSysConfig,
-      defaultSysConfigExtension
+      defaultSysConfigExtension,
     );
     this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
 
@@ -1828,11 +1829,11 @@ export function FlightLogParser(logData) {
 
     adjustFieldDefsList(
       that.sysConfig.firmwareType,
-      that.sysConfig.firmwareVersion
+      that.sysConfig.firmwareVersion,
     );
     FlightLogFieldPresenter.adjustDebugDefsList(
       that.sysConfig.firmwareType,
-      that.sysConfig.firmwareVersion
+      that.sysConfig.firmwareVersion,
     );
 
     if (!isFrameDefComplete(this.frameDefs.I)) {
@@ -1944,7 +1945,7 @@ export function FlightLogParser(logData) {
           this.stats.frame[lastFrameType.marker] = {
             bytes: 0,
             sizeCount: new Int32Array(
-              256
+              256,
             ) /* int32 arrays are zero-filled, handy! */,
             validCount: 0,
             corruptCount: 0,
@@ -1966,7 +1967,7 @@ export function FlightLogParser(logData) {
               lastFrameType.marker,
               frameStart,
               stream.pos,
-              raw
+              raw,
             );
 
           if (frameAccepted) {
@@ -2055,7 +2056,7 @@ FlightLogParser.prototype.resetStats = function () {
 };
 
 FlightLogParser.prototype.FLIGHT_LOG_START_MARKER = asciiStringToByteArray(
-  "H Product:Blackbox flight data recorder by Nicholas Sherlock\n"
+  "H Product:Blackbox flight data recorder by Nicholas Sherlock\n",
 );
 
 FlightLogParser.prototype.FLIGHT_LOG_FIELD_UNSIGNED = 0;

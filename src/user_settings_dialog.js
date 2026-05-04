@@ -264,9 +264,8 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 
     if ($(".custom-mixes").is(":checked")) {
       let motorOrder = new Array(
-        mixerList[
-          currentSettings.mixerConfiguration - 1
-        ].defaultMotorOrder.length
+        mixerList[currentSettings.mixerConfiguration - 1].defaultMotorOrder
+          .length,
       );
       for (let i = 0; i < motorOrder.length; i++) {
         let select_e = $(
@@ -274,7 +273,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
             mixerList[currentSettings.mixerConfiguration - 1].defaultMotorOrder[
               i
             ]
-          }_`
+          }_`,
         );
         motorOrder[i] = select_e.val();
       }
@@ -291,7 +290,9 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
 
   function convertUIToSettings() {
     // Safely parse darkMode with fallback to current or default value
-    let darkModeValue = Number.parseInt($('input[name="dark-mode"]:checked').val());
+    let darkModeValue = Number.parseInt(
+      $('input[name="dark-mode"]:checked').val(),
+    );
     if (Number.isNaN(darkModeValue)) {
       darkModeValue = currentSettings.darkMode ?? defaultSettings.darkMode;
     }
@@ -328,7 +329,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         left: `${$('.watermark-settings input[name="watermark-left"]').val()}%`,
         size: `${$('.watermark-settings input[name="watermark-size"]').val()}%`,
         transparency: `${$(
-          '.watermark-settings input[name="watermark-transparency"]'
+          '.watermark-settings input[name="watermark-transparency"]',
         ).val()}%`,
         logo: currentLogo,
       },
@@ -338,7 +339,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
         top: `${$('.laptimer-settings input[name="laptimer-top"]').val()}%`,
         left: `${$('.laptimer-settings input[name="laptimer-left"]').val()}%`,
         transparency: `${$(
-          '.laptimer-settings input[name="laptimer-transparency"]'
+          '.laptimer-settings input[name="laptimer-transparency"]',
         ).val()}%`,
       },
       drawLapTimer: $(".laptimer").is(":checked"),
@@ -396,7 +397,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
           } motors.` +
           `</p>` +
           `</td>` +
-          `</tr>`
+          `</tr>`,
       );
       motor_list_e.append(motors_e);
     } else {
@@ -410,7 +411,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
             `<td colspan="2"><label>Motor ${
               i + 1
             }</label><select class="motor_${i}_"><!-- list generated here --></select></td>` +
-            `</tr>`
+            `</tr>`,
         );
         let select_e = $("select", motors_e);
         if (currentSettings.customMix != null) {
@@ -422,7 +423,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
             if (mixerList[mixerConfiguration - 1].defaultMotorOrder[j] == i) {
               buildAvailableMotors(
                 select_e,
-                `motor[${currentSettings.customMix.motorOrder[j]}]`
+                `motor[${currentSettings.customMix.motorOrder[j]}]`,
               );
               break;
             }
@@ -441,7 +442,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
   let mixer_list_e = $("select.mixerList");
   for (var i = 0; i < mixerList.length; i++) {
     mixer_list_e.append(
-      `<option value="${i + 1}">${mixerList[i].name}</option>`
+      `<option value="${i + 1}">${mixerList[i].name}</option>`,
     );
   }
 
@@ -453,7 +454,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     if (val > 0 && val <= mixerList.length) {
       $(".mixerPreview img").attr(
         "src",
-        `./images/motor_order/${mixerList[val - 1].image}.svg`
+        `./images/motor_order/${mixerList[val - 1].image}.svg`,
       );
     }
 
@@ -576,7 +577,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
       {},
       defaultSettings,
       currentSettings,
-      settings || {}
+      settings || {},
     );
 
     getAvailableMotors(flightLog); // Which motors are in the log file ?
@@ -615,7 +616,7 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
       // set the toggle switch
       $(".map-trail-altitude-colored").prop(
         "checked",
-        currentSettings.mapTrailAltitudeColored
+        currentSettings.mapTrailAltitudeColored,
       );
     }
 
@@ -645,31 +646,31 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
       .attr("checked", true);
 
     $('.stick-mode-group input[name="stick-top"]').val(
-      parseInt(currentSettings.sticks.top)
+      parseInt(currentSettings.sticks.top),
     );
     $('.stick-mode-group input[name="stick-left"]').val(
-      parseInt(currentSettings.sticks.left)
+      parseInt(currentSettings.sticks.left),
     );
     $('.stick-mode-group input[name="stick-size"]').val(
-      parseInt(currentSettings.sticks.size)
+      parseInt(currentSettings.sticks.size),
     );
     $('.craft-settings input[name="craft-top"]').val(
-      parseInt(currentSettings.craft.top)
+      parseInt(currentSettings.craft.top),
     );
     $('.craft-settings input[name="craft-left"]').val(
-      parseInt(currentSettings.craft.left)
+      parseInt(currentSettings.craft.left),
     );
     $('.craft-settings input[name="craft-size"]').val(
-      parseInt(currentSettings.craft.size)
+      parseInt(currentSettings.craft.size),
     );
     $('.analyser-settings input[name="analyser-top"]').val(
-      parseInt(currentSettings.analyser.top)
+      parseInt(currentSettings.analyser.top),
     );
     $('.analyser-settings input[name="analyser-left"]').val(
-      parseInt(currentSettings.analyser.left)
+      parseInt(currentSettings.analyser.left),
     );
     $('.analyser-settings input[name="analyser-size"]').val(
-      parseInt(currentSettings.analyser.size)
+      parseInt(currentSettings.analyser.size),
     );
 
     $('.analyser-settings input[name="analyser-legend-top"]').val(
@@ -682,13 +683,13 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
       parseInt(currentSettings.analyser_legend.width),
     );
     $('.map-settings input[name="map-top"]').val(
-      parseInt(currentSettings.map.top)
+      parseInt(currentSettings.map.top),
     );
     $('.map-settings input[name="map-left"]').val(
-      parseInt(currentSettings.map.left)
+      parseInt(currentSettings.map.left),
     );
     $('.map-settings input[name="map-size"]').val(
-      parseInt(currentSettings.map.size)
+      parseInt(currentSettings.map.size),
     );
 
     if (currentSettings.drawWatermark != null) {
@@ -700,16 +701,16 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     }
 
     $('.watermark-settings input[name="watermark-top"]').val(
-      parseInt(currentSettings.watermark.top)
+      parseInt(currentSettings.watermark.top),
     );
     $('.watermark-settings input[name="watermark-left"]').val(
-      parseInt(currentSettings.watermark.left)
+      parseInt(currentSettings.watermark.left),
     );
     $('.watermark-settings input[name="watermark-size"]').val(
-      parseInt(currentSettings.watermark.size)
+      parseInt(currentSettings.watermark.size),
     );
     $('.watermark-settings input[name="watermark-transparency"]').val(
-      parseInt(currentSettings.watermark.transparency)
+      parseInt(currentSettings.watermark.transparency),
     );
 
     if (currentSettings.watermark.logo != null) {
@@ -728,13 +729,13 @@ export function UserSettingsDialog(dialog, onLoad, onSave) {
     }
 
     $('.laptimer-settings input[name="laptimer-top"]').val(
-      parseInt(currentSettings.laptimer.top)
+      parseInt(currentSettings.laptimer.top),
     );
     $('.laptimer-settings input[name="laptimer-left"]').val(
-      parseInt(currentSettings.laptimer.left)
+      parseInt(currentSettings.laptimer.left),
     );
     $('.laptimer-settings input[name="laptimer-transparency"]').val(
-      parseInt(currentSettings.laptimer.transparency)
+      parseInt(currentSettings.laptimer.transparency),
     );
 
     if (currentSettings.drawGradient != null) {

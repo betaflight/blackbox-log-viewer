@@ -26,7 +26,7 @@ export function FlightLogVideoRenderer(
   flightLog,
   logParameters,
   videoOptions,
-  events
+  events,
 ) {
   let WORK_CHUNK_SIZE_FOCUSED = 8,
     WORK_CHUNK_SIZE_UNFOCUSED = 32,
@@ -88,7 +88,7 @@ export function FlightLogVideoRenderer(
       document.addEventListener(
         visibilityChange,
         handleVisibilityChange,
-        false
+        false,
       );
     }
   }
@@ -143,10 +143,10 @@ export function FlightLogVideoRenderer(
               function (e) {
                 // File is not readable or does not exist!
                 reject(e);
-              }
+              },
             );
           }
-        }
+        },
       );
     });
   }
@@ -209,7 +209,7 @@ export function FlightLogVideoRenderer(
           canvasContext.drawImage(
             analyserCanvas,
             analyserCanvasLeft,
-            analyserCanvasTop
+            analyserCanvasTop,
           );
 
         videoWriter.addFrame(canvas);
@@ -231,7 +231,7 @@ export function FlightLogVideoRenderer(
             0,
             0,
             videoOptions.width,
-            videoOptions.height
+            videoOptions.height,
           );
 
           if (videoOptions.videoDim > 0) {
@@ -295,7 +295,7 @@ export function FlightLogVideoRenderer(
         function (error) {
           console.error(error);
           notifyCompletion(false);
-        }
+        },
       );
     } else {
       videoWriter = new WebMWriter(webMOptions);
@@ -339,7 +339,7 @@ export function FlightLogVideoRenderer(
     stickCanvas,
     craftCanvas,
     analyserCanvas,
-    options
+    options,
   );
 
   stickCanvasLeft = parseInt($(stickCanvas).css("left"), 10);
@@ -363,7 +363,7 @@ export function FlightLogVideoRenderer(
 
   // If the in -> out time is not an exact number of frames, we'll round the end time of the video to make it so:
   frameCount = Math.round(
-    (logParameters.outTime - logParameters.inTime) / frameDuration
+    (logParameters.outTime - logParameters.inTime) / frameDuration,
   );
 
   if (logParameters.flightVideo) {

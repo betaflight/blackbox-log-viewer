@@ -20,7 +20,7 @@ export function FlightLogIndex(logData) {
 
     for (i = 0; ; i++) {
       logStart = stream.nextOffsetOf(
-        FlightLogParser.prototype.FLIGHT_LOG_START_MARKER
+        FlightLogParser.prototype.FLIGHT_LOG_START_MARKER,
       );
 
       if (logStart == -1) {
@@ -126,14 +126,14 @@ export function FlightLogIndex(logData) {
         if (magADC[0] === undefined) {
           magADC = false;
         }
-        
+
         let frameTime;
         parser.onFrameReady = function (
           frameValid,
           frame,
           frameType,
           frameOffset,
-          frameSize
+          frameSize,
         ) {
           if (!frameValid) {
             return;
@@ -142,7 +142,8 @@ export function FlightLogIndex(logData) {
           switch (frameType) {
             case "P":
             case "I":
-              frameTime = frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+              frameTime =
+                frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
               if (intraIndex.minTime === false) {
                 intraIndex.minTime = frameTime;
               }
@@ -173,7 +174,7 @@ export function FlightLogIndex(logData) {
 
                     intraIndex.maxMotorDiff.push(maxMotor - minMotor);
                     intraIndex.avgThrottle.push(
-                      Math.round(throttleTotal / motorFields.length)
+                      Math.round(throttleTotal / motorFields.length),
                     );
                   }
                   if (maxRCFields.length) {
@@ -206,7 +207,7 @@ export function FlightLogIndex(logData) {
                 sysConfig.gyroScale,
                 magADC
                   ? [frame[magADC[0]], frame[magADC[1]], frame[magADC[2]]]
-                  : false
+                  : false,
               );
               break;
             case "G":

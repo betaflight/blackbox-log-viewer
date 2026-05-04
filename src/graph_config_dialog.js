@@ -45,7 +45,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
     const MAX_HEIGHT = 5;
 
     const selectHeight = $(
-      '<select class="form-control graph-height"></select>'
+      '<select class="form-control graph-height"></select>',
     );
     for (let i = 1; i <= MAX_HEIGHT; i++) {
       const option = $("<option></option>").text(i).attr("value", i);
@@ -85,8 +85,8 @@ export function GraphConfigurationDialog(dialog, onSave) {
       .text(
         FlightLogFieldPresenter.fieldNameToFriendly(
           fieldName,
-          activeFlightLog.getSysConfig().debug_mode
-        )
+          activeFlightLog.getSysConfig().debug_mode,
+        ),
       )
       .attr("value", fieldName);
 
@@ -107,7 +107,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
           : `${
               GraphConfig.getDefaultSmoothingForField(flightLog, field.name) /
               100
-            }%`
+            }%`,
       );
       if (field.curve != null) {
         $("input[name=power]", elem).val(
@@ -116,27 +116,27 @@ export function GraphConfigurationDialog(dialog, onSave) {
             : `${
                 GraphConfig.getDefaultCurveForField(flightLog, field.name)
                   .power * 100
-              }%`
+              }%`,
         );
         if (field.curve.MinMax != null) {
           $("input[name=MinValue]", elem).val(
-            field.curve.MinMax.min.toFixed(1)
+            field.curve.MinMax.min.toFixed(1),
           );
           $("input[name=MaxValue]", elem).val(
-            field.curve.MinMax.max.toFixed(1)
+            field.curve.MinMax.max.toFixed(1),
           );
         } else {
           $("input[name=MinValue]", elem).val(
             GraphConfig.getDefaultCurveForField(
               flightLog,
-              field.name
-            ).MinMax.min.toFixed(1)
+              field.name,
+            ).MinMax.min.toFixed(1),
           );
           $("input[name=MaxValue]", elem).val(
             GraphConfig.getDefaultCurveForField(
               flightLog,
-              field.name
-            ).MinMax.max.toFixed(1)
+              field.name,
+            ).MinMax.max.toFixed(1),
           );
         }
       } else {
@@ -144,19 +144,19 @@ export function GraphConfigurationDialog(dialog, onSave) {
           `${(
             GraphConfig.getDefaultCurveForField(flightLog, field.name).power *
             100
-          ).toFixed(0)}%`
+          ).toFixed(0)}%`,
         );
         $("input[name=MinValue]", elem).val(
           GraphConfig.getDefaultCurveForField(
             flightLog,
-            field.name
-          ).MinMax.min.toFixed(1)
+            field.name,
+          ).MinMax.min.toFixed(1),
         );
         $("input[name=MaxValue]", elem).val(
           GraphConfig.getDefaultCurveForField(
             flightLog,
-            field.name
-          ).MinMax.max.toFixed(1)
+            field.name,
+          ).MinMax.max.toFixed(1),
         );
       }
     }
@@ -177,7 +177,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
           '<td><input name="MinValue" class="form-control minmax-control" type="text"/></td>' +
           '<td><input name="MaxValue" class="form-control minmax-control" type="text"/></td>' +
           '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>' +
-          "</tr>"
+          "</tr>",
       ),
       select = $("select.form-control", elem),
       selectedFieldName = field ? field.name : false;
@@ -202,7 +202,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
       };
       const fields = activeGraphConfig.extendFields(
         activeFlightLog,
-        selectedField
+        selectedField,
       );
       if (fields.length === 1) {
         renderSmoothingOptions(elem, activeFlightLog, fields[0]);
@@ -219,14 +219,14 @@ export function GraphConfigurationDialog(dialog, onSave) {
         const index = $("select.form-control", elem).prop("selectedIndex");
         $("select.form-control", elem).prop(
           "selectedIndex",
-          index + fields.length
+          index + fields.length,
         );
         $("select.form-control", elem).trigger("change");
 
         const colorPicker = $("select.color-picker", elem);
         colorPicker.prop(
           "selectedIndex",
-          colorIndex % GraphConfig.PALETTE.length
+          colorIndex % GraphConfig.PALETTE.length,
         );
         colorPicker.trigger("change");
       }
@@ -246,7 +246,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
       const name = $("select.form-control option:selected", elem).val();
       const MinMax = GraphConfig.getDefaultCurveForField(
         flightLog,
-        name
+        name,
       ).MinMax;
       const value = e.target.name == "MinValue" ? MinMax.min : MinMax.max;
       $(this).val(value.toFixed(1));
@@ -277,7 +277,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
         $(".config-graph-field", $(this).parents(".config-graph")),
         flightLog,
         logGrapher,
-        RefreshCharts
+        RefreshCharts,
       );
       return false;
     });
@@ -340,7 +340,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
           `</div>` +
           `</dd>` +
           `</dl>` +
-          `</li>`
+          `</li>`,
       ),
       fieldList = $(".config-graph-field-list", graphElem);
 
@@ -366,7 +366,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
     //Populate the Height seletor
     $("select.graph-height", graphElem).replaceWith(
-      chooseHeight(graph.height ? graph.height : 1)
+      chooseHeight(graph.height ? graph.height : 1),
     );
 
     // Add Field List
@@ -374,7 +374,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
     for (const field of graph.fields) {
       const extendedFields = activeGraphConfig.extendFields(
         activeFlightLog,
-        field
+        field,
       );
       for (const extField of extendedFields) {
         if (!extField.color || extField.color == -1) {
@@ -451,7 +451,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
 
       graph.label = $("input[type='text']", this).val();
       graph.height = parseInt(
-        $("select.graph-height option:selected", this).val()
+        $("select.graph-height option:selected", this).val(),
       );
 
       $(".config-graph-field", this).each(function () {
@@ -607,7 +607,7 @@ export function GraphConfigurationDialog(dialog, onSave) {
       graphElem = renderGraph(
         activeFlightLog,
         $(".config-graph", dialog).length,
-        graph
+        graph,
       );
 
     $(configGraphsList, dialog).append(graphElem);

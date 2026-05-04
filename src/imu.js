@@ -139,7 +139,7 @@ export function IMU(copyFrom) {
     currentTime,
     acc_1G,
     gyroScale,
-    magADC
+    magADC,
   ) {
     let accMag = 0,
       deltaTime,
@@ -186,8 +186,8 @@ export function IMU(copyFrom) {
         -this.estimateGyro.X,
         Math.sqrt(
           this.estimateGyro.Y * this.estimateGyro.Y +
-            this.estimateGyro.Z * this.estimateGyro.Z
-        )
+            this.estimateGyro.Z * this.estimateGyro.Z,
+        ),
       ),
     };
 
@@ -208,7 +208,7 @@ export function IMU(copyFrom) {
       attitude.heading = calculateHeading(
         this.estimateMag,
         attitude.roll,
-        attitude.pitch
+        attitude.pitch,
       );
     } else {
       rotateVector(this.EstN, deltaGyroAngle);
@@ -216,7 +216,7 @@ export function IMU(copyFrom) {
       attitude.heading = calculateHeading(
         this.EstN,
         attitude.roll,
-        attitude.pitch
+        attitude.pitch,
       );
     }
 

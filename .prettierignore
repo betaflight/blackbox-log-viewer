@@ -1,34 +1,13 @@
 # node.js npm related
-
 node_modules/
 npm-debug.log*
 
-# Configurator Build process
-cache/
-apps/
+# Build
 dist/
-public/
-src/vendor/
-dist_cordova/
-debug/
-release/
-testresults/
-.eslintcache
-cordova/bundle.keystore
 
 # OSX
 .DS_store
 
-# artefacts for Visual Studio Code
+# IDE
 /.vscode/
-
-# NetBeans
-nbproject/
-
-# IntelliJ
 .idea
-
-# Eclipse
-.project
-.settings/
-test-results-junit/

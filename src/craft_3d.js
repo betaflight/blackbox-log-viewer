@@ -53,7 +53,7 @@ export function Craft3D(flightLog, canvas, propColors) {
             0,
             propRadius,
             0,
-            (Math.PI * 2 * i) / (NUM_PROP_LEVELS - 1)
+            (Math.PI * 2 * i) / (NUM_PROP_LEVELS - 1),
           );
         } else {
           shape.moveTo(0, 0);
@@ -62,7 +62,7 @@ export function Craft3D(flightLog, canvas, propColors) {
             0,
             propRadius,
             0,
-            (Math.PI * 2 * i) / (NUM_PROP_LEVELS - 1)
+            (Math.PI * 2 * i) / (NUM_PROP_LEVELS - 1),
           );
         }
 
@@ -122,12 +122,12 @@ export function Craft3D(flightLog, canvas, propColors) {
       if (i === 0) {
         path.moveTo(
           Math.cos(armStart) * HUB_RADIUS,
-          Math.sin(armStart) * HUB_RADIUS
+          Math.sin(armStart) * HUB_RADIUS,
         );
       } else {
         path.lineTo(
           Math.cos(armStart) * HUB_RADIUS,
-          Math.sin(armStart) * HUB_RADIUS
+          Math.sin(armStart) * HUB_RADIUS,
         );
       }
 
@@ -166,7 +166,7 @@ export function Craft3D(flightLog, canvas, propColors) {
         var point = armPoints[j];
         path.lineTo(
           point.length * armVectorX - point.width * crossArmX,
-          point.length * armVectorY - point.width * crossArmY
+          point.length * armVectorY - point.width * crossArmY,
         );
       }
 
@@ -175,7 +175,7 @@ export function Craft3D(flightLog, canvas, propColors) {
         var point = armPoints[j];
         path.lineTo(
           point.length * armVectorX + point.width * crossArmX,
-          point.length * armVectorY + point.width * crossArmY
+          point.length * armVectorY + point.width * crossArmY,
         );
       }
 
@@ -236,7 +236,7 @@ export function Craft3D(flightLog, canvas, propColors) {
   for (var i = 0; i < numMotors; i++) {
     let propShell = new THREE.Mesh(
       propGeometry[propGeometry.length - 1],
-      propShellMaterial
+      propShellMaterial,
     );
 
     propShells[i] = propShell;
@@ -290,10 +290,10 @@ export function Craft3D(flightLog, canvas, propColors) {
           Math.max(
             frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]] -
               sysInfo.motorOutput[0],
-            0
+            0,
           ) /
             (sysInfo.motorOutput[1] - sysInfo.motorOutput[0]),
-          1.0
+          1.0,
         ),
         propLevel = Math.round(throttlePos * (NUM_PROP_LEVELS - 1)),
         geometry = propGeometry[propLevel],

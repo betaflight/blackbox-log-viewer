@@ -53,7 +53,7 @@ export function PrefStorage(keyPrefix) {
             globalThis.localStorage[name] = JSON.stringify(value);
           } catch (e) {
             // Storage quota exceeded or other error
-            console.warn('Failed to save to localStorage:', e.message);
+            console.warn("Failed to save to localStorage:", e.message);
           }
         }
         break;
@@ -76,13 +76,16 @@ export function PrefStorage(keyPrefix) {
   } else if (globalThis.localStorage) {
     // Verify localStorage is actually usable (may be disabled in some browsers)
     try {
-      const testKey = '__pref_storage_test__';
-      globalThis.localStorage.setItem(testKey, 'test');
+      const testKey = "__pref_storage_test__";
+      globalThis.localStorage.setItem(testKey, "test");
       globalThis.localStorage.removeItem(testKey);
       mode = LOCALSTORAGE;
     } catch (e) {
       // localStorage exists but isn't usable (e.g., private browsing mode)
-      console.warn('localStorage is not available, falling back to in-memory storage:', e.message);
+      console.warn(
+        "localStorage is not available, falling back to in-memory storage:",
+        e.message,
+      );
       mode = MEMORY;
     }
   } else {

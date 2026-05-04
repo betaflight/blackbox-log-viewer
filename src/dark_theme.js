@@ -14,7 +14,7 @@
 
 export const DarkTheme = {
   // Preference key name
-  configName: 'darkTheme',
+  configName: "darkTheme",
 
   // Theme modes
   modes: {
@@ -39,7 +39,7 @@ export const DarkTheme = {
    * Initialize the dark theme system
    * @param {PrefStorage} prefsStorage - The preference storage instance
    */
-  init: function(prefsStorage) {
+  init: function (prefsStorage) {
     this.prefs = prefsStorage;
 
     // Load saved preference
@@ -48,7 +48,7 @@ export const DarkTheme = {
       const allowedModes = Object.values(this.modes);
       if (
         value !== null &&
-        typeof value === 'number' &&
+        typeof value === "number" &&
         Number.isFinite(value) &&
         allowedModes.includes(value)
       ) {
@@ -65,11 +65,11 @@ export const DarkTheme = {
 
     // Set up system preference monitoring for AUTO mode
     if (globalThis.matchMedia) {
-      this.mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)');
+      this.mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
 
       // Modern browsers
       if (this.mediaQuery.addEventListener) {
-        this.mediaQuery.addEventListener('change', () => {
+        this.mediaQuery.addEventListener("change", () => {
           if (this.currentMode === this.modes.AUTO) {
             this.apply();
           }
@@ -91,9 +91,13 @@ export const DarkTheme = {
    * @param {number} mode - One of the modes (ON, OFF, AUTO)
    * @param {function} callback - Optional callback after theme is applied
    */
-  setMode: function(mode, callback) {
-    if (mode !== this.modes.ON && mode !== this.modes.OFF && mode !== this.modes.AUTO) {
-      console.error('Invalid dark theme mode:', mode);
+  setMode: function (mode, callback) {
+    if (
+      mode !== this.modes.ON &&
+      mode !== this.modes.OFF &&
+      mode !== this.modes.AUTO
+    ) {
+      console.error("Invalid dark theme mode:", mode);
       return;
     }
 
@@ -108,7 +112,7 @@ export const DarkTheme = {
     // Notify the application that theme has changed so canvas can redraw
     globalThis.blackboxLogViewer?.refreshGraph?.();
 
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       callback();
     }
   },
@@ -116,7 +120,7 @@ export const DarkTheme = {
   /**
    * Apply the current theme mode
    */
-  apply: function() {
+  apply: function () {
     const shouldUseDark = this.shouldUseDarkTheme();
 
     if (shouldUseDark) {
@@ -129,16 +133,16 @@ export const DarkTheme = {
   /**
    * Apply dark theme
    */
-  applyDark: function() {
-    document.body.classList.add('dark-theme');
+  applyDark: function () {
+    document.body.classList.add("dark-theme");
     this.enabled = true;
   },
 
   /**
    * Apply light theme (remove dark theme)
    */
-  applyNormal: function() {
-    document.body.classList.remove('dark-theme');
+  applyNormal: function () {
+    document.body.classList.remove("dark-theme");
     this.enabled = false;
   },
 
@@ -146,7 +150,7 @@ export const DarkTheme = {
    * Determine if dark theme should be active based on current mode
    * @returns {boolean} True if dark theme should be enabled
    */
-  shouldUseDarkTheme: function() {
+  shouldUseDarkTheme: function () {
     switch (this.currentMode) {
       case this.modes.ON:
         return true;
@@ -170,7 +174,7 @@ export const DarkTheme = {
    * Check if dark theme is currently enabled
    * @returns {boolean} True if dark theme is active
    */
-  isEnabled: function() {
+  isEnabled: function () {
     return this.enabled;
   },
 
@@ -178,7 +182,7 @@ export const DarkTheme = {
    * Get the current mode
    * @returns {number} Current mode (ON, OFF, or AUTO)
    */
-  getMode: function() {
+  getMode: function () {
     return this.currentMode;
   },
 };

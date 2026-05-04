@@ -2,8 +2,8 @@ export function SimpleStats(flightLog) {
   const frames = _(
       flightLog.getChunksInTimeRange(
         flightLog.getMinTime(),
-        flightLog.getMaxTime()
-      )
+        flightLog.getMaxTime(),
+      ),
     )
       .map((chunk) => chunk.frames)
       .flatten()
@@ -19,7 +19,12 @@ export function SimpleStats(flightLog) {
 
   const getMinMaxMean = (fieldName) => {
     const index = _.findIndex(fields, (f) => f === fieldName);
-    if (index === -1 || !frames.length || !(index in frames[0]) || !frames[index][index]) {
+    if (
+      index === -1 ||
+      !frames.length ||
+      !(index in frames[0]) ||
+      !frames[index][index]
+    ) {
       return undefined;
     }
     const result = _.mapValues({

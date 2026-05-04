@@ -37,7 +37,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       0.7,
       (500 * (sysConfig.rcRate ? sysConfig.rcRate : 100)) / 100,
       1.0,
-      10
+      10,
     );
 
   // Use defaults for any options not provided
@@ -59,7 +59,9 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     // Use that plus the inter-stick spacing that has been determined already to decide how big each stick should be:
     drawingParams.stickSurroundRadius = Math.min(
       width / 4 - drawingParams.stickSpacing,
-      height / 2 - drawingParams.stickSpacing - drawingParams.fontSizeValueLabel
+      height / 2 -
+        drawingParams.stickSpacing -
+        drawingParams.fontSizeValueLabel,
     );
 
     // Decide if to show the labels
@@ -76,7 +78,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     centerFrame,
     chunks,
     startFrameIndex,
-    windowCenterTime
+    windowCenterTime,
   ) {
     if (userSettings.eraseBackground) {
       canvasContext.clearRect(0, 0, canvas.width, canvas.height);
@@ -129,7 +131,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                 {
                   stickSurroundRadius: drawingParams.stickSurroundRadius,
                   yawStickMax: yawStickMax,
-                }
+                },
               );
               stickPositionsTrail.push(frameStickPositions);
             }
@@ -162,7 +164,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         radi * 2,
         10,
         true,
-        false
+        false,
       );
 
       //Draw crosshair
@@ -186,7 +188,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         canvasContext.fillText(
           stickLabel[i * 2],
           0,
-          radi + drawingParams.fontSizeValueLabel + drawingParams.stickSpacing
+          radi + drawingParams.fontSizeValueLabel + drawingParams.stickSpacing,
         );
 
         //Draw vertical stick label
@@ -194,7 +196,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         canvasContext.fillText(
           stickLabel[i * 2 + 1],
           (i == 0 ? -1 : 1) * (radi + drawingParams.stickSpacing),
-          drawingParams.fontSizeValueLabel / 2
+          drawingParams.fontSizeValueLabel / 2,
         );
 
         // put the mode label on the throttle stick
@@ -214,7 +216,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
           canvasContext.fillText(
             `Mode ${userSettings.stickMode}`,
             0,
-            radi - drawingParams.fontSizeValueLabel / 2
+            radi - drawingParams.fontSizeValueLabel / 2,
           );
         }
       }
@@ -231,7 +233,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
             stickPositionsTrail[j][i * 2 + 1],
             Math.abs(radi) / 20,
             0,
-            2 * Math.PI
+            2 * Math.PI,
           );
           canvasContext.fill();
         }
@@ -245,7 +247,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         stickPositions[i * 2 + 1],
         Math.abs(radi) / 7.5,
         0,
-        2 * Math.PI
+        2 * Math.PI,
       );
       canvasContext.fill();
 
@@ -283,7 +285,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                 flightLog,
                 flightLog.getMainFieldNames()[rcCommandFields[stickIndex]],
                 frame[rcCommandFields[stickIndex]],
-                currentFlightMode
+                currentFlightMode,
               );
           }
         }
@@ -357,8 +359,8 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         stickPositions[stickIndex] > 1
           ? 1
           : stickPositions[stickIndex] < -1
-          ? -1
-          : stickPositions[stickIndex];
+            ? -1
+            : stickPositions[stickIndex];
 
       //Scale to our stick size
       stickPositions[stickIndex] *= config.stickSurroundRadius;

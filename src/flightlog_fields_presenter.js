@@ -139,8 +139,8 @@ const FRIENDLY_FIELD_NAMES = {
   "gpsCartesianCoords[0]": "GPS Coords [X]",
   "gpsCartesianCoords[1]": "GPS Coords [Y]",
   "gpsCartesianCoords[2]": "GPS Coords [Z]",
-  gpsDistance:     "GPS Home distance",
-  gpsHomeAzimuth:     "GPS Home azimuth",
+  gpsDistance: "GPS Home distance",
+  gpsHomeAzimuth: "GPS Home azimuth",
   gpsTrajectoryTiltAngle: "GPS Traject. tilt angle",
 };
 
@@ -1157,7 +1157,7 @@ let DEBUG_FRIENDLY_FIELD_NAMES = null;
 
 FlightLogFieldPresenter.adjustDebugDefsList = function (
   firmwareType,
-  firmwareVersion
+  firmwareVersion,
 ) {
   DEBUG_FRIENDLY_FIELD_NAMES = { ...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL };
 
@@ -1306,7 +1306,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
       };
     }
 
-    if (semver.gte(firmwareVersion, '4.5.0')) {
+    if (semver.gte(firmwareVersion, "4.5.0")) {
       DEBUG_FRIENDLY_FIELD_NAMES.ATTITUDE = {
         "debug[all]": "Attitude",
         "debug[0]": "Roll angle",
@@ -1331,134 +1331,134 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
       };
     }
 
-    if (semver.gte(firmwareVersion, '2025.12.0')) {
+    if (semver.gte(firmwareVersion, "2025.12.0")) {
       // FFT_FREQ updated in firmware #13750
       DEBUG_FRIENDLY_FIELD_NAMES.FFT_FREQ = {
-        'debug[all]':'Debug FFT FREQ',
-        'debug[0]':'Gyro Pre Dyn Notch [dbg-axis]',
-        'debug[1]':'Notch 1 Center Freq [dbg-axis]',
-        'debug[2]':'Notch 2 Center Freq [dbg-axis]',
-        'debug[3]':'Notch 3 Center Freq [dbg-axis]',
-        'debug[4]':'Notch 4 Center Freq [dbg-axis]',
-        'debug[5]':'Notch 5 Center Freq [dbg-axis]',
-        'debug[6]':'Notch 6 Center Freq [dbg-axis]',
-        'debug[7]':'Notch 7 Center Freq [dbg-axis]',
+        "debug[all]": "Debug FFT FREQ",
+        "debug[0]": "Gyro Pre Dyn Notch [dbg-axis]",
+        "debug[1]": "Notch 1 Center Freq [dbg-axis]",
+        "debug[2]": "Notch 2 Center Freq [dbg-axis]",
+        "debug[3]": "Notch 3 Center Freq [dbg-axis]",
+        "debug[4]": "Notch 4 Center Freq [dbg-axis]",
+        "debug[5]": "Notch 5 Center Freq [dbg-axis]",
+        "debug[6]": "Notch 6 Center Freq [dbg-axis]",
+        "debug[7]": "Notch 7 Center Freq [dbg-axis]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_ALTITUDE = {
-        'debug[all]': 'Autopilot Altitude',
-        'debug[0]': 'Autopilot Throttle',
-        'debug[1]': 'Tilt Multiplier',
-        'debug[2]': 'Zero Altitude cm',
-        'debug[3]': 'Altitude cm',
-        'debug[4]': 'Altitude P',
-        'debug[5]': 'Altitude I',
-        'debug[6]': 'Altitude D',
-        'debug[7]': 'Altitude F',
+        "debug[all]": "Autopilot Altitude",
+        "debug[0]": "Autopilot Throttle",
+        "debug[1]": "Tilt Multiplier",
+        "debug[2]": "Zero Altitude cm",
+        "debug[3]": "Altitude cm",
+        "debug[4]": "Altitude P",
+        "debug[5]": "Altitude I",
+        "debug[6]": "Altitude D",
+        "debug[7]": "Altitude F",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.TPA = {
-        'debug[all]': 'TPA',
-        'debug[0]': 'TPA Factor',
-        'debug[1]': 'TPA Attitude Roll (Wing)',
-        'debug[2]': 'TPA Attitude Pitch (Wing)',
-        'debug[3]': 'TPA Calculated Throttle (Wing)',
-        'debug[4]': 'TPA Speed (Wing)',
-        'debug[5]': 'TPA Argument (Wing)',
+        "debug[all]": "TPA",
+        "debug[0]": "TPA Factor",
+        "debug[1]": "TPA Attitude Roll (Wing)",
+        "debug[2]": "TPA Attitude Pitch (Wing)",
+        "debug[3]": "TPA Calculated Throttle (Wing)",
+        "debug[4]": "TPA Speed (Wing)",
+        "debug[5]": "TPA Argument (Wing)",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.S_TERM = {
-        'debug[all]': 'S Term',
-        'debug[0]': 'S Term [roll]',
-        'debug[1]': 'S Term [pitch]',
-        'debug[2]': 'S Term [yaw]',
+        "debug[all]": "S Term",
+        "debug[0]": "S Term [roll]",
+        "debug[1]": "S Term [pitch]",
+        "debug[2]": "S Term [yaw]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.SPA = {
-        'debug[all': 'SPA',
-        'debug[0]': 'Setpoint PID Attenuation [roll]',
-        'debug[1]': 'Setpoint PID Attenuation [pitch]',
-        'debug[2]': 'Setpoint PID Attenuation [yaw]',
+        "debug[all": "SPA",
+        "debug[0]": "Setpoint PID Attenuation [roll]",
+        "debug[1]": "Setpoint PID Attenuation [pitch]",
+        "debug[2]": "Setpoint PID Attenuation [yaw]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.TASK = {
-        'debug[all]': 'TASK',
-        'debug[0]': 'Value',
-        'debug[1]': 'Rate (Hz)',
-        'debug[2]': 'Max (us)',
-        'debug[3]': 'Average (us)',
-        'debug[4]': 'Estimated execution time (us)',
-        'debug[5]': 'Actual execution time (us)',
-        'debug[6]': 'Difference estimated vs actual',
-        'debug[7]': 'Late count',
+        "debug[all]": "TASK",
+        "debug[0]": "Value",
+        "debug[1]": "Rate (Hz)",
+        "debug[2]": "Max (us)",
+        "debug[3]": "Average (us)",
+        "debug[4]": "Estimated execution time (us)",
+        "debug[5]": "Actual execution time (us)",
+        "debug[6]": "Difference estimated vs actual",
+        "debug[7]": "Late count",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.GIMBAL = {
-        'debug[all]': 'Gimbal',
-        'debug[0]': 'Headtracker Roll',
-        'debug[1]': 'Headtracker Pitch',
-        'debug[2]': 'Headtracker Yaw',
-        'debug[3]': 'Gimbal Roll',
-        'debug[4]': 'Gimbal Pitch',
-        'debug[5]': 'Gimbal Yaw',
+        "debug[all]": "Gimbal",
+        "debug[0]": "Headtracker Roll",
+        "debug[1]": "Headtracker Pitch",
+        "debug[2]": "Headtracker Yaw",
+        "debug[3]": "Gimbal Roll",
+        "debug[4]": "Gimbal Pitch",
+        "debug[5]": "Gimbal Yaw",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.WING_SETPOINT = {
-        'debug[all]': 'Wing Setpoint',
-        'debug[0]': 'Current Setpoint [roll]',
-        'debug[1]': 'Adjusted Setpoint [roll]',
-        'debug[2]': 'Current Setpoint [pitch]',
-        'debug[3]': 'Adjusted Setpoint [pitch]',
-        'debug[4]': 'Current Setpoint [yaw]',
-        'debug[5]': 'Adjusted Setpoint [yaw]',
+        "debug[all]": "Wing Setpoint",
+        "debug[0]": "Current Setpoint [roll]",
+        "debug[1]": "Adjusted Setpoint [roll]",
+        "debug[2]": "Current Setpoint [pitch]",
+        "debug[3]": "Adjusted Setpoint [pitch]",
+        "debug[4]": "Current Setpoint [yaw]",
+        "debug[5]": "Adjusted Setpoint [yaw]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.OPTICALFLOW = {
-        'debug[all]': 'Optical Flow',
-        'debug[0]': 'Quality',
-        'debug[1]': 'Raw flow rates X',
-        'debug[2]': 'Raw flow rates Y',
-        'debug[3]': 'Processed flow rates X',
-        'debug[4]': 'Processed flow rates Y',
-        'debug[5]': 'Delta time',
+        "debug[all]": "Optical Flow",
+        "debug[0]": "Quality",
+        "debug[1]": "Raw flow rates X",
+        "debug[2]": "Raw flow rates Y",
+        "debug[3]": "Processed flow rates X",
+        "debug[4]": "Processed flow rates Y",
+        "debug[5]": "Delta time",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.MULTI_GYRO_RAW = {
-        'debug[all]': 'Debug Multi Gyro Raw',
-        'debug[0]': 'Gyro 1 Raw [roll]',
-        'debug[1]': 'Gyro 1 Raw [pitch]',
-        'debug[2]': 'Gyro 2 Raw [roll]',
-        'debug[3]': 'Gyro 2 Raw [pitch]',
-        'debug[4]': 'Gyro 3 Raw [roll]',
-        'debug[5]': 'Gyro 3 Raw [pitch]',
-        'debug[6]': 'Gyro 4 Raw [roll]',
-        'debug[7]': 'Gyro 4 Raw [pitch]',
+        "debug[all]": "Debug Multi Gyro Raw",
+        "debug[0]": "Gyro 1 Raw [roll]",
+        "debug[1]": "Gyro 1 Raw [pitch]",
+        "debug[2]": "Gyro 2 Raw [roll]",
+        "debug[3]": "Gyro 2 Raw [pitch]",
+        "debug[4]": "Gyro 3 Raw [roll]",
+        "debug[5]": "Gyro 3 Raw [pitch]",
+        "debug[6]": "Gyro 4 Raw [roll]",
+        "debug[7]": "Gyro 4 Raw [pitch]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.MULTI_GYRO_DIFF = {
-        'debug[all]': 'Debug Multi Gyro Diff',
-        'debug[0]': 'Gyro 1 Diff [roll]',
-        'debug[1]': 'Gyro 1 Diff [pitch]',
-        'debug[2]': 'Gyro 2 Diff [roll]',
-        'debug[3]': 'Gyro 2 Diff [pitch]',
-        'debug[4]': 'Gyro 3 Diff [roll]',
-        'debug[5]': 'Gyro 3 Diff [pitch]',
-        'debug[6]': 'Gyro 4 Diff [roll]',
-        'debug[7]': 'Gyro 4 Diff [pitch]',
+        "debug[all]": "Debug Multi Gyro Diff",
+        "debug[0]": "Gyro 1 Diff [roll]",
+        "debug[1]": "Gyro 1 Diff [pitch]",
+        "debug[2]": "Gyro 2 Diff [roll]",
+        "debug[3]": "Gyro 2 Diff [pitch]",
+        "debug[4]": "Gyro 3 Diff [roll]",
+        "debug[5]": "Gyro 3 Diff [pitch]",
+        "debug[6]": "Gyro 4 Diff [roll]",
+        "debug[7]": "Gyro 4 Diff [pitch]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.MULTI_GYRO_SCALED = {
-        'debug[all]': 'Multi Gyro Scaled',
-        'debug[0]': 'Gyro 1 [roll]',
-        'debug[1]': 'Gyro 1 [pitch]',
-        'debug[2]': 'Gyro 2 [roll]',
-        'debug[3]': 'Gyro 2 [pitch]',
-        'debug[4]': 'Gyro 3 [roll]',
-        'debug[5]': 'Gyro 3 [pitch]',
-        'debug[6]': 'Gyro 4 [roll]',
-        'debug[7]': 'Gyro 4 [pitch]',
+        "debug[all]": "Multi Gyro Scaled",
+        "debug[0]": "Gyro 1 [roll]",
+        "debug[1]": "Gyro 1 [pitch]",
+        "debug[2]": "Gyro 2 [roll]",
+        "debug[3]": "Gyro 2 [pitch]",
+        "debug[4]": "Gyro 3 [roll]",
+        "debug[5]": "Gyro 3 [pitch]",
+        "debug[6]": "Gyro 4 [roll]",
+        "debug[7]": "Gyro 4 [pitch]",
       };
       DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_POSITION = {
-        'debug[all]': 'Autopilot Position',
-        'debug[0]': 'Distance',
-        'debug[1]': 'GPS Distance',
-        'debug[2]': 'PID Sum EF',
-        'debug[3]': 'Angle',
-        'debug[4]': 'pidP',
-        'debug[5]': 'pidI',
-        'debug[6]': 'pidD',
-        'debug[7]': 'pidA',
+        "debug[all]": "Autopilot Position",
+        "debug[0]": "Distance",
+        "debug[1]": "GPS Distance",
+        "debug[2]": "PID Sum EF",
+        "debug[3]": "Angle",
+        "debug[4]": "pidP",
+        "debug[5]": "pidI",
+        "debug[6]": "pidD",
+        "debug[7]": "pidA",
       };
-    DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
+      DEBUG_FRIENDLY_FIELD_NAMES.FEEDFORWARD = {
         "debug[all]": "Feedforward [debug_axis]",
         "debug[0]": "Setpoint, un-smoothed",
         "debug[1]": "Delta, smoothed",
@@ -1543,11 +1543,11 @@ FlightLogFieldPresenter.presentFlags = function (flags, flagNames) {
 FlightLogFieldPresenter.presentChangeEvent = function presentChangeEvent(
   flags,
   lastFlags,
-  flagNames)
-{
+  flagNames,
+) {
   let eventState = "";
   let found = false;
-  const maxModeNumber = 32;   // int has 32 bit only! We have not to roll bit shift 1<<i for i values grate then 31 !!!
+  const maxModeNumber = 32; // int has 32 bit only! We have not to roll bit shift 1<<i for i values grate then 31 !!!
   let modesCount = flagNames.length;
   if (modesCount > maxModeNumber) {
     modesCount = maxModeNumber;
@@ -1584,7 +1584,7 @@ FlightLogFieldPresenter.presentEnum = function presentEnum(value, enumNames) {
 
 FlightLogFieldPresenter.decodeCorrectAltitude = function (
   altitude,
-  altitudeUnits
+  altitudeUnits,
 ) {
   switch (altitudeUnits) {
     case 1: // Keep it in meters.
@@ -1597,7 +1597,7 @@ FlightLogFieldPresenter.decodeCorrectAltitude = function (
 // Altitude back convertacion function
 FlightLogFieldPresenter.decodeAltitudeLogToChart = function (
   altitude,
-  altitudeUnits
+  altitudeUnits,
 ) {
   switch (altitudeUnits) {
     case 1: // Keep it in meters.
@@ -1619,7 +1619,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
   flightLog,
   fieldName,
   value,
-  currentFlightMode
+  currentFlightMode,
 ) {
   if (value === undefined) {
     return "";
@@ -1653,18 +1653,18 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "axisError[1]":
     case "axisError[2]":
       return `${(value / highResolutionScale).toFixed(
-        highResolutionAddPrecision
+        highResolutionAddPrecision,
       )} °/s`;
 
     case "rcCommand[0]":
     case "rcCommand[1]":
     case "rcCommand[2]":
       return `${(value / highResolutionScale + 1500).toFixed(
-        highResolutionAddPrecision
+        highResolutionAddPrecision,
       )} us`;
     case "rcCommand[3]":
       return `${(value / highResolutionScale).toFixed(
-        highResolutionAddPrecision
+        highResolutionAddPrecision,
       )} us`;
 
     case "motor[0]":
@@ -1695,7 +1695,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "rcCommands[1]":
     case "rcCommands[2]":
       return `${(value / highResolutionScale).toFixed(
-        highResolutionAddPrecision
+        highResolutionAddPrecision,
       )} °/s`;
     case "rcCommands[3]":
       return `${value.toFixed(1)}%`;
@@ -1735,7 +1735,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
         return (
           `${(value / 100).toFixed(2)}V` +
           `, ${(value / 100 / flightLog.getNumCellsEstimate()).toFixed(
-            2
+            2,
           )} V/cell`
         );
       } else if (
@@ -1747,7 +1747,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
         return (
           `${(value / 10).toFixed(2)}V` +
           `, ${(value / 10 / flightLog.getNumCellsEstimate()).toFixed(
-            2
+            2,
           )} V/cell`
         );
       } else {
@@ -1799,25 +1799,25 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "baroAlt":
       return FlightLogFieldPresenter.decodeCorrectAltitude(
         value / 100,
-        userSettings.altitudeUnits
+        userSettings.altitudeUnits,
       );
 
     case "flightModeFlags":
       return FlightLogFieldPresenter.presentFlags(
         value,
-        FLIGHT_LOG_FLIGHT_MODE_NAME
+        FLIGHT_LOG_FLIGHT_MODE_NAME,
       );
 
     case "stateFlags":
       return FlightLogFieldPresenter.presentFlags(
         value,
-        FLIGHT_LOG_FLIGHT_STATE_NAME
+        FLIGHT_LOG_FLIGHT_STATE_NAME,
       );
 
     case "failsafePhase":
       return FlightLogFieldPresenter.presentEnum(
         value,
-        FLIGHT_LOG_FAILSAFE_PHASE_NAME
+        FLIGHT_LOG_FAILSAFE_PHASE_NAME,
       );
 
     case "features":
@@ -1835,7 +1835,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "GPS_altitude":
       return FlightLogFieldPresenter.decodeCorrectAltitude(
         value / 10,
-        userSettings.altitudeUnits
+        userSettings.altitudeUnits,
       );
     case "GPS_speed":
       switch (userSettings.speedUnits) {
@@ -1878,7 +1878,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       return FlightLogFieldPresenter.decodeDebugFieldToFriendly(
         flightLog,
         fieldName,
-        value
+        value,
       );
 
     default:
@@ -1889,7 +1889,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
 FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
   flightLog,
   fieldName,
-  value
+  value,
 ) {
   if (flightLog) {
     const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
@@ -1989,7 +1989,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
           case "debug[1]": // gyro post dyn notch [for gyro debug axis]
           case "debug[2]": // gyro pre dyn notch, downsampled for FFT [for gyro debug axis]
             return `${Math.round(
-              flightLog.gyroRawToDegreesPerSecond(value)
+              flightLog.gyroRawToDegreesPerSecond(value),
             )} °/s`;
           // debug 3 = not used
           default:
@@ -2007,17 +2007,21 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             return value.toFixed(0);
         }
       case "FFT_FREQ":
-        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '2025.12.0')) {
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2025.12.0")) {
           switch (fieldName) {
-            case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
-              return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
+            case "debug[0]": // gyro pre dyn notch [for gyro debug axis]
+              return (
+                Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s"
+              );
             default:
               return value.toFixed(0) + " Hz";
           }
         } else {
           switch (fieldName) {
-            case 'debug[3]': // gyro pre dyn notch [for gyro debug axis]
-              return Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s";
+            case "debug[3]": // gyro pre dyn notch [for gyro debug axis]
+              return (
+                Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s"
+              );
             default:
               return value.toFixed(0) + " Hz";
           }
@@ -2092,7 +2096,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
           case "debug[0]": // gyro scaled [for selected axis]
           case "debug[3]": // pre-dyn notch gyro [for selected axis]
             return `${Math.round(
-              flightLog.gyroRawToDegreesPerSecond(value)
+              flightLog.gyroRawToDegreesPerSecond(value),
             )} °/s`;
           default:
             return `${value.toFixed(0)} Hz`;
@@ -2361,7 +2365,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
           // case "debug[5]": setpoint speed smoothed
           case "debug[6]": // feedforward smoothing PT1K * 1000
             return `${(value / 1000).toFixed(3)}`;
-          case "debug[7]":   // smoothed RxRateHz
+          case "debug[7]": // smoothed RxRateHz
             return `${value.toFixed(0)} Hz`;
           default:
             return value.toFixed(0);
@@ -2411,7 +2415,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
   flightLog,
   fieldName,
   toFriendly,
-  value
+  value,
 ) {
   if (value === undefined) {
     return 0;
@@ -2552,12 +2556,12 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
       return toFriendly
         ? FlightLogFieldPresenter.decodeAltitudeLogToChart(
             value / 100,
-            userSettings.altitudeUnits
+            userSettings.altitudeUnits,
           )
         : (value * 100) /
             FlightLogFieldPresenter.decodeAltitudeLogToChart(
               1.0,
-              userSettings.altitudeUnits
+              userSettings.altitudeUnits,
             );
 
     case "flightModeFlags":
@@ -2585,12 +2589,12 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
       return toFriendly
         ? FlightLogFieldPresenter.decodeAltitudeLogToChart(
             value / 10,
-            userSettings.altitudeUnits
+            userSettings.altitudeUnits,
           )
         : (value * 10) /
             FlightLogFieldPresenter.decodeAltitudeLogToChart(
               1.0,
-              userSettings.altitudeUnits
+              userSettings.altitudeUnits,
             );
     case "GPS_speed":
       switch (userSettings.speedUnits) {
@@ -2624,7 +2628,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
         flightLog,
         fieldName,
         toFriendly,
-        value
+        value,
       );
 
     default:
@@ -2644,7 +2648,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
   flightLog,
   fieldName,
   toFriendly,
-  value
+  value,
 ) {
   if (flightLog) {
     const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
@@ -2768,9 +2772,9 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value;
         }
       case "FFT_FREQ":
-        if (semver.gte(flightLog.getSysConfig().firmwareVersion, '2025.12.0')) {
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2025.12.0")) {
           switch (fieldName) {
-            case 'debug[0]': // gyro pre dyn notch [for gyro debug axis]
+            case "debug[0]": // gyro pre dyn notch [for gyro debug axis]
               return toFriendly
                 ? flightLog.gyroRawToDegreesPerSecond(value)
                 : value / flightLog.gyroRawToDegreesPerSecond(1.0); // °/s;
@@ -3092,7 +3096,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           // case "debug[0]": // setpoint
           // case "debug[1]": // setpoint speed
           // case "debug[2]": //feedforward boost
-          case "debug[3]":    // rcCommand Delta integer * 10
+          case "debug[3]": // rcCommand Delta integer * 10
             return toFriendly ? value / 10 : value * 10;
           // case "debug[4]": // jitter attenuator percent
           // case "debug[5]": // boolean indicating packet duplicate

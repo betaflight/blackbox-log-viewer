@@ -17,7 +17,7 @@ export function CsvExporter(flightLog, opts = {}) {
       stringDelimiter: '"',
       quoteStrings: true,
     },
-    opts
+    opts,
   );
 
   /**
@@ -27,8 +27,8 @@ export function CsvExporter(flightLog, opts = {}) {
     let frames = _(
         flightLog.getChunksInTimeRange(
           flightLog.getMinTime(),
-          flightLog.getMaxTime()
-        )
+          flightLog.getMaxTime(),
+        ),
       )
         .map((chunk) => chunk.frames)
         .value(),

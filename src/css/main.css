@@ -695,7 +695,7 @@ html.has-analyser-fullscreen.has-analyser
 .analyser input#analyserMaxPSD::-webkit-inner-spin-button,
 .analyser input#analyserMaxPSD::-webkit-outer-spin-button,
 .analyser input#analyserLowLevelPSD::-webkit-inner-spin-button,
-.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button ,
+.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button,
 .analyser input#analyserSegmentLengthPowerAt2::-webkit-inner-spin-button,
 .analyser input#analyserSegmentLengthPowerAt2::-webkit-outer-spin-button {
   -webkit-appearance: auto !important;
@@ -714,8 +714,8 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser label#analyserMaxPSDLabel {
-  position:absolute;
-  color:gray;
+  position: absolute;
+  color: gray;
   left: 0px;
   top: 30px;
   font-size: 12px;
@@ -729,8 +729,8 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser label#analyserMinPSDLabel {
-  position:absolute;
-  color:gray;
+  position: absolute;
+  color: gray;
   left: 0px;
   top: 55px;
   font-size: 12px;
@@ -744,8 +744,8 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser label#analyserLowLevelPSDLabel {
-  position:absolute;
-  color:gray;
+  position: absolute;
+  color: gray;
   left: 0px;
   top: 80px;
   font-size: 12px;
@@ -759,8 +759,8 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser label#analyserSegmentLengthPowerAt2Label {
-  position:absolute;
-  color:gray;
+  position: absolute;
+  color: gray;
   width: 50px;
   height: 20px;
   left: 0px;
@@ -1361,7 +1361,10 @@ progress {
 
 .btn-nobg:hover {
   color: var(--text-inverse);
-  text-shadow: 1px 1px 2px gray, 0 0 5px blue, 0 0 10px white;
+  text-shadow:
+    1px 1px 2px gray,
+    0 0 5px blue,
+    0 0 10px white;
 }
 
 .btn-nobg:focus,
@@ -1609,7 +1612,9 @@ input[type="checkbox"].ios-switch + div > div {
   -moz-transition-timing-function: cubic-bezier(0.54, 1.85, 0.5, 1);
   -moz-transition-duration: 0.4s;
   -moz-transition-property: transform, background-color;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   margin-left: 0;
 }
@@ -1619,7 +1624,9 @@ input[type="checkbox"].ios-switch:checked + div > div {
   -webkit-transform: translate3d(20px, 0, 0);
   -moz-transform: translate3d(20px, 0, 0);
   background-color: var(--surface-0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172, 1);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(8, 80, 172, 1);
 }
 
 /* Tiny Knob */
@@ -1633,7 +1640,9 @@ input[type="checkbox"].tinyswitch.ios-switch + div > div {
 input[type="checkbox"].tinyswitch.ios-switch:checked + div > div {
   -webkit-transform: translate3d(16px, 0, 0);
   -moz-transform: translate3d(16px, 0, 0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172, 1);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(8, 80, 172, 1);
 }
 
 /* Big Knob */
@@ -1647,25 +1656,33 @@ input[type="checkbox"].bigswitch.ios-switch + div > div {
 input[type="checkbox"].bigswitch.ios-switch:checked + div > div {
   -webkit-transform: translate3d(25px, 0, 0);
   -moz-transform: translate3d(16px, 0, 0);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172, 1);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(8, 80, 172, 1);
 }
 
 /* Green Knob */
 input[type="checkbox"].green.ios-switch:checked + div > div,
 html.isCF input[type="checkbox"].ios-switch:checked + div > div {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 162, 63, 1);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 162, 63, 1);
 }
 
 /* Orange Knob */
 input[type="checkbox"].orange.ios-switch:checked + div > div,
 html.isBF input[type="checkbox"].ios-switch:checked + div > div {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(158, 100, 0, 1);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(158, 100, 0, 1);
 }
 
 /* Blue Knob */
 input[type="checkbox"].blue.ios-switch:checked + div > div,
 html.isINAV input[type="checkbox"].ios-switch:checked + div > div {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(8, 80, 172, 1);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(8, 80, 172, 1);
 }
 
 html.isBF .config-graph h4 span:first-child,

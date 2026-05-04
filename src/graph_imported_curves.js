@@ -1,5 +1,5 @@
 export function ImportedCurves(curvesChanged) {
-  const MAX_IMPORT_COUNT = 6;   // This value is limited by legends size and curves colors visibility. May be increased if needed by users
+  const MAX_IMPORT_COUNT = 6; // This value is limited by legends size and curves colors visibility. May be increased if needed by users
   const _curvesData = [];
   const _that = this;
   this.minX = Number.MAX_VALUE;
@@ -7,19 +7,21 @@ export function ImportedCurves(curvesChanged) {
   this.minY = Number.MAX_VALUE;
   this.maxY = -Number.MAX_VALUE;
 
-  this.curvesCount = function() {
+  this.curvesCount = function () {
     return _curvesData.length;
   };
 
-  this.getCurve = function(index) {
+  this.getCurve = function (index) {
     if (index < _curvesData.length) {
       return _curvesData[index];
     } else {
-      throw new RangeError(`The imported curves index (${index}) exceeds the maximum allowed value (${_curvesData.length - 1})`);
+      throw new RangeError(
+        `The imported curves index (${index}) exceeds the maximum allowed value (${_curvesData.length - 1})`,
+      );
     }
   };
 
-  this.importCurvesFromCSV = function(files) {
+  this.importCurvesFromCSV = function (files) {
     let importsLeft = MAX_IMPORT_COUNT - _curvesData.length;
 
     for (const file of files) {
@@ -32,7 +34,11 @@ export function ImportedCurves(curvesChanged) {
           const stringRows = e.target.result.split("\n");
 
           const header = stringRows[0].split(",");
-          if (header.length !== 2 || header[0].trim() !== "x" || header[1].trim() !== "y") {
+          if (
+            header.length !== 2 ||
+            header[0].trim() !== "x" ||
+            header[1].trim() !== "y"
+          ) {
             throw new SyntaxError("Wrong curves CSV data format");
           }
 
@@ -42,10 +48,10 @@ export function ImportedCurves(curvesChanged) {
             stringRows.pop();
           }
 
-          const curvesData = stringRows.map( function(row) {
+          const curvesData = stringRows.map(function (row) {
             const data = row.split(","),
-                  x = parseFloat(data[0].trim()),
-                  y = parseFloat(data[1].trim());
+              x = parseFloat(data[0].trim()),
+              y = parseFloat(data[1].trim());
             _that.minX = Math.min(x, _that.minX);
             _that.maxX = Math.max(x, _that.maxX);
             _that.minY = Math.min(y, _that.minY);
@@ -57,13 +63,13 @@ export function ImportedCurves(curvesChanged) {
           });
 
           const curve = {
-            name: file.name.split('.')[0],
+            name: file.name.split(".")[0],
             points: curvesData,
           };
           _curvesData.push(curve);
           curvesChanged();
         } catch (e) {
-          alert('Curves data import error: ' + e.message);
+          alert("Curves data import error: " + e.message);
           return;
         }
       };
@@ -72,11 +78,11 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  const getCurveRange = function(points) {
+  const getCurveRange = function (points) {
     let minX = Number.MAX_VALUE,
-        maxX = -Number.MAX_VALUE,
-        minY = Number.MAX_VALUE,
-        maxY = -Number.MAX_VALUE;
+      maxX = -Number.MAX_VALUE,
+      minY = Number.MAX_VALUE,
+      maxY = -Number.MAX_VALUE;
     for (const point of points) {
       minX = Math.min(point.x, minX);
       maxX = Math.max(point.x, maxX);
@@ -104,7 +110,7 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  this.addCurve = function(points, name) {
+  this.addCurve = function (points, name) {
     if (this.curvesCount() < MAX_IMPORT_COUNT) {
       const range = getCurveRange(points);
       _curvesData.push({
@@ -122,7 +128,7 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  this.isNewCurve = function(name) {
+  this.isNewCurve = function (name) {
     for (const curve of _curvesData) {
       if (curve.name === name) {
         return false;
@@ -131,13 +137,13 @@ export function ImportedCurves(curvesChanged) {
     return true;
   };
 
-  this.removeAllCurves = function() {
+  this.removeAllCurves = function () {
     _curvesData.length = 0;
     computeGlobalCurvesRange();
     curvesChanged();
   };
 
-  this.removeCurve = function(name) {
+  this.removeCurve = function (name) {
     for (let index = 0; index < _curvesData.length; index++) {
       if (_curvesData[index].name === name) {
         _curvesData.splice(index, 1);
@@ -148,11 +154,11 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  this.isFull = function() {
+  this.isFull = function () {
     return this.curvesCount() === MAX_IMPORT_COUNT;
   };
 
-  this.isEmpty = function() {
+  this.isEmpty = function () {
     return this.curvesCount() === 0;
   };
 }

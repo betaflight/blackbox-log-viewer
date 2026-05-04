@@ -104,7 +104,7 @@ export function SeekBar(canvas) {
   function onTouchMove(e) {
     if (e.which == 0)
       seekToDOMPixel(
-        e.originalEvent.touches[0].pageX - $(canvas).offset().left
+        e.originalEvent.touches[0].pageX - $(canvas).offset().left,
       );
   }
 
@@ -166,7 +166,7 @@ export function SeekBar(canvas) {
   this.setActivity = function (
     newActivityTimes,
     newActivityStrengths,
-    newHasEvent
+    newHasEvent,
   ) {
     activityTime = newActivityTimes;
     activityStrength = newActivityStrengths;
@@ -265,7 +265,7 @@ export function SeekBar(canvas) {
             0,
             0,
             (inTime - min) / pixelTimeStep + BAR_INSET,
-            canvas.height
+            canvas.height,
           );
         }
 
@@ -276,7 +276,7 @@ export function SeekBar(canvas) {
             barStartX,
             0,
             canvas.width - barStartX,
-            canvas.height
+            canvas.height,
           );
         }
       }
@@ -304,7 +304,7 @@ export function SeekBar(canvas) {
         dirtyRegion.x,
         dirtyRegion.y,
         dirtyRegion.width,
-        dirtyRegion.height
+        dirtyRegion.height,
       );
     }
 
@@ -324,14 +324,14 @@ export function SeekBar(canvas) {
         cursorX - CURSOR_WIDTH,
         0,
         CURSOR_WIDTH * 2,
-        canvas.height
+        canvas.height,
       );
     } else {
       canvasContext.fillRect(
         cursorX - CURSOR_WIDTH,
         0,
         CURSOR_WIDTH * 2,
-        canvas.height
+        canvas.height,
       );
 
       canvasContext.fillStyle = getCursorStyleWindow(); // paint window
@@ -339,7 +339,7 @@ export function SeekBar(canvas) {
         cursorX - cursorWidth,
         0,
         cursorWidth * 2,
-        canvas.height
+        canvas.height,
       );
     }
 

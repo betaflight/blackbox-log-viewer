@@ -10,8 +10,8 @@ export function GpxExporter(flightLog) {
     let frames = _(
         flightLog.getChunksInTimeRange(
           flightLog.getMinTime(),
-          flightLog.getMaxTime()
-        )
+          flightLog.getMaxTime(),
+        ),
       )
         .map((chunk) => chunk.frames)
         .value(),

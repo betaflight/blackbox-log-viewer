@@ -125,8 +125,8 @@ export function VideoExportDialog(dialog, onSave) {
 
     videoDuration.text(
       formatTime(
-        Math.round((logParameters.outTime - logParameters.inTime) / 1000000)
-      )
+        Math.round((logParameters.outTime - logParameters.inTime) / 1000000),
+      ),
     );
 
     $(".jumpy-video-note").toggle(!!logParameters.flightVideo);
@@ -159,7 +159,7 @@ export function VideoExportDialog(dialog, onSave) {
             `${frameIndex + 1} / ${frameCount} (${(
               ((frameIndex + 1) / frameCount) *
               100
-            ).toFixed(1)}%)`
+            ).toFixed(1)}%)`,
           );
 
           if (frameIndex > 0) {
@@ -175,14 +175,14 @@ export function VideoExportDialog(dialog, onSave) {
 
             let estimatedRemaining = Math.max(
               Math.round((lastEstimatedTimeMsec - elapsedTimeMsec) / 1000),
-              0
+              0,
             );
 
             progressRemaining.text(formatTime(estimatedRemaining));
 
             let writtenBytes = videoRenderer.getWrittenSize(),
               estimatedBytes = Math.round(
-                (frameCount / frameIndex) * writtenBytes
+                (frameCount / frameIndex) * writtenBytes,
               );
 
             /*
@@ -196,13 +196,13 @@ export function VideoExportDialog(dialog, onSave) {
                 // Wait for the first significant chunk to be written (don't use the tiny header as a size estimate)
                 progressSize.text(
                   `${formatFilesize(writtenBytes)} / ${formatFilesize(
-                    estimatedBytes
-                  )}`
+                    estimatedBytes,
+                  )}`,
                 );
 
                 fileSizeWarning.toggle(
                   !videoRenderer.willWriteDirectToDisk() &&
-                    estimatedBytes >= 475 * 1024 * 1024
+                    estimatedBytes >= 475 * 1024 * 1024,
                 );
               }
             }
@@ -212,8 +212,8 @@ export function VideoExportDialog(dialog, onSave) {
           if (success) {
             $(".video-export-result").text(
               `Rendered ${frameCount} frames in ${formatTime(
-                Math.round((Date.now() - renderStartTime) / 1000)
-              )}`
+                Math.round((Date.now() - renderStartTime) / 1000),
+              )}`,
             );
             setDialogMode(DIALOG_MODE_COMPLETE);
           } else {
@@ -224,7 +224,7 @@ export function VideoExportDialog(dialog, onSave) {
             videoRenderer = false;
           }
         },
-      }
+      },
     );
 
     progressBar.prop("value", 0);

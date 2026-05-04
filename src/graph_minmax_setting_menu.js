@@ -8,7 +8,7 @@ export function showMinMaxSetupContextMenu(
   curves_table,
   flightLog,
   logGrapher,
-  RefreshCharts
+  RefreshCharts,
 ) {
   const main_menu = $(".main_menu", selected_curve.parents(".config-graph"));
   const sub_menu = $(".sub_menu", selected_curve.parents(".config-graph"));
@@ -33,12 +33,12 @@ export function showMinMaxSetupContextMenu(
       const fieldName = $("select", this).val();
       const mm = GraphConfig.getMinMaxForFieldDuringAllTime(
         flightLog,
-        fieldName
+        fieldName,
       );
 
       const fieldFriendlyName = $(
         "select.form-control option:selected",
-        this
+        this,
       ).text();
       let curve = curvesData[fieldFriendlyName];
       curve.min = mm.min;
@@ -58,7 +58,7 @@ export function showMinMaxSetupContextMenu(
 
       const fieldFriendlyName = $(
         "select.form-control option:selected",
-        this
+        this,
       ).text();
       let curve = curvesData[fieldFriendlyName];
       curve.min = mm.min;
@@ -82,7 +82,7 @@ export function showMinMaxSetupContextMenu(
     curves_table.each(function () {
       const fieldFriendlyName = $(
         "select.form-control option:selected",
-        this
+        this,
       ).text();
       let curve = curvesData[fieldFriendlyName];
       curve.min = Min;
@@ -99,12 +99,12 @@ export function showMinMaxSetupContextMenu(
       const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(
         flightLog,
         logGrapher,
-        fieldName
+        fieldName,
       );
 
       const fieldFriendlyName = $(
         "select.form-control option:selected",
-        this
+        this,
       ).text();
       let curve = curvesData[fieldFriendlyName];
       curve.min = mm.min;
@@ -121,14 +121,14 @@ export function showMinMaxSetupContextMenu(
       let mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(
         flightLog,
         logGrapher,
-        fieldName
+        fieldName,
       );
       mm.max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
       mm.min = -mm.max;
 
       const fieldFriendlyName = $(
         "select.form-control option:selected",
-        this
+        this,
       ).text();
       let curve = curvesData[fieldFriendlyName];
       curve.min = mm.min;
@@ -147,7 +147,7 @@ export function showMinMaxSetupContextMenu(
       let mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(
         flightLog,
         logGrapher,
-        fieldName
+        fieldName,
       );
       Max = Math.max(Max, Math.max(Math.abs(mm.min), Math.abs(mm.max)));
     });
@@ -156,7 +156,7 @@ export function showMinMaxSetupContextMenu(
     curves_table.each(function () {
       const fieldFriendlyName = $(
         "select.form-control option:selected",
-        this
+        this,
       ).text();
       let curve = curvesData[fieldFriendlyName];
       curve.min = Min;
@@ -170,7 +170,7 @@ export function showMinMaxSetupContextMenu(
   function SetSelectedCurveMinMaxToDefault() {
     const defaultCurve = GraphConfig.getDefaultCurveForField(
       flightLog,
-      selected_field_name
+      selected_field_name,
     );
     const mm = defaultCurve.MinMax;
     const power = `${(defaultCurve.power * 100).toFixed(0)}%`;
@@ -181,7 +181,7 @@ export function showMinMaxSetupContextMenu(
 
     const fieldFriendlyName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     let curve = curvesData[fieldFriendlyName];
     curve.min = mm.min;
@@ -197,11 +197,11 @@ export function showMinMaxSetupContextMenu(
   function SetSelectedCurveMinMaxToFullRangeDuringAllTime() {
     const mm = GraphConfig.getMinMaxForFieldDuringAllTime(
       flightLog,
-      selected_field_name
+      selected_field_name,
     );
     const fieldFriendlyName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     let curve = curvesData[fieldFriendlyName];
     curve.min = mm.min;
@@ -215,12 +215,12 @@ export function showMinMaxSetupContextMenu(
     const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(
       flightLog,
       logGrapher,
-      selected_field_name
+      selected_field_name,
     );
 
     const fieldFriendlyName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     let curve = curvesData[fieldFriendlyName];
     curve.min = mm.min;
@@ -234,12 +234,12 @@ export function showMinMaxSetupContextMenu(
     const mm = GraphConfig.getMinMaxForFieldDuringMarkedInterval(
       flightLog,
       logGrapher,
-      selected_field_name
+      selected_field_name,
     );
 
     const fieldFriendlyName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     let curve = curvesData[fieldFriendlyName];
     curve.min = mm.min;
@@ -258,7 +258,7 @@ export function showMinMaxSetupContextMenu(
       const curve = curvesData[key];
       curve.checked = true;
       elem = $(
-        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`
+        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`,
       );
       $("input", elem).click(function (e) {
         let curve = curvesData[this.parentElement.innerText];
@@ -291,7 +291,7 @@ export function showMinMaxSetupContextMenu(
       curves_table.each(function () {
         const fieldFriendlyName = $(
           "select.form-control option:selected",
-          this
+          this,
         ).text();
         let curve = curvesData[fieldFriendlyName];
         if (curve.checked) {
@@ -300,24 +300,24 @@ export function showMinMaxSetupContextMenu(
           if (e.data == "global") {
             mm = GraphConfig.getMinMaxForFieldDuringAllTime(
               flightLog,
-              fieldName
+              fieldName,
             );
           } else if (e.data == "local") {
             mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(
               flightLog,
               logGrapher,
-              fieldName
+              fieldName,
             );
           } else if (e.data == "marked") {
             mm = GraphConfig.getMinMaxForFieldDuringMarkedInterval(
               flightLog,
               logGrapher,
-              fieldName
+              fieldName,
             );
           } else
             mm = GraphConfig.getMinMaxForFieldDuringAllTime(
               flightLog,
-              fieldName
+              fieldName,
             );
 
           let curve = curvesData[fieldFriendlyName];
@@ -350,7 +350,7 @@ export function showMinMaxSetupContextMenu(
     menu.append(elem);
 
     elem = $(
-      '<div class="menu-button iconDiv {isSubmenuLevel2 ? back-submenu2 : back-submenu} ">&#9668;Back</div>'
+      '<div class="menu-button iconDiv {isSubmenuLevel2 ? back-submenu2 : back-submenu} ">&#9668;Back</div>',
     );
     elem.click(function () {
       hideMenu(menu);
@@ -406,7 +406,7 @@ export function showMinMaxSetupContextMenu(
       const curve = curvesData[key];
       curve.checked = true;
       elem = $(
-        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`
+        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`,
       );
       $("input", elem).click(function (e) {
         let curve = curvesData[this.parentElement.innerText];
@@ -442,14 +442,14 @@ export function showMinMaxSetupContextMenu(
       curves_table.each(function () {
         const fieldFriendlyName = $(
           "select.form-control option:selected",
-          this
+          this,
         ).text();
         let curve = curvesData[fieldFriendlyName];
         if (curve.checked) {
           const fieldName = $("select", this).val();
           const defaultCurve = GraphConfig.getDefaultCurveForField(
             flightLog,
-            fieldName
+            fieldName,
           );
           const mm = defaultCurve.MinMax;
           const power = `${(defaultCurve.power * 100).toFixed(0)}%`;
@@ -477,7 +477,7 @@ export function showMinMaxSetupContextMenu(
       const curve = curvesData[key];
       curve.checked = true;
       elem = $(
-        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`
+        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`,
       );
       $("input", elem).click(function (e) {
         let curve = curvesData[this.parentElement.innerText];
@@ -513,7 +513,7 @@ export function showMinMaxSetupContextMenu(
       curves_table.each(function () {
         const fieldFriendlyName = $(
           "select.form-control option:selected",
-          this
+          this,
         ).text();
         let curve = curvesData[fieldFriendlyName];
         if (curve.checked) {
@@ -538,7 +538,7 @@ export function showMinMaxSetupContextMenu(
     Min = -Max;
     const fieldFriendlyName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     let curve = curvesData[fieldFriendlyName];
     curve.min = Min;
@@ -559,7 +559,7 @@ export function showMinMaxSetupContextMenu(
 
     const SelectedCurveMin = $("input[name=MinValue]", selected_curve).val();
     elem = $(
-      '<div>Min:<input name="InputMin" type="number" value="10"/></div>'
+      '<div>Min:<input name="InputMin" type="number" value="10"/></div>',
     );
     inputMinValue = $("input[name=InputMin]", elem);
     inputMinValue.val(SelectedCurveMin);
@@ -567,14 +567,14 @@ export function showMinMaxSetupContextMenu(
 
     const SelectedCurveMax = $("input[name=MaxValue]", selected_curve).val();
     elem = $(
-      '<div>Max:<input name="InputMax" type="number" value="100"/></div>'
+      '<div>Max:<input name="InputMax" type="number" value="100"/></div>',
     );
     inputMaxValue = $("input[name=InputMax]", elem);
     inputMaxValue.val(SelectedCurveMax);
     sub_menu.append(elem);
 
     elem = $(
-      '<div class="titleDiv bottomBorder topBorder">TO SELECTED CURVES:</div>'
+      '<div class="titleDiv bottomBorder topBorder">TO SELECTED CURVES:</div>',
     );
     sub_menu.append(elem);
 
@@ -582,7 +582,7 @@ export function showMinMaxSetupContextMenu(
       const curve = curvesData[key];
       curve.checked = true;
       elem = $(
-        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`
+        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`,
       );
       $("input", elem).click(function (e) {
         let curve = curvesData[this.parentElement.innerText];
@@ -621,7 +621,7 @@ export function showMinMaxSetupContextMenu(
       curves_table.each(function () {
         const fieldFriendlyName = $(
           "select.form-control option:selected",
-          this
+          this,
         ).text();
         let curve = curvesData[fieldFriendlyName];
         if (curvesData[fieldFriendlyName].checked) {
@@ -644,7 +644,7 @@ export function showMinMaxSetupContextMenu(
       const curve = curvesData[key];
       curve.checked = true;
       elem = $(
-        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`
+        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`,
       );
       $("input", elem).click(function (e) {
         let curve = curvesData[this.parentElement.innerText];
@@ -689,7 +689,7 @@ export function showMinMaxSetupContextMenu(
       curves_table.each(function () {
         const fieldFriendlyName = $(
           "select.form-control option:selected",
-          this
+          this,
         ).text();
         let curve = curvesData[fieldFriendlyName];
         if (curve.checked) {
@@ -721,7 +721,7 @@ export function showMinMaxSetupContextMenu(
       if (SingleCurve) {
         SelectedCurveName = $(
           "select.form-control option:selected",
-          selected_curve
+          selected_curve,
         ).text();
       }
 
@@ -739,7 +739,7 @@ export function showMinMaxSetupContextMenu(
     elem = $('<div class="titleDiv bottomBorder">INPUT ZOOM [%]:</div>');
     sub_menu.append(elem);
     elem = $(
-      '<div><input type="number" min="5" max="1000" step="10" value="10"/></div>'
+      '<div><input type="number" min="5" max="1000" step="10" value="10"/></div>',
     );
     sub_menu.append(elem);
     elem = $('<div class="titleDiv bottomBorder">SELECT CURVES:</div>');
@@ -749,7 +749,7 @@ export function showMinMaxSetupContextMenu(
       const curve = curvesData[key];
       curve.checked = true;
       elem = $(
-        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`
+        `<div><input type="checkbox" checked="true">${curve.friendly_name}</input></div>`,
       );
       $("input", elem).click(function () {
         let curve = curvesData[this.parentElement.innerText];
@@ -793,7 +793,7 @@ export function showMinMaxSetupContextMenu(
       curves_table.each(function () {
         const fieldFriendlyName = $(
           "select.form-control option:selected",
-          this
+          this,
         ).text();
         const curve = curvesData[fieldFriendlyName];
         if (curve.checked) {
@@ -867,7 +867,7 @@ export function showMinMaxSetupContextMenu(
     elem = $(
       `<div class="iconDiv">Full range<span class=${
         is_main_menu ? "right-arrow" : "right-arrow2"
-      } style="display: none">&#9658;</span></div>`
+      } style="display: none">&#9658;</span></div>`,
     );
     elem.click("SingleCurve", SetCurvesToFullRange);
     menu.append(elem);
@@ -881,7 +881,7 @@ export function showMinMaxSetupContextMenu(
     menu.append(elem);
 
     elem = $(
-      '<div class="ZoomOut bottomBorder">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>'
+      '<div class="ZoomOut bottomBorder">Zoom Out&nbsp;&nbsp;&nbsp;&nbsp;</div>',
     );
     elem.click("SingleCurve", SetZoomToCurves);
     menu.append(elem);
@@ -896,7 +896,7 @@ export function showMinMaxSetupContextMenu(
     const fieldName = $("select", this).val();
     const fieldFriendlyName = $(
       "select.form-control option:selected",
-      this
+      this,
     ).text();
     const minimum = $("input[name=MinValue]", this).val();
     const maximum = $("input[name=MaxValue]", this).val();
@@ -924,50 +924,50 @@ export function showMinMaxSetupContextMenu(
     main_menu.append(elem);
 
     elem = $(
-      '<div class="iconDiv">Like this one<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="iconDiv">Like this one<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(ShowCurvesToSetMinMaxCheckboxedMenu);
     main_menu.append(elem);
 
     elem = $(
-      '<div class="iconDiv AllCurves">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="iconDiv AllCurves">Full range<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(SetCurvesToFullRange);
     main_menu.append(elem);
 
     elem = $(
-      '<div class="iconDiv">One scale<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="iconDiv">One scale<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(ShowCurvesToSetSameScaleCheckboxedMenu);
     main_menu.append(elem);
 
     elem = $(
-      '<div class="iconDiv bottomBorder">Centered<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="iconDiv bottomBorder">Centered<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(ShowCurvesToSetZeroOffsetCheckboxedMenu);
     main_menu.append(elem);
 
     elem = $(
-      '<div class="ZoomIn AllCurves iconDiv">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="ZoomIn AllCurves iconDiv">Zoom In<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(SetZoomToCurves);
     main_menu.append(elem);
 
     elem = $(
-      '<div class="ZoomOut AllCurves iconDiv bottomBorder">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="ZoomOut AllCurves iconDiv bottomBorder">Zoom Out<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(SetZoomToCurves);
     main_menu.append(elem);
 
     elem = $(
-      '<div class="iconDiv bottomBorder">Default<span class="right-arrow" style="display: none">&#9658;</span></div>'
+      '<div class="iconDiv bottomBorder">Default<span class="right-arrow" style="display: none">&#9658;</span></div>',
     );
     elem.click(ShowCurvesToSetDefaultCheckboxedMenu);
     main_menu.append(elem);
 
     const selectedFieldName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     elem = $(`<div>${selectedFieldName} actions&#9658;</div>`);
     elem.click(ShowThisCurvesActionSubmenu);
@@ -975,10 +975,10 @@ export function showMinMaxSetupContextMenu(
   } else {
     const selectedFieldName = $(
       "select.form-control option:selected",
-      selected_curve
+      selected_curve,
     ).text();
     elem = $(
-      `<div class="titleDiv bottomBorder">${selectedFieldName} actions:</div>`
+      `<div class="titleDiv bottomBorder">${selectedFieldName} actions:</div>`,
     );
     main_menu.append(elem);
     FillThisCurveActionsIntoMenu(main_menu, true);

@@ -39,7 +39,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     const analyserLowLevelPSD = $("#analyserLowLevelPSD");
     const analyserSegmentLengthPowerAt2 = $("#analyserSegmentLengthPowerAt2");
 
-
     const spectrumToolbarElem = $("#spectrumToolbar");
     const spectrumTypeElem = $("#spectrumTypeSelect");
     const overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
@@ -163,7 +162,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
           fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
           if (fftData.maximalSegmentsLength > 0) {
-            analyserSegmentLengthPowerAt2.prop("max", Math.ceil(Math.log2(fftData.maximalSegmentsLength)));
+            analyserSegmentLengthPowerAt2.prop(
+              "max",
+              Math.ceil(Math.log2(fftData.maximalSegmentsLength)),
+            );
           }
           break;
 
@@ -175,7 +177,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.shouldAddCurrentSpectrumBeforeReload = function () {
-      return addSpectrumForComparison && fftData !== null && !this.isMultiSpectrum() && !dataReload;
+      return (
+        addSpectrumForComparison &&
+        fftData !== null &&
+        !this.isMultiSpectrum() &&
+        !dataReload
+      );
     };
 
     /* This function is called from the canvas drawing routines within grapher.js
@@ -183,20 +190,26 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
            analyser on screen*/
     this.plotSpectrum = function (fieldIndex, curve, fieldName) {
       // Detect change of selected field.... reload and redraw required.
-      const isMaxCountOfImportedPSD = GraphSpectrumPlot.isImportedCurvesMaxCount() && userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-      let shouldReload = fftData == null ||
-                         fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD || // Lock spectrum data reload while PSD curves import is full
-                         dataReload;
+      const isMaxCountOfImportedPSD =
+        GraphSpectrumPlot.isImportedCurvesMaxCount() &&
+        userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+      let shouldReload =
+        fftData == null ||
+        (fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD) || // Lock spectrum data reload while PSD curves import is full
+        dataReload;
 
-      if (addSpectrumForComparison && !GraphSpectrumPlot.isNewComparedCurve(fieldName)) {
+      if (
+        addSpectrumForComparison &&
+        !GraphSpectrumPlot.isNewComparedCurve(fieldName)
+      ) {
         GraphSpectrumPlot.removeComparedCurve(fieldName);
         addSpectrumForComparison = false;
-        shouldReload = false;   // Do not load if spectrum was deleted
+        shouldReload = false; // Do not load if spectrum was deleted
       }
 
       if (shouldReload) {
         if (this.shouldAddCurrentSpectrumBeforeReload()) {
-          GraphSpectrumPlot.addCurrentSpectrumIntoImport();  // The main curve is added into imported list when the second curve is selected for comparison
+          GraphSpectrumPlot.addCurrentSpectrumIntoImport(); // The main curve is added into imported list when the second curve is selected for comparison
         }
         dataReload = false;
         dataLoad(fieldIndex, curve, fieldName);
@@ -331,13 +344,17 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       })
       .val(analyserMinPSD.val());
 
-    GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** DEFAULT_PSD_SEGMENT_LENGTH_POWER);
+    GraphSpectrumCalc.setPointsPerSegmentPSD(
+      2 ** DEFAULT_PSD_SEGMENT_LENGTH_POWER,
+    );
     analyserSegmentLengthPowerAt2
       .on(
         "input",
         debounce(100, function () {
           // Recalculate PSD with updated samples per segment count
-          GraphSpectrumCalc.setPointsPerSegmentPSD(2 ** Number.parseInt($(this).val()));
+          GraphSpectrumCalc.setPointsPerSegmentPSD(
+            2 ** Number.parseInt($(this).val()),
+          );
           dataLoad();
           GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
           that.refresh();
@@ -414,11 +431,16 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           !psdCurveSelected,
         );
 
+        const showSpectrumsComparisonPanel =
+          optionSelected === SPECTRUM_TYPE.FREQUENCY ||
+          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+        $("#spectrumComparison").css(
+          "visibility",
+          showSpectrumsComparisonPanel ? "visible" : "hidden",
+        );
 
-        const showSpectrumsComparisonPanel = optionSelected === SPECTRUM_TYPE.FREQUENCY || optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-        $("#spectrumComparison").css("visibility", (showSpectrumsComparisonPanel ? "visible" : "hidden"));
-
-        const showAddSpectrumButton = optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+        const showAddSpectrumButton =
+          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
         $("#btn-spectrum-add").toggle(showAddSpectrumButton);
       })
       .change();
@@ -436,7 +458,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         userSettings.overdrawSpectrumType = optionSelected;
         saveOneUserSetting(
           "overdrawSpectrumType",
-          userSettings.overdrawSpectrumType
+          userSettings.overdrawSpectrumType,
         );
 
         // Refresh the graph
@@ -479,19 +501,19 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       });
     }
 
-    this.exportSpectrumToCSV = function(onSuccess, options) {
+    this.exportSpectrumToCSV = function (onSuccess, options) {
       SpectrumExporter(fftData, options).dump(onSuccess);
     };
 
-    this.importSpectrumFromCSV = function(files) {
+    this.importSpectrumFromCSV = function (files) {
       GraphSpectrumPlot.importCurvesFromCSV(files);
     };
 
-    this.removeImportedSpectrums = function() {
+    this.removeImportedSpectrums = function () {
       GraphSpectrumPlot.removeImportedCurves();
     };
 
-    this.getExportedFileName = function() {
+    this.getExportedFileName = function () {
       let fileName = $(".log-filename").text().split(".")[0];
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQUENCY:
@@ -504,10 +526,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       return fileName;
     };
 
-    this.isMultiSpectrum = function() {
+    this.isMultiSpectrum = function () {
       return GraphSpectrumPlot.isMultiSpectrum();
     };
-
   } catch (e) {
     console.error(`Failed to create analyser... error: ${e}`);
   }

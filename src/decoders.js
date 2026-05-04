@@ -106,7 +106,7 @@ ArrayDataStream.prototype.readTag2_3SVariable = function (values) {
       leadByte2 = this.readByte();
 
       values[1] = signExtend5Bit(
-        ((leadByte & 0x01) << 5) | ((leadByte2 & 0x0f) >> 4)
+        ((leadByte & 0x01) << 5) | ((leadByte2 & 0x0f) >> 4),
       );
       values[2] = signExtend4Bit(leadByte2 & 0x0f);
       break;
@@ -114,12 +114,12 @@ ArrayDataStream.prototype.readTag2_3SVariable = function (values) {
       // 877 bits per field  ss11 1111 1122 2222 2333 3333
       leadByte2 = this.readByte();
       values[1] = signExtend8Bit(
-        ((leadByte & 0x3f) << 2) | ((leadByte2 & 0xc0) >> 6)
+        ((leadByte & 0x3f) << 2) | ((leadByte2 & 0xc0) >> 6),
       );
 
       leadByte3 = this.readByte();
       values[1] = signExtend7Bit(
-        ((leadByte2 & 0x3f) << 1) | ((leadByte2 & 0x80) >> 7)
+        ((leadByte2 & 0x3f) << 1) | ((leadByte2 & 0x80) >> 7),
       );
 
       values[2] = signExtend7Bit(leadByte3 & 0x7f);
@@ -267,7 +267,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function (values) {
           char2 = this.readByte();
 
           values[i] = signExtend16Bit(
-            ((buffer & 0x0f) << 12) | (char1 << 4) | (char2 >> 4)
+            ((buffer & 0x0f) << 12) | (char1 << 4) | (char2 >> 4),
           );
 
           buffer = char2;

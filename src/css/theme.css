@@ -21,9 +21,9 @@
   --primary-950: #5c2f00;
 
   /* Surface Colors - Light Mode (HSL for easy adjustments) */
-  --surface-0: hsl(0, 0%, 100%);   /* Pure white */
-  --surface-50: hsl(0, 0%, 98%);   /* Almost white */
-  --surface-100: hsl(0, 0%, 95%);  /* Light gray */
+  --surface-0: hsl(0, 0%, 100%); /* Pure white */
+  --surface-50: hsl(0, 0%, 98%); /* Almost white */
+  --surface-100: hsl(0, 0%, 95%); /* Light gray */
   --surface-200: hsl(0, 0%, 92%);
   --surface-300: hsl(0, 0%, 84%);
   --surface-400: hsl(0, 0%, 75%);
@@ -35,13 +35,13 @@
   --surface-950: hsl(0, 0%, 20%);
 
   /* Text Colors - Light Mode */
-  --text-primary: hsl(0, 0%, 10%);    /* Nearly black */
-  --text-secondary: hsl(0, 0%, 40%);  /* Medium gray */
-  --text-muted: hsl(0, 0%, 60%);      /* Light gray */
-  --text-inverse: hsl(0, 0%, 95%);    /* For dark backgrounds */
+  --text-primary: hsl(0, 0%, 10%); /* Nearly black */
+  --text-secondary: hsl(0, 0%, 40%); /* Medium gray */
+  --text-muted: hsl(0, 0%, 60%); /* Light gray */
+  --text-inverse: hsl(0, 0%, 95%); /* For dark backgrounds */
 
   /* Graph/Canvas Colors - Light Mode */
-  --graph-background: #000000;          /* Black background for graphs */
+  --graph-background: #000000; /* Black background for graphs */
   --graph-grid: rgba(255, 255, 255, 0.15);
   --graph-text: rgba(255, 255, 255, 0.9);
   --graph-text-secondary: rgba(255, 255, 255, 0.65);
@@ -114,9 +114,9 @@
  */
 body.dark-theme {
   /* Surface Colors - Dark Mode (inverted lightness) */
-  --surface-0: hsl(0, 0%, 4%);     /* Very dark background */
+  --surface-0: hsl(0, 0%, 4%); /* Very dark background */
   --surface-50: hsl(0, 0%, 8%);
-  --surface-100: #181818;           /* Betaflight's dark gray */
+  --surface-100: #181818; /* Betaflight's dark gray */
   --surface-200: hsl(0, 0%, 13%);
   --surface-300: hsl(0, 0%, 15%);
   --surface-400: hsl(0, 0%, 20%);
@@ -128,13 +128,13 @@ body.dark-theme {
   --surface-950: hsl(0, 0%, 80%);
 
   /* Text Colors - Dark Mode (light text on dark background) */
-  --text-primary: hsl(0, 0%, 95%);    /* Off-white */
-  --text-secondary: hsl(0, 0%, 70%);  /* Medium light gray */
-  --text-muted: hsl(0, 0%, 50%);      /* Mid gray */
-  --text-inverse: hsl(0, 0%, 10%);    /* For light backgrounds */
+  --text-primary: hsl(0, 0%, 95%); /* Off-white */
+  --text-secondary: hsl(0, 0%, 70%); /* Medium light gray */
+  --text-muted: hsl(0, 0%, 50%); /* Mid gray */
+  --text-inverse: hsl(0, 0%, 10%); /* For light backgrounds */
 
   /* Graph/Canvas Colors - Dark Mode */
-  --graph-background: #1a1a1a;          /* Dark gray background for graphs */
+  --graph-background: #1a1a1a; /* Dark gray background for graphs */
   --graph-grid: rgba(255, 255, 255, 0.2);
   --graph-text: rgba(255, 255, 255, 0.95);
   --graph-text-secondary: rgba(255, 255, 255, 0.75);
@@ -146,7 +146,7 @@ body.dark-theme {
   --border-color-dark: #303030;
 
   /* Buttons keep primary orange color in dark mode for consistency */
-  --button-text: #000;  /* Black text still works on orange buttons in dark mode */
+  --button-text: #000; /* Black text still works on orange buttons in dark mode */
 
   --input-bg: #1a1a1a;
   --input-bg-disabled: #252525;

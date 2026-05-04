@@ -79,19 +79,19 @@ export function LapTimer() {
     ctx.fillText(
       formatTime(lapTime.current, true),
       margin + firstColumnWidth + margin,
-      lineHeight * currentRow++
+      lineHeight * currentRow++,
     );
     ctx.fillText("Last", margin, lineHeight * currentRow);
     ctx.fillText(
       formatTime(lapTime.last, true),
       margin + firstColumnWidth + margin,
-      lineHeight * currentRow++
+      lineHeight * currentRow++,
     );
     ctx.fillText("Best", margin, lineHeight * currentRow);
     ctx.fillText(
       formatTime(lapTime.best, true),
       margin + firstColumnWidth + margin,
-      lineHeight * currentRow++
+      lineHeight * currentRow++,
     );
 
     // Laps
@@ -114,7 +114,7 @@ export function LapTimer() {
         ctx.fillText(
           formatTime(lapTime.laps[i], true),
           margin + firstColumnWidth + margin,
-          lineHeight * currentRow++
+          lineHeight * currentRow++,
         );
       }
     }
@@ -137,7 +137,7 @@ export function LapTimer() {
           if (i > 0 && currentTime >= bookmarkTimesSorted[0]) {
             // Calculate all the laps so far
             lapTime.laps.push(
-              (bookmarkTimesSorted[i] - bookmarkTimesSorted[i - 1]) / 1000
+              (bookmarkTimesSorted[i] - bookmarkTimesSorted[i - 1]) / 1000,
             );
           }
           if (

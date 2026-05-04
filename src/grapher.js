@@ -22,7 +22,7 @@ export function FlightLogGrapher(
   stickCanvas,
   craftCanvas,
   analyserCanvas,
-  options
+  options,
 ) {
   let PID_P = 0,
     PID_I = 1,
@@ -124,7 +124,7 @@ export function FlightLogGrapher(
       //Reverse the seek direction so that it looks like you're dragging the data
       that.onSeek(
         ((lastMouseX - e.originalEvent.touches[0].pageX) / canvas.width) *
-          windowWidthMicros
+          windowWidthMicros,
       );
     }
 
@@ -269,7 +269,7 @@ export function FlightLogGrapher(
       (parseInt(options.watermark.left) / 100) * canvas.width,
       (parseInt(options.watermark.top) / 100) * canvas.height,
       (parseInt(options.watermark.size) / 100) * watermarkLogo.width,
-      (parseInt(options.watermark.size) / 100) * watermarkLogo.height
+      (parseInt(options.watermark.size) / 100) * watermarkLogo.height,
     );
     canvasContext.restore();
   }
@@ -279,7 +279,7 @@ export function FlightLogGrapher(
     lapTimer.refresh(
       windowCenterTime,
       3600 * 1000000 /*a long time*/,
-      blackboxLogViewer.getBookmarkTimes()
+      blackboxLogViewer.getBookmarkTimes(),
     );
     lapTimer.drawCanvas(canvas, options);
   }
@@ -298,7 +298,7 @@ export function FlightLogGrapher(
     canvasContext.fillText(
       `#${leftPad(frameIndex, "0", 7)}`,
       canvas.width - frameLabelTextWidthFrameNumber - 8,
-      canvas.height - 8
+      canvas.height - 8,
     );
 
     if (frameLabelTextWidthFrameTime == null)
@@ -308,7 +308,7 @@ export function FlightLogGrapher(
     canvasContext.fillText(
       formatTime(timeMsec, true),
       canvas.width - frameLabelTextWidthFrameTime - 8,
-      canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8
+      canvas.height - 8 - drawingParams.fontSizeFrameLabel - 8,
     );
   }
 
@@ -324,7 +324,7 @@ export function FlightLogGrapher(
     plotHeight,
     color,
     lineWidth,
-    highlight
+    highlight,
   ) {
     let GAP_WARNING_BOX_RADIUS = 3,
       chunkIndex,
@@ -388,7 +388,7 @@ export function FlightLogGrapher(
               nextX - GAP_WARNING_BOX_RADIUS,
               nextY - GAP_WARNING_BOX_RADIUS,
               GAP_WARNING_BOX_RADIUS * 2,
-              GAP_WARNING_BOX_RADIUS * 2
+              GAP_WARNING_BOX_RADIUS * 2,
             );
             inGap = true;
             drawingLine = false;
@@ -404,7 +404,7 @@ export function FlightLogGrapher(
                 nextX - GAP_WARNING_BOX_RADIUS,
                 nextY - GAP_WARNING_BOX_RADIUS,
                 GAP_WARNING_BOX_RADIUS * 2,
-                GAP_WARNING_BOX_RADIUS * 2
+                GAP_WARNING_BOX_RADIUS * 2,
               );
 
               if (chunk.gapStartsHere[frameIndex]) continue;
@@ -458,7 +458,7 @@ export function FlightLogGrapher(
       0,
       -plotHeight / 2,
       0,
-      plotHeight / 2
+      plotHeight / 2,
     );
     axisGradient.addColorStop(0.0, "rgba(255,255,255,0.1)");
     axisGradient.addColorStop(0.15, "rgba(0,0,0,0)");
@@ -544,27 +544,27 @@ export function FlightLogGrapher(
 
       canvasContext.moveTo(
         x + labelDirection * (width - 1),
-        labelY - drawingParams.fontSizeEventLabel / 2
+        labelY - drawingParams.fontSizeEventLabel / 2,
       );
       canvasContext.lineTo(
         x + labelDirection * margin,
-        labelY - drawingParams.fontSizeEventLabel * 1.5
+        labelY - drawingParams.fontSizeEventLabel * 1.5,
       );
       canvasContext.lineTo(
         x + labelDirection * labelWidth,
-        labelY - drawingParams.fontSizeEventLabel * 1.5
+        labelY - drawingParams.fontSizeEventLabel * 1.5,
       );
       canvasContext.lineTo(
         x + labelDirection * labelWidth,
-        labelY + drawingParams.fontSizeEventLabel / 2
+        labelY + drawingParams.fontSizeEventLabel / 2,
       );
       canvasContext.lineTo(
         x + labelDirection * margin,
-        labelY + drawingParams.fontSizeEventLabel / 2
+        labelY + drawingParams.fontSizeEventLabel / 2,
       );
       canvasContext.lineTo(
         x + labelDirection * (width - 1),
-        labelY - drawingParams.fontSizeEventLabel / 2
+        labelY - drawingParams.fontSizeEventLabel / 2,
       );
 
       canvasContext.fillStyle = color || "rgba(255,255,255,0.5)";
@@ -605,7 +605,7 @@ export function FlightLogGrapher(
           x,
           labelY,
           `GTune result - axis:${event.data.axis} gyroAVG:${event.data.gyroAVG} newP:${event.data.newP}`,
-          "rgba(255,255,255,0.5)"
+          "rgba(255,255,255,0.5)",
         );
         break;
       case FlightLogEvent.INFLIGHT_ADJUSTMENT:
@@ -614,7 +614,7 @@ export function FlightLogGrapher(
           labelY,
           `${event.data.name} = ${event.data.value}`,
           "rgba(0,255,255,0.5)",
-          2
+          2,
         );
         break;
       case FlightLogEvent.TWITCH_TEST:
@@ -623,7 +623,7 @@ export function FlightLogGrapher(
           labelY,
           `Twitch Test: ${event.data.name}${event.data.value.toFixed(3)}ms`,
           "rgba(0,133,255,0.5)",
-          2
+          2,
         );
         break;
       case FlightLogEvent.FLIGHT_MODE:
@@ -633,10 +633,10 @@ export function FlightLogGrapher(
           FlightLogFieldPresenter.presentChangeEvent(
             event.data.newFlags,
             event.data.lastFlags,
-            FLIGHT_LOG_FLIGHT_MODE_NAME
+            FLIGHT_LOG_FLIGHT_MODE_NAME,
           ),
           "rgba(0,0,255,0.75)",
-          3
+          3,
         );
         break;
       case FlightLogEvent.DISARM:
@@ -645,10 +645,10 @@ export function FlightLogGrapher(
           labelY,
           `Disarm: ${FlightLogFieldPresenter.presentEnum(
             event.data.reason,
-            FLIGHT_LOG_DISARM_REASON
+            FLIGHT_LOG_DISARM_REASON,
           )}`,
           "rgba(128,0,255,0.75)",
-          3
+          3,
         );
         break;
       case FlightLogEvent.CUSTOM: // Virtual Events shown in RED
@@ -659,7 +659,7 @@ export function FlightLogGrapher(
           "rgba(255,0,0,0.75)",
           3,
           null,
-          event.align
+          event.align,
         );
         break;
       case FlightLogEvent.CUSTOM_BLANK: // Virtual Events shown in RED
@@ -670,7 +670,7 @@ export function FlightLogGrapher(
           "rgba(255,0,0,0.75)",
           0,
           null,
-          event.align
+          event.align,
         );
         break;
       default:
@@ -731,18 +731,18 @@ export function FlightLogGrapher(
               time: markerEvent.time,
               label: `Marker:${formatTime(
                 (markerEvent.time - flightLog.getMinTime()) / 1000,
-                true
+                true,
               )}`,
               align: markerEvent.time < windowCenterTime ? "left" : "right",
             },
-            sequenceNum++
+            sequenceNum++,
           );
         }
 
         let markerFrequency =
           (windowCenterTime - markerEvent.time).toFixed(0) != 0
             ? `${(1000000 / (windowCenterTime - markerEvent.time)).toFixed(
-                0
+                0,
               )}Hz`
             : "";
         drawEvent(
@@ -751,11 +751,11 @@ export function FlightLogGrapher(
             time: windowCenterTime,
             label: `${formatTime(
               (windowCenterTime - markerEvent.time) / 1000,
-              true
+              true,
             )}ms ${markerFrequency}`,
             align: markerEvent.time < windowCenterTime ? "right" : "left",
           },
-          sequenceNum++
+          sequenceNum++,
         );
       }
     }
@@ -776,7 +776,7 @@ export function FlightLogGrapher(
                   time: bookmarkEvents[i].time,
                   label: i,
                 },
-                sequenceNum++
+                sequenceNum++,
               );
             }
         }
@@ -802,7 +802,7 @@ export function FlightLogGrapher(
           0,
           0,
           Math.min(inMarkerX, canvas.width),
-          canvas.height
+          canvas.height,
         );
       }
 
@@ -812,7 +812,7 @@ export function FlightLogGrapher(
           outMarkerXClipped,
           0,
           canvas.width - outMarkerXClipped,
-          canvas.height
+          canvas.height,
         );
       }
 
@@ -880,12 +880,12 @@ export function FlightLogGrapher(
       left: `${Math.max(
         (canvas.width * parseInt(options.sticks.left)) / 100.0 -
           sticksWidth / 2,
-        0
+        0,
       )}px`,
       top: `${Math.max(
         (canvas.height * parseInt(options.sticks.top)) / 100.0 -
           sticksHeight / 2,
-        0
+        0,
       )}px`,
     });
 
@@ -901,11 +901,11 @@ export function FlightLogGrapher(
     $(craftCanvas).css({
       left: `${Math.max(
         (canvas.width * parseInt(options.craft.left)) / 100.0 - craftSize / 2,
-        0
+        0,
       )}px`,
       top: `${Math.max(
         (canvas.height * parseInt(options.craft.top)) / 100.0 - craftSize / 2,
-        0
+        0,
       )}px`,
     });
 
@@ -935,7 +935,7 @@ export function FlightLogGrapher(
 
     let chunks = flightLog.getSmoothedChunksInTimeRange(
         windowStartTime,
-        windowEndTime
+        windowEndTime,
       ),
       startChunkIndex,
       startFrameIndex,
@@ -995,7 +995,7 @@ export function FlightLogGrapher(
                 : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
               field.lineWidth ? field.lineWidth : null,
               graphConfig.highlightGraphIndex == i &&
-                graphConfig.highlightFieldIndex == j
+                graphConfig.highlightFieldIndex == j,
             );
           }
 
@@ -1048,7 +1048,7 @@ export function FlightLogGrapher(
             centerFrame[
               FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
             ],
-            Math.round((windowCenterTime - flightLog.getMinTime()) / 1000)
+            Math.round((windowCenterTime - flightLog.getMinTime()) / 1000),
           );
         }
 
@@ -1110,13 +1110,13 @@ export function FlightLogGrapher(
           flightLog,
           field.name,
           false,
-          field.curve.MinMax.min
+          field.curve.MinMax.min,
         );
         const max = FlightLogFieldPresenter.ConvertFieldValue(
           flightLog,
           field.name,
           false,
-          field.curve.MinMax.max
+          field.curve.MinMax.max,
         );
         const inputRange = (max - min) / 2;
         const offset = -(max + min) / 2;
@@ -1128,7 +1128,7 @@ export function FlightLogGrapher(
           options.graphExpoOverride ? 1.0 : field.curve.power,
           inputRange,
           outputRange,
-          field.curve.steps
+          field.curve.steps,
         );
 
         if (field.smoothing > 0) {
@@ -1252,7 +1252,7 @@ export function FlightLogGrapher(
       if (ctrlKey) {
         analyser.prepareSpectrumForComparison();
       } else if (this.hasMultiSpectrumAnalyser()) {
-        analyser.removeImportedSpectrums();     // Remove imported spectrums by simple mouse click at the any curves legend
+        analyser.removeImportedSpectrums(); // Remove imported spectrums by simple mouse click at the any curves legend
       }
     }
 
@@ -1291,7 +1291,7 @@ export function FlightLogGrapher(
     flightLog,
     idents.rcCommandFields,
     stickCanvas,
-    options
+    options,
   );
 
   this.initializeCraftModel();

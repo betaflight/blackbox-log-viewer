@@ -119,8 +119,7 @@
 }
 
 .user-settings-dialog input[type="number"]::-webkit-inner-spin-button,
-.user-settings-dialog input[type="number"]::-webkit-outer-spin-button
-{
+.user-settings-dialog input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: auto !important;
   appearance: auto !important;
   opacity: 1 !important;

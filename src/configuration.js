@@ -27,7 +27,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
             fileLinesArray[i].length == 0
               ? ' style="background-color: white; height: 10px;"'
               : ""
-          }>${fileLinesArray[i].length == 0 ? "&nbsp" : fileLinesArray[i]}</li>`
+          }>${fileLinesArray[i].length == 0 ? "&nbsp" : fileLinesArray[i]}</li>`,
         ); // Removed default syntax highlighting
         configurationList.append(li);
       } else {
@@ -37,7 +37,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
           if (highLight != null) {
             // don't include blank lines
             li = $(
-              `<li class="configuration-row">${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}</li>`
+              `<li class="configuration-row">${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}</li>`,
             ); // Removed default syntax highlighting
             configurationList.append(li);
           }
@@ -58,7 +58,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
           `<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>` +
           `</div>` +
           `<div><ul class="list-unstyled configuration-list"></ul></div>` +
-          `</div>`
+          `</div>`,
       ),
       configurationTitle = $("h3", configurationDiv),
       li;

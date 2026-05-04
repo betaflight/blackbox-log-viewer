@@ -4,7 +4,7 @@ export function WorkspaceSelection(
   targetElem,
   workspaces,
   onSelectionChange,
-  onSaveWorkspace
+  onSaveWorkspace,
 ) {
   var numberSpan = null,
     titleSpan = null,
@@ -16,20 +16,20 @@ export function WorkspaceSelection(
 
   function buildUI() {
     buttonElem = $(
-      '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>'
+      '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="workspace-menu"></button>',
     );
     numberSpan = $('<span class="workspace-selector-index">');
     titleSpan = $('<span class="workspace-selector-title">');
     let caretElem = $('<span class="caret"></span>');
 
     editButton = $(
-      '<span class="glyphicon glyphicon-pencil workspace-selector-editButton" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>'
+      '<span class="glyphicon glyphicon-pencil workspace-selector-editButton" aria-hidden="true" data-toggle="tooltip" title="Edit Workspace Name"></span>',
     );
     editButton.click(editTitle);
     editButton.tooltip({ trigger: "hover", placement: "auto bottom" });
 
     menuElem = $(
-      '<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>'
+      '<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="workspace-menu"></ul>',
     );
 
     targetElem.empty();
@@ -96,7 +96,7 @@ export function WorkspaceSelection(
       let actionButtons = $('<span class="pull-right"></span>');
 
       let saveButton = $(
-        '<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>'
+        '<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true" data-toggle="tooltip" title="Save current graph setup to this Workspace"></span>',
       );
       saveButton.click((e) => {
         if (!element) {

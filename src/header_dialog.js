@@ -810,7 +810,7 @@ export function HeaderDialog(dialog, onSave) {
         return (
           semver.gte(
             activeSysConfig.firmwareVersion,
-            parameterVersion[i].min
+            parameterVersion[i].min,
           ) &&
           semver.lte(activeSysConfig.firmwareVersion, parameterVersion[i].max)
         );
@@ -841,7 +841,7 @@ export function HeaderDialog(dialog, onSave) {
 
     parameterElem.css(
       "display",
-      isParameterValid(name) ? "table-cell" : "none"
+      isParameterValid(name) ? "table-cell" : "none",
     );
 
     if (selected != null) {
@@ -864,7 +864,7 @@ export function HeaderDialog(dialog, onSave) {
     }
     parameterElem.css(
       "display",
-      isParameterValid(name) ? "table-cell" : "none"
+      isParameterValid(name) ? "table-cell" : "none",
     );
   }
 
@@ -897,19 +897,22 @@ export function HeaderDialog(dialog, onSave) {
       parameterElem.addClass("missing");
     } else {
       // Convert number to binary string with leading zeros
-      const binaryString = data.toString(2).padStart(totalBits, '0');
+      const binaryString = data.toString(2).padStart(totalBits, "0");
       // Display as "3 (00000011)" format
       const displayValue = `${data} (${binaryString})`;
       nameElem.val(displayValue);
       // Store the raw integer value for round-trip saving
       nameElem.data("raw-value", data);
       nameElem.attr("readonly", true); // Make it readonly since it shows formatted bitmask
-      parameterElem.attr("title", `Bitmask value: ${data} (binary: ${binaryString})`);
+      parameterElem.attr(
+        "title",
+        `Bitmask value: ${data} (binary: ${binaryString})`,
+      );
       parameterElem.removeClass("missing");
     }
     parameterElem.css(
       "display",
-      isParameterValid(name) ? "table-cell" : "none"
+      isParameterValid(name) ? "table-cell" : "none",
     );
   }
 
@@ -1137,7 +1140,7 @@ export function HeaderDialog(dialog, onSave) {
           group: "other",
           name: "BLACKBOX",
           description: "Blackbox flight data recorder",
-        }
+        },
       );
     }
 
@@ -1196,7 +1199,7 @@ export function HeaderDialog(dialog, onSave) {
           group: "other",
           name: "ANTI_GRAVITY",
           description: "Temporary boost I-Term on high throttle changes",
-        }
+        },
       );
       if (semver.lt(sysConfig.firmwareVersion, "4.3.0")) {
         features.push({
@@ -1230,7 +1233,7 @@ export function HeaderDialog(dialog, onSave) {
             features[i].name
           }</label></td><td><span>${
             features[i].description
-          }</span>${feature_tip_html}</td></tr>`
+          }</span>${feature_tip_html}</td></tr>`,
         );
         radioGroups.push(features[i].group);
       } else {
@@ -1243,7 +1246,7 @@ export function HeaderDialog(dialog, onSave) {
             features[i].name
           }</label></td><td><span>${
             features[i].description
-          }</span>${feature_tip_html}</td></tr>`
+          }</span>${feature_tip_html}</td></tr>`,
         );
 
         let feature_e = row_e.find("input.feature");
@@ -1328,8 +1331,8 @@ export function HeaderDialog(dialog, onSave) {
       const row_e = $(`<tr><td><label class="option"><input class="field ${i}
                           ios-switch" name="${fields[i].name}
                           " title="field ${value & (1 << i) ? "" : "-"} ${
-        fields[i].name
-      }
+                            fields[i].name
+                          }
                           " type="checkbox" /><div><div></div></div></label></td><td><label for="field-
                           ${i}">${fields[i].name}</label></td><td><span>
                           ${fields[i].description}</span></td></tr>`);
@@ -1375,7 +1378,7 @@ export function HeaderDialog(dialog, onSave) {
     // Update the log header
 
     $("h5.modal-title-craft").text(
-      sysConfig["Craft name"] != null ? ` ${sysConfig["Craft name"]}` : ""
+      sysConfig["Craft name"] != null ? ` ${sysConfig["Craft name"]}` : "",
     );
     //      $('h5.modal-title-date').text((sysConfig['Firmware date'] != null) ? ` ${sysConfig['Firmware date']}` : '');
     $("h5.modal-title-revision").text(
@@ -1387,12 +1390,12 @@ export function HeaderDialog(dialog, onSave) {
         sysConfig["Firmware date"] != null
           ? ` ${sysConfig["Firmware date"]}`
           : ""
-      }`
+      }`,
     );
     $("h5.modal-title-board-info").text(
       sysConfig["Board information"] != null
         ? ` Board : ${sysConfig["Board information"]}`
-        : ""
+        : "",
     );
 
     switch (sysConfig.firmwareType) {
@@ -1488,7 +1491,7 @@ export function HeaderDialog(dialog, onSave) {
       setParameter(
         "vbatwarningcellvoltage",
         sysConfig.vbatwarningcellvoltage,
-        2
+        2,
       );
     } else {
       setParameter("vbatmincellvoltage", sysConfig.vbatmincellvoltage, 1);
@@ -1496,7 +1499,7 @@ export function HeaderDialog(dialog, onSave) {
       setParameter(
         "vbatwarningcellvoltage",
         sysConfig.vbatwarningcellvoltage,
-        1
+        1,
       );
     }
     setParameter("minthrottle", sysConfig.minthrottle, 0);
@@ -1530,19 +1533,19 @@ export function HeaderDialog(dialog, onSave) {
     setParameter(
       "rollPitchItermResetRate",
       sysConfig.rollPitchItermResetRate,
-      0
+      0,
     );
     setParameter("yawItermResetRate", sysConfig.yawItermResetRate, 0);
     setParameter(
       "rollPitchItermIgnoreRate",
       sysConfig.rollPitchItermIgnoreRate,
-      0
+      0,
     );
     setParameter("yawItermIgnoreRate", sysConfig.yawItermIgnoreRate, 0);
     setParameter(
       "itermWindupPointPercent",
       sysConfig.itermWindupPointPercent,
-      0
+      0,
     );
     setParameter("dterm_cut_hz", sysConfig.dterm_cut_hz, 2);
     setParameter("iterm_reset_offset", sysConfig.iterm_reset_offset, 0);
@@ -1561,24 +1564,24 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect(
       "gyro_32khz_hardware_lpf",
       sysConfig.gyro_32khz_hardware_lpf,
-      GYRO_32KHZ_HARDWARE_LPF
+      GYRO_32KHZ_HARDWARE_LPF,
     );
     setParameter("acc_lpf_hz", sysConfig.acc_lpf_hz, 2);
     setParameter("acc_cut_hz", sysConfig.acc_cut_hz, 2);
     setParameter(
       "airmode_activate_throttle",
       sysConfig.airmode_activate_throttle,
-      0
+      0,
     );
     renderSelect(
       "serialrx_provider",
       sysConfig.serialrx_provider,
-      SERIALRX_PROVIDER
+      SERIALRX_PROVIDER,
     );
     renderSelect(
       "superExpoYawMode",
       sysConfig.superExpoYawMode,
-      SUPER_EXPO_YAW
+      SUPER_EXPO_YAW,
     );
     renderSelect("dynamic_pid", sysConfig.dynamic_pid, OFF_ON);
 
@@ -1616,21 +1619,21 @@ export function HeaderDialog(dialog, onSave) {
     setParameter(
       "gyro_rpm_notch_harmonics",
       sysConfig.gyro_rpm_notch_harmonics,
-      0
+      0,
     );
     setParameter("gyro_rpm_notch_q", sysConfig.gyro_rpm_notch_q, 0);
     setParameter("gyro_rpm_notch_min", sysConfig.gyro_rpm_notch_min, 0);
     setParameter(
       "rpm_filter_fade_range_hz",
       sysConfig.rpm_filter_fade_range_hz,
-      0
+      0,
     );
     setParameter("rpm_notch_lpf", sysConfig.rpm_notch_lpf, 0);
 
     setParameter(
       "dterm_rpm_notch_harmonics",
       sysConfig.dterm_rpm_notch_harmonics,
-      0
+      0,
     );
     setParameter("dterm_rpm_notch_q", sysConfig.dterm_rpm_notch_q, 0);
     setParameter("dterm_rpm_notch_min", sysConfig.dterm_rpm_notch_min, 0);
@@ -1642,22 +1645,54 @@ export function HeaderDialog(dialog, onSave) {
       if (semver.gte(activeSysConfig.firmwareVersion, "2025.12.0")) {
         $("#rcSmoothingFeedforwardHz").hide();
         $("#rcSmoothingActiveCutoffsFf").hide();
-        setParameter("rcSmoothingActiveCutoffsSp", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
-        setParameter("rcSmoothingActiveCutoffsThr", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1], 0);
+        setParameter(
+          "rcSmoothingActiveCutoffsSp",
+          sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0],
+          0,
+        );
+        setParameter(
+          "rcSmoothingActiveCutoffsThr",
+          sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1],
+          0,
+        );
       } else if (semver.gte(activeSysConfig.firmwareVersion, "4.3.0")) {
-        setParameter("rcSmoothingFeedforwardHz", sysConfig.rc_smoothing_feedforward_hz, 0);
-        setParameter("rcSmoothingActiveCutoffsFf", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
-        setParameter("rcSmoothingActiveCutoffsSp", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1], 0);
-        setParameter("rcSmoothingActiveCutoffsThr", sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[2], 0);
+        setParameter(
+          "rcSmoothingFeedforwardHz",
+          sysConfig.rc_smoothing_feedforward_hz,
+          0,
+        );
+        setParameter(
+          "rcSmoothingActiveCutoffsFf",
+          sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0],
+          0,
+        );
+        setParameter(
+          "rcSmoothingActiveCutoffsSp",
+          sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1],
+          0,
+        );
+        setParameter(
+          "rcSmoothingActiveCutoffsThr",
+          sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[2],
+          0,
+        );
       }
     }
 
     if (semver.gte(activeSysConfig.firmwareVersion, "4.5.0")) {
-      setParameter("rcSmoothingRxSmoothed", sysConfig.rc_smoothing_rx_smoothed, 0);
+      setParameter(
+        "rcSmoothingRxSmoothed",
+        sysConfig.rc_smoothing_rx_smoothed,
+        0,
+      );
       $("#rcSmoothingRxSmoothed").show();
       $("#rcSmoothingRxAverage").hide();
     } else {
-      setParameter("rcSmoothingRxAverage", sysConfig.rc_smoothing_rx_average, 3);
+      setParameter(
+        "rcSmoothingRxAverage",
+        sysConfig.rc_smoothing_rx_average,
+        3,
+      );
       $("#rcSmoothingRxAverage").show();
       $("#rcSmoothingRxSmoothed").hide();
     }
@@ -1665,7 +1700,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect(
       "rcSmoothingDebugAxis",
       sysConfig.rc_smoothing_debug_axis,
-      RC_SMOOTHING_DEBUG_AXIS
+      RC_SMOOTHING_DEBUG_AXIS,
     );
 
     if (
@@ -1675,27 +1710,27 @@ export function HeaderDialog(dialog, onSave) {
       renderSelect(
         "rcSmoothingMode",
         sysConfig.rc_smoothing_mode,
-        RC_SMOOTHING_MODE
+        RC_SMOOTHING_MODE,
       );
       setParameter(
         "rcSmoothingSetpointHz",
         sysConfig.rc_smoothing_setpoint_hz,
-        0
+        0,
       );
       setParameter(
         "rcSmoothingAutoFactorSetpoint",
         sysConfig.rc_smoothing_auto_factor_setpoint,
-        0
+        0,
       );
       setParameter(
         "rcSmoothingThrottleHz",
         sysConfig.rc_smoothing_throttle_hz,
-        0
+        0,
       );
       setParameter(
         "rcSmoothingAutoFactorThrottle",
         sysConfig.rc_smoothing_auto_factor_throttle,
-        0
+        0,
       );
     } else if (
       activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
@@ -1704,47 +1739,47 @@ export function HeaderDialog(dialog, onSave) {
       renderSelect(
         "rcSmoothingMode",
         sysConfig.rc_smoothing_mode,
-        RC_SMOOTHING_TYPE
+        RC_SMOOTHING_TYPE,
       );
       setParameter(
         "rcSmoothingFeedforwardHz",
         sysConfig.rc_smoothing_cutoffs[0],
-        0
+        0,
       );
       setParameter(
         "rcSmoothingSetpointHz",
         sysConfig.rc_smoothing_cutoffs[1],
-        0
+        0,
       );
       setParameter(
         "rcSmoothingAutoFactorSetpoint",
         sysConfig.rc_smoothing_auto_factor_setpoint,
-        0
+        0,
       );
       setParameter(
         "rcSmoothingThrottleHz",
         sysConfig.rc_smoothing_cutoffs[1],
-        0
+        0,
       );
       setParameter(
         "rcSmoothingAutoFactorThrottle",
         sysConfig.rc_smoothing_auto_factor_setpoint,
-        0
+        0,
       );
       setParameter(
         "rcSmoothingActiveCutoffsFf",
         sysConfig.rc_smoothing_active_cutoffs[0],
-        0
+        0,
       );
       setParameter(
         "rcSmoothingActiveCutoffsSp",
         sysConfig.rc_smoothing_active_cutoffs[1],
-        0
+        0,
       );
       setParameter(
         "rcSmoothingActiveCutoffsThr",
         sysConfig.rc_smoothing_active_cutoffs[1],
-        0
+        0,
       );
     } else {
       renderSelect("rcSmoothingMode", "0", 0);
@@ -1789,7 +1824,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect(
       "iterm_relax_type",
       sysConfig.iterm_relax_type,
-      ITERM_RELAX_TYPE
+      ITERM_RELAX_TYPE,
     );
     setParameter("iterm_relax_cutoff", sysConfig.iterm_relax_cutoff, 0);
 
@@ -1797,7 +1832,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect(
       "fast_pwm_protocol",
       sysConfig.fast_pwm_protocol,
-      FAST_PROTOCOL
+      FAST_PROTOCOL,
     );
     setParameter("motor_pwm_rate", sysConfig.motor_pwm_rate, 0);
     renderSelect("dshot_bidir", sysConfig.dshot_bidir, OFF_ON);
@@ -1806,7 +1841,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect(
       "dterm_filter2_type",
       sysConfig.dterm_filter2_type,
-      FILTER_TYPE
+      FILTER_TYPE,
     );
     setParameter("ptermSRateWeight", sysConfig.ptermSRateWeight, 2);
     setParameter("dtermSetpointWeight", sysConfig.dtermSetpointWeight, 2);
@@ -1818,7 +1853,7 @@ export function HeaderDialog(dialog, onSave) {
       renderSelect(
         "feedforwardAveraging",
         sysConfig.ff_averaging,
-        FF_AVERAGING
+        FF_AVERAGING,
       );
       setParameter("feedforwardSmoothing", sysConfig.ff_smooth_factor, 0);
       setParameter("feedforwardJitter", sysConfig.ff_jitter_factor, 0);
@@ -1853,7 +1888,7 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect(
       "antiGravityMode",
       sysConfig.anti_gravity_mode,
-      ANTI_GRAVITY_MODE
+      ANTI_GRAVITY_MODE,
     );
     if (
       (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
@@ -1885,13 +1920,13 @@ export function HeaderDialog(dialog, onSave) {
     setParameter(
       "dyn_idle_start_increase",
       sysConfig.dyn_idle_start_increase,
-      0
+      0,
     );
     setParameter("dyn_idle_max_increase", sysConfig.dyn_idle_max_increase, 0);
     renderSelect(
       "simplified_pids_mode",
       sysConfig.simplified_pids_mode,
-      SIMPLIFIED_PIDS_MODE
+      SIMPLIFIED_PIDS_MODE,
     );
     setParameter("simplified_pi_gain", sysConfig.simplified_pi_gain, 0);
     setParameter("simplified_i_gain", sysConfig.simplified_i_gain, 0);
@@ -1900,50 +1935,50 @@ export function HeaderDialog(dialog, onSave) {
     setParameter(
       "simplified_feedforward_gain",
       sysConfig.simplified_feedforward_gain,
-      0
+      0,
     );
     setParameter(
       "simplified_pitch_d_gain",
       sysConfig.simplified_pitch_d_gain,
-      0
+      0,
     );
     setParameter(
       "simplified_pitch_pi_gain",
       sysConfig.simplified_pitch_pi_gain,
-      0
+      0,
     );
     setParameter(
       "simplified_master_multiplier",
       sysConfig.simplified_master_multiplier,
-      0
+      0,
     );
 
     renderSelect(
       "simplified_dterm_filter",
       sysConfig.simplified_dterm_filter,
-      OFF_ON
+      OFF_ON,
     );
     setParameter(
       "simplified_dterm_filter_multiplier",
       sysConfig.simplified_dterm_filter_multiplier,
-      0
+      0,
     );
     renderSelect(
       "simplified_gyro_filter",
       sysConfig.simplified_gyro_filter,
-      OFF_ON
+      OFF_ON,
     );
     setParameter(
       "simplified_gyro_filter_multiplier",
       sysConfig.simplified_gyro_filter_multiplier,
-      0
+      0,
     );
 
     setParameter("motor_output_limit", sysConfig.motor_output_limit, 0);
     renderSelect(
       "throttle_limit_type",
       sysConfig.throttle_limit_type,
-      THROTTLE_LIMIT_TYPE
+      THROTTLE_LIMIT_TYPE,
     );
     setParameter("throttle_limit_percent", sysConfig.throttle_limit_percent, 0);
     setParameter("throttle_boost", sysConfig.throttle_boost, 0);
@@ -2002,7 +2037,11 @@ export function HeaderDialog(dialog, onSave) {
     renderSelect("baro_hardware", sysConfig.baro_hardware, BARO_HARDWARE);
     renderSelect("mag_hardware", sysConfig.mag_hardware, MAG_HARDWARE);
     renderSelect("gyro_to_use", sysConfig.gyro_to_use, GYRO_TO_USE);
-    setBitmaskParameter("gyro_enabled_bitmask", sysConfig.gyro_enabled_bitmask, 8);
+    setBitmaskParameter(
+      "gyro_enabled_bitmask",
+      sysConfig.gyro_enabled_bitmask,
+      8,
+    );
     setParameter("motor_poles", sysConfig.motor_poles, 0);
 
     /* Booleans */

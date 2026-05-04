@@ -530,7 +530,11 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_COMBINED"), 1);
     }
     if (semver.gte(firmwareVersion, "4.3.0")) {
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_INTERPOLATED"), 1, "FEEDFORWARD");
+      DEBUG_MODE.splice(
+        DEBUG_MODE.indexOf("FF_INTERPOLATED"),
+        1,
+        "FEEDFORWARD",
+      );
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("FF_LIMIT"), 1, "FEEDFORWARD_LIMIT");
     }
     if (semver.gte(firmwareVersion, "4.5.0")) {
@@ -545,29 +549,53 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("BMA280"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM303DLHC"), 1);
-      ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("LSM6DSV16X") + 1, 0, "IIM42653");
+      ACC_HARDWARE.splice(
+        ACC_HARDWARE.indexOf("LSM6DSV16X") + 1,
+        0,
+        "IIM42653",
+      );
 
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf('GPS_RESCUE_THROTTLE_PID'), 1, 'AUTOPILOT_ALTITUDE');
+      DEBUG_MODE.splice(
+        DEBUG_MODE.indexOf("GPS_RESCUE_THROTTLE_PID"),
+        1,
+        "AUTOPILOT_ALTITUDE",
+      );
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("GYRO_SCALED"), 1);
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("RANGEFINDER_QUALITY") + 1, 0, "OPTICALFLOW");
+      DEBUG_MODE.splice(
+        DEBUG_MODE.indexOf("RANGEFINDER_QUALITY") + 1,
+        0,
+        "OPTICALFLOW",
+      );
       DEBUG_MODE.push(
-        'TPA',
-        'S_TERM',
-        'SPA',
-        'TASK',
-        'GIMBAL',
-        'WING_SETPOINT',
-        'AUTOPILOT_POSITION',
-        'CHIRP',
-        'FLASH_TEST_PRBS',
-        'MAVLINK_TELEMETRY',
+        "TPA",
+        "S_TERM",
+        "SPA",
+        "TASK",
+        "GIMBAL",
+        "WING_SETPOINT",
+        "AUTOPILOT_POSITION",
+        "CHIRP",
+        "FLASH_TEST_PRBS",
+        "MAVLINK_TELEMETRY",
       );
     }
     if (semver.gte(firmwareVersion, "2025.12.0")) {
       //rename DUAL_GYRO_ to MULTI_GYRO
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_RAW"), 1, "MULTI_GYRO_RAW");
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_DIFF"), 1, "MULTI_GYRO_DIFF");
-      DEBUG_MODE.splice(DEBUG_MODE.indexOf("DUAL_GYRO_SCALED"), 1, "MULTI_GYRO_SCALED");
+      DEBUG_MODE.splice(
+        DEBUG_MODE.indexOf("DUAL_GYRO_RAW"),
+        1,
+        "MULTI_GYRO_RAW",
+      );
+      DEBUG_MODE.splice(
+        DEBUG_MODE.indexOf("DUAL_GYRO_DIFF"),
+        1,
+        "MULTI_GYRO_DIFF",
+      );
+      DEBUG_MODE.splice(
+        DEBUG_MODE.indexOf("DUAL_GYRO_SCALED"),
+        1,
+        "MULTI_GYRO_SCALED",
+      );
     }
     if (semver.gte(firmwareVersion, "2026.6.0")) {
       DEBUG_MODE.push("AUTOPILOT_PID");
@@ -579,58 +607,64 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
 
     // Flight mode names
     if (semver.gte(firmwareVersion, "2025.12.0")) {
-      FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
+      FLIGHT_LOG_FLIGHT_MODE_NAME =
+        FLIGHT_LOG_FLIGHT_MODE_NAME_POST_4_5.slice(0);
     } else {
-      FLIGHT_LOG_FLIGHT_MODE_NAME = FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
+      FLIGHT_LOG_FLIGHT_MODE_NAME =
+        FLIGHT_LOG_FLIGHT_MODE_NAME_POST_3_3.slice(0);
       if (semver.lt(firmwareVersion, "3.4.0")) {
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSRESCUE"),
-          1
+          1,
         );
       }
       if (semver.gte(firmwareVersion, "3.5.0")) {
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("RANGEFINDER"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("CAMTRIG"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("LEDMAX"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("LLIGHTS"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GOV"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GTUNE"),
-          1
+          1,
         );
       }
       if (semver.gte(firmwareVersion, "4.0.0")) {
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("BARO"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSHOME"),
-          1
+          1,
         );
         FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
           FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSHOLD"),
-          1
+          1,
         );
       }
     }
     if (semver.gte(firmwareVersion, "2026.6.0")) {
-      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSRESCUE") + 1, 0, "AUTOPILOT");
+      FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
+        FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("GPSRESCUE") + 1,
+        0,
+        "AUTOPILOT",
+      );
     }
 
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
@@ -645,7 +679,7 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     ) {
       FLIGHT_LOG_FLIGHT_MODE_NAME.splice(
         FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf("ANTIGRAVITY"),
-        1
+        1,
       );
     }
 

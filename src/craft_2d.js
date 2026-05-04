@@ -186,7 +186,7 @@ export function Craft2D(flightLog, canvas, propColors) {
           craftParameters.motors[i].x,
         armLength *
           ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER *
-          craftParameters.motors[i].y
+          craftParameters.motors[i].y,
       );
     }
 
@@ -201,7 +201,7 @@ export function Craft2D(flightLog, canvas, propColors) {
       0,
       armLength * CENTRAL_HUB_SIZE_MULTIPLIER,
       0,
-      2 * Math.PI
+      2 * Math.PI,
     );
 
     canvasContext.fillStyle = craftColor;
@@ -215,7 +215,7 @@ export function Craft2D(flightLog, canvas, propColors) {
         //Move to the motor center
         canvasContext.translate(
           armLength * craftParameters.motors[i].x,
-          armLength * craftParameters.motors[i].y
+          armLength * craftParameters.motors[i].y,
         );
 
         canvasContext.fillStyle = shadeColors[motorOrder[i]];
@@ -240,7 +240,7 @@ export function Craft2D(flightLog, canvas, propColors) {
           -Math.PI / 2 +
             (Math.PI * 2 * Math.max(motorValue - sysConfig.motorOutput[0], 0)) /
               (sysConfig.motorOutput[1] - sysConfig.motorOutput[0]),
-          false
+          false,
         );
 
         canvasContext.fill();

@@ -235,24 +235,24 @@ export function stringLoopTime(
   loopTime,
   pid_process_denom,
   unsynced_fast_pwm,
-  motor_pwm_rate
+  motor_pwm_rate,
 ) {
   let returnString = "";
   if (loopTime != null) {
     returnString = `${loopTime}\u03BCS (${parseFloat(
-      (1000 / loopTime).toFixed(3)
+      (1000 / loopTime).toFixed(3),
     )}kHz`;
     if (pid_process_denom != null) {
       returnString += `/${parseFloat(
-        (1000 / (loopTime * pid_process_denom)).toFixed(3)
+        (1000 / (loopTime * pid_process_denom)).toFixed(3),
       )}kHz`;
       if (unsynced_fast_pwm != null) {
         returnString +=
           unsynced_fast_pwm == 0
             ? "/SYNCED"
             : motor_pwm_rate != null
-            ? `/${parseFloat((motor_pwm_rate / 1000).toFixed(3))}kHz`
-            : "UNSYNCED";
+              ? `/${parseFloat((motor_pwm_rate / 1000).toFixed(3))}kHz`
+              : "UNSYNCED";
       }
     }
     returnString += ")";
@@ -319,7 +319,7 @@ export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
     x + width,
     y + height,
     x + width - radius.br,
-    y + height
+    y + height,
   );
   ctx.lineTo(x + radius.bl, y + height);
   ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
@@ -378,11 +378,11 @@ export var mouseNotification = {
     if (mouseNotificationElem.length != 0) {
       clearTimeout(this.timeout);
       mouseNotificationElem.replaceWith(
-        `<div class="${messageClass}" id="mouse-notification">${message}</div>`
+        `<div class="${messageClass}" id="mouse-notification">${message}</div>`,
       );
     } else {
       this.elem.append(
-        `<div class="${messageClass}" id="mouse-notification">${message}</div>`
+        `<div class="${messageClass}" id="mouse-notification">${message}</div>`,
       );
     }
     this.timeout = setTimeout(function () {

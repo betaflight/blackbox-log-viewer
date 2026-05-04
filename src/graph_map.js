@@ -128,7 +128,7 @@ export function MapGrapher() {
       const polylineC = this.createAltitudeColoredPolyline(
         latlngs,
         maxAlt,
-        minAlt
+        minAlt,
       );
 
       trailLayers.set(logIndex, { polyline, polylineC });
@@ -156,7 +156,7 @@ export function MapGrapher() {
 
     const chunks = flightLog.getChunksInTimeRange(
       flightLog.getMinTime(),
-      flightLog.getMaxTime()
+      flightLog.getMaxTime(),
     );
 
     for (const chunk of chunks) {
@@ -166,7 +166,7 @@ export function MapGrapher() {
           frame,
           latIndexAtFrame,
           lngIndexAtFrame,
-          altitudeIndexAtFrame
+          altitudeIndexAtFrame,
         );
 
         // if there are no coordinates the frame is skipped
@@ -230,11 +230,11 @@ export function MapGrapher() {
         frame.current,
         latIndexAtFrame,
         lngIndexAtFrame,
-        altitudeIndexAtFrame
+        altitudeIndexAtFrame,
       );
       groundCourse = this.getGroundCourseFromFrame(
         frame.current,
-        groundCourseIndexAtFrame
+        groundCourseIndexAtFrame,
       );
     } catch (e) {}
   };
@@ -289,7 +289,7 @@ export function MapGrapher() {
         // debug circle
         if (debugCircle) {
           homeMarker.circle = L.circle(homePosition, debugCircleOptions).addTo(
-            myMap
+            myMap,
           );
         }
       }
@@ -317,7 +317,7 @@ export function MapGrapher() {
         if (debugCircle) {
           craftMarker.circle = L.circle(
             craftPosition,
-            debugCircleOptions
+            debugCircleOptions,
           ).addTo(myMap);
         }
       }
@@ -378,7 +378,7 @@ export function MapGrapher() {
     frame,
     latIndex,
     lngIndex,
-    altitudeIndex
+    altitudeIndex,
   ) {
     const lat = frame[latIndex];
     const lng = frame[lngIndex];
@@ -388,7 +388,7 @@ export function MapGrapher() {
       ? L.latLng(
           lat / coordinateDivider,
           lng / coordinateDivider,
-          alt / altitudeDivider
+          alt / altitudeDivider,
         )
       : null;
   };

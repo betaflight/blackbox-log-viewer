@@ -99,11 +99,11 @@ export function FlightLog(logData) {
         rawStats.field[i] = {
           min: Math.min(
             rawStats.frame.I.field[i].min,
-            rawStats.frame.P.field[i].min
+            rawStats.frame.P.field[i].min,
           ),
           max: Math.max(
             rawStats.frame.I.field[i].max,
-            rawStats.frame.P.field[i].max
+            rawStats.frame.P.field[i].max,
           ),
         };
       }
@@ -267,9 +267,11 @@ export function FlightLog(logData) {
 
     // Add names for our ADDITIONAL_COMPUTED_FIELDS
     // Add heading fields when: ATTITUDE enabled (added 2025.12 / quaternion available) OR both GYRO and ACC enabled (IMU estimation available)
-    if (fieldNames.includes("imuQuaternion[0]") ||
-      fieldNames.includes("gyroADC[0]") && fieldNames.includes("accSmooth[0]")) {
-        fieldNames.push("heading[0]", "heading[1]", "heading[2]");
+    if (
+      fieldNames.includes("imuQuaternion[0]") ||
+      (fieldNames.includes("gyroADC[0]") && fieldNames.includes("accSmooth[0]"))
+    ) {
+      fieldNames.push("heading[0]", "heading[1]", "heading[2]");
     }
 
     if (!that.isFieldDisabled().PID) {
@@ -281,7 +283,7 @@ export function FlightLog(logData) {
         "rcCommands[0]",
         "rcCommands[1]",
         "rcCommands[2]",
-        "rcCommands[3]"
+        "rcCommands[3]",
       ); // Custom calculated scaled rccommand
     }
 
@@ -292,7 +294,13 @@ export function FlightLog(logData) {
     if (!that.isFieldDisabled().GPS) {
       if (fieldNames.includes("GPS_coord[0]")) {
         // GPS coords in cartesian system
-        fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance", "gpsHomeAzimuth");
+        fieldNames.push(
+          "gpsCartesianCoords[0]",
+          "gpsCartesianCoords[1]",
+          "gpsCartesianCoords[2]",
+          "gpsDistance",
+          "gpsHomeAzimuth",
+        );
       }
 
       if (fieldNames.includes("GPS_velned[0]")) {
@@ -442,7 +450,7 @@ export function FlightLog(logData) {
           frame,
           frameType,
           frameOffset,
-          frameSize
+          frameSize,
         ) {
           let destFrame, destFrame_currentIndex;
 
@@ -539,7 +547,12 @@ export function FlightLog(logData) {
                 break;
               case "H": {
                 const homeAltitude = frame.length > 2 ? frame[2] / 10 : 0; // will work after BF firmware improvement
-                gpsTransform = new GPS_transform(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0.0);
+                gpsTransform = new GPS_transform(
+                  frame[0] / 10000000,
+                  frame[1] / 10000000,
+                  homeAltitude,
+                  0.0,
+                );
                 break;
               }
               case "G":
@@ -624,9 +637,21 @@ export function FlightLog(logData) {
    * sourceChunks and destChunks can be the same array.
    */
   function injectComputedFields(sourceChunks, destChunks) {
-    let gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
-    let accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
-    let magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
+    let gyroADC = [
+      fieldNameToIndex["gyroADC[0]"],
+      fieldNameToIndex["gyroADC[1]"],
+      fieldNameToIndex["gyroADC[2]"],
+    ];
+    let accSmooth = [
+      fieldNameToIndex["accSmooth[0]"],
+      fieldNameToIndex["accSmooth[1]"],
+      fieldNameToIndex["accSmooth[2]"],
+    ];
+    let magADC = [
+      fieldNameToIndex["magADC[0]"],
+      fieldNameToIndex["magADC[1]"],
+      fieldNameToIndex["magADC[2]"],
+    ];
     let imuQuaternion = [
       fieldNameToIndex["imuQuaternion[0]"],
       fieldNameToIndex["imuQuaternion[1]"],
@@ -680,7 +705,7 @@ export function FlightLog(logData) {
         fieldNameToIndex["axisS[2]"],
       ],
     ];
-    
+
     const numSatIndex = fieldNameToIndex["GPS_numSat"];
 
     let sourceChunkIndex;
@@ -692,7 +717,7 @@ export function FlightLog(logData) {
       return;
     }
 
-// Do we have mag fields? If not mark that data as absent
+    // Do we have mag fields? If not mark that data as absent
     if (!magADC[0]) {
       magADC = false;
     }
@@ -757,7 +782,7 @@ export function FlightLog(logData) {
             fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
           if (imuQuaternion) {
-            const scaleFromFixedInt16 = 0x7FFF; // 0x7FFF = 2^15 - 1
+            const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
             const q = {
               x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
               y: srcFrame[imuQuaternion[1]] / scaleFromFixedInt16,
@@ -767,28 +792,28 @@ export function FlightLog(logData) {
 
             let m = q.x ** 2 + q.y ** 2 + q.z ** 2;
             if (m < 1.0) {
-                // reconstruct .w of unit quaternion
-                q.w = Math.sqrt(1.0 - m);
+              // reconstruct .w of unit quaternion
+              q.w = Math.sqrt(1.0 - m);
             } else {
-                // normalize [0,x,y,z]
-                m = Math.sqrt(m);
-                q.x /= m;
-                q.y /= m;
-                q.z /= m;
-                q.w = 0;
+              // normalize [0,x,y,z]
+              m = Math.sqrt(m);
+              q.x /= m;
+              q.y /= m;
+              q.z /= m;
+              q.w = 0;
             }
             const xx = q.x ** 2,
-                  xy = q.x * q.y,
-                  xz = q.x * q.z,
-                  wx = q.w * q.x,
-                  yy = q.y ** 2,
-                  yz = q.y * q.z,
-                  wy = q.w * q.y,
-                  zz = q.z ** 2,
-                  wz = q.w * q.z;
-            let roll = Math.atan2((+2.0 * (wx + yz)), (+1.0 - 2.0 * (xx + yy)));
-            let pitch = ((0.5 * Math.PI) - Math.acos(+2.0 * (wy - xz)));
-            let heading = -Math.atan2((+2.0 * (wz + xy)), (+1.0 - 2.0 * (yy + zz)));
+              xy = q.x * q.y,
+              xz = q.x * q.z,
+              wx = q.w * q.x,
+              yy = q.y ** 2,
+              yz = q.y * q.z,
+              wy = q.w * q.y,
+              zz = q.z ** 2,
+              wz = q.w * q.z;
+            let roll = Math.atan2(+2.0 * (wx + yz), +1.0 - 2.0 * (xx + yy));
+            let pitch = 0.5 * Math.PI - Math.acos(+2.0 * (wy - xz));
+            let heading = -Math.atan2(+2.0 * (wz + xy), +1.0 - 2.0 * (yy + zz));
             if (heading < 0) {
               heading += 2.0 * Math.PI;
             }
@@ -798,12 +823,21 @@ export function FlightLog(logData) {
             destFrame[fieldIndex++] = heading;
           } else if (gyroADC && accSmooth) {
             const attitude = chunkIMU.updateEstimatedAttitude(
-                    [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
-                    [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
-                    srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-                    sysConfig.acc_1G,
-                    sysConfig.gyroScale,
-                    magADC);
+              [
+                srcFrame[gyroADC[0]],
+                srcFrame[gyroADC[1]],
+                srcFrame[gyroADC[2]],
+              ],
+              [
+                srcFrame[accSmooth[0]],
+                srcFrame[accSmooth[1]],
+                srcFrame[accSmooth[2]],
+              ],
+              srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
+              sysConfig.acc_1G,
+              sysConfig.gyroScale,
+              magADC,
+            );
             destFrame[fieldIndex++] = attitude.roll;
             destFrame[fieldIndex++] = attitude.pitch;
             destFrame[fieldIndex++] = attitude.heading;
@@ -825,7 +859,7 @@ export function FlightLog(logData) {
                 (axisPID[axis][3] !== undefined
                   ? srcFrame[axisPID[axis][3]]
                   : 0) +
-                  (axisPID[axis][4] !== undefined
+                (axisPID[axis][4] !== undefined
                   ? srcFrame[axisPID[axis][4]]
                   : 0);
 
@@ -871,7 +905,7 @@ export function FlightLog(logData) {
                     ? that.rcCommandRawToDegreesPerSecond(
                         srcFrame[rcCommand[axis]],
                         axis,
-                        currentFlightMode
+                        currentFlightMode,
                       )
                     : 0;
               }
@@ -879,7 +913,7 @@ export function FlightLog(logData) {
               destFrame[fieldIndex++] =
                 rcCommand[AXIS.YAW + 1] !== undefined
                   ? that.rcCommandRawToThrottle(
-                      srcFrame[rcCommand[AXIS.YAW + 1]]
+                      srcFrame[rcCommand[AXIS.YAW + 1]],
                     )
                   : 0;
             }
@@ -904,13 +938,23 @@ export function FlightLog(logData) {
           if (gpsTransform && gpsCoord) {
             const numSat = numSatIndex ? srcFrame[numSatIndex] : 0;
             if (numSat > 4) {
-              const gpsCartesianCoords = gpsTransform.WGS_BS(srcFrame[gpsCoord[0]] / 10000000, srcFrame[gpsCoord[1]] / 10000000, srcFrame[gpsCoord[2]] / 10);
+              const gpsCartesianCoords = gpsTransform.WGS_BS(
+                srcFrame[gpsCoord[0]] / 10000000,
+                srcFrame[gpsCoord[1]] / 10000000,
+                srcFrame[gpsCoord[2]] / 10,
+              );
               destFrame[fieldIndex++] = gpsCartesianCoords.x;
               destFrame[fieldIndex++] = gpsCartesianCoords.y;
               destFrame[fieldIndex++] = gpsCartesianCoords.z;
-              destFrame[fieldIndex++] = Math.sqrt(gpsCartesianCoords.x * gpsCartesianCoords.x + gpsCartesianCoords.z * gpsCartesianCoords.z);
+              destFrame[fieldIndex++] = Math.sqrt(
+                gpsCartesianCoords.x * gpsCartesianCoords.x +
+                  gpsCartesianCoords.z * gpsCartesianCoords.z,
+              );
 
-              let homeAzimuth = Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) * 180 / Math.PI;
+              let homeAzimuth =
+                (Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) *
+                  180) /
+                Math.PI;
               if (homeAzimuth < 0) {
                 homeAzimuth += 360;
               }
@@ -927,14 +971,14 @@ export function FlightLog(logData) {
           // Calculate trajectory tilt angle by NED GPS velocity
           if (gpsVelNED) {
             const Vn = srcFrame[gpsVelNED[0]],
-                  Ve = srcFrame[gpsVelNED[1]],
-                  Vd = srcFrame[gpsVelNED[2]];
+              Ve = srcFrame[gpsVelNED[1]],
+              Vd = srcFrame[gpsVelNED[2]];
             const velocity = Math.hypot(Vn, Ve, Vd);
-            const minVelo = 5;  // 5cm/s limit to prevent division by zero and miss tiny noise values
+            const minVelo = 5; // 5cm/s limit to prevent division by zero and miss tiny noise values
             let trajectoryTiltAngle = 0;
             if (velocity > minVelo) {
               const angleSin = Math.max(-1, Math.min(1, Vd / velocity));
-              trajectoryTiltAngle = -Math.asin(angleSin) * 180 / Math.PI; // [degree], if velo is up then >0
+              trajectoryTiltAngle = (-Math.asin(angleSin) * 180) / Math.PI; // [degree], if velo is up then >0
             }
             destFrame[fieldIndex++] = trajectoryTiltAngle;
           }
@@ -1032,7 +1076,7 @@ export function FlightLog(logData) {
       startIndex =
         binarySearchOrPrevious(
           iframeDirectory.times,
-          startTime - maxSmoothing
+          startTime - maxSmoothing,
         ) - leadingROChunks,
       endIndex =
         binarySearchOrNext(iframeDirectory.times, endTime + maxSmoothing) +
@@ -1059,7 +1103,7 @@ export function FlightLog(logData) {
 
     //Create an independent copy of the raw frame data to smooth out:
     resultChunks = new Array(
-      sourceChunks.length - leadingROChunks - trailingROChunks
+      sourceChunks.length - leadingROChunks - trailingROChunks,
     );
     chunkAlreadyDone = new Array(sourceChunks.length);
 
@@ -1142,7 +1186,6 @@ export function FlightLog(logData) {
           for (
             centerFrameIndex = 0;
             centerFrameIndex < sourceChunks[centerChunkIndex].frames.length;
-
           ) {
             var //Current beginning & end of the smoothing window:
               leftChunkIndex = centerChunkIndex,
@@ -1330,7 +1373,7 @@ export function FlightLog(logData) {
 
     parser.parseHeader(
       logIndexes.getLogBeginOffset(index),
-      logIndexes.getLogBeginOffset(index + 1)
+      logIndexes.getLogBeginOffset(index + 1),
     );
 
     // Hide the header button if we are not using betaflight
@@ -1372,7 +1415,7 @@ export function FlightLog(logData) {
       const mm = this.getMinMaxForFieldDuringTimeInterval(
         field_name,
         this.getMinTime(),
-        this.getMaxTime()
+        this.getMaxTime(),
       );
       if (mm !== undefined) {
         min = Math.min(mm.min, min);
@@ -1393,7 +1436,7 @@ export function FlightLog(logData) {
   this.getMinMaxForFieldDuringTimeInterval = function (
     field_name,
     start_time,
-    end_time
+    end_time,
   ) {
     let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
     let startFrameIndex;
@@ -1473,7 +1516,7 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function (value) {
 FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
   value,
   axis,
-  currentFlightMode
+  currentFlightMode,
 ) {
   let sysConfig = this.getSysConfig();
 
@@ -1507,7 +1550,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
           constrain(
             1.0 - rcCommandfAbs * (sysConfig.rates[axis] / 100.0),
             0.01,
-            1.0
+            1.0,
           );
         angleRate *= rcSuperfactor;
       }
@@ -1552,7 +1595,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
           constrain(
             1.0 - rcFactor * (validate(sysConfig.rates[axis], 100) / 100.0),
             0.01,
-            1.0
+            1.0,
           );
 
         angleRate = rcFactor * ((27 * value) / 16.0);
@@ -1630,9 +1673,9 @@ FlightLog.prototype.rcCommandRawToThrottle = function (value) {
       ((value - this.getSysConfig().minthrottle) /
         (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) *
         100.0,
-      0.0
+      0.0,
     ),
-    100.0
+    100.0,
   );
 };
 

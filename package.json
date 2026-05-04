@@ -31,11 +31,11 @@
     "leaflet-marker-rotation": "^0.4.0",
     "Leaflet.MultiOptionsPolyline": "github:hgoebl/Leaflet.MultiOptionsPolyline",
     "lodash": "^4.18.1",
-    "prettier": "^2.8.1",
     "throttle-debounce": "^5.0.0"
   },
   "devDependencies": {
     "inflection": "1.12.0",
+    "prettier": "^3.8.3",
     "vite": "^7.3.2",
     "vite-plugin-pwa": "^1.0.3"
   },

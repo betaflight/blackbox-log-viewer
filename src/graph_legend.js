@@ -8,7 +8,7 @@ export function GraphLegend(
   onHighlightChange,
   onZoomGraph,
   onExpandGraph,
-  onNewGraphConfig
+  onNewGraphConfig,
 ) {
   let that = this;
 
@@ -22,7 +22,7 @@ export function GraphLegend(
     for (i = 0; i < graphs.length; i++) {
       let graph = graphs[i],
         graphDiv = $(
-          `<div class="graph-legend" id="${i}"><h3 class="graph-legend-group field-quick-adjust" graph="${i}"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>`
+          `<div class="graph-legend" id="${i}"><h3 class="graph-legend-group field-quick-adjust" graph="${i}"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>`,
         ),
         graphTitle = $("h3", graphDiv),
         fieldList = $("ul", graphDiv);
@@ -33,22 +33,22 @@ export function GraphLegend(
       for (j = 0; j < graph.fields.length; j++) {
         let field = graph.fields[j],
           li = $(
-            `<li class="graph-legend-field field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></li>`
+            `<li class="graph-legend-field field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></li>`,
           ),
           nameElem = $(
-            `<span class="graph-legend-field-name field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`
+            `<span class="graph-legend-field-name field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`,
           ),
           valueElem = $(
-            `<span class="graph-legend-field-value field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`
+            `<span class="graph-legend-field-value field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`,
           ),
           settingsElem = $(
-            `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`
+            `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`,
           ),
           visibilityIcon = config.isGraphFieldHidden(i, j)
             ? "glyphicon-eye-close"
             : "glyphicon-eye-open",
           visibilityElem = $(
-            `<span class="glyphicon ${visibilityIcon} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`
+            `<span class="glyphicon ${visibilityIcon} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`,
           );
         li.append(nameElem);
         li.append(visibilityElem);
@@ -85,7 +85,7 @@ export function GraphLegend(
 
     // Add a trigger on legend; select the analyser graph/field to plot
     $(
-      ".graph-legend-field-name, .graph-legend-field-settings, .graph-legend-field-value"
+      ".graph-legend-field-name, .graph-legend-field-settings, .graph-legend-field-value",
     ).on("click", function (e) {
       if (e.which != 1) return; // only accept left mouse clicks
 
@@ -196,7 +196,7 @@ export function GraphLegend(
             flightLog,
             fieldName,
             value,
-            currentFlightMode
+            currentFlightMode,
           );
         } else {
           // raw value
