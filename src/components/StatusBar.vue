@@ -1,14 +1,14 @@
 <template>
   <div class="flex items-center justify-between px-4 py-1 bg-neutral-100 dark:bg-neutral-900 text-xs text-neutral-600 dark:text-neutral-400 border-t border-neutral-200 dark:border-neutral-800">
     <div class="flex items-center gap-4">
-      <span>{{ firmwareVersion }}</span>
-      <span>{{ cells }}</span>
-      <span>{{ loopTime }}</span>
-      <span>{{ logRate }}</span>
-      <span>{{ flightMode }}</span>
+      <span>{{ appStore.statusVersion }}</span>
+      <span v-if="appStore.statusCells">{{ appStore.statusCells }}</span>
+      <span>{{ appStore.statusLooptime }}</span>
+      <span>{{ appStore.statusLograte }}</span>
+      <span>{{ appStore.statusFlightMode }}</span>
     </div>
     <div class="flex items-center gap-2">
-      <span class="font-mono">{{ markerOffset }}</span>
+      <span class="font-mono">{{ appStore.statusMarkerOffset }}</span>
 
       <!-- Bookmarks -->
       <template v-for="n in 9" :key="n">
@@ -22,25 +22,17 @@
         />
       </template>
 
-      <span>{{ viewerVersion }}</span>
+      <span>{{ appStore.statusViewerVersion }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useAppStore } from "../stores/app.js";
 import { useWorkspaceStore } from "../stores/workspace.js";
-
-defineProps({
-  firmwareVersion: { type: String, default: "-" },
-  cells: { type: String, default: "-" },
-  loopTime: { type: String, default: "-" },
-  logRate: { type: String, default: "-" },
-  flightMode: { type: String, default: "-" },
-  markerOffset: { type: String, default: "00:00.000" },
-  viewerVersion: { type: String, default: "-" },
-});
 
 defineEmits(["goto-bookmark"]);
 
+const appStore = useAppStore();
 const workspaceStore = useWorkspaceStore();
 </script>

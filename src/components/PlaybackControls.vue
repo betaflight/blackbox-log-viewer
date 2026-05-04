@@ -65,8 +65,8 @@ const playbackStore = usePlaybackStore();
 const logStore = useLogStore();
 
 const formattedTime = computed(() => {
-  const timeUs = logStore.currentBlackboxTime;
-  const totalMs = Math.abs(timeUs / 1000);
+  const elapsed = logStore.currentBlackboxTime - logStore.minTime;
+  const totalMs = Math.abs(elapsed / 1000);
   const minutes = Math.floor(totalMs / 60000);
   const seconds = Math.floor((totalMs % 60000) / 1000);
   const ms = Math.floor(totalMs % 1000);

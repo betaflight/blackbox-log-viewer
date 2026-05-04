@@ -347,26 +347,26 @@ function BlackboxLogViewer() {
       }
 
       // Update flight mode flags on status bar
-      $(".flight-mode", statusBar).text(
-        fieldPresenter.decodeFieldToFriendly(
-          null,
-          "flightModeFlags",
-          currentFlightMode,
-          null,
-        ),
+      const flightModeText = fieldPresenter.decodeFieldToFriendly(
+        null,
+        "flightModeFlags",
+        currentFlightMode,
+        null,
       );
+      $(".flight-mode", statusBar).text(flightModeText);
+      appStore.statusFlightMode = flightModeText;
 
       // update time field on status bar
       $(".graph-time").val(
         formatTime((currentBlackboxTime - flightLog.getMinTime()) / 1000, true),
       );
       if (hasMarker) {
-        $(".marker-offset", statusBar).text(
-          `Marker Offset ${formatTime(
-            (currentBlackboxTime - markerTime) / 1000,
-            true,
-          )}ms ${(1000000 / (currentBlackboxTime - markerTime)).toFixed(0)}Hz`,
-        );
+        const markerText = `Marker Offset ${formatTime(
+          (currentBlackboxTime - markerTime) / 1000,
+          true,
+        )}ms ${(1000000 / (currentBlackboxTime - markerTime)).toFixed(0)}Hz`;
+        $(".marker-offset", statusBar).text(markerText);
+        appStore.statusMarkerOffset = markerText;
       }
 
       // Update the Legend Values
@@ -558,14 +558,15 @@ function BlackboxLogViewer() {
     $(".log-index").val(flightLog.getLogIndex());
 
     if (flightLog.getNumCellsEstimate()) {
-      $(".log-cells").text(
-        `${flightLog.getNumCellsEstimate()}S (${Number(
-          flightLog.getReferenceVoltageMillivolts() / 1000,
-        ).toFixed(2)}V)`,
-      );
+      const cellsText = `${flightLog.getNumCellsEstimate()}S (${Number(
+        flightLog.getReferenceVoltageMillivolts() / 1000,
+      ).toFixed(2)}V)`;
+      $(".log-cells").text(cellsText);
       $(".log-cells-header,.log-cells").css("display", "block");
+      appStore.statusCells = cellsText;
     } else {
       $(".log-cells-header,.log-cells").css("display", "none");
+      appStore.statusCells = "";
     }
 
     /**
@@ -582,29 +583,33 @@ function BlackboxLogViewer() {
     // Add log version information to status bar
     const sysConfig = flightLog.getSysConfig();
 
-    $(".version", statusBar).text(
+    const versionText =
       (sysConfig["Craft name"] != null && sysConfig["Craft name"].length
         ? `${sysConfig["Craft name"]} : `
         : "") +
-        (sysConfig["Firmware revision"] != null
-          ? `${sysConfig["Firmware revision"]}`
-          : "") +
-        (sysConfig.deviceUID != null ? ` (${sysConfig.deviceUID})` : ""),
+      (sysConfig["Firmware revision"] != null
+        ? `${sysConfig["Firmware revision"]}`
+        : "") +
+      (sysConfig.deviceUID != null ? ` (${sysConfig.deviceUID})` : "");
+    $(".version", statusBar).text(versionText);
+    appStore.statusVersion = versionText;
+
+    const looptimeText = stringLoopTime(
+      sysConfig.looptime,
+      sysConfig.pid_process_denom,
+      sysConfig.unsynced_fast_pwm,
+      sysConfig.motor_pwm_rate,
     );
-    $(".looptime", statusBar).text(
-      stringLoopTime(
-        sysConfig.looptime,
-        sysConfig.pid_process_denom,
-        sysConfig.unsynced_fast_pwm,
-        sysConfig.motor_pwm_rate,
-      ),
-    );
-    $(".lograte", statusBar).text(
+    $(".looptime", statusBar).text(looptimeText);
+    appStore.statusLooptime = looptimeText;
+
+    const lograteText =
       sysConfig["frameIntervalPDenom"] != null &&
-        sysConfig["frameIntervalPNum"] != null
+      sysConfig["frameIntervalPNum"] != null
         ? `Sample Rate : ${sysConfig["frameIntervalPNum"]}/${sysConfig["frameIntervalPDenom"]}`
-        : "",
-    );
+        : "";
+    $(".lograte", statusBar).text(lograteText);
+    appStore.statusLograte = lograteText;
 
     seekBar.setTimeRange(
       flightLog.getMinTime(),
@@ -1326,6 +1331,7 @@ function BlackboxLogViewer() {
     // Get Latest Version Information
     $("#viewer-version").text(`You are using version ${__APP_VERSION__}`);
     $(".viewer-version", statusBar).text(`v${__APP_VERSION__}`);
+    appStore.statusViewerVersion = `v${__APP_VERSION__}`;
     try {
       $.getJSON(
         "https://api.github.com/repos/betaflight/blackbox-log-viewer/releases/latest",
