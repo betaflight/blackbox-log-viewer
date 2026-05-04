@@ -40,7 +40,8 @@
     "vite-plugin-pwa": "^1.0.3"
   },
   "overrides": {
-    "lodash.template": "^4.5.0"
+    "lodash.template": "^4.5.0",
+    "@rollup/plugin-terser": "^1.0.0"
   },
   "engines": {
     "node": "24.x"
