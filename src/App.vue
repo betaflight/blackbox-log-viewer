@@ -297,10 +297,7 @@ function onApplyDefaultWorkspace(index) {
 }
 
 function onGotoBookmark(index) {
-  // Legacy bookmark navigation — dispatch click on the bookmark element
-  document
-    .querySelector(`.bookmark-${index + 1}`)
-    ?.dispatchEvent(new Event("click"));
+  getLegacy()?.gotoBookmark?.(index + 1);
 }
 
 // Expose for external access during migration

@@ -129,7 +129,6 @@ function BlackboxLogViewer() {
     analyserCanvas = $("#analyserCanvas")[0],
     stickCanvas = $("#stickCanvas")[0],
     craftCanvas = $("#craftCanvas")[0],
-    statusBar = $("#status-bar"),
     html = $("html"),
     videoURL = false,
     videoOffset = 0.0,
@@ -353,7 +352,6 @@ function BlackboxLogViewer() {
         currentFlightMode,
         null,
       );
-      $(".flight-mode", statusBar).text(flightModeText);
       appStore.statusFlightMode = flightModeText;
 
       // update time field
@@ -367,7 +365,6 @@ function BlackboxLogViewer() {
           (currentBlackboxTime - markerTime) / 1000,
           true,
         )}ms ${(1000000 / (currentBlackboxTime - markerTime)).toFixed(0)}Hz`;
-        $(".marker-offset", statusBar).text(markerText);
         appStore.statusMarkerOffset = markerText;
       }
 
@@ -488,7 +485,6 @@ function BlackboxLogViewer() {
   }
 
   function renderLogFileInfo(file) {
-    $(".log-filename").text(file.name);
     appStore.logFilename = file.name;
 
     const logIndexContainer = $(".log-index"),
@@ -594,7 +590,6 @@ function BlackboxLogViewer() {
         ? `${sysConfig["Firmware revision"]}`
         : "") +
       (sysConfig.deviceUID != null ? ` (${sysConfig.deviceUID})` : "");
-    $(".version", statusBar).text(versionText);
     appStore.statusVersion = versionText;
 
     const looptimeText = stringLoopTime(
@@ -603,7 +598,6 @@ function BlackboxLogViewer() {
       sysConfig.unsynced_fast_pwm,
       sysConfig.motor_pwm_rate,
     );
-    $(".looptime", statusBar).text(looptimeText);
     appStore.statusLooptime = looptimeText;
 
     const lograteText =
@@ -611,7 +605,6 @@ function BlackboxLogViewer() {
       sysConfig["frameIntervalPNum"] != null
         ? `Sample Rate : ${sysConfig["frameIntervalPNum"]}/${sysConfig["frameIntervalPDenom"]}`
         : "";
-    $(".lograte", statusBar).text(lograteText);
     appStore.statusLograte = lograteText;
 
     seekBar.setTimeRange(
@@ -1205,7 +1198,7 @@ function BlackboxLogViewer() {
       const blob = new Blob([data], { type: fileType }),
         e = document.createEvent("MouseEvents"),
         a = document.createElement("a");
-      a.download = file || `${$(".log-filename").text()}.${fileExtension}`;
+      a.download = file || `${appStore.logFilename}.${fileExtension}`;
       a.href = globalThis.URL.createObjectURL(blob);
       a.dataset.downloadurl = [fileType, a.download, a.href].join(":");
       e.initMouseEvent(
@@ -1316,13 +1309,9 @@ function BlackboxLogViewer() {
       placement: "auto bottom",
     }); // initialise tooltips
     $('[data-toggle="dropdown"]').dropdown(); // initialise menus
-    $("a.auto-hide-menu").click(function () {
-      $(this).closest(".dropdown").children().first().dropdown("toggle");
-    });
+    // Legacy navbar handlers removed — now wired via Vue AppToolbar
 
-    // Get Latest Version Information
-    $("#viewer-version").text(`You are using version ${__APP_VERSION__}`);
-    $(".viewer-version", statusBar).text(`v${__APP_VERSION__}`);
+    // Version information
     appStore.statusViewerVersion = `v${__APP_VERSION__}`;
     try {
       $.getJSON(
@@ -1330,17 +1319,10 @@ function BlackboxLogViewer() {
         {},
         function (data) {
           latestVersion = data;
-          if (latestVersion) {
-            $(".btn-viewer-download").text(latestVersion.tag_name);
-            $(".viewer-download").show();
-          } else {
-            $(".viewer-download").hide();
-          }
         },
       );
     } catch (e) {
       console.log("Cannot get latest version information");
-      $(".viewer-download").hide();
     }
 
     graphLegend = new GraphLegend(
@@ -1394,20 +1376,7 @@ function BlackboxLogViewer() {
     hasAnalyser = false;
     html.toggleClass("has-analyser", hasAnalyser);
 
-    $(".btn-new-window").click(function (e) {
-      createNewBlackboxWindow();
-    });
-
-    $(".file-open").change(function (e) {
-      const files = e.target.files;
-
-      loadFiles(files);
-
-      // Clear the files, in this way we can open a file with the same path/name again
-      e.target.value = "";
-    });
-
-    // View controls wired via Vue ViewControls bridge
+    // File open and new window wired via Vue AppToolbar
 
     let logJumpBack = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
@@ -1581,64 +1550,24 @@ function BlackboxLogViewer() {
       globalThis.vueApp.graphConfigDialogOpen = true;
     });
 
-    $(".open-header-dialog").click(function (e) {
-      e.preventDefault();
+    // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
 
-      globalThis.vueApp.headerDialogOpen = true;
-    });
-
-    $(".open-keys-dialog").click(function (e) {
-      e.preventDefault();
-
-      globalThis.vueApp.keysDialogOpen = true;
-    });
-
-    $(".open-user-settings-dialog").click(function (e) {
-      e.preventDefault();
-
-      globalThis.vueApp.settingsDialogOpen = true;
-    });
-
-    $(".marker-offset", statusBar).click(function (e) {
+    // Status bar interactions wired via Vue StatusBar bridge
+    that.gotoBookmark = function (index) {
+      if (bookmarkTimes && bookmarkTimes[index] != null) {
+        setCurrentBlackboxTime(bookmarkTimes[index]);
+        invalidateGraph();
+      }
+    };
+    that.gotoMarker = function () {
       setCurrentBlackboxTime(markerTime);
       invalidateGraph();
-    });
+    };
+    that.showConfigFile = function () {
+      showConfigFile(true);
+    };
 
-    for (let i = 1; i < 9; i++) {
-      // Loop through all the bookmarks.
-      $(`.bookmark-${i}`, statusBar).click(function () {
-        setCurrentBlackboxTime(
-          bookmarkTimes[Number.parseInt(this.className.slice(-1))],
-        );
-        invalidateGraph();
-      });
-    }
-
-    $(".bookmark-clear", statusBar).click(function () {
-      bookmarkTimes = null;
-      for (let i = 1; i <= 9; i++) {
-        $(`.bookmark-${i}`, statusBar).css("visibility", "hidden");
-      }
-      $(".bookmark-clear", statusBar).css("visibility", "hidden");
-      invalidateGraph();
-    });
-
-    $(".configuration-file-name", statusBar).click(function (e) {
-      showConfigFile(true); // show the config file
-      e.preventDefault();
-    });
-
-    $(".btn-workspaces-export").click(function (e) {
-      setGraphState(GRAPH_STATE_PAUSED);
-      saveWorkspaces();
-      e.preventDefault();
-    });
-
-    $(".btn-csv-export").click(function (e) {
-      setGraphState(GRAPH_STATE_PAUSED);
-      exportCsv();
-      e.preventDefault();
-    });
+    // Export buttons wired via Vue AppToolbar
 
     $("#btn-spectrum-export").click(function (e) {
       exportSpectrumToCsv();
@@ -1656,11 +1585,7 @@ function BlackboxLogViewer() {
       e.preventDefault();
     });
 
-    $(".btn-gpx-export").click(function (e) {
-      setGraphState(GRAPH_STATE_PAUSED);
-      exportGpx();
-      e.preventDefault();
-    });
+    // GPX export wired via Vue AppToolbar
 
     $(window).resize(function () {
       updateCanvasSize(); /*updateHeaderSize()*/
@@ -2062,9 +1987,9 @@ function BlackboxLogViewer() {
               // Add a marker to graph window
               markerTime = currentBlackboxTime;
               setMarker(!hasMarker);
-              $(".marker-offset", statusBar)
-                .text(`Marker Offset ${formatTime(0)}ms`)
-                .css("visibility", hasMarker ? "visible" : "hidden");
+              appStore.statusMarkerOffset = hasMarker
+                ? `Marker Offset ${formatTime(0)}ms`
+                : "";
               invalidateGraph();
             }
             e.preventDefault();
@@ -2157,35 +2082,14 @@ function BlackboxLogViewer() {
                   // store time to bookmark
                   // Special Case : Shift Alt 0 clears all bookmarks
                   if (e.which == 48) {
-                    bookmarkTimes = null;
-                    for (let i = 1; i <= 9; i++) {
-                      $(`.bookmark-${i}`, statusBar).css(
-                        "visibility",
-                        "hidden",
-                      );
-                    }
-                    $(".bookmark-clear", statusBar).css("visibility", "hidden");
+                    bookmarkTimes = [];
                   } else {
-                    if (bookmarkTimes == null) bookmarkTimes = new Array();
+                    if (bookmarkTimes == null) bookmarkTimes = [];
                     if (bookmarkTimes[e.which - 48] == null) {
-                      bookmarkTimes[e.which - 48] = currentBlackboxTime; // Save current time to bookmark
+                      bookmarkTimes[e.which - 48] = currentBlackboxTime;
                     } else {
-                      bookmarkTimes[e.which - 48] = null; // clear the bookmark
+                      bookmarkTimes[e.which - 48] = null;
                     }
-                    $(`.bookmark-${e.which - 48}`, statusBar).css(
-                      "visibility",
-                      bookmarkTimes[e.which - 48] == null
-                        ? "hidden"
-                        : "visible",
-                    );
-                    let countBookmarks = 0;
-                    for (let i = 0; i < 10; i++) {
-                      countBookmarks += bookmarkTimes[i] == null ? 0 : 1;
-                    }
-                    $(".bookmark-clear", statusBar).css(
-                      "visibility",
-                      countBookmarks > 0 ? "visible" : "hidden",
-                    );
                   }
                   invalidateGraph();
                 }
