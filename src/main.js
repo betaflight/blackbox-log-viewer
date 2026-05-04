@@ -11,8 +11,8 @@ import { GraphConfig } from "./graph_config.js";
 import { SeekBar } from "./seekbar.js";
 import { GpxExporter } from "./gpx-exporter.js";
 import { CsvExporter } from "./csv-exporter.js";
-import { WorkspaceSelection } from "./workspace_selection.js";
-import { WorkspaceMenu } from "./workspace_menu.js";
+import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
+import supaflyWorkspace from "./ws_supafly.json";
 import { GraphLegend } from "./graph_legend.js";
 import { FlightLog } from "./flightlog.js";
 import { FlightLogParser } from "./flightlog_parser.js";
@@ -109,8 +109,6 @@ function BlackboxLogViewer() {
     // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
     activeGraphConfig = new GraphConfig(),
     graphLegend = null,
-    workspaceSelection = null,
-    workspaceMenu = null,
     fieldPresenter = FlightLogFieldPresenter,
     hasVideo = false,
     hasLog = false,
@@ -197,6 +195,7 @@ function BlackboxLogViewer() {
 
     // Workspace
     workspaceStore.activeWorkspace = activeWorkspace;
+    workspaceStore.workspaceGraphConfigs = workspaceGraphConfigs || [];
     workspaceStore.bookmarkTimes = [...bookmarkTimes];
 
     // App
@@ -1280,8 +1279,10 @@ function BlackboxLogViewer() {
   function onSwitchWorkspace(newWorkspaces, newActiveId) {
     prefs.set("activeWorkspace", newActiveId);
     prefs.set("workspaceGraphConfigs", newWorkspaces);
-    workspaceSelection.setWorkspaces(newWorkspaces);
-    workspaceSelection.setActiveWorkspace(newActiveId);
+    workspaceGraphConfigs = newWorkspaces;
+    activeWorkspace = newActiveId;
+    workspaceStore.workspaceGraphConfigs = newWorkspaces || [];
+    workspaceStore.activeWorkspace = newActiveId;
     if (
       flightLog &&
       newWorkspaces[newActiveId] &&
@@ -1291,7 +1292,6 @@ function BlackboxLogViewer() {
       document.getElementById("legend_title").textContent =
         newWorkspaces[newActiveId].title;
     }
-    activeWorkspace = newActiveId;
   }
 
   // Save current config
@@ -1354,16 +1354,12 @@ function BlackboxLogViewer() {
       newGraphConfig,
     );
 
-    workspaceMenu = new WorkspaceMenu(
-      $("#default_workspaces_menu"),
-      onSwitchWorkspace,
-    );
     // initial load of the configuration defaults if we have them
     prefs.get("workspaceGraphConfigs", function (item) {
       if (item) {
         workspaceGraphConfigs = upgradeWorkspaceFormat(item);
       } else {
-        workspaceGraphConfigs = workspaceMenu.getDefaultWorkspace();
+        workspaceGraphConfigs = ctzsnoozeWorkspace;
       }
     });
 
@@ -1375,12 +1371,6 @@ function BlackboxLogViewer() {
       }
     });
 
-    workspaceSelection = new WorkspaceSelection(
-      $(".log-workspace-selection"),
-      workspaceGraphConfigs,
-      onSwitchWorkspace,
-      onSaveWorkspace,
-    );
     onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
 
     prefs.get("log-legend-hidden", function (item) {
@@ -2207,7 +2197,7 @@ function BlackboxLogViewer() {
             break;
           case "W".codePointAt(0):
             if (e.shiftKey) {
-              workspaceMenu.show();
+              workspaceStore.showDefaultMenu = true;
             }
             break;
           case "Z".codePointAt(0): // Ctrl-Z key to toggle between last graph config and current one - undo
@@ -2487,6 +2477,20 @@ function BlackboxLogViewer() {
           setCurrentBlackboxTime(newTime);
         }
         invalidateGraph();
+      }
+    };
+    that.switchWorkspace = function (id) {
+      if (workspaceGraphConfigs[id] != null) {
+        onSwitchWorkspace(workspaceGraphConfigs, id);
+      }
+    };
+    that.saveWorkspace = function (id, title) {
+      onSaveWorkspace(id, title);
+    };
+    that.applyDefaultWorkspace = function (index) {
+      const presets = [null, ctzsnoozeWorkspace, supaflyWorkspace];
+      if (presets[index]) {
+        onSwitchWorkspace(presets[index], 1);
       }
     };
   });

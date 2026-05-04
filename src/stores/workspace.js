@@ -26,6 +26,19 @@ export const useWorkspaceStore = defineStore("workspace", () => {
     bookmarkTimes.value = [];
   }
 
+  const showDefaultMenu = ref(false);
+
+  /** Get title for a workspace slot (1-9, 0) */
+  function getTitle(id) {
+    const entry = workspaceGraphConfigs.value[id];
+    return entry ? entry.title : null;
+  }
+
+  /** Check if a workspace slot has data */
+  function hasWorkspace(id) {
+    return workspaceGraphConfigs.value[id] != null;
+  }
+
   return {
     workspaceGraphConfigs,
     activeWorkspace,
@@ -35,5 +48,8 @@ export const useWorkspaceStore = defineStore("workspace", () => {
     addBookmark,
     removeBookmark,
     clearBookmarks,
+    showDefaultMenu,
+    getTitle,
+    hasWorkspace,
   };
 });

@@ -63,6 +63,13 @@
           @offset-change="onOffsetChange"
         />
       </Teleport>
+      <Teleport to="#vue-workspace-panel">
+        <WorkspacePanel
+          @switch-workspace="onSwitchWorkspace"
+          @save-workspace="onSaveWorkspace"
+          @apply-default="onApplyDefaultWorkspace"
+        />
+      </Teleport>
 
       <!-- Still hidden — kept for future phases -->
       <GraphCanvas v-show="false" ref="graphCanvasRef" />
@@ -107,6 +114,7 @@ import TimePanel from "./components/TimePanel.vue";
 import SpeedPanel from "./components/SpeedPanel.vue";
 import ZoomPanel from "./components/ZoomPanel.vue";
 import SyncPanel from "./components/SyncPanel.vue";
+import WorkspacePanel from "./components/WorkspacePanel.vue";
 import StatusBar from "./components/StatusBar.vue";
 import GraphCanvas from "./components/GraphCanvas.vue";
 import SeekBarCanvas from "./components/SeekBarCanvas.vue";
@@ -274,6 +282,18 @@ function onGraphConfigUpdate(newConfig) {
 
 function onSaveVideoConfig(cfg) {
   getLegacy()?.saveVideoConfig?.(cfg);
+}
+
+function onSwitchWorkspace(id) {
+  getLegacy()?.switchWorkspace?.(id);
+}
+
+function onSaveWorkspace(id, title) {
+  getLegacy()?.saveWorkspace?.(id, title);
+}
+
+function onApplyDefaultWorkspace(index) {
+  getLegacy()?.applyDefaultWorkspace?.(index);
 }
 
 function onGotoBookmark(index) {
