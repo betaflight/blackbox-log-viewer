@@ -18,17 +18,20 @@ export function PrefStorage(keyPrefix) {
     name = keyPrefix + name;
 
     switch (mode) {
-      case LOCALSTORAGE:
+      case LOCALSTORAGE: {
         let parsed = null;
 
         if (globalThis.localStorage) {
           try {
             parsed = JSON.parse(globalThis.localStorage[name]);
-          } catch (e) {}
+          } catch {
+            // Invalid JSON in storage — return null
+          }
         }
 
         onGet(parsed);
         break;
+      }
       case CHROME_STORAGE_LOCAL:
         chrome.storage.local.get(name, function (data) {
           onGet(data[name]);
@@ -57,13 +60,14 @@ export function PrefStorage(keyPrefix) {
           }
         }
         break;
-      case CHROME_STORAGE_LOCAL:
+      case CHROME_STORAGE_LOCAL: {
         const data = {};
 
         data[name] = value;
 
         chrome.storage.local.set(data);
         break;
+      }
       case MEMORY:
         memoryStorage[name] = value;
         break;

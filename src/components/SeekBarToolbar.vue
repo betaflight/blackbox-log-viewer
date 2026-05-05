@@ -39,7 +39,9 @@ onMounted(() => {
   // Wait for legacy renderSeekBarPicker() to create the native select
   const observer = new MutationObserver(() => {
     const el = document.getElementById("seekbarTypeSelect");
-    if (!el) return;
+    if (!el) {
+      return;
+    }
     observer.disconnect();
 
     // Intercept .value setter

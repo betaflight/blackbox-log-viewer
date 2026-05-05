@@ -165,31 +165,43 @@ let lastEstimatedTimeMsec = null;
 const hasFlightVideo = computed(() => !!props.logParameters?.flightVideo);
 
 const progressPercent = computed(() => {
-  if (progressMax.value <= 0) return 0;
+  if (progressMax.value <= 0) {
+    return 0;
+  }
   return Math.round((progressValue.value / progressMax.value) * 100);
 });
 
 const videoDurationText = computed(() => {
-  if (!props.logParameters) return "";
+  if (!props.logParameters) {
+    return "";
+  }
   const inTime = props.logParameters.inTime ?? props.flightLog?.getMinTime() ?? 0;
   const outTime = props.logParameters.outTime ?? props.flightLog?.getMaxTime() ?? 0;
   return formatTime(Math.round((outTime - inTime) / 1000000));
 });
 
 const title = computed(() => {
-  if (mode.value === "progress") return "Rendering video...";
-  if (mode.value === "complete") return "Video rendering complete!";
+  if (mode.value === "progress") {
+    return "Rendering video...";
+  }
+  if (mode.value === "complete") {
+    return "Video rendering complete!";
+  }
   return "Export video";
 });
 
 function populateConfig(cfg) {
-  if (cfg.frameRate) frameRate.value = String(cfg.frameRate);
-  if (cfg.width) resolution.value = `${cfg.width}x${cfg.height}`;
+  if (cfg.frameRate) {
+    frameRate.value = String(cfg.frameRate);
+  }
+  if (cfg.width) {
+    resolution.value = `${cfg.width}x${cfg.height}`;
+  }
   if (cfg.videoDim !== undefined) {
     // Find closest match
     const best = videoDimOptions.reduce((prev, cur) =>
       Math.abs(parseFloat(cur.value) - cfg.videoDim) < Math.abs(parseFloat(prev.value) - cfg.videoDim) ? cur : prev,
-    );
+    videoDimOptions[0]);
     videoDim.value = best.value;
   }
 }

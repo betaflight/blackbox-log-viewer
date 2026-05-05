@@ -16,7 +16,8 @@
               <UIcon name="i-lucide-move" class="size-3.5 text-primary" />
               <span>Navigation</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>←</kbd> <kbd>→</kbd></td><td>Move through log by 100ms</td></tr>
               <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Move by exactly one frame</td></tr>
               <tr><td class="keys-td-keys"><kbd>PgUp</kbd> <kbd>PgDn</kbd></td><td>Move through log fast</td></tr>
@@ -32,7 +33,8 @@
               <UIcon name="i-lucide-activity" class="size-3.5 text-primary" />
               <span>Spectrum Analyser</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>A</kbd></td><td>Toggle analyser display</td></tr>
               <tr><td class="keys-td-keys"><kbd>Shift</kbd></td><td>Show frequency under mouse</td></tr>
             </table>
@@ -46,7 +48,8 @@
               <UIcon name="i-lucide-zap" class="size-3.5 text-primary" />
               <span>Quick Modes</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>Z</kbd></td><td>QuickZoom — max zoom and back</td></tr>
               <tr><td class="keys-td-keys"><kbd>S</kbd></td><td>QuickSmooth — smoothing to zero</td></tr>
               <tr><td class="keys-td-keys"><kbd>X</kbd></td><td>QuickExpo — expo to linear</td></tr>
@@ -61,7 +64,8 @@
               <UIcon name="i-lucide-sliders-horizontal" class="size-3.5 text-primary" />
               <span>Field Adjustments</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>Ctrl</kbd> <kbd>Scroll</kbd></td><td>Adjust smoothing</td></tr>
               <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>Scroll</kbd></td><td>Adjust zoom</td></tr>
               <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>Scroll</kbd></td><td>Adjust expo</td></tr>
@@ -77,7 +81,8 @@
               <UIcon name="i-lucide-crosshair" class="size-3.5 text-primary" />
               <span>Marking &amp; Sync</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>M</kbd></td><td>Toggle marker at current time</td></tr>
               <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>M</kbd></td><td>Smart Sync at marker position</td></tr>
               <tr><td class="keys-td-keys"><kbd>I</kbd></td><td>Set IN point</td></tr>
@@ -90,7 +95,8 @@
               <UIcon name="i-lucide-bookmark" class="size-3.5 text-primary" />
               <span>Bookmarks</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>1-9</kbd></td><td>Save bookmark</td></tr>
               <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>1-9</kbd></td><td>Recall bookmark</td></tr>
               <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>0</kbd></td><td>Clear all bookmarks</td></tr>
@@ -106,7 +112,8 @@
               <UIcon name="i-lucide-layout-grid" class="size-3.5 text-primary" />
               <span>Workspaces</span>
             </div>
-            <table class="keys-table">
+            <table class="keys-table" aria-label="Keyboard shortcuts">
+              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
               <tr><td class="keys-td-keys"><kbd>0-9</kbd></td><td>Recall workspace</td></tr>
               <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>0-9</kbd></td><td>Save to workspace</td></tr>
               <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>S</kbd></td><td>Save to current workspace</td></tr>

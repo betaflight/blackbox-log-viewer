@@ -121,7 +121,7 @@ select.log-index:focus {
   right: 0;
   padding-left: 15px;
   padding-right: 15px;
-  display: contents;
+  display: none;
 }
 
 .log-seek-bar canvas {
@@ -506,6 +506,8 @@ html.has-analyser-fullscreen.has-analyser
 .log-field-values table {
   width: 100%;
   border-collapse: collapse;
+  background-color: var(--surface-0);
+  overflow-y: auto;
 }
 
 .log-field-values th,
@@ -528,11 +530,6 @@ html.has-analyser-fullscreen.has-analyser
 
 .log-field-values .raw-value {
   max-width: 5em;
-}
-
-.log-field-values table {
-  background-color: var(--surface-0);
-  overflow-y: auto;
 }
 
 .log-field-values tr:nth-child(even) {
@@ -784,10 +781,6 @@ html.has-smoothing-override .toggle-smoothing,
 html.has-grid-override .toggle-grid {
   stroke-opacity: 0.2;
   fill-opacity: 0.2;
-}
-
-.app-main-pane {
-  display: none;
 }
 
 html.video-hidden video {

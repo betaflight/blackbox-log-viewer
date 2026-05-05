@@ -44,7 +44,9 @@ export function Configuration(file, _configurationDefaults, showConfigFile) {
 
   function renderFileContents() {
     const existingElem = document.querySelector(".configuration-file");
-    if (!existingElem) return;
+    if (!existingElem) {
+      return;
+    }
 
     const configurationDiv = document.createElement("div");
     configurationDiv.className = "configuration-file";
@@ -64,7 +66,9 @@ export function Configuration(file, _configurationDefaults, showConfigFile) {
     if (statusBarFileName) statusBarFileName.textContent = file.name;
 
     configurationDiv.querySelector(".configuration-close")?.addEventListener("click", function () {
-      if (showConfigFile) showConfigFile(false);
+      if (showConfigFile) {
+        showConfigFile(false);
+      }
     });
   }
 
@@ -146,10 +150,14 @@ export function ConfigurationDefaults(prefs) {
   this.isDefault = function (line) {
     // Returns the default line equivalent
 
-    if (!fileLinesArray) return true; // by default, lines are the same if there is no default file loaded
+    if (!fileLinesArray) {
+      return true; // by default, lines are the same if there is no default file loaded
+    }
 
     for (let i = 0; i < fileLinesArray.length; i++) {
-      if (line !== fileLinesArray[i]) continue; // not the same line, keep looking
+      if (line !== fileLinesArray[i]) {
+        continue; // not the same line, keep looking
+      }
       return true; // line is same as default
     }
     return false; // line not the same as default or not found

@@ -15,7 +15,7 @@
     <div class="log-graph-legend">
     </div>
 
-    <div class="flex gap-1 override-button-group my-2" role="group">
+    <fieldset class="flex gap-1 override-button-group my-2">
       <UButton variant="ghost" color="neutral" size="xs" class="toggle-expo" title="Expo On/Off">
         <svg width="20" height="20" viewBox="0 0 8.467 8.467">
           <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"/>
@@ -37,7 +37,7 @@
           </g>
         </svg>
       </UButton>
-    </div>
+    </fieldset>
 
     <UButton color="primary" variant="outline" block size="xs" class="open-graph-configuration-dialog" label="Graph setup" />
   </div>
