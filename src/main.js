@@ -1,5 +1,5 @@
-import $ from "./jquery.js";
 import "./vendor.js";
+
 import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
@@ -123,23 +123,23 @@ function BlackboxLogViewer() {
     hasConfig = false,
     hasConfigOverlay = false,
     isFullscreen = false, // New fullscreen feature (to hide table)
-    video = $(".log-graph video")[0],
-    canvas = $("#graphCanvas")[0],
-    analyserCanvas = $("#analyserCanvas")[0],
-    stickCanvas = $("#stickCanvas")[0],
-    craftCanvas = $("#craftCanvas")[0],
-    html = $("html"),
+    video = document.querySelector(".log-graph video"),
+    canvas = document.getElementById("graphCanvas"),
+    analyserCanvas = document.getElementById("analyserCanvas"),
+    stickCanvas = document.getElementById("stickCanvas"),
+    craftCanvas = document.getElementById("craftCanvas"),
+    html = document.documentElement,
     videoURL = false,
     videoOffset = 0.0,
     videoExportInTime = false,
     videoExportOutTime = false,
     markerTime = 0, // New marker time
     graphRendersCount = 0,
-    seekBarCanvas = $(".log-seek-bar canvas")[0],
+    seekBarCanvas = document.querySelector(".log-seek-bar canvas"),
     seekBar = new SeekBar(seekBarCanvas),
     seekBarRepaintRateLimited = throttle(
       200,
-      $.proxy(seekBar.repaint, seekBar),
+      seekBar.repaint.bind(seekBar),
     ),
     seekBarMode = "avgThrottle",
     updateValuesChartRateLimited,
@@ -247,12 +247,12 @@ function BlackboxLogViewer() {
   }
 
   function updateValuesChart() {
-    let table = $(".log-field-values table"),
+    let table = document.querySelector(".log-field-values table"),
       i,
       frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
       fieldNames = flightLog.getMainFieldNames();
 
-    $("tr:not(:first)", table).remove();
+    table.querySelectorAll("tr:not(:first-child)").forEach((tr) => tr.remove());
 
     if (frame) {
       let currentFlightMode =
@@ -300,48 +300,44 @@ function BlackboxLogViewer() {
           rows.push(row);
         }
 
-        table.append(rows.join(""));
+        table.insertAdjacentHTML("beforeend", rows.join(""));
 
         const statRows = [];
-        const statsTable = $(".log-field-values #stats-table");
-        $("tr:not(:first)", statsTable).remove();
+        const statsTable = document.querySelector(".log-field-values #stats-table");
+        statsTable.querySelectorAll("tr:not(:first-child)").forEach((tr) => tr.remove());
         const stats = SimpleStats(flightLog).calculate();
-        const tpl = _.template(
-          "<tr><td><%= name %></td><td><%= min %> (<%= min_raw %>)</td><td><%= max %> (<%= max_raw %>)</td><td><%= mean %> (<%= mean_raw %>)</td></tr>",
-        );
         for (const field of Object.keys(stats)) {
           const stat = stats[field];
           if (stat === undefined) {
             continue;
           }
+          const name = fieldPresenter.fieldNameToFriendly(
+            stat.name,
+            flightLog.getSysConfig().debug_mode,
+          );
+          const minRaw = atMost2DecPlaces(stat.min);
+          const minVal = FlightLogFieldPresenter.decodeFieldToFriendly(
+            flightLog,
+            stat.name,
+            stat.min,
+          );
+          const maxRaw = atMost2DecPlaces(stat.max);
+          const maxVal = FlightLogFieldPresenter.decodeFieldToFriendly(
+            flightLog,
+            stat.name,
+            stat.max,
+          );
+          const meanRaw = atMost2DecPlaces(stat.mean);
+          const meanVal = FlightLogFieldPresenter.decodeFieldToFriendly(
+            flightLog,
+            stat.name,
+            stat.mean,
+          );
           statRows.push(
-            tpl({
-              name: fieldPresenter.fieldNameToFriendly(
-                stat.name,
-                flightLog.getSysConfig().debug_mode,
-              ),
-              min_raw: atMost2DecPlaces(stat.min),
-              min: FlightLogFieldPresenter.decodeFieldToFriendly(
-                flightLog,
-                stat.name,
-                stat.min,
-              ),
-              max_raw: atMost2DecPlaces(stat.max),
-              max: FlightLogFieldPresenter.decodeFieldToFriendly(
-                flightLog,
-                stat.name,
-                stat.max,
-              ),
-              mean_raw: atMost2DecPlaces(stat.mean),
-              mean: FlightLogFieldPresenter.decodeFieldToFriendly(
-                flightLog,
-                stat.name,
-                stat.mean,
-              ),
-            }),
+            `<tr><td>${name}</td><td>${minVal} (${minRaw})</td><td>${maxVal} (${maxRaw})</td><td>${meanVal} (${meanRaw})</td></tr>`,
           );
         }
-        statsTable.append(statRows.join(""));
+        statsTable.insertAdjacentHTML("beforeend", statRows.join(""));
       }
 
       // Update flight mode flags on status bar
@@ -438,8 +434,8 @@ function BlackboxLogViewer() {
   }
 
   function updateCanvasSize() {
-    const width = $(canvas).width(),
-      height = $(canvas).height();
+    const width = canvas.clientWidth,
+      height = canvas.clientHeight;
 
     if (graph) {
       graph.resize(width, height);
@@ -453,19 +449,19 @@ function BlackboxLogViewer() {
   }
 
   function renderSeekBarPicker() {
-    const seekBarContainer = $(".seekBar-selection"),
-      seekBarPicker = $(
-        '<select id="seekbarTypeSelect", class="seekbarTypeSelect">',
-      ),
+    const seekBarContainer = document.querySelector(".seekBar-selection"),
       seekBarItems = [
         ["avgThrottle", "Average motor throttle"],
         ["maxRC", "Maximum stick input"],
         ["maxMotorDiff", "Maximum motor differential"],
       ];
-    seekBarContainer.empty();
-    seekBarPicker.change(function () {
+    seekBarContainer.innerHTML = "";
+    const seekBarPicker = document.createElement("select");
+    seekBarPicker.id = "seekbarTypeSelect";
+    seekBarPicker.className = "seekbarTypeSelect";
+    seekBarPicker.addEventListener("change", function () {
       const activity = flightLog.getActivitySummary(),
-        displayItem = $(this).val();
+        displayItem = this.value;
       seekBarMode = displayItem;
       seekBar.setActivity(
         activity.times,
@@ -475,32 +471,29 @@ function BlackboxLogViewer() {
       seekBar.repaint();
     });
     for (const item of seekBarItems) {
-      const option = $("<option></option>");
-      option.text(item[1]);
-      option.attr("value", item[0]);
-      seekBarPicker.append(option);
+      const option = document.createElement("option");
+      option.textContent = item[1];
+      option.value = item[0];
+      seekBarPicker.appendChild(option);
     }
-    seekBarContainer.append(seekBarPicker);
+    seekBarContainer.appendChild(seekBarPicker);
   }
 
   function renderLogFileInfo(file) {
     appStore.logFilename = file.name;
 
-    const logIndexContainer = $(".log-index"),
+    const logIndexContainer = document.querySelector(".log-index"),
       logCount = flightLog.getLogCount();
 
-    logIndexContainer.empty();
+    logIndexContainer.innerHTML = "";
 
-    const logIndexPicker = $(
-      '<select class="log-index form-control no-wheel">',
-    );
+    const logIndexPicker = document.createElement("select");
+    logIndexPicker.className = "log-index form-control no-wheel";
     if (logCount > 1) {
-      logIndexPicker.change(function () {
-        selectLog(Number.parseInt($(this).val(), 10));
+      logIndexPicker.addEventListener("change", function () {
+        selectLog(Number.parseInt(this.value, 10));
         if (graph) {
-          hasAnalyserFullscreen
-            ? html.addClass("has-analyser-fullscreen")
-            : html.removeClass("has-analyser-fullscreen");
+          html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
           graph.setAnalyser(hasAnalyserFullscreen);
         }
       });
@@ -528,24 +521,22 @@ function BlackboxLogViewer() {
       }
 
       if (logCount > 1) {
-        const option = $("<option></option>");
-
-        option.text(`${index + 1}/${flightLog.getLogCount()}: ${logLabel}`);
-        option.attr("value", index);
-
-        if (error) option.attr("disabled", "disabled");
-
-        logIndexPicker.append(option);
+        const option = document.createElement("option");
+        option.textContent = `${index + 1}/${flightLog.getLogCount()}: ${logLabel}`;
+        option.value = index;
+        if (error) option.disabled = true;
+        logIndexPicker.appendChild(option);
       } else {
-        const holder = $('<div class="form-control-static no-wheel"></div>');
-        holder.text(logLabel);
-        logIndexContainer.append(holder);
+        const holder = document.createElement("div");
+        holder.className = "form-control-static no-wheel";
+        holder.textContent = logLabel;
+        logIndexContainer.appendChild(holder);
       }
     }
 
     if (logCount > 1) {
-      logIndexPicker.val(0);
-      logIndexContainer.append(logIndexPicker);
+      logIndexPicker.value = 0;
+      logIndexContainer.appendChild(logIndexPicker);
     }
   }
 
@@ -553,17 +544,18 @@ function BlackboxLogViewer() {
    * Update the metadata displays to show information about the currently selected log index.
    */
   function renderSelectedLogInfo() {
-    $(".log-index").val(flightLog.getLogIndex());
+    const logIndexSelect = document.querySelector(".log-index select, select.log-index");
+    if (logIndexSelect) logIndexSelect.value = flightLog.getLogIndex();
 
     if (flightLog.getNumCellsEstimate()) {
       const cellsText = `${flightLog.getNumCellsEstimate()}S (${Number(
         flightLog.getReferenceVoltageMillivolts() / 1000,
       ).toFixed(2)}V)`;
-      $(".log-cells").text(cellsText);
-      $(".log-cells-header,.log-cells").css("display", "block");
+      document.querySelectorAll(".log-cells").forEach((el) => el.textContent = cellsText);
+      document.querySelectorAll(".log-cells-header,.log-cells").forEach((el) => el.style.display = "block");
       appStore.statusCells = cellsText;
     } else {
-      $(".log-cells-header,.log-cells").css("display", "none");
+      document.querySelectorAll(".log-cells-header,.log-cells").forEach((el) => el.style.display = "none");
       appStore.statusCells = "";
     }
 
@@ -626,7 +618,7 @@ function BlackboxLogViewer() {
     seekBar.repaint();
 
     // Add flightLog to map
-    html.toggleClass("has-gps", flightLog.hasGpsData());
+    html.classList.toggle("has-gps", flightLog.hasGpsData());
     if (flightLog.hasGpsData()) {
       mapGrapher.setUserSettings(userSettings);
       mapGrapher.setFlightLog(flightLog);
@@ -635,7 +627,7 @@ function BlackboxLogViewer() {
 
   function setGraphState(newState) {
     graphState = newState;
-    const btnLogPlayPause = $(".log-play-pause");
+    const btnLogPlayPause = document.querySelector(".log-play-pause");
 
     lastRenderTime = false;
 
@@ -644,13 +636,19 @@ function BlackboxLogViewer() {
         if (hasVideo) {
           video.play();
         }
-        $("span", btnLogPlayPause).attr("class", "glyphicon glyphicon-pause");
+        if (btnLogPlayPause) {
+          const span = btnLogPlayPause.querySelector("span");
+          if (span) span.className = "glyphicon glyphicon-pause";
+        }
         break;
       case GRAPH_STATE_PAUSED:
         if (hasVideo) {
           video.pause();
         }
-        $("span", btnLogPlayPause).attr("class", "glyphicon glyphicon-play");
+        if (btnLogPlayPause) {
+          const span = btnLogPlayPause.querySelector("span");
+          if (span) span.className = "glyphicon glyphicon-play";
+        }
         break;
     }
 
@@ -744,7 +742,7 @@ function BlackboxLogViewer() {
         //state defined, just set item
         hasConfigOverlay = state ? true : false;
       }
-      html.toggleClass("has-config-overlay", hasConfigOverlay);
+      html.classList.toggle("has-config-overlay", hasConfigOverlay);
     }
   }
 
@@ -756,7 +754,7 @@ function BlackboxLogViewer() {
       //state defined, just set item
       hasTableOverlay = state ? true : false;
     }
-    html.toggleClass("has-table-overlay", hasTableOverlay);
+    html.classList.toggle("has-table-overlay", hasTableOverlay);
     updateValuesChart();
   }
 
@@ -851,8 +849,11 @@ function BlackboxLogViewer() {
   }
 
   function loadFileMessage(fileName) {
-    $("#loading-file-text").text(`Trying to load file ${fileName}...`);
-    $("#loading-file-text").show();
+    const loadingEl = document.getElementById("loading-file-text");
+    if (loadingEl) {
+      loadingEl.textContent = `Trying to load file ${fileName}...`;
+      loadingEl.style.display = "";
+    }
   }
 
   function loadFiles(files) {
@@ -916,7 +917,7 @@ function BlackboxLogViewer() {
               showConfigFile,
             ); // the configuration class will actually re-open the file as a text object.
             hasConfig = true;
-            html.toggleClass("has-config", hasConfig);
+            html.classList.toggle("has-config", hasConfig);
           }
         } catch (e) {
           configuration = null;
@@ -950,27 +951,27 @@ function BlackboxLogViewer() {
 
       hasLog = true;
       logStore.hasLog = true;
-      html.toggleClass("has-log", hasLog);
-      html.toggleClass("has-table", hasTable);
-      html.toggleClass("has-craft", userSettings.drawCraft);
-      html.toggleClass("has-sticks", userSettings.drawSticks);
-      html.toggleClass("has-expo-override", userSettings.graphExpoOverride);
-      html.toggleClass(
+      html.classList.toggle("has-log", hasLog);
+      html.classList.toggle("has-table", hasTable);
+      html.classList.toggle("has-craft", userSettings.drawCraft);
+      html.classList.toggle("has-sticks", userSettings.drawSticks);
+      html.classList.toggle("has-expo-override", userSettings.graphExpoOverride);
+      html.classList.toggle(
         "has-smoothing-override",
         userSettings.graphSmoothOverride,
       );
-      html.toggleClass("has-grid-override", userSettings.graphSmoothOverride);
+      html.classList.toggle("has-grid-override", userSettings.graphSmoothOverride);
 
       setTimeout(function () {
-        $(window).resize();
+        window.dispatchEvent(new Event("resize"));
       }, 500); // refresh the window size;
 
       selectLog(null);
 
       if (graph) {
         hasAnalyserFullscreen
-          ? html.addClass("has-analyser-fullscreen")
-          : html.removeClass("has-analyser-fullscreen");
+          ? html.classList.add("has-analyser-fullscreen")
+          : html.classList.remove("has-analyser-fullscreen");
         graph.setAnalyser(hasAnalyserFullscreen);
       }
     };
@@ -1003,7 +1004,7 @@ function BlackboxLogViewer() {
 
   function videoLoaded(e) {
     hasVideo = true;
-    html.toggleClass("has-video", hasVideo);
+    html.classList.toggle("has-video", hasVideo);
 
     syncToStores();
     setGraphState(GRAPH_STATE_PAUSED);
@@ -1035,7 +1036,7 @@ function BlackboxLogViewer() {
       hasAnalyser = true; // Default to true when toggleAnalizer is false
     }
     graph.setDrawAnalyser(hasAnalyser, ctrlKey);
-    html.toggleClass("has-analyser", hasAnalyser);
+    html.classList.toggle("has-analyser", hasAnalyser);
     prefs.set("hasAnalyser", hasAnalyser);
     invalidateGraph();
   }
@@ -1047,13 +1048,13 @@ function BlackboxLogViewer() {
   function setMarker(state) {
     // update marker field
     hasMarker = state;
-    html.toggleClass("has-marker", state);
+    html.classList.toggle("has-marker", state);
   }
 
   function setFullscreen(state) {
     // update fullscreen status
     isFullscreen = state;
-    html.toggleClass("is-fullscreen", state);
+    html.classList.toggle("is-fullscreen", state);
   }
 
   this.getMarker = function () {
@@ -1299,22 +1300,18 @@ function BlackboxLogViewer() {
     invalidateGraph();
   });
 
-  $(function () {
+  // Initialize on DOM ready (modules are deferred, DOM is ready)
+  (function () {
     // Initialize dark theme
     DarkTheme.init(prefs);
 
-    $('[data-toggle="tooltip"]').tooltip({
-      trigger: "hover",
-      placement: "auto bottom",
-    }); // initialise tooltips
-    $('[data-toggle="dropdown"]').dropdown(); // initialise menus
-    // Legacy navbar handlers removed — now wired via Vue AppToolbar
+    // Bootstrap tooltips/dropdowns no longer initialized — replaced by Vue/CSS
 
     // Version information
     appStore.statusViewerVersion = `v${__APP_VERSION__}`;
 
     graphLegend = new GraphLegend(
-      $(".log-graph-legend"),
+      document.querySelector(".log-graph-legend"),
       activeGraphConfig,
       onLegendVisbilityChange,
       onLegendSelectionChange,
@@ -1353,16 +1350,16 @@ function BlackboxLogViewer() {
         prefs.get('hasTable', function(item) {
            if (item) {
                hasTable = item;
-               html.toggleClass("has-table", hasTable);
+               html.classList.toggle("has-table", hasTable);
            }
         });
         */
     hasTable = false;
-    html.toggleClass("has-table", hasTable);
+    html.classList.toggle("has-table", hasTable);
 
     // Reset the analyser window on application startup.
     hasAnalyser = false;
-    html.toggleClass("has-analyser", hasAnalyser);
+    html.classList.toggle("has-analyser", hasAnalyser);
 
     // File open and new window wired via Vue AppToolbar
 
@@ -1532,9 +1529,8 @@ function BlackboxLogViewer() {
         return true;
       })();
 
-    $(".open-graph-configuration-dialog").click(function (e) {
+    document.querySelector(".open-graph-configuration-dialog")?.addEventListener("click", function (e) {
       e.preventDefault();
-
       globalThis.vueApp.graphConfigDialogOpen = true;
     });
 
@@ -1557,34 +1553,35 @@ function BlackboxLogViewer() {
 
     // Export buttons wired via Vue AppToolbar
 
-    $("#btn-spectrum-export").click(function (e) {
+    document.getElementById("btn-spectrum-export")?.addEventListener("click", function (e) {
       exportSpectrumToCsv();
       e.preventDefault();
     });
 
-    $("#btn-spectrum-import").change(function (e) {
+    document.getElementById("btn-spectrum-import")?.addEventListener("change", function (e) {
       graph.getAnalyser().importSpectrumFromCSV(e.target.files);
       e.preventDefault();
       e.target.value = "";
     });
 
-    $("#btn-spectrum-clear").click(function (e) {
+    document.getElementById("btn-spectrum-clear")?.addEventListener("click", function (e) {
       graph.getAnalyser().removeImportedSpectrums();
       e.preventDefault();
     });
 
     // GPX export wired via Vue AppToolbar
 
-    $(window).resize(function () {
-      updateCanvasSize(); /*updateHeaderSize()*/
+    window.addEventListener("resize", function () {
+      updateCanvasSize();
     });
 
     function updateHeaderSize() {
-      const newHeight = $(".video-top-controls").height() - 20; // 23px offset
-      $(".log-graph").css("top", `${newHeight}px`);
-      $(".log-graph-config").css("top", `${newHeight}px`);
-      $(".log-seek-bar").css("top", `${newHeight}px`);
-      $(".log-field-values").css("top", `${newHeight}px`);
+      const topControls = document.querySelector(".video-top-controls");
+      if (!topControls) return;
+      const newHeight = topControls.clientHeight - 20;
+      document.querySelectorAll(".log-graph, .log-graph-config, .log-seek-bar, .log-field-values").forEach((el) => {
+        el.style.top = `${newHeight}px`;
+      });
       invalidateGraph();
     }
 
@@ -1804,31 +1801,31 @@ function BlackboxLogViewer() {
 
     function toggleOverrideStatus(userSetting, className) {
       userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
-      html.toggleClass(className, userSettings[userSetting]);
+      html.classList.toggle(className, userSettings[userSetting]);
       saveOneUserSetting(userSetting, userSettings[userSetting]);
       graph.refreshOptions(userSettings);
       graph.refreshGraphConfig();
       invalidateGraph();
     }
 
-    $(".log-graph-legend").on("mousedown", function (e) {
-      if (e.which != 2) return; // is it the middle mouse button, no, then ignore
+    document.querySelector(".log-graph-legend")?.addEventListener("mousedown", function (e) {
+      if (e.button !== 1) return; // middle mouse button only
 
       if (
-        $(e.target).hasClass("graph-legend-group") ||
-        $(e.target).hasClass("graph-legend-field")
+        e.target.classList.contains("graph-legend-group") ||
+        e.target.classList.contains("graph-legend-field")
       ) {
         const refreshRequired = restorePenDefaults(
           activeGraphConfig.getGraphs(),
-          $(e.target).attr("graph"),
-          $(e.target).attr("field"),
+          e.target.getAttribute("graph"),
+          e.target.getAttribute("field"),
         );
 
         if (refreshRequired) {
           graph.refreshGraphConfig();
           invalidateGraph();
           mouseNotification.show(
-            $(".log-graph"),
+            document.querySelector(".log-graph"),
             null,
             null,
             refreshRequired,
@@ -1843,63 +1840,56 @@ function BlackboxLogViewer() {
       }
     });
 
-    $(document).on("wheel", function (e) {
-      if ($(e.target).hasClass("no-wheel")) {
-        // prevent mousewheel scrolling on non scrollable elements.
+    document.addEventListener("wheel", function (e) {
+      if (e.target.classList.contains("no-wheel")) {
         e.preventDefault();
         return;
       }
 
-      if (graph && $(e.target).parents(".modal").length == 0) {
-        const delta = Math.max(-1, Math.min(1, e.originalEvent.wheelDelta));
+      if (graph && !e.target.closest(".modal")) {
+        const delta = Math.max(-1, Math.min(1, e.deltaY < 0 ? 1 : e.deltaY > 0 ? -1 : 0));
         if (delta != 0) {
-          if ($(e.target).attr("id") == "graphCanvas") {
-            // we are scrolling the graph
+          if (e.target.id === "graphCanvas") {
             if (delta < 0) {
-              // scroll down (or left)
               if (e.altKey || e.shiftKey) {
                 setGraphZoom(graphZoom - 10 - (e.altKey ? 15 : 0), true);
               } else {
-                logJumpBack(0.1 /*10%*/);
+                logJumpBack(0.1);
               }
             } else {
-              // scroll up or right
               if (e.altKey || e.shiftKey) {
                 setGraphZoom(graphZoom + 10 + (e.altKey ? 15 : 0), true);
               } else {
-                logJumpForward(0.1 /*10%*/);
+                logJumpForward(0.1);
               }
             }
             e.preventDefault();
-            return true;
+            return;
           }
-          if ($(e.target).hasClass("field-quick-adjust")) {
+          if (e.target.classList.contains("field-quick-adjust")) {
             let refreshRequired = false;
 
             if (e.shiftKey) {
-              // change zoom
               refreshRequired = changePenZoom(
                 activeGraphConfig.getGraphs(),
-                $(e.target).attr("graph"),
-                $(e.target).attr("field"),
+                e.target.getAttribute("graph"),
+                e.target.getAttribute("field"),
                 delta >= 0,
               );
               e.preventDefault();
             } else if (e.altKey) {
-              // change Expo
               refreshRequired = changePenExpo(
                 activeGraphConfig.getGraphs(),
-                $(e.target).attr("graph"),
-                $(e.target).attr("field"),
+                e.target.getAttribute("graph"),
+                e.target.getAttribute("field"),
                 delta >= 0,
               );
               e.preventDefault();
             } else if (e.ctrlKey) {
-              // Change smoothing
               refreshRequired = changePenSmoothing(
                 activeGraphConfig.getGraphs(),
-                $(e.target).attr("graph"),
-                $(e.target).attr("field"),
+                e.target.getAttribute("graph"),
+                e.target.getAttribute("field"),
                 delta >= 0,
               );
               e.preventDefault();
@@ -1909,7 +1899,7 @@ function BlackboxLogViewer() {
               graph.refreshGraphConfig();
               invalidateGraph();
               mouseNotification.show(
-                $(".log-graph"),
+                document.querySelector(".log-graph"),
                 null,
                 null,
                 refreshRequired,
@@ -1920,30 +1910,26 @@ function BlackboxLogViewer() {
               );
             }
 
-            return true;
+            return;
           }
         }
       }
-    });
+    }, { passive: false });
 
-    $(document).keydown(function (e) {
-      // Pressing any key hides dropdown menus
-      //$(".dropdown-toggle").dropdown("toggle");
-
+    document.addEventListener("keydown", function (e) {
       const shifted = e.altKey || e.shiftKey || e.ctrlKey || e.metaKey;
       if (
         e.which === 13 &&
         e.target.type === "text" &&
-        $(e.target).parents(".modal").length == 0
+        !e.target.closest(".modal")
       ) {
-        // pressing return on a text field clears the focus.
-        $(e.target).blur();
+        e.target.blur();
       }
       // keyboard controls are disabled on modal dialog boxes and text entry fields
       if (
         graph &&
         e.target.type != "text" &&
-        $(e.target).parents(".modal").length == 0
+        !e.target.closest(".modal")
       ) {
         switch (e.which) {
           case "I".codePointAt(0):
@@ -1997,7 +1983,7 @@ function BlackboxLogViewer() {
                 hasAnalyser = !hasAnalyser;
               } else hasAnalyser = false;
               graph.setDrawAnalyser(hasAnalyser);
-              html.toggleClass("has-analyser", hasAnalyser);
+              html.classList.toggle("has-analyser", hasAnalyser);
               prefs.set("hasAnalyser", hasAnalyser);
               invalidateGraph();
               e.preventDefault();
@@ -2007,8 +1993,8 @@ function BlackboxLogViewer() {
                 hasAnalyserFullscreen = !hasAnalyserFullscreen;
               } else hasAnalyserFullscreen = false;
               hasAnalyserFullscreen
-                ? html.addClass("has-analyser-fullscreen")
-                : html.removeClass("has-analyser-fullscreen");
+                ? html.classList.add("has-analyser-fullscreen")
+                : html.classList.remove("has-analyser-fullscreen");
               graph.setAnalyser(hasAnalyserFullscreen);
               invalidateGraph();
             }
@@ -2196,11 +2182,9 @@ function BlackboxLogViewer() {
       }
     });
 
-    $(video).on({
-      loadedmetadata: updateCanvasSize,
-      error: reportVideoError,
-      loadeddata: videoLoaded,
-    });
+    video.addEventListener("loadedmetadata", updateCanvasSize);
+    video.addEventListener("error", reportVideoError);
+    video.addEventListener("loadeddata", videoLoaded);
 
     const percentageFormat = {
       to: function (value) {
@@ -2279,17 +2263,17 @@ function BlackboxLogViewer() {
     that.toggleVideo = function () {
       viewVideo = !viewVideo;
       appStore.viewVideo = viewVideo;
-      html.toggleClass("video-hidden", !viewVideo);
+      html.classList.toggle("video-hidden", !viewVideo);
     };
     that.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
-      html.toggleClass("has-craft", userSettings.drawCraft);
+      html.classList.toggle("has-craft", userSettings.drawCraft);
       saveOneUserSetting("drawCraft", userSettings.drawCraft);
     };
     that.toggleSticks = function () {
       userSettings.drawSticks = !userSettings.drawSticks;
       graph.setDrawSticks(userSettings.drawSticks);
-      html.toggleClass("has-sticks", userSettings.drawSticks);
+      html.classList.toggle("has-sticks", userSettings.drawSticks);
       saveOneUserSetting("drawSticks", userSettings.drawSticks);
       invalidateGraph();
     };
@@ -2317,14 +2301,14 @@ function BlackboxLogViewer() {
         }
       }
       graph.setDrawAnalyser(hasAnalyser);
-      html.toggleClass("has-analyser", hasAnalyser);
+      html.classList.toggle("has-analyser", hasAnalyser);
       prefs.set("hasAnalyser", hasAnalyser);
       invalidateGraph();
     };
     that.toggleMap = function () {
       hasMap = !hasMap;
       graphStore.hasMap = hasMap;
-      html.toggleClass("has-map", hasMap);
+      html.classList.toggle("has-map", hasMap);
       prefs.set("hasMap", hasMap);
       if (flightLog.hasGpsData()) {
         mapGrapher.initialize(userSettings);
@@ -2335,8 +2319,8 @@ function BlackboxLogViewer() {
         hasAnalyserFullscreen = !hasAnalyserFullscreen;
       } else hasAnalyserFullscreen = false;
       hasAnalyserFullscreen
-        ? html.addClass("has-analyser-fullscreen")
-        : html.removeClass("has-analyser-fullscreen");
+        ? html.classList.add("has-analyser-fullscreen")
+        : html.classList.remove("has-analyser-fullscreen");
       graph.setAnalyser(hasAnalyserFullscreen);
       invalidateGraph();
     };
@@ -2385,7 +2369,7 @@ function BlackboxLogViewer() {
         onSwitchWorkspace(presets[index], 1);
       }
     };
-  });
+  })();
 
   // Bridge API — expose key functions for Vue components during migration
   this.loadFiles = loadFiles;
@@ -2473,15 +2457,11 @@ function BlackboxLogViewer() {
 }
 
 // Close the dropdowns if not clicking a descendant of the dropdown
-$(document).click(function (e) {
-  const p = $(e.target).closest(".dropdown");
-  if (!p.length) {
-    $(".dropdown").removeClass("open");
+document.addEventListener("click", function (e) {
+  if (!e.target.closest(".dropdown")) {
+    document.querySelectorAll(".dropdown.open").forEach((el) => el.classList.remove("open"));
   }
 });
-
-// Bootstrap's data API is extremely slow when there are a lot of DOM elements churning, don't use it
-$(document).off(".data-api");
 
 globalThis.blackboxLogViewer = new BlackboxLogViewer();
 if (globalThis.window !== undefined) {
