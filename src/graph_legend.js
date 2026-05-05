@@ -12,186 +12,227 @@ export function GraphLegend(
 ) {
   let that = this;
 
+  // targetElem may be a jQuery object or a DOM element
+  const targetEl =
+    targetElem instanceof Element ? targetElem : targetElem[0] || targetElem;
+
+  function createElement(html) {
+    const template = document.createElement("template");
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
+  }
+
   function buildLegend() {
     let graphs = config.getGraphs(),
       i,
       j;
 
-    targetElem.empty();
+    targetEl.innerHTML = "";
 
     for (i = 0; i < graphs.length; i++) {
-      let graph = graphs[i],
-        graphDiv = $(
-          `<div class="graph-legend" id="${i}"><h3 class="graph-legend-group field-quick-adjust" graph="${i}"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>`,
-        ),
-        graphTitle = $("h3", graphDiv),
-        fieldList = $("ul", graphDiv);
+      let graph = graphs[i];
+      let graphDiv = createElement(
+        `<div class="graph-legend" id="${i}"><h3 class="graph-legend-group field-quick-adjust" graph="${i}"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>`,
+      );
+      let graphTitle = graphDiv.querySelector("h3");
+      let fieldList = graphDiv.querySelector("ul");
 
-      graphTitle.text(graph.label);
-      graphTitle.prepend('<span class="glyphicon glyphicon-minus"></span>');
+      graphTitle.textContent = graph.label;
+      graphTitle.insertAdjacentHTML("afterbegin", '<span class="glyphicon glyphicon-minus"></span>');
 
       for (j = 0; j < graph.fields.length; j++) {
-        let field = graph.fields[j],
-          li = $(
-            `<li class="graph-legend-field field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></li>`,
-          ),
-          nameElem = $(
-            `<span class="graph-legend-field-name field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`,
-          ),
-          valueElem = $(
-            `<span class="graph-legend-field-value field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`,
-          ),
-          settingsElem = $(
-            `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`,
-          ),
-          visibilityIcon = config.isGraphFieldHidden(i, j)
-            ? "glyphicon-eye-close"
-            : "glyphicon-eye-open",
-          visibilityElem = $(
-            `<span class="glyphicon ${visibilityIcon} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`,
-          );
-        li.append(nameElem);
-        li.append(visibilityElem);
-        li.append(valueElem);
-        li.append(settingsElem);
+        let field = graph.fields[j];
+        let li = createElement(
+          `<li class="graph-legend-field field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></li>`,
+        );
+        let nameElem = createElement(
+          `<span class="graph-legend-field-name field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`,
+        );
+        let valueElem = createElement(
+          `<span class="graph-legend-field-value field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></span>`,
+        );
+        let settingsElem = createElement(
+          `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`,
+        );
+        let visibilityIcon = config.isGraphFieldHidden(i, j)
+          ? "glyphicon-eye-close"
+          : "glyphicon-eye-open";
+        let visibilityElem = createElement(
+          `<span class="glyphicon ${visibilityIcon} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`,
+        );
+        li.appendChild(nameElem);
+        li.appendChild(visibilityElem);
+        li.appendChild(valueElem);
+        li.appendChild(settingsElem);
 
-        nameElem.text(field.friendlyName);
-        settingsElem.text(" ");
-        settingsElem.css("background", field.color);
-        fieldList.append(li);
+        nameElem.textContent = field.friendlyName;
+        settingsElem.textContent = " ";
+        settingsElem.style.background = field.color;
+        fieldList.appendChild(li);
       }
 
-      targetElem.append(graphDiv);
+      targetEl.appendChild(graphDiv);
     }
 
-    // Add a trigger on legend; highlight the hovered field in plot
-    $(".graph-legend-field").on("mouseenter", function (e) {
-      $(this).addClass("highlight");
-      config.highlightGraphIndex = $(this).attr("graph");
-      config.highlightFieldIndex = $(this).attr("field");
-      if (onHighlightChange) {
-        onHighlightChange();
-      }
+    // Highlight the hovered field in plot
+    targetEl.querySelectorAll(".graph-legend-field").forEach((el) => {
+      el.addEventListener("mouseenter", function () {
+        this.classList.add("highlight");
+        config.highlightGraphIndex = this.getAttribute("graph");
+        config.highlightFieldIndex = this.getAttribute("field");
+        if (onHighlightChange) onHighlightChange();
+      });
+      el.addEventListener("mouseleave", function () {
+        this.classList.remove("highlight");
+        config.highlightGraphIndex = null;
+        config.highlightFieldIndex = null;
+        if (onHighlightChange) onHighlightChange();
+      });
     });
 
-    $(".graph-legend-field").on("mouseleave", function (e) {
-      $(this).removeClass("highlight");
-      config.highlightGraphIndex = null;
-      config.highlightFieldIndex = null;
-      if (onHighlightChange) {
-        onHighlightChange();
-      }
-    });
-
-    // Add a trigger on legend; select the analyser graph/field to plot
-    $(
+    // Select the analyser graph/field to plot
+    targetEl.querySelectorAll(
       ".graph-legend-field-name, .graph-legend-field-settings, .graph-legend-field-value",
-    ).on("click", function (e) {
-      if (e.which != 1) return; // only accept left mouse clicks
+    ).forEach((el) => {
+      el.addEventListener("click", function (e) {
+        if (e.button !== 0) return;
 
-      let selectedGraphIndex = $(this).attr("graph"),
-        selectedFieldIndex = $(this).attr("field");
+        let selectedGraphIndex = this.getAttribute("graph"),
+          selectedFieldIndex = this.getAttribute("field");
 
-      if (!e.altKey) {
-        const selectedFieldName =
-          config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex]
-            .friendlyName;
-        if (config.selectedFieldName != selectedFieldName) {
-          config.selectedFieldName = selectedFieldName;
-          config.selectedGraphIndex = selectedGraphIndex;
-          config.selectedFieldIndex = selectedFieldIndex;
-          if (onNewSelectionChange) {
-            onNewSelectionChange(false, e.ctrlKey);
+        if (!e.altKey) {
+          const selectedFieldName =
+            config.getGraphs()[selectedGraphIndex].fields[selectedFieldIndex]
+              .friendlyName;
+          if (config.selectedFieldName != selectedFieldName) {
+            config.selectedFieldName = selectedFieldName;
+            config.selectedGraphIndex = selectedGraphIndex;
+            config.selectedFieldIndex = selectedFieldIndex;
+            if (onNewSelectionChange) onNewSelectionChange(false, e.ctrlKey);
+          } else {
+            onNewSelectionChange(true, e.ctrlKey);
           }
+        }
+        e.preventDefault();
+      });
+    });
+
+    // Select the graph to expand
+    targetEl.querySelectorAll(".graph-legend h3").forEach((el) => {
+      el.addEventListener("click", function (e) {
+        if (e.button !== 0) return;
+
+        let selectedGraph = this.getAttribute("graph");
+        if (!e.altKey) {
+          if (onZoomGraph) onZoomGraph(selectedGraph);
         } else {
-          onNewSelectionChange(true, e.ctrlKey);
+          if (onExpandGraph) onExpandGraph(selectedGraph);
         }
-      }
-      e.preventDefault();
+        e.preventDefault();
+      });
     });
 
-    // Add a trigger on legend list title; select the graph to expland
-    $(".graph-legend h3").on("click", function (e) {
-      if (e.which != 1) return; // only accept left mouse clicks
-
-      let selectedGraph = $(this).attr("graph");
-      if (!e.altKey) {
-        if (onZoomGraph) {
-          onZoomGraph(selectedGraph);
+    // Make the legend draggable (native drag & drop replaces jQuery sortable)
+    const legendContainer = document.querySelector(".log-graph-legend");
+    if (legendContainer) {
+      legendContainer.querySelectorAll(".graph-legend").forEach((item) => {
+        item.draggable = true;
+        item.addEventListener("dragstart", (e) => {
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", item.id);
+          item.classList.add("dragging");
+        });
+        item.addEventListener("dragend", () => {
+          item.classList.remove("dragging");
+        });
+      });
+      legendContainer.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        const dragging = legendContainer.querySelector(".dragging");
+        const afterElement = getDragAfterElement(legendContainer, e.clientY);
+        if (afterElement == null) {
+          legendContainer.appendChild(dragging);
+        } else {
+          legendContainer.insertBefore(dragging, afterElement);
         }
-      } else {
-        if (onExpandGraph) {
-          onExpandGraph(selectedGraph);
-        }
-      }
-      e.preventDefault();
-    });
-
-    // Make the legend dragabble
-    $(".log-graph-legend").sortable({
-      update: function (event, ui) {
-        let newOrder = $(".log-graph-legend").sortable("toArray");
+      });
+      legendContainer.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const newOrder = Array.from(legendContainer.querySelectorAll(".graph-legend")).map((el) => parseInt(el.id));
         let newGraphs = [];
         let oldGraphs = config.getGraphs();
         for (let i = 0; i < newOrder.length; i++) {
           newGraphs[i] = oldGraphs[newOrder[i]];
         }
         onNewGraphConfig(newGraphs);
-      },
-      cursor: "move",
-    });
-    $(".log-graph-legend").disableSelection();
+      });
+    }
 
-    $(".log-close-legend-dialog").on("click", function () {
-      that.hide();
+    document.querySelectorAll(".log-close-legend-dialog").forEach((el) => {
+      el.addEventListener("click", () => that.hide());
     });
 
-    $(".log-open-legend-dialog").on("click", function () {
-      that.show();
+    document.querySelectorAll(".log-open-legend-dialog").forEach((el) => {
+      el.addEventListener("click", () => that.show());
     });
 
     // on first show, hide the analyser button
-    if (!config.selectedFieldName) $(".hide-analyser-window").hide();
+    if (!config.selectedFieldName) {
+      document.querySelectorAll(".hide-analyser-window").forEach((el) => el.style.display = "none");
+    }
 
-    // Add a trigger on legend; select the analyser graph/field to plot
-    $(".graph-legend-field-visibility").on("click", function (e) {
-      if (e.which != 1) {
-        return; // only accept left mouse clicks
-      }
+    // Toggle field visibility
+    targetEl.querySelectorAll(".graph-legend-field-visibility").forEach((el) => {
+      el.addEventListener("click", function (e) {
+        if (e.button !== 0) return;
 
-      const $this = $(this),
-        graphIndex = $this.attr("graph"),
-        fieldIndex = $this.attr("field");
+        const graphIndex = this.getAttribute("graph"),
+          fieldIndex = this.getAttribute("field");
 
-      config.toggleGraphField(graphIndex, fieldIndex);
-      onHighlightChange();
+        config.toggleGraphField(graphIndex, fieldIndex);
+        onHighlightChange();
 
-      if (config.isGraphFieldHidden(graphIndex, fieldIndex)) {
-        $this.removeClass("glyphicon-eye-open");
-        $this.addClass("glyphicon-eye-close");
-      } else {
-        $this.addClass("glyphicon-eye-open");
-        $this.removeClass("glyphicon-eye-close");
-      }
+        if (config.isGraphFieldHidden(graphIndex, fieldIndex)) {
+          this.classList.remove("glyphicon-eye-open");
+          this.classList.add("glyphicon-eye-close");
+        } else {
+          this.classList.add("glyphicon-eye-open");
+          this.classList.remove("glyphicon-eye-close");
+        }
 
-      e.preventDefault();
+        e.preventDefault();
+      });
     });
+  }
+
+  function getDragAfterElement(container, y) {
+    const draggableElements = [
+      ...container.querySelectorAll(".graph-legend:not(.dragging)"),
+    ];
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      },
+      { offset: Number.NEGATIVE_INFINITY },
+    ).element;
   }
 
   this.updateValues = function (flightLog, frame) {
     try {
-      // New function to show values on legend.
       let currentFlightMode =
         frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
-      let graphs = config.getGraphs(),
-        i,
-        j;
+      let graphs = config.getGraphs();
 
-      $(".graph-legend-field-value").each(function (index, value) {
-        let fieldName = $(this).attr("name");
-        var value = frame[flightLog.getMainFieldIndexByName(fieldName)]; // get the raw value from log
+      targetEl.querySelectorAll(".graph-legend-field-value").forEach((el) => {
+        let fieldName = el.getAttribute("name");
+        var value = frame[flightLog.getMainFieldIndexByName(fieldName)];
         if (userSettings.legendUnits) {
-          // if we want the legend to show engineering units
           value = FlightLogFieldPresenter.decodeFieldToFriendly(
             flightLog,
             fieldName,
@@ -199,29 +240,24 @@ export function GraphLegend(
             currentFlightMode,
           );
         } else {
-          // raw value
           if (value % 1 != 0) {
             value = value.toFixed(2);
           }
         }
 
-        if (value != null) {
-          $(this).text(value);
-        } else {
-          $(this).text("");
-        }
+        el.textContent = value != null ? value : "";
       });
 
-      $(".graph-legend-field-settings").each(function (index, value) {
-        let i = $(this).attr("graph");
-        let j = $(this).attr("field");
+      targetEl.querySelectorAll(".graph-legend-field-settings").forEach((el) => {
+        let i = el.getAttribute("graph");
+        let j = el.getAttribute("field");
         let field = graphs[i].fields[j];
         let str =
-          `Z100` + // There are no direct zoom now, set 100%
+          `Z100` +
           ` E${(field.curve.power * 100).toFixed(0)} S${(
             field.smoothing / 100
           ).toFixed(0)}`;
-        $(this).text(str);
+        el.textContent = str;
       });
     } catch (e) {
       console.log("Cannot update legend with values");
@@ -229,21 +265,17 @@ export function GraphLegend(
   };
 
   this.show = function () {
-    $(".log-graph-config").show();
-    $(".log-open-legend-dialog").hide();
+    document.querySelectorAll(".log-graph-config").forEach((el) => el.style.display = "");
+    document.querySelectorAll(".log-open-legend-dialog").forEach((el) => el.style.display = "none");
 
-    if (onVisibilityChange) {
-      onVisibilityChange(false);
-    }
+    if (onVisibilityChange) onVisibilityChange(false);
   };
 
   this.hide = function () {
-    $(".log-graph-config").hide();
-    $(".log-open-legend-dialog").show();
+    document.querySelectorAll(".log-graph-config").forEach((el) => el.style.display = "none");
+    document.querySelectorAll(".log-open-legend-dialog").forEach((el) => el.style.display = "");
 
-    if (onVisibilityChange) {
-      onVisibilityChange(true);
-    }
+    if (onVisibilityChange) onVisibilityChange(true);
   };
 
   config.addListener(buildLegend);

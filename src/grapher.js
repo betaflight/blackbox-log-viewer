@@ -139,12 +139,13 @@ export function FlightLogGrapher(
       lastMouseY = e.pageY;
 
       //"capture" the mouse so we can drag outside the boundaries of canvas
-      $(document).on("mousemove", onMouseMove);
+      document.addEventListener("mousemove", onMouseMove);
 
-      //Release the capture when the mouse is released
-      $(document).one("mouseup", function () {
-        $(document).off("mousemove", onMouseMove);
-      });
+      function onMouseUp() {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+      document.addEventListener("mouseup", onMouseUp);
 
       e.preventDefault();
     }
@@ -156,12 +157,13 @@ export function FlightLogGrapher(
       lastMouseY = e.originalEvent.touches[0].pageY;
 
       //"capture" so we can drag outside the boundaries of canvas
-      $(document).on("touchmove", onTouchMove);
+      document.addEventListener("touchmove", onTouchMove);
 
-      //Release the capture when released
-      $(document).one("touchend", function () {
-        $(document).off("touchmove", onTouchMove);
-      });
+      function onTouchEnd() {
+        document.removeEventListener("touchmove", onTouchMove);
+        document.removeEventListener("touchend", onTouchEnd);
+      }
+      document.addEventListener("touchend", onTouchEnd);
 
       e.preventDefault();
     }
@@ -876,18 +878,16 @@ export function FlightLogGrapher(
     }
 
     // Recenter the craft canvas in the top left corner
-    $(stickCanvas).css({
-      left: `${Math.max(
-        (canvas.width * parseInt(options.sticks.left)) / 100.0 -
-          sticksWidth / 2,
-        0,
-      )}px`,
-      top: `${Math.max(
-        (canvas.height * parseInt(options.sticks.top)) / 100.0 -
-          sticksHeight / 2,
-        0,
-      )}px`,
-    });
+    stickCanvas.style.left = `${Math.max(
+      (canvas.width * parseInt(options.sticks.left)) / 100.0 -
+        sticksWidth / 2,
+      0,
+    )}px`;
+    stickCanvas.style.top = `${Math.max(
+      (canvas.height * parseInt(options.sticks.top)) / 100.0 -
+        sticksHeight / 2,
+      0,
+    )}px`;
 
     let craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
 
@@ -898,16 +898,14 @@ export function FlightLogGrapher(
     }
 
     // Position the craft canvas according to options
-    $(craftCanvas).css({
-      left: `${Math.max(
-        (canvas.width * parseInt(options.craft.left)) / 100.0 - craftSize / 2,
-        0,
-      )}px`,
-      top: `${Math.max(
-        (canvas.height * parseInt(options.craft.top)) / 100.0 - craftSize / 2,
-        0,
-      )}px`,
-    });
+    craftCanvas.style.left = `${Math.max(
+      (canvas.width * parseInt(options.craft.left)) / 100.0 - craftSize / 2,
+      0,
+    )}px`;
+    craftCanvas.style.top = `${Math.max(
+      (canvas.height * parseInt(options.craft.top)) / 100.0 - craftSize / 2,
+      0,
+    )}px`;
 
     if (analyser != null) analyser.resize();
 
@@ -1093,7 +1091,7 @@ export function FlightLogGrapher(
       i,
       graph;
 
-    graphs = jQuery.extend(true, [], graphConfig.getGraphs());
+    graphs = structuredClone(graphConfig.getGraphs());
 
     for (i = 0; i < graphs.length; i++) {
       graph = graphs[i];
@@ -1187,8 +1185,8 @@ export function FlightLogGrapher(
   };
 
   this.destroy = function () {
-    $(canvas).off("mousedown", onMouseDown);
-    $(canvas).off("touchstart", onTouchStart);
+    canvas.removeEventListener("mousedown", onMouseDown);
+    canvas.removeEventListener("touchstart", onTouchStart);
   };
 
   this.refreshTheme = function () {
@@ -1305,13 +1303,13 @@ export function FlightLogGrapher(
   lapTimer = new LapTimer();
 
   //Handle dragging events
-  $(canvas).on("mousedown", onMouseDown);
-  $(canvas).on("touchstart", onTouchStart);
+  canvas.addEventListener("mousedown", onMouseDown);
+  canvas.addEventListener("touchstart", onTouchStart);
 
   graphConfig.addListener(this.refreshGraphConfig);
   this.refreshGraphConfig();
 
-  $("html").toggleClass("has-grid-override", options["graphGridOverride"]);
+  document.documentElement.classList.toggle("has-grid-override", options["graphGridOverride"]);
 
   this.resize(canvas.width, canvas.height);
 }

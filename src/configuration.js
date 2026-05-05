@@ -6,40 +6,34 @@
  */
 
 export function Configuration(file, configurationDefaults, showConfigFile) {
-  // Private Variables
-  let that = this; // generic pointer back to this function
-  let fileData; // configuration file information
-  let fileLinesArray; // Store the contents of the file globally
+  let fileData;
+  let fileLinesArray;
 
   function renderFileContentList(configurationList, filter) {
-    let li;
-
-    // Clear the contents of the list
-    $("li", configurationList).remove();
+    // Clear existing items
+    configurationList.querySelectorAll("li").forEach((li) => li.remove());
 
     for (let i = 0; i < fileLinesArray.length; i++) {
       if (!filter || filter.length < 1) {
-        //Everything
-        // li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + fileLinesArray[i] + '</li>');
-
-        li = $(
-          `<li class="configuration-row"${
-            fileLinesArray[i].length == 0
-              ? ' style="background-color: white; height: 10px;"'
-              : ""
-          }>${fileLinesArray[i].length == 0 ? "&nbsp" : fileLinesArray[i]}</li>`,
-        ); // Removed default syntax highlighting
-        configurationList.append(li);
+        const li = document.createElement("li");
+        li.className = "configuration-row";
+        if (fileLinesArray[i].length == 0) {
+          li.style.backgroundColor = "white";
+          li.style.height = "10px";
+          li.innerHTML = "&nbsp";
+        } else {
+          li.textContent = fileLinesArray[i];
+        }
+        configurationList.appendChild(li);
       } else {
         try {
           let regFilter = new RegExp(`(.*)(${filter})(.*)`, "i");
           let highLight = fileLinesArray[i].match(regFilter);
           if (highLight != null) {
-            // don't include blank lines
-            li = $(
-              `<li class="configuration-row">${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}</li>`,
-            ); // Removed default syntax highlighting
-            configurationList.append(li);
+            const li = document.createElement("li");
+            li.className = "configuration-row";
+            li.innerHTML = `${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}`;
+            configurationList.appendChild(li);
           }
         } catch (e) {
           continue;
@@ -48,70 +42,60 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
     }
   }
 
-  function renderFileContents(filter) {
-    let configurationElem = ".configuration-file", // point to the actual element in index.html
-      configurationDiv = $(
-        `<div class="configuration-file">` +
-          `<div class="configuration-header">` +
-          `<h4>${file.name}<span class="configuration-close glyphicon glyphicon-remove"></span>` +
-          `</h4>` +
-          `<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>` +
-          `</div>` +
-          `<div><ul class="list-unstyled configuration-list"></ul></div>` +
-          `</div>`,
-      ),
-      configurationTitle = $("h3", configurationDiv),
-      li;
+  function renderFileContents() {
+    const existingElem = document.querySelector(".configuration-file");
+    if (!existingElem) return;
 
-    // now replace the element in the index.html with the loaded file information
-    $(configurationElem).replaceWith(configurationDiv);
+    const configurationDiv = document.createElement("div");
+    configurationDiv.className = "configuration-file";
+    configurationDiv.innerHTML =
+      `<div class="configuration-header">` +
+      `<h4>${file.name}<span class="configuration-close glyphicon glyphicon-remove"></span></h4>` +
+      `<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>` +
+      `</div>` +
+      `<div><ul class="list-unstyled configuration-list"></ul></div>`;
 
-    let configurationList = $(".configuration-list");
+    existingElem.replaceWith(configurationDiv);
+
+    const configurationList = configurationDiv.querySelector(".configuration-list");
     renderFileContentList(configurationList, null);
 
-    //configurationTitle.text(file.name);
-    $("#status-bar .configuration-file-name").text(file.name);
+    const statusBarFileName = document.querySelector("#status-bar .configuration-file-name");
+    if (statusBarFileName) statusBarFileName.textContent = file.name;
 
-    // now replace the element in the index.html with the loaded file information
-    $(configurationElem).replaceWith(configurationDiv);
-
-    // Add close icon
-    $(".configuration-close").click(function () {
-      if (showConfigFile) showConfigFile(false); // hide the config file
+    configurationDiv.querySelector(".configuration-close")?.addEventListener("click", function () {
+      if (showConfigFile) showConfigFile(false);
     });
   }
 
   function loadFile(file) {
     let reader = new FileReader();
-    fileData = file; // Store the data locally;
+    fileData = file;
 
     reader.onload = function (e) {
-      let data = e.target.result; // all the data
-
-      fileLinesArray = data.split("\n"); // separated into lines
+      let data = e.target.result;
+      fileLinesArray = data.split("\n");
 
       renderFileContents();
 
-      // Add user configurable file filter
-      $(".configuration-filter").keyup(function () {
-        let newFilter = $(".configuration-filter").val();
-
-        let configurationList = $(".configuration-list");
-        renderFileContentList(configurationList, newFilter);
-      });
+      const filterInput = document.querySelector(".configuration-filter");
+      if (filterInput) {
+        filterInput.addEventListener("keyup", function () {
+          const newFilter = filterInput.value;
+          const configurationList = document.querySelector(".configuration-list");
+          renderFileContentList(configurationList, newFilter);
+        });
+      }
     };
 
     reader.readAsText(file);
   }
 
-  // Public variables and functions
   this.getFile = function () {
     return fileData;
   };
 
-  loadFile(file); // configuration file loaded
-
-  // Add filter
+  loadFile(file);
 }
 
 export function ConfigurationDefaults(prefs) {

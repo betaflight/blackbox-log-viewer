@@ -1380,11 +1380,11 @@ export function FlightLog(logData) {
     switch (this.getSysConfig().firmwareType) {
       case FIRMWARE_TYPE_BETAFLIGHT:
       case FIRMWARE_TYPE_INAV:
-        $(".open-header-dialog").show();
+        document.querySelectorAll(".open-header-dialog").forEach((el) => el.style.display = "");
         break;
 
       default:
-        $(".open-header-dialog").hide();
+        document.querySelectorAll(".open-header-dialog").forEach((el) => el.style.display = "none");
         break;
     }
 

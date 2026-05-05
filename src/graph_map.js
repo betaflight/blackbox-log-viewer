@@ -138,7 +138,7 @@ export function MapGrapher() {
       console.debug("FlightLog has no gps data.");
     }
 
-    $("#mapContainer").toggleClass("no-gps-data", !hasGpsData);
+    document.getElementById("mapContainer")?.classList.toggle("no-gps-data", !hasGpsData);
   };
 
   this.setFlightLogIndexs = function () {
@@ -371,7 +371,15 @@ export function MapGrapher() {
       left: (width * parseInt(userSettings.map.left)) / 100.0,
       top: (height * parseInt(userSettings.map.top)) / 100.0,
     };
-    $("#mapContainer").css(containerstyle);
+    const mapEl = document.getElementById("mapContainer");
+    if (mapEl) {
+      Object.assign(mapEl.style, {
+        height: `${containerstyle.height}px`,
+        width: `${containerstyle.width}px`,
+        left: `${containerstyle.left}px`,
+        top: `${containerstyle.top}px`,
+      });
+    }
   };
 
   this.getCoordinatesFromFrame = function (

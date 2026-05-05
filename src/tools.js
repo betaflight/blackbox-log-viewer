@@ -336,74 +336,47 @@ export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
 export var mouseNotification = {
   enabled: true,
-  elem: $(".mouseNotification"),
+  elem: null,
   timeout: null,
   show: function (target, x, y, message, delay, messageClass, align, margin) {
-    /**
-         target 			is the target element that triggered the mouse notification
-         x,y				are the mouse coordinates (if required)
-         message 		is the text to display (supports html encoding)
-         delay 			is how long the message will remain before auto clearing
-         messageClass 	is the css class that should be used to draw the box, null for default
-         align 			is the position to put the popup to, null means at the mouse position, 'top-left' etc,
-         margin 			is the margin from the mouse cursor or border, null for default 10px
-
-         the index.html should have an entry <div class="mouseNotification"></div>
-         and the .css should have two definitions...
-
-         .mouseNotification {
-                position: absolute;
-                margin 0 auto;
-                white-space: pre-wrap;
-            }
-
-         .mouseNotification-box {
-                padding: 4px;
-                color: black;
-                background-color: #EAEAEA;
-                border: 2px solid white;
-                border-radius: 3px;
-            }
-
-         **/
-
     if (!this.enabled) return false;
 
-    this.elem = this.elem || $(".mouseNotification");
+    if (!this.elem) {
+      this.elem = document.querySelector(".mouseNotification");
+    }
 
     messageClass = messageClass || "mouseNotification-box";
     margin = margin || 10;
 
-    let mouseNotificationElem = $("#mouse-notification");
-    if (mouseNotificationElem.length != 0) {
+    let notifElem = document.getElementById("mouse-notification");
+    if (notifElem) {
       clearTimeout(this.timeout);
-      mouseNotificationElem.replaceWith(
-        `<div class="${messageClass}" id="mouse-notification">${message}</div>`,
-      );
+      notifElem.className = messageClass;
+      notifElem.innerHTML = message;
     } else {
-      this.elem.append(
-        `<div class="${messageClass}" id="mouse-notification">${message}</div>`,
-      );
+      notifElem = document.createElement("div");
+      notifElem.className = messageClass;
+      notifElem.id = "mouse-notification";
+      notifElem.innerHTML = message;
+      this.elem.appendChild(notifElem);
     }
     this.timeout = setTimeout(function () {
-      $("#mouse-notification").remove();
+      document.getElementById("mouse-notification")?.remove();
     }, delay || 1000);
 
-    let popupRect = $(this.elem).get(0).getBoundingClientRect(); // get the popup metrics
-    let targetRect = $(target).get(0).getBoundingClientRect();
-
-    let left = 0,
-      top = 0;
+    let popupRect = this.elem.getBoundingClientRect();
+    const targetEl =
+      target instanceof Element ? target : document.querySelector(target);
+    let targetRect = targetEl.getBoundingClientRect();
 
     // reposition the notification;
     if (align != null) {
-      // default is at the mouse position
+      let left, top;
       if (align.indexOf("right") !== -1) {
         left = targetRect.width - (popupRect.width + margin);
       } else if (align.indexOf("center") !== -1) {
         left = targetRect.width / 2 - (popupRect.width + margin) / 2;
       } else {
-        // default left
         left = margin;
       }
       if (align.indexOf("bottom") !== -1) {
@@ -411,27 +384,20 @@ export var mouseNotification = {
       } else if (align.indexOf("middle") !== -1) {
         top = targetRect.height / 2 - (popupRect.height + margin) / 2;
       } else {
-        // default top
         top = margin;
       }
-      this.elem.css("left", left);
-      this.elem.css("top", top);
+      this.elem.style.left = `${left}px`;
+      this.elem.style.top = `${top}px`;
     } else {
-      // default is at the mouse position
-      this.elem.css("left", (x || 0) - targetRect.left + margin);
-      this.elem.css("top", (y || 0) - targetRect.top + margin);
+      this.elem.style.left = `${(x || 0) - targetRect.left + margin}px`;
+      this.elem.style.top = `${(y || 0) - targetRect.top + margin}px`;
     }
 
     // now re-position the box if it goes out of the target element
-    popupRect = $(this.elem).get(0).getBoundingClientRect(); // now get them again now that we have positioned it.
+    popupRect = this.elem.getBoundingClientRect();
     if (popupRect.right > targetRect.right - margin) {
-      this.elem.css("left", targetRect.right - popupRect.width - margin);
+      this.elem.style.left = `${targetRect.right - popupRect.width - margin}px`;
     }
-    /* // disable the overflow to the bottom as single elements will overflow.
-         if (popupRect.bottom > (targetRect.bottom - margin)) {
-         this.elem.css('top', targetRect.bottom - popupRect.height - margin);
-         }
-         */
 
     return true;
   },

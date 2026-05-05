@@ -18,6 +18,15 @@ globalThis.FIRMWARE_TYPE_CLEANFLIGHT = 2;
 globalThis.FIRMWARE_TYPE_BETAFLIGHT = 3;
 globalThis.FIRMWARE_TYPE_INAV = 4;
 
+const FIRMWARE_CLASSES = ["isBaseF", "isCF", "isBF", "isINAV"];
+
+function setFirmwareClass(cls) {
+  const html = document.documentElement;
+  for (const c of FIRMWARE_CLASSES) {
+    html.classList.toggle(c, c === cls);
+  }
+}
+
 export function FlightLogParser(logData) {
   //Private constants:
   let FLIGHT_LOG_MAX_FIELDS = 128,
@@ -613,17 +622,11 @@ export function FlightLogParser(logData) {
         switch (fieldValue) {
           case "Cleanflight":
             that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
-            $("html").removeClass("isBaseF");
-            $("html").addClass("isCF");
-            $("html").removeClass("isBF");
-            $("html").removeClass("isINAV");
+            setFirmwareClass("isCF");
             break;
           default:
             that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
-            $("html").addClass("isBaseF");
-            $("html").removeClass("isCF");
-            $("html").removeClass("isBF");
-            $("html").removeClass("isINAV");
+            setFirmwareClass("isBaseF");
         }
         break;
 
@@ -956,10 +959,7 @@ export function FlightLogParser(logData) {
           // Detecting Betaflight requires looking at the revision string
           if (matches[1] === "Betaflight") {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
-            $("html").removeClass("isBaseF");
-            $("html").removeClass("isCF");
-            $("html").addClass("isBF");
-            $("html").removeClass("isINAV");
+            setFirmwareClass("isBF");
           }
 
           that.sysConfig.firmware = `${parseInt(matches[2])}.${parseInt(matches[3])}`;
@@ -976,12 +976,7 @@ export function FlightLogParser(logData) {
             that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
             that.sysConfig.firmwarePatch =
               matches[5] != null ? parseInt(matches[5]) : "";
-            //added class definition as the isBF, isCF etc classes are only used for colors and
-            //a few images in the css.
-            $("html").removeClass("isBaseF");
-            $("html").removeClass("isCF");
-            $("html").removeClass("isBF");
-            $("html").addClass("isINAV");
+            setFirmwareClass("isINAV");
           } else {
             // Legacy firmware versions
             that.sysConfig.firmwareVersion = "0.0.0";

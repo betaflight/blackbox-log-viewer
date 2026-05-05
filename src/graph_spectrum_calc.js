@@ -62,18 +62,21 @@ GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
     this._blackBoxRate = Math.round(this._actualeRate);
 
   if (this._BetaflightRate !== this._blackBoxRate) {
-    $(".actual-lograte").text(
-      this._actualeRate.toFixed(0) +
+    const lograteEl = document.querySelector(".actual-lograte");
+    if (lograteEl) {
+      lograteEl.textContent =
+        this._actualeRate.toFixed(0) +
         "/" +
         this._BetaflightRate.toFixed(0) +
-        "Hz",
-    );
+        "Hz";
+    }
     return {
       actualRate: this._actualeRate,
       betaflightRate: this._BetaflightRate,
     };
   } else {
-    $(".actual-lograte").text("");
+    const lograteEl2 = document.querySelector(".actual-lograte");
+    if (lograteEl2) lograteEl2.textContent = "";
   }
 
   return undefined;

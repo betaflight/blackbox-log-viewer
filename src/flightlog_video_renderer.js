@@ -342,14 +342,14 @@ export function FlightLogVideoRenderer(
     options,
   );
 
-  stickCanvasLeft = parseInt($(stickCanvas).css("left"), 10);
-  stickCanvasTop = parseInt($(stickCanvas).css("top"), 10);
+  stickCanvasLeft = parseInt(stickCanvas.style.left, 10) || 0;
+  stickCanvasTop = parseInt(stickCanvas.style.top, 10) || 0;
 
-  craftCanvasLeft = parseInt($(craftCanvas).css("left"), 10);
-  craftCanvasTop = parseInt($(craftCanvas).css("top"), 10);
+  craftCanvasLeft = parseInt(craftCanvas.style.left, 10) || 0;
+  craftCanvasTop = parseInt(craftCanvas.style.top, 10) || 0;
 
-  analyserCanvasLeft = parseInt($(analyserCanvas).css("left"), 10);
-  analyserCanvasTop = parseInt($(analyserCanvas).css("top"), 10);
+  analyserCanvasLeft = parseInt(analyserCanvas.style.left, 10) || 0;
+  analyserCanvasTop = parseInt(analyserCanvas.style.top, 10) || 0;
 
   if (!("inTime" in logParameters) || logParameters.inTime === false) {
     logParameters.inTime = flightLog.getMinTime();

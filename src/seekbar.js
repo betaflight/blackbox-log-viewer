@@ -80,55 +80,55 @@ export function SeekBar(canvas) {
     backgroundValid = false;
   }
 
-  function onMouseMove(e) {
-    if (e.which == 1) seekToDOMPixel(e.pageX - $(canvas).offset().left);
+  function getCanvasOffsetLeft() {
+    return canvas.getBoundingClientRect().left + window.scrollX;
   }
 
-  $(canvas).mousedown(function (e) {
+  function onMouseMove(e) {
+    if (e.which == 1) seekToDOMPixel(e.pageX - getCanvasOffsetLeft());
+  }
+
+  function onMouseDown(e) {
     e.preventDefault();
 
     if (e.which == 1) {
-      //Left mouse button only for seeking
-      seekToDOMPixel(e.pageX - $(this).offset().left);
+      seekToDOMPixel(e.pageX - getCanvasOffsetLeft());
 
-      //"capture" the mouse so we can drag outside the boundaries of the seek bar
-      $("body").on("mousemove", onMouseMove);
+      document.body.addEventListener("mousemove", onMouseMove);
 
-      //Release the capture when the mouse is released
-      $("body").one("mouseup", function () {
-        $("body").off("mousemove", onMouseMove);
-      });
+      function onMouseUp() {
+        document.body.removeEventListener("mousemove", onMouseMove);
+        document.body.removeEventListener("mouseup", onMouseUp);
+      }
+      document.body.addEventListener("mouseup", onMouseUp);
     }
-  });
+  }
+
+  canvas.addEventListener("mousedown", onMouseDown);
 
   function onTouchMove(e) {
-    if (e.which == 0)
-      seekToDOMPixel(
-        e.originalEvent.touches[0].pageX - $(canvas).offset().left,
-      );
+    seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
   }
 
   function onTouchStart(e) {
     e.preventDefault();
 
-    if (e.which == 0) {
-      //touch only for seeking
-      seekToDOMPixel(e.originalEvent.touches[0].pageX - $(this).offset().left);
+    seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
 
-      //"capture" so we can drag outside the boundaries of the seek bar
-      $("body").on("touchmove", onTouchMove);
+    document.body.addEventListener("touchmove", onTouchMove);
 
-      //Release the capture when touch ends
-      $("body").one("touchend", function () {
-        $("body").off("touchmove", onTouchMove);
-      });
+    function onTouchEnd() {
+      document.body.removeEventListener("touchmove", onTouchMove);
+      document.body.removeEventListener("touchend", onTouchEnd);
     }
+    document.body.addEventListener("touchend", onTouchEnd);
   }
 
-  $(canvas).on("touchstart", onTouchStart);
+  canvas.addEventListener("touchstart", onTouchStart);
 
   this.destroy = function () {
-    $(canvas).off("touchstart", onTouchStart);
+    canvas.removeEventListener("mousedown", onMouseDown);
+    canvas.removeEventListener("touchstart", onTouchStart);
   };
 
   this.resize = function (width, height) {

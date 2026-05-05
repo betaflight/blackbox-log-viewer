@@ -8,9 +8,8 @@ export function makeScreenshot() {
     )}${`00${now.getDate()}`.slice(-2)}-${`00${now.getHours()}`.slice(
       -2,
     )}${`00${now.getMinutes()}`.slice(-2)}${`00${now.getSeconds()}`.slice(-2)}`,
-    defaultFilename = `${$(".log-filename")
-      .text()
-      .replace(".", "_")}-${timestamp}.png`;
+    logFilenameEl = document.querySelector(".log-filename"),
+    defaultFilename = `${(logFilenameEl?.textContent || "").replace(".", "_")}-${timestamp}.png`;
   html2canvas(el).then((canvas) => {
     globalThis.canv = canvas;
     let anchor = document.createElement("a");

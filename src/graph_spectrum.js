@@ -32,16 +32,16 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     const logRateInfo = GraphSpectrumCalc.initialize(flightLog, sysConfig);
     GraphSpectrumPlot.initialize(analyserCanvas, sysConfig);
     GraphSpectrumPlot.setLogRateWarningInfo(logRateInfo);
-    const analyserZoomXElem = $("#analyserZoomX");
-    const analyserZoomYElem = $("#analyserZoomY");
-    const analyserMinPSD = $("#analyserMinPSD");
-    const analyserMaxPSD = $("#analyserMaxPSD");
-    const analyserLowLevelPSD = $("#analyserLowLevelPSD");
-    const analyserSegmentLengthPowerAt2 = $("#analyserSegmentLengthPowerAt2");
+    const analyserZoomXElem = document.getElementById("analyserZoomX");
+    const analyserZoomYElem = document.getElementById("analyserZoomY");
+    const analyserMinPSD = document.getElementById("analyserMinPSD");
+    const analyserMaxPSD = document.getElementById("analyserMaxPSD");
+    const analyserLowLevelPSD = document.getElementById("analyserLowLevelPSD");
+    const analyserSegmentLengthPowerAt2 = document.getElementById("analyserSegmentLengthPowerAt2");
 
-    const spectrumToolbarElem = $("#spectrumToolbar");
-    const spectrumTypeElem = $("#spectrumTypeSelect");
-    const overdrawSpectrumTypeElem = $("#overdrawSpectrumTypeSelect");
+    const spectrumToolbarElem = document.getElementById("spectrumToolbar");
+    const spectrumTypeElem = document.getElementById("spectrumTypeSelect");
+    const overdrawSpectrumTypeElem = document.getElementById("overdrawSpectrumTypeSelect");
 
     this.setFullscreen = function (size) {
       isFullscreen = size == true;
@@ -91,46 +91,23 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
       // Recenter the analyser canvas in the bottom left corner
-      const parentElem = $(analyserCanvas).parent();
+      const parentElem = analyserCanvas.parentElement;
 
-      $(parentElem).css({
-        left: newSize.left, // (canvas.width  * getSize().left) + "px",
-        top: newSize.top, // (canvas.height * getSize().top ) + "px"
-      });
+      parentElem.style.left = `${newSize.left}px`;
+      parentElem.style.top = `${newSize.top}px`;
+
       // place the sliders.
-      $("#analyserZoomX", parentElem).css({
-        left: `${newSize.width - 130}px`,
-      });
-      $("#analyserZoomY", parentElem).css({
-        left: `${newSize.width - 20}px`,
-      });
-      $("#analyserResize", parentElem).css({
-        left: `${newSize.width - 20}px`,
-      });
-      $("#analyserMaxPSD", parentElem).css({
-        left: `${newSize.width - 90}px`,
-      });
-      $("#analyserMinPSD", parentElem).css({
-        left: `${newSize.width - 90}px`,
-      });
-      $("#analyserLowLevelPSD", parentElem).css({
-        left: `${newSize.width - 90}px`,
-      });
-      $("#analyserMaxPSDLabel", parentElem).css({
-        left: `${newSize.width - 150}px`,
-      });
-      $("#analyserMinPSDLabel", parentElem).css({
-        left: `${newSize.width - 150}px`,
-      });
-      $("#analyserLowLevelPSDLabel", parentElem).css({
-        left: `${newSize.width - 155}px`,
-      });
-      $("#analyserSegmentLengthPowerAt2", parentElem).css({
-        left: `${newSize.width - 57}px`,
-      });
-      $("#analyserSegmentLengthPowerAt2Label", parentElem).css({
-        left: `${newSize.width - 135}px`,
-      });
+      analyserZoomXElem.style.left = `${newSize.width - 130}px`;
+      analyserZoomYElem.style.left = `${newSize.width - 20}px`;
+      document.getElementById("analyserResize").style.left = `${newSize.width - 20}px`;
+      analyserMaxPSD.style.left = `${newSize.width - 90}px`;
+      analyserMinPSD.style.left = `${newSize.width - 90}px`;
+      analyserLowLevelPSD.style.left = `${newSize.width - 90}px`;
+      document.getElementById("analyserMaxPSDLabel").style.left = `${newSize.width - 150}px`;
+      document.getElementById("analyserMinPSDLabel").style.left = `${newSize.width - 150}px`;
+      document.getElementById("analyserLowLevelPSDLabel").style.left = `${newSize.width - 155}px`;
+      analyserSegmentLengthPowerAt2.style.left = `${newSize.width - 57}px`;
+      document.getElementById("analyserSegmentLengthPowerAt2Label").style.left = `${newSize.width - 135}px`;
     };
 
     const dataLoad = function (fieldIndex, curve, fieldName) {
@@ -162,10 +139,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
           fftData = GraphSpectrumCalc.dataLoadPSD(analyserZoomY);
           if (fftData.maximalSegmentsLength > 0) {
-            analyserSegmentLengthPowerAt2.prop(
-              "max",
-              Math.ceil(Math.log2(fftData.maximalSegmentsLength)),
-            );
+            analyserSegmentLengthPowerAt2.max =
+              Math.ceil(Math.log2(fftData.maximalSegmentsLength));
           }
           break;
 
@@ -222,9 +197,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.draw(); // draw the analyser on the canvas....
     };
 
+    function onMouseMoveAnalyser(e) {
+      trackFrequency(e, that);
+    }
+
     this.destroy = function () {
-      $(analyserCanvas).off("mousemove", trackFrequency);
-      $(analyserCanvas).off("touchmove", trackFrequency);
+      analyserCanvas.removeEventListener("mousemove", onMouseMoveAnalyser);
+      analyserCanvas.removeEventListener("touchmove", onMouseMoveAnalyser);
     };
 
     this.refresh = function () {
@@ -236,42 +215,33 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     /* Add mouse/touch over event to read the frequency */
-    $(analyserCanvas).on("mousemove", function (e) {
-      trackFrequency(e, that);
-    });
-    $(analyserCanvas).on("touchmove", function (e) {
-      trackFrequency(e, that);
-    });
+    analyserCanvas.addEventListener("mousemove", onMouseMoveAnalyser);
+    analyserCanvas.addEventListener("touchmove", onMouseMoveAnalyser);
 
     /* add zoom controls */
     const DEFAULT_ZOOM = 100;
-    analyserZoomXElem
-      .on(
-        "input",
-        debounce(100, function () {
-          analyserZoomX = analyserZoomXElem.val() / 100;
-          GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
-          that.refresh();
-        }),
-      )
-      .dblclick(function () {
-        $(this).val(DEFAULT_ZOOM).trigger("input");
-      })
-      .val(DEFAULT_ZOOM);
 
-    analyserZoomYElem
-      .on(
-        "input",
-        debounce(100, function () {
-          analyserZoomY = 1 / (analyserZoomYElem.val() / 100);
-          GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
-          that.refresh();
-        }),
-      )
-      .dblclick(function () {
-        $(this).val(DEFAULT_ZOOM).trigger("input");
-      })
-      .val(DEFAULT_ZOOM);
+    analyserZoomXElem.value = DEFAULT_ZOOM;
+    analyserZoomXElem.addEventListener("input", debounce(100, function () {
+      analyserZoomX = analyserZoomXElem.value / 100;
+      GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+      that.refresh();
+    }));
+    analyserZoomXElem.addEventListener("dblclick", function () {
+      analyserZoomXElem.value = DEFAULT_ZOOM;
+      analyserZoomXElem.dispatchEvent(new Event("input"));
+    });
+
+    analyserZoomYElem.value = DEFAULT_ZOOM;
+    analyserZoomYElem.addEventListener("input", debounce(100, function () {
+      analyserZoomY = 1 / (analyserZoomYElem.value / 100);
+      GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+      that.refresh();
+    }));
+    analyserZoomYElem.addEventListener("dblclick", function () {
+      analyserZoomYElem.value = DEFAULT_ZOOM;
+      analyserZoomYElem.dispatchEvent(new Event("input"));
+    });
 
     if (userSettings.psdHeatmapMin == undefined) {
       userSettings.psdHeatmapMin = DEFAULT_PSD_HEATMAP_MIN;
@@ -284,175 +254,139 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     }
     GraphSpectrumPlot.setMaxPSD(userSettings.psdHeatmapMax);
 
-    analyserMinPSD
-      .on(
-        "input",
-        debounce(100, function () {
-          const min = parseInt(analyserMinPSD.val());
-          GraphSpectrumPlot.setMinPSD(min);
-          saveOneUserSetting("psdHeatmapMin", min);
-          analyserLowLevelPSD.prop("min", min);
-          analyserMaxPSD.prop("min", min + 5);
-          if (analyserLowLevelPSD.val() < min) {
-            analyserLowLevelPSD.val(min).trigger("input");
-          }
-          that.refresh();
-        }),
-      )
-      .dblclick(function (e) {
-        if (e.ctrlKey) {
-          $(this).val(userSettings.psdHeatmapMin).trigger("input");
-        }
-      })
-      .val(userSettings.psdHeatmapMin);
+    analyserMinPSD.value = userSettings.psdHeatmapMin;
+    analyserMinPSD.addEventListener("input", debounce(100, function () {
+      const min = parseInt(analyserMinPSD.value);
+      GraphSpectrumPlot.setMinPSD(min);
+      saveOneUserSetting("psdHeatmapMin", min);
+      analyserLowLevelPSD.min = min;
+      analyserMaxPSD.min = min + 5;
+      if (parseInt(analyserLowLevelPSD.value) < min) {
+        analyserLowLevelPSD.value = min;
+        analyserLowLevelPSD.dispatchEvent(new Event("input"));
+      }
+      that.refresh();
+    }));
+    analyserMinPSD.addEventListener("dblclick", function (e) {
+      if (e.ctrlKey) {
+        analyserMinPSD.value = userSettings.psdHeatmapMin;
+        analyserMinPSD.dispatchEvent(new Event("input"));
+      }
+    });
 
-    analyserMaxPSD
-      .on(
-        "input",
-        debounce(100, function () {
-          const max = parseInt(analyserMaxPSD.val());
-          GraphSpectrumPlot.setMaxPSD(max);
-          saveOneUserSetting("psdHeatmapMax", max);
-          analyserMinPSD.prop("max", max - 5);
-          analyserLowLevelPSD.prop("max", max);
-          if (analyserLowLevelPSD.val() > max) {
-            analyserLowLevelPSD.val(max).trigger("input");
-          }
-          that.refresh();
-        }),
-      )
-      .dblclick(function (e) {
-        if (e.ctrlKey) {
-          $(this).val(userSettings.psdHeatmapMax).trigger("input");
-        }
-      })
-      .val(userSettings.psdHeatmapMax);
+    analyserMaxPSD.value = userSettings.psdHeatmapMax;
+    analyserMaxPSD.addEventListener("input", debounce(100, function () {
+      const max = parseInt(analyserMaxPSD.value);
+      GraphSpectrumPlot.setMaxPSD(max);
+      saveOneUserSetting("psdHeatmapMax", max);
+      analyserMinPSD.max = max - 5;
+      analyserLowLevelPSD.max = max;
+      if (parseInt(analyserLowLevelPSD.value) > max) {
+        analyserLowLevelPSD.value = max;
+        analyserLowLevelPSD.dispatchEvent(new Event("input"));
+      }
+      that.refresh();
+    }));
+    analyserMaxPSD.addEventListener("dblclick", function (e) {
+      if (e.ctrlKey) {
+        analyserMaxPSD.value = userSettings.psdHeatmapMax;
+        analyserMaxPSD.dispatchEvent(new Event("input"));
+      }
+    });
 
-    analyserLowLevelPSD
-      .on(
-        "input",
-        debounce(100, function () {
-          const lowLevel = analyserLowLevelPSD.val();
-          GraphSpectrumPlot.setLowLevelPSD(lowLevel);
-          that.refresh();
-        }),
-      )
-      .dblclick(function (e) {
-        if (e.ctrlKey) {
-          $(this).val(analyserMinPSD.val()).trigger("input");
-        }
-      })
-      .val(analyserMinPSD.val());
+    analyserLowLevelPSD.value = analyserMinPSD.value;
+    analyserLowLevelPSD.addEventListener("input", debounce(100, function () {
+      const lowLevel = analyserLowLevelPSD.value;
+      GraphSpectrumPlot.setLowLevelPSD(lowLevel);
+      that.refresh();
+    }));
+    analyserLowLevelPSD.addEventListener("dblclick", function (e) {
+      if (e.ctrlKey) {
+        analyserLowLevelPSD.value = analyserMinPSD.value;
+        analyserLowLevelPSD.dispatchEvent(new Event("input"));
+      }
+    });
 
     GraphSpectrumCalc.setPointsPerSegmentPSD(
       2 ** DEFAULT_PSD_SEGMENT_LENGTH_POWER,
     );
-    analyserSegmentLengthPowerAt2
-      .on(
-        "input",
-        debounce(100, function () {
-          // Recalculate PSD with updated samples per segment count
-          GraphSpectrumCalc.setPointsPerSegmentPSD(
-            2 ** Number.parseInt($(this).val()),
-          );
-          dataLoad();
-          GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
-          that.refresh();
-        }),
-      )
-      .dblclick(function (e) {
-        if (e.ctrlKey) {
-          $(this).val(DEFAULT_PSD_SEGMENT_LENGTH_POWER).trigger("input");
-        }
-      })
-      .val(DEFAULT_PSD_SEGMENT_LENGTH_POWER);
+    analyserSegmentLengthPowerAt2.value = DEFAULT_PSD_SEGMENT_LENGTH_POWER;
+    analyserSegmentLengthPowerAt2.addEventListener("input", debounce(100, function () {
+      GraphSpectrumCalc.setPointsPerSegmentPSD(
+        2 ** Number.parseInt(analyserSegmentLengthPowerAt2.value),
+      );
+      dataLoad();
+      GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
+      that.refresh();
+    }));
+    analyserSegmentLengthPowerAt2.addEventListener("dblclick", function (e) {
+      if (e.ctrlKey) {
+        analyserSegmentLengthPowerAt2.value = DEFAULT_PSD_SEGMENT_LENGTH_POWER;
+        analyserSegmentLengthPowerAt2.dispatchEvent(new Event("input"));
+      }
+    });
 
     // Spectrum type to show
     userSettings.spectrumType =
       userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
-    spectrumTypeElem.val(userSettings.spectrumType);
+    spectrumTypeElem.value = userSettings.spectrumType;
 
-    spectrumTypeElem
-      .change(function () {
-        const optionSelected = parseInt(spectrumTypeElem.val(), 10);
+    function onSpectrumTypeChange() {
+      const optionSelected = parseInt(spectrumTypeElem.value, 10);
 
-        if (optionSelected != userSettings.spectrumType) {
-          userSettings.spectrumType = optionSelected;
-          saveOneUserSetting("spectrumType", userSettings.spectrumType);
+      if (optionSelected != userSettings.spectrumType) {
+        userSettings.spectrumType = optionSelected;
+        saveOneUserSetting("spectrumType", userSettings.spectrumType);
 
-          // Recalculate the data, for the same curve than now, and draw it
-          dataReload = true;
-          that.plotSpectrum(-1, null, null); // Update fft data only
-        }
+        dataReload = true;
+        that.plotSpectrum(-1, null, null);
+      }
 
-        // Hide overdraw and zoomY if needed
-        const pidErrorVsSetpointSelected =
-          optionSelected === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT;
-        const psdHeatMapSelected =
-          optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
-          optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
-        const psdCurveSelected =
-          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-        overdrawSpectrumTypeElem.toggle(!pidErrorVsSetpointSelected);
-        analyserZoomYElem.toggleClass(
-          "onlyFullScreenException",
-          pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected,
-        );
-        analyserSegmentLengthPowerAt2.toggleClass(
-          "onlyFullScreenException",
-          !psdCurveSelected,
-        );
-        analyserLowLevelPSD.toggleClass(
-          "onlyFullScreenException",
-          !psdHeatMapSelected,
-        );
-        analyserMinPSD.toggleClass(
-          "onlyFullScreenException",
-          !psdHeatMapSelected,
-        );
-        analyserMaxPSD.toggleClass(
-          "onlyFullScreenException",
-          !psdHeatMapSelected,
-        );
-        $("#analyserMaxPSDLabel").toggleClass(
-          "onlyFullScreenException",
-          !psdHeatMapSelected,
-        );
-        $("#analyserMinPSDLabel").toggleClass(
-          "onlyFullScreenException",
-          !psdHeatMapSelected,
-        );
-        $("#analyserLowLevelPSDLabel").toggleClass(
-          "onlyFullScreenException",
-          !psdHeatMapSelected,
-        );
-        $("#analyserSegmentLengthPowerAt2Label").toggleClass(
-          "onlyFullScreenException",
-          !psdCurveSelected,
-        );
+      const pidErrorVsSetpointSelected =
+        optionSelected === SPECTRUM_TYPE.PIDERROR_VS_SETPOINT;
+      const psdHeatMapSelected =
+        optionSelected === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
+        optionSelected === SPECTRUM_TYPE.PSD_VS_RPM;
+      const psdCurveSelected =
+        optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
 
-        const showSpectrumsComparisonPanel =
-          optionSelected === SPECTRUM_TYPE.FREQUENCY ||
-          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-        $("#spectrumComparison").css(
-          "visibility",
-          showSpectrumsComparisonPanel ? "visible" : "hidden",
-        );
+      overdrawSpectrumTypeElem.style.display = pidErrorVsSetpointSelected ? "none" : "";
+      analyserZoomYElem.classList.toggle(
+        "onlyFullScreenException",
+        pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected,
+      );
+      analyserSegmentLengthPowerAt2.classList.toggle("onlyFullScreenException", !psdCurveSelected);
+      analyserLowLevelPSD.classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
+      analyserMinPSD.classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
+      analyserMaxPSD.classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
+      document.getElementById("analyserMaxPSDLabel").classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
+      document.getElementById("analyserMinPSDLabel").classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
+      document.getElementById("analyserLowLevelPSDLabel").classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
+      document.getElementById("analyserSegmentLengthPowerAt2Label").classList.toggle("onlyFullScreenException", !psdCurveSelected);
 
-        const showAddSpectrumButton =
-          optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
-        $("#btn-spectrum-add").toggle(showAddSpectrumButton);
-      })
-      .change();
+      const showSpectrumsComparisonPanel =
+        optionSelected === SPECTRUM_TYPE.FREQUENCY ||
+        optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+      document.getElementById("spectrumComparison").style.visibility =
+        showSpectrumsComparisonPanel ? "visible" : "hidden";
+
+      const showAddSpectrumButton =
+        optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
+      const btnAdd = document.getElementById("btn-spectrum-add");
+      if (btnAdd) btnAdd.style.display = showAddSpectrumButton ? "" : "none";
+    }
+
+    spectrumTypeElem.addEventListener("change", onSpectrumTypeChange);
+    onSpectrumTypeChange();
 
     // Spectrum overdraw to show
     userSettings.overdrawSpectrumType =
       userSettings.overdrawSpectrumType || SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS;
-    overdrawSpectrumTypeElem.val(userSettings.overdrawSpectrumType);
+    overdrawSpectrumTypeElem.value = userSettings.overdrawSpectrumType;
     GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
-    overdrawSpectrumTypeElem.change(function () {
-      const optionSelected = parseInt(overdrawSpectrumTypeElem.val(), 10);
+    overdrawSpectrumTypeElem.addEventListener("change", function () {
+      const optionSelected = parseInt(overdrawSpectrumTypeElem.value, 10);
 
       if (optionSelected != userSettings.overdrawSpectrumType) {
         userSettings.overdrawSpectrumType = optionSelected;
@@ -461,7 +395,6 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
           userSettings.overdrawSpectrumType,
         );
 
-        // Refresh the graph
         GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
         that.draw();
       }
@@ -474,7 +407,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     function trackFrequency(e, analyser) {
       if (e.shiftKey) {
         // Hide the combo and maximize buttons
-        spectrumToolbarElem.removeClass("non-shift");
+        spectrumToolbarElem.classList.remove("non-shift");
 
         const rect = analyserCanvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -489,7 +422,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         }
         e.preventDefault();
       } else {
-        spectrumToolbarElem.addClass("non-shift");
+        spectrumToolbarElem.classList.add("non-shift");
       }
     }
 
@@ -514,7 +447,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.getExportedFileName = function () {
-      let fileName = $(".log-filename").text().split(".")[0];
+      let fileName = (document.querySelector(".log-filename")?.textContent || "").split(".")[0];
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQUENCY:
           fileName = fileName + "_sp";
