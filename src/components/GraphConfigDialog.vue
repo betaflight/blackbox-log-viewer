@@ -5,7 +5,7 @@
         <h4 class="font-semibold">Configure graphs</h4>
         <div class="flex items-center gap-2">
           <UDropdownMenu :items="addGraphItems" :content="{ class: 'z-[300]' }">
-            <UButton color="primary" icon="i-lucide-plus" label="Add graph" trailing-icon="i-lucide-chevron-down" size="xs" />
+            <UButton variant="outline" color="neutral" icon="i-lucide-plus" label="Add graph" trailing-icon="i-lucide-chevron-down" size="xs" />
           </UDropdownMenu>
           <UButton
             v-if="localGraphs.length > 0"
@@ -21,7 +21,7 @@
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-5 max-h-[70vh] overflow-y-auto">
+      <div class="flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
         <!-- Graph panels -->
         <UiBox
           v-for="(graph, gIdx) in localGraphs"

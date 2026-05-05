@@ -6,7 +6,7 @@
         <h5 v-if="revision" class="text-sm text-dimmed">{{ revision }}</h5>
         <h5 v-if="boardInfo" class="text-sm text-dimmed">{{ boardInfo }}</h5>
       </div>
-      <UButton variant="solid" color="primary" icon="i-lucide-x" label="Close" class="ml-auto" @click="open = false" />
+      <UButton variant="outline" color="neutral" icon="i-lucide-x" label="Close" size="xs" class="ml-auto" @click="open = false" />
     </template>
 
     <template #body>
@@ -125,8 +125,9 @@
             <table class="w-full text-sm">
               <tbody>
                 <tr v-for="f in featuresList" :key="f.name" class="border-b border-default">
-                  <td class="py-0.5 w-6">
-                    <input type="checkbox" :checked="f.enabled" disabled class="cursor-default" />
+                  <td class="py-0.5 w-6 text-center">
+                    <UIcon v-if="f.enabled" name="i-lucide-check" class="size-3.5 text-green-500" />
+                    <UIcon v-else name="i-lucide-minus" class="size-3.5 text-neutral-300 dark:text-neutral-600" />
                   </td>
                   <td class="py-0.5 font-medium">{{ f.name }}</td>
                   <td class="py-0.5 text-neutral-500 text-xs">{{ f.description }}</td>
@@ -139,8 +140,9 @@
             <table class="w-full text-sm">
               <tbody>
                 <tr v-for="f in disabledFieldsList" :key="f.name" class="border-b border-default">
-                  <td class="py-0.5 w-6">
-                    <input type="checkbox" :checked="f.enabled" disabled class="cursor-default" />
+                  <td class="py-0.5 w-6 text-center">
+                    <UIcon v-if="f.enabled" name="i-lucide-check" class="size-3.5 text-green-500" />
+                    <UIcon v-else name="i-lucide-minus" class="size-3.5 text-neutral-300 dark:text-neutral-600" />
                   </td>
                   <td class="py-0.5 font-medium">{{ f.name }}</td>
                   <td class="py-0.5 text-neutral-500 text-xs">{{ f.description }}</td>

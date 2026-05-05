@@ -10,9 +10,9 @@
         <template v-if="mode === 'settings'">
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium">Video duration</span>
-            <span class="text-sm text-neutral-400">{{ videoDurationText }}</span>
+            <span class="text-sm text-dimmed">{{ videoDurationText }}</span>
           </div>
-          <p v-if="videoDurationText" class="text-xs text-neutral-500">
+          <p v-if="videoDurationText" class="text-xs text-dimmed">
             Use the I (In) and O (Out) keys while viewing the log to mark the start and end points of the video
           </p>
 
@@ -33,15 +33,15 @@
 
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium">Video format</span>
-            <span class="text-sm text-neutral-400">WebM</span>
+            <span class="text-sm text-dimmed">WebM</span>
           </div>
 
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium">Audio format</span>
-            <span class="text-sm text-neutral-400">Not supported yet (no audio will be included)</span>
+            <span class="text-sm text-dimmed">Not supported yet (no audio will be included)</span>
           </div>
 
-          <p v-if="hasFlightVideo" class="text-xs text-neutral-500">
+          <p v-if="hasFlightVideo" class="text-xs text-dimmed">
             If you experience problems with the background flight video being glitchy in the exported video,
             <a href="https://github.com/betaflight/blackbox-tools/blob/master/Readme.md" target="_blank" rel="noopener noreferrer" class="underline">follow the instructions here</a>
             to re-encode your flight video.
@@ -50,17 +50,17 @@
 
         <!-- Progress mode -->
         <template v-else-if="mode === 'progress'">
-          <progress :value="progressValue" :max="progressMax" class="w-full h-2" />
+          <UProgress :model-value="progressPercent" color="primary" size="sm" />
           <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-            <span class="text-neutral-500">Rendered frames</span>
+            <span class="text-dimmed">Rendered frames</span>
             <span>{{ renderedFramesText }}</span>
-            <span class="text-neutral-500">File size</span>
+            <span class="text-dimmed">File size</span>
             <span>{{ fileSizeText }}</span>
             <template v-if="fileSizeWarning">
               <span></span>
               <span class="text-red-500 text-xs">You must install this tool as a Chrome App in order to export videos larger than 500MB</span>
             </template>
-            <span class="text-neutral-500">Remaining time</span>
+            <span class="text-dimmed">Remaining time</span>
             <span>{{ remainingText }}</span>
           </div>
         </template>
@@ -163,6 +163,11 @@ let renderStartTime = 0;
 let lastEstimatedTimeMsec = false;
 
 const hasFlightVideo = computed(() => !!props.logParameters?.flightVideo);
+
+const progressPercent = computed(() => {
+  if (progressMax.value <= 0) return 0;
+  return Math.round((progressValue.value / progressMax.value) * 100);
+});
 
 const videoDurationText = computed(() => {
   if (!props.logParameters) return "";
