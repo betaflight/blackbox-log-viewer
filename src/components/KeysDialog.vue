@@ -9,117 +9,20 @@
 
     <template #body>
       <div class="keys-grid">
-        <!-- Column 1 -->
-        <div class="keys-col">
-          <div class="keys-card">
+        <div v-for="(col, ci) in layout" :key="ci" class="keys-col">
+          <div v-for="(card, ki) in col" :key="ki" class="keys-card">
             <div class="keys-card-header">
-              <UIcon name="i-lucide-move" class="size-3.5 text-primary" />
-              <span>Navigation</span>
+              <UIcon :name="card.icon" class="size-3.5 text-primary" />
+              <span>{{ card.title }}</span>
             </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>←</kbd> <kbd>→</kbd></td><td>Move through log by 100ms</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Move by exactly one frame</td></tr>
-              <tr><td class="keys-td-keys"><kbd>PgUp</kbd> <kbd>PgDn</kbd></td><td>Move through log fast</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Home</kbd> <kbd>End</kbd></td><td>Jump to start / end of log</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Zoom in / out</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>Alt</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Zoom in / out faster</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Space</kbd></td><td>Play / Pause</td></tr>
-            </table>
-          </div>
-
-          <div class="keys-card">
-            <div class="keys-card-header">
-              <UIcon name="i-lucide-activity" class="size-3.5 text-primary" />
-              <span>Spectrum Analyser</span>
-            </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>A</kbd></td><td>Toggle analyser display</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd></td><td>Show frequency under mouse</td></tr>
-            </table>
-          </div>
-        </div>
-
-        <!-- Column 2 -->
-        <div class="keys-col">
-          <div class="keys-card">
-            <div class="keys-card-header">
-              <UIcon name="i-lucide-zap" class="size-3.5 text-primary" />
-              <span>Quick Modes</span>
-            </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>Z</kbd></td><td>QuickZoom — max zoom and back</td></tr>
-              <tr><td class="keys-td-keys"><kbd>S</kbd></td><td>QuickSmooth — smoothing to zero</td></tr>
-              <tr><td class="keys-td-keys"><kbd>X</kbd></td><td>QuickExpo — expo to linear</td></tr>
-              <tr><td class="keys-td-keys"><kbd>G</kbd></td><td>QuickGrid — hide all grids</td></tr>
-              <tr><td class="keys-td-keys"><kbd>T</kbd></td><td>Toggle field values table</td></tr>
-              <tr><td class="keys-td-keys"><kbd>C</kbd></td><td>Toggle configuration dump</td></tr>
-            </table>
-          </div>
-
-          <div class="keys-card">
-            <div class="keys-card-header">
-              <UIcon name="i-lucide-sliders-horizontal" class="size-3.5 text-primary" />
-              <span>Field Adjustments</span>
-            </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>Ctrl</kbd> <kbd>Scroll</kbd></td><td>Adjust smoothing</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>Scroll</kbd></td><td>Adjust zoom</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>Scroll</kbd></td><td>Adjust expo</td></tr>
-            </table>
-            <p class="keys-hint">Hover over a field in the legend, then scroll</p>
-          </div>
-        </div>
-
-        <!-- Column 3 -->
-        <div class="keys-col">
-          <div class="keys-card">
-            <div class="keys-card-header">
-              <UIcon name="i-lucide-crosshair" class="size-3.5 text-primary" />
-              <span>Marking &amp; Sync</span>
-            </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>M</kbd></td><td>Toggle marker at current time</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>M</kbd></td><td>Smart Sync at marker position</td></tr>
-              <tr><td class="keys-td-keys"><kbd>I</kbd></td><td>Set IN point</td></tr>
-              <tr><td class="keys-td-keys"><kbd>O</kbd></td><td>Set OUT point</td></tr>
-            </table>
-          </div>
-
-          <div class="keys-card">
-            <div class="keys-card-header">
-              <UIcon name="i-lucide-bookmark" class="size-3.5 text-primary" />
-              <span>Bookmarks</span>
-            </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>1-9</kbd></td><td>Save bookmark</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>1-9</kbd></td><td>Recall bookmark</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>0</kbd></td><td>Clear all bookmarks</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Alt</kbd> <kbd>S</kbd></td><td>Save graph to PNG</td></tr>
-            </table>
-          </div>
-        </div>
-
-        <!-- Column 4 -->
-        <div class="keys-col">
-          <div class="keys-card">
-            <div class="keys-card-header">
-              <UIcon name="i-lucide-layout-grid" class="size-3.5 text-primary" />
-              <span>Workspaces</span>
-            </div>
-            <table class="keys-table" aria-label="Keyboard shortcuts">
-              <thead class="sr-only"><tr><th>Keys</th><th>Action</th></tr></thead>
-              <tr><td class="keys-td-keys"><kbd>0-9</kbd></td><td>Recall workspace</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>0-9</kbd></td><td>Save to workspace</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>S</kbd></td><td>Save to current workspace</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Shift</kbd> <kbd>W</kbd></td><td>Load default workspace</td></tr>
-              <tr><td class="keys-td-keys"><kbd>Ctrl</kbd> <kbd>Z</kbd></td><td>Toggle last two configs</td></tr>
-            </table>
+            <UTable :data="card.data" :columns="columns" :ui="tableUi">
+              <template #keys-cell="{ row }">
+                <span class="whitespace-nowrap">
+                  <kbd v-for="(k, i) in row.original.keys" :key="i" class="keys-kbd">{{ k }}</kbd>
+                </span>
+              </template>
+            </UTable>
+            <p v-if="card.hint" class="keys-hint">{{ card.hint }}</p>
           </div>
         </div>
       </div>
@@ -139,6 +42,103 @@
 
 <script setup>
 const open = defineModel("open", { type: Boolean, default: false });
+
+const columns = [
+  { accessorKey: "keys", header: "Keys" },
+  { accessorKey: "action", header: "Action" },
+];
+
+const tableUi = {
+  thead: "sr-only",
+  base: "w-full",
+  td: "py-0.5 text-xs",
+  tr: "",
+};
+
+const layout = [
+  [
+    {
+      icon: "i-lucide-move",
+      title: "Navigation",
+      data: [
+        { keys: ["←", "→"], action: "Move through log by 100ms" },
+        { keys: ["Alt", "←", "→"], action: "Move by exactly one frame" },
+        { keys: ["PgUp", "PgDn"], action: "Move through log fast" },
+        { keys: ["Home", "End"], action: "Jump to start / end of log" },
+        { keys: ["Shift", "←", "→"], action: "Zoom in / out" },
+        { keys: ["Shift", "Alt", "←", "→"], action: "Zoom in / out faster" },
+        { keys: ["Space"], action: "Play / Pause" },
+      ],
+    },
+    {
+      icon: "i-lucide-activity",
+      title: "Spectrum Analyser",
+      data: [
+        { keys: ["A"], action: "Toggle analyser display" },
+        { keys: ["Shift"], action: "Show frequency under mouse" },
+      ],
+    },
+  ],
+  [
+    {
+      icon: "i-lucide-zap",
+      title: "Quick Modes",
+      data: [
+        { keys: ["Z"], action: "QuickZoom — max zoom and back" },
+        { keys: ["S"], action: "QuickSmooth — smoothing to zero" },
+        { keys: ["X"], action: "QuickExpo — expo to linear" },
+        { keys: ["G"], action: "QuickGrid — hide all grids" },
+        { keys: ["T"], action: "Toggle field values table" },
+        { keys: ["C"], action: "Toggle configuration dump" },
+      ],
+    },
+    {
+      icon: "i-lucide-sliders-horizontal",
+      title: "Field Adjustments",
+      hint: "Hover over a field in the legend, then use modifier + scroll wheel",
+      data: [
+        { keys: ["Ctrl", "Scroll"], action: "Adjust smoothing" },
+        { keys: ["Shift", "Scroll"], action: "Adjust zoom" },
+        { keys: ["Alt", "Scroll"], action: "Adjust expo" },
+      ],
+    },
+  ],
+  [
+    {
+      icon: "i-lucide-crosshair",
+      title: "Marking & Sync",
+      data: [
+        { keys: ["M"], action: "Toggle marker at current time" },
+        { keys: ["Alt", "M"], action: "Smart Sync at marker position" },
+        { keys: ["I"], action: "Set IN point" },
+        { keys: ["O"], action: "Set OUT point" },
+      ],
+    },
+    {
+      icon: "i-lucide-bookmark",
+      title: "Bookmarks",
+      data: [
+        { keys: ["Alt", "Shift", "1-9"], action: "Save bookmark" },
+        { keys: ["Alt", "1-9"], action: "Recall bookmark" },
+        { keys: ["Alt", "0"], action: "Clear all bookmarks" },
+        { keys: ["Alt", "S"], action: "Save graph to PNG" },
+      ],
+    },
+  ],
+  [
+    {
+      icon: "i-lucide-layout-grid",
+      title: "Workspaces",
+      data: [
+        { keys: ["0-9"], action: "Recall workspace" },
+        { keys: ["Shift", "0-9"], action: "Save to workspace" },
+        { keys: ["Shift", "S"], action: "Save to current workspace" },
+        { keys: ["Shift", "W"], action: "Load default workspace" },
+        { keys: ["Ctrl", "Z"], action: "Toggle last two configs" },
+      ],
+    },
+  ],
+];
 </script>
 
 <style scoped>
@@ -182,27 +182,10 @@ const open = defineModel("open", { type: Boolean, default: false });
   border-bottom: 1px solid var(--ui-border);
 }
 
-.keys-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.keys-table td {
-  padding: 0.2rem 0;
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  vertical-align: baseline;
-}
-
-.keys-td-keys {
-  white-space: nowrap;
-  padding-right: 0.75rem !important;
-  width: 1%;
-}
-
-.keys-table kbd {
+.keys-kbd {
   display: inline-block;
   padding: 0.05rem 0.35rem;
+  margin-right: 0.15rem;
   font-family: ui-monospace, SFMono-Regular, monospace;
   font-size: 0.65rem;
   line-height: 1.5;
