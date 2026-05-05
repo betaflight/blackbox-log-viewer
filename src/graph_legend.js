@@ -12,7 +12,6 @@ export function GraphLegend(
 ) {
   let that = this;
 
-  // targetElem may be a jQuery object or a DOM element
   const targetEl =
     targetElem instanceof Element ? targetElem : targetElem[0] || targetElem;
 

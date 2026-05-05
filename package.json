@@ -22,10 +22,7 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
-    "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
-    "jquery": "^3.7.1",
-    "jquery-ui": "^1.13.2",
     "leaflet": "^1.9.3",
     "leaflet-marker-rotation": "^0.4.0",
     "Leaflet.MultiOptionsPolyline": "github:hgoebl/Leaflet.MultiOptionsPolyline",
@@ -49,7 +46,6 @@
     "vite-plugin-pwa": "^1.0.3"
   },
   "overrides": {
-    "lodash.template": "^4.5.0",
     "@rollup/plugin-terser": "^1.0.0"
   },
   "engines": {

@@ -2259,7 +2259,7 @@ function BlackboxLogViewer() {
       }
     });
 
-    // View toggle bridges (must be inside $(function) scope)
+    // View toggle bridges
     that.toggleVideo = function () {
       viewVideo = !viewVideo;
       appStore.viewVideo = viewVideo;
