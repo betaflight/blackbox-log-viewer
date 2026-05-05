@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-4xl' }">
+  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-5xl' }">
     <template #header>
       <h4 class="font-semibold">Advanced User Settings</h4>
     </template>
@@ -265,6 +265,7 @@ const PercentInput = (props, { emit }) =>
       step: 1,
       formatOptions: { useGrouping: false },
       size: "xs",
+      orientation: "vertical",
       ui: { root: "w-16" },
       "onUpdate:modelValue": (v) => emit("update:modelValue", `${v}%`),
     }),
@@ -284,6 +285,7 @@ const PositionInputs = (props, { emit }) => {
         step: 1,
         formatOptions: { useGrouping: false },
         size: "xs",
+        orientation: "vertical",
         ui: { root: "w-14" },
         "onUpdate:modelValue": (v) => emit(`update:${key}`, `${v}%`),
       }),
