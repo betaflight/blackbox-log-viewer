@@ -21,6 +21,13 @@ export default defineConfig({
           defaultVariants: {
             size: "sm",
           },
+          compoundVariants: [
+            {
+              color: "primary",
+              variant: "solid",
+              class: "text-black",
+            },
+          ],
         },
         tooltip: {
           slots: {
