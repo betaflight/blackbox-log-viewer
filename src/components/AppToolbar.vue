@@ -1,10 +1,12 @@
 <template>
   <div>
     <!-- Logo bar -->
-    <div class="app-logo-bar">
-      <img src="/images/light-wide-2.svg" alt="Betaflight" class="h-8" />
-      <span class="app-logo-subtitle">Blackbox Explorer</span>
-      <span v-if="appStore.logFilename" class="app-logo-filename">
+    <div class="flex items-center dark:bg-neutral-800 px-4 py-1">
+      <div class="flex flex-col">
+        <img src="/images/light-wide-2.svg" alt="Betaflight" class="h-7 w-auto" />
+        <span class="text-[10px] text-neutral-400 -mt-0.5 pl-0.5">Blackbox Explorer</span>
+      </div>
+      <span v-if="appStore.logFilename" class="ml-auto text-[13px] text-neutral-300">
         {{ appStore.logFilename }}
       </span>
     </div>
@@ -97,27 +99,6 @@ const appStore = useAppStore();
 </script>
 
 <style>
-.app-logo-bar {
-  background-color: var(--primary-500);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 6px 16px;
-}
-
-.app-logo-subtitle {
-  color: white;
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.app-logo-filename {
-  color: white;
-  font-size: 13px;
-  opacity: 0.85;
-  margin-left: 8px;
-}
-
 .app-action-bar {
   display: flex;
   align-items: center;
