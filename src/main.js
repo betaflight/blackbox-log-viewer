@@ -53,8 +53,6 @@ const INNER_BOUNDS_HEIGHT = 480;
 const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
-  const that = this; // eslint-disable-line -- needed: IIFE below loses `this` context
-
   function supportsRequiredAPIs() {
     return (
       globalThis.File &&
@@ -1306,7 +1304,7 @@ function BlackboxLogViewer() {
   });
 
   // Initialize on DOM ready (modules are deferred, DOM is ready)
-  (function () {
+  {
     // Initialize dark theme
     DarkTheme.init(prefs);
 
@@ -1515,15 +1513,13 @@ function BlackboxLogViewer() {
       invalidateGraph();
     }
     // Initialize user settings from prefs (replaces legacy UserSettingsDialog onLoad)
-    (function () {
-      prefs.get("userSettings", function (item) {
-        if (item) {
-          globalThis.userSettings = { ...defaultUserSettings, ...item };
-        } else {
-          globalThis.userSettings = { ...defaultUserSettings };
-        }
-      });
-    })();
+    prefs.get("userSettings", function (item) {
+      if (item) {
+        globalThis.userSettings = { ...defaultUserSettings, ...item };
+      } else {
+        globalThis.userSettings = { ...defaultUserSettings };
+      }
+    });
 
     document
       .querySelector(".open-graph-configuration-dialog")
@@ -1535,17 +1531,17 @@ function BlackboxLogViewer() {
     // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
 
     // Status bar interactions wired via Vue StatusBar bridge
-    that.gotoBookmark = function (index) {
+    this.gotoBookmark = function (index) {
       if (bookmarkTimes?.[index] != null) {
         setCurrentBlackboxTime(bookmarkTimes[index]);
         invalidateGraph();
       }
     };
-    that.gotoMarker = function () {
+    this.gotoMarker = function () {
       setCurrentBlackboxTime(markerTime);
       invalidateGraph();
     };
-    that.showConfigFile = function () {
+    this.showConfigFile = function () {
       showConfigFile(true);
     };
 
@@ -2270,32 +2266,32 @@ function BlackboxLogViewer() {
     });
 
     // View toggle bridges
-    that.toggleVideo = function () {
+    this.toggleVideo = function () {
       viewVideo = !viewVideo;
       appStore.viewVideo = viewVideo;
       html.classList.toggle("video-hidden", !viewVideo);
     };
-    that.toggleCraft = function () {
+    this.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
       html.classList.toggle("has-craft", userSettings.drawCraft);
       saveOneUserSetting("drawCraft", userSettings.drawCraft);
     };
-    that.toggleSticks = function () {
+    this.toggleSticks = function () {
       userSettings.drawSticks = !userSettings.drawSticks;
       graph.setDrawSticks(userSettings.drawSticks);
       html.classList.toggle("has-sticks", userSettings.drawSticks);
       saveOneUserSetting("drawSticks", userSettings.drawSticks);
       invalidateGraph();
     };
-    that.toggleTable = function () {
+    this.toggleTable = function () {
       showValueTable();
       showConfigFile(false);
     };
-    that.viewConfig = function () {
+    this.viewConfig = function () {
       showValueTable(false);
       showConfigFile();
     };
-    that.toggleAnalyser = function () {
+    this.toggleAnalyser = function () {
       if (activeGraphConfig.selectedFieldName != null) {
         hasAnalyser = !hasAnalyser;
       } else {
@@ -2315,7 +2311,7 @@ function BlackboxLogViewer() {
       prefs.set("hasAnalyser", hasAnalyser);
       invalidateGraph();
     };
-    that.toggleMap = function () {
+    this.toggleMap = function () {
       hasMap = !hasMap;
       graphStore.hasMap = hasMap;
       html.classList.toggle("has-map", hasMap);
@@ -2324,7 +2320,7 @@ function BlackboxLogViewer() {
         mapGrapher.initialize(userSettings);
       }
     };
-    that.toggleAnalyserFullscreen = function () {
+    this.toggleAnalyserFullscreen = function () {
       if (hasAnalyser) {
         hasAnalyserFullscreen = !hasAnalyserFullscreen;
       } else hasAnalyserFullscreen = false;
@@ -2334,40 +2330,40 @@ function BlackboxLogViewer() {
       graph.setAnalyser(hasAnalyserFullscreen);
       invalidateGraph();
     };
-    that.toggleSmoothing = function () {
+    this.toggleSmoothing = function () {
       toggleOverrideStatus("graphSmoothOverride", "has-smoothing-override");
     };
-    that.toggleExpo = function () {
+    this.toggleExpo = function () {
       toggleOverrideStatus("graphExpoOverride", "has-expo-override");
     };
-    that.toggleGrid = function () {
+    this.toggleGrid = function () {
       toggleOverrideStatus("graphGridOverride", "has-grid-override");
     };
-    that.setPlaybackRate = function (rate) {
+    this.setPlaybackRate = function (rate) {
       setPlaybackRate(rate, false);
     };
-    that.setGraphZoom = function (zoom) {
+    this.setGraphZoom = function (zoom) {
       setGraphZoom(zoom, false);
     };
-    that.logSyncHere = function () {
+    this.logSyncHere = function () {
       logSyncHere();
     };
-    that.logSyncBack = function () {
+    this.logSyncBack = function () {
       logSyncBack();
     };
-    that.logSyncForward = function () {
+    this.logSyncForward = function () {
       logSyncForward();
     };
-    that.logSmartSync = function () {
+    this.logSmartSync = function () {
       logSmartSync();
     };
-    that.setVideoOffsetValue = function (val) {
+    this.setVideoOffsetValue = function (val) {
       const offset = Number.parseFloat(val);
       if (!Number.isNaN(offset)) {
         setVideoOffset(offset, true);
       }
     };
-    that.setGraphTime = function (timeStr) {
+    this.setGraphTime = function (timeStr) {
       let newTime = stringTimetoMsec(timeStr);
       if (!isNaN(newTime)) {
         if (hasVideo) {
@@ -2379,21 +2375,21 @@ function BlackboxLogViewer() {
         invalidateGraph();
       }
     };
-    that.switchWorkspace = function (id) {
+    this.switchWorkspace = function (id) {
       if (workspaceGraphConfigs[id] != null) {
         onSwitchWorkspace(workspaceGraphConfigs, id);
       }
     };
-    that.saveWorkspace = function (id, title) {
+    this.saveWorkspace = function (id, title) {
       onSaveWorkspace(id, title);
     };
-    that.applyDefaultWorkspace = function (index) {
+    this.applyDefaultWorkspace = function (index) {
       const presets = [null, ctzsnoozeWorkspace, supaflyWorkspace];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
       }
     };
-  })();
+  }
 
   // Bridge API — expose key functions for Vue components during migration
   this.loadFiles = loadFiles;
