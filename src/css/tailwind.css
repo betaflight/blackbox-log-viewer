@@ -22,6 +22,11 @@
   --color-neutral-850: oklch(23.5% 0 0);
 }
 
-html {
+:root, :host {
+  --ui-primary: var(--color-primary-500);
   --ui-radius: 0.35rem;
+}
+
+.dark {
+  --ui-primary: var(--color-primary-400);
 }

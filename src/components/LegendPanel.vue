@@ -31,6 +31,6 @@
       </button>
     </div>
 
-    <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
+    <UButton color="primary" variant="solid" block class="open-graph-configuration-dialog" label="Graph setup" />
   </div>
 </template>
