@@ -1,11 +1,9 @@
 <template>
   <div class="log-field-values" id="log-field-values">
-    <a href="#log-field-values">
-      <h4>Field values</h4>
-    </a>
+    <h4 class="text-sm font-semibold px-2 py-1 bg-elevated rounded-t">Field values</h4>
     <table class="field-values-table">
       <thead>
-        <tr>
+        <tr class="text-xs text-dimmed">
           <th>&nbsp;</th>
           <th>Raw value</th>
           <th>Decoded</th>
@@ -18,13 +16,11 @@
       </tbody>
     </table>
 
-    <a href="#log-field-values">
-      <h4>Statistics</h4>
-    </a>
+    <h4 class="text-sm font-semibold px-2 py-1 bg-elevated mt-2 rounded-t">Statistics</h4>
     <table id="stats-table" class="field-values-table">
-      <caption>Min/max values from this log</caption>
+      <caption class="text-xs text-dimmed text-left px-2 py-0.5">Min/max values from this log</caption>
       <thead>
-        <tr>
+        <tr class="text-xs text-dimmed">
           <th>&nbsp;</th>
           <th>Min</th>
           <th>Max</th>

@@ -332,81 +332,6 @@ html.has-log .log-graph-config {
   display: flex;
 }
 
-.config-graph {
-  margin: 0.5em 0;
-  background-color: var(--surface-0);
-}
-
-.config-graph dd {
-  margin-top: 0.5em;
-}
-
-.config-graph-header {
-  margin-bottom: 0;
-  margin-right: 0;
-  width: 100%;
-}
-
-.config-graph-field {
-  margin-bottom: 0.5em;
-  margin-top: 0.2em;
-  font-size: 12px;
-}
-
-.config-graph-field-list {
-  margin-top: 8px;
-  margin-bottom: 5px;
-}
-
-
-.config-graph-field-header {
-  margin-bottom: 0;
-  font-size: 12px;
-}
-
-.config-graph-field-list td,
-.config-graph-field-list th {
-  padding: 2px 2px;
-}
-
-.config-graph-field input {
-  padding: 5px 5px;
-  text-align: right;
-  max-width: 45px;
-}
-
-.config-graph-field input[name="grid"] {
-  width: 25px;
-}
-
-
-.config-graph-field input[name="linewidth"],
-.config-graph-field select.color-picker {
-  height: 30px;
-  max-width: 30px;
-  border-radius: 4px;
-}
-
-.config-graph h4 button {
-  margin-left: 0.5em;
-}
-
-.config-graph table tr {
-  line-height: 10px;
-}
-
-.setup-parameters {
-  margin: 0.5em 0;
-}
-
-.setup-parameters dd {
-  margin-top: 0.5em;
-}
-
-.setup-parameter {
-  margin: 0.5em 0;
-}
-
 #graphCanvas {
   position: absolute;
   top: 0;
@@ -753,19 +678,6 @@ html.has-analyser-fullscreen.has-analyser
   overflow-y: auto;
 }
 
-.log-field-values h4 {
-  background-color: var(--surface-0);
-  font-size: 13px;
-  font-weight: bold;
-  margin: 0;
-  padding: 2px 5px;
-}
-
-.log-field-values a + table + a {
-  margin-top: 10px;
-  display: block;
-}
-
 .log-field-values tr:nth-child(even) {
   background-color: var(--surface-100);
 }
@@ -1070,12 +982,6 @@ html.has-log:not(.is-fullscreen).has-table .log-field-values {
   display: none;
 }
 
-.nowrap {
-  /* overflow-y: hidden; */
-  /* width: 40px; */
-  /* white-space: nowrap; */
-}
-
 html.has-video .video-top-controls,
 html.has-log .video-top-controls,
 html.has-video .log-graph,
@@ -1145,17 +1051,6 @@ html.has-video .welcome-pane {
   display: none;
 }
 
-
-.pane-video-settings,
-.pane-video-progress,
-.pane-video-complete {
-  display: none;
-}
-.video-export-mode-settings .pane-video-settings,
-.video-export-mode-progress .pane-video-progress,
-.video-export-mode-complete .pane-video-complete {
-  display: block;
-}
 
 .video-dim-section {
   display: none;
@@ -1276,22 +1171,18 @@ html:not(.has-config) #status-bar .configuration-file-name {
   float: right;
 }
 
-html.isBF .config-graph h4 span:first-child,
 html.isBF .log-graph-config h3 span {
   background-image: linear-gradient(to bottom, #fff8e9 0, #ffbb00 100%);
 }
 
-html.isCF .config-graph h4 span:first-child,
 html.isCF .log-graph-config h3 span {
   background-image: linear-gradient(to bottom, #fff8e9 0, #00a23f 100%);
 }
 
-html.isINAV .config-graph h4 span:first-child,
 html.isINAV .log-graph-config h3 span {
   background-image: linear-gradient(to bottom, #fff8e9 0, #0850ac 100%);
 }
 
-.config-graph h4 span,
 .log-graph-config h3 span {
   /* background-color: rgba(239,187,0,0.5); */
   padding: 2px 4px 4px;
@@ -1328,11 +1219,6 @@ html.hasLaps table#lap-timer-laps {
 div#lap-timer td:first-child {
   padding-right: 10px;
 }
-
-.viewer-download {
-  display: none;
-}
-
 
 /*
  Mouse Notification styling
@@ -1383,27 +1269,6 @@ dialog h3 {
   -webkit-margin-start: 0px;
   -webkit-margin-end: 0px;
   font-weight: bold;
-}
-
-.regular-button {
-  margin-top: 8px;
-  margin-bottom: 8px;
-  margin-right: 10px;
-  background-color: var(--primary-500);
-  border-radius: 3px;
-  border: 1px solid var(--primary-600);
-  color: #000;
-  font-family: "open_sansbold", Arial;
-  font-size: 12px;
-  font-weight: bold;
-  text-shadow: 0px 1px rgba(255, 255, 255, 0.25);
-  display: inline-block;
-  cursor: pointer;
-  transition: all ease 0.2s;
-  padding: 0px;
-  padding-left: 9px;
-  padding-right: 9px;
-  line-height: 28px;
 }
 
 .actual-lograte {
