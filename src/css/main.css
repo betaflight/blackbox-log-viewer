@@ -397,6 +397,12 @@ html.has-analyser-fullscreen.has-analyser
   display: block;
 }
 
+html.has-analyser-fullscreen.has-analyser
+  .analyser
+  div.onlyFullScreen:not(.onlyFullScreenException) {
+  display: block;
+}
+
 #analyser,
 #log-seek-bar {
   z-index: 10;
@@ -418,20 +424,23 @@ html.has-analyser-fullscreen.has-analyser
     brightness(64%) contrast(130%);
 }
 
-.analyser:hover .non-shift #analyserResize {
+.analyser:hover .non-shift .spectrum-buttons {
   opacity: 1;
   height: auto;
   transition: opacity 500ms ease-in;
 }
 
-.analyser #analyserResize {
+.analyser .spectrum-buttons {
   height: 0;
   overflow: hidden;
   opacity: 0;
   top: 5px;
-  left: 975px;
+  left: 340px;
   z-index: 9;
   position: absolute;
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
 .analyser:hover .non-shift #spectrumType {
@@ -468,41 +477,22 @@ html.has-analyser-fullscreen.has-analyser
   min-width: 160px;
 }
 
-.analyser:hover .non-shift #spectrumComparison {
-  opacity: 1;
-  height: auto;
-  transition: opacity 500ms ease-in;
-}
 
-.analyser #spectrumComparison {
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  top: 5px;
-  left: 340px;
-  float: left;
-  z-index: 9;
-  position: absolute;
-  display: flex;
-  gap: 4px;
-}
-
-.analyser input#analyserZoomX {
-  width: 100px;
-  height: 10px;
+.analyser .analyser-slider-x {
   left: 975px;
-  top: 10px;
-  float: right;
+  top: 5px;
+  position: absolute;
+  z-index: 9;
 }
 
-.analyser input#analyserZoomY {
-  width: 100px;
-  height: 10px;
+.analyser .analyser-slider-y {
   left: 1085px;
-  top: 130px;
-  float: right;
-  transform: rotate(-90deg);
-  transform-origin: left top;
+  top: 5px;
+  position: absolute;
+  z-index: 9;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  height: 100px;
 }
 
 .analyser input#analyserMinPSD::-webkit-inner-spin-button,
@@ -594,6 +584,12 @@ html.has-analyser-fullscreen.has-analyser
   display: none;
   padding: 3px;
   margin-right: 3px;
+  z-index: 9;
+  position: absolute;
+}
+
+.analyser div.onlyFullScreen {
+  display: none;
   z-index: 9;
   position: absolute;
 }

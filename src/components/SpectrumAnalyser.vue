@@ -30,33 +30,42 @@
         />
       </div>
 
-      <div id="spectrumComparison" title="Spectrum comparison">
-        <UButton id="btn-spectrum-export" size="xs" color="primary" label="Exp" title="Export spectrum to CSV" />
-        <UButton size="xs" color="primary" label="Imp" title="Import spectrum from CSV" @click="triggerImport" />
-        <input type="file" id="btn-spectrum-import" accept=".csv" class="hidden onlyFullScreenException" multiple/>
-        <UButton id="btn-spectrum-clear" size="xs" color="primary" label="Clr" title="Clear imported spectrums" />
-      </div>
-
-      <div id="analyserResize" class="view-analyser-fullscreen" @click="toggleFullscreen">
-        <UButton
-          color="primary"
-          size="xs"
-          class="icon-resize-full"
-          icon="i-lucide-maximize-2"
-          title="Maximize analyser"
-        />
-        <UButton
-          color="primary"
-          size="xs"
-          class="icon-resize-small"
-          icon="i-lucide-minimize-2"
-          title="Minimize analyser"
-        />
+      <div id="spectrumButtons" class="spectrum-buttons">
+        <div id="spectrumComparison" class="flex gap-1">
+          <UButton id="btn-spectrum-export" size="xs" color="primary" label="Exp" title="Export spectrum to CSV" />
+          <UButton size="xs" color="primary" label="Imp" title="Import spectrum from CSV" @click="triggerImport" />
+          <input type="file" id="btn-spectrum-import" accept=".csv" class="hidden onlyFullScreenException" multiple/>
+          <UButton id="btn-spectrum-clear" size="xs" color="primary" label="Clr" title="Clear imported spectrums" />
+        </div>
+        <div class="view-analyser-fullscreen" @click="toggleFullscreen">
+          <UButton
+            color="primary"
+            size="xs"
+            class="icon-resize-full"
+            icon="i-lucide-maximize-2"
+            title="Maximize analyser"
+          />
+          <UButton
+            color="primary"
+            size="xs"
+            class="icon-resize-small"
+            icon="i-lucide-minimize-2"
+            title="Minimize analyser"
+          />
+        </div>
       </div>
     </span>
 
-    <input id="analyserZoomX" class="onlyFullScreen" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks" />
-    <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks" />
+    <!-- Hidden native inputs for legacy graph_spectrum.js compat -->
+    <input id="analyserZoomX" class="hidden onlyFullScreenException" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" />
+    <input id="analyserZoomY" class="hidden onlyFullScreenException" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" />
+    <!-- USlider wrappers positioned by CSS -->
+    <div id="analyserZoomXSlider" class="onlyFullScreen analyser-slider-x">
+      <USlider v-model="zoomX" :min="100" :max="500" :step="10" class="w-24" />
+    </div>
+    <div id="analyserZoomYSlider" class="onlyFullScreen analyser-slider-y">
+      <USlider v-model="zoomY" :min="10" :max="1000" :step="10" class="w-24" />
+    </div>
     <input id="analyserSegmentLengthPowerAt2" class="onlyFullScreen text-xs" type="number" name="analyserSegmentLengthPowerAt2" value="9" min="6" max="20" step="1" />
     <label id="analyserSegmentLengthPowerAt2Label" name="analyserSegmentLengthPowerAt2Label" class="onlyFullScreen text-xs text-dimmed">
       Segment&nbsp;length&nbsp;<br>power&nbsp;at&nbsp;2:
@@ -74,16 +83,6 @@
       Min&nbsp;dBm
     </label>
 
-    <datalist id="analyserZoomXTicks">
-      <option>100</option>
-      <option>200</option>
-      <option>300</option>
-      <option>400</option>
-      <option>500</option>
-    </datalist>
-    <datalist id="analyserZoomYTicks">
-      <option>100</option>
-    </datalist>
   </div>
 </template>
 
@@ -111,6 +110,8 @@ const overdrawOptions = [
 
 const spectrumType = ref("0");
 const overdrawType = ref("0");
+const zoomX = ref(100);
+const zoomY = ref(100);
 
 // Sync USelect → hidden native select and dispatch change event for legacy code
 watch(spectrumType, (val) => {
@@ -129,7 +130,24 @@ watch(overdrawType, (val) => {
   }
 });
 
-// Sync legacy → USelect when legacy code sets .value on the hidden select
+// Sync USlider → hidden native range input and dispatch input event for legacy code
+watch(zoomX, (val) => {
+  const el = document.getElementById("analyserZoomX");
+  if (el) {
+    el.value = val;
+    el.dispatchEvent(new Event("input"));
+  }
+});
+
+watch(zoomY, (val) => {
+  const el = document.getElementById("analyserZoomY");
+  if (el) {
+    el.value = val;
+    el.dispatchEvent(new Event("input"));
+  }
+});
+
+// Sync legacy → USelect/USlider when legacy code sets .value on hidden elements
 onMounted(() => {
   const specEl = document.getElementById("spectrumTypeSelect");
   const overdrawEl = document.getElementById("overdrawSpectrumTypeSelect");
@@ -153,6 +171,31 @@ onMounted(() => {
       set(v) {
         origOverDesc.set.call(this, v);
         overdrawType.value = String(v);
+      },
+    });
+  }
+
+  // Intercept .value setter on hidden range inputs for legacy sync
+  const zoomXEl = document.getElementById("analyserZoomX");
+  const zoomYEl = document.getElementById("analyserZoomY");
+  const origInputDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+
+  if (zoomXEl) {
+    Object.defineProperty(zoomXEl, "value", {
+      get() { return origInputDesc.get.call(this); },
+      set(v) {
+        origInputDesc.set.call(this, v);
+        zoomX.value = Number(v);
+      },
+    });
+  }
+
+  if (zoomYEl) {
+    Object.defineProperty(zoomYEl, "value", {
+      get() { return origInputDesc.get.call(this); },
+      set(v) {
+        origInputDesc.set.call(this, v);
+        zoomY.value = Number(v);
       },
     });
   }

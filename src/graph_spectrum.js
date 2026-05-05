@@ -97,16 +97,18 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       parentElem.style.top = `${newSize.top}px`;
 
       // place the sliders.
-      analyserZoomXElem.style.left = `${newSize.width - 130}px`;
-      analyserZoomYElem.style.left = `${newSize.width - 20}px`;
-      const comparisonElem = document.getElementById("spectrumComparison");
-      const resizeElem = document.getElementById("analyserResize");
-      const isFullscreen = document.documentElement.classList.contains("has-analyser-fullscreen");
-      if (comparisonElem) {
-        comparisonElem.style.left = `${newSize.width - (isFullscreen ? 250 : 150)}px`;
+      const zoomXSlider = document.getElementById("analyserZoomXSlider");
+      const zoomYSlider = document.getElementById("analyserZoomYSlider");
+      if (zoomXSlider) zoomXSlider.style.left = `${newSize.width - 130}px`;
+      if (zoomYSlider) {
+        zoomYSlider.style.left = `${newSize.width - 20}px`;
+        zoomYSlider.style.height = `${Math.min(newSize.height - 40, 200)}px`;
       }
-      if (resizeElem) {
-        resizeElem.style.left = `${newSize.width - (isFullscreen ? 20 : 30)}px`;
+      const buttonsElem = document.getElementById("spectrumButtons");
+      const isFullscreen = document.documentElement.classList.contains("has-analyser-fullscreen");
+      if (buttonsElem) {
+        // In fullscreen: place buttons before the horizontal slider; otherwise near right edge
+        buttonsElem.style.left = `${newSize.width - (isFullscreen ? 310 : 150)}px`;
       }
       analyserMaxPSD.style.left = `${newSize.width - 90}px`;
       analyserMinPSD.style.left = `${newSize.width - 90}px`;
@@ -359,10 +361,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
 
       overdrawSpectrumTypeElem.style.display = pidErrorVsSetpointSelected ? "none" : "";
-      analyserZoomYElem.classList.toggle(
-        "onlyFullScreenException",
-        pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected,
-      );
+      const zoomYException = pidErrorVsSetpointSelected || psdHeatMapSelected || psdCurveSelected;
+      // Only toggle USlider wrapper visibility; native input stays always hidden
+      document.getElementById("analyserZoomYSlider")?.classList.toggle("onlyFullScreenException", zoomYException);
       analyserSegmentLengthPowerAt2.classList.toggle("onlyFullScreenException", !psdCurveSelected);
       analyserLowLevelPSD.classList.toggle("onlyFullScreenException", !psdHeatMapSelected);
       analyserMinPSD.classList.toggle("onlyFullScreenException", !psdHeatMapSelected);

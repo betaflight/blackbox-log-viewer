@@ -2,15 +2,13 @@
   <li class="log-playback-rate-panel">
     <h4>Speed</h4>
     <div class="flex items-center gap-1">
-      <input
-        type="range"
-        class="w-20 accent-primary"
+      <USlider
+        v-model="rate"
         :min="10"
         :max="300"
         :step="5"
-        :value="playbackStore.playbackRate"
+        class="w-20"
         title="Playback speed"
-        @input="$emit('rate-change', Number($event.target.value))"
         @dblclick="$emit('rate-change', 100)"
       />
       <UBadge color="primary" variant="solid" size="sm" class="font-mono min-w-[42px] justify-center">
@@ -21,9 +19,15 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { usePlaybackStore } from "../stores/playback.js";
 
-defineEmits(["rate-change"]);
+const emit = defineEmits(["rate-change"]);
 
 const playbackStore = usePlaybackStore();
+
+const rate = computed({
+  get: () => playbackStore.playbackRate,
+  set: (val) => emit("rate-change", val),
+});
 </script>
