@@ -1591,39 +1591,6 @@ div#lap-timer td:first-child {
   display: none;
 }
 
-/*
- Bootstrap Tooltip Overrides
-*/
-.tooltip {
-  --tooltip-color: var(--surface-800);
-}
-.tooltip-inner {
-  background-color: var(--tooltip-color);
-}
-.tooltip.top .tooltip-arrow {
-  border-top-color: var(--tooltip-color);
-}
-.tooltip.top-left .tooltip-arrow {
-  border-top-color: var(--tooltip-color);
-}
-.tooltip.top-right .tooltip-arrow {
-  border-top-color: var(--tooltip-color);
-}
-.tooltip.right .tooltip-arrow {
-  border-right-color: var(--tooltip-color);
-}
-.tooltip.left .tooltip-arrow {
-  border-left-color: var(--tooltip-color);
-}
-.tooltip.bottom .tooltip-arrow {
-  border-bottom-color: var(--tooltip-color);
-}
-.tooltip.bottom-left .tooltip-arrow {
-  border-bottom-color: var(--tooltip-color);
-}
-.tooltip.bottom-right .tooltip-arrow {
-  border-bottom-color: var(--tooltip-color);
-}
 
 /*
  Mouse Notification styling
