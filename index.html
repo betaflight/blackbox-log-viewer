@@ -33,166 +33,15 @@
                 <video></video>
                 <canvas width="200" height="100" id="graphCanvas"></canvas>
                 <canvas width="0" height="0" id="craftCanvas"></canvas>
-                <div id="analyser" class="analyser">
-                    <canvas width="0" height="0" id="analyserCanvas"></canvas>
-
-                    <span id="spectrumToolbar">
-                        <div id="spectrumType" data-toggle="tooltip" title="Type of Spectrum">
-                            <select id="spectrumTypeSelect">
-                                <option value="0">Frequency</option>
-                                <option value="1">Freq. vs Throttle</option>
-                                <option value="2">Freq. vs RPM</option>
-                                <option value="3">Power Spectral Density</option>
-                                <option value="4">PSD vs Throttle</option>
-                                <option value="5">PSD vs RPM</option>
-                                <option value="6">Error vs Setpoint</option>
-                            </select>
-                        </div>
-
-                        <div id="overdrawSpectrumType" data-toggle="tooltip" title="Show Filters">
-                            <select id="overdrawSpectrumTypeSelect">
-                                <option value="0">Show all filters</option>
-                                <option value="1">Show only Gyro filters</option>
-                                <option value="2">Show only D-Term filters</option>
-                                <option value="3">Show only Yaw filters</option>
-                                <option value="4">Hide all filters</option>
-                                <option value="5">Auto</option>
-                            </select>
-                        </div>
-
-                        <div id="spectrumComparison" data-toggle="tooltip" title="Spectrum comparison">
-                          <button id="btn-spectrum-export" type="button" title="Export spectrum to CSV">Exp</button>
-                          <button type="button" onclick="document.getElementById('btn-spectrum-import').click()" title="Import spectrum from CSV">Imp</button>
-                          <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
-                          <button type="button" id="btn-spectrum-clear" title="Clear imported spectrums">Clr</button>
-                        </div>
-
-                        <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
-                            <span class="glyphicon glyphicon-resize-full"></span>
-                            <span class="glyphicon glyphicon-resize-small"></span>
-                        </div>
-                    </span>
-
-                    <input id="analyserZoomX" class="onlyFullScreen" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks"
-                    />
-                    <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks"
-                    />
-                    <input id="analyserSegmentLengthPowerAt2" class="onlyFullScreen" type="number" name="analyserSegmentLengthPowerAt2" value="9" min="6" max="20" step="1"
-                    />
-                    <label id="analyserSegmentLengthPowerAt2Label" name="analyserSegmentLengthPowerAt2Label" class="onlyFullScreen" >
-                      Segment&nbsp;length&nbsp;<br>power&nbsp;at&nbsp;2:
-                    </label>
-                    <input id="analyserLowLevelPSD" class="onlyFullScreen" type="number" name="analyserLowLevelPSD" value="-40" min="-40" max="10" step="5"
-                    />
-                    <label id="analyserLowLevelPSDLabel" name="analyserLowLevelPSDLabel" class="onlyFullScreen" >
-                      Limit&nbsp;dBm
-                    </label>
-                    <input id="analyserMaxPSD" class="onlyFullScreen" type="number" name="analyserMaxPSD" value="10" min="-35" max="100" step="5"
-                    />
-                    <label id="analyserMaxPSDLabel" name="analyserMaxPSDLabel" class="onlyFullScreen" >
-                      Max&nbsp;dBm
-                    </label>
-                    <input id="analyserMinPSD" class="onlyFullScreen" type="number" name="analyserMinPSD" value="-40" min="-100" max="5" step="5"
-                    />
-                    <label id="analyserMinPSDLabel" name="analyserMinPSDLabel" class="onlyFullScreen" >
-                      Min&nbsp;dBm
-                    </label>
-
-
-
-                    <datalist id="analyserZoomXTicks">
-                        <option>100</option>
-                        <option>200</option>
-                        <option>300</option>
-                        <option>400</option>
-                        <option>500</option>
-                    </datalist>
-                    <datalist id="analyserZoomYTicks">
-                        <option>100</option>
-                    </datalist>
-                </div>
+                <div id="vue-analyser" style="display: contents"></div>
                 <div id="mapContainer" class="map-container"></div>
                 <canvas width="0" height="0" id="stickCanvas"></canvas>
                 <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
             </div>
-            <div class="log-graph-config">
-                <h2 id="legend_title">Legend
-                    <span class="log-close-legend-dialog glyphicon glyphicon-remove" data-toggle="tooltip" title="Hide the legend"></span>
-                </h2>
-                <div class="log-index"></div>
-                <div class="log-graph-legend">
-                </div>
-
-                <div class="btn-group override-button-group" role="group">
-                    <button type="button" class="btn btn-nobg btn-svg-icon toggle-expo" data-toggle="tooltip" title="Expo On/Off">
-                        <svg width="24" height="24" viewBox="0 0 8.467 8.467">
-                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"/>
-                            <path fill="#FFF" d="M4.233 0L3.175 1.058h2.117L4.233 0zm0 1.058L3.175 2.117h.794V6.35h-.794l1.058 1.058L5.292 6.35h-.794V2.117h.794L4.233 1.058zm0 6.35H3.175l1.058 1.059 1.059-1.059H4.233z"/>
-                            </svg>
-                    </button>
-                    <button type="button" class="btn btn-nobg btn-svg-icon toggle-smoothing" data-toggle="tooltip" title="Smoothing On/Off">
-                        <svg width="24" height="24" viewBox="0 0 8.467 8.467">
-                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"></path>
-                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width=".265"
-                                d="M0 4.233l1.058 3.97 1.059-2.911 1.058 2.91 1.058-7.144 1.059 4.234L6.35.265l1.058 3.968h1.059"></path>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn btn-nobg btn-svg-icon toggle-grid" data-toggle="tooltip" title="Grid On/Off">
-                        <svg width="24" height="24" viewBox="0 0 8.467 8.467">
-                            <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-width=".5" d="M0 4.233s2.117 5.292 4.233 0c2.117-5.291 4.234 0 4.234 0"/>
-                            <g fill="none" stroke="#FFF" stroke-width=".198">
-                                <path d="M0 3.175h8.467M0 7.408h8.467M0 5.292h8.467M0 1.058h8.467" opacity=".75"/>
-                            </g>
-                            </svg>
-                    </button>
-                </div>
-
-                <button type="button" class="btn btn-default btn-block open-graph-configuration-dialog" data-toggle="tooltip" title="Setup chart pens">Graph setup</button>
-            </div>
+            <div id="vue-legend-panel" style="display: contents"></div>
             <div class="mouseNotification"></div>
         </div>
-        <div class="log-field-values" id="log-field-values">
-            <a href="#log-field-values">
-                <h4>Field values</h4>
-            </a>
-            <table class="table table-condensed">
-                <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>Raw value</th>
-                        <th>Decoded</th>
-                        <th>&nbsp;</th>
-                        <th>Raw value</th>
-                        <th>Decoded</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <!-- auto filled by updateValues function -->
-                    </tr>
-                </tbody>
-            </table>
-
-            <a href="#log-field-values">
-                <h4>Statistics</h4>
-            </a>
-            <table id="stats-table" class="table table-condensed">
-                <caption>Min/max values from this log</caption>
-                <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>Min</th>
-                        <th>Max</th>
-                        <th>Mean</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <!-- auto filled by updateValues function -->
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div id="vue-field-values" style="display: contents"></div>
         <div class="configuration-file" id="configuration-file">
             <!-- auto filled by configuration function -->
         </div>
@@ -200,10 +49,7 @@
     <!-- Log Scroll bar -->
     <div id="log-seek-bar" class="log-seek-bar">
         <canvas id="seekbarCanvas" width="200" height="100"></canvas>
-        <span id="seekbarToolbar" class="non-shift">
-            <div id="seekbarType" class="seekBar-selection" data-toggle="tooltip" title="Value to plot">
-            </div>
-        </span>
+        <div id="vue-seekbar-toolbar" style="display: contents"></div>
     </div>
     <!-- Vue Status Bar -->
     <div id="vue-statusbar" class="vue-statusbar"></div>

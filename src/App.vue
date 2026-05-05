@@ -71,6 +71,19 @@
         />
       </Teleport>
 
+      <Teleport to="#vue-analyser">
+        <SpectrumAnalyser />
+      </Teleport>
+      <Teleport to="#vue-legend-panel">
+        <LegendPanel />
+      </Teleport>
+      <Teleport to="#vue-field-values">
+        <FieldValuesPanel />
+      </Teleport>
+      <Teleport to="#vue-seekbar-toolbar">
+        <SeekBarToolbar />
+      </Teleport>
+
       <!-- Still hidden — kept for future phases -->
       <GraphCanvas v-show="false" ref="graphCanvasRef" />
       <SeekBarCanvas v-show="false" ref="seekBarRef" />
@@ -123,6 +136,10 @@ import UserSettingsDialog from "./components/UserSettingsDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
 import VideoExportDialog from "./components/VideoExportDialog.vue";
+import SpectrumAnalyser from "./components/SpectrumAnalyser.vue";
+import LegendPanel from "./components/LegendPanel.vue";
+import FieldValuesPanel from "./components/FieldValuesPanel.vue";
+import SeekBarToolbar from "./components/SeekBarToolbar.vue";
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
