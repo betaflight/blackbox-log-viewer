@@ -288,7 +288,6 @@ html:not(.has-log):not(.has-video) .header-pane {
 
 .log-graph-legend {
   font-size: 85%;
-  -webkit-flex-grow: 1;
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -297,7 +296,6 @@ html:not(.has-log):not(.has-video) .header-pane {
 
 .log-graph {
   position: relative;
-  -webkit-flex-grow: 1;
   flex-grow: 1;
   background-color: var(--graph-background);
 }
@@ -305,23 +303,24 @@ html:not(.has-log):not(.has-video) .header-pane {
 .log-graph-config {
   background-color: var(--surface-100);
   color: var(--text-secondary);
-  padding: 1em;
+  padding: 0.75rem;
   margin-left: 6px;
   border-radius: 6px;
-
+  border: 1px solid var(--border-color, #e5e5e5);
   min-width: 135px;
-
-  -webkit-flex-grow: 0.02;
   flex-grow: 0.02;
-
-  -webkit-flex-direction: column;
   flex-direction: column;
-
   display: none;
 }
+
+:root.dark .log-graph-config {
+  border-color: var(--surface-800, hsl(0, 0%, 25%));
+}
+
 .log-graph-config h2 {
   margin-top: 0;
 }
+
 .log-graph-config h3 {
   font-size: 125%;
   margin-top: 1em;
@@ -330,7 +329,6 @@ html:not(.has-log):not(.has-video) .header-pane {
 }
 
 html.has-log .log-graph-config {
-  display: -webkit-flex;
   display: flex;
 }
 
@@ -687,12 +685,10 @@ html.has-table-overlay .log-field-values {
   padding: 9px;
   font-size: small;
   background-color: var(--surface-0);
-  border: black;
-  /*z-index: 10;*/
+  border: 1px solid var(--border-color, #e5e5e5);
+  border-radius: 6px;
   bottom: 80px;
   overflow-y: auto;
-  border-style: solid;
-  border-width: 1px;
 }
 
 html:not(.has-config-overlay) .configuration-file,
@@ -779,7 +775,6 @@ html.has-config .configuration-list {
 
 html.has-video .graph-row,
 html.has-log .graph-row {
-  display: -webkit-flex;
   display: flex;
   position: fixed;
   top: 130px;
@@ -1022,9 +1017,12 @@ html.has-log .video-top-controls {
   margin-top: 6px;
 }
 
+.override-button-group {
+  display: flex;
+}
+
 .override-button-group button {
-  width: 33%;
-  padding-bottom: 8px;
+  flex: 1;
 }
 
 html.has-scaling-override .toggle-scaling,
@@ -1095,14 +1093,6 @@ html.has-log .app-navbar {
   width: 100%;
 }
 
-#status-bar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  z-index: 10;
-}
-
-html:not(.has-log) #status-bar,
 html:not(.has-log) .vue-statusbar {
   display: none;
 }
@@ -1119,45 +1109,7 @@ html:not(.has-gps) .map-container {
   display: none !important;
 }
 
-#status-bar .bookmark-1,
-#status-bar .bookmark-2,
-#status-bar .bookmark-3,
-#status-bar .bookmark-4,
-#status-bar .bookmark-5,
-#status-bar .bookmark-6,
-#status-bar .bookmark-7,
-#status-bar .bookmark-8,
-#status-bar .bookmark-9 {
-  background-color: red;
-  color: var(--text-inverse);
-  /* padding-left: 5px; */
-  /* padding-right: 0; */
-  width: 20px;
-  /* margin-right: 0; */
-  /* margin-left: 0; */
-  text-align: center;
-  visibility: hidden;
-  cursor: pointer;
-}
-
-#status-bar .marker-offset {
-  visibility: hidden;
-  cursor: pointer;
-}
-
-#status-bar .bookmark-clear {
-  background-color: blue;
-  color: var(--text-inverse);
-  padding-left: 0;
-  padding-right: 0;
-  width: 60px;
-  margin-right: 0;
-  margin-left: 0;
-  text-align: center;
-  visibility: hidden;
-  cursor: pointer;
-}
-
+/* Legacy status-bar configuration file name (used by configuration.js) */
 #status-bar .configuration-file-name {
   cursor: pointer;
 }
@@ -1166,38 +1118,42 @@ html:not(.has-config) #status-bar .configuration-file-name {
   display: none;
 }
 
-#status-bar div:not(:last-child) {
-  float: left;
-  padding-right: 5px;
-  margin-right: 5px;
-  border-right: 1px solid #7d7d79;
-}
-
-#status-bar div:first-child {
-  margin-left: 10px;
-}
-
-#status-bar div:last-child {
-  float: right;
+.log-graph-config h3 span {
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 html.isBF .log-graph-config h3 span {
-  background-image: linear-gradient(to bottom, #fff8e9 0, #ffbb00 100%);
+  background-color: var(--color-primary-100, #fff3cc);
+  color: var(--color-primary-800, #8a5a00);
 }
 
 html.isCF .log-graph-config h3 span {
-  background-image: linear-gradient(to bottom, #fff8e9 0, #00a23f 100%);
+  background-color: #d9f2e3;
+  color: #006b28;
 }
 
 html.isINAV .log-graph-config h3 span {
-  background-image: linear-gradient(to bottom, #fff8e9 0, #0850ac 100%);
+  background-color: #d9e6f7;
+  color: #0850ac;
 }
 
-.log-graph-config h3 span {
-  /* background-color: rgba(239,187,0,0.5); */
-  padding: 2px 4px 4px;
-  border-radius: 5px;
-  margin-right: 3px;
+:root.dark html.isBF .log-graph-config h3 span {
+  background-color: rgba(255, 187, 0, 0.2);
+  color: var(--color-primary-400, #ffd03d);
+}
+
+:root.dark html.isCF .log-graph-config h3 span {
+  background-color: rgba(0, 162, 63, 0.2);
+  color: #5cd99a;
+}
+
+:root.dark html.isINAV .log-graph-config h3 span {
+  background-color: rgba(8, 80, 172, 0.2);
+  color: #6ea8e6;
 }
 
 div#lap-timer {

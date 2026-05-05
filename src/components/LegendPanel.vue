@@ -39,6 +39,6 @@
       </UButton>
     </div>
 
-    <UButton color="primary" variant="solid" block class="open-graph-configuration-dialog" label="Graph setup" />
+    <UButton color="primary" variant="outline" block size="xs" class="open-graph-configuration-dialog" label="Graph setup" />
   </div>
 </template>

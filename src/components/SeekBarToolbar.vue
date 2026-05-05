@@ -9,7 +9,6 @@
         :items="seekbarOptions"
         size="xs"
         class="w-full"
-        :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
       />
     </div>
   </span>
