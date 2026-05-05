@@ -15,9 +15,6 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <!-- auto filled by updateValuesChart -->
-        </tr>
       </tbody>
     </table>
 
@@ -35,9 +32,6 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <!-- auto filled by updateValuesChart -->
-        </tr>
       </tbody>
     </table>
   </div>

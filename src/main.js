@@ -248,11 +248,12 @@ function BlackboxLogViewer() {
 
   function updateValuesChart() {
     let table = document.querySelector(".log-field-values table"),
+      tbody = table.querySelector("tbody"),
       i,
       frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
       fieldNames = flightLog.getMainFieldNames();
 
-    table.querySelectorAll("tr:not(:first-child)").forEach((tr) => tr.remove());
+    tbody.innerHTML = "";
 
     if (frame) {
       let currentFlightMode =
@@ -300,11 +301,12 @@ function BlackboxLogViewer() {
           rows.push(row);
         }
 
-        table.insertAdjacentHTML("beforeend", rows.join(""));
+        tbody.insertAdjacentHTML("beforeend", rows.join(""));
 
         const statRows = [];
         const statsTable = document.querySelector(".log-field-values #stats-table");
-        statsTable.querySelectorAll("tr:not(:first-child)").forEach((tr) => tr.remove());
+        const statsTbody = statsTable.querySelector("tbody");
+        statsTbody.innerHTML = "";
         const stats = SimpleStats(flightLog).calculate();
         for (const field of Object.keys(stats)) {
           const stat = stats[field];
@@ -337,7 +339,7 @@ function BlackboxLogViewer() {
             `<tr><td>${name}</td><td>${minVal} (${minRaw})</td><td>${maxVal} (${maxRaw})</td><td>${meanVal} (${meanRaw})</td></tr>`,
           );
         }
-        statsTable.insertAdjacentHTML("beforeend", statRows.join(""));
+        statsTbody.insertAdjacentHTML("beforeend", statRows.join(""));
       }
 
       // Update flight mode flags on status bar

@@ -831,10 +831,17 @@ html.has-analyser-fullscreen.has-analyser
   display: block;
 }
 
-/* Prevent field value columns from jumping as their contents change */
+/* Basic table styling (replaces Bootstrap .table .table-condensed) */
+.log-field-values table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 .log-field-values th,
 .log-field-values td {
   width: 15%;
+  padding: 3px 5px;
+  text-align: left;
 }
 
 .log-field-values td,
@@ -852,11 +859,22 @@ html.has-analyser-fullscreen.has-analyser
   max-width: 5em;
 }
 
-.log-field-values table,
-.log-field-values h4 {
+.log-field-values table {
   background-color: var(--surface-0);
   overflow-y: auto;
-  height: 20px;
+}
+
+.log-field-values h4 {
+  background-color: var(--surface-0);
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0;
+  padding: 2px 5px;
+}
+
+.log-field-values a + table + a {
+  margin-top: 10px;
+  display: block;
 }
 
 .log-field-values tr:nth-child(even) {
