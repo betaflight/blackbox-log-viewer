@@ -53,8 +53,8 @@ a.disabled {
   }
 
   .video-top-controls {
-    height: 50px;
-    padding-top: 10px;
+    height: 36px;
+    padding-top: 6px;
   }
 
   .graph-row,
@@ -98,12 +98,12 @@ a.disabled {
 
 
   ul.video-top-controls {
-    height: 30px;
-    padding-top: 5px;
+    height: 28px;
+    padding-top: 4px;
   }
 
   .video-top-controls li {
-    margin-right: 1px;
+    margin-right: 2px;
   }
 
   div.graph-row {
@@ -856,17 +856,30 @@ html:not(.has-analyser) .view-analyser-fullscreen {
 
 .video-top-controls li {
   display: inline-block;
-  margin-right: 17px;
-  vertical-align: top;
-  /* height: 80px; */
+  margin-right: 12px;
+  padding-right: 12px;
+  vertical-align: middle;
+  border-right: 1px solid var(--border-color, #e5e5e5);
+}
+
+.video-top-controls li:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+:root.dark .video-top-controls li {
+  border-right-color: var(--surface-800, hsl(0, 0%, 25%));
 }
 
 .video-top-controls h4 {
-  font-size: 11px;
-  color: var(--text-primary);
-  margin-top: 7px;
-  margin-bottom: 4px;
-  font-weight: bold;
+  font-size: 9px;
+  color: var(--text-secondary, hsl(0, 0%, 50%));
+  margin-top: 4px;
+  margin-bottom: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 html.has-log .video-top-controls li.log-view-panel,
@@ -988,13 +1001,18 @@ html.has-log .log-graph {
 html.has-video .video-top-controls,
 html.has-log .video-top-controls {
   top: 80px;
-  padding-top: 6px;
+  padding: 2px 0.75rem;
   position: fixed;
   z-index: 10;
   background-color: var(--surface-0);
+  border-bottom: 1px solid var(--border-color, #e5e5e5);
   width: 100%;
   min-width: 1390px;
   white-space: nowrap;
+}
+
+:root.dark .video-top-controls {
+  border-bottom-color: var(--surface-800, hsl(0, 0%, 25%));
 }
 
 .playback-rate-control,

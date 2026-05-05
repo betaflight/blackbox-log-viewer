@@ -5,12 +5,14 @@
     <UDropdownMenu :items="workspaceItems" class="w-full">
       <UButton
         variant="outline"
+        color="neutral"
+        size="xs"
         block
-        class="justify-between font-mono text-xs"
+        class="justify-between font-mono"
         trailing-icon="i-lucide-chevron-down"
       >
         <span v-if="activeEntry" class="flex items-center gap-1 truncate">
-          <span class="opacity-70">{{ workspaceStore.activeWorkspace }}</span>
+          <span class="opacity-50">{{ workspaceStore.activeWorkspace }}</span>
           <span class="truncate">{{ activeEntry.title }}</span>
         </span>
         <span v-else class="opacity-50">No workspace</span>

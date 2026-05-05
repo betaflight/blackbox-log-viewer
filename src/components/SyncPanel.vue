@@ -1,28 +1,28 @@
 <template>
   <li class="log-sync-panel">
     <h4>Log sync</h4>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-0.5">
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-step-back"
-        size="sm"
+        size="xs"
         title="Move log earlier"
         @click="$emit('sync-back')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-align-start-vertical"
-        size="sm"
+        size="xs"
         title="Start log here"
         @click="$emit('sync-here')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-step-forward"
-        size="sm"
+        size="xs"
         title="Move log later"
         @click="$emit('sync-forward')"
       />
@@ -34,10 +34,10 @@
         @change="$emit('offset-change', $event.target.value)"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-align-center-vertical"
-        size="sm"
+        size="xs"
         title="Smart Sync (Alt+M)"
         @click="$emit('smart-sync')"
       />

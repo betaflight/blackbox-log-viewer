@@ -11,7 +11,7 @@
         title="Graph zoom level"
         @dblclick="$emit('zoom-change', 100)"
       />
-      <UBadge color="primary" variant="solid" size="sm" class="font-mono min-w-[42px] justify-center">
+      <UBadge color="neutral" variant="subtle" size="sm" class="font-mono min-w-[42px] justify-center">
         {{ graphStore.graphZoom }}%
       </UBadge>
     </div>

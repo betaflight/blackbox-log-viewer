@@ -1,62 +1,62 @@
 <template>
   <li class="log-playback-panel">
     <h4>Playback</h4>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-0.5">
       <UButton
         v-if="logStore.hasVideo"
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-skip-back"
-        size="sm"
+        size="xs"
         title="Jump to start of video"
         @click="$emit('video-jump-start')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-skip-back"
-        size="sm"
+        size="xs"
         title="Jump to start of log"
         @click="$emit('jump-start')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-step-back"
-        size="sm"
+        size="xs"
         title="Jump back"
         @click="$emit('step-back')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         :icon="playbackStore.isPlaying() ? 'i-lucide-pause' : 'i-lucide-play'"
-        size="sm"
+        size="xs"
         title="Play/Pause"
         @click="$emit('play-pause')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-step-forward"
-        size="sm"
+        size="xs"
         title="Jump forward"
         @click="$emit('step-forward')"
       />
       <UButton
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-skip-forward"
-        size="sm"
+        size="xs"
         title="Jump to end of log"
         @click="$emit('jump-end')"
       />
       <UButton
         v-if="logStore.hasVideo"
-        variant="solid"
-        color="primary"
+        variant="ghost"
+        color="neutral"
         icon="i-lucide-skip-forward"
-        size="sm"
+        size="xs"
         title="Jump to end of video"
         @click="$emit('video-jump-end')"
       />
