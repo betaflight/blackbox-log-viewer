@@ -22,7 +22,6 @@
   /* Text Colors - Light Mode */
   --text-primary: hsl(0, 0%, 10%);
   --text-secondary: hsl(0, 0%, 40%);
-  --text-muted: hsl(0, 0%, 60%);
   --text-inverse: hsl(0, 0%, 95%);
 
   /* Graph/Canvas Colors - Light Mode (read by theme_colors.js) */
@@ -40,13 +39,8 @@
   --input-border-focus: var(--primary-500);
 
   /* Semantic Colors */
-  --success-400: #90f042;
-  --success-500: #70e212;
-  --success-600: #5cb10f;
   --error-500: #e2123f;
   --error-transparent-2: rgba(226, 18, 63, 0.2);
-  --info-500: #3399ff;
-  --warning-500: #ff6600;
 }
 
 /**
@@ -60,7 +54,6 @@ body.dark-theme {
 
   --text-primary: hsl(0, 0%, 95%);
   --text-secondary: hsl(0, 0%, 70%);
-  --text-muted: hsl(0, 0%, 50%);
   --text-inverse: hsl(0, 0%, 10%);
 
   --graph-background: #1a1a1a;

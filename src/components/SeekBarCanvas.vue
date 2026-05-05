@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref } from "vue";
 
 defineProps({
   height: {
@@ -19,13 +19,5 @@ const canvas = ref(null);
 // Expose canvas for legacy SeekBar renderer
 defineExpose({
   canvas,
-});
-
-onMounted(() => {
-  // Canvas ready for SeekBar attachment
-});
-
-onBeforeUnmount(() => {
-  // Cleanup
 });
 </script>

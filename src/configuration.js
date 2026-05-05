@@ -5,7 +5,7 @@
  *
  */
 
-export function Configuration(file, configurationDefaults, showConfigFile) {
+export function Configuration(file, _configurationDefaults, showConfigFile) {
   let fileData;
   let fileLinesArray;
 
@@ -17,7 +17,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
       if (!filter || filter.length < 1) {
         const li = document.createElement("li");
         li.className = "configuration-row";
-        if (fileLinesArray[i].length == 0) {
+        if (fileLinesArray[i].length === 0) {
           li.style.backgroundColor = "white";
           li.style.height = "10px";
           li.innerHTML = "&nbsp";
@@ -29,7 +29,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
         try {
           let regFilter = new RegExp(`(.*)(${filter})(.*)`, "i");
           let highLight = fileLinesArray[i].match(regFilter);
-          if (highLight != null) {
+          if (highLight !== null) {
             const li = document.createElement("li");
             li.className = "configuration-row";
             li.innerHTML = `${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}`;
@@ -102,7 +102,6 @@ export function ConfigurationDefaults(prefs) {
   // Special configuration file that handles default values only
 
   // Private Variables
-  let that = this; // generic pointer back to this function
   let fileData; // configuration file information
   let fileLinesArray = null; // Store the contents of the file globally
 
@@ -141,7 +140,7 @@ export function ConfigurationDefaults(prefs) {
   };
 
   this.hasDefaults = function () {
-    return fileLinesArray != null; // is there a default file array
+    return fileLinesArray !== null; // is there a default file array
   };
 
   this.isDefault = function (line) {
@@ -150,7 +149,7 @@ export function ConfigurationDefaults(prefs) {
     if (!fileLinesArray) return true; // by default, lines are the same if there is no default file loaded
 
     for (let i = 0; i < fileLinesArray.length; i++) {
-      if (line != fileLinesArray[i]) continue; // not the same line, keep looking
+      if (line !== fileLinesArray[i]) continue; // not the same line, keep looking
       return true; // line is same as default
     }
     return false; // line not the same as default or not found

@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref } from "vue";
 
 const container = ref(null);
 const graphCanvas = ref(null);
@@ -32,13 +32,5 @@ defineExpose({
   analyserContainer,
   mapContainer,
   videoEl,
-});
-
-onMounted(() => {
-  // Canvases are ready for renderer attachment
-});
-
-onBeforeUnmount(() => {
-  // Cleanup will go here when renderers are managed by this component
 });
 </script>

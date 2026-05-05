@@ -19,7 +19,7 @@ export function PrefStorage(keyPrefix) {
 
     switch (mode) {
       case LOCALSTORAGE:
-        var parsed = null;
+        let parsed = null;
 
         if (globalThis.localStorage) {
           try {
@@ -58,7 +58,7 @@ export function PrefStorage(keyPrefix) {
         }
         break;
       case CHROME_STORAGE_LOCAL:
-        var data = {};
+        const data = {};
 
         data[name] = value;
 

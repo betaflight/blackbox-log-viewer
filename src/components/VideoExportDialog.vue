@@ -160,7 +160,7 @@ const resultText = ref("");
 
 let videoRenderer = null;
 let renderStartTime = 0;
-let lastEstimatedTimeMsec = false;
+let lastEstimatedTimeMsec = null;
 
 const hasFlightVideo = computed(() => !!props.logParameters?.flightVideo);
 
@@ -251,7 +251,7 @@ function onStartExport() {
           const elapsedTimeMsec = Date.now() - renderStartTime;
           const estimatedTimeMsec = (elapsedTimeMsec * frameCount) / frameIndex;
 
-          if (lastEstimatedTimeMsec === false) {
+          if (lastEstimatedTimeMsec === null) {
             lastEstimatedTimeMsec = estimatedTimeMsec;
           } else {
             lastEstimatedTimeMsec = estimatedTimeMsec;
@@ -292,7 +292,7 @@ function onStartExport() {
   mode.value = "progress";
 
   renderStartTime = Date.now();
-  lastEstimatedTimeMsec = false;
+  lastEstimatedTimeMsec = null;
   videoRenderer.start();
 }
 

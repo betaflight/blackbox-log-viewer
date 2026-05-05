@@ -105,7 +105,7 @@ export function MapGrapher() {
     flightLog = newFlightLog;
 
     const newLogStartDateTime = flightLog.getSysConfig()["Log start datetime"];
-    if (currentLogStartDateTime != newLogStartDateTime) {
+    if (currentLogStartDateTime !== newLogStartDateTime) {
       this.reset();
       currentLogStartDateTime = newLogStartDateTime;
     }
@@ -181,7 +181,7 @@ export function MapGrapher() {
         minAlt = coordinates.alt < minAlt ? coordinates.alt : minAlt;
 
         // 1/4 of the dots is enough to draw the line
-        if (fi % 4 == 0) {
+        if (fi % 4 === 0) {
           latlngs.push(coordinates);
         }
       }
@@ -236,7 +236,9 @@ export function MapGrapher() {
         frame.current,
         groundCourseIndexAtFrame,
       );
-    } catch (e) {}
+    } catch {
+      // Frame coordinates unavailable — skip position update
+    }
   };
 
   this.setUserSettings = function (newUserSettings) {
@@ -256,7 +258,7 @@ export function MapGrapher() {
   this.redrawFlightTrail = function () {
     // If flightLog has changed redraw flight trail
     const currentLogIndex = flightLog.getLogIndex();
-    if (previousLogIndex != currentLogIndex) {
+    if (previousLogIndex !== currentLogIndex) {
       this.clearMap(previousLogIndex);
       if (trailLayers.has(currentLogIndex)) {
         const polyline = userSettings.mapTrailAltitudeColored
@@ -407,7 +409,7 @@ export function MapGrapher() {
 
   this.getGroundCourseFromFrame = function (frame, groundCourseIndex) {
     const gc = frame[groundCourseIndex];
-    return typeof gc == "number" ? gc / grounCourseDivider : 0;
+    return typeof gc === "number" ? gc / grounCourseDivider : 0;
   };
 
   this.getHomeCoordinatesFromFlightLog = function (flightLog) {

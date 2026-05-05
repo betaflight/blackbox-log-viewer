@@ -36,7 +36,7 @@ export const useWorkspaceStore = defineStore("workspace", () => {
 
   /** Check if a workspace slot has data */
   function hasWorkspace(id) {
-    return workspaceGraphConfigs.value[id] != null;
+    return workspaceGraphConfigs.value[id] !== null;
   }
 
   return {
