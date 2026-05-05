@@ -22,19 +22,13 @@
 
     <template #body>
       <div class="flex flex-col gap-5 max-h-[70vh] overflow-y-auto">
-        <!-- Graph panels (configurator UiBox style) -->
-        <div
+        <!-- Graph panels -->
+        <UiBox
           v-for="(graph, gIdx) in localGraphs"
           :key="gIdx"
-          class="relative border-2 rounded-lg border-neutral-500/30 mt-3"
+          :title="`Graph ${gIdx + 1}${graph.label ? ' — ' + graph.label : ''}`"
         >
-          <!-- Pill title on top border -->
-          <div class="flex gap-2 items-center absolute top-0 left-4 -translate-y-1/2 px-3 py-1 rounded-full bg-elevated text-highlighted text-[13px] font-semibold">
-            Graph {{ gIdx + 1 }}
-            <span v-if="graph.label" class="font-normal opacity-80">— {{ graph.label }}</span>
-          </div>
-
-          <div class="flex flex-col p-3 pt-5 gap-1">
+          <div class="flex flex-col gap-1">
             <!-- Graph settings row -->
             <div class="flex items-center gap-3 mb-1 text-xs">
               <span class="text-dimmed">Label</span>
@@ -174,7 +168,7 @@
               />
             </div>
           </div>
-        </div>
+        </UiBox>
       </div>
     </template>
 
@@ -189,6 +183,7 @@
 
 <script setup>
 import { ref, watch, computed } from "vue";
+import UiBox from "./UiBox.vue";
 import { GraphConfig } from "../graph_config.js";
 import { FlightLogFieldPresenter } from "../flightlog_fields_presenter.js";
 

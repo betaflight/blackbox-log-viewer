@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :ui="{ width: 'max-w-4xl' }">
+  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-4xl' }">
     <template #header>
       <h4 class="font-semibold">Advanced User Settings</h4>
     </template>
@@ -9,7 +9,7 @@
         <!-- Left column -->
         <div class="flex flex-col gap-4">
           <!-- Mixer Settings -->
-          <SettingsSection title="Mixer Settings">
+          <UiBox title="Mixer Settings">
             <ToggleRow v-model="local.customMix" label="Custom" description="Select custom craft display." :as-bool="true" />
             <div v-if="local.customMix" class="flex flex-col gap-2 mt-2">
               <div class="flex items-center gap-4">
@@ -24,14 +24,14 @@
                   :alt="mixerName"
                 />
               </div>
-              <p class="text-xs text-neutral-500">
+              <p class="text-xs text-dimmed">
                 Custom mixer settings only affect the craft icon displayed over the log.
               </p>
             </div>
-          </SettingsSection>
+          </UiBox>
 
           <!-- Stick Settings -->
-          <SettingsSection title="Stick Settings">
+          <UiBox title="Stick Settings">
             <ToggleRow v-model="local.stickUnits" label="Units" description="Display actual units on stick display." />
             <ToggleRow v-model="local.stickTrails" label="Stick Trails" description="Show stick trails." />
             <ToggleRow v-model="local.stickInvertYaw" label="Invert Yaw" description="Invert yaw in stick display." />
@@ -52,15 +52,15 @@
               />
             </div>
             <PositionInputs v-model:top="local.sticks.top" v-model:left="local.sticks.left" v-model:size="local.sticks.size" />
-          </SettingsSection>
+          </UiBox>
 
           <!-- Legend Settings -->
-          <SettingsSection title="Legend Settings">
+          <UiBox title="Legend Settings">
             <ToggleRow v-model="local.legendUnits" label="Units" description="Display actual units on legend." />
-          </SettingsSection>
+          </UiBox>
 
           <!-- Measurement System -->
-          <SettingsSection title="Measurement System">
+          <UiBox title="Measurement System">
             <div class="flex flex-col gap-2">
               <span class="text-sm font-medium">Speed Units</span>
               <div class="flex gap-3">
@@ -79,31 +79,31 @@
                 </label>
               </div>
             </div>
-          </SettingsSection>
+          </UiBox>
         </div>
 
         <!-- Right column -->
         <div class="flex flex-col gap-4">
           <!-- Craft Settings -->
-          <SettingsSection title="Craft Settings">
+          <UiBox title="Craft Settings">
             <PositionInputs v-model:top="local.craft.top" v-model:left="local.craft.left" v-model:size="local.craft.size" />
-          </SettingsSection>
+          </UiBox>
 
           <!-- Analyser Settings -->
-          <SettingsSection title="Analyser Settings">
+          <UiBox title="Analyser Settings">
             <ToggleRow v-model="local.analyserHanning" label="Hanning" description="Use Hanning window for analyser." />
             <PositionInputs v-model:top="local.analyser.top" v-model:left="local.analyser.left" v-model:size="local.analyser.size" label="Position" />
             <PositionInputs v-model:top="local.analyser_legend.top" v-model:left="local.analyser_legend.left" v-model:size="local.analyser_legend.width" label="Legend" size-label="Width" />
-          </SettingsSection>
+          </UiBox>
 
           <!-- Map Settings -->
-          <SettingsSection title="Map Settings">
+          <UiBox title="Map Settings">
             <ToggleRow v-model="local.mapTrailAltitudeColored" label="ACT" description="Use altitude colored trail (slower)." />
             <PositionInputs v-model:top="local.map.top" v-model:left="local.map.left" v-model:size="local.map.size" />
-          </SettingsSection>
+          </UiBox>
 
           <!-- Watermark Settings -->
-          <SettingsSection title="Watermark Settings">
+          <UiBox title="Watermark Settings">
             <ToggleRow v-model="local.drawWatermark" label="Watermark" description="Show the watermark." />
             <div v-if="local.drawWatermark" class="flex flex-col gap-2 mt-2">
               <div class="flex items-center gap-3">
@@ -113,41 +113,41 @@
               <img
                 v-if="local.watermark.logo"
                 :src="local.watermark.logo"
-                class="w-24 h-16 object-contain border rounded dark:border-neutral-700"
+                class="w-24 h-16 object-contain border rounded border-default"
                 alt="Watermark logo"
               />
               <PositionInputs v-model:top="local.watermark.top" v-model:left="local.watermark.left" v-model:size="local.watermark.size" />
               <PercentInput v-model="local.watermark.transparency" label="Transparency" />
             </div>
-          </SettingsSection>
+          </UiBox>
 
           <!-- Lap Timer Settings -->
-          <SettingsSection title="Lap Timer Settings">
+          <UiBox title="Lap Timer Settings">
             <ToggleRow v-model="local.drawLapTimer" label="Lap Timer" description="Show the lap timer." />
             <div v-if="local.drawLapTimer" class="flex flex-col gap-2 mt-2">
               <PositionInputs v-model:top="local.laptimer.top" v-model:left="local.laptimer.left" />
               <PercentInput v-model="local.laptimer.transparency" label="Transparency" />
-              <p class="text-xs text-neutral-500">
+              <p class="text-xs text-dimmed">
                 Set a "start time" bookmark at the beginning of the log/video plus additional bookmarks to mark the start of each lap.
               </p>
             </div>
-          </SettingsSection>
+          </UiBox>
 
           <!-- Graph Style Settings -->
-          <SettingsSection title="Graph Style Settings">
+          <UiBox title="Graph Style Settings">
             <ToggleRow v-model="local.drawGradient" label="Gradient" description="Show the gradient background." />
             <ToggleRow v-model="local.drawVerticalBar" label="TimeBar" description="Show the vertical timebar." />
-          </SettingsSection>
+          </UiBox>
 
           <!-- Dark Mode -->
-          <SettingsSection title="Dark Mode">
+          <UiBox title="Dark Mode">
             <div class="flex flex-col gap-1">
               <label v-for="opt in darkModeOptions" :key="opt.value" class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="radio" :value="opt.value" v-model.number="local.darkMode" class="accent-primary" />
                 {{ opt.label }}
               </label>
             </div>
-          </SettingsSection>
+          </UiBox>
         </div>
       </div>
     </template>
@@ -162,7 +162,8 @@
 </template>
 
 <script setup>
-import { h, ref, watch, computed } from "vue";
+import { h, ref, watch, computed, resolveComponent } from "vue";
+import UiBox from "./UiBox.vue";
 import { mixerList } from "../user_settings_data.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
@@ -236,28 +237,17 @@ function onSave() {
 
 // --- Functional sub-components ---
 
-const SettingsSection = (props, { slots }) =>
-  h("div", { class: "border rounded-lg p-3 dark:border-neutral-700" }, [
-    h("h5", { class: "font-semibold text-sm mb-2 uppercase tracking-wide text-neutral-500 dark:text-neutral-400" }, props.title),
-    h("div", { class: "flex flex-col gap-1" }, slots.default?.()),
-  ]);
-SettingsSection.props = ["title"];
-
 const ToggleRow = (props, { emit }) => {
-  // asBool: treat null/non-null as boolean (for customMix)
   const checked = props.asBool ? !!props.modelValue : props.modelValue;
   return h("div", { class: "flex items-center justify-between py-1" }, [
     h("div", [
       h("span", { class: "text-sm font-medium" }, props.label),
-      props.description ? h("p", { class: "text-xs text-neutral-500" }, props.description) : null,
+      props.description ? h("p", { class: "text-xs text-dimmed" }, props.description) : null,
     ]),
-    h("input", {
-      type: "checkbox",
-      checked,
-      class: "accent-primary cursor-pointer w-4 h-4",
-      onChange: (e) => {
-        const val = props.asBool ? (e.target.checked ? {} : null) : e.target.checked;
-        emit("update:modelValue", val);
+    h(resolveComponent("USwitch"), {
+      modelValue: checked,
+      "onUpdate:modelValue": (val) => {
+        emit("update:modelValue", props.asBool ? (val ? {} : null) : val);
       },
     }),
   ]);
@@ -267,17 +257,18 @@ ToggleRow.emits = ["update:modelValue"];
 
 const PercentInput = (props, { emit }) =>
   h("div", { class: "flex items-center gap-2" }, [
-    h("label", { class: "text-sm text-neutral-600 dark:text-neutral-400 w-24" }, props.label),
-    h("input", {
-      type: "number",
+    h("label", { class: "text-sm text-dimmed w-24" }, props.label),
+    h(resolveComponent("UInputNumber"), {
+      modelValue: parseInt(props.modelValue) || 0,
       min: 0,
       max: 100,
       step: 1,
-      value: parseInt(props.modelValue) || 0,
-      class: "w-16 px-2 py-1 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800",
-      onInput: (e) => emit("update:modelValue", `${e.target.value}%`),
+      formatOptions: { useGrouping: false },
+      size: "xs",
+      ui: { root: "w-16" },
+      "onUpdate:modelValue": (v) => emit("update:modelValue", `${v}%`),
     }),
-    h("span", { class: "text-xs text-neutral-500" }, "%"),
+    h("span", { class: "text-xs text-dimmed" }, "%"),
   ]);
 PercentInput.props = ["modelValue", "label"];
 PercentInput.emits = ["update:modelValue"];
@@ -285,17 +276,18 @@ PercentInput.emits = ["update:modelValue"];
 const PositionInputs = (props, { emit }) => {
   const field = (label, key, val) =>
     h("div", { class: "flex items-center gap-1" }, [
-      h("label", { class: "text-xs text-neutral-500" }, label),
-      h("input", {
-        type: "number",
+      h("label", { class: "text-xs text-dimmed" }, label),
+      h(resolveComponent("UInputNumber"), {
+        modelValue: parseInt(val) || 0,
         min: 0,
         max: 100,
         step: 1,
-        value: parseInt(val) || 0,
-        class: "w-14 px-1.5 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800",
-        onInput: (e) => emit(`update:${key}`, `${e.target.value}%`),
+        formatOptions: { useGrouping: false },
+        size: "xs",
+        ui: { root: "w-14" },
+        "onUpdate:modelValue": (v) => emit(`update:${key}`, `${v}%`),
       }),
-      h("span", { class: "text-xs text-neutral-500" }, "%"),
+      h("span", { class: "text-xs text-dimmed" }, "%"),
     ]);
 
   const fields = [
@@ -307,7 +299,7 @@ const PositionInputs = (props, { emit }) => {
   }
 
   return h("div", { class: "flex items-center gap-3 mt-1" }, [
-    h("span", { class: "text-sm text-neutral-600 dark:text-neutral-400 w-16 shrink-0" }, props.label || "Position"),
+    h("span", { class: "text-sm text-dimmed w-16 shrink-0" }, props.label || "Position"),
     ...fields,
   ]);
 };

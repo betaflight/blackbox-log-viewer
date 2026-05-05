@@ -3,8 +3,8 @@
     <template #header>
       <div class="flex-1">
         <h4 class="font-semibold">{{ craftName }}</h4>
-        <h5 v-if="revision" class="text-sm text-neutral-500">{{ revision }}</h5>
-        <h5 v-if="boardInfo" class="text-sm text-neutral-500">{{ boardInfo }}</h5>
+        <h5 v-if="revision" class="text-sm text-dimmed">{{ revision }}</h5>
+        <h5 v-if="boardInfo" class="text-sm text-dimmed">{{ boardInfo }}</h5>
       </div>
       <UButton variant="solid" color="primary" icon="i-lucide-x" label="Close" class="ml-auto" @click="open = false" />
     </template>
@@ -13,10 +13,10 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pb-6 text-[0.8rem]">
         <!-- Column 1: PIDs & Rates -->
         <div class="flex flex-col gap-4">
-          <Section title="PID Settings">
+          <UiBox title="PID Settings">
             <table class="w-full text-sm">
               <thead>
-                <tr class="border-b dark:border-neutral-700 text-xs text-neutral-500">
+                <tr class="border-b border-default text-xs text-dimmed">
                   <th class="text-left py-1" />
                   <th class="text-center py-1">P</th>
                   <th class="text-center py-1">I</th>
@@ -30,101 +30,101 @@
                 <PidRow v-for="row in mainPids" :key="row.label" :row="row" :showDMax="showDMax" />
               </tbody>
             </table>
-          </Section>
+          </UiBox>
 
-          <Section v-if="showBaroPids" title="Baro">
+          <UiBox v-if="showBaroPids" title="Baro">
             <table class="w-full text-sm">
               <tbody>
                 <PidRow v-for="row in baroPids" :key="row.label" :row="row" :showDMax="false" />
               </tbody>
             </table>
-          </Section>
+          </UiBox>
 
-          <Section v-if="showMagPids" title="Mag">
+          <UiBox v-if="showMagPids" title="Mag">
             <table class="w-full text-sm">
               <tbody>
                 <PidRow v-for="row in magPids" :key="row.label" :row="row" :showDMax="false" />
               </tbody>
             </table>
-          </Section>
+          </UiBox>
 
-          <Section v-if="showGpsPids" title="GPS">
+          <UiBox v-if="showGpsPids" title="GPS">
             <table class="w-full text-sm">
               <tbody>
                 <PidRow v-for="row in gpsPids" :key="row.label" :row="row" :showDMax="false" />
               </tbody>
             </table>
-          </Section>
+          </UiBox>
 
-          <Section v-if="pidSliderParams.length > 0" title="PID Sliders">
+          <UiBox v-if="pidSliderParams.length > 0" title="PID Sliders">
             <ParamTable :params="pidSliderParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="feedforwardParams.length > 0" title="Feedforward">
+          <UiBox v-if="feedforwardParams.length > 0" title="Feedforward">
             <ParamTable :params="feedforwardParams" />
-          </Section>
+          </UiBox>
 
-          <Section title="Rates">
+          <UiBox title="Rates">
             <ParamTable :params="rateParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="dMaxParams.length > 0" title="D Max">
+          <UiBox v-if="dMaxParams.length > 0" title="D Max">
             <ParamTable :params="dMaxParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="rateLimitParams.length > 0" title="Rate Limits">
+          <UiBox v-if="rateLimitParams.length > 0" title="Rate Limits">
             <ParamTable :params="rateLimitParams" />
-          </Section>
+          </UiBox>
         </div>
 
         <!-- Column 2: Parameters -->
         <div class="flex flex-col gap-4">
-          <Section title="Parameters">
+          <UiBox title="Parameters">
             <ParamTable :params="generalParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="antiGravityParams.length > 0" title="Anti Gravity">
+          <UiBox v-if="antiGravityParams.length > 0" title="Anti Gravity">
             <ParamTable :params="antiGravityParams" />
-          </Section>
+          </UiBox>
 
-          <Section title="Motor / ESC">
+          <UiBox title="Motor / ESC">
             <ParamTable :params="motorParams" />
-          </Section>
+          </UiBox>
         </div>
 
         <!-- Column 3: Filters -->
         <div class="flex flex-col gap-4">
-          <Section title="Gyro Filters">
+          <UiBox title="Gyro Filters">
             <ParamTable :params="gyroFilterParams" />
-          </Section>
+          </UiBox>
 
-          <Section title="D-Term Filters">
+          <UiBox title="D-Term Filters">
             <ParamTable :params="dtermFilterParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="dynNotchParams.length > 0" title="Dynamic Notch">
+          <UiBox v-if="dynNotchParams.length > 0" title="Dynamic Notch">
             <ParamTable :params="dynNotchParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="rpmFilterParams.length > 0" title="RPM Filter">
+          <UiBox v-if="rpmFilterParams.length > 0" title="RPM Filter">
             <ParamTable :params="rpmFilterParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="rcSmoothingParams.length > 0" title="RC Smoothing">
+          <UiBox v-if="rcSmoothingParams.length > 0" title="RC Smoothing">
             <ParamTable :params="rcSmoothingParams" />
-          </Section>
+          </UiBox>
 
-          <Section v-if="otherParams.length > 0" title="Other">
+          <UiBox v-if="otherParams.length > 0" title="Other">
             <ParamTable :params="otherParams" />
-          </Section>
+          </UiBox>
         </div>
 
         <!-- Column 4: Features & Fields -->
         <div class="flex flex-col gap-4">
-          <Section v-if="featuresList.length > 0" title="Features">
+          <UiBox v-if="featuresList.length > 0" title="Features">
             <table class="w-full text-sm">
               <tbody>
-                <tr v-for="f in featuresList" :key="f.name" class="border-b dark:border-neutral-800">
+                <tr v-for="f in featuresList" :key="f.name" class="border-b border-default">
                   <td class="py-0.5 w-6">
                     <input type="checkbox" :checked="f.enabled" disabled class="cursor-default" />
                   </td>
@@ -133,12 +133,12 @@
                 </tr>
               </tbody>
             </table>
-          </Section>
+          </UiBox>
 
-          <Section v-if="disabledFieldsList.length > 0" title="Disabled Fields">
+          <UiBox v-if="disabledFieldsList.length > 0" title="Disabled Fields">
             <table class="w-full text-sm">
               <tbody>
-                <tr v-for="f in disabledFieldsList" :key="f.name" class="border-b dark:border-neutral-800">
+                <tr v-for="f in disabledFieldsList" :key="f.name" class="border-b border-default">
                   <td class="py-0.5 w-6">
                     <input type="checkbox" :checked="f.enabled" disabled class="cursor-default" />
                   </td>
@@ -147,11 +147,11 @@
                 </tr>
               </tbody>
             </table>
-          </Section>
+          </UiBox>
 
-          <Section v-if="unknownHeaders.length > 0" title="Unknown Headers">
+          <UiBox v-if="unknownHeaders.length > 0" title="Unknown Headers">
             <ParamTable :params="unknownHeaders" />
-          </Section>
+          </UiBox>
         </div>
       </div>
     </template>
@@ -160,6 +160,7 @@
 
 <script setup>
 import { computed, h } from "vue";
+import UiBox from "./UiBox.vue";
 import {
   OFF_ON,
   FAST_PROTOCOL,
@@ -195,24 +196,17 @@ const props = defineProps({
 
 // --- Functional sub-components ---
 
-const Section = (props, { slots }) =>
-  h("div", [
-    h("h5", { class: "font-semibold text-sm mb-1 text-neutral-700 dark:text-neutral-300" }, props.title),
-    slots.default?.(),
-  ]);
-Section.props = ["title"];
-
 const ParamTable = (props) =>
   h("table", { class: "w-full text-sm" },
     h("tbody", props.params.map((p) =>
       h("tr", {
         key: p.name,
         class: [
-          "border-b dark:border-neutral-800",
+          "border-b border-default",
           p.missing ? "opacity-40" : "",
         ],
       }, [
-        h("td", { class: "py-0.5 text-neutral-600 dark:text-neutral-400 w-1/2" }, p.name),
+        h("td", { class: "py-0.5 text-dimmed w-1/2" }, p.name),
         h("td", { class: "py-0.5" }, p.value ?? "-"),
       ])
     ))
@@ -230,7 +224,7 @@ const PidRow = (props) => {
   cells.push(h("td", { class: "text-center py-1" }, fmtPid(row.d)));
   if (!showDMax) cells.push(h("td"));
   cells.push(h("td", { class: "text-center py-1" }, fmtPid(row.f)));
-  return h("tr", { class: row.missing ? "opacity-40 border-b dark:border-neutral-800" : "border-b dark:border-neutral-800" }, cells);
+  return h("tr", { class: row.missing ? "opacity-40 border-b border-default" : "border-b border-default" }, cells);
 };
 PidRow.props = ["row", "showDMax"];
 
