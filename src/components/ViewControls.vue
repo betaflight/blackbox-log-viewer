@@ -19,7 +19,7 @@
         size="xs"
         aria-label="View log header"
         title="View log header (H)"
-        @click="$emit('open-header')"
+        @click="$emit('toggle-header')"
       />
       <UButton
         variant="ghost"
@@ -88,7 +88,7 @@
 <script setup>
 defineEmits([
   "view-config",
-  "open-header",
+  "toggle-header",
   "toggle-table",
   "toggle-video",
   "toggle-craft",

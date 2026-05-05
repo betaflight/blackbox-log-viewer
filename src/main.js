@@ -2053,7 +2053,8 @@ function BlackboxLogViewer() {
           break;
         case "KeyH":
           if (!shifted) {
-            globalThis.vueApp.headerDialogOpen = true;
+            globalThis.vueApp.headerDialogOpen =
+              !globalThis.vueApp.headerDialogOpen;
             e.preventDefault();
           }
           break;

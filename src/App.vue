@@ -24,7 +24,7 @@
       <Teleport to="#vue-view-controls">
         <ViewControls
           @view-config="onViewConfig"
-          @open-header="onOpenHeader"
+          @toggle-header="onToggleHeader"
           @toggle-table="onToggleTable"
           @toggle-video="onToggleVideo"
           @toggle-craft="onToggleCraft"
@@ -209,9 +209,11 @@ function onViewConfig() {
   getLegacy()?.viewConfig?.();
 }
 
-function onOpenHeader() {
-  refreshLegacyState();
-  headerDialogOpen.value = true;
+function onToggleHeader() {
+  if (!headerDialogOpen.value) {
+    refreshLegacyState();
+  }
+  headerDialogOpen.value = !headerDialogOpen.value;
 }
 
 function onToggleTable() {

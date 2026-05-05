@@ -1,11 +1,9 @@
 <template>
-  <UModal
-    v-model:open="open"
-    fullscreen
-    :close="false"
-    :ui="{ body: 'overflow-y-auto min-h-0' }"
+  <div
+    v-show="open"
+    class="fixed top-[110px] left-[15px] right-[15px] bottom-[80px] z-50 flex flex-col bg-default border border-default rounded-lg shadow-lg"
   >
-    <template #header>
+    <div class="flex items-center gap-3 px-4 py-2 border-b border-default shrink-0">
       <div class="flex-1">
         <h4 class="font-semibold">{{ craftName }}</h4>
         <h5 v-if="revision" class="text-sm text-dimmed">{{ revision }}</h5>
@@ -20,9 +18,9 @@
         class="ml-auto"
         @click="open = false"
       />
-    </template>
+    </div>
 
-    <template #body>
+    <div class="overflow-y-auto flex-1 p-4">
       <div
         class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pb-6 text-[0.8rem]"
       >
@@ -261,8 +259,8 @@
           </UiBox>
         </div>
       </div>
-    </template>
-  </UModal>
+    </div>
+  </div>
 </template>
 
 <script setup>
