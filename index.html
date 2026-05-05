@@ -16,9 +16,9 @@
 <body>
     <!-- Vue teleport targets -->
     <div id="vue-welcome"></div>
-    <div id="vue-navbar" class="navbar-static-top" style="z-index: 100"></div>
+    <div id="vue-navbar" class="app-navbar" style="z-index: 100"></div>
     <!-- Main Page -->
-    <div class="container-fluid main-pane">
+    <div class="app-main-pane">
         <ul class="video-top-controls list-unstyled">
             <div id="vue-view-controls" style="display: contents"></div>
             <div id="vue-playback" style="display: contents"></div>
@@ -36,7 +36,7 @@
                 <div id="vue-analyser" style="display: contents"></div>
                 <div id="mapContainer" class="map-container"></div>
                 <canvas width="0" height="0" id="stickCanvas"></canvas>
-                <span class="log-open-legend-dialog glyphicon glyphicon-cog" data-toggle="tooltip" title="Show the legend"></span>
+                <span class="log-open-legend-dialog" title="Show the legend" style="cursor:pointer">⚙</span>
             </div>
             <div id="vue-legend-panel" style="display: contents"></div>
             <div class="mouseNotification"></div>
@@ -57,9 +57,6 @@
     <!-- Scripts -->
     <script src="/js/complex.js"></script>
     <script src="/js/real.js"></script>
-    <script src="/js/jquery-1.11.3.min.js"></script>
-    <script src="/js/jquery-ui-1.11.4.min.js"></script>
-    <script src="/js/jquery.ba-throttle-debounce.js"></script>
     <script src="/js/three.min.js"></script>
     <script src="/js/FileSaver.js"></script>
     <script src="/js/semver.js"></script>

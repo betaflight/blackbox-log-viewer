@@ -496,11 +496,7 @@ export function FlightLogParser(logData) {
   this.frameDefs = {};
 
   // Lets add the custom extensions
-  let completeSysConfig = $.extend(
-    {},
-    defaultSysConfig,
-    defaultSysConfigExtension,
-  );
+  let completeSysConfig = { ...defaultSysConfig, ...defaultSysConfigExtension };
   this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
 
   /*
@@ -1768,11 +1764,10 @@ export function FlightLogParser(logData) {
 
     //Reset system configuration to MW's defaults
     // Lets add the custom extensions
-    let completeSysConfig = $.extend(
-      {},
-      defaultSysConfig,
-      defaultSysConfigExtension,
-    );
+    let completeSysConfig = {
+      ...defaultSysConfig,
+      ...defaultSysConfigExtension,
+    };
     this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
 
     this.frameDefs = {};

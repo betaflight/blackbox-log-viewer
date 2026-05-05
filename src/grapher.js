@@ -1269,7 +1269,7 @@ export function FlightLogGrapher(
 
   // Update user options
   this.refreshOptions = function (newSettings) {
-    options = $.extend(defaultOptions, newSettings || {});
+    options = { ...defaultOptions, ...(newSettings || {}) };
   };
 
   this.refreshLogo = function () {

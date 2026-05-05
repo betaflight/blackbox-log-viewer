@@ -561,17 +561,6 @@ function BlackboxLogViewer() {
       appStore.statusCells = "";
     }
 
-    /**
-        Removed as cant see a reason to display this information
-
-        if (flightLog.getSysConfig().deviceUID != null) {
-            $(".log-device-uid").text(flightLog.getSysConfig().deviceUID);
-            $(".log-device-uid-header,.log-device-uid").css('display', 'block');
-        } else {
-           $(".log-device-uid-header,.log-device-uid").css('display', 'none');
-        }
-    **/
-
     // Add log version information to status bar
     const sysConfig = flightLog.getSysConfig();
 

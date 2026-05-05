@@ -147,7 +147,7 @@ export function FlightLog(logData) {
   };
 
   this.setSysConfig = function (newSysConfig) {
-    $.extend(true, parser.sysConfig, newSysConfig);
+    Object.assign(parser.sysConfig, newSysConfig);
   };
 
   /**

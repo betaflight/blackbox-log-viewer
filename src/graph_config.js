@@ -68,14 +68,13 @@ export function GraphConfig(graphConfig) {
           fields.push(
             adaptField(
               flightLog,
-              $.extend({}, field, {
-                curve: $.extend({}, field.curve),
+              { ...field, curve: { ...field.curve },
                 name: fieldName,
                 friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(
                   fieldName,
                   flightLog.getSysConfig().debug_mode,
                 ),
-              }),
+              },
               forceNewCurve,
             ),
           );
@@ -87,13 +86,12 @@ export function GraphConfig(graphConfig) {
         fields.push(
           adaptField(
             flightLog,
-            $.extend({}, field, {
-              curve: $.extend({}, field.curve),
+            { ...field, curve: { ...field.curve },
               friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(
                 field.name,
                 flightLog.getSysConfig().debug_mode,
               ),
-            }),
+            },
           ),
         );
       }
@@ -131,18 +129,14 @@ export function GraphConfig(graphConfig) {
       newGraphs = [];
 
     for (const graph of graphs) {
-      const newGraph = $.extend(
+      const newGraph = {
         // Default values for missing properties:
-        {
-          height: 1,
-        },
+        height: 1,
         // The old graph
-        graph,
+        ...graph,
         // New fields to replace the old ones:
-        {
-          fields: [],
-        },
-      );
+        fields: [],
+      };
 
       for (const field of graph.fields) {
         const fields = this.extendFields(flightLog, field);

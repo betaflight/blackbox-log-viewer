@@ -24,7 +24,7 @@ a.disabled {
 
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
-  .container.main-pane {
+  .app-main-pane {
     width: 90%;
   }
 }
@@ -67,13 +67,13 @@ a.disabled {
 }
 
 @media (max-width: 675px) {
-  .container-fluid.main-pane,
+  .app-main-pane,
   html.has-log div.log-seek-bar {
     padding-left: 0;
     padding-right: 0;
   }
 
-  .container-fluid.main-pane .graph-row {
+  .app-main-pane .graph-row {
     width: 100%;
   }
 
@@ -215,10 +215,6 @@ input.graph-time {
   text-align: right;
 }
 
-.container-fluid {
-  padding-left: 15px;
-  padding-right: 15px;
-}
 
 /* Replace Bootstrap .list-unstyled */
 .list-unstyled {
@@ -244,12 +240,14 @@ input.graph-time {
 }
 
 .welcome-pane,
-.main-pane {
+.app-main-pane {
   position: fixed;
   top: 15px;
   bottom: 100px;
   left: 0;
   right: 0;
+  padding-left: 15px;
+  padding-right: 15px;
   display: contents;
 }
 
@@ -1217,7 +1215,7 @@ html.has-grid-override .toggle-grid {
   fill-opacity: 0.2;
 }
 
-.main-pane {
+.app-main-pane {
   display: none;
 }
 
@@ -1238,8 +1236,8 @@ html:not(.has-marker) li.has-marker {
   display: none;
 }
 
-html.has-log .main-pane,
-html.has-video .main-pane {
+html.has-log .app-main-pane,
+html.has-video .app-main-pane {
   display: block;
 }
 html.has-log .welcome-pane,
@@ -1285,12 +1283,12 @@ progress {
 }
 
 
-html.has-video .navbar-static-top,
-html.has-log .navbar-static-top {
+html.has-video .app-navbar,
+html.has-log .app-navbar {
   display: block;
 }
 
-.navbar-static-top {
+.app-navbar {
   display: none;
   position: fixed;
   width: 100%;

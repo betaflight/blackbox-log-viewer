@@ -326,11 +326,7 @@ export function FlightLogVideoRenderer(
     delete logParameters.flightVideo;
   }
 
-  let options = $.extend({}, userSettings || {}, {
-    eraseBackground: !logParameters.flightVideo,
-    drawEvents: false,
-    fillBackground: !logParameters.flightVideo,
-  });
+  let options = { ...(userSettings || {}), eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
 
   graph = new FlightLogGrapher(
     flightLog,
