@@ -2,59 +2,75 @@
   <div id="analyser" class="analyser">
     <canvas width="0" height="0" id="analyserCanvas"></canvas>
 
-    <span id="spectrumToolbar">
+    <span id="spectrumToolbar" class="non-shift">
       <div id="spectrumType" title="Type of Spectrum">
-        <select id="spectrumTypeSelect">
-          <option value="0">Frequency</option>
-          <option value="1">Freq. vs Throttle</option>
-          <option value="2">Freq. vs RPM</option>
-          <option value="3">Power Spectral Density</option>
-          <option value="4">PSD vs Throttle</option>
-          <option value="5">PSD vs RPM</option>
-          <option value="6">Error vs Setpoint</option>
+        <!-- Hidden native select for legacy graph_spectrum.js compat -->
+        <select id="spectrumTypeSelect" class="hidden">
+          <option v-for="o in spectrumTypeOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
+        <USelect
+          v-model="spectrumType"
+          :items="spectrumTypeOptions"
+          size="xs"
+          class="w-full"
+          :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
+        />
       </div>
 
       <div id="overdrawSpectrumType" title="Show Filters">
-        <select id="overdrawSpectrumTypeSelect">
-          <option value="0">Show all filters</option>
-          <option value="1">Show only Gyro filters</option>
-          <option value="2">Show only D-Term filters</option>
-          <option value="3">Show only Yaw filters</option>
-          <option value="4">Hide all filters</option>
-          <option value="5">Auto</option>
+        <select id="overdrawSpectrumTypeSelect" class="hidden">
+          <option v-for="o in overdrawOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
+        <USelect
+          v-model="overdrawType"
+          :items="overdrawOptions"
+          size="xs"
+          class="w-full"
+          :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
+        />
       </div>
 
       <div id="spectrumComparison" title="Spectrum comparison">
-        <button id="btn-spectrum-export" type="button" title="Export spectrum to CSV">Exp</button>
-        <button type="button" @click="triggerImport" title="Import spectrum from CSV">Imp</button>
+        <UButton id="btn-spectrum-export" size="xs" color="primary" label="Exp" title="Export spectrum to CSV" />
+        <UButton size="xs" color="primary" label="Imp" title="Import spectrum from CSV" @click="triggerImport" />
         <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
-        <button type="button" id="btn-spectrum-clear" title="Clear imported spectrums">Clr</button>
+        <UButton id="btn-spectrum-clear" size="xs" color="primary" label="Clr" title="Clear imported spectrums" />
       </div>
 
-      <div id="analyserResize" class="view-analyser-fullscreen cursor-pointer text-neutral-400 hover:text-white" title="Zoom Analyser Window" @click="toggleFullscreen">
-        <span class="icon-resize-full i-lucide-maximize-2 w-4 h-4 inline-block"></span>
-        <span class="icon-resize-small i-lucide-minimize-2 w-4 h-4 inline-block"></span>
+      <div id="analyserResize" class="view-analyser-fullscreen" @click="toggleFullscreen">
+        <UButton
+          color="primary"
+          size="xs"
+          class="icon-resize-full"
+          icon="i-lucide-maximize-2"
+          title="Maximize analyser"
+        />
+        <UButton
+          color="primary"
+          size="xs"
+          class="icon-resize-small"
+          icon="i-lucide-minimize-2"
+          title="Minimize analyser"
+        />
       </div>
     </span>
 
     <input id="analyserZoomX" class="onlyFullScreen" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" title="" list="analyserZoomXTicks" />
     <input id="analyserZoomY" class="onlyFullScreen" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" list="analyserZoomYTicks" />
-    <input id="analyserSegmentLengthPowerAt2" class="onlyFullScreen" type="number" name="analyserSegmentLengthPowerAt2" value="9" min="6" max="20" step="1" />
-    <label id="analyserSegmentLengthPowerAt2Label" name="analyserSegmentLengthPowerAt2Label" class="onlyFullScreen">
+    <input id="analyserSegmentLengthPowerAt2" class="onlyFullScreen text-xs" type="number" name="analyserSegmentLengthPowerAt2" value="9" min="6" max="20" step="1" />
+    <label id="analyserSegmentLengthPowerAt2Label" name="analyserSegmentLengthPowerAt2Label" class="onlyFullScreen text-xs text-dimmed">
       Segment&nbsp;length&nbsp;<br>power&nbsp;at&nbsp;2:
     </label>
-    <input id="analyserLowLevelPSD" class="onlyFullScreen" type="number" name="analyserLowLevelPSD" value="-40" min="-40" max="10" step="5" />
-    <label id="analyserLowLevelPSDLabel" name="analyserLowLevelPSDLabel" class="onlyFullScreen">
+    <input id="analyserLowLevelPSD" class="onlyFullScreen text-xs" type="number" name="analyserLowLevelPSD" value="-40" min="-40" max="10" step="5" />
+    <label id="analyserLowLevelPSDLabel" name="analyserLowLevelPSDLabel" class="onlyFullScreen text-xs text-dimmed">
       Limit&nbsp;dBm
     </label>
-    <input id="analyserMaxPSD" class="onlyFullScreen" type="number" name="analyserMaxPSD" value="10" min="-35" max="100" step="5" />
-    <label id="analyserMaxPSDLabel" name="analyserMaxPSDLabel" class="onlyFullScreen">
+    <input id="analyserMaxPSD" class="onlyFullScreen text-xs" type="number" name="analyserMaxPSD" value="10" min="-35" max="100" step="5" />
+    <label id="analyserMaxPSDLabel" name="analyserMaxPSDLabel" class="onlyFullScreen text-xs text-dimmed">
       Max&nbsp;dBm
     </label>
-    <input id="analyserMinPSD" class="onlyFullScreen" type="number" name="analyserMinPSD" value="-40" min="-100" max="5" step="5" />
-    <label id="analyserMinPSDLabel" name="analyserMinPSDLabel" class="onlyFullScreen">
+    <input id="analyserMinPSD" class="onlyFullScreen text-xs" type="number" name="analyserMinPSD" value="-40" min="-100" max="5" step="5" />
+    <label id="analyserMinPSDLabel" name="analyserMinPSDLabel" class="onlyFullScreen text-xs text-dimmed">
       Min&nbsp;dBm
     </label>
 
@@ -72,6 +88,76 @@
 </template>
 
 <script setup>
+import { ref, watch, onMounted } from "vue";
+
+const spectrumTypeOptions = [
+  { label: "Frequency", value: "0" },
+  { label: "Freq. vs Throttle", value: "1" },
+  { label: "Freq. vs RPM", value: "2" },
+  { label: "Power Spectral Density", value: "3" },
+  { label: "PSD vs Throttle", value: "4" },
+  { label: "PSD vs RPM", value: "5" },
+  { label: "Error vs Setpoint", value: "6" },
+];
+
+const overdrawOptions = [
+  { label: "Show all filters", value: "0" },
+  { label: "Show only Gyro filters", value: "1" },
+  { label: "Show only D-Term filters", value: "2" },
+  { label: "Show only Yaw filters", value: "3" },
+  { label: "Hide all filters", value: "4" },
+  { label: "Auto", value: "5" },
+];
+
+const spectrumType = ref("0");
+const overdrawType = ref("0");
+
+// Sync USelect → hidden native select and dispatch change event for legacy code
+watch(spectrumType, (val) => {
+  const el = document.getElementById("spectrumTypeSelect");
+  if (el) {
+    el.value = val;
+    el.dispatchEvent(new Event("change"));
+  }
+});
+
+watch(overdrawType, (val) => {
+  const el = document.getElementById("overdrawSpectrumTypeSelect");
+  if (el) {
+    el.value = val;
+    el.dispatchEvent(new Event("change"));
+  }
+});
+
+// Sync legacy → USelect when legacy code sets .value on the hidden select
+onMounted(() => {
+  const specEl = document.getElementById("spectrumTypeSelect");
+  const overdrawEl = document.getElementById("overdrawSpectrumTypeSelect");
+
+  if (specEl) {
+    // Observe value changes from legacy code via MutationObserver on the value property
+    const origSpecDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+    Object.defineProperty(specEl, "value", {
+      get() { return origSpecDesc.get.call(this); },
+      set(v) {
+        origSpecDesc.set.call(this, v);
+        spectrumType.value = String(v);
+      },
+    });
+  }
+
+  if (overdrawEl) {
+    const origOverDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+    Object.defineProperty(overdrawEl, "value", {
+      get() { return origOverDesc.get.call(this); },
+      set(v) {
+        origOverDesc.set.call(this, v);
+        overdrawType.value = String(v);
+      },
+    });
+  }
+});
+
 function triggerImport() {
   document.getElementById("btn-spectrum-import").click();
 }

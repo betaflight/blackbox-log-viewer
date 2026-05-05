@@ -99,7 +99,15 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       // place the sliders.
       analyserZoomXElem.style.left = `${newSize.width - 130}px`;
       analyserZoomYElem.style.left = `${newSize.width - 20}px`;
-      document.getElementById("analyserResize").style.left = `${newSize.width - 20}px`;
+      const comparisonElem = document.getElementById("spectrumComparison");
+      const resizeElem = document.getElementById("analyserResize");
+      const isFullscreen = document.documentElement.classList.contains("has-analyser-fullscreen");
+      if (comparisonElem) {
+        comparisonElem.style.left = `${newSize.width - (isFullscreen ? 250 : 150)}px`;
+      }
+      if (resizeElem) {
+        resizeElem.style.left = `${newSize.width - (isFullscreen ? 20 : 30)}px`;
+      }
       analyserMaxPSD.style.left = `${newSize.width - 90}px`;
       analyserMinPSD.style.left = `${newSize.width - 90}px`;
       analyserLowLevelPSD.style.left = `${newSize.width - 90}px`;

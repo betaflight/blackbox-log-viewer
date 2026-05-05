@@ -511,17 +511,15 @@ html.has-analyser-fullscreen.has-analyser
   height: auto;
   transition: opacity 500ms ease-in;
 }
+
 .analyser #analyserResize {
-  color: var(--text-secondary);
   height: 0;
   overflow: hidden;
   opacity: 0;
   top: 5px;
   left: 975px;
-  float: right;
   z-index: 9;
   position: absolute;
-  font-size: 18px;
 }
 
 .analyser:hover .non-shift #spectrumType {
@@ -531,7 +529,6 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .analyser #spectrumType {
-  color: var(--text-secondary);
   height: 0;
   overflow: hidden;
   opacity: 0;
@@ -539,13 +536,7 @@ html.has-analyser-fullscreen.has-analyser
   float: left;
   z-index: 9;
   position: absolute;
-  font-size: 9px;
-}
-
-.analyser #spectrumType select {
-  border-radius: 3px;
-  padding: 0px 5px;
-  color: var(--text-primary);
+  min-width: 150px;
 }
 
 .analyser:hover .non-shift #overdrawSpectrumType {
@@ -558,17 +549,11 @@ html.has-analyser-fullscreen.has-analyser
   height: 0;
   overflow: hidden;
   opacity: 0;
-  left: 130px;
+  left: 170px;
   float: left;
   z-index: 9;
   position: absolute;
-  font-size: 9px;
-}
-
-.analyser #overdrawSpectrumType select {
-  border-radius: 3px;
-  padding: 0px 5px;
-  color: var(--text-primary);
+  min-width: 160px;
 }
 
 .analyser:hover .non-shift #spectrumComparison {
@@ -581,28 +566,13 @@ html.has-analyser-fullscreen.has-analyser
   height: 0;
   overflow: hidden;
   opacity: 0;
-  left: 260px;
+  top: 5px;
+  left: 340px;
   float: left;
   z-index: 9;
   position: absolute;
-  font-size: 9px;
-  border: gray;
-  border-style: solid;
-  border-width: 1px;
   display: flex;
-}
-
-.analyser #spectrumComparison select {
-  border-radius: 3px;
-  padding: 0px 5px;
-  color: var(--text-primary);
-}
-
-#spectrumComparison button {
-  width: auto;
-  height: auto;
-  border-radius: 3px;
-  float: left;
+  gap: 4px;
 }
 
 .analyser input#analyserZoomX {
