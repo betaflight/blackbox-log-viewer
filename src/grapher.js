@@ -1091,7 +1091,7 @@ export function FlightLogGrapher(
       i,
       graph;
 
-    graphs = structuredClone(graphConfig.getGraphs());
+    graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs()));
 
     for (i = 0; i < graphs.length; i++) {
       graph = graphs[i];
