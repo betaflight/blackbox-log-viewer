@@ -272,6 +272,11 @@ input.graph-time {
   text-align: right;
 }
 
+.container-fluid {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
 .welcome-pane,
 .main-pane {
   position: fixed;
