@@ -26,10 +26,10 @@
         title="Move log later"
         @click="$emit('sync-forward')"
       />
-      <input
-        type="text"
-        class="controls-input w-16"
-        :value="appStore.videoOffsetDisplay"
+      <UInput
+        :model-value="appStore.videoOffsetDisplay"
+        size="xs"
+        class="w-16 font-mono"
         title="Enter a time offset"
         @change="$emit('offset-change', $event.target.value)"
       />

@@ -4,7 +4,7 @@
     <div class="flex items-center gap-1">
       <input
         type="range"
-        class="controls-slider"
+        class="w-20 accent-primary"
         :min="10"
         :max="300"
         :step="5"
@@ -13,9 +13,9 @@
         @input="$emit('rate-change', Number($event.target.value))"
         @dblclick="$emit('rate-change', 100)"
       />
-      <span class="controls-value">
+      <UBadge color="primary" variant="solid" size="sm" class="font-mono min-w-[42px] justify-center">
         {{ playbackStore.playbackRate }}%
-      </span>
+      </UBadge>
     </div>
   </li>
 </template>

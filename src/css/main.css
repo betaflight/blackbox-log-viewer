@@ -965,37 +965,6 @@ html:not(.has-analyser) .view-analyser-fullscreen {
   font-weight: bold;
 }
 
-/* Controls bar shared styles */
-.controls-slider {
-  width: 80px;
-  accent-color: var(--primary-500);
-}
-
-.controls-value {
-  display: inline-block;
-  min-width: 42px;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-family: monospace;
-  text-align: center;
-  background-color: var(--primary-500);
-  color: var(--button-text);
-  border-radius: 3px;
-  font-weight: 600;
-}
-
-.controls-input {
-  width: 90px;
-  padding: 3px 6px;
-  font-size: 12px;
-  font-family: monospace;
-  background-color: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 3px;
-  color: var(--text-primary);
-}
-
-
 html.has-log .video-top-controls li.log-view-panel,
 html.has-log .video-top-controls li.log-chart-zoom-panel,
 html.has-log .video-top-controls li.log-chart-time-panel {

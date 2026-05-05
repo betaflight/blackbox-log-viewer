@@ -4,7 +4,7 @@
     <div class="flex items-center gap-1">
       <input
         type="range"
-        class="controls-slider"
+        class="w-20 accent-primary"
         :min="1"
         :max="1000"
         :step="1"
@@ -13,9 +13,9 @@
         @input="$emit('zoom-change', Number($event.target.value))"
         @dblclick="$emit('zoom-change', 100)"
       />
-      <span class="controls-value">
+      <UBadge color="primary" variant="solid" size="sm" class="font-mono min-w-[42px] justify-center">
         {{ graphStore.graphZoom }}%
-      </span>
+      </UBadge>
     </div>
   </li>
 </template>

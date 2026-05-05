@@ -2,10 +2,10 @@
   <li class="log-chart-time-panel">
     <h4>Time</h4>
     <div>
-      <input
-        type="text"
-        class="controls-input"
-        :value="appStore.graphTimeDisplay"
+      <UInput
+        :model-value="appStore.graphTimeDisplay"
+        size="xs"
+        class="w-24 font-mono"
         title="Enter a time to jump to"
         @change="onTimeChange"
       />
