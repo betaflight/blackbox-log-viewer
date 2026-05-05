@@ -271,11 +271,6 @@ html:not(.has-log):not(.has-video) .header-pane {
 }
 
 .log-close-legend-dialog {
-  float: right;
-  font-size: 14px;
-  color: var(--text-secondary);
-  position: relative;
-  top: -10px;
   cursor: pointer;
 }
 
@@ -309,6 +304,8 @@ html:not(.has-log):not(.has-video) .header-pane {
   background-color: var(--surface-100);
   color: var(--text-secondary);
   padding: 1em;
+  margin-left: 6px;
+  border-radius: 6px;
 
   min-width: 135px;
 
@@ -321,8 +318,7 @@ html:not(.has-log):not(.has-video) .header-pane {
   display: none;
 }
 .log-graph-config h2 {
-  font-size: 160%;
-  margin-top: 5px;
+  margin-top: 0;
 }
 .log-graph-config h3 {
   font-size: 125%;
