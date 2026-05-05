@@ -12,7 +12,7 @@
     </div>
 
     <!-- Action buttons row -->
-    <div v-if="logStore.hasLog" class="app-action-bar">
+    <div v-if="logStore.hasLog" class="flex items-center justify-between px-4 py-1 bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
       <div class="flex items-center gap-2">
         <UButton
           variant="soft"
@@ -98,13 +98,3 @@ const logStore = useLogStore();
 const appStore = useAppStore();
 </script>
 
-<style>
-.app-action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 16px;
-  background-color: var(--surface-100);
-  border-bottom: 1px solid var(--border-color);
-}
-</style>
