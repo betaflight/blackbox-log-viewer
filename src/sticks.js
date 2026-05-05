@@ -41,7 +41,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     );
 
   // Use defaults for any options not provided
-  globalThis.userSettings = { ...defaultSettings, ...(userSettings || {}) };
+  globalThis.userSettings = { ...defaultSettings, ...userSettings };
 
   this.resize = function (width, height) {
     // Resize canvas if size changed

@@ -198,13 +198,13 @@ export function FlightLogVideoRenderer(
       renderFrame = function () {
         graph.render(frameTime);
 
-        if (logParameters.hasSticks && parseInt(userSettings.sticks.size) > 0)
+        if (logParameters.hasSticks && Number.parseInt(userSettings.sticks.size) > 0)
           canvasContext.drawImage(stickCanvas, stickCanvasLeft, stickCanvasTop);
-        if (logParameters.hasCraft && parseInt(userSettings.craft.size) > 0)
+        if (logParameters.hasCraft && Number.parseInt(userSettings.craft.size) > 0)
           canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
         if (
           logParameters.hasAnalyser &&
-          parseInt(userSettings.analyser.size) > 0
+          Number.parseInt(userSettings.analyser.size) > 0
         )
           canvasContext.drawImage(
             analyserCanvas,
@@ -326,7 +326,7 @@ export function FlightLogVideoRenderer(
     delete logParameters.flightVideo;
   }
 
-  let options = { ...(userSettings || {}), eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
+  let options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
 
   graph = new FlightLogGrapher(
     flightLog,
@@ -338,14 +338,14 @@ export function FlightLogVideoRenderer(
     options,
   );
 
-  stickCanvasLeft = parseInt(stickCanvas.style.left, 10) || 0;
-  stickCanvasTop = parseInt(stickCanvas.style.top, 10) || 0;
+  stickCanvasLeft = Number.parseInt(stickCanvas.style.left, 10) || 0;
+  stickCanvasTop = Number.parseInt(stickCanvas.style.top, 10) || 0;
 
-  craftCanvasLeft = parseInt(craftCanvas.style.left, 10) || 0;
-  craftCanvasTop = parseInt(craftCanvas.style.top, 10) || 0;
+  craftCanvasLeft = Number.parseInt(craftCanvas.style.left, 10) || 0;
+  craftCanvasTop = Number.parseInt(craftCanvas.style.top, 10) || 0;
 
-  analyserCanvasLeft = parseInt(analyserCanvas.style.left, 10) || 0;
-  analyserCanvasTop = parseInt(analyserCanvas.style.top, 10) || 0;
+  analyserCanvasLeft = Number.parseInt(analyserCanvas.style.left, 10) || 0;
+  analyserCanvasTop = Number.parseInt(analyserCanvas.style.top, 10) || 0;
 
   if (!("inTime" in logParameters) || logParameters.inTime === false) {
     logParameters.inTime = flightLog.getMinTime();

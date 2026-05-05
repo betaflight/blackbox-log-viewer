@@ -1091,7 +1091,7 @@ export function FlightLogGrapher(
       i,
       graph;
 
-    graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs()));
+    graphs = structuredClone(graphConfig.getGraphs());
 
     for (i = 0; i < graphs.length; i++) {
       graph = graphs[i];
@@ -1269,7 +1269,7 @@ export function FlightLogGrapher(
 
   // Update user options
   this.refreshOptions = function (newSettings) {
-    options = { ...defaultOptions, ...(newSettings || {}) };
+    options = { ...defaultOptions, ...newSettings };
   };
 
   this.refreshLogo = function () {

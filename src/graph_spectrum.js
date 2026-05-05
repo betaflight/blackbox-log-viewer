@@ -76,10 +76,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       } else {
         return {
           height:
-            (canvas.height * parseInt(userSettings.analyser.size)) / 100.0,
-          width: (canvas.width * parseInt(userSettings.analyser.size)) / 100.0,
-          left: (canvas.width * parseInt(userSettings.analyser.left)) / 100.0,
-          top: (canvas.height * parseInt(userSettings.analyser.top)) / 100.0,
+            (canvas.height * Number.parseInt(userSettings.analyser.size)) / 100.0,
+          width: (canvas.width * Number.parseInt(userSettings.analyser.size)) / 100.0,
+          left: (canvas.width * Number.parseInt(userSettings.analyser.left)) / 100.0,
+          top: (canvas.height * Number.parseInt(userSettings.analyser.top)) / 100.0,
         };
       }
     };
@@ -99,7 +99,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       // place the sliders.
       const zoomXSlider = document.getElementById("analyserZoomXSlider");
       const zoomYSlider = document.getElementById("analyserZoomYSlider");
-      if (zoomXSlider) zoomXSlider.style.left = `${newSize.width - 130}px`;
+      if (zoomXSlider) { zoomXSlider.style.left = `${newSize.width - 130}px`; }
       if (zoomYSlider) {
         zoomYSlider.style.left = `${newSize.width - 20}px`;
         zoomYSlider.style.height = `${Math.min(newSize.height - 40, 200)}px`;
@@ -266,12 +266,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     analyserMinPSD.value = userSettings.psdHeatmapMin;
     analyserMinPSD.addEventListener("input", debounce(100, function () {
-      const min = parseInt(analyserMinPSD.value);
+      const min = Number.parseInt(analyserMinPSD.value);
       GraphSpectrumPlot.setMinPSD(min);
       saveOneUserSetting("psdHeatmapMin", min);
       analyserLowLevelPSD.min = min;
       analyserMaxPSD.min = min + 5;
-      if (parseInt(analyserLowLevelPSD.value) < min) {
+      if (Number.parseInt(analyserLowLevelPSD.value) < min) {
         analyserLowLevelPSD.value = min;
         analyserLowLevelPSD.dispatchEvent(new Event("input"));
       }
@@ -286,12 +286,12 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     analyserMaxPSD.value = userSettings.psdHeatmapMax;
     analyserMaxPSD.addEventListener("input", debounce(100, function () {
-      const max = parseInt(analyserMaxPSD.value);
+      const max = Number.parseInt(analyserMaxPSD.value);
       GraphSpectrumPlot.setMaxPSD(max);
       saveOneUserSetting("psdHeatmapMax", max);
       analyserMinPSD.max = max - 5;
       analyserLowLevelPSD.max = max;
-      if (parseInt(analyserLowLevelPSD.value) > max) {
+      if (Number.parseInt(analyserLowLevelPSD.value) > max) {
         analyserLowLevelPSD.value = max;
         analyserLowLevelPSD.dispatchEvent(new Event("input"));
       }
@@ -323,7 +323,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     analyserSegmentLengthPowerAt2.value = DEFAULT_PSD_SEGMENT_LENGTH_POWER;
     analyserSegmentLengthPowerAt2.addEventListener("input", debounce(100, function () {
       GraphSpectrumCalc.setPointsPerSegmentPSD(
-        2 ** Number.parseInt(analyserSegmentLengthPowerAt2.value),
+        2 ** Number.Number.parseInt(analyserSegmentLengthPowerAt2.value),
       );
       dataLoad();
       GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
@@ -342,7 +342,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     spectrumTypeElem.value = userSettings.spectrumType;
 
     function onSpectrumTypeChange() {
-      const optionSelected = parseInt(spectrumTypeElem.value, 10);
+      const optionSelected = Number.parseInt(spectrumTypeElem.value, 10);
 
       if (optionSelected != userSettings.spectrumType) {
         userSettings.spectrumType = optionSelected;
@@ -382,7 +382,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       const showAddSpectrumButton =
         optionSelected === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
       const btnAdd = document.getElementById("btn-spectrum-add");
-      if (btnAdd) btnAdd.style.display = showAddSpectrumButton ? "" : "none";
+      if (btnAdd) { btnAdd.style.display = showAddSpectrumButton ? "" : "none"; }
     }
 
     spectrumTypeElem.addEventListener("change", onSpectrumTypeChange);
@@ -395,7 +395,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     GraphSpectrumPlot.setOverdraw(userSettings.overdrawSpectrumType);
 
     overdrawSpectrumTypeElem.addEventListener("change", function () {
-      const optionSelected = parseInt(overdrawSpectrumTypeElem.value, 10);
+      const optionSelected = Number.parseInt(overdrawSpectrumTypeElem.value, 10);
 
       if (optionSelected != userSettings.overdrawSpectrumType) {
         userSettings.overdrawSpectrumType = optionSelected;

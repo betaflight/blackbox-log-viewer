@@ -85,13 +85,13 @@ export function SeekBar(canvas) {
   }
 
   function onMouseMove(e) {
-    if (e.which == 1) seekToDOMPixel(e.pageX - getCanvasOffsetLeft());
+    if (e.which === 1) { seekToDOMPixel(e.pageX - getCanvasOffsetLeft()); }
   }
 
   function onMouseDown(e) {
     e.preventDefault();
 
-    if (e.which == 1) {
+    if (e.which === 1) {
       seekToDOMPixel(e.pageX - getCanvasOffsetLeft());
 
       document.body.addEventListener("mousemove", onMouseMove);

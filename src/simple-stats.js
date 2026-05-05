@@ -21,8 +21,8 @@ export function SimpleStats(flightLog) {
     let min = Infinity, max = -Infinity, sum = 0;
     for (const f of frames) {
       const v = f[index];
-      if (v < min) min = v;
-      if (v > max) max = v;
+      if (v < min) { min = v; }
+      if (v > max) { max = v; }
       sum += v;
     }
     return {

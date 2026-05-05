@@ -331,7 +331,9 @@ function onGotoBookmark(index) {
 }
 
 // Refresh legacy state when dialogs opened externally (e.g. from legacy JS)
-watch(graphConfigDialogOpen, (val) => { if (val) refreshLegacyState(); });
+watch(graphConfigDialogOpen, (val) => {
+  if (val) { refreshLegacyState(); }
+});
 
 // Expose for external access during migration
 defineExpose({

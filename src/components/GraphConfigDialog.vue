@@ -463,7 +463,7 @@ function onCancel() {
 
 // Initialize when dialog opens
 watch(open, (val) => {
-  if (!val) return;
+  if (!val) { return; }
   buildOfferedFields();
   buildExampleGraphs();
 

@@ -76,7 +76,7 @@ GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
     };
   } else {
     const lograteEl2 = document.querySelector(".actual-lograte");
-    if (lograteEl2) lograteEl2.textContent = "";
+    if (lograteEl2) { lograteEl2.textContent = ""; }
   }
 
   return undefined;

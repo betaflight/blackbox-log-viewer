@@ -200,17 +200,17 @@ function populateConfig(cfg) {
   if (cfg.videoDim !== undefined) {
     // Find closest match
     const best = videoDimOptions.reduce((prev, cur) =>
-      Math.abs(parseFloat(cur.value) - cfg.videoDim) < Math.abs(parseFloat(prev.value) - cfg.videoDim) ? cur : prev,
+      Math.abs(Number.parseFloat(cur.value) - cfg.videoDim) < Math.abs(Number.parseFloat(prev.value) - cfg.videoDim) ? cur : prev,
     videoDimOptions[0]);
     videoDim.value = best.value;
   }
 }
 
 function buildVideoConfig() {
-  const [w, h] = resolution.value.split("x").map((v) => parseInt(v, 10));
+  const [w, h] = resolution.value.split("x").map((v) => Number.parseInt(v, 10));
   return {
-    frameRate: parseFloat(frameRate.value),
-    videoDim: parseFloat(videoDim.value),
+    frameRate: Number.parseFloat(frameRate.value),
+    videoDim: Number.parseFloat(videoDim.value),
     width: w,
     height: h,
   };
@@ -218,7 +218,7 @@ function buildVideoConfig() {
 
 function leftPad(value, pad, width) {
   value = `${value}`;
-  while (value.length < width) value = pad + value;
+  while (value.length < width) { value = pad + value; }
   return value;
 }
 
@@ -227,7 +227,9 @@ function formatTime(secs) {
   secs = secs % 60;
   const hours = Math.floor(mins / 60);
   mins = mins % 60;
-  if (hours) return `${hours}:${leftPad(mins, "0", 2)}:${leftPad(secs, "0", 2)}`;
+  if (hours) {
+    return `${hours}:${leftPad(mins, "0", 2)}:${leftPad(secs, "0", 2)}`;
+  }
   return `${mins}:${leftPad(secs, "0", 2)}`;
 }
 
@@ -263,11 +265,7 @@ function onStartExport() {
           const elapsedTimeMsec = Date.now() - renderStartTime;
           const estimatedTimeMsec = (elapsedTimeMsec * frameCount) / frameIndex;
 
-          if (lastEstimatedTimeMsec === null) {
-            lastEstimatedTimeMsec = estimatedTimeMsec;
-          } else {
-            lastEstimatedTimeMsec = estimatedTimeMsec;
-          }
+          lastEstimatedTimeMsec = estimatedTimeMsec;
 
           const estimatedRemaining = Math.max(Math.round((lastEstimatedTimeMsec - elapsedTimeMsec) / 1000), 0);
           remainingText.value = formatTime(estimatedRemaining);
@@ -326,7 +324,7 @@ watch(open, (val) => {
     fileSizeText.value = "";
     fileSizeWarning.value = false;
     resultText.value = "";
-    if (props.videoConfig) populateConfig(props.videoConfig);
+    if (props.videoConfig) { populateConfig(props.videoConfig); }
   } else if (videoRenderer) {
     videoRenderer.cancel();
     videoRenderer = null;

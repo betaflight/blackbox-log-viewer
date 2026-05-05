@@ -247,7 +247,8 @@ const ToggleRow = (props, { emit }) => {
     h(resolveComponent("USwitch"), {
       modelValue: checked,
       "onUpdate:modelValue": (val) => {
-        emit("update:modelValue", props.asBool ? (val ? {} : null) : val);
+        const newVal = props.asBool ? (val ? {} : null) : val;
+        emit("update:modelValue", newVal);
       },
     }),
   ]);
@@ -259,7 +260,7 @@ const PercentInput = (props, { emit }) =>
   h("div", { class: "flex items-center gap-2" }, [
     h("label", { class: "text-sm text-dimmed w-24" }, props.label),
     h(resolveComponent("UInputNumber"), {
-      modelValue: parseInt(props.modelValue) || 0,
+      modelValue: Number.parseInt(props.modelValue) || 0,
       min: 0,
       max: 100,
       step: 1,
@@ -279,7 +280,7 @@ const PositionInputs = (props, { emit }) => {
     h("div", { class: "flex items-center gap-1" }, [
       h("label", { class: "text-xs text-dimmed" }, label),
       h(resolveComponent("UInputNumber"), {
-        modelValue: parseInt(val) || 0,
+        modelValue: Number.parseInt(val) || 0,
         min: 0,
         max: 100,
         step: 1,

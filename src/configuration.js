@@ -63,7 +63,9 @@ export function Configuration(file, _configurationDefaults, showConfigFile) {
     renderFileContentList(configurationList, null);
 
     const statusBarFileName = document.querySelector("#status-bar .configuration-file-name");
-    if (statusBarFileName) statusBarFileName.textContent = file.name;
+    if (statusBarFileName) {
+      statusBarFileName.textContent = file.name;
+    }
 
     configurationDiv.querySelector(".configuration-close")?.addEventListener("click", function () {
       if (showConfigFile) {
