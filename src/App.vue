@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, watch } from "vue";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -148,12 +148,22 @@ const settingsDialogOpen = ref(false);
 const graphConfigDialogOpen = ref(false);
 const headerDialogOpen = ref(false);
 const videoExportDialogOpen = ref(false);
-const currentUserSettings = computed(() => globalThis.userSettings || {});
-const currentFlightLog = computed(() => getLegacy()?.flightLog ?? null);
-const currentGraphConfig = computed(() => getLegacy()?.activeGraphConfig ?? null);
-const currentSysConfig = computed(() => getLegacy()?.flightLog?.getSysConfig?.() ?? null);
-const videoExportParams = computed(() => getLegacy()?.getVideoExportParams?.() ?? null);
-const currentVideoConfig = computed(() => getLegacy()?.videoConfig ?? null);
+const currentUserSettings = ref({});
+const currentFlightLog = ref(null);
+const currentGraphConfig = ref(null);
+const currentSysConfig = ref(null);
+const videoExportParams = ref(null);
+const currentVideoConfig = ref(null);
+
+function refreshLegacyState() {
+  const legacy = getLegacy();
+  currentUserSettings.value = globalThis.userSettings || {};
+  currentFlightLog.value = legacy?.flightLog ?? null;
+  currentGraphConfig.value = legacy?.activeGraphConfig ?? null;
+  currentSysConfig.value = legacy?.flightLog?.getSysConfig?.() ?? null;
+  videoExportParams.value = legacy?.getVideoExportParams?.() ?? null;
+  currentVideoConfig.value = legacy?.videoConfig ?? null;
+}
 
 // Bridge helper — access legacy BlackboxLogViewer instance
 function getLegacy() {
@@ -165,6 +175,7 @@ function onFilesSelected(files) {
 }
 
 function onOpenSettings() {
+  refreshLegacyState();
   settingsDialogOpen.value = true;
 }
 
@@ -182,6 +193,7 @@ function onExportGpx() {
 
 function onExportVideo() {
   getLegacy()?.pauseForExport?.();
+  refreshLegacyState();
   videoExportDialogOpen.value = true;
 }
 
@@ -198,6 +210,7 @@ function onViewConfig() {
 }
 
 function onOpenHeader() {
+  refreshLegacyState();
   headerDialogOpen.value = true;
 }
 
@@ -316,6 +329,9 @@ function onApplyDefaultWorkspace(index) {
 function onGotoBookmark(index) {
   getLegacy()?.gotoBookmark?.(index + 1);
 }
+
+// Refresh legacy state when dialogs opened externally (e.g. from legacy JS)
+watch(graphConfigDialogOpen, (val) => { if (val) refreshLegacyState(); });
 
 // Expose for external access during migration
 defineExpose({

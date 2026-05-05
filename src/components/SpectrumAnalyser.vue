@@ -33,7 +33,7 @@
         <button type="button" id="btn-spectrum-clear" title="Clear imported spectrums">Clr</button>
       </div>
 
-      <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window">
+      <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window" @click="toggleFullscreen">
         <span class="glyphicon glyphicon-resize-full"></span>
         <span class="glyphicon glyphicon-resize-small"></span>
       </div>
@@ -74,5 +74,9 @@
 <script setup>
 function triggerImport() {
   document.getElementById("btn-spectrum-import").click();
+}
+
+function toggleFullscreen() {
+  globalThis.blackboxLogViewer?.toggleAnalyserFullscreen?.();
 }
 </script>

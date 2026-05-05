@@ -2390,8 +2390,8 @@ function BlackboxLogViewer() {
   // Bridge API — expose key functions for Vue components during migration
   this.loadFiles = loadFiles;
   this.invalidateGraph = invalidateGraph;
-  this.flightLog = flightLog;
-  this.activeGraphConfig = activeGraphConfig;
+  Object.defineProperty(this, "flightLog", { get: () => flightLog });
+  Object.defineProperty(this, "activeGraphConfig", { get: () => activeGraphConfig });
   this.newGraphConfig = function (newConfig, redrawChart) {
     newGraphConfig(newConfig, redrawChart);
   };

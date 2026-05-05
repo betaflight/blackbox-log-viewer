@@ -863,7 +863,7 @@ html.has-analyser-fullscreen.has-analyser
 
 html.has-table-overlay .log-field-values {
   position: fixed;
-  top: 110px;
+  top: 135px;
   left: 15px;
   width: calc(100% - 30px);
   display: block;
