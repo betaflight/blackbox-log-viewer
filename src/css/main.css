@@ -855,7 +855,7 @@ html.isINAV .log-graph-config h3 span {
 
 :root.dark html.isCF .log-graph-config h3 span {
   background-color: rgba(0, 162, 63, 0.2);
-  color: #a0f0c8;
+  color: #d0ffe8;
 }
 
 :root.dark html.isINAV .log-graph-config h3 span {

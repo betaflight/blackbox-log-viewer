@@ -879,11 +879,13 @@ export function FlightLogGrapher(
 
     // Recenter the craft canvas in the top left corner
     stickCanvas.style.left = `${Math.max(
-      (canvas.width * parseInt(options.sticks.left)) / 100.0 - sticksWidth / 2,
+      (canvas.width * Number.parseInt(options.sticks.left)) / 100 -
+        sticksWidth / 2,
       0,
     )}px`;
     stickCanvas.style.top = `${Math.max(
-      (canvas.height * parseInt(options.sticks.top)) / 100.0 - sticksHeight / 2,
+      (canvas.height * Number.parseInt(options.sticks.top)) / 100 -
+        sticksHeight / 2,
       0,
     )}px`;
 
@@ -1089,8 +1091,7 @@ export function FlightLogGrapher(
       i,
       graph;
 
-    // NOSONAR: structuredClone fails on Vue reactive proxies (DataCloneError)
-    graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs()));
+    graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs())); // NOSONAR — structuredClone fails on Vue reactive proxies
 
     for (i = 0; i < graphs.length; i++) {
       graph = graphs[i];

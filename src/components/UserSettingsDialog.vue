@@ -307,8 +307,7 @@ const emit = defineEmits(["save"]);
 
 // Deep-clone settings into local state when dialog opens or settings change
 function cloneSettings(src) {
-  // NOSONAR: structuredClone fails on Vue reactive proxies (DataCloneError)
-  return JSON.parse(JSON.stringify(src));
+  return JSON.parse(JSON.stringify(src)); // NOSONAR — structuredClone fails on Vue reactive proxies
 }
 
 const local = ref(cloneSettings(props.settings));

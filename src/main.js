@@ -124,8 +124,8 @@ function BlackboxLogViewer() {
     html = document.documentElement,
     videoURL = false,
     videoOffset = 0.0,
-    videoExportInTime = false,
-    videoExportOutTime = false,
+    videoExportInTime = null,
+    videoExportOutTime = null,
     markerTime = 0, // New marker time
     graphRendersCount = 0,
     seekBarCanvas = document.querySelector(".log-seek-bar canvas"),
@@ -1991,7 +1991,7 @@ function BlackboxLogViewer() {
     function handleAnalyserKey(shifted) {
       if (!shifted) {
         hasAnalyser =
-          activeGraphConfig.selectedFieldName != null ? !hasAnalyser : false;
+          activeGraphConfig.selectedFieldName == null ? false : !hasAnalyser;
         graph.setDrawAnalyser(hasAnalyser);
         html.classList.toggle("has-analyser", hasAnalyser);
         prefs.set("hasAnalyser", hasAnalyser);
@@ -2003,133 +2003,148 @@ function BlackboxLogViewer() {
       invalidateGraph();
     }
 
-    function handleLetterKey(e, shifted) {
-      switch (e.code) {
-        case "KeyI":
-          if (!shifted) {
-            setVideoInTime(
-              videoExportInTime === currentBlackboxTime
-                ? false
-                : currentBlackboxTime,
-            );
-          }
-          e.preventDefault();
-          break;
-        case "KeyO":
-          if (!shifted) {
-            setVideoOutTime(
-              videoExportOutTime === currentBlackboxTime
-                ? false
-                : currentBlackboxTime,
-            );
-          }
-          e.preventDefault();
-          break;
-        case "KeyM":
-          if (e.altKey) {
-            logSmartSync();
-          } else {
-            markerTime = currentBlackboxTime;
-            setMarker(!hasMarker);
-            appStore.statusMarkerOffset = hasMarker
-              ? `Marker Offset ${formatTime(0)}ms`
-              : "";
-            invalidateGraph();
-          }
-          e.preventDefault();
-          break;
-        case "KeyC":
-          if (!shifted) {
-            showValueTable(false);
-            showConfigFile();
-            e.preventDefault();
-          }
-          break;
-        case "KeyA":
-          handleAnalyserKey(shifted);
-          if (!shifted) {
-            e.preventDefault();
-          }
-          break;
-        case "KeyH":
-          if (!shifted) {
-            globalThis.vueApp.headerDialogOpen =
-              !globalThis.vueApp.headerDialogOpen;
-            e.preventDefault();
-          }
-          break;
-        case "KeyT":
-          if (!shifted) {
-            showValueTable();
-            showConfigFile(false);
-            invalidateGraph();
-            e.preventDefault();
-          }
-          break;
-        case "KeyW":
-          if (e.shiftKey) {
-            workspaceStore.showDefaultMenu = true;
-          }
-          break;
-        case "KeyZ":
-          try {
-            if (e.ctrlKey) {
-              if (lastGraphConfig != null) {
-                newGraphConfig(lastGraphConfig);
-              }
-            } else if (graphZoom === GRAPH_MIN_ZOOM) {
-              setGraphZoom(null, true);
-            } else {
-              setGraphZoom(GRAPH_MIN_ZOOM, true);
-            }
-          } catch {
-            // Intentionally ignored — workspace toggle gracefully degrades when graph state is incomplete
-          }
-          e.preventDefault();
-          break;
-        case "KeyS":
-          try {
-            if (!shifted) {
-              toggleOverrideStatus(
-                "graphSmoothOverride",
-                "has-smoothing-override",
-              );
-            } else if (e.altKey) {
-              makeScreenshot();
-            } else if (e.shiftKey) {
-              onSaveWorkspace(
-                activeWorkspace,
-                workspaceGraphConfigs[activeWorkspace].title,
-              );
-            }
-          } catch {
-            // Intentionally ignored — smoothing/screenshot/save gracefully degrades when graph state is incomplete
-          }
-          e.preventDefault();
-          break;
-        case "KeyX":
-          try {
-            if (!shifted) {
-              toggleOverrideStatus("graphExpoOverride", "has-expo-override");
-            }
-          } catch {
-            // Intentionally ignored — expo override gracefully degrades when graph state is incomplete
-          }
-          e.preventDefault();
-          break;
-        case "KeyG":
-          try {
-            if (!shifted) {
-              toggleOverrideStatus("graphGridOverride", "has-grid-override");
-            }
-          } catch {
-            // Intentionally ignored — grid override gracefully degrades when graph state is incomplete
-          }
-          e.preventDefault();
-          break;
-        default:
-          return false;
+    function handleKeyVideoIn(e, shifted) {
+      if (!shifted) {
+        setVideoInTime(
+          videoExportInTime === currentBlackboxTime
+            ? null
+            : currentBlackboxTime,
+        );
       }
+      e.preventDefault();
+    }
+
+    function handleKeyVideoOut(e, shifted) {
+      if (!shifted) {
+        setVideoOutTime(
+          videoExportOutTime === currentBlackboxTime
+            ? null
+            : currentBlackboxTime,
+        );
+      }
+      e.preventDefault();
+    }
+
+    function handleKeyMarker(e) {
+      if (e.altKey) {
+        logSmartSync();
+      } else {
+        markerTime = currentBlackboxTime;
+        setMarker(!hasMarker);
+        appStore.statusMarkerOffset = hasMarker
+          ? `Marker Offset ${formatTime(0)}ms`
+          : "";
+        invalidateGraph();
+      }
+      e.preventDefault();
+    }
+
+    function handleKeyConfig(e, shifted) {
+      if (!shifted) {
+        showValueTable(false);
+        showConfigFile();
+        e.preventDefault();
+      }
+    }
+
+    function handleKeyTable(e, shifted) {
+      if (!shifted) {
+        showValueTable();
+        showConfigFile(false);
+        invalidateGraph();
+        e.preventDefault();
+      }
+    }
+
+    function handleKeyZoom(e) {
+      try {
+        if (e.ctrlKey) {
+          if (lastGraphConfig != null) {
+            newGraphConfig(lastGraphConfig);
+          }
+        } else if (graphZoom === GRAPH_MIN_ZOOM) {
+          setGraphZoom(null, true);
+        } else {
+          setGraphZoom(GRAPH_MIN_ZOOM, true);
+        }
+      } catch {
+        // Intentionally ignored — zoom toggle gracefully degrades when graph state is incomplete
+      }
+      e.preventDefault();
+    }
+
+    function handleKeySave(e, shifted) {
+      try {
+        if (!shifted) {
+          toggleOverrideStatus(
+            "graphSmoothOverride",
+            "has-smoothing-override",
+          );
+        } else if (e.altKey) {
+          makeScreenshot();
+        } else if (e.shiftKey) {
+          onSaveWorkspace(
+            activeWorkspace,
+            workspaceGraphConfigs[activeWorkspace].title,
+          );
+        }
+      } catch {
+        // Intentionally ignored — smoothing/screenshot/save gracefully degrades when graph state is incomplete
+      }
+      e.preventDefault();
+    }
+
+    function handleKeyOverride(settingKey, cssClass, e, shifted) {
+      try {
+        if (!shifted) {
+          toggleOverrideStatus(settingKey, cssClass);
+        }
+      } catch {
+        // Intentionally ignored — override gracefully degrades when graph state is incomplete
+      }
+      e.preventDefault();
+    }
+
+    const letterKeyHandlers = {
+      KeyI: handleKeyVideoIn,
+      KeyO: handleKeyVideoOut,
+      KeyM: handleKeyMarker,
+      KeyC: handleKeyConfig,
+      KeyA(e, shifted) {
+        handleAnalyserKey(shifted);
+        if (!shifted) {
+          e.preventDefault();
+        }
+      },
+      KeyH(e, shifted) {
+        if (!shifted) {
+          globalThis.vueApp.headerDialogOpen =
+            !globalThis.vueApp.headerDialogOpen;
+          e.preventDefault();
+        }
+      },
+      KeyT: handleKeyTable,
+      KeyW(e) {
+        if (e.shiftKey) {
+          workspaceStore.showDefaultMenu = true;
+        }
+      },
+      KeyZ: handleKeyZoom,
+      KeyS: handleKeySave,
+      KeyX(e, shifted) {
+        handleKeyOverride("graphExpoOverride", "has-expo-override", e, shifted);
+      },
+      KeyG(e, shifted) {
+        handleKeyOverride("graphGridOverride", "has-grid-override", e, shifted);
+      },
+    };
+
+    function handleLetterKey(e, shifted) {
+      const handler = letterKeyHandlers[e.code];
+      if (!handler) {
+        return false;
+      }
+      handler(e, shifted);
       return true;
     }
 
