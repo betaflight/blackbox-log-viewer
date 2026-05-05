@@ -37,7 +37,7 @@
           <input type="file" id="btn-spectrum-import" accept=".csv" class="hidden onlyFullScreenException" multiple/>
           <UButton id="btn-spectrum-clear" size="xs" color="primary" label="Clr" title="Clear imported spectrums" />
         </div>
-        <div class="view-analyser-fullscreen" @click="toggleFullscreen">
+        <div class="view-analyser-fullscreen flex items-center" @click="toggleFullscreen">
           <UButton
             color="primary"
             size="xs"
