@@ -109,27 +109,12 @@ a.disabled {
   div.graph-row {
     top: 115px !important;
   }
-
-
-  html.has-log button.log-jump-start,
-  html.has-log button.log-jump-back,
-  html.has-log button.log-jump-forward,
-  html.has-log button.log-jump-end {
-    display: none;
-  }
 }
 
 /* With video */
 @media (max-width: 920px) {
   html.has-video .video-top-controls li {
     margin-right: 1px;
-  }
-
-  html.has-video button.log-jump-start,
-  html.has-video button.log-jump-back,
-  html.has-video button.log-jump-forward,
-  html.has-video button.log-jump-end {
-    display: none;
   }
 }
 
@@ -701,46 +686,6 @@ html.has-video #graphCanvas {
   background-color: transparent;
 }
 
-html .view-video,
-html .view-craft,
-html .view-sticks,
-html .view-table,
-html .view-analyser,
-html .view-analyser-sticks,
-html .view-analyser-fullscreen {
-  color: var(--text-primary);
-}
-
-html.has-analyser-sticks.isBF .view-analyser-sticks,
-html.has-analyser.isBF .view-analyser,
-html.has-map.isBF .view-map,
-html.has-table.isBF .view-table,
-html.has-sticks.isBF .view-sticks,
-html.has-craft.isBF .view-craft,
-html:not(.video-hidden).isBF .view-video {
-  color: var(--primary-500);
-}
-
-html.has-analyser-sticks.isCF .view-analyser-sticks,
-html.has-analyser.isCF .view-analyser,
-html.has-map.isCF .view-map,
-html.has-table.isCF .view-table,
-html.has-sticks.isCF .view-sticks,
-html.has-craft.isCF .view-craft,
-html:not(.video-hidden).isCF .view-video {
-  color: var(--success-500);
-}
-
-html.has-analyser-sticks.isINAV .view-analyser-sticks,
-html.has-analyser.isINAV .view-analyser,
-html.has-map.isINAV .view-map,
-html.has-table.isINAV .view-table,
-html.has-sticks.isINAV .view-sticks,
-html.has-craft.isINAV .view-craft,
-html:not(.video-hidden).isINAV .view-video {
-  color: var(--info-500);
-}
-
 html:not(.has-analyser-fullscreen) .icon-resize-small {
   display: none;
 }
@@ -804,21 +749,6 @@ html.has-log .video-top-controls li.log-chart-time-panel {
 html.has-video.has-log .video-top-controls .log-sync-panel {
   display: inline-block;
 }
-html .video-jump-start,
-html .video-jump-end,
-html .log-jump-start,
-html .log-jump-end {
-  display: none;
-}
-html.has-video .video-jump-start,
-html.has-video .video-jump-end {
-  display: block;
-}
-html.has-log .log-jump-start,
-html.has-log .log-jump-end {
-  display: block;
-}
-
 .log-seek-bar {
   display: none;
 }
@@ -833,51 +763,6 @@ html.has-log .log-seek-bar {
 
 .log-workspace-panel {
   width: 200px;
-}
-
-.log-workspace-panel button {
-  width: 100%;
-  text-align: left;
-}
-
-.log-workspace-panel .open .workspace-selector-editButton {
-  display: none;
-}
-
-.log-workspace-panel li > a {
-  padding: 3px 5px 3px 5px;
-}
-
-.log-workspace-panel .workspace-selector-index {
-  padding-right: 5px;
-  opacity: 0.9;
-  vertical-align: middle;
-}
-
-.log-workspace-panel .faded {
-  opacity: 0.4;
-}
-
-.log-workspace-panel .workspace-selector-title {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.log-workspace-panel input {
-  padding-top: 2px;
-  margin-left: -2px;
-  width: 108px;
-  height: 18px;
-}
-
-html .graph-time-marker-group > .graph-time-marker {
-  display: none;
-}
-html.has-marker .graph-time-marker-group > .graph-time-marker {
-  display: inline-block;
 }
 
 .log-field-values {
@@ -945,15 +830,6 @@ html:not(.has-video) .view-video {
   display: none;
 }
 
-html:not(.has-video) a.view-video,
-html:not(.has-config) a.view-config,
-html:not(.has-analyser) a.view-analyser,
-html:not(.has-analyser) a.view-analyser-fullscreen,
-html:not(.has-analyser) li.has-analyser,
-html:not(.has-marker) li.has-marker {
-  display: none;
-}
-
 html.has-log .app-main-pane,
 html.has-video .app-main-pane {
   display: block;
@@ -961,24 +837,6 @@ html.has-video .app-main-pane {
 html.has-log .welcome-pane,
 html.has-video .welcome-pane {
   display: none;
-}
-
-
-.video-dim-section {
-  display: none;
-}
-html.has-video .video-dim-section {
-  display: block;
-}
-
-progress {
-  width: 100%;
-  height: 20px;
-}
-.loading-message {
-  padding-left: 30px;
-  font-weight: bold;
-  font-size: 1.5em;
 }
 
 
@@ -1062,16 +920,15 @@ div#lap-timer {
   z-index: 10;
   top: 5%;
   left: calc(90% - 233px);
-  border-radius: 5px;
-  padding: 5px;
+  border-radius: 6px;
+  padding: 8px;
   color: var(--text-secondary);
-  border: thin solid;
+  border: 1px solid var(--border-color, #e5e5e5);
 }
 
 tr.lap-timer-heading td {
   font-style: italic;
-  /* text-decoration: underline; */
-  border-bottom: thin solid white;
+  border-bottom: 1px solid var(--border-color, #e5e5e5);
 }
 
 table#lap-timer-laps {
