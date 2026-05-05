@@ -58,6 +58,12 @@ export default defineConfig({
             size: "sm",
           },
         },
+        modal: {
+          slots: {
+            overlay: "z-[200]",
+            content: "z-[200]",
+          },
+        },
         colors: {
           primary: "primary",
           neutral: "neutral",

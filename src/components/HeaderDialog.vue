@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" fullscreen :close="false" :ui="{ overlay: 'z-[200]', content: 'z-[200]', body: 'overflow-y-auto min-h-0' }">
+  <UModal v-model:open="open" fullscreen :close="false" :ui="{ body: 'overflow-y-auto min-h-0' }">
     <template #header>
       <div class="flex-1">
         <h4 class="font-semibold">{{ craftName }}</h4>
