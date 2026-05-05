@@ -1,71 +1,59 @@
 <template>
-  <UModal v-model:open="open" :ui="{ width: 'max-w-5xl' }">
+  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-fit' }">
     <template #header>
-      <h4 class="font-semibold">Configure graphs</h4>
-    </template>
-
-    <template #body>
-      <div class="flex flex-col gap-4 p-4 max-h-[70vh] overflow-y-auto">
-        <!-- Top actions -->
-        <div class="flex items-center justify-between">
-          <div class="relative" ref="dropdownRef">
-            <UButton
-              color="primary"
-              icon="i-lucide-plus"
-              label="Add graph"
-              @click="dropdownOpen = !dropdownOpen"
-            />
-            <div
-              v-if="dropdownOpen"
-              class="absolute left-0 top-full mt-1 z-50 bg-white dark:bg-neutral-800 border dark:border-neutral-700 rounded-lg shadow-lg max-h-64 overflow-y-auto min-w-48"
-            >
-              <button
-                v-for="(eg, i) in exampleGraphs"
-                :key="i"
-                class="block w-full text-left px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer"
-                :class="{ 'border-b dark:border-neutral-700': eg.dividerAfter }"
-                @click="addExampleGraph(eg); dropdownOpen = false"
-              >
-                {{ eg.label }}
-              </button>
-            </div>
-          </div>
+      <div class="flex items-center justify-between w-full">
+        <h4 class="font-semibold">Configure graphs</h4>
+        <div class="flex items-center gap-2">
+          <UDropdownMenu :items="addGraphItems" :content="{ class: 'z-[300]' }">
+            <UButton color="primary" icon="i-lucide-plus" label="Add graph" trailing-icon="i-lucide-chevron-down" size="xs" />
+          </UDropdownMenu>
           <UButton
             v-if="localGraphs.length > 0"
             variant="ghost"
             color="error"
             icon="i-lucide-trash-2"
             label="Remove all"
+            size="xs"
             @click="localGraphs = []; emitUpdate()"
           />
         </div>
+      </div>
+    </template>
 
-        <!-- Graph list -->
-        <ul class="flex flex-col gap-3">
-          <li
-            v-for="(graph, gIdx) in localGraphs"
-            :key="gIdx"
-            class="border rounded-lg p-3 dark:border-neutral-700"
-          >
-            <!-- Graph header -->
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <h5 class="font-semibold text-sm">Graph {{ gIdx + 1 }}</h5>
-                <input
-                  v-model="graph.label"
-                  type="text"
-                  placeholder="Axis label"
-                  class="px-2 py-1 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 w-48"
-                  @change="emitUpdate()"
-                />
-                <select
-                  v-model.number="graph.height"
-                  class="px-2 py-1 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 w-16 cursor-pointer"
-                  @change="emitUpdate()"
-                >
-                  <option v-for="h in 5" :key="h" :value="h">{{ h }}</option>
-                </select>
-              </div>
+    <template #body>
+      <div class="flex flex-col gap-5 max-h-[70vh] overflow-y-auto">
+        <!-- Graph panels (configurator UiBox style) -->
+        <div
+          v-for="(graph, gIdx) in localGraphs"
+          :key="gIdx"
+          class="relative border-2 rounded-lg border-neutral-500/30 mt-3"
+        >
+          <!-- Pill title on top border -->
+          <div class="flex gap-2 items-center absolute top-0 left-4 -translate-y-1/2 px-3 py-1 rounded-full bg-elevated text-highlighted text-[13px] font-semibold">
+            Graph {{ gIdx + 1 }}
+            <span v-if="graph.label" class="font-normal opacity-80">— {{ graph.label }}</span>
+          </div>
+
+          <div class="flex flex-col p-3 pt-5 gap-1">
+            <!-- Graph settings row -->
+            <div class="flex items-center gap-3 mb-1 text-xs">
+              <span class="text-dimmed">Label</span>
+              <UInput
+                v-model="graph.label"
+                placeholder="Axis label"
+                size="xs"
+                class="w-44"
+                @change="emitUpdate()"
+              />
+              <span class="text-dimmed">Height</span>
+              <USelect
+                v-model.number="graph.height"
+                :items="heightOptions"
+                size="xs"
+                class="w-16"
+                @change="emitUpdate()"
+              />
+              <div class="flex-1" />
               <UButton
                 variant="ghost"
                 color="error"
@@ -75,118 +63,118 @@
               />
             </div>
 
-            <!-- Field table -->
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b dark:border-neutral-700 text-xs text-neutral-500">
-                  <th class="text-left py-1 w-48">Name</th>
-                  <th class="text-center py-1 w-16">Smooth</th>
-                  <th class="text-center py-1 w-16">Expo</th>
-                  <th class="text-center py-1 w-14">Line</th>
-                  <th class="text-center py-1 w-20">Color</th>
-                  <th class="text-center py-1 w-20">Min</th>
-                  <th class="text-center py-1 w-20">Max</th>
-                  <th class="w-8" />
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(field, fIdx) in graph.fields"
-                  :key="fIdx"
-                  class="border-b dark:border-neutral-800"
-                >
-                  <td class="py-1 pr-2">
-                    <select
-                      v-model="field.name"
-                      class="w-full px-1 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 cursor-pointer"
-                      @change="onFieldChange(graph, field); emitUpdate()"
-                    >
-                      <option value="">(choose a field)</option>
-                      <option v-for="fn in offeredFields" :key="fn" :value="fn">
-                        {{ friendlyName(fn) }}
-                      </option>
-                    </select>
-                  </td>
-                  <td class="py-1 text-center">
-                    <input
-                      :value="formatSmoothing(field)"
-                      class="w-14 px-1 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 text-center"
-                      @change="parseSmoothing(field, $event.target.value); emitUpdate()"
-                    />
-                  </td>
-                  <td class="py-1 text-center">
-                    <input
-                      :value="formatExpo(field)"
-                      class="w-14 px-1 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 text-center"
-                      @change="parseExpo(field, $event.target.value); emitUpdate()"
-                    />
-                  </td>
-                  <td class="py-1 text-center">
-                    <input
-                      v-model.number="field.lineWidth"
-                      type="number"
-                      min="1"
-                      max="5"
-                      class="w-12 px-1 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 text-center"
-                      @change="emitUpdate()"
-                    />
-                  </td>
-                  <td class="py-1 text-center">
-                    <select
-                      v-model="field.color"
-                      class="w-18 px-1 py-0.5 text-sm border rounded cursor-pointer"
-                      :style="{ backgroundColor: field.color, color: field.color }"
-                      @change="emitUpdate()"
-                    >
-                      <option
-                        v-for="c in palette"
-                        :key="c.color"
-                        :value="c.color"
-                        :style="{ color: c.color }"
-                      >
-                        {{ c.name }}
-                      </option>
-                    </select>
-                  </td>
-                  <td class="py-1 text-center">
-                    <input
-                      :value="field.curve?.MinMax?.min?.toFixed(1) ?? ''"
-                      class="w-18 px-1 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 text-center"
-                      @change="setMin(field, $event.target.value); emitUpdate()"
-                      @dblclick="resetMin(field); emitUpdate()"
-                    />
-                  </td>
-                  <td class="py-1 text-center">
-                    <input
-                      :value="field.curve?.MinMax?.max?.toFixed(1) ?? ''"
-                      class="w-18 px-1 py-0.5 text-sm border rounded dark:border-neutral-600 dark:bg-neutral-800 text-center"
-                      @change="setMax(field, $event.target.value); emitUpdate()"
-                      @dblclick="resetMax(field); emitUpdate()"
-                    />
-                  </td>
-                  <td class="py-1 text-center">
-                    <button
-                      class="text-neutral-400 hover:text-red-500 cursor-pointer"
-                      @click="removeField(graph, fIdx)"
-                    >
-                      <span class="i-lucide-x w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <!-- Field grid (PID table style) -->
+            <div class="grid grid-cols-[11rem_auto_auto_auto_2rem_auto_auto_2rem] gap-x-3 gap-y-1 items-center min-w-0">
+              <!-- Header -->
+              <div />
+              <div class="text-xs text-center text-dimmed">Smooth</div>
+              <div class="text-xs text-center text-dimmed">Expo</div>
+              <div class="text-xs text-center text-dimmed">Line</div>
+              <div class="text-xs text-center text-dimmed">Color</div>
+              <div class="text-xs text-center text-dimmed">Min</div>
+              <div class="text-xs text-center text-dimmed">Max</div>
+              <div />
 
-            <UButton
-              variant="ghost"
-              color="neutral"
-              icon="i-lucide-plus"
-              label="Add field"
-              size="xs"
-              class="mt-1"
-              @click="addField(graph)"
-            />
-          </li>
-        </ul>
+              <!-- Field rows -->
+              <template v-for="(field, fIdx) in graph.fields" :key="fIdx">
+                <USelectMenu
+                  v-model="field.name"
+                  :items="fieldItems"
+                  value-key="value"
+                  size="xs"
+                  :ui="{ content: 'z-[300] max-h-72' }"
+                  :search-input="{ placeholder: 'Search fields...' }"
+                  @update:model-value="onFieldChange(graph, field); emitUpdate()"
+                >
+                  <template #default>
+                    <span v-if="field.name" class="truncate">{{ friendlyName(field.name) }}</span>
+                    <span v-else class="opacity-50 truncate">Choose a field</span>
+                  </template>
+                </USelectMenu>
+                <UInputNumber
+                  :model-value="(field.smoothing ?? 0) / 100"
+                  :step="1"
+                  :min="0"
+                  :max="100"
+                  :format-options="noGrouping"
+                  size="xs"
+                  orientation="vertical"
+                  :ui="{ root: 'w-16' }"
+                  @update:model-value="field.smoothing = $event * 100; emitUpdate()"
+                />
+                <UInputNumber
+                  :model-value="Math.round((field.curve?.power ?? 1) * 100)"
+                  :step="10"
+                  :min="0"
+                  :max="500"
+                  :format-options="noGrouping"
+                  size="xs"
+                  orientation="vertical"
+                  :ui="{ root: 'w-16' }"
+                  @update:model-value="if (!field.curve) field.curve = {}; field.curve.power = $event / 100; emitUpdate()"
+                />
+                <UInputNumber
+                  v-model="field.lineWidth"
+                  :step="1"
+                  :min="1"
+                  :max="5"
+                  :format-options="noGrouping"
+                  size="xs"
+                  orientation="vertical"
+                  :ui="{ root: 'w-12' }"
+                  @update:model-value="emitUpdate()"
+                />
+                <div class="flex justify-center">
+                  <span
+                    class="inline-block w-6 h-6 rounded-sm cursor-pointer border border-neutral-200 dark:border-neutral-700"
+                    :style="{ backgroundColor: field.color }"
+                    :title="palette.find(c => c.color === field.color)?.name || 'Color'"
+                    @click="cycleColor(field)"
+                  />
+                </div>
+                <UInputNumber
+                  :model-value="field.curve?.MinMax?.min ?? -500"
+                  :step="10"
+                  :format-options="noGrouping"
+                  size="xs"
+                  orientation="vertical"
+                  :ui="{ root: 'w-20' }"
+                  @update:model-value="setMin(field, $event); emitUpdate()"
+                  @dblclick="resetMin(field); emitUpdate()"
+                />
+                <UInputNumber
+                  :model-value="field.curve?.MinMax?.max ?? 500"
+                  :step="10"
+                  :format-options="noGrouping"
+                  size="xs"
+                  orientation="vertical"
+                  :ui="{ root: 'w-20' }"
+                  @update:model-value="setMax(field, $event); emitUpdate()"
+                  @dblclick="resetMax(field); emitUpdate()"
+                />
+                <UButton
+                  variant="ghost"
+                  color="error"
+                  icon="i-lucide-trash-2"
+                  size="2xs"
+                  @click="removeField(graph, fIdx)"
+                />
+              </template>
+            </div>
+
+            <!-- Add field -->
+            <div class="flex justify-end mt-1">
+              <UButton
+                variant="link"
+                color="neutral"
+                icon="i-lucide-plus"
+                label="Add field"
+                size="xs"
+                @click="addField(graph)"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </template>
 
@@ -200,7 +188,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { GraphConfig } from "../graph_config.js";
 import { FlightLogFieldPresenter } from "../flightlog_fields_presenter.js";
 
@@ -214,12 +202,37 @@ const props = defineProps({
 const emit = defineEmits(["save", "update"]);
 
 const palette = GraphConfig.PALETTE;
+const noGrouping = { useGrouping: false };
 const localGraphs = ref([]);
 const prevConfig = ref(null);
 const offeredFields = ref([]);
 const exampleGraphs = ref([]);
-const dropdownOpen = ref(false);
-const dropdownRef = ref(null);
+
+const heightOptions = [
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+  { label: "3", value: 3 },
+  { label: "4", value: 4 },
+  { label: "5", value: 5 },
+];
+
+// Build USelect items from offered fields
+const fieldItems = computed(() =>
+  offeredFields.value.map((fn) => ({
+    label: friendlyName(fn),
+    value: fn,
+  })),
+);
+
+// Build UDropdownMenu items for "Add graph"
+const addGraphItems = computed(() => [
+  exampleGraphs.value.map((eg) => ({
+    label: eg.label,
+    onSelect() {
+      addExampleGraph(eg);
+    },
+  })),
+]);
 
 // Build the offered field names list
 function buildOfferedFields() {
@@ -393,6 +406,12 @@ function makeField(name, existing, color) {
   };
 }
 
+function cycleColor(field) {
+  const idx = palette.findIndex((c) => c.color === field.color);
+  field.color = palette[(idx + 1) % palette.length].color;
+  emitUpdate();
+}
+
 function addField(graph) {
   const colorIdx = graph.fields.length;
   const color = palette[colorIdx % palette.length].color;
@@ -449,10 +468,7 @@ function onCancel() {
 
 // Initialize when dialog opens
 watch(open, (val) => {
-  if (!val) {
-    dropdownOpen.value = false;
-    return;
-  }
+  if (!val) return;
   buildOfferedFields();
   buildExampleGraphs();
 
@@ -476,14 +492,4 @@ watch(open, (val) => {
     prevConfig.value = convertToConfig();
   }
 });
-
-// Close dropdown when clicking outside
-function onClickOutside(e) {
-  if (dropdownRef.value && !dropdownRef.value.contains(e.target)) {
-    dropdownOpen.value = false;
-  }
-}
-if (typeof document !== "undefined") {
-  document.addEventListener("click", onClickOutside, true);
-}
 </script>

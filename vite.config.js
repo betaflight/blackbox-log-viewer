@@ -58,6 +58,15 @@ export default defineConfig({
             size: "sm",
           },
         },
+        inputNumber: {
+          slots: {
+            root: "min-w-12",
+            base: "appearance-none",
+          },
+          defaultVariants: {
+            size: "sm",
+          },
+        },
         modal: {
           slots: {
             overlay: "z-[200]",
