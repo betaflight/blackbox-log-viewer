@@ -133,85 +133,7 @@ a.disabled {
   }
 }
 
-@media (max-width: 1150px) {
-  html.has-video .view-buttons-expanded {
-    display: none !important;
-  }
-}
-
-@media (min-width: 1151px) {
-  html.has-video .view-buttons {
-    display: none !important;
-  }
-}
-
-@media (max-width: 1404px) {
-  html.has-video .playback-rate-expanded,
-  html.has-video .graph-zoom-expanded,
-  html.has-video .log-sync-expanded {
-    display: none !important;
-  }
-}
-
-@media (min-width: 1405px) {
-  html.has-video .playback-rate,
-  html.has-video .zoom-menu,
-  html.has-video .sync-menu {
-    display: none !important;
-  }
-}
-
-@media (max-width: 1537px) {
-  html.has-video .log-chart-time-panel {
-    display: none !important;
-  }
-}
-
-/* Without video */
-
-@media (max-width: 886px) {
-  html:not(.has-video) .view-buttons-expanded {
-    display: none !important;
-  }
-}
-
-@media (min-width: 887px) {
-  html:not(.has-video) .view-buttons {
-    display: none !important;
-  }
-}
-
-@media (max-width: 1020px) {
-  html:not(.has-video) .playback-rate-expanded,
-  html:not(.has-video) .graph-zoom-expanded,
-  html:not(.has-video) .log-sync-expanded {
-    display: none !important;
-  }
-}
-
-@media (min-width: 1021px) {
-  html:not(.has-video) .playback-rate,
-  html:not(.has-video) .zoom-menu,
-  html:not(.has-video) .sync-menu {
-    display: none !important;
-  }
-}
-
-@media (max-width: 1153px) {
-  html:not(.has-video) .log-chart-time-panel {
-    display: none !important;
-  }
-}
-
 /*** end toolbar expansion ***/
-input.video-offset {
-  width: 65px !important;
-}
-
-input.graph-time {
-  text-align: right;
-}
-
 
 /* Shared input styling for legacy generated elements */
 .configuration-filter,
@@ -242,18 +164,6 @@ select.log-index:focus {
   padding-left: 15px;
   padding-right: 15px;
   display: contents;
-}
-
-.header-pane {
-  width: 100%;
-}
-
-html:not(.has-log):not(.has-video) .header-pane {
-  visibility: hidden;
-}
-
-.log-info {
-  max-width: 30em;
 }
 
 .log-seek-bar canvas {
@@ -368,7 +278,7 @@ html.has-sticks #stickCanvas {
   left: 0;
   z-index: 9999;
   content: "";
-  background-color: gray;
+  background-color: var(--surface-200, hsl(0, 0%, 50%));
   opacity: 0.5;
 }
 
@@ -520,7 +430,7 @@ html.has-analyser-fullscreen.has-analyser
 
 .analyser label#analyserMaxPSDLabel {
   position: absolute;
-  color: gray;
+  color: var(--text-secondary);
   left: 0px;
   top: 30px;
   font-size: 12px;
@@ -535,7 +445,7 @@ html.has-analyser-fullscreen.has-analyser
 
 .analyser label#analyserMinPSDLabel {
   position: absolute;
-  color: gray;
+  color: var(--text-secondary);
   left: 0px;
   top: 55px;
   font-size: 12px;
@@ -550,7 +460,7 @@ html.has-analyser-fullscreen.has-analyser
 
 .analyser label#analyserLowLevelPSDLabel {
   position: absolute;
-  color: gray;
+  color: var(--text-secondary);
   left: 0px;
   top: 80px;
   font-size: 12px;
@@ -565,7 +475,7 @@ html.has-analyser-fullscreen.has-analyser
 
 .analyser label#analyserSegmentLengthPowerAt2Label {
   position: absolute;
-  color: gray;
+  color: var(--text-secondary);
   width: 50px;
   height: 20px;
   left: 0px;
@@ -719,12 +629,10 @@ html.has-config .configuration-file {
   width: calc(100% - 30px);
   padding: 9px;
   background-color: var(--surface-0);
-  border: black;
-  /* z-index: 10; */
+  border: 1px solid var(--border-color, #e5e5e5);
+  border-radius: 6px;
   bottom: 80px;
   overflow-y: hidden;
-  border-style: solid;
-  border-width: 1px;
 }
 
 html.has-config .configuration-list {
@@ -972,11 +880,9 @@ html.has-marker .graph-time-marker-group > .graph-time-marker {
   display: inline-block;
 }
 
-.log-metadata,
 .log-field-values {
   display: none;
 }
-html.has-log:not(.is-fullscreen) .log-metadata,
 html.has-log:not(.is-fullscreen).has-table .log-field-values {
   display: block;
 }
@@ -1010,12 +916,6 @@ html.has-log .video-top-controls {
   border-bottom-color: var(--surface-800, hsl(0, 0%, 25%));
 }
 
-.playback-rate-control,
-.graph-zoom-control {
-  width: 200px;
-  margin-right: 13px;
-  margin-top: 6px;
-}
 
 .override-button-group {
   display: flex;
@@ -1196,47 +1096,15 @@ div#lap-timer td:first-child {
 }
 
 .mouseNotification-box {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1.42857143;
-  text-decoration: none;
-  text-shadow: none;
-  text-transform: none;
-  letter-spacing: normal;
-  word-break: normal;
-  word-spacing: normal;
-  word-wrap: normal;
+  line-height: 1.4;
   z-index: 10;
-  padding: 4px;
+  padding: 4px 8px;
   color: var(--text-inverse);
   background-color: var(--surface-800);
-  border: 2px;
-  border-radius: 3px;
-}
-
-dialog {
-  background-color: var(--surface-0);
-  padding: 1em;
-  height: auto;
-  margin: auto auto;
-  position: absolute;
-  width: 50%;
-  border-radius: 3px;
-  border: 1px solid var(--border-color);
-}
-
-dialog h3 {
-  display: block;
-  font-size: 1.17em;
-  -webkit-margin-before: 1em;
-  -webkit-margin-after: 1em;
-  -webkit-margin-start: 0px;
-  -webkit-margin-end: 0px;
-  font-weight: bold;
+  border-radius: 4px;
 }
 
 .actual-lograte {
-  color: red;
+  color: var(--color-error-500, #ef4444);
 }
