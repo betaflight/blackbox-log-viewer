@@ -51,7 +51,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
     configurationDiv.innerHTML =
       `<div class="configuration-header">` +
       `<h4>${file.name}<span class="configuration-close" style="cursor:pointer;margin-left:8px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></h4>` +
-      `<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>` +
+      `<input type="text" class="configuration-filter" placeholder="Enter filter" size="5"/>` +
       `</div>` +
       `<div><ul class="list-none pl-0 configuration-list"></ul></div>`;
 

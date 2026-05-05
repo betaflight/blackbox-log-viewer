@@ -490,7 +490,7 @@ function BlackboxLogViewer() {
     logIndexContainer.innerHTML = "";
 
     const logIndexPicker = document.createElement("select");
-    logIndexPicker.className = "log-index form-control no-wheel";
+    logIndexPicker.className = "log-index no-wheel";
     if (logCount > 1) {
       logIndexPicker.addEventListener("change", function () {
         selectLog(Number.parseInt(this.value, 10));
@@ -530,7 +530,7 @@ function BlackboxLogViewer() {
         logIndexPicker.appendChild(option);
       } else {
         const holder = document.createElement("div");
-        holder.className = "form-control-static no-wheel";
+        holder.className = "log-index-static no-wheel";
         holder.textContent = logLabel;
         logIndexContainer.appendChild(holder);
       }

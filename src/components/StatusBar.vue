@@ -1,28 +1,29 @@
 <template>
-  <div class="flex items-center justify-between px-4 py-1 bg-neutral-100 dark:bg-neutral-900 text-xs text-neutral-600 dark:text-neutral-400 border-t border-neutral-200 dark:border-neutral-800">
-    <div class="flex items-center gap-4">
-      <span>{{ appStore.statusVersion }}</span>
-      <span v-if="appStore.statusCells">{{ appStore.statusCells }}</span>
-      <span>{{ appStore.statusLooptime }}</span>
-      <span>{{ appStore.statusLograte }}</span>
-      <span>{{ appStore.statusFlightMode }}</span>
+  <div class="status-bar">
+    <div class="flex items-center gap-3">
+      <span v-if="appStore.statusVersion" class="status-item">{{ appStore.statusVersion }}</span>
+      <span v-if="appStore.statusCells" class="status-item">{{ appStore.statusCells }}</span>
+      <span v-if="appStore.statusLooptime" class="status-item">{{ appStore.statusLooptime }}</span>
+      <span v-if="appStore.statusLograte" class="status-item">{{ appStore.statusLograte }}</span>
+      <span v-if="appStore.statusFlightMode" class="status-item status-flight-mode">{{ appStore.statusFlightMode }}</span>
     </div>
     <div class="flex items-center gap-2">
-      <span class="font-mono">{{ appStore.statusMarkerOffset }}</span>
+      <span v-if="appStore.statusMarkerOffset" class="font-mono text-[10px]">{{ appStore.statusMarkerOffset }}</span>
 
       <!-- Bookmarks -->
       <template v-for="n in 9" :key="n">
         <UButton
           v-if="workspaceStore.bookmarkTimes[n - 1] !== undefined"
-          variant="ghost"
+          variant="soft"
           color="primary"
           size="2xs"
           :label="String(n)"
+          class="font-mono"
           @click="$emit('goto-bookmark', n - 1)"
         />
       </template>
 
-      <span>{{ appStore.statusViewerVersion }}</span>
+      <span v-if="appStore.statusViewerVersion" class="text-[10px] opacity-50">{{ appStore.statusViewerVersion }}</span>
     </div>
   </div>
 </template>
@@ -36,3 +37,31 @@ defineEmits(["goto-bookmark"]);
 const appStore = useAppStore();
 const workspaceStore = useWorkspaceStore();
 </script>
+
+<style scoped>
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.75rem;
+  height: 1.5rem;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  background: var(--surface-200, hsl(0, 0%, 92%));
+  border-top: 1px solid var(--border-color, #ccc);
+}
+
+:root.dark .status-bar {
+  background: var(--surface-100, hsl(0, 0%, 8%));
+  border-top-color: var(--surface-800, hsl(0, 0%, 25%));
+}
+
+.status-item {
+  white-space: nowrap;
+}
+
+.status-flight-mode {
+  color: var(--color-primary-600, #e69400);
+  font-weight: 600;
+}
+</style>
