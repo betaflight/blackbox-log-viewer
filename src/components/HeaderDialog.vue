@@ -1,18 +1,18 @@
 <template>
-  <UModal v-model:open="open" :ui="{ width: 'max-w-6xl' }">
+  <UModal v-model:open="open" fullscreen :close="false" :ui="{ overlay: 'z-[200]', content: 'z-[200]', body: 'overflow-y-auto min-h-0' }">
     <template #header>
-      <div>
+      <div class="flex-1">
         <h4 class="font-semibold">{{ craftName }}</h4>
         <h5 v-if="revision" class="text-sm text-neutral-500">{{ revision }}</h5>
         <h5 v-if="boardInfo" class="text-sm text-neutral-500">{{ boardInfo }}</h5>
       </div>
+      <UButton variant="solid" color="primary" icon="i-lucide-x" label="Close" class="ml-auto" @click="open = false" />
     </template>
 
     <template #body>
-      <div class="flex gap-6 p-4 max-h-[75vh] overflow-y-auto">
-        <!-- Left column: PIDs -->
-        <div class="w-1/2 flex flex-col gap-4">
-          <!-- Main PID table -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pb-6 text-[0.8rem]">
+        <!-- Column 1: PIDs & Rates -->
+        <div class="flex flex-col gap-4">
           <Section title="PID Settings">
             <table class="w-full text-sm">
               <thead>
@@ -32,7 +32,6 @@
             </table>
           </Section>
 
-          <!-- Baro PIDs -->
           <Section v-if="showBaroPids" title="Baro">
             <table class="w-full text-sm">
               <tbody>
@@ -41,7 +40,6 @@
             </table>
           </Section>
 
-          <!-- Mag PIDs -->
           <Section v-if="showMagPids" title="Mag">
             <table class="w-full text-sm">
               <tbody>
@@ -50,7 +48,6 @@
             </table>
           </Section>
 
-          <!-- GPS PIDs -->
           <Section v-if="showGpsPids" title="GPS">
             <table class="w-full text-sm">
               <tbody>
@@ -59,80 +56,71 @@
             </table>
           </Section>
 
-          <!-- PID Sliders -->
           <Section v-if="pidSliderParams.length > 0" title="PID Sliders">
             <ParamTable :params="pidSliderParams" />
           </Section>
 
-          <!-- Feedforward -->
           <Section v-if="feedforwardParams.length > 0" title="Feedforward">
             <ParamTable :params="feedforwardParams" />
           </Section>
 
-          <!-- Rates -->
           <Section title="Rates">
             <ParamTable :params="rateParams" />
           </Section>
 
-          <!-- D_MAX -->
           <Section v-if="dMaxParams.length > 0" title="D Max">
             <ParamTable :params="dMaxParams" />
           </Section>
 
-          <!-- Rate Limits -->
           <Section v-if="rateLimitParams.length > 0" title="Rate Limits">
             <ParamTable :params="rateLimitParams" />
           </Section>
         </div>
 
-        <!-- Right column: Parameters, Filters, Features -->
-        <div class="w-1/2 flex flex-col gap-4">
-          <!-- General Parameters -->
+        <!-- Column 2: Parameters -->
+        <div class="flex flex-col gap-4">
           <Section title="Parameters">
             <ParamTable :params="generalParams" />
           </Section>
 
-          <!-- Gyro Filters -->
-          <Section title="Gyro Filters">
-            <ParamTable :params="gyroFilterParams" />
-          </Section>
-
-          <!-- D-Term Filters -->
-          <Section title="D-Term Filters">
-            <ParamTable :params="dtermFilterParams" />
-          </Section>
-
-          <!-- Dynamic Notch -->
-          <Section v-if="dynNotchParams.length > 0" title="Dynamic Notch">
-            <ParamTable :params="dynNotchParams" />
-          </Section>
-
-          <!-- RPM Filter -->
-          <Section v-if="rpmFilterParams.length > 0" title="RPM Filter">
-            <ParamTable :params="rpmFilterParams" />
-          </Section>
-
-          <!-- RC Smoothing -->
-          <Section v-if="rcSmoothingParams.length > 0" title="RC Smoothing">
-            <ParamTable :params="rcSmoothingParams" />
-          </Section>
-
-          <!-- Motor / ESC -->
-          <Section title="Motor / ESC">
-            <ParamTable :params="motorParams" />
-          </Section>
-
-          <!-- Anti Gravity -->
           <Section v-if="antiGravityParams.length > 0" title="Anti Gravity">
             <ParamTable :params="antiGravityParams" />
           </Section>
 
-          <!-- Other -->
+          <Section title="Motor / ESC">
+            <ParamTable :params="motorParams" />
+          </Section>
+        </div>
+
+        <!-- Column 3: Filters -->
+        <div class="flex flex-col gap-4">
+          <Section title="Gyro Filters">
+            <ParamTable :params="gyroFilterParams" />
+          </Section>
+
+          <Section title="D-Term Filters">
+            <ParamTable :params="dtermFilterParams" />
+          </Section>
+
+          <Section v-if="dynNotchParams.length > 0" title="Dynamic Notch">
+            <ParamTable :params="dynNotchParams" />
+          </Section>
+
+          <Section v-if="rpmFilterParams.length > 0" title="RPM Filter">
+            <ParamTable :params="rpmFilterParams" />
+          </Section>
+
+          <Section v-if="rcSmoothingParams.length > 0" title="RC Smoothing">
+            <ParamTable :params="rcSmoothingParams" />
+          </Section>
+
           <Section v-if="otherParams.length > 0" title="Other">
             <ParamTable :params="otherParams" />
           </Section>
+        </div>
 
-          <!-- Features -->
+        <!-- Column 4: Features & Fields -->
+        <div class="flex flex-col gap-4">
           <Section v-if="featuresList.length > 0" title="Features">
             <table class="w-full text-sm">
               <tbody>
@@ -147,7 +135,6 @@
             </table>
           </Section>
 
-          <!-- Disabled Fields -->
           <Section v-if="disabledFieldsList.length > 0" title="Disabled Fields">
             <table class="w-full text-sm">
               <tbody>
@@ -162,16 +149,11 @@
             </table>
           </Section>
 
-          <!-- Unknown Headers -->
           <Section v-if="unknownHeaders.length > 0" title="Unknown Headers">
             <ParamTable :params="unknownHeaders" />
           </Section>
         </div>
       </div>
-    </template>
-
-    <template #footer>
-      <UButton variant="outline" color="neutral" label="Close" @click="open = false" />
     </template>
   </UModal>
 </template>
