@@ -3,7 +3,7 @@
     <canvas width="0" height="0" id="analyserCanvas"></canvas>
 
     <span id="spectrumToolbar">
-      <div id="spectrumType" data-toggle="tooltip" title="Type of Spectrum">
+      <div id="spectrumType" title="Type of Spectrum">
         <select id="spectrumTypeSelect">
           <option value="0">Frequency</option>
           <option value="1">Freq. vs Throttle</option>
@@ -15,7 +15,7 @@
         </select>
       </div>
 
-      <div id="overdrawSpectrumType" data-toggle="tooltip" title="Show Filters">
+      <div id="overdrawSpectrumType" title="Show Filters">
         <select id="overdrawSpectrumTypeSelect">
           <option value="0">Show all filters</option>
           <option value="1">Show only Gyro filters</option>
@@ -26,16 +26,16 @@
         </select>
       </div>
 
-      <div id="spectrumComparison" data-toggle="tooltip" title="Spectrum comparison">
+      <div id="spectrumComparison" title="Spectrum comparison">
         <button id="btn-spectrum-export" type="button" title="Export spectrum to CSV">Exp</button>
         <button type="button" @click="triggerImport" title="Import spectrum from CSV">Imp</button>
         <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
         <button type="button" id="btn-spectrum-clear" title="Clear imported spectrums">Clr</button>
       </div>
 
-      <div id="analyserResize" class="btn-nobg view-analyser-fullscreen" data-toggle="tooltip" title="Zoom Analyser Window" @click="toggleFullscreen">
-        <span class="glyphicon glyphicon-resize-full"></span>
-        <span class="glyphicon glyphicon-resize-small"></span>
+      <div id="analyserResize" class="view-analyser-fullscreen cursor-pointer text-neutral-400 hover:text-white" title="Zoom Analyser Window" @click="toggleFullscreen">
+        <span class="icon-resize-full">&#x26F6;</span>
+        <span class="icon-resize-small">&#x2716;</span>
       </div>
     </span>
 

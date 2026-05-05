@@ -3,7 +3,7 @@
     <a href="#log-field-values">
       <h4>Field values</h4>
     </a>
-    <table class="table table-condensed">
+    <table class="field-values-table">
       <thead>
         <tr>
           <th>&nbsp;</th>
@@ -21,7 +21,7 @@
     <a href="#log-field-values">
       <h4>Statistics</h4>
     </a>
-    <table id="stats-table" class="table table-condensed">
+    <table id="stats-table" class="field-values-table">
       <caption>Min/max values from this log</caption>
       <thead>
         <tr>
