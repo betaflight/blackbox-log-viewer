@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="open"
-    class="fixed top-[110px] left-[15px] right-[15px] bottom-[80px] z-50 flex flex-col bg-default border border-default rounded-lg shadow-lg"
+    class="fixed top-[135px] left-[15px] right-[15px] bottom-[80px] flex flex-col bg-default border border-default rounded-lg shadow-lg"
   >
     <div class="flex items-center gap-3 px-4 py-2 border-b border-default shrink-0">
       <div class="flex-1">
