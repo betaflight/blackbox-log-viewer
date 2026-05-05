@@ -31,10 +31,6 @@ a.disabled {
 
 
 @media (min-width: 768px) {
-  .welcome-pane .panel-body {
-    min-height: 100px;
-  }
-
   .log-workspace-panel {
     width: 200px;
   }
@@ -224,6 +220,29 @@ input.graph-time {
   padding-right: 15px;
 }
 
+/* Replace Bootstrap .list-unstyled */
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Replace Bootstrap .form-control */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 3px;
+}
+
+.form-control:focus {
+  border-color: var(--input-border-focus);
+  outline: 0;
+}
+
 .welcome-pane,
 .main-pane {
   position: fixed;
@@ -244,30 +263,6 @@ html:not(.has-log):not(.has-video) .header-pane {
 
 .log-info {
   max-width: 30em;
-}
-.log-info .form-group {
-  margin-bottom: 10px;
-}
-
-/* Bootstrap-styled file inputs by abeautifulsite http://www.abeautifulsite.net/whipping-file-inputs-into-shape-with-bootstrap-3/ */
-.btn-file {
-  position: relative;
-  overflow: hidden;
-}
-.btn-file input[type="file"] {
-  position: absolute;
-  top: 0;
-  right: 0;
-  min-width: 100%;
-  min-height: 100%;
-  font-size: 100px;
-  text-align: right;
-  filter: alpha(opacity=0);
-  opacity: 0;
-  outline: none;
-  background: white;
-  cursor: inherit;
-  display: block;
 }
 
 .log-seek-bar canvas {
@@ -378,10 +373,6 @@ html.has-log .log-graph-config {
   margin-bottom: 5px;
 }
 
-.config-graph-field .form-control {
-  font-size: 12px;
-  height: 30px;
-}
 
 .config-graph-field-header {
   margin-bottom: 0;
@@ -403,10 +394,6 @@ html.has-log .log-graph-config {
   width: 25px;
 }
 
-.config-graph-field select.form-control {
-  padding-left: 2px;
-  max-width: 180px;
-}
 
 .config-graph-field input[name="linewidth"],
 .config-graph-field select.color-picker {
@@ -1260,15 +1247,6 @@ html.has-video .welcome-pane {
   display: none;
 }
 
-.btn-video-export.disabled {
-  pointer-events: all !important;
-}
-.btn-video-export {
-  display: none;
-}
-html.has-log .btn-video-export {
-  display: inline-block;
-}
 
 .pane-video-settings,
 .pane-video-progress,
@@ -1342,8 +1320,7 @@ html:not(.has-log) .vue-statusbar {
 }
 
 html:not(.has-gps) .view-map,
-html:not(.has-gps) .map-container,
-html:not(.has-gps) .btn-gpx-export {
+html:not(.has-gps) .map-container {
   display: none !important;
 }
 
