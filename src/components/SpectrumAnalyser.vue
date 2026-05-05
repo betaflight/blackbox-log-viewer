@@ -34,8 +34,8 @@
       </div>
 
       <div id="analyserResize" class="view-analyser-fullscreen cursor-pointer text-neutral-400 hover:text-white" title="Zoom Analyser Window" @click="toggleFullscreen">
-        <span class="icon-resize-full">&#x26F6;</span>
-        <span class="icon-resize-small">&#x2716;</span>
+        <span class="icon-resize-full i-lucide-maximize-2 w-4 h-4 inline-block"></span>
+        <span class="icon-resize-small i-lucide-minimize-2 w-4 h-4 inline-block"></span>
       </div>
     </span>
 

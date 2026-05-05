@@ -37,7 +37,7 @@ export function GraphLegend(
       let fieldList = graphDiv.querySelector("ul");
 
       graphTitle.textContent = graph.label;
-      graphTitle.insertAdjacentHTML("afterbegin", '<span class="legend-collapse-icon">−</span>');
+      graphTitle.insertAdjacentHTML("afterbegin", '<span class="legend-collapse-icon i-lucide-minus w-4 h-4 inline-block align-middle mr-1"></span>');
 
       for (j = 0; j < graph.fields.length; j++) {
         let field = graph.fields[j];
@@ -53,11 +53,14 @@ export function GraphLegend(
         let settingsElem = createElement(
           `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`,
         );
+        let visibilityIcon = config.isGraphFieldHidden(i, j)
+          ? "i-lucide-eye-off"
+          : "i-lucide-eye";
         let visibilityClass = config.isGraphFieldHidden(i, j)
           ? "legend-eye-closed"
           : "legend-eye-open";
         let visibilityElem = createElement(
-          `<span class="${visibilityClass} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`,
+          `<span class="${visibilityClass} graph-legend-field-visibility" graph="${i}" field="${j}"><span class="${visibilityIcon} w-4 h-4 inline-block align-middle"></span></span>`,
         );
         li.appendChild(nameElem);
         li.appendChild(visibilityElem);
@@ -191,12 +194,15 @@ export function GraphLegend(
         config.toggleGraphField(graphIndex, fieldIndex);
         onHighlightChange();
 
+        const icon = this.querySelector("span");
         if (config.isGraphFieldHidden(graphIndex, fieldIndex)) {
           this.classList.remove("legend-eye-open");
           this.classList.add("legend-eye-closed");
+          icon?.classList.replace("i-lucide-eye", "i-lucide-eye-off");
         } else {
           this.classList.add("legend-eye-open");
           this.classList.remove("legend-eye-closed");
+          icon?.classList.replace("i-lucide-eye-off", "i-lucide-eye");
         }
 
         e.preventDefault();

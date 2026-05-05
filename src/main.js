@@ -63,7 +63,7 @@ function BlackboxLogViewer() {
       globalThis.File &&
       globalThis.FileReader &&
       globalThis.FileList &&
-      Modernizr.canvas
+      !!document.createElement("canvas").getContext
     );
   }
 

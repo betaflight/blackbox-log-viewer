@@ -50,7 +50,7 @@ export function Configuration(file, configurationDefaults, showConfigFile) {
     configurationDiv.className = "configuration-file";
     configurationDiv.innerHTML =
       `<div class="configuration-header">` +
-      `<h4>${file.name}<span class="configuration-close" style="cursor:pointer;margin-left:8px">✕</span></h4>` +
+      `<h4>${file.name}<span class="configuration-close" style="cursor:pointer;margin-left:8px"><span class="i-lucide-x w-4 h-4 inline-block align-middle"></span></span></h4>` +
       `<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>` +
       `</div>` +
       `<div><ul class="list-unstyled configuration-list"></ul></div>`;

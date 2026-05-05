@@ -1,7 +1,7 @@
 <template>
   <div class="log-graph-config">
     <h2 id="legend_title">Legend
-      <span class="log-close-legend-dialog cursor-pointer ml-2" title="Hide the legend">✕</span>
+      <span class="log-close-legend-dialog cursor-pointer ml-2" title="Hide the legend"><span class="i-lucide-x w-4 h-4 inline-block align-middle"></span></span>
     </h2>
     <div class="log-index"></div>
     <div class="log-graph-legend">

@@ -902,16 +902,7 @@ html.has-config .configuration-list {
   box-shadow: 0px 0px 2px white;
 }
 
-.legend-collapse-icon {
-  margin-right: 0.3em;
-}
-
-.legend-eye-open::before {
-  content: "👁";
-}
-
-.legend-eye-closed::before {
-  content: "👁";
+.legend-eye-closed {
   opacity: 0.3;
 }
 
