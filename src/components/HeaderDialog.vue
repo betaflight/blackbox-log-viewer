@@ -127,10 +127,10 @@
                 <tr v-for="f in featuresList" :key="f.name" class="border-b border-default">
                   <td class="py-0.5 w-6 text-center">
                     <UIcon v-if="f.enabled" name="i-lucide-check" class="size-3.5 text-green-500" />
-                    <UIcon v-else name="i-lucide-minus" class="size-3.5 text-neutral-300 dark:text-neutral-600" />
+                    <UIcon v-else name="i-lucide-minus" class="size-3.5 text-muted" />
                   </td>
                   <td class="py-0.5 font-medium">{{ f.name }}</td>
-                  <td class="py-0.5 text-neutral-500 text-xs">{{ f.description }}</td>
+                  <td class="py-0.5 text-dimmed text-xs">{{ f.description }}</td>
                 </tr>
               </tbody>
             </table>
@@ -142,10 +142,10 @@
                 <tr v-for="f in disabledFieldsList" :key="f.name" class="border-b border-default">
                   <td class="py-0.5 w-6 text-center">
                     <UIcon v-if="f.enabled" name="i-lucide-check" class="size-3.5 text-green-500" />
-                    <UIcon v-else name="i-lucide-minus" class="size-3.5 text-neutral-300 dark:text-neutral-600" />
+                    <UIcon v-else name="i-lucide-minus" class="size-3.5 text-muted" />
                   </td>
                   <td class="py-0.5 font-medium">{{ f.name }}</td>
-                  <td class="py-0.5 text-neutral-500 text-xs">{{ f.description }}</td>
+                  <td class="py-0.5 text-dimmed text-xs">{{ f.description }}</td>
                 </tr>
               </tbody>
             </table>

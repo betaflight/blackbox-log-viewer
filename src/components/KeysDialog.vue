@@ -81,7 +81,7 @@ const open = defineModel("open", { type: Boolean, default: false });
 
 const ShortcutSection = (props, { slots }) =>
   h("div", [
-    h("h5", { class: "font-semibold text-sm mb-2 text-neutral-500 dark:text-neutral-400 uppercase tracking-wide" }, props.title),
+    h("h5", { class: "font-semibold text-sm mb-2 text-dimmed uppercase tracking-wide" }, props.title),
     h("ul", { class: "flex flex-col gap-1.5" }, slots.default?.()),
   ]);
 ShortcutSection.props = ["title"];
@@ -91,10 +91,10 @@ const ShortcutItem = (props) =>
     h("span", { class: "flex items-center gap-1 shrink-0 min-w-28" },
       props.keys.flatMap((key, i) => {
         const items = [
-          h("kbd", { class: "px-1.5 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-xs font-mono" }, key),
+          h("kbd", { class: "px-1.5 py-0.5 bg-elevated rounded text-xs font-mono" }, key),
         ];
         if (props.join && i < props.keys.length - 1) {
-          items.push(h("span", { class: "text-xs text-neutral-400" }, props.join));
+          items.push(h("span", { class: "text-xs text-dimmed" }, props.join));
         }
         return items;
       }),

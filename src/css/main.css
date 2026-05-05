@@ -1,10 +1,6 @@
 @import "leaflet/dist/leaflet.css";
 @import "./theme.css";
 
-body {
-  padding-bottom: 2em;
-}
-
 html,
 body {
   height: 100%;
@@ -16,32 +12,10 @@ a:hover {
   color: inherit;
 }
 
-a.disabled {
-  pointer-events: none;
-  cursor: default;
-  color: var(--text-muted);
-}
-
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
   .app-main-pane {
     width: 90%;
-  }
-}
-
-
-@media (min-width: 768px) {
-  .log-workspace-panel {
-    width: 200px;
-  }
-  .workspace-selector-title {
-    width: 130px;
-  }
-}
-
-@media (max-width: 768px) {
-  .workspace-selector-title {
-    width: 94px;
   }
 }
 
@@ -139,7 +113,6 @@ select.log-index:focus {
   outline: 0;
 }
 
-.welcome-pane,
 .app-main-pane {
   position: fixed;
   top: 15px;
@@ -160,11 +133,6 @@ select.log-index:focus {
 .graph-row {
   margin-top: 1em;
   display: none;
-}
-
-#main-page {
-  position: static;
-  top: 60px;
 }
 
 .log-close-legend-dialog {
@@ -826,17 +794,9 @@ html.video-hidden video {
   display: none;
 }
 
-html:not(.has-video) .view-video {
-  display: none;
-}
-
 html.has-log .app-main-pane,
 html.has-video .app-main-pane {
   display: block;
-}
-html.has-log .welcome-pane,
-html.has-video .welcome-pane {
-  display: none;
 }
 
 

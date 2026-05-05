@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="visible"
-    class="flex flex-col gap-2 p-3 bg-neutral-50 dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 overflow-y-auto"
+    class="flex flex-col gap-2 p-3 bg-elevated border-l border-default overflow-y-auto"
     :style="{ width: '260px' }"
   >
     <div class="flex items-center justify-between">
@@ -16,14 +16,14 @@
     </div>
 
     <div v-for="(graph, gi) in graphs" :key="gi" class="flex flex-col gap-1">
-      <h4 class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+      <h4 class="text-sm font-medium text-dimmed">
         {{ graph.label }}
       </h4>
       <ul class="flex flex-col gap-0.5">
         <li
           v-for="(field, fi) in graph.fields"
           :key="fi"
-          class="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800 text-sm"
+          class="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-elevated text-sm"
           :class="{ 'opacity-40': !field.visible }"
           @click="$emit('toggle-visibility', gi, fi)"
           @mouseenter="$emit('highlight', gi, fi)"
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Override buttons -->
-    <div class="flex items-center gap-1 mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+    <div class="flex items-center gap-1 mt-2 pt-2 border-t border-default">
       <UButton
         variant="ghost"
         color="neutral"

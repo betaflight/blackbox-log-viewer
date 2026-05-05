@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="graphStore.hasConfig"
-    class="overflow-y-auto p-4 bg-neutral-50 dark:bg-neutral-900"
+    class="overflow-y-auto p-4 bg-elevated"
   >
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-semibold">Configuration</h3>
@@ -19,9 +19,9 @@
         <tr
           v-for="param in filteredParams"
           :key="param.name"
-          class="border-b dark:border-neutral-800"
+          class="border-b border-default"
         >
-          <td class="py-1 pr-4 text-neutral-600 dark:text-neutral-400 font-mono text-xs">
+          <td class="py-1 pr-4 text-dimmed font-mono text-xs">
             {{ param.name }}
           </td>
           <td class="py-1 font-mono text-xs">{{ param.value }}</td>
