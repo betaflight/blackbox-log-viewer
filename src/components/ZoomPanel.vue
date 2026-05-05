@@ -1,5 +1,5 @@
 <template>
-  <li class="log-chart-zoom-panel">
+  <div class="toolbar-panel log-chart-zoom-panel">
     <h4>Zoom</h4>
     <div class="flex items-center gap-1">
       <USlider
@@ -15,7 +15,7 @@
         {{ graphStore.graphZoom }}%
       </UBadge>
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup>

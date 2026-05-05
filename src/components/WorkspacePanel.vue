@@ -1,5 +1,5 @@
 <template>
-  <li class="log-workspace-panel">
+  <div class="toolbar-panel log-workspace-panel">
     <h4>Workspace</h4>
 
     <UDropdownMenu :items="workspaceItems" class="w-full">
@@ -18,7 +18,7 @@
         <span v-else class="opacity-50">No workspace</span>
       </UButton>
     </UDropdownMenu>
-  </li>
+  </div>
 </template>
 
 <script setup>

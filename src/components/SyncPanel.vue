@@ -1,5 +1,5 @@
 <template>
-  <li class="log-sync-panel">
+  <div class="toolbar-panel log-sync-panel">
     <h4>Log sync</h4>
     <div class="flex items-center gap-0.5">
       <UButton
@@ -42,7 +42,7 @@
         @click="$emit('smart-sync')"
       />
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup>

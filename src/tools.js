@@ -334,6 +334,42 @@ export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
   }
 }
 
+function getOrCreateNotifElem(parentElem, messageClass, message, timeout) {
+  let notifElem = document.getElementById("mouse-notification");
+  if (notifElem) {
+    clearTimeout(timeout);
+    notifElem.className = messageClass;
+    notifElem.innerHTML = message;
+  } else {
+    notifElem = document.createElement("div");
+    notifElem.className = messageClass;
+    notifElem.id = "mouse-notification";
+    notifElem.innerHTML = message;
+    parentElem.appendChild(notifElem);
+  }
+  return notifElem;
+}
+
+function computeAlignedLeft(align, targetWidth, popupWidth, margin) {
+  if (align.indexOf("right") !== -1) {
+    return targetWidth - (popupWidth + margin);
+  }
+  if (align.indexOf("center") !== -1) {
+    return targetWidth / 2 - (popupWidth + margin) / 2;
+  }
+  return margin;
+}
+
+function computeAlignedTop(align, targetHeight, popupHeight, margin) {
+  if (align.indexOf("bottom") !== -1) {
+    return targetHeight - (popupHeight + margin);
+  }
+  if (align.indexOf("middle") !== -1) {
+    return targetHeight / 2 - (popupHeight + margin) / 2;
+  }
+  return margin;
+}
+
 export var mouseNotification = {
   enabled: true,
   elem: null,
@@ -348,18 +384,7 @@ export var mouseNotification = {
     messageClass = messageClass || "mouseNotification-box";
     margin = margin || 10;
 
-    let notifElem = document.getElementById("mouse-notification");
-    if (notifElem) {
-      clearTimeout(this.timeout);
-      notifElem.className = messageClass;
-      notifElem.innerHTML = message;
-    } else {
-      notifElem = document.createElement("div");
-      notifElem.className = messageClass;
-      notifElem.id = "mouse-notification";
-      notifElem.innerHTML = message;
-      this.elem.appendChild(notifElem);
-    }
+    getOrCreateNotifElem(this.elem, messageClass, message, this.timeout);
     this.timeout = setTimeout(function () {
       document.getElementById("mouse-notification")?.remove();
     }, delay || 1000);
@@ -369,23 +394,20 @@ export var mouseNotification = {
       target instanceof Element ? target : document.querySelector(target);
     let targetRect = targetEl.getBoundingClientRect();
 
-    // reposition the notification;
+    // reposition the notification
     if (align != null) {
-      let left, top;
-      if (align.indexOf("right") !== -1) {
-        left = targetRect.width - (popupRect.width + margin);
-      } else if (align.indexOf("center") !== -1) {
-        left = targetRect.width / 2 - (popupRect.width + margin) / 2;
-      } else {
-        left = margin;
-      }
-      if (align.indexOf("bottom") !== -1) {
-        top = targetRect.height - (popupRect.height + margin);
-      } else if (align.indexOf("middle") !== -1) {
-        top = targetRect.height / 2 - (popupRect.height + margin) / 2;
-      } else {
-        top = margin;
-      }
+      const left = computeAlignedLeft(
+        align,
+        targetRect.width,
+        popupRect.width,
+        margin,
+      );
+      const top = computeAlignedTop(
+        align,
+        targetRect.height,
+        popupRect.height,
+        margin,
+      );
       this.elem.style.left = `${left}px`;
       this.elem.style.top = `${top}px`;
     } else {

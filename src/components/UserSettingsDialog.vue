@@ -5,12 +5,19 @@
     </template>
 
     <template #body>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 max-h-[70vh] overflow-y-auto">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 max-h-[70vh] overflow-y-auto"
+      >
         <!-- Left column -->
         <div class="flex flex-col gap-4">
           <!-- Mixer Settings -->
           <UiBox title="Mixer Settings">
-            <ToggleRow v-model="local.customMix" label="Custom" description="Select custom craft display." :as-bool="true" />
+            <ToggleRow
+              v-model="local.customMix"
+              label="Custom"
+              description="Select custom craft display."
+              :as-bool="true"
+            />
             <div v-if="local.customMix" class="flex flex-col gap-2 mt-2">
               <div class="flex items-center gap-4">
                 <USelect
@@ -25,22 +32,44 @@
                 />
               </div>
               <p class="text-xs text-dimmed">
-                Custom mixer settings only affect the craft icon displayed over the log.
+                Custom mixer settings only affect the craft icon displayed over
+                the log.
               </p>
             </div>
           </UiBox>
 
           <!-- Stick Settings -->
           <UiBox title="Stick Settings">
-            <ToggleRow v-model="local.stickUnits" label="Units" description="Display actual units on stick display." />
-            <ToggleRow v-model="local.stickTrails" label="Stick Trails" description="Show stick trails." />
-            <ToggleRow v-model="local.stickInvertYaw" label="Invert Yaw" description="Invert yaw in stick display." />
+            <ToggleRow
+              v-model="local.stickUnits"
+              label="Units"
+              description="Display actual units on stick display."
+            />
+            <ToggleRow
+              v-model="local.stickTrails"
+              label="Stick Trails"
+              description="Show stick trails."
+            />
+            <ToggleRow
+              v-model="local.stickInvertYaw"
+              label="Invert Yaw"
+              description="Invert yaw in stick display."
+            />
             <div class="flex items-center gap-4 mt-2">
               <div class="flex flex-col gap-1">
                 <span class="text-sm font-medium">Mode</span>
                 <div class="flex gap-3">
-                  <label v-for="m in 4" :key="m" class="flex items-center gap-1 text-sm cursor-pointer">
-                    <input type="radio" :value="m" v-model.number="local.stickMode" class="accent-primary" />
+                  <label
+                    v-for="m in 4"
+                    :key="m"
+                    class="flex items-center gap-1 text-sm cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      :value="m"
+                      v-model.number="local.stickMode"
+                      class="accent-primary"
+                    />
                     Mode {{ m }}
                   </label>
                 </div>
@@ -51,12 +80,20 @@
                 alt="Stick mode preview"
               />
             </div>
-            <PositionInputs v-model:top="local.sticks.top" v-model:left="local.sticks.left" v-model:size="local.sticks.size" />
+            <PositionInputs
+              v-model:top="local.sticks.top"
+              v-model:left="local.sticks.left"
+              v-model:size="local.sticks.size"
+            />
           </UiBox>
 
           <!-- Legend Settings -->
           <UiBox title="Legend Settings">
-            <ToggleRow v-model="local.legendUnits" label="Units" description="Display actual units on legend." />
+            <ToggleRow
+              v-model="local.legendUnits"
+              label="Units"
+              description="Display actual units on legend."
+            />
           </UiBox>
 
           <!-- Measurement System -->
@@ -64,8 +101,17 @@
             <div class="flex flex-col gap-2">
               <span class="text-sm font-medium">Speed Units</span>
               <div class="flex gap-3">
-                <label v-for="opt in speedOptions" :key="opt.value" class="flex items-center gap-1 text-sm cursor-pointer">
-                  <input type="radio" :value="opt.value" v-model.number="local.speedUnits" class="accent-primary" />
+                <label
+                  v-for="opt in speedOptions"
+                  :key="opt.value"
+                  class="flex items-center gap-1 text-sm cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    :value="opt.value"
+                    v-model.number="local.speedUnits"
+                    class="accent-primary"
+                  />
                   {{ opt.label }}
                 </label>
               </div>
@@ -73,8 +119,17 @@
             <div class="flex flex-col gap-2 mt-2">
               <span class="text-sm font-medium">Altitude Units</span>
               <div class="flex gap-3">
-                <label v-for="opt in altitudeOptions" :key="opt.value" class="flex items-center gap-1 text-sm cursor-pointer">
-                  <input type="radio" :value="opt.value" v-model.number="local.altitudeUnits" class="accent-primary" />
+                <label
+                  v-for="opt in altitudeOptions"
+                  :key="opt.value"
+                  class="flex items-center gap-1 text-sm cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    :value="opt.value"
+                    v-model.number="local.altitudeUnits"
+                    class="accent-primary"
+                  />
                   {{ opt.label }}
                 </label>
               </div>
@@ -86,29 +141,65 @@
         <div class="flex flex-col gap-4">
           <!-- Craft Settings -->
           <UiBox title="Craft Settings">
-            <PositionInputs v-model:top="local.craft.top" v-model:left="local.craft.left" v-model:size="local.craft.size" />
+            <PositionInputs
+              v-model:top="local.craft.top"
+              v-model:left="local.craft.left"
+              v-model:size="local.craft.size"
+            />
           </UiBox>
 
           <!-- Analyser Settings -->
           <UiBox title="Analyser Settings">
-            <ToggleRow v-model="local.analyserHanning" label="Hanning" description="Use Hanning window for analyser." />
-            <PositionInputs v-model:top="local.analyser.top" v-model:left="local.analyser.left" v-model:size="local.analyser.size" label="Position" />
-            <PositionInputs v-model:top="local.analyser_legend.top" v-model:left="local.analyser_legend.left" v-model:size="local.analyser_legend.width" label="Legend" size-label="Width" />
+            <ToggleRow
+              v-model="local.analyserHanning"
+              label="Hanning"
+              description="Use Hanning window for analyser."
+            />
+            <PositionInputs
+              v-model:top="local.analyser.top"
+              v-model:left="local.analyser.left"
+              v-model:size="local.analyser.size"
+              label="Position"
+            />
+            <PositionInputs
+              v-model:top="local.analyser_legend.top"
+              v-model:left="local.analyser_legend.left"
+              v-model:size="local.analyser_legend.width"
+              label="Legend"
+              size-label="Width"
+            />
           </UiBox>
 
           <!-- Map Settings -->
           <UiBox title="Map Settings">
-            <ToggleRow v-model="local.mapTrailAltitudeColored" label="ACT" description="Use altitude colored trail (slower)." />
-            <PositionInputs v-model:top="local.map.top" v-model:left="local.map.left" v-model:size="local.map.size" />
+            <ToggleRow
+              v-model="local.mapTrailAltitudeColored"
+              label="ACT"
+              description="Use altitude colored trail (slower)."
+            />
+            <PositionInputs
+              v-model:top="local.map.top"
+              v-model:left="local.map.left"
+              v-model:size="local.map.size"
+            />
           </UiBox>
 
           <!-- Watermark Settings -->
           <UiBox title="Watermark Settings">
-            <ToggleRow v-model="local.drawWatermark" label="Watermark" description="Show the watermark." />
+            <ToggleRow
+              v-model="local.drawWatermark"
+              label="Watermark"
+              description="Show the watermark."
+            />
             <div v-if="local.drawWatermark" class="flex flex-col gap-2 mt-2">
               <div class="flex items-center gap-3">
                 <label class="text-sm">Logo</label>
-                <input type="file" accept="image/*" class="text-sm" @change="onLogoChange" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="text-sm"
+                  @change="onLogoChange"
+                />
               </div>
               <img
                 v-if="local.watermark.logo"
@@ -116,34 +207,69 @@
                 class="w-24 h-16 object-contain border rounded border-default"
                 alt="Watermark logo"
               />
-              <PositionInputs v-model:top="local.watermark.top" v-model:left="local.watermark.left" v-model:size="local.watermark.size" />
-              <PercentInput v-model="local.watermark.transparency" label="Transparency" />
+              <PositionInputs
+                v-model:top="local.watermark.top"
+                v-model:left="local.watermark.left"
+                v-model:size="local.watermark.size"
+              />
+              <PercentInput
+                v-model="local.watermark.transparency"
+                label="Transparency"
+              />
             </div>
           </UiBox>
 
           <!-- Lap Timer Settings -->
           <UiBox title="Lap Timer Settings">
-            <ToggleRow v-model="local.drawLapTimer" label="Lap Timer" description="Show the lap timer." />
+            <ToggleRow
+              v-model="local.drawLapTimer"
+              label="Lap Timer"
+              description="Show the lap timer."
+            />
             <div v-if="local.drawLapTimer" class="flex flex-col gap-2 mt-2">
-              <PositionInputs v-model:top="local.laptimer.top" v-model:left="local.laptimer.left" />
-              <PercentInput v-model="local.laptimer.transparency" label="Transparency" />
+              <PositionInputs
+                v-model:top="local.laptimer.top"
+                v-model:left="local.laptimer.left"
+              />
+              <PercentInput
+                v-model="local.laptimer.transparency"
+                label="Transparency"
+              />
               <p class="text-xs text-dimmed">
-                Set a "start time" bookmark at the beginning of the log/video plus additional bookmarks to mark the start of each lap.
+                Set a "start time" bookmark at the beginning of the log/video
+                plus additional bookmarks to mark the start of each lap.
               </p>
             </div>
           </UiBox>
 
           <!-- Graph Style Settings -->
           <UiBox title="Graph Style Settings">
-            <ToggleRow v-model="local.drawGradient" label="Gradient" description="Show the gradient background." />
-            <ToggleRow v-model="local.drawVerticalBar" label="TimeBar" description="Show the vertical timebar." />
+            <ToggleRow
+              v-model="local.drawGradient"
+              label="Gradient"
+              description="Show the gradient background."
+            />
+            <ToggleRow
+              v-model="local.drawVerticalBar"
+              label="TimeBar"
+              description="Show the vertical timebar."
+            />
           </UiBox>
 
           <!-- Dark Mode -->
           <UiBox title="Dark Mode">
             <div class="flex flex-col gap-1">
-              <label v-for="opt in darkModeOptions" :key="opt.value" class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="radio" :value="opt.value" v-model.number="local.darkMode" class="accent-primary" />
+              <label
+                v-for="opt in darkModeOptions"
+                :key="opt.value"
+                class="flex items-center gap-2 text-sm cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  :value="opt.value"
+                  v-model.number="local.darkMode"
+                  class="accent-primary"
+                />
                 {{ opt.label }}
               </label>
             </div>
@@ -154,7 +280,12 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton variant="outline" color="neutral" label="Cancel" @click="open = false" />
+        <UButton
+          variant="outline"
+          color="neutral"
+          label="Cancel"
+          @click="open = false"
+        />
         <UButton color="primary" label="Save" @click="onSave" />
       </div>
     </template>
@@ -183,7 +314,9 @@ const local = ref(cloneSettings(props.settings));
 
 watch(
   () => props.settings,
-  (val) => { local.value = cloneSettings(val); },
+  (val) => {
+    local.value = cloneSettings(val);
+  },
 );
 
 // Re-clone when dialog opens to pick up any external changes
@@ -226,7 +359,9 @@ function onLogoChange(e) {
   const file = e.target.files?.[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = (ev) => { local.value.watermark.logo = ev.target.result; };
+  reader.onload = (ev) => {
+    local.value.watermark.logo = ev.target.result;
+  };
   reader.readAsDataURL(file);
 }
 
@@ -242,12 +377,17 @@ const ToggleRow = (props, { emit }) => {
   return h("div", { class: "flex items-center justify-between py-1" }, [
     h("div", [
       h("span", { class: "text-sm font-medium" }, props.label),
-      props.description ? h("p", { class: "text-xs text-dimmed" }, props.description) : null,
+      props.description
+        ? h("p", { class: "text-xs text-dimmed" }, props.description)
+        : null,
     ]),
     h(resolveComponent("USwitch"), {
       modelValue: checked,
       "onUpdate:modelValue": (val) => {
-        const newVal = props.asBool ? (val ? {} : null) : val;
+        let newVal = val;
+        if (props.asBool) {
+          newVal = val ? {} : null;
+        }
         emit("update:modelValue", newVal);
       },
     }),
@@ -302,7 +442,11 @@ const PositionInputs = (props, { emit }) => {
   }
 
   return h("div", { class: "flex items-center gap-3 mt-1" }, [
-    h("span", { class: "text-sm text-dimmed w-16 shrink-0" }, props.label || "Position"),
+    h(
+      "span",
+      { class: "text-sm text-dimmed w-16 shrink-0" },
+      props.label || "Position",
+    ),
     ...fields,
   ]);
 };

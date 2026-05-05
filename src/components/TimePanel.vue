@@ -1,5 +1,5 @@
 <template>
-  <li class="log-chart-time-panel">
+  <div class="toolbar-panel log-chart-time-panel">
     <h4>Time</h4>
     <div>
       <UInput
@@ -10,7 +10,7 @@
         @change="onTimeChange"
       />
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup>

@@ -5,7 +5,14 @@
         <h4 class="font-semibold">Configure graphs</h4>
         <div class="flex items-center gap-2">
           <UDropdownMenu :items="addGraphItems" :content="{ class: 'z-[300]' }">
-            <UButton variant="outline" color="neutral" icon="i-lucide-plus" label="Add graph" trailing-icon="i-lucide-chevron-down" size="xs" />
+            <UButton
+              variant="outline"
+              color="neutral"
+              icon="i-lucide-plus"
+              label="Add graph"
+              trailing-icon="i-lucide-chevron-down"
+              size="xs"
+            />
           </UDropdownMenu>
           <UButton
             v-if="localGraphs.length > 0"
@@ -14,7 +21,10 @@
             icon="i-lucide-trash-2"
             label="Remove all"
             size="xs"
-            @click="localGraphs = []; emitUpdate()"
+            @click="
+              localGraphs = [];
+              emitUpdate();
+            "
           />
         </div>
       </div>
@@ -53,12 +63,17 @@
                 color="error"
                 icon="i-lucide-trash-2"
                 size="xs"
-                @click="localGraphs.splice(gIdx, 1); emitUpdate()"
+                @click="
+                  localGraphs.splice(gIdx, 1);
+                  emitUpdate();
+                "
               />
             </div>
 
             <!-- Field grid (PID table style) -->
-            <div class="grid grid-cols-[11rem_auto_auto_auto_2rem_auto_auto_2rem] gap-x-3 gap-y-1 items-center min-w-0">
+            <div
+              class="grid grid-cols-[11rem_auto_auto_auto_2rem_auto_auto_2rem] gap-x-3 gap-y-1 items-center min-w-0"
+            >
               <!-- Header -->
               <div />
               <div class="text-xs text-center text-dimmed">Smooth</div>
@@ -78,11 +93,18 @@
                   size="xs"
                   :ui="{ content: 'z-[300] max-h-72' }"
                   :search-input="{ placeholder: 'Search fields...' }"
-                  @update:model-value="onFieldChange(graph, field); emitUpdate()"
+                  @update:model-value="
+                    onFieldChange(graph, field);
+                    emitUpdate();
+                  "
                 >
                   <template #default>
-                    <span v-if="field.name" class="truncate">{{ friendlyName(field.name) }}</span>
-                    <span v-else class="opacity-50 truncate">Choose a field</span>
+                    <span v-if="field.name" class="truncate">{{
+                      friendlyName(field.name)
+                    }}</span>
+                    <span v-else class="opacity-50 truncate"
+                      >Choose a field</span
+                    >
                   </template>
                 </USelectMenu>
                 <UInputNumber
@@ -94,7 +116,10 @@
                   size="xs"
                   orientation="vertical"
                   :ui="{ root: 'w-16' }"
-                  @update:model-value="field.smoothing = $event * 100; emitUpdate()"
+                  @update:model-value="
+                    field.smoothing = $event * 100;
+                    emitUpdate();
+                  "
                 />
                 <UInputNumber
                   :model-value="Math.round((field.curve?.power ?? 1) * 100)"
@@ -105,7 +130,11 @@
                   size="xs"
                   orientation="vertical"
                   :ui="{ root: 'w-16' }"
-                  @update:model-value="if (!field.curve) field.curve = {}; field.curve.power = $event / 100; emitUpdate()"
+                  @update:model-value="
+                    if (!field.curve) field.curve = {};
+                    field.curve.power = $event / 100;
+                    emitUpdate();
+                  "
                 />
                 <UInputNumber
                   v-model="field.lineWidth"
@@ -122,7 +151,10 @@
                   <span
                     class="inline-block w-6 h-6 rounded-sm cursor-pointer border border-neutral-200 dark:border-neutral-700"
                     :style="{ backgroundColor: field.color }"
-                    :title="palette.find(c => c.color === field.color)?.name || 'Color'"
+                    :title="
+                      palette.find((c) => c.color === field.color)?.name ||
+                      'Color'
+                    "
                     @click="cycleColor(field)"
                   />
                 </div>
@@ -133,8 +165,14 @@
                   size="xs"
                   orientation="vertical"
                   :ui="{ root: 'w-20' }"
-                  @update:model-value="setMin(field, $event); emitUpdate()"
-                  @dblclick="resetMin(field); emitUpdate()"
+                  @update:model-value="
+                    setMin(field, $event);
+                    emitUpdate();
+                  "
+                  @dblclick="
+                    resetMin(field);
+                    emitUpdate();
+                  "
                 />
                 <UInputNumber
                   :model-value="field.curve?.MinMax?.max ?? 500"
@@ -143,8 +181,14 @@
                   size="xs"
                   orientation="vertical"
                   :ui="{ root: 'w-20' }"
-                  @update:model-value="setMax(field, $event); emitUpdate()"
-                  @dblclick="resetMax(field); emitUpdate()"
+                  @update:model-value="
+                    setMax(field, $event);
+                    emitUpdate();
+                  "
+                  @dblclick="
+                    resetMax(field);
+                    emitUpdate();
+                  "
                 />
                 <UButton
                   variant="ghost"
@@ -174,7 +218,12 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton variant="outline" color="neutral" label="Cancel" @click="onCancel" />
+        <UButton
+          variant="outline"
+          color="neutral"
+          label="Cancel"
+          @click="onCancel"
+        />
         <UButton color="primary" label="Apply changes" @click="onSave" />
       </div>
     </template>
@@ -229,44 +278,59 @@ const addGraphItems = computed(() => [
   })),
 ]);
 
-// Build the offered field names list
-function buildOfferedFields() {
-  if (!props.flightLog) return;
+const BLACKLISTED_FIELDS = {
+  time: true,
+  loopIteration: true,
+  "setpoint[0]": true,
+  "setpoint[1]": true,
+  "setpoint[2]": true,
+  "setpoint[3]": true,
+};
+const ARRAY_FIELD_PATTERN = /^(.+)\[[0-9]+\]$/;
 
-  const BLACKLISTED = { time: true, loopIteration: true, "setpoint[0]": true, "setpoint[1]": true, "setpoint[2]": true, "setpoint[3]": true };
-  const fieldNames = props.flightLog.getMainFieldNames();
-  const result = [];
-  const seen = {};
+function collectFieldsFromLog(fieldNames, result, seen) {
   let lastRoot = null;
-
   for (const name of fieldNames) {
-    if (BLACKLISTED[name]) continue;
-    const m = name.match(/^(.+)\[[0-9]+\]$/);
-    if (m) {
-      if (m[1] !== lastRoot) {
-        lastRoot = m[1];
-        const allName = `${lastRoot}[all]`;
-        result.push(allName);
-        seen[allName] = true;
-      }
-    } else {
+    if (BLACKLISTED_FIELDS[name]) continue;
+    const m = name.match(ARRAY_FIELD_PATTERN);
+    if (m && m[1] !== lastRoot) {
+      lastRoot = m[1];
+      const allName = `${lastRoot}[all]`;
+      result.push(allName);
+      seen[allName] = true;
+    } else if (!m) {
       lastRoot = null;
     }
     result.push(name);
     seen[name] = true;
   }
+}
+
+function collectFieldsFromConfig(graphConfig, result, seen) {
+  const graphs = graphConfig.getGraphs();
+  for (const g of graphs) {
+    for (const f of g.fields) {
+      if (!seen[f.name]) {
+        result.push(f.name);
+        seen[f.name] = true;
+      }
+    }
+  }
+}
+
+// Build the offered field names list
+function buildOfferedFields() {
+  if (!props.flightLog) return;
+
+  const fieldNames = props.flightLog.getMainFieldNames();
+  const result = [];
+  const seen = {};
+
+  collectFieldsFromLog(fieldNames, result, seen);
 
   // Include any fields from current config that aren't in this log
   if (props.graphConfig) {
-    const graphs = props.graphConfig.getGraphs();
-    for (const g of graphs) {
-      for (const f of g.fields) {
-        if (!seen[f.name]) {
-          result.push(f.name);
-          seen[f.name] = true;
-        }
-      }
-    }
+    collectFieldsFromConfig(props.graphConfig, result, seen);
   }
 
   offeredFields.value = result;
@@ -275,7 +339,11 @@ function buildOfferedFields() {
 function buildExampleGraphs() {
   if (!props.flightLog) return;
   const examples = GraphConfig.getExampleGraphConfigs(props.flightLog);
-  examples.unshift({ label: "Custom graph", fields: [{ name: "" }], dividerAfter: true });
+  examples.unshift({
+    label: "Custom graph",
+    fields: [{ name: "" }],
+    dividerAfter: true,
+  });
   exampleGraphs.value = examples;
 }
 
@@ -320,8 +388,12 @@ function friendlyName(fieldName) {
 }
 
 function getDefaults(fieldName) {
-  if (!props.flightLog) return { smoothing: 0, power: 1, MinMax: { min: -500, max: 500 } };
-  const smoothing = GraphConfig.getDefaultSmoothingForField(props.flightLog, fieldName);
+  if (!props.flightLog)
+    return { smoothing: 0, power: 1, MinMax: { min: -500, max: 500 } };
+  const smoothing = GraphConfig.getDefaultSmoothingForField(
+    props.flightLog,
+    fieldName,
+  );
   const curve = GraphConfig.getDefaultCurveForField(props.flightLog, fieldName);
   return { smoothing, ...curve };
 }
@@ -369,7 +441,9 @@ function onFieldChange(graph, field) {
   if (!field.name || !props.flightLog || !props.graphConfig) return;
 
   // Check if this is a group field that expands
-  const expanded = props.graphConfig.extendFields(props.flightLog, { name: field.name });
+  const expanded = props.graphConfig.extendFields(props.flightLog, {
+    name: field.name,
+  });
   if (expanded.length > 1) {
     // Replace this field with the expanded set
     const idx = graph.fields.indexOf(field);
@@ -394,7 +468,9 @@ function makeField(name, existing, color) {
     smoothing: existing?.smoothing ?? defaults.smoothing,
     curve: {
       power: existing?.curve?.power ?? defaults.power,
-      MinMax: existing?.curve?.MinMax ? { ...existing.curve.MinMax } : { ...defaults.MinMax },
+      MinMax: existing?.curve?.MinMax
+        ? { ...existing.curve.MinMax }
+        : { ...defaults.MinMax },
     },
     color: color || existing?.color || palette[0].color,
     lineWidth: existing?.lineWidth ?? 1,
@@ -427,12 +503,17 @@ function addExampleGraph(example) {
   const fields = [];
   for (const f of example.fields) {
     if (!props.flightLog || !props.graphConfig) {
-      fields.push(makeField(f.name, f, palette[fields.length % palette.length].color));
+      fields.push(
+        makeField(f.name, f, palette[fields.length % palette.length].color),
+      );
       continue;
     }
     const expanded = props.graphConfig.extendFields(props.flightLog, f);
     for (const ef of expanded) {
-      const c = ef.color && ef.color !== -1 ? ef.color : palette[(colorBase + fields.length) % palette.length].color;
+      const c =
+        ef.color && ef.color !== -1
+          ? ef.color
+          : palette[(colorBase + fields.length) % palette.length].color;
       fields.push(makeField(ef.name, ef, c));
     }
   }
@@ -463,7 +544,9 @@ function onCancel() {
 
 // Initialize when dialog opens
 watch(open, (val) => {
-  if (!val) { return; }
+  if (!val) {
+    return;
+  }
   buildOfferedFields();
   buildExampleGraphs();
 
@@ -477,7 +560,10 @@ watch(open, (val) => {
         if (!props.flightLog) continue;
         const expanded = props.graphConfig.extendFields(props.flightLog, f);
         for (const ef of expanded) {
-          const c = ef.color && ef.color !== -1 ? ef.color : palette[fields.length % palette.length].color;
+          const c =
+            ef.color && ef.color !== -1
+              ? ef.color
+              : palette[fields.length % palette.length].color;
           fields.push(makeField(ef.name, ef, c));
         }
       }

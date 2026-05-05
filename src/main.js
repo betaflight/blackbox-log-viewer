@@ -132,10 +132,7 @@ function BlackboxLogViewer() {
     graphRendersCount = 0,
     seekBarCanvas = document.querySelector(".log-seek-bar canvas"),
     seekBar = new SeekBar(seekBarCanvas),
-    seekBarRepaintRateLimited = throttle(
-      200,
-      seekBar.repaint.bind(seekBar),
-    ),
+    seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar)),
     seekBarMode = "avgThrottle",
     updateValuesChartRateLimited,
     animationFrameIsQueued = false,
@@ -226,7 +223,9 @@ function BlackboxLogViewer() {
     appStore.videoOffsetDisplay = videoOffsetDisplay;
 
     playbackStore.videoOffset = videoOffset;
-    if (withRefresh) { invalidateGraph(); }
+    if (withRefresh) {
+      invalidateGraph();
+    }
   }
 
   function isInteger(value) {
@@ -236,7 +235,9 @@ function BlackboxLogViewer() {
   function atMost2DecPlaces(value) {
     if (isInteger(value)) return value; //it's an integer already
 
-    if (value === null) { return "(absent)"; }
+    if (value === null) {
+      return "(absent)";
+    }
 
     return value.toFixed(2);
   }
@@ -299,7 +300,9 @@ function BlackboxLogViewer() {
         tbody.insertAdjacentHTML("beforeend", rows.join(""));
 
         const statRows = [];
-        const statsTable = document.querySelector(".log-field-values #stats-table");
+        const statsTable = document.querySelector(
+          ".log-field-values #stats-table",
+        );
         const statsTbody = statsTable.querySelector("tbody");
         statsTbody.innerHTML = "";
         const stats = SimpleStats(flightLog).calculate();
@@ -361,7 +364,9 @@ function BlackboxLogViewer() {
       }
 
       // Update the Legend Values
-      if (graphLegend) { graphLegend.updateValues(flightLog, frame); }
+      if (graphLegend) {
+        graphLegend.updateValues(flightLog, frame);
+      }
     }
   }
 
@@ -490,7 +495,10 @@ function BlackboxLogViewer() {
       logIndexPicker.addEventListener("change", function () {
         selectLog(Number.parseInt(this.value, 10));
         if (graph) {
-          html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
+          html.classList.toggle(
+            "has-analyser-fullscreen",
+            hasAnalyserFullscreen,
+          );
           graph.setAnalyser(hasAnalyserFullscreen);
         }
       });
@@ -521,7 +529,9 @@ function BlackboxLogViewer() {
         const option = document.createElement("option");
         option.textContent = `${index + 1}/${flightLog.getLogCount()}: ${logLabel}`;
         option.value = index;
-        if (error) { option.disabled = true; }
+        if (error) {
+          option.disabled = true;
+        }
         logIndexPicker.appendChild(option);
       } else {
         const holder = document.createElement("div");
@@ -541,18 +551,28 @@ function BlackboxLogViewer() {
    * Update the metadata displays to show information about the currently selected log index.
    */
   function renderSelectedLogInfo() {
-    const logIndexSelect = document.querySelector(".log-index select, select.log-index");
-    if (logIndexSelect) { logIndexSelect.value = flightLog.getLogIndex(); }
+    const logIndexSelect = document.querySelector(
+      ".log-index select, select.log-index",
+    );
+    if (logIndexSelect) {
+      logIndexSelect.value = flightLog.getLogIndex();
+    }
 
     if (flightLog.getNumCellsEstimate()) {
       const cellsText = `${flightLog.getNumCellsEstimate()}S (${Number(
         flightLog.getReferenceVoltageMillivolts() / 1000,
       ).toFixed(2)}V)`;
-      document.querySelectorAll(".log-cells").forEach((el) => el.textContent = cellsText);
-      document.querySelectorAll(".log-cells-header,.log-cells").forEach((el) => el.style.display = "block");
+      document
+        .querySelectorAll(".log-cells")
+        .forEach((el) => (el.textContent = cellsText));
+      document
+        .querySelectorAll(".log-cells-header,.log-cells")
+        .forEach((el) => (el.style.display = "block"));
       appStore.statusCells = cellsText;
     } else {
-      document.querySelectorAll(".log-cells-header,.log-cells").forEach((el) => el.style.display = "none");
+      document
+        .querySelectorAll(".log-cells-header,.log-cells")
+        .forEach((el) => (el.style.display = "none"));
       appStore.statusCells = "";
     }
 
@@ -566,7 +586,7 @@ function BlackboxLogViewer() {
       (sysConfig["Firmware revision"] != null
         ? `${sysConfig["Firmware revision"]}`
         : "") +
-      (sysConfig.deviceUID != null ? ` (${sysConfig.deviceUID})` : "");
+      (sysConfig.deviceUID == null ? "" : ` (${sysConfig.deviceUID})`);
     appStore.statusVersion = versionText;
 
     const looptimeText = stringLoopTime(
@@ -932,12 +952,18 @@ function BlackboxLogViewer() {
       html.classList.toggle("has-table", hasTable);
       html.classList.toggle("has-craft", userSettings.drawCraft);
       html.classList.toggle("has-sticks", userSettings.drawSticks);
-      html.classList.toggle("has-expo-override", userSettings.graphExpoOverride);
+      html.classList.toggle(
+        "has-expo-override",
+        userSettings.graphExpoOverride,
+      );
       html.classList.toggle(
         "has-smoothing-override",
         userSettings.graphSmoothOverride,
       );
-      html.classList.toggle("has-grid-override", userSettings.graphSmoothOverride);
+      html.classList.toggle(
+        "has-grid-override",
+        userSettings.graphSmoothOverride,
+      );
 
       setTimeout(function () {
         globalThis.dispatchEvent(new Event("resize"));
@@ -1080,8 +1106,12 @@ function BlackboxLogViewer() {
   function saveWorkspaces(file) {
     let data; // Data to save
 
-    if (!workspaceGraphConfigs) { return null; } // No workspaces to save
-    if (!file) { file = "workspaces.json"; } // No filename to save to, make one up
+    if (!workspaceGraphConfigs) {
+      return null;
+    } // No workspaces to save
+    if (!file) {
+      file = "workspaces.json";
+    } // No filename to save to, make one up
 
     if (typeof workspaceGraphConfigs === "object") {
       data = JSON.stringify(workspaceGraphConfigs, undefined, 4);
@@ -1341,7 +1371,8 @@ function BlackboxLogViewer() {
     let logJumpBack = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
       if (fast != null) {
-        scrollTime = fast !== 0 ? graph.getWindowWidthTime() * fast : scrollTime;
+        scrollTime =
+          fast === 0 ? scrollTime : graph.getWindowWidthTime() * fast;
       }
       if (hasVideo) {
         if (slow) {
@@ -1370,7 +1401,8 @@ function BlackboxLogViewer() {
     let logJumpForward = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
       if (fast != null) {
-        scrollTime = fast !== 0 ? graph.getWindowWidthTime() * fast : scrollTime;
+        scrollTime =
+          fast === 0 ? scrollTime : graph.getWindowWidthTime() * fast;
       }
       if (hasVideo) {
         if (slow) {
@@ -1402,18 +1434,6 @@ function BlackboxLogViewer() {
     let logJumpEnd = function () {
       setCurrentBlackboxTime(flightLog.getMaxTime());
       setGraphState(GRAPH_STATE_PAUSED);
-    };
-
-    let videoJumpStart = function () {
-      setVideoTime(0);
-      setGraphState(GRAPH_STATE_PAUSED);
-    };
-
-    let videoJumpEnd = function () {
-      if (video.duration) {
-        setVideoTime(video.duration);
-        setGraphState(GRAPH_STATE_PAUSED);
-      }
     };
 
     let logPlayPause = function () {
@@ -1495,21 +1515,22 @@ function BlackboxLogViewer() {
       invalidateGraph();
     }
     // Initialize user settings from prefs (replaces legacy UserSettingsDialog onLoad)
-    const userSettingsInitialized = (function () {
-        prefs.get("userSettings", function (item) {
-          if (item) {
-            globalThis.userSettings = { ...defaultUserSettings, ...item };
-          } else {
-            globalThis.userSettings = { ...defaultUserSettings };
-          }
-        });
-        return true;
-      })();
+    (function () {
+      prefs.get("userSettings", function (item) {
+        if (item) {
+          globalThis.userSettings = { ...defaultUserSettings, ...item };
+        } else {
+          globalThis.userSettings = { ...defaultUserSettings };
+        }
+      });
+    })();
 
-    document.querySelector(".open-graph-configuration-dialog")?.addEventListener("click", function (e) {
-      e.preventDefault();
-      globalThis.vueApp.graphConfigDialogOpen = true;
-    });
+    document
+      .querySelector(".open-graph-configuration-dialog")
+      ?.addEventListener("click", function (e) {
+        e.preventDefault();
+        globalThis.vueApp.graphConfigDialogOpen = true;
+      });
 
     // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
 
@@ -1530,21 +1551,27 @@ function BlackboxLogViewer() {
 
     // Export buttons wired via Vue AppToolbar
 
-    document.getElementById("btn-spectrum-export")?.addEventListener("click", function (e) {
-      exportSpectrumToCsv();
-      e.preventDefault();
-    });
+    document
+      .getElementById("btn-spectrum-export")
+      ?.addEventListener("click", function (e) {
+        exportSpectrumToCsv();
+        e.preventDefault();
+      });
 
-    document.getElementById("btn-spectrum-import")?.addEventListener("change", function (e) {
-      graph.getAnalyser().importSpectrumFromCSV(e.target.files);
-      e.preventDefault();
-      e.target.value = "";
-    });
+    document
+      .getElementById("btn-spectrum-import")
+      ?.addEventListener("change", function (e) {
+        graph.getAnalyser().importSpectrumFromCSV(e.target.files);
+        e.preventDefault();
+        e.target.value = "";
+      });
 
-    document.getElementById("btn-spectrum-clear")?.addEventListener("click", function (e) {
-      graph.getAnalyser().removeImportedSpectrums();
-      e.preventDefault();
-    });
+    document
+      .getElementById("btn-spectrum-clear")
+      ?.addEventListener("click", function (e) {
+        graph.getAnalyser().removeImportedSpectrums();
+        e.preventDefault();
+      });
 
     // GPX export wired via Vue AppToolbar
 
@@ -1554,11 +1581,17 @@ function BlackboxLogViewer() {
 
     function updateHeaderSize() {
       const topControls = document.querySelector(".video-top-controls");
-      if (!topControls) { return; }
+      if (!topControls) {
+        return;
+      }
       const newHeight = topControls.clientHeight - 20;
-      document.querySelectorAll(".log-graph, .log-graph-config, .log-seek-bar, .log-field-values").forEach((el) => {
-        el.style.top = `${newHeight}px`;
-      });
+      document
+        .querySelectorAll(
+          ".log-graph, .log-graph-config, .log-seek-bar, .log-field-values",
+        )
+        .forEach((el) => {
+          el.style.top = `${newHeight}px`;
+        });
       invalidateGraph();
     }
 
@@ -1569,7 +1602,9 @@ function BlackboxLogViewer() {
        * field is the actual pen to change, null means all pens within group
        */
 
-      if (graph == null && field == null) { return false; } // no pen specified, just exit
+      if (graph == null && field == null) {
+        return false;
+      } // no pen specified, just exit
 
       if (graph != null && field == null) {
         const gi = Number.parseInt(graph, 10);
@@ -1606,7 +1641,9 @@ function BlackboxLogViewer() {
        * field is the actual pen to change, null means all pens within group
        */
 
-      if (graph == null && field == null) { return false; } // no pen specified, just exit
+      if (graph == null && field == null) {
+        return false;
+      } // no pen specified, just exit
 
       if (graph != null && field == null) {
         const gi = Number.parseInt(graph, 10);
@@ -1615,7 +1652,9 @@ function BlackboxLogViewer() {
           if (configField.default != null) {
             configField.smoothing = configField.default.smoothing;
             configField.curve.power = configField.default.power;
-          } else { return false; }
+          } else {
+            return false;
+          }
         }
         return "<h4>Restored defaults for all pens</h4>";
       }
@@ -1646,7 +1685,9 @@ function BlackboxLogViewer() {
       const range = { min: 0, max: 10000 }; // actually in milliseconds!
       const scroll = 1000; // actually in milliseconds
 
-      if (graph == null && field == null) { return false; } // no pen specified, just exit
+      if (graph == null && field == null) {
+        return false;
+      } // no pen specified, just exit
 
       savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
@@ -1688,7 +1729,9 @@ function BlackboxLogViewer() {
        * delta is the direction false is down, true is up
        */
 
-      if (graph == null && field == null) { return false; } // no pen specified, just exit
+      if (graph == null && field == null) {
+        return false;
+      } // no pen specified, just exit
 
       savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
       const zoomScaleOut = 1.05,
@@ -1732,7 +1775,9 @@ function BlackboxLogViewer() {
       const range = { min: 0.05, max: 1.0 }; // 1.0 is actually 100 percent linear!
       const scroll = 0.05;
 
-      if (graph == null && field == null) { return false; } // no pen specified, just exit
+      if (graph == null && field == null) {
+        return false;
+      } // no pen specified, just exit
 
       savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
 
@@ -1785,37 +1830,41 @@ function BlackboxLogViewer() {
       invalidateGraph();
     }
 
-    document.querySelector(".log-graph-legend")?.addEventListener("mousedown", function (e) {
-      if (e.button !== 1) { return; } // middle mouse button only
+    document
+      .querySelector(".log-graph-legend")
+      ?.addEventListener("mousedown", function (e) {
+        if (e.button !== 1) {
+          return;
+        } // middle mouse button only
 
-      if (
-        e.target.classList.contains("graph-legend-group") ||
-        e.target.classList.contains("graph-legend-field")
-      ) {
-        const refreshRequired = restorePenDefaults(
-          activeGraphConfig.getGraphs(),
-          e.target.getAttribute("graph"),
-          e.target.getAttribute("field"),
-        );
-
-        if (refreshRequired) {
-          graph.refreshGraphConfig();
-          invalidateGraph();
-          mouseNotification.show(
-            document.querySelector(".log-graph"),
-            null,
-            null,
-            refreshRequired,
-            1000,
-            null,
-            "bottom-right",
-            0,
+        if (
+          e.target.classList.contains("graph-legend-group") ||
+          e.target.classList.contains("graph-legend-field")
+        ) {
+          const refreshRequired = restorePenDefaults(
+            activeGraphConfig.getGraphs(),
+            e.target.getAttribute("graph"),
+            e.target.getAttribute("field"),
           );
+
+          if (refreshRequired) {
+            graph.refreshGraphConfig();
+            invalidateGraph();
+            mouseNotification.show(
+              document.querySelector(".log-graph"),
+              null,
+              null,
+              refreshRequired,
+              1000,
+              null,
+              "bottom-right",
+              0,
+            );
+          }
+          e.preventDefault();
+          return;
         }
-        e.preventDefault();
-        return;
-      }
-    });
+      });
 
     function handleGraphCanvasWheel(e, delta) {
       const zoomStep = 10 + (e.altKey ? 15 : 0);
@@ -1849,7 +1898,12 @@ function BlackboxLogViewer() {
         refreshRequired = changePenExpo(graphs, graphIdx, fieldIdx, increase);
         e.preventDefault();
       } else if (e.ctrlKey) {
-        refreshRequired = changePenSmoothing(graphs, graphIdx, fieldIdx, increase);
+        refreshRequired = changePenSmoothing(
+          graphs,
+          graphIdx,
+          fieldIdx,
+          increase,
+        );
         e.preventDefault();
       }
 
@@ -1869,29 +1923,36 @@ function BlackboxLogViewer() {
       }
     }
 
-    document.addEventListener("wheel", function (e) {
-      if (e.target.classList.contains("no-wheel")) {
-        e.preventDefault();
-        return;
-      }
+    document.addEventListener(
+      "wheel",
+      function (e) {
+        if (e.target.classList.contains("no-wheel")) {
+          e.preventDefault();
+          return;
+        }
 
-      if (graph && !e.target.closest(".modal")) {
-        let rawDelta = 0;
-        if (e.deltaY < 0) { rawDelta = 1; }
-        else if (e.deltaY > 0) { rawDelta = -1; }
-        const delta = Math.max(-1, Math.min(1, rawDelta));
-        if (delta !== 0) {
-          if (e.target.id === "graphCanvas") {
-            handleGraphCanvasWheel(e, delta);
-            return;
+        if (graph && !e.target.closest(".modal")) {
+          let rawDelta = 0;
+          if (e.deltaY < 0) {
+            rawDelta = 1;
+          } else if (e.deltaY > 0) {
+            rawDelta = -1;
           }
-          if (e.target.classList.contains("field-quick-adjust")) {
-            handleFieldQuickAdjustWheel(e, delta);
-            return;
+          const delta = Math.max(-1, Math.min(1, rawDelta));
+          if (delta !== 0) {
+            if (e.target.id === "graphCanvas") {
+              handleGraphCanvasWheel(e, delta);
+              return;
+            }
+            if (e.target.classList.contains("field-quick-adjust")) {
+              handleFieldQuickAdjustWheel(e, delta);
+              return;
+            }
           }
         }
-      }
-    }, { passive: false });
+      },
+      { passive: false },
+    );
 
     function handleDigitKey(e) {
       const id = Number.parseInt(e.code.slice(5), 10);
@@ -1906,19 +1967,15 @@ function BlackboxLogViewer() {
         } else {
           onSaveWorkspace(id, "Unnamed");
         }
-      } else if (!e.shiftKey) {
-        // retrieve time from bookmark
-        if (bookmarkTimes[id] != null) {
-          setCurrentBlackboxTime(bookmarkTimes[id]);
-          invalidateGraph();
-        }
-      } else {
+      } else if (e.shiftKey) {
         // store time to bookmark
         if (id === 0) {
           // Special Case : Shift Alt 0 clears all bookmarks
           bookmarkTimes = [];
         } else {
-          if (bookmarkTimes == null) { bookmarkTimes = []; }
+          if (bookmarkTimes == null) {
+            bookmarkTimes = [];
+          }
           if (bookmarkTimes[id] == null) {
             bookmarkTimes[id] = currentBlackboxTime;
           } else {
@@ -1926,6 +1983,12 @@ function BlackboxLogViewer() {
           }
         }
         invalidateGraph();
+      } else {
+        // retrieve time from bookmark
+        if (bookmarkTimes[id] != null) {
+          setCurrentBlackboxTime(bookmarkTimes[id]);
+          invalidateGraph();
+        }
       }
     }
 
@@ -1989,7 +2052,10 @@ function BlackboxLogViewer() {
             } else {
               hasAnalyserFullscreen = false;
             }
-            html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
+            html.classList.toggle(
+              "has-analyser-fullscreen",
+              hasAnalyserFullscreen,
+            );
             graph.setAnalyser(hasAnalyserFullscreen);
             invalidateGraph();
           }
@@ -2024,22 +2090,28 @@ function BlackboxLogViewer() {
             } else {
               setGraphZoom(GRAPH_MIN_ZOOM, true);
             }
-          } catch (err) {
-            console.log("Workspace toggle feature not functioning");
+          } catch {
+            // Intentionally ignored — workspace toggle gracefully degrades when graph state is incomplete
           }
           e.preventDefault();
           break;
         case "KeyS":
           try {
             if (!shifted) {
-              toggleOverrideStatus("graphSmoothOverride", "has-smoothing-override");
+              toggleOverrideStatus(
+                "graphSmoothOverride",
+                "has-smoothing-override",
+              );
             } else if (e.altKey) {
               makeScreenshot();
             } else if (e.shiftKey) {
-              onSaveWorkspace(activeWorkspace, workspaceGraphConfigs[activeWorkspace].title);
+              onSaveWorkspace(
+                activeWorkspace,
+                workspaceGraphConfigs[activeWorkspace].title,
+              );
             }
-          } catch (err) {
-            console.log("Smoothing override toggle feature not functioning");
+          } catch {
+            // Intentionally ignored — smoothing/screenshot/save gracefully degrades when graph state is incomplete
           }
           e.preventDefault();
           break;
@@ -2048,8 +2120,8 @@ function BlackboxLogViewer() {
             if (!shifted) {
               toggleOverrideStatus("graphExpoOverride", "has-expo-override");
             }
-          } catch (err) {
-            console.log("Expo override toggle feature not functioning");
+          } catch {
+            // Intentionally ignored — expo override gracefully degrades when graph state is incomplete
           }
           e.preventDefault();
           break;
@@ -2058,8 +2130,8 @@ function BlackboxLogViewer() {
             if (!shifted) {
               toggleOverrideStatus("graphGridOverride", "has-grid-override");
             }
-          } catch (err) {
-            console.log("Grid override toggle feature not functioning");
+          } catch {
+            // Intentionally ignored — grid override gracefully degrades when graph state is incomplete
           }
           e.preventDefault();
           break;
@@ -2117,21 +2189,19 @@ function BlackboxLogViewer() {
         e.target.blur();
       }
       // keyboard controls are disabled on modal dialog boxes and text entry fields
-      if (
-        graph &&
-        e.target.type !== "text" &&
-        !e.target.closest(".modal")
-      ) {
+      if (graph && e.target.type !== "text" && !e.target.closest(".modal")) {
         if (e.code.startsWith("Digit")) {
           try {
             handleDigitKey(e);
-          } catch (err) {
-            console.log("Workspace feature not functioning");
+          } catch {
+            // Intentionally ignored — workspace feature gracefully degrades when graph state is incomplete
           }
           e.preventDefault();
           return;
         }
-        if (handleLetterKey(e, shifted)) { return; }
+        if (handleLetterKey(e, shifted)) {
+          return;
+        }
         handleNavigationKey(e);
       }
     });
@@ -2139,15 +2209,6 @@ function BlackboxLogViewer() {
     video.addEventListener("loadedmetadata", updateCanvasSize);
     video.addEventListener("error", reportVideoError);
     video.addEventListener("loadeddata", videoLoaded);
-
-    const percentageFormat = {
-      to: function (value) {
-        return `${value.toFixed(0)}%`;
-      },
-      from: function (value) {
-        return Number.parseFloat(value);
-      },
-    };
 
     // Speed/Zoom sliders and navbar toggle wired via Vue
 
@@ -2287,15 +2348,29 @@ function BlackboxLogViewer() {
     that.toggleGrid = function () {
       toggleOverrideStatus("graphGridOverride", "has-grid-override");
     };
-    that.setPlaybackRate = function (rate) { setPlaybackRate(rate, false); };
-    that.setGraphZoom = function (zoom) { setGraphZoom(zoom, false); };
-    that.logSyncHere = function () { logSyncHere(); };
-    that.logSyncBack = function () { logSyncBack(); };
-    that.logSyncForward = function () { logSyncForward(); };
-    that.logSmartSync = function () { logSmartSync(); };
+    that.setPlaybackRate = function (rate) {
+      setPlaybackRate(rate, false);
+    };
+    that.setGraphZoom = function (zoom) {
+      setGraphZoom(zoom, false);
+    };
+    that.logSyncHere = function () {
+      logSyncHere();
+    };
+    that.logSyncBack = function () {
+      logSyncBack();
+    };
+    that.logSyncForward = function () {
+      logSyncForward();
+    };
+    that.logSmartSync = function () {
+      logSmartSync();
+    };
     that.setVideoOffsetValue = function (val) {
-      const offset = parseFloat(val);
-      if (!isNaN(offset)) setVideoOffset(offset, true);
+      const offset = Number.parseFloat(val);
+      if (!Number.isNaN(offset)) {
+        setVideoOffset(offset, true);
+      }
     };
     that.setGraphTime = function (timeStr) {
       let newTime = stringTimetoMsec(timeStr);
@@ -2329,7 +2404,9 @@ function BlackboxLogViewer() {
   this.loadFiles = loadFiles;
   this.invalidateGraph = invalidateGraph;
   Object.defineProperty(this, "flightLog", { get: () => flightLog });
-  Object.defineProperty(this, "activeGraphConfig", { get: () => activeGraphConfig });
+  Object.defineProperty(this, "activeGraphConfig", {
+    get: () => activeGraphConfig,
+  });
   this.newGraphConfig = function (newConfig, redrawChart) {
     newGraphConfig(newConfig, redrawChart);
   };
@@ -2382,10 +2459,14 @@ function BlackboxLogViewer() {
     logJumpEnd();
   };
   this.videoJumpStart = function () {
-    videoJumpStart();
+    setVideoTime(0);
+    setGraphState(GRAPH_STATE_PAUSED);
   };
   this.videoJumpEnd = function () {
-    videoJumpEnd();
+    if (video.duration) {
+      setVideoTime(video.duration);
+      setGraphState(GRAPH_STATE_PAUSED);
+    }
   };
   this.openNewWindow = function () {
     createNewBlackboxWindow();
@@ -2413,7 +2494,9 @@ function BlackboxLogViewer() {
 // Close the dropdowns if not clicking a descendant of the dropdown
 document.addEventListener("click", function (e) {
   if (!e.target.closest(".dropdown")) {
-    document.querySelectorAll(".dropdown.open").forEach((el) => el.classList.remove("open"));
+    document
+      .querySelectorAll(".dropdown.open")
+      .forEach((el) => el.classList.remove("open"));
   }
 });
 

@@ -1,5 +1,5 @@
 <template>
-  <li class="log-playback-panel">
+  <div class="toolbar-panel log-playback-panel">
     <h4>Playback</h4>
     <div class="flex items-center gap-0.5">
       <UButton
@@ -61,7 +61,7 @@
         @click="$emit('video-jump-end')"
       />
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup>

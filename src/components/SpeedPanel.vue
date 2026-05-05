@@ -1,5 +1,5 @@
 <template>
-  <li class="log-playback-rate-panel">
+  <div class="toolbar-panel log-playback-rate-panel">
     <h4>Speed</h4>
     <div class="flex items-center gap-1">
       <USlider
@@ -15,7 +15,7 @@
         {{ playbackStore.playbackRate }}%
       </UBadge>
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup>

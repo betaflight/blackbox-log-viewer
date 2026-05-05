@@ -1,6 +1,6 @@
 <template>
   <!-- View panel -->
-  <li class="log-view-panel">
+  <div class="toolbar-panel log-view-panel">
     <h4>View</h4>
     <div class="flex items-center gap-0.5">
       <UButton
@@ -28,9 +28,9 @@
         @click="$emit('toggle-table')"
       />
     </div>
-  </li>
+  </div>
   <!-- Overlay panel -->
-  <li class="log-overlay-panel">
+  <div class="toolbar-panel log-overlay-panel">
     <h4>Overlay</h4>
     <div class="flex items-center gap-0.5">
       <UButton
@@ -74,7 +74,7 @@
         @click="$emit('toggle-map')"
       />
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup>
