@@ -307,6 +307,7 @@ const emit = defineEmits(["save"]);
 
 // Deep-clone settings into local state when dialog opens or settings change
 function cloneSettings(src) {
+  // NOSONAR: structuredClone fails on Vue reactive proxies (DataCloneError)
   return JSON.parse(JSON.stringify(src));
 }
 
@@ -321,7 +322,9 @@ watch(
 
 // Re-clone when dialog opens to pick up any external changes
 watch(open, (val) => {
-  if (val) local.value = cloneSettings(props.settings);
+  if (val) {
+    local.value = cloneSettings(props.settings);
+  }
 });
 
 // Mixer helpers
@@ -357,7 +360,9 @@ const darkModeOptions = [
 
 function onLogoChange(e) {
   const file = e.target.files?.[0];
-  if (!file) return;
+  if (!file) {
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (ev) => {
     local.value.watermark.logo = ev.target.result;

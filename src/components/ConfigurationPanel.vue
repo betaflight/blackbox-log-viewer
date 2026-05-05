@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-show="graphStore.hasConfig"
-    class="overflow-y-auto p-4 bg-elevated"
-  >
+  <div v-show="graphStore.hasConfig" class="overflow-y-auto p-4 bg-elevated">
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-semibold">Configuration</h3>
       <UInput
@@ -15,6 +12,12 @@
     </div>
 
     <table class="w-full text-sm">
+      <thead class="sr-only">
+        <tr>
+          <th>Parameter</th>
+          <th>Value</th>
+        </tr>
+      </thead>
       <tbody>
         <tr
           v-for="param in filteredParams"
@@ -47,7 +50,9 @@ const props = defineProps({
 const search = ref("");
 
 const filteredParams = computed(() => {
-  if (!search.value) return props.params;
+  if (!search.value) {
+    return props.params;
+  }
   const q = search.value.toLowerCase();
   return props.params.filter(
     (p) =>

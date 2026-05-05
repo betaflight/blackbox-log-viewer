@@ -53,7 +53,7 @@ const INNER_BOUNDS_HEIGHT = 480;
 const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
-  const that = this;
+  const that = this; // eslint-disable-line -- needed: IIFE below loses `this` context
 
   function supportsRequiredAPIs() {
     return (
@@ -1954,63 +1954,78 @@ function BlackboxLogViewer() {
       { passive: false },
     );
 
+    function handleWorkspaceKey(id, shiftKey) {
+      if (!shiftKey) {
+        if (workspaceGraphConfigs[id] != null) {
+          onSwitchWorkspace(workspaceGraphConfigs, id);
+        }
+      } else if (workspaceGraphConfigs[id]) {
+        onSaveWorkspace(id, workspaceGraphConfigs[id].title);
+      } else {
+        onSaveWorkspace(id, "Unnamed");
+      }
+    }
+
+    function handleBookmarkSave(id) {
+      if (id === 0) {
+        bookmarkTimes = [];
+      } else if (bookmarkTimes == null) {
+        bookmarkTimes = [];
+        bookmarkTimes[id] = currentBlackboxTime;
+      } else if (bookmarkTimes[id] == null) {
+        bookmarkTimes[id] = currentBlackboxTime;
+      } else {
+        bookmarkTimes[id] = null;
+      }
+      invalidateGraph();
+    }
+
     function handleDigitKey(e) {
       const id = Number.parseInt(e.code.slice(5), 10);
       if (!e.altKey) {
-        // Workspaces feature
-        if (!e.shiftKey) {
-          if (workspaceGraphConfigs[id] != null) {
-            onSwitchWorkspace(workspaceGraphConfigs, id);
-          }
-        } else if (workspaceGraphConfigs[id]) {
-          onSaveWorkspace(id, workspaceGraphConfigs[id].title);
-        } else {
-          onSaveWorkspace(id, "Unnamed");
-        }
+        handleWorkspaceKey(id, e.shiftKey);
       } else if (e.shiftKey) {
-        // store time to bookmark
-        if (id === 0) {
-          // Special Case : Shift Alt 0 clears all bookmarks
-          bookmarkTimes = [];
-        } else {
-          if (bookmarkTimes == null) {
-            bookmarkTimes = [];
-          }
-          if (bookmarkTimes[id] == null) {
-            bookmarkTimes[id] = currentBlackboxTime;
-          } else {
-            bookmarkTimes[id] = null;
-          }
-        }
+        handleBookmarkSave(id);
+      } else if (bookmarkTimes[id] != null) {
+        setCurrentBlackboxTime(bookmarkTimes[id]);
         invalidateGraph();
-      } else {
-        // retrieve time from bookmark
-        if (bookmarkTimes[id] != null) {
-          setCurrentBlackboxTime(bookmarkTimes[id]);
-          invalidateGraph();
-        }
       }
+    }
+
+    function handleAnalyserKey(shifted) {
+      if (!shifted) {
+        hasAnalyser =
+          activeGraphConfig.selectedFieldName != null ? !hasAnalyser : false;
+        graph.setDrawAnalyser(hasAnalyser);
+        html.classList.toggle("has-analyser", hasAnalyser);
+        prefs.set("hasAnalyser", hasAnalyser);
+      } else {
+        hasAnalyserFullscreen = hasAnalyser ? !hasAnalyserFullscreen : false;
+        html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
+        graph.setAnalyser(hasAnalyserFullscreen);
+      }
+      invalidateGraph();
     }
 
     function handleLetterKey(e, shifted) {
       switch (e.code) {
         case "KeyI":
           if (!shifted) {
-            if (videoExportInTime === currentBlackboxTime) {
-              setVideoInTime(false);
-            } else {
-              setVideoInTime(currentBlackboxTime);
-            }
+            setVideoInTime(
+              videoExportInTime === currentBlackboxTime
+                ? false
+                : currentBlackboxTime,
+            );
           }
           e.preventDefault();
           break;
         case "KeyO":
           if (!shifted) {
-            if (videoExportOutTime === currentBlackboxTime) {
-              setVideoOutTime(false);
-            } else {
-              setVideoOutTime(currentBlackboxTime);
-            }
+            setVideoOutTime(
+              videoExportOutTime === currentBlackboxTime
+                ? false
+                : currentBlackboxTime,
+            );
           }
           e.preventDefault();
           break;
@@ -2035,29 +2050,9 @@ function BlackboxLogViewer() {
           }
           break;
         case "KeyA":
+          handleAnalyserKey(shifted);
           if (!shifted) {
-            if (activeGraphConfig.selectedFieldName != null) {
-              hasAnalyser = !hasAnalyser;
-            } else {
-              hasAnalyser = false;
-            }
-            graph.setDrawAnalyser(hasAnalyser);
-            html.classList.toggle("has-analyser", hasAnalyser);
-            prefs.set("hasAnalyser", hasAnalyser);
-            invalidateGraph();
             e.preventDefault();
-          } else {
-            if (hasAnalyser) {
-              hasAnalyserFullscreen = !hasAnalyserFullscreen;
-            } else {
-              hasAnalyserFullscreen = false;
-            }
-            html.classList.toggle(
-              "has-analyser-fullscreen",
-              hasAnalyserFullscreen,
-            );
-            graph.setAnalyser(hasAnalyserFullscreen);
-            invalidateGraph();
           }
           break;
         case "KeyH":

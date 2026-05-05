@@ -286,12 +286,14 @@ const BLACKLISTED_FIELDS = {
   "setpoint[2]": true,
   "setpoint[3]": true,
 };
-const ARRAY_FIELD_PATTERN = /^(.+)\[[0-9]+\]$/;
+const ARRAY_FIELD_PATTERN = /^(.+)\[\d+\]$/;
 
 function collectFieldsFromLog(fieldNames, result, seen) {
   let lastRoot = null;
   for (const name of fieldNames) {
-    if (BLACKLISTED_FIELDS[name]) continue;
+    if (BLACKLISTED_FIELDS[name]) {
+      continue;
+    }
     const m = name.match(ARRAY_FIELD_PATTERN);
     if (m && m[1] !== lastRoot) {
       lastRoot = m[1];
@@ -320,7 +322,9 @@ function collectFieldsFromConfig(graphConfig, result, seen) {
 
 // Build the offered field names list
 function buildOfferedFields() {
-  if (!props.flightLog) return;
+  if (!props.flightLog) {
+    return;
+  }
 
   const fieldNames = props.flightLog.getMainFieldNames();
   const result = [];
@@ -337,7 +341,9 @@ function buildOfferedFields() {
 }
 
 function buildExampleGraphs() {
-  if (!props.flightLog) return;
+  if (!props.flightLog) {
+    return;
+  }
   const examples = GraphConfig.getExampleGraphConfigs(props.flightLog);
   examples.unshift({
     label: "Custom graph",
@@ -348,7 +354,7 @@ function buildExampleGraphs() {
 }
 
 function cloneGraphs(graphs) {
-  return JSON.parse(JSON.stringify(graphs));
+  return structuredClone(graphs);
 }
 
 // Convert internal graph config to the format expected by legacy code
@@ -388,8 +394,9 @@ function friendlyName(fieldName) {
 }
 
 function getDefaults(fieldName) {
-  if (!props.flightLog)
+  if (!props.flightLog) {
     return { smoothing: 0, power: 1, MinMax: { min: -500, max: 500 } };
+  }
   const smoothing = GraphConfig.getDefaultSmoothingForField(
     props.flightLog,
     fieldName,
@@ -403,7 +410,7 @@ function formatSmoothing(field) {
 }
 
 function parseSmoothing(field, val) {
-  field.smoothing = parseInt(val) * 100;
+  field.smoothing = Number.parseInt(val) * 100;
 }
 
 function formatExpo(field) {
@@ -411,20 +418,29 @@ function formatExpo(field) {
 }
 
 function parseExpo(field, val) {
-  if (!field.curve) field.curve = {};
-  field.curve.power = parseInt(val) / 100;
+  if (!field.curve) {
+    field.curve = {};
+  }
+  field.curve.power = Number.parseInt(val) / 100;
+}
+
+function ensureCurveMinMax(field) {
+  if (!field.curve) {
+    field.curve = {};
+  }
+  if (!field.curve.MinMax) {
+    field.curve.MinMax = {};
+  }
 }
 
 function setMin(field, val) {
-  if (!field.curve) field.curve = {};
-  if (!field.curve.MinMax) field.curve.MinMax = {};
-  field.curve.MinMax.min = parseFloat(val);
+  ensureCurveMinMax(field);
+  field.curve.MinMax.min = Number.parseFloat(val);
 }
 
 function setMax(field, val) {
-  if (!field.curve) field.curve = {};
-  if (!field.curve.MinMax) field.curve.MinMax = {};
-  field.curve.MinMax.max = parseFloat(val);
+  ensureCurveMinMax(field);
+  field.curve.MinMax.max = Number.parseFloat(val);
 }
 
 function resetMin(field) {
@@ -438,7 +454,9 @@ function resetMax(field) {
 }
 
 function onFieldChange(graph, field) {
-  if (!field.name || !props.flightLog || !props.graphConfig) return;
+  if (!field.name || !props.flightLog || !props.graphConfig) {
+    return;
+  }
 
   // Check if this is a group field that expands
   const expanded = props.graphConfig.extendFields(props.flightLog, {
@@ -493,7 +511,9 @@ function removeField(graph, fIdx) {
   graph.fields.splice(fIdx, 1);
   if (graph.fields.length === 0) {
     const gIdx = localGraphs.value.indexOf(graph);
-    if (gIdx !== -1) localGraphs.value.splice(gIdx, 1);
+    if (gIdx !== -1) {
+      localGraphs.value.splice(gIdx, 1);
+    }
   }
   emitUpdate();
 }
@@ -522,7 +542,9 @@ function addExampleGraph(example) {
     height: example.height || 1,
     fields,
   });
-  if (example.label !== "Custom graph") emitUpdate();
+  if (example.label !== "Custom graph") {
+    emitUpdate();
+  }
 }
 
 function emitUpdate() {
@@ -542,6 +564,24 @@ function onCancel() {
   open.value = false;
 }
 
+function cloneGraphToLocal(g) {
+  const fields = [];
+  for (const f of g.fields) {
+    if (!props.flightLog) {
+      continue;
+    }
+    const expanded = props.graphConfig.extendFields(props.flightLog, f);
+    for (const ef of expanded) {
+      const c =
+        ef.color && ef.color !== -1
+          ? ef.color
+          : palette[fields.length % palette.length].color;
+      fields.push(makeField(ef.name, ef, c));
+    }
+  }
+  return { label: g.label || "", height: g.height || 1, fields };
+}
+
 // Initialize when dialog opens
 watch(open, (val) => {
   if (!val) {
@@ -552,24 +592,7 @@ watch(open, (val) => {
 
   // Clone current graphs into local state
   if (props.graphConfig) {
-    const graphs = props.graphConfig.getGraphs();
-    const cloned = [];
-    for (const g of graphs) {
-      const fields = [];
-      for (const f of g.fields) {
-        if (!props.flightLog) continue;
-        const expanded = props.graphConfig.extendFields(props.flightLog, f);
-        for (const ef of expanded) {
-          const c =
-            ef.color && ef.color !== -1
-              ? ef.color
-              : palette[fields.length % palette.length].color;
-          fields.push(makeField(ef.name, ef, c));
-        }
-      }
-      cloned.push({ label: g.label || "", height: g.height || 1, fields });
-    }
-    localGraphs.value = cloned;
+    localGraphs.value = props.graphConfig.getGraphs().map(cloneGraphToLocal);
     prevConfig.value = convertToConfig();
   }
 });

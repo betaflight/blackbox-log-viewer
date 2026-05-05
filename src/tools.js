@@ -351,20 +351,20 @@ function getOrCreateNotifElem(parentElem, messageClass, message, timeout) {
 }
 
 function computeAlignedLeft(align, targetWidth, popupWidth, margin) {
-  if (align.indexOf("right") !== -1) {
+  if (align.includes("right")) {
     return targetWidth - (popupWidth + margin);
   }
-  if (align.indexOf("center") !== -1) {
+  if (align.includes("center")) {
     return targetWidth / 2 - (popupWidth + margin) / 2;
   }
   return margin;
 }
 
 function computeAlignedTop(align, targetHeight, popupHeight, margin) {
-  if (align.indexOf("bottom") !== -1) {
+  if (align.includes("bottom")) {
     return targetHeight - (popupHeight + margin);
   }
-  if (align.indexOf("middle") !== -1) {
+  if (align.includes("middle")) {
     return targetHeight / 2 - (popupHeight + margin) / 2;
   }
   return margin;

@@ -11,7 +11,7 @@ const PLAYBACK_RATE_STEP = 5;
 export const usePlaybackStore = defineStore("playback", () => {
   const graphState = ref(GRAPH_STATE_PAUSED);
   const playbackRate = ref(PLAYBACK_DEFAULT_RATE);
-  const videoOffset = ref(0.0);
+  const videoOffset = ref(0);
   const videoExportInTime = ref(false);
   const videoExportOutTime = ref(false);
 
