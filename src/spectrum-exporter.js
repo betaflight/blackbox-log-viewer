@@ -11,13 +11,11 @@
  * @param {ExportOptions} [opts={}]
  */
 export function SpectrumExporter(fftData, opts = {}) {
-  opts = _.merge(
-    {
-      columnDelimiter: ",",
-      quoteStrings: true,
-    },
-    opts,
-  );
+  opts = {
+    columnDelimiter: ",",
+    quoteStrings: true,
+    ...opts,
+  };
 
   /**
    * @param {function} success is a callback triggered when export is done

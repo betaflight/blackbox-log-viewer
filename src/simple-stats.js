@@ -1,24 +1,15 @@
 export function SimpleStats(flightLog) {
-  const frames = _(
-      flightLog.getChunksInTimeRange(
-        flightLog.getMinTime(),
-        flightLog.getMaxTime(),
-      ),
-    )
-      .map((chunk) => chunk.frames)
-      .flatten()
-      .value(),
-    fields = _.map(flightLog.getMainFieldNames(), (f) => {
-      // fix typo. potential bug in either FW or BBE
-      if (f === "BaroAlt") {
-        return "baroAlt";
-      } else {
-        return f;
-      }
-    });
+  const chunks = flightLog.getChunksInTimeRange(
+    flightLog.getMinTime(),
+    flightLog.getMaxTime(),
+  );
+  const frames = chunks.flatMap((chunk) => chunk.frames);
+  const fields = flightLog.getMainFieldNames().map((f) =>
+    f === "BaroAlt" ? "baroAlt" : f,
+  );
 
   const getMinMaxMean = (fieldName) => {
-    const index = _.findIndex(fields, (f) => f === fieldName);
+    const index = fields.indexOf(fieldName);
     if (
       index === -1 ||
       !frames.length ||
@@ -27,13 +18,19 @@ export function SimpleStats(flightLog) {
     ) {
       return undefined;
     }
-    const result = _.mapValues({
-      min: _.minBy(frames, (f) => f[index])[index],
-      max: _.maxBy(frames, (f) => f[index])[index],
-      mean: _.meanBy(frames, (f) => f[index]),
-    });
-    result["name"] = fieldName;
-    return result;
+    let min = Infinity, max = -Infinity, sum = 0;
+    for (const f of frames) {
+      const v = f[index];
+      if (v < min) min = v;
+      if (v > max) max = v;
+      sum += v;
+    }
+    return {
+      name: fieldName,
+      min,
+      max,
+      mean: sum / frames.length,
+    };
   };
 
   const template = {
@@ -49,7 +46,9 @@ export function SimpleStats(flightLog) {
   };
 
   function calculate() {
-    return _.mapValues(template, (f) => f.call());
+    return Object.fromEntries(
+      Object.entries(template).map(([key, fn]) => [key, fn()]),
+    );
   }
 
   return {

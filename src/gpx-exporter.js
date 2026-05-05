@@ -7,14 +7,12 @@ export function GpxExporter(flightLog) {
    * @param {function} success is a callback triggered when export is done
    */
   function dump(success) {
-    let frames = _(
-        flightLog.getChunksInTimeRange(
+    let frames = flightLog
+        .getChunksInTimeRange(
           flightLog.getMinTime(),
           flightLog.getMaxTime(),
-        ),
-      )
-        .map((chunk) => chunk.frames)
-        .value(),
+        )
+        .map((chunk) => chunk.frames),
       worker = new Worker("/js/webworkers/gpx-export-worker.js");
 
     worker.onmessage = (event) => {
