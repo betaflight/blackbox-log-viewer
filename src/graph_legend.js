@@ -1,5 +1,8 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 
+const ICON_EYE = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_EYE_OFF = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>';
+
 export function GraphLegend(
   targetElem,
   config,
@@ -37,7 +40,7 @@ export function GraphLegend(
       let fieldList = graphDiv.querySelector("ul");
 
       graphTitle.textContent = graph.label;
-      graphTitle.insertAdjacentHTML("afterbegin", '<span class="legend-collapse-icon i-lucide-minus w-4 h-4 inline-block align-middle mr-1"></span>');
+      graphTitle.insertAdjacentHTML("afterbegin", '<span class="legend-collapse-icon" style="margin-right:0.3em"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></span>');
 
       for (j = 0; j < graph.fields.length; j++) {
         let field = graph.fields[j];
@@ -53,14 +56,12 @@ export function GraphLegend(
         let settingsElem = createElement(
           `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`,
         );
-        let visibilityIcon = config.isGraphFieldHidden(i, j)
-          ? "i-lucide-eye-off"
-          : "i-lucide-eye";
-        let visibilityClass = config.isGraphFieldHidden(i, j)
+        let isHidden = config.isGraphFieldHidden(i, j);
+        let visibilityClass = isHidden
           ? "legend-eye-closed"
           : "legend-eye-open";
         let visibilityElem = createElement(
-          `<span class="${visibilityClass} graph-legend-field-visibility" graph="${i}" field="${j}"><span class="${visibilityIcon} w-4 h-4 inline-block align-middle"></span></span>`,
+          `<span class="${visibilityClass} graph-legend-field-visibility" graph="${i}" field="${j}">${isHidden ? ICON_EYE_OFF : ICON_EYE}</span>`,
         );
         li.appendChild(nameElem);
         li.appendChild(visibilityElem);
@@ -194,15 +195,14 @@ export function GraphLegend(
         config.toggleGraphField(graphIndex, fieldIndex);
         onHighlightChange();
 
-        const icon = this.querySelector("span");
         if (config.isGraphFieldHidden(graphIndex, fieldIndex)) {
           this.classList.remove("legend-eye-open");
           this.classList.add("legend-eye-closed");
-          icon?.classList.replace("i-lucide-eye", "i-lucide-eye-off");
+          this.innerHTML = ICON_EYE_OFF;
         } else {
           this.classList.add("legend-eye-open");
           this.classList.remove("legend-eye-closed");
-          icon?.classList.replace("i-lucide-eye-off", "i-lucide-eye");
+          this.innerHTML = ICON_EYE;
         }
 
         e.preventDefault();
