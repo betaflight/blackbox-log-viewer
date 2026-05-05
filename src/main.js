@@ -629,7 +629,6 @@ function BlackboxLogViewer() {
 
   function setGraphState(newState) {
     graphState = newState;
-    const btnLogPlayPause = document.querySelector(".log-play-pause");
 
     lastRenderTime = false;
 
@@ -638,18 +637,10 @@ function BlackboxLogViewer() {
         if (hasVideo) {
           video.play();
         }
-        if (btnLogPlayPause) {
-          const span = btnLogPlayPause.querySelector("span");
-          if (span) span.className = "glyphicon glyphicon-pause";
-        }
         break;
       case GRAPH_STATE_PAUSED:
         if (hasVideo) {
           video.pause();
-        }
-        if (btnLogPlayPause) {
-          const span = btnLogPlayPause.querySelector("span");
-          if (span) span.className = "glyphicon glyphicon-play";
         }
         break;
     }

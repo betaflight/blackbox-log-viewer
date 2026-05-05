@@ -917,12 +917,21 @@ html.has-config .configuration-list {
   box-shadow: 0px 0px 2px white;
 }
 
-.graph-legend-field > .glyphicon-equalizer {
-  float: right;
-  margin-left: 0.7em;
+.legend-collapse-icon {
+  margin-right: 0.3em;
+}
+
+.legend-eye-open::before {
+  content: "👁";
+}
+
+.legend-eye-closed::before {
+  content: "👁";
+  opacity: 0.3;
 }
 
 .graph-legend-field-visibility {
+  cursor: pointer;
   float: right;
   margin-left: 0.7em;
 }
@@ -1110,17 +1119,6 @@ html.has-log .log-seek-bar {
   margin-top: 8px;
 }
 
-.log-workspace-panel .glyphicon {
-  opacity: 0.4;
-  transition: 250ms;
-  vertical-align: middle;
-  top: 0px;
-}
-
-.log-workspace-panel .glyphicon:hover {
-  opacity: 1;
-  transition: 0ms;
-}
 
 .log-workspace-panel .open .workspace-selector-editButton {
   display: none;

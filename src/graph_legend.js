@@ -37,7 +37,7 @@ export function GraphLegend(
       let fieldList = graphDiv.querySelector("ul");
 
       graphTitle.textContent = graph.label;
-      graphTitle.insertAdjacentHTML("afterbegin", '<span class="glyphicon glyphicon-minus"></span>');
+      graphTitle.insertAdjacentHTML("afterbegin", '<span class="legend-collapse-icon">−</span>');
 
       for (j = 0; j < graph.fields.length; j++) {
         let field = graph.fields[j];
@@ -53,11 +53,11 @@ export function GraphLegend(
         let settingsElem = createElement(
           `<div class="graph-legend-field-settings field-quick-adjust" name="${field.name}" graph="${i}" field="${j}"></div>`,
         );
-        let visibilityIcon = config.isGraphFieldHidden(i, j)
-          ? "glyphicon-eye-close"
-          : "glyphicon-eye-open";
+        let visibilityClass = config.isGraphFieldHidden(i, j)
+          ? "legend-eye-closed"
+          : "legend-eye-open";
         let visibilityElem = createElement(
-          `<span class="glyphicon ${visibilityIcon} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`,
+          `<span class="${visibilityClass} graph-legend-field-visibility" graph="${i}" field="${j}"></span>`,
         );
         li.appendChild(nameElem);
         li.appendChild(visibilityElem);
@@ -192,11 +192,11 @@ export function GraphLegend(
         onHighlightChange();
 
         if (config.isGraphFieldHidden(graphIndex, fieldIndex)) {
-          this.classList.remove("glyphicon-eye-open");
-          this.classList.add("glyphicon-eye-close");
+          this.classList.remove("legend-eye-open");
+          this.classList.add("legend-eye-closed");
         } else {
-          this.classList.add("glyphicon-eye-open");
-          this.classList.remove("glyphicon-eye-close");
+          this.classList.add("legend-eye-open");
+          this.classList.remove("legend-eye-closed");
         }
 
         e.preventDefault();
