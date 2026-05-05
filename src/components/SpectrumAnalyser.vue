@@ -33,7 +33,7 @@
       <div id="spectrumComparison" title="Spectrum comparison">
         <UButton id="btn-spectrum-export" size="xs" color="primary" label="Exp" title="Export spectrum to CSV" />
         <UButton size="xs" color="primary" label="Imp" title="Import spectrum from CSV" @click="triggerImport" />
-        <input type="file" id="btn-spectrum-import" accept=".csv" style="display:none" multiple/>
+        <input type="file" id="btn-spectrum-import" accept=".csv" class="hidden" multiple/>
         <UButton id="btn-spectrum-clear" size="xs" color="primary" label="Clr" title="Clear imported spectrums" />
       </div>
 

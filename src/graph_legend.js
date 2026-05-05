@@ -34,7 +34,7 @@ export function GraphLegend(
     for (i = 0; i < graphs.length; i++) {
       let graph = graphs[i];
       let graphDiv = createElement(
-        `<div class="graph-legend" id="${i}"><h3 class="graph-legend-group field-quick-adjust" graph="${i}"></h3><ul class="list-unstyled graph-legend-field-list"></ul></div>`,
+        `<div class="graph-legend" id="${i}"><h3 class="graph-legend-group field-quick-adjust" graph="${i}"></h3><ul class="list-none pl-0 graph-legend-field-list"></ul></div>`,
       );
       let graphTitle = graphDiv.querySelector("h3");
       let fieldList = graphDiv.querySelector("ul");

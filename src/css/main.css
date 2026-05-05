@@ -34,9 +34,6 @@ a.disabled {
   .log-workspace-panel {
     width: 200px;
   }
-  .dropdown-menu {
-    width: 200px;
-  }
   .workspace-selector-title {
     width: 130px;
   }
@@ -215,12 +212,6 @@ input.graph-time {
   text-align: right;
 }
 
-
-/* Replace Bootstrap .list-unstyled */
-.list-unstyled {
-  list-style: none;
-  padding-left: 0;
-}
 
 /* Replace Bootstrap .form-control */
 .form-control {
@@ -1060,12 +1051,6 @@ html.has-log .log-seek-bar {
   text-align: left;
 }
 
-.log-workspace-panel .caret {
-  float: right;
-  margin-top: 8px;
-}
-
-
 .log-workspace-panel .open .workspace-selector-editButton {
   display: none;
 }
@@ -1152,17 +1137,6 @@ html.has-log .video-top-controls {
   margin-top: 6px;
 }
 
-.noUi-horizontal .noUi-handle {
-  text-align: center;
-  padding: 3px;
-  width: fit-content;
-}
-
-.noUi-handle:after,
-.noUi-handle:before {
-  visibility: hidden;
-}
-
 .override-button-group button {
   width: 33%;
   padding-bottom: 8px;
@@ -1229,14 +1203,6 @@ progress {
   width: 100%;
   height: 20px;
 }
-.jumbotron {
-  padding: 15px;
-}
-
-.hiddenElement {
-  display: none;
-}
-
 .loading-message {
   padding-left: 30px;
   font-weight: bold;
@@ -1343,154 +1309,6 @@ html:not(.has-config) #status-bar .configuration-file-name {
 
 #status-bar div:last-child {
   float: right;
-}
-
-/***
-
-    IOS Style Checkboxes common code
-
-***/
-
-input[type="checkbox"].ios-switch {
-  position: absolute;
-  opacity: 0;
-}
-
-/* Normal Track */
-input[type="checkbox"].ios-switch + div {
-  vertical-align: middle;
-  width: 40px;
-  height: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  border-radius: 999px;
-  background-color: rgba(0, 0, 0, 0.1);
-  -webkit-transition-duration: 0.4s;
-  -webkit-transition-property: background-color, box-shadow;
-  box-shadow: inset 0 0 0 0 rgba(0, 0, 0, 0.4);
-  margin: 0 0 0 2.5em;
-  display: inherit;
-}
-
-/* Checked Track (Blue) */
-input[type="checkbox"].ios-switch:checked + div {
-  width: 40px;
-  background: #3b89ec 0 0;
-  border: 1px solid #0e62cd;
-  box-shadow: inset 0 0 0 10px rgba(59, 137, 259, 1);
-}
-
-/* Tiny Track */
-input[type="checkbox"].tinyswitch.ios-switch + div {
-  width: 34px;
-  height: 18px;
-}
-
-/* Big Track */
-input[type="checkbox"].bigswitch.ios-switch + div {
-  width: 50px;
-  height: 25px;
-}
-
-/* Green Track */
-input[type="checkbox"].green.ios-switch:checked + div,
-html.isCF input[type="checkbox"].ios-switch:checked + div {
-  background-color: var(--success-500);
-  border: 1px solid var(--success-600);
-  box-shadow: inset 0 0 0 10px var(--success-400);
-}
-
-/* Orange Track */
-input[type="checkbox"].orange.ios-switch:checked + div,
-html.isBF input[type="checkbox"].ios-switch:checked + div {
-  background-color: var(--primary-500);
-  border: 1px solid var(--primary-600);
-  box-shadow: inset 0 0 0 10px var(--primary-400);
-}
-
-/* Normal Knob */
-input[type="checkbox"].ios-switch + div > div {
-  float: left;
-  width: 18px;
-  height: 18px;
-  border-radius: inherit;
-  background: #ffffff;
-  -webkit-transition-timing-function: cubic-bezier(0.54, 1.85, 0.5, 1);
-  -webkit-transition-duration: 0.4s;
-  -webkit-transition-property: transform, background-color, box-shadow;
-  -moz-transition-timing-function: cubic-bezier(0.54, 1.85, 0.5, 1);
-  -moz-transition-duration: 0.4s;
-  -moz-transition-property: transform, background-color;
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(0, 0, 0, 0.4);
-  pointer-events: none;
-  margin-left: 0;
-}
-
-/* Checked Knob (Blue Style) */
-input[type="checkbox"].ios-switch:checked + div > div {
-  -webkit-transform: translate3d(20px, 0, 0);
-  -moz-transform: translate3d(20px, 0, 0);
-  background-color: var(--surface-0);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(8, 80, 172, 1);
-}
-
-/* Tiny Knob */
-input[type="checkbox"].tinyswitch.ios-switch + div > div {
-  width: 16px;
-  height: 16px;
-  margin-top: 1px;
-}
-
-/* Checked Tiny Knob (Blue Style) */
-input[type="checkbox"].tinyswitch.ios-switch:checked + div > div {
-  -webkit-transform: translate3d(16px, 0, 0);
-  -moz-transform: translate3d(16px, 0, 0);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(8, 80, 172, 1);
-}
-
-/* Big Knob */
-input[type="checkbox"].bigswitch.ios-switch + div > div {
-  width: 23px;
-  height: 23px;
-  margin-top: 1px;
-}
-
-/* Checked Big Knob (Blue Style) */
-input[type="checkbox"].bigswitch.ios-switch:checked + div > div {
-  -webkit-transform: translate3d(25px, 0, 0);
-  -moz-transform: translate3d(16px, 0, 0);
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(8, 80, 172, 1);
-}
-
-/* Green Knob */
-input[type="checkbox"].green.ios-switch:checked + div > div,
-html.isCF input[type="checkbox"].ios-switch:checked + div > div {
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(0, 162, 63, 1);
-}
-
-/* Orange Knob */
-input[type="checkbox"].orange.ios-switch:checked + div > div,
-html.isBF input[type="checkbox"].ios-switch:checked + div > div {
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(158, 100, 0, 1);
-}
-
-/* Blue Knob */
-input[type="checkbox"].blue.ios-switch:checked + div > div,
-html.isINAV input[type="checkbox"].ios-switch:checked + div > div {
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(8, 80, 172, 1);
 }
 
 html.isBF .config-graph h4 span:first-child,
