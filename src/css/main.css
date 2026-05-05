@@ -786,7 +786,7 @@ html.has-log .graph-row {
   position: fixed;
   top: 130px;
   width: calc(100% - 30px);
-  bottom: 80px;
+  bottom: 96px;
 }
 
 html.has-video .log-graph {
@@ -912,7 +912,7 @@ html.has-video .log-seek-bar,
 html.has-log .log-seek-bar {
   display: block;
   position: fixed;
-  bottom: 20px;
+  bottom: 32px;
   padding-left: 15px;
   padding-right: 15px;
 }
