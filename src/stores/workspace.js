@@ -14,18 +14,6 @@ export const useWorkspaceStore = defineStore("workspace", () => {
     workspaceGraphConfigs.value = configs;
   }
 
-  function addBookmark(time) {
-    bookmarkTimes.value.push(time);
-  }
-
-  function removeBookmark(index) {
-    bookmarkTimes.value.splice(index, 1);
-  }
-
-  function clearBookmarks() {
-    bookmarkTimes.value = [];
-  }
-
   const showDefaultMenu = ref(false);
 
   /** Get title for a workspace slot (1-9, 0) */
@@ -45,9 +33,6 @@ export const useWorkspaceStore = defineStore("workspace", () => {
     bookmarkTimes,
     setActiveWorkspace,
     setWorkspaceGraphConfigs,
-    addBookmark,
-    removeBookmark,
-    clearBookmarks,
     showDefaultMenu,
     getTitle,
     hasWorkspace,

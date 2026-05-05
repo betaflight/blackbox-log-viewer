@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const GRAPH_STATE_PAUSED = 0;
 const GRAPH_STATE_PLAY = 1;
@@ -12,11 +12,11 @@ export const usePlaybackStore = defineStore("playback", () => {
   const graphState = ref(GRAPH_STATE_PAUSED);
   const playbackRate = ref(PLAYBACK_DEFAULT_RATE);
   const videoOffset = ref(0);
-  const videoExportInTime = ref(false);
-  const videoExportOutTime = ref(false);
+  const videoExportInTime = ref(null);
+  const videoExportOutTime = ref(null);
 
-  const isPlaying = () => graphState.value === GRAPH_STATE_PLAY;
-  const isPaused = () => graphState.value === GRAPH_STATE_PAUSED;
+  const isPlaying = computed(() => graphState.value === GRAPH_STATE_PLAY);
+  const isPaused = computed(() => graphState.value === GRAPH_STATE_PAUSED);
 
   function play() {
     graphState.value = GRAPH_STATE_PLAY;

@@ -7,7 +7,7 @@ export const useLogStore = defineStore("log", () => {
   const currentBlackboxTime = ref(0);
   const hasLog = ref(false);
   const hasVideo = ref(false);
-  const videoURL = ref(false);
+  const videoURL = ref(null);
 
   const minTime = computed(() => flightLog.value?.getMinTime() ?? 0);
   const maxTime = computed(() => flightLog.value?.getMaxTime() ?? 0);

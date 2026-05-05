@@ -8,6 +8,7 @@
         color="neutral"
         icon="i-lucide-home"
         size="xs"
+        aria-label="View graph"
         title="View graph"
         @click="$emit('view-config')"
       />
@@ -16,6 +17,7 @@
         color="neutral"
         icon="i-lucide-info"
         size="xs"
+        aria-label="View log header"
         title="View log header (H)"
         @click="$emit('open-header')"
       />
@@ -24,6 +26,7 @@
         color="neutral"
         icon="i-lucide-table"
         size="xs"
+        aria-label="View table"
         title="View table (T)"
         @click="$emit('toggle-table')"
       />
@@ -38,6 +41,7 @@
         color="neutral"
         icon="i-lucide-film"
         size="xs"
+        aria-label="Video"
         title="Video"
         @click="$emit('toggle-video')"
       />
@@ -46,6 +50,7 @@
         color="neutral"
         icon="i-lucide-plane"
         size="xs"
+        aria-label="Craft"
         title="Craft"
         @click="$emit('toggle-craft')"
       />
@@ -54,6 +59,7 @@
         color="neutral"
         icon="i-lucide-gamepad-2"
         size="xs"
+        aria-label="Sticks"
         title="Sticks"
         @click="$emit('toggle-sticks')"
       />
@@ -62,6 +68,7 @@
         color="neutral"
         icon="i-lucide-bar-chart-3"
         size="xs"
+        aria-label="Analyser"
         title="Analyser (A)"
         @click="$emit('toggle-analyser')"
       />
@@ -70,6 +77,7 @@
         color="neutral"
         icon="i-lucide-map-pin"
         size="xs"
+        aria-label="Map"
         title="Map"
         @click="$emit('toggle-map')"
       />

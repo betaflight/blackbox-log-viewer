@@ -30,7 +30,7 @@
       <UButton
         variant="ghost"
         color="neutral"
-        :icon="playbackStore.isPlaying() ? 'i-lucide-pause' : 'i-lucide-play'"
+        :icon="playbackStore.isPlaying ? 'i-lucide-pause' : 'i-lucide-play'"
         size="xs"
         title="Play/Pause"
         @click="$emit('play-pause')"

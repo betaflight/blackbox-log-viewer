@@ -56,8 +56,10 @@ const filteredParams = computed(() => {
   const q = search.value.toLowerCase();
   return props.params.filter(
     (p) =>
-      p.name.toLowerCase().includes(q) ||
-      String(p.value).toLowerCase().includes(q),
+      (p.name ?? "").toLowerCase().includes(q) ||
+      String(p.value ?? "")
+        .toLowerCase()
+        .includes(q),
   );
 });
 </script>

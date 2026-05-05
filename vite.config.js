@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
+import { fileURLToPath, URL } from "node:url";
 import vue from "@vitejs/plugin-vue";
 import ui from "@nuxt/ui/vite";
-import path from "node:path";
 import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json";
 
@@ -123,10 +123,9 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      vue: path.resolve(
-        __dirname,
-        "node_modules/vue/dist/vue.esm-bundler.js",
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      vue: fileURLToPath(
+        new URL("./node_modules/vue/dist/vue.esm-bundler.js", import.meta.url),
       ),
     },
   },

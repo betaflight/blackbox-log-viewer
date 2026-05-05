@@ -26,18 +26,15 @@ export const useGraphStore = defineStore("graph", () => {
   const seekBarMode = ref("avgThrottle");
 
   function setGraphZoom(zoom) {
-    graphZoom.value = Math.max(
-      GRAPH_MIN_ZOOM,
-      Math.min(GRAPH_MAX_ZOOM, zoom),
-    );
+    graphZoom.value = Math.max(GRAPH_MIN_ZOOM, Math.min(GRAPH_MAX_ZOOM, zoom));
   }
 
   function quickZoomToggle(newZoom) {
     if (graphZoom.value === newZoom) {
-      graphZoom.value = lastGraphZoom.value;
+      setGraphZoom(lastGraphZoom.value);
     } else {
       lastGraphZoom.value = graphZoom.value;
-      graphZoom.value = newZoom;
+      setGraphZoom(newZoom);
     }
   }
 
