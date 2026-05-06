@@ -33,29 +33,20 @@ export function FlightLogVideoRenderer(
 ) {
   const { userSettings } = useSettingsStore();
 
-  let WORK_CHUNK_SIZE_FOCUSED = 8,
-    WORK_CHUNK_SIZE_UNFOCUSED = 32,
-    videoWriter,
-    canvas = document.createElement("canvas"),
-    stickCanvas = document.createElement("canvas"),
-    craftCanvas = document.createElement("canvas"),
-    analyserCanvas = document.createElement("canvas"),
-    stickCanvasLeft,
-    stickCanvasTop,
-    craftCanvasLeft,
-    craftCanvasTop,
-    analyserCanvasLeft,
-    analyserCanvasTop,
-    canvasContext = canvas.getContext("2d"),
-    frameCount,
-    frameDuration /* Duration of a frame in Blackbox's microsecond time units */,
-    frameTime,
-    frameIndex,
-    cancel = false,
-    workChunkSize = WORK_CHUNK_SIZE_FOCUSED,
-    hidden,
-    visibilityChange,
-    graph;
+  const WORK_CHUNK_SIZE_FOCUSED = 8;
+  const WORK_CHUNK_SIZE_UNFOCUSED = 32;
+  let videoWriter;
+  const canvas = document.createElement("canvas");
+  const stickCanvas = document.createElement("canvas");
+  const craftCanvas = document.createElement("canvas");
+  const analyserCanvas = document.createElement("canvas");
+  const canvasContext = canvas.getContext("2d");
+  let frameTime;
+  let frameIndex;
+  let cancel = false;
+  let workChunkSize = WORK_CHUNK_SIZE_FOCUSED;
+  let hidden;
+  let visibilityChange;
 
   // From https://developer.mozilla.org/en-US/docs/Web/Guide/User_experience/Using_the_Page_Visibility_API
   if (typeof document.hidden !== "undefined") {
@@ -261,7 +252,7 @@ export function FlightLogVideoRenderer(
 
   const options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
 
-  graph = new FlightLogGrapher(
+  const graph = new FlightLogGrapher(
     flightLog,
     logParameters.graphConfig,
     canvas,
@@ -271,14 +262,14 @@ export function FlightLogVideoRenderer(
     options,
   );
 
-  stickCanvasLeft = Number.parseInt(stickCanvas.style.left, 10) || 0;
-  stickCanvasTop = Number.parseInt(stickCanvas.style.top, 10) || 0;
+  const stickCanvasLeft = Number.parseInt(stickCanvas.style.left, 10) || 0;
+  const stickCanvasTop = Number.parseInt(stickCanvas.style.top, 10) || 0;
 
-  craftCanvasLeft = Number.parseInt(craftCanvas.style.left, 10) || 0;
-  craftCanvasTop = Number.parseInt(craftCanvas.style.top, 10) || 0;
+  const craftCanvasLeft = Number.parseInt(craftCanvas.style.left, 10) || 0;
+  const craftCanvasTop = Number.parseInt(craftCanvas.style.top, 10) || 0;
 
-  analyserCanvasLeft = Number.parseInt(analyserCanvas.style.left, 10) || 0;
-  analyserCanvasTop = Number.parseInt(analyserCanvas.style.top, 10) || 0;
+  const analyserCanvasLeft = Number.parseInt(analyserCanvas.style.left, 10) || 0;
+  const analyserCanvasTop = Number.parseInt(analyserCanvas.style.top, 10) || 0;
 
   if (!("inTime" in logParameters) || logParameters.inTime === false) {
     logParameters.inTime = flightLog.getMinTime();
@@ -288,10 +279,10 @@ export function FlightLogVideoRenderer(
     logParameters.outTime = flightLog.getMaxTime();
   }
 
-  frameDuration = 1000000 / videoOptions.frameRate;
+  const frameDuration = 1000000 / videoOptions.frameRate;
 
   // If the in -> out time is not an exact number of frames, we'll round the end time of the video to make it so:
-  frameCount = Math.round(
+  const frameCount = Math.round(
     (logParameters.outTime - logParameters.inTime) / frameDuration,
   );
 

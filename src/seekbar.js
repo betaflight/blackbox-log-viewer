@@ -28,37 +28,37 @@ function getCursorStyleWindow() {
 }
 
 export function SeekBar(canvas) {
-  let that = this,
-    //Times:
-    min,
-    max,
-    current,
-    currentWindow = 0,
-    //Activity to display on bar:
-    activityStrength,
-    activityTime,
-    //Whether a special event exists at the given time:
-    hasEvent,
-    //Expect to be plotting PWM-like data by default:
-    activityMin = 1000,
-    activityMax = 2000,
-    canvasContext = canvas.getContext("2d"),
-    background = document.createElement("canvas"),
-    backgroundContext = background.getContext("2d"),
-    inTime = false,
-    outTime = false,
-    backgroundValid = false,
-    dirtyRegion = false,
-    //Current time cursor:
-    CURSOR_WIDTH = 1,
-    // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
-    BAR_INSET = CURSOR_WIDTH;
+  const that = this;
+  //Times:
+  let min;
+  let max;
+  let current;
+  let currentWindow = 0;
+  //Activity to display on bar:
+  let activityStrength;
+  let activityTime;
+  //Whether a special event exists at the given time:
+  let hasEvent;
+  //Expect to be plotting PWM-like data by default:
+  let activityMin = 1000;
+  let activityMax = 2000;
+  const canvasContext = canvas.getContext("2d");
+  const background = document.createElement("canvas");
+  const backgroundContext = background.getContext("2d");
+  let inTime = false;
+  let outTime = false;
+  let backgroundValid = false;
+  let dirtyRegion = false;
+  //Current time cursor:
+  let CURSOR_WIDTH = 1;
+  // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
+  let BAR_INSET = CURSOR_WIDTH;
 
   this.onSeek = false;
 
   function seekToDOMPixel(x) {
-    let bounding = canvas.getBoundingClientRect(),
-      time;
+    const bounding = canvas.getBoundingClientRect();
+    let time;
 
     // Compensate for canvas being stretched on the page
     x = (x / (bounding.right - bounding.left)) * canvas.width;
@@ -318,9 +318,9 @@ export function SeekBar(canvas) {
     }
 
     //Draw cursor
-    let pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2),
-      cursorX = (current - min) / pixelTimeStep + BAR_INSET,
-      cursorWidth = 0;
+    const pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2);
+    const cursorX = (current - min) / pixelTimeStep + BAR_INSET;
+    let cursorWidth = 0;
 
     if (currentWindow != 0) {
       cursorWidth = currentWindow / 2 / pixelTimeStep;
