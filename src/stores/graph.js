@@ -32,6 +32,12 @@ export const useGraphStore = defineStore("graph", () => {
   // Each: { label, fields: [{ name, friendlyName, color, hidden }] }
   const legendValues = shallowRef({});
   // Map of fieldName → { value, settings }
+
+  // Analyser
+  const analyserLayout = shallowRef({ width: 0, height: 0, left: 0, top: 0 });
+  const spectrumShiftActive = ref(false);
+  const segmentLengthMax = ref(20);
+
   const isFullscreen = ref(false);
   const markerTime = ref(0);
   const seekBarMode = ref("avgThrottle");
@@ -71,6 +77,9 @@ export const useGraphStore = defineStore("graph", () => {
     legendTitle,
     legendGraphs,
     legendValues,
+    analyserLayout,
+    spectrumShiftActive,
+    segmentLengthMax,
     isFullscreen,
     markerTime,
     seekBarMode,

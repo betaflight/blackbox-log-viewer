@@ -230,24 +230,6 @@ html.has-sticks #stickCanvas {
   font-size: 3vw;
 }
 
-html.has-analyser-fullscreen.has-analyser
-  .analyser
-  input:not(.onlyFullScreenException) {
-  display: block;
-}
-
-html.has-analyser-fullscreen.has-analyser
-  .analyser
-  label:not(.onlyFullScreenException) {
-  display: block;
-}
-
-html.has-analyser-fullscreen.has-analyser
-  .analyser
-  div.onlyFullScreen:not(.onlyFullScreenException) {
-  display: block;
-}
-
 #analyser,
 #log-seek-bar {
   z-index: 10;
@@ -352,103 +334,27 @@ html.has-analyser-fullscreen.has-analyser
   height: 50px;
 }
 
-.analyser input#analyserMinPSD::-webkit-inner-spin-button,
-.analyser input#analyserMinPSD::-webkit-outer-spin-button,
-.analyser input#analyserMaxPSD::-webkit-inner-spin-button,
-.analyser input#analyserMaxPSD::-webkit-outer-spin-button,
-.analyser input#analyserLowLevelPSD::-webkit-inner-spin-button,
-.analyser input#analyserLowLevelPSD::-webkit-outer-spin-button,
-.analyser input#analyserSegmentLengthPowerAt2::-webkit-inner-spin-button,
-.analyser input#analyserSegmentLengthPowerAt2::-webkit-outer-spin-button {
-  -webkit-appearance: auto !important;
-  -moz-appearance: auto !important;
+.analyser .analyser-psd-input::-webkit-inner-spin-button,
+.analyser .analyser-psd-input::-webkit-outer-spin-button {
   appearance: auto !important;
   opacity: 1 !important;
   height: auto !important;
   width: auto !important;
 }
 
-.analyser input#analyserMaxPSD {
+.analyser .analyser-psd-input {
   width: 50px;
   height: 20px;
-  left: 0px;
-  top: 30px;
-}
-
-.analyser label#analyserMaxPSDLabel {
-  position: absolute;
-  color: var(--text-secondary);
-  left: 0px;
-  top: 30px;
-  font-size: 12px;
-}
-
-.analyser input#analyserMinPSD {
-  width: 50px;
-  height: 20px;
-  left: 0px;
-  top: 55px;
-}
-
-.analyser label#analyserMinPSDLabel {
-  position: absolute;
-  color: var(--text-secondary);
-  left: 0px;
-  top: 55px;
-  font-size: 12px;
-}
-
-.analyser input#analyserLowLevelPSD {
-  width: 50px;
-  height: 20px;
-  left: 0px;
-  top: 80px;
-}
-
-.analyser label#analyserLowLevelPSDLabel {
-  position: absolute;
-  color: var(--text-secondary);
-  left: 0px;
-  top: 80px;
-  font-size: 12px;
-}
-
-.analyser input#analyserSegmentLengthPowerAt2 {
-  width: 42px;
-  height: 20px;
-  left: 0px;
-  top: 42px;
-}
-
-.analyser label#analyserSegmentLengthPowerAt2Label {
-  position: absolute;
-  color: var(--text-secondary);
-  width: 50px;
-  height: 20px;
-  left: 0px;
-  top: 20px;
-}
-
-.analyser input.onlyFullScreen {
-  display: none;
   padding: 3px;
-  margin-right: 3px;
   z-index: 9;
   position: absolute;
 }
 
-.analyser label.onlyFullScreen {
-  display: none;
+.analyser .analyser-psd-label {
+  position: absolute;
+  color: var(--text-secondary);
+  z-index: 9;
   padding: 3px;
-  margin-right: 3px;
-  z-index: 9;
-  position: absolute;
-}
-
-.analyser div.onlyFullScreen {
-  display: none;
-  z-index: 9;
-  position: absolute;
 }
 
 .analyser,

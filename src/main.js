@@ -1508,29 +1508,19 @@ function BlackboxLogViewer() {
       showConfigFile(true);
     };
 
-    // Export buttons wired via Vue AppToolbar
-
-    document
-      .getElementById("btn-spectrum-export")
-      ?.addEventListener("click", function (e) {
-        exportSpectrumToCsv();
-        e.preventDefault();
-      });
-
-    document
-      .getElementById("btn-spectrum-import")
-      ?.addEventListener("change", function (e) {
-        graph.getAnalyser().importSpectrumFromCSV(e.target.files);
-        e.preventDefault();
-        e.target.value = "";
-      });
-
-    document
-      .getElementById("btn-spectrum-clear")
-      ?.addEventListener("click", function (e) {
-        graph.getAnalyser().removeImportedSpectrums();
-        e.preventDefault();
-      });
+    // Spectrum actions wired via Vue SpectrumAnalyser
+    this.spectrumExport = function () {
+      exportSpectrumToCsv();
+    };
+    this.spectrumImport = function (files) {
+      graph.getAnalyser()?.importSpectrumFromCSV(files);
+    };
+    this.spectrumClear = function () {
+      graph.getAnalyser()?.removeImportedSpectrums();
+    };
+    this.getAnalyser = function () {
+      return graph?.getAnalyser();
+    };
 
     // GPX export wired via Vue AppToolbar
 
