@@ -4,11 +4,11 @@
  * Supply keyPrefix if you want it automatically prepended to key names.
  */
 export function PrefStorage(keyPrefix) {
-  let LOCALSTORAGE = 0,
-    CHROME_STORAGE_LOCAL = 1,
-    MEMORY = 2,
-    mode,
-    memoryStorage = {};
+  const LOCALSTORAGE = 0;
+  const CHROME_STORAGE_LOCAL = 1;
+  const MEMORY = 2;
+  let mode;
+  const memoryStorage = {};
 
   /**
    * Fetch the value with the given name, calling the onGet handler (possibly asynchronously) with the retrieved

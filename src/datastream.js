@@ -101,8 +101,8 @@ ArrayDataStream.prototype.readSignedVB = function () {
 };
 
 ArrayDataStream.prototype.readString = function (length) {
-  let chars = new Array(length),
-    i;
+  const chars = new Array(length);
+  let i;
 
   for (i = 0; i < length; i++) {
     chars[i] = this.readChar();

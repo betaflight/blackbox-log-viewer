@@ -104,9 +104,9 @@ export function parseCommaSeparatedString(string, length) {
    * returns              if the string does not contain a comma, then the first integer/float/string is returned
    *                      else an Array is returned containing all the values up to the length (if specified)
    ***/
-  let parts = string.split(","),
-    result,
-    value;
+  const parts = string.split(",");
+  let result;
+  let value;
 
   length = length || parts.length; // we can force a length if we like
 
@@ -189,17 +189,15 @@ export function leftPad(string, pad, minLength) {
 
 export function formatTime(msec, displayMsec) {
   // modify function to allow negative times.
-  let ms, secs, mins, hours;
+  let ms = Math.round(Math.abs(msec));
 
-  ms = Math.round(Math.abs(msec));
-
-  secs = Math.floor(ms / 1000);
+  let secs = Math.floor(ms / 1000);
   ms %= 1000;
 
-  mins = Math.floor(secs / 60);
+  let mins = Math.floor(secs / 60);
   secs %= 60;
 
-  hours = Math.floor(mins / 60);
+  const hours = Math.floor(mins / 60);
   mins %= 60;
 
   return `${

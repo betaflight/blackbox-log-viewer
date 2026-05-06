@@ -306,8 +306,8 @@ export function FFTComplex(n, inverse) {
     t[2 * i + 1] = Math.sin(phase);
   }
 
-  let p = 4,
-    v = Math.floor(Math.sqrt(n));
+  let p = 4;
+  const v = Math.floor(Math.sqrt(n));
 
   while (n > 1) {
     while (n % p) {
