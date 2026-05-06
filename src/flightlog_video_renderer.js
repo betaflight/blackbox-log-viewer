@@ -139,13 +139,13 @@ export function FlightLogVideoRenderer(
       renderFrame = function () {
         graph.render(frameTime);
 
-        if (logParameters.hasSticks && Number.parseInt(userSettings.sticks.size) > 0)
+        if (logParameters.hasSticks && Number.parseInt(userSettings.sticks.size, 10) > 0)
           canvasContext.drawImage(stickCanvas, stickCanvasLeft, stickCanvasTop);
-        if (logParameters.hasCraft && Number.parseInt(userSettings.craft.size) > 0)
+        if (logParameters.hasCraft && Number.parseInt(userSettings.craft.size, 10) > 0)
           canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
         if (
           logParameters.hasAnalyser &&
-          Number.parseInt(userSettings.analyser.size) > 0
+          Number.parseInt(userSettings.analyser.size, 10) > 0
         )
           canvasContext.drawImage(
             analyserCanvas,

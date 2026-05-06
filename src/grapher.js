@@ -242,13 +242,13 @@ export function FlightLogGrapher(
 
   function drawWaterMark() {
     canvasContext.save();
-    canvasContext.globalAlpha = parseInt(options.watermark.transparency) / 100;
+    canvasContext.globalAlpha = parseInt(options.watermark.transparency, 10) / 100;
     canvasContext.drawImage(
       watermarkLogo,
-      (parseInt(options.watermark.left) / 100) * canvas.width,
-      (parseInt(options.watermark.top) / 100) * canvas.height,
-      (parseInt(options.watermark.size) / 100) * watermarkLogo.width,
-      (parseInt(options.watermark.size) / 100) * watermarkLogo.height,
+      (parseInt(options.watermark.left, 10) / 100) * canvas.width,
+      (parseInt(options.watermark.top, 10) / 100) * canvas.height,
+      (parseInt(options.watermark.size, 10) / 100) * watermarkLogo.width,
+      (parseInt(options.watermark.size, 10) / 100) * watermarkLogo.height,
     );
     canvasContext.restore();
   }
@@ -839,9 +839,9 @@ export function FlightLogGrapher(
     canvas.height = height;
 
     const sticksHeight =
-      (canvas.height * parseInt(options.sticks.size)) / 2 / 100.0;
+      (canvas.height * parseInt(options.sticks.size, 10)) / 2 / 100.0;
     // The total width available to draw both sticks in:
-    const sticksWidth = (canvas.width * parseInt(options.sticks.size)) / 100.0;
+    const sticksWidth = (canvas.width * parseInt(options.sticks.size, 10)) / 100.0;
 
     if (sticks) {
       sticks.resize(sticksWidth, sticksHeight);
@@ -849,17 +849,17 @@ export function FlightLogGrapher(
 
     // Recenter the craft canvas in the top left corner
     stickCanvas.style.left = `${Math.max(
-      (canvas.width * Number.parseInt(options.sticks.left)) / 100 -
+      (canvas.width * Number.parseInt(options.sticks.left, 10)) / 100 -
         sticksWidth / 2,
       0,
     )}px`;
     stickCanvas.style.top = `${Math.max(
-      (canvas.height * Number.parseInt(options.sticks.top)) / 100 -
+      (canvas.height * Number.parseInt(options.sticks.top, 10)) / 100 -
         sticksHeight / 2,
       0,
     )}px`;
 
-    const craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
+    const craftSize = canvas.height * (parseInt(options.craft.size, 10) / 100.0);
 
     if (craft2D) {
       craft2D.resize(craftSize, craftSize);
@@ -869,11 +869,11 @@ export function FlightLogGrapher(
 
     // Position the craft canvas according to options
     craftCanvas.style.left = `${Math.max(
-      (canvas.width * parseInt(options.craft.left)) / 100.0 - craftSize / 2,
+      (canvas.width * parseInt(options.craft.left, 10)) / 100.0 - craftSize / 2,
       0,
     )}px`;
     craftCanvas.style.top = `${Math.max(
-      (canvas.height * parseInt(options.craft.top)) / 100.0 - craftSize / 2,
+      (canvas.height * parseInt(options.craft.top, 10)) / 100.0 - craftSize / 2,
       0,
     )}px`;
 

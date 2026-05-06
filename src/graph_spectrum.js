@@ -93,13 +93,13 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       } else {
         return {
           height:
-            (canvas.height * Number.parseInt(userSettings.analyser.size)) / 100,
+            (canvas.height * Number.parseInt(userSettings.analyser.size, 10)) / 100,
           width:
-            (canvas.width * Number.parseInt(userSettings.analyser.size)) / 100,
+            (canvas.width * Number.parseInt(userSettings.analyser.size, 10)) / 100,
           left:
-            (canvas.width * Number.parseInt(userSettings.analyser.left)) / 100,
+            (canvas.width * Number.parseInt(userSettings.analyser.left, 10)) / 100,
           top:
-            (canvas.height * Number.parseInt(userSettings.analyser.top)) / 100,
+            (canvas.height * Number.parseInt(userSettings.analyser.top, 10)) / 100,
         };
       }
     };
@@ -277,7 +277,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.setMinPSD = debounce(100, function (value) {
-      const min = Number.parseInt(value);
+      const min = Number.parseInt(value, 10);
       GraphSpectrumPlot.setMinPSD(min);
       saveOneUserSetting("psdHeatmapMin", min);
       that.refresh();
@@ -289,7 +289,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.setMaxPSD = debounce(100, function (value) {
-      const max = Number.parseInt(value);
+      const max = Number.parseInt(value, 10);
       GraphSpectrumPlot.setMaxPSD(max);
       saveOneUserSetting("psdHeatmapMax", max);
       that.refresh();
@@ -301,18 +301,18 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     this.setLowLevelPSD = debounce(100, function (value) {
-      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(value));
+      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(value, 10));
       that.refresh();
     });
 
     this.resetLowLevelPSD = function (minValue) {
-      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(minValue));
+      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(minValue, 10));
       that.refresh();
     };
 
     this.setSegmentLength = debounce(100, function (value) {
       GraphSpectrumCalc.setPointsPerSegmentPSD(
-        2 ** Number.parseInt(value),
+        2 ** Number.parseInt(value, 10),
       );
       dataLoad();
       GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);

@@ -369,10 +369,10 @@ export function MapGrapher() {
       return;
     }
     const containerstyle = {
-      height: (height * parseInt(userSettings.map.size)) / 100.0,
-      width: (width * parseInt(userSettings.map.size)) / 100.0,
-      left: (width * parseInt(userSettings.map.left)) / 100.0,
-      top: (height * parseInt(userSettings.map.top)) / 100.0,
+      height: (height * parseInt(userSettings.map.size, 10)) / 100.0,
+      width: (width * parseInt(userSettings.map.size, 10)) / 100.0,
+      left: (width * parseInt(userSettings.map.left, 10)) / 100.0,
+      top: (height * parseInt(userSettings.map.top, 10)) / 100.0,
     };
     const mapEl = document.getElementById("mapContainer");
     if (mapEl) {

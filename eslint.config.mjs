@@ -43,6 +43,7 @@ export default [
       eqeqeq: ["error", "smart"],
       "prefer-const": "error",
       "prefer-template": "error",
+      radix: "error",
       "comma-dangle": ["error", "always-multiline"],
       semi: ["error", "always"],
     },

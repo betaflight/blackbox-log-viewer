@@ -930,9 +930,9 @@ export function FlightLogParser(logData) {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
           }
 
-          that.sysConfig.firmware = `${parseInt(matches[2])}.${parseInt(matches[3])}`;
+          that.sysConfig.firmware = `${parseInt(matches[2], 10)}.${parseInt(matches[3], 10)}`;
           that.sysConfig.firmwarePatch =
-            matches[5] != null ? parseInt(matches[5]) : "0";
+            matches[5] != null ? parseInt(matches[5], 10) : "0";
           that.sysConfig.firmwareVersion = `${that.sysConfig.firmware}.${that.sysConfig.firmwarePatch}`;
         } else {
           /*
@@ -943,7 +943,7 @@ export function FlightLogParser(logData) {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
             that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
             that.sysConfig.firmwarePatch =
-              matches[5] != null ? parseInt(matches[5]) : "";
+              matches[5] != null ? parseInt(matches[5], 10) : "";
           } else {
             // Legacy firmware versions
             that.sysConfig.firmwareVersion = "0.0.0";
@@ -1014,7 +1014,7 @@ export function FlightLogParser(logData) {
         } else {
           console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
           if (that.sysConfig.unknownHeaders === null) {
-            that.sysConfig.unknownHeaders = new Array();
+            that.sysConfig.unknownHeaders = [];
           }
           that.sysConfig.unknownHeaders.push({
             name: fieldName,
