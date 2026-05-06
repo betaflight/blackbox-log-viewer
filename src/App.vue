@@ -126,7 +126,7 @@
 import { ref, computed, watchEffect } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
-import { useLogStore } from "./stores/log.js";
+import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useSettingsStore } from "./stores/settings.js";
 import AppToolbar from "./components/AppToolbar.vue";
@@ -178,6 +178,14 @@ watchEffect(() => {
   cl.toggle("has-expo-override", !!settingsStore.userSettings.graphExpoOverride);
   cl.toggle("has-smoothing-override", !!settingsStore.userSettings.graphSmoothOverride);
   cl.toggle("has-grid-override", !!settingsStore.userSettings.graphGridOverride);
+  // Dark theme
+  cl.toggle("dark", appStore.darkThemeEnabled);
+  document.body.classList.toggle("dark-theme", appStore.darkThemeEnabled);
+  // Firmware type (map icon color filters)
+  const fwClass = logStore.firmwareClass;
+  for (const c of FIRMWARE_CLASSES) {
+    cl.toggle(c, c === fwClass);
+  }
 });
 
 // Derived state from stores

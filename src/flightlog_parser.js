@@ -20,15 +20,6 @@ import {
   parseCommaSeparatedString,
 } from "./tools";
 
-const FIRMWARE_CLASSES = ["isBaseF", "isCF", "isBF", "isINAV"];
-
-function setFirmwareClass(cls) {
-  const html = document.documentElement;
-  for (const c of FIRMWARE_CLASSES) {
-    html.classList.toggle(c, c === cls);
-  }
-}
-
 export function FlightLogParser(logData) {
   //Private constants:
   let FLIGHT_LOG_MAX_FIELDS = 128,
@@ -620,11 +611,9 @@ export function FlightLogParser(logData) {
         switch (fieldValue) {
           case "Cleanflight":
             that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
-            setFirmwareClass("isCF");
             break;
           default:
             that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
-            setFirmwareClass("isBaseF");
         }
         break;
 
@@ -957,7 +946,6 @@ export function FlightLogParser(logData) {
           // Detecting Betaflight requires looking at the revision string
           if (matches[1] === "Betaflight") {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
-            setFirmwareClass("isBF");
           }
 
           that.sysConfig.firmware = `${parseInt(matches[2])}.${parseInt(matches[3])}`;
@@ -974,7 +962,6 @@ export function FlightLogParser(logData) {
             that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
             that.sysConfig.firmwarePatch =
               matches[5] != null ? parseInt(matches[5]) : "";
-            setFirmwareClass("isINAV");
           } else {
             // Legacy firmware versions
             that.sysConfig.firmwareVersion = "0.0.0";

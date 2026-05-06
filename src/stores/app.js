@@ -4,6 +4,7 @@ import { ref, shallowRef } from "vue";
 export const useAppStore = defineStore("app", () => {
   const legendHidden = ref(false);
   const viewVideo = ref(true);
+  const darkThemeEnabled = ref(false);
 
   // Filename of loaded log (pushed from legacy code)
   const logFilename = ref("");
@@ -40,6 +41,7 @@ export const useAppStore = defineStore("app", () => {
   return {
     legendHidden,
     viewVideo,
+    darkThemeEnabled,
     logFilename,
     statusVersion,
     statusCells,

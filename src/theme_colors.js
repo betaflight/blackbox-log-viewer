@@ -6,6 +6,8 @@
  * theme-aware colors that update when the theme changes.
  */
 
+import { useAppStore } from "./stores/app.js";
+
 export const ThemeColors = {
   colorCache: {},
 
@@ -25,7 +27,7 @@ export const ThemeColors = {
   },
 
   isDarkTheme: function () {
-    return document.body.classList.contains("dark-theme");
+    return useAppStore().darkThemeEnabled;
   },
 
   getGraphBackground: function () {

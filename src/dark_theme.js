@@ -133,21 +133,16 @@ export const DarkTheme = {
   },
 
   /**
-   * Apply dark theme
+   * Apply the resolved theme state to the store (classes applied by App.vue watchEffect)
    */
   applyDark: function () {
-    document.body.classList.add("dark-theme");
-    document.documentElement.classList.add("dark");
     this.enabled = true;
+    useAppStore().darkThemeEnabled = true;
   },
 
-  /**
-   * Apply light theme (remove dark theme)
-   */
   applyNormal: function () {
-    document.body.classList.remove("dark-theme");
-    document.documentElement.classList.remove("dark");
     this.enabled = false;
+    useAppStore().darkThemeEnabled = false;
   },
 
   /**

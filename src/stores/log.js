@@ -1,5 +1,20 @@
 import { defineStore } from "pinia";
 import { ref, shallowRef, computed } from "vue";
+import {
+  FIRMWARE_TYPE_BASEFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_INAV,
+} from "../flightlog_fielddefs.js";
+
+const FIRMWARE_CLASS_MAP = {
+  [FIRMWARE_TYPE_BASEFLIGHT]: "isBaseF",
+  [FIRMWARE_TYPE_CLEANFLIGHT]: "isCF",
+  [FIRMWARE_TYPE_BETAFLIGHT]: "isBF",
+  [FIRMWARE_TYPE_INAV]: "isINAV",
+};
+
+export const FIRMWARE_CLASSES = Object.values(FIRMWARE_CLASS_MAP);
 
 export const useLogStore = defineStore("log", () => {
   const flightLog = ref(null);
@@ -21,6 +36,11 @@ export const useLogStore = defineStore("log", () => {
 
   const minTime = computed(() => flightLog.value?.getMinTime() ?? 0);
   const maxTime = computed(() => flightLog.value?.getMaxTime() ?? 0);
+
+  const firmwareClass = computed(() => {
+    const type = flightLog.value?.getSysConfig?.()?.firmwareType;
+    return FIRMWARE_CLASS_MAP[type] ?? null;
+  });
 
   function setFlightLog(log) {
     flightLog.value = log;
@@ -54,6 +74,7 @@ export const useLogStore = defineStore("log", () => {
     activeLogIndex,
     minTime,
     maxTime,
+    firmwareClass,
     setFlightLog,
     setFlightLogDataArray,
     setCurrentBlackboxTime,
