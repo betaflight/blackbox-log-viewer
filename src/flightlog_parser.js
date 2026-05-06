@@ -23,8 +23,7 @@ import {
 
 export function FlightLogParser(logData) {
   //Private constants:
-  let FLIGHT_LOG_MAX_FIELDS = 128,
-    FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
+  let FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
     //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
     MAXIMUM_TIME_JUMP_BETWEEN_FRAMES = 10 * 1000000,
     //Likewise for iteration count
@@ -66,7 +65,6 @@ export function FlightLogParser(logData) {
     FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16 = 8,
     FLIGHT_LOG_FIELD_ENCODING_NULL = 9, // Nothing is written to the file, take value to be zero
     FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE = 10,
-    FLIGHT_LOG_EVENT_LOG_END = 255,
     EOF = ArrayDataStream.prototype.EOF,
     NEWLINE = "\n".charCodeAt(0),
     INFLIGHT_ADJUSTMENT_FUNCTIONS = [
@@ -546,9 +544,7 @@ export function FlightLogParser(logData) {
       lineStart,
       lineEnd,
       separatorPos = false,
-      matches,
-      i,
-      c;
+      matches;
 
     if (stream.peekChar() != " ") return;
 
@@ -1299,7 +1295,7 @@ export function FlightLogParser(logData) {
     parseFrame(that.frameDefs.I, current, previous, null, 0, raw);
   }
 
-  function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
+  function completeGPSHomeFrame(frameType, frameStart, frameEnd, _raw) {
     updateFieldStatistics(frameType, gpsHomeHistory[0]);
 
     that.setGPSHomeHistory(gpsHomeHistory[0]);
@@ -1317,7 +1313,7 @@ export function FlightLogParser(logData) {
     return true;
   }
 
-  function completeGPSFrame(frameType, frameStart, frameEnd, raw) {
+  function completeGPSFrame(frameType, frameStart, frameEnd, _raw) {
     if (gpsHomeIsValid) {
       updateFieldStatistics(frameType, lastGPS);
     }
@@ -1335,7 +1331,7 @@ export function FlightLogParser(logData) {
     return gpsHomeIsValid;
   }
 
-  function completeSlowFrame(frameType, frameStart, frameEnd, raw) {
+  function completeSlowFrame(frameType, frameStart, frameEnd, _raw) {
     updateFieldStatistics(frameType, lastSlow);
 
     if (that.onFrameReady) {
@@ -1586,7 +1582,7 @@ export function FlightLogParser(logData) {
     }
   }
 
-  function completeEventFrame(frameType, frameStart, frameEnd, raw) {
+  function completeEventFrame(frameType, frameStart, frameEnd, _raw) {
     if (lastEvent) {
       switch (lastEvent.event) {
         case FlightLogEvent.LOGGING_RESUME:
@@ -1615,7 +1611,7 @@ export function FlightLogParser(logData) {
     return false;
   }
 
-  function parseEventFrame(raw) {
+  function parseEventFrame(_raw) {
     let END_OF_LOG_MESSAGE = "End of log\0",
       eventType = stream.readByte();
 

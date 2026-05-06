@@ -120,7 +120,7 @@ GraphSpectrumCalc.setPointsPerSegmentPSD = function (pointsCount) {
   this._pointsPerSegmentPSD = pointsCount;
 };
 
-GraphSpectrumCalc.dataLoadPSD = function (analyserZoomY) {
+GraphSpectrumCalc.dataLoadPSD = function (_analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
   const totalCount = flightSamples.count; // actual samples, not padded length
   let pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);

@@ -8,19 +8,10 @@ export function IMU(copyFrom) {
     ROLL = 0,
     PITCH = 1,
     YAW = 2,
-    THROTTLE = 3,
-    X = 0,
-    Y = 1,
-    Z = 2,
     //Settings that would normally be set by the user in MW config:
     gyro_cmpf_factor = 600,
-    gyro_cmpfm_factor = 250,
-    accz_lpf_cutoff = 5.0,
     magneticDeclination = 0, // user to set to local declination in degrees * 10
-    //Calculate RC time constant used in the accZ lpf:
-    fc_acc = 0.5 / (Math.PI * accz_lpf_cutoff),
-    INV_GYR_CMPF_FACTOR = 1.0 / (gyro_cmpf_factor + 1.0),
-    INV_GYR_CMPFM_FACTOR = 1.0 / (gyro_cmpfm_factor + 1.0);
+    INV_GYR_CMPF_FACTOR = 1.0 / (gyro_cmpf_factor + 1.0);
 
   // **************************************************
   // Simplified IMU based on "Complementary Filter"
@@ -92,22 +83,6 @@ export function IMU(copyFrom) {
     v.Z = v_tmp.X * mat[0][2] + v_tmp.Y * mat[1][2] + v_tmp.Z * mat[2][2];
   }
 
-  // Rotate the accel values into the earth frame and subtract acceleration due to gravity from the result
-  function calculateAccelerationInEarthFrame(accSmooth, attitude, acc_1G) {
-    let rpy = [-attitude.roll, -attitude.pitch, -attitude.heading],
-      result = {
-        X: accSmooth[0],
-        Y: accSmooth[1],
-        Z: accSmooth[2],
-      };
-
-    rotateVector(result, rpy);
-
-    result.Z -= acc_1G;
-
-    return result;
-  }
-
   // Use the craft's estimated roll/pitch to compensate for the roll/pitch of the magnetometer reading
   function calculateHeading(vec, roll, pitch) {
     let cosineRoll = Math.cos(roll),
@@ -139,7 +114,7 @@ export function IMU(copyFrom) {
     currentTime,
     acc_1G,
     gyroScale,
-    magADC,
+    _magADC,
   ) {
     let accMag = 0,
       deltaTime,

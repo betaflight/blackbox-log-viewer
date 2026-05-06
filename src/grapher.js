@@ -27,10 +27,7 @@ export function FlightLogGrapher(
 ) {
   const { controller } = useAppStore();
 
-  let PID_P = 0,
-    PID_I = 1,
-    PID_D = 2,
-    DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
+  let DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
     drawingParams = {
       fontSizePIDTableLabel: null,
       fontSizeAxisLabel: null,
@@ -74,12 +71,10 @@ export function FlightLogGrapher(
     },
     windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
     idents,
-    sysConfig = flightLog.getSysConfig(),
     graphs = [],
     inTime = false,
     outTime = false,
     lastMouseX,
-    lastMouseY,
     sticks = null,
     craft3D = null,
     craft2D = null,
@@ -117,7 +112,6 @@ export function FlightLogGrapher(
     }
 
     lastMouseX = e.pageX;
-    lastMouseY = e.pageY;
   }
 
   function onTouchMove(e) {
@@ -132,14 +126,12 @@ export function FlightLogGrapher(
     }
 
     lastMouseX = e.originalEvent.touches[0].pageX;
-    lastMouseY = e.originalEvent.touches[0].pageY;
   }
 
   function onMouseDown(e) {
     if (e.which == 1) {
       //Left mouse button only for seeking
       lastMouseX = e.pageX;
-      lastMouseY = e.pageY;
 
       //"capture" the mouse so we can drag outside the boundaries of canvas
       document.addEventListener("mousemove", onMouseMove);
@@ -157,7 +149,6 @@ export function FlightLogGrapher(
   function onTouchStart(e) {
     if (e.which == 0) {
       lastMouseX = e.originalEvent.touches[0].pageX;
-      lastMouseY = e.originalEvent.touches[0].pageY;
 
       //"capture" so we can drag outside the boundaries of canvas
       document.addEventListener("touchmove", onTouchMove);
@@ -337,8 +328,6 @@ export function FlightLogGrapher(
       drawingLine = false,
       notInBounds = -5, // when <0, then line is always drawn, (this allows us to paritially dash the line when the bounds is exceeded)
       inGap = false,
-      lastX,
-      lastY,
       yScale = -plotHeight,
       xScale = canvas.width / windowWidthMicros;
 
@@ -937,7 +926,6 @@ export function FlightLogGrapher(
         windowStartTime,
         windowEndTime,
       ),
-      startChunkIndex,
       startFrameIndex,
       i,
       j;
@@ -1171,7 +1159,7 @@ export function FlightLogGrapher(
       if (craftCanvas) {
         try {
           craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
-        } catch (e) {
+        } catch {
           //WebGL not supported, fall back to 2D rendering
           options.craftType = "2D";
         }

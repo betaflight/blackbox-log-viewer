@@ -17,7 +17,10 @@ export default [
     },
     rules: {
       "no-var": "warn",
-      "no-unused-vars": "warn",
+      "no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
       "no-undef": "warn",
       "no-redeclare": "warn",
       "no-prototype-builtins": "warn",

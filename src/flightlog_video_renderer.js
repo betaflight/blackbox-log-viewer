@@ -42,13 +42,10 @@ export function FlightLogVideoRenderer(
     analyserCanvas = document.createElement("canvas"),
     stickCanvasLeft,
     stickCanvasTop,
-    hasStick,
     craftCanvasLeft,
     craftCanvasTop,
-    hasCraft,
     analyserCanvasLeft,
     analyserCanvasTop,
-    hasAnalyser,
     canvasContext = canvas.getContext("2d"),
     frameCount,
     frameDuration /* Duration of a frame in Blackbox's microsecond time units */,
@@ -112,7 +109,7 @@ export function FlightLogVideoRenderer(
    * Returns a Promise that resolves to a FileWriter for the file the user chose, or fails if the user cancels/
    * something else bad happens.
    */
-  function openFileForWrite(suggestedName, onComplete) {
+  function openFileForWrite(suggestedName, _onComplete) {
     return new Promise(function (resolve, reject) {
       chrome.fileSystem.chooseEntry(
         {

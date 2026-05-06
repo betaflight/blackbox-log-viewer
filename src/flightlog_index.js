@@ -8,7 +8,6 @@ export function FlightLogIndex(logData) {
   //Private:
   let that = this,
     logBeginOffsets = false,
-    logCount = false,
     intraframeDirectories = false;
 
   function buildLogOffsetsIndex() {
@@ -59,18 +58,13 @@ export function FlightLogIndex(logData) {
           unLoggedTime: 0,
         },
         imu = new IMU(),
-        gyroADC,
-        accSmooth,
-        magADC,
         iframeCount = 0,
         motorFields = [],
         maxRCFields = [],
-        matches,
         throttleTotal,
         rcTotal,
         maxMotor,
         minMotor,
-        eventInThisChunk = null,
         parsedHeader,
         sawEndMarker = false;
 
@@ -133,7 +127,7 @@ export function FlightLogIndex(logData) {
           frame,
           frameType,
           frameOffset,
-          frameSize,
+          _frameSize,
         ) {
           if (!frameValid) {
             return;
@@ -272,7 +266,7 @@ export function FlightLogIndex(logData) {
   }
 
   //Public:
-  this.loadFromJSON = function (json) {};
+  this.loadFromJSON = function (_json) {};
 
   this.saveToJSON = function () {
     let intraframeDirectories = this.getIntraframeDirectories(),
@@ -285,7 +279,6 @@ export function FlightLogIndex(logData) {
         lastLastTime,
         lastOffset,
         lastLastOffset,
-        lastThrottle,
         sourceIndex = intraframeDirectories[i],
         resultIndex = {
           times: new Array(sourceIndex.times.length),

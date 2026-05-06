@@ -56,15 +56,6 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     return result;
   }
 
-  function lookupMathPow(input) {
-    input += offset;
-
-    let result = Math.pow(Math.abs(input) / inputRange, power) * outputRange;
-
-    if (input < 0) return -result;
-    return result;
-  }
-
   rawInputScale = outputRange / inputRange;
 
   // If steps argument isn't supplied, use a reasonable default

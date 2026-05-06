@@ -1,10 +1,5 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-import {
-  DSHOT_MIN_VALUE,
-  DSHOT_RANGE,
-  RATES_TYPE,
-  DEBUG_MODE,
-} from "./flightlog_fielddefs";
+import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
@@ -217,7 +212,7 @@ GraphConfig.getDefaultSmoothingForField = function (flightLog, fieldName) {
     } else {
       return 0;
     }
-  } catch (e) {
+  } catch {
     return 0;
   }
 };
@@ -315,22 +310,6 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
 
   const gyroScaleMargin = 1.2; // Give a 20% margin for gyro graphs
   const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
-  const mm = getMinMaxForFields(fieldName);
-  // added convertation min max values from log file units to friendly chart
-  const mmChartUnits = {
-    min: FlightLogFieldPresenter.ConvertFieldValue(
-      flightLog,
-      fieldName,
-      true,
-      mm.min,
-    ),
-    max: FlightLogFieldPresenter.ConvertFieldValue(
-      flightLog,
-      fieldName,
-      true,
-      mm.max,
-    ),
-  };
   try {
     if (fieldName.match(/^motor\[/)) {
       return {
@@ -1504,7 +1483,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     // if not found above then
     // Scale and center the field based on the whole-log observed ranges for that field
     return getCurveForMinMaxFields(fieldName);
-  } catch (e) {
+  } catch {
     return {
       power: 1,
       MinMax: {

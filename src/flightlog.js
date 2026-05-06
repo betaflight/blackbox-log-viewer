@@ -12,7 +12,6 @@ import {
   SUPER_EXPO_YAW,
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_CLEANFLIGHT,
-  FIRMWARE_TYPE_INAV,
 } from "./flightlog_fielddefs";
 import { IMU } from "./imu";
 import { FIFOCache } from "./cache";
@@ -187,7 +186,7 @@ export function FlightLog(logData) {
     return fieldNameToIndex[name];
   };
 
-  this.getMainFieldIndexes = function (name) {
+  this.getMainFieldIndexes = function (_name) {
     return fieldNameToIndex;
   };
 
@@ -336,9 +335,7 @@ export function FlightLog(logData) {
 
   function estimateNumCells() {
     let i,
-      fieldNames = that.getMainFieldNames(),
-      sysConfig = that.getSysConfig(),
-      found = false;
+      sysConfig = that.getSysConfig();
 
     let refVoltage;
     if (firmwareGreaterOrEqual(sysConfig, "3.1.0", "2.0.0")) {
@@ -456,8 +453,8 @@ export function FlightLog(logData) {
           frameValid,
           frame,
           frameType,
-          frameOffset,
-          frameSize,
+          _frameOffset,
+          _frameSize,
         ) {
           let destFrame, destFrame_currentIndex;
 
@@ -1049,7 +1046,7 @@ export function FlightLog(logData) {
   /*
    * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
    */
-  function verifyChunkIndexes(chunks) {
+  function verifyChunkIndexes(_chunks) {
     // Uncomment for debugging...
     /*
         for (let i = 0; i < chunks.length - 1; i++) {
@@ -1519,9 +1516,6 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
     const RC_RATE_INCREMENTAL = 14.54;
     const RC_EXPO_POWER = 3;
 
-    let rcInput;
-    const that = this;
-
     let calculateSetpointRate = function (axis, rc) {
       let rcCommandf = rc / 500.0;
       let rcCommandfAbs = Math.abs(rcCommandf);
@@ -1567,8 +1561,6 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
 
     return calculateSetpointRate(axis, value);
   } else if (firmwareGreaterOrEqual(sysConfig, "2.8.0")) {
-    const that = this;
-
     let isSuperExpoActive = function () {
       let FEATURE_SUPEREXPO_RATES = 1 << 23;
 

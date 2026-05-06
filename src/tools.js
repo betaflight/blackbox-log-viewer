@@ -260,7 +260,7 @@ export function stringTimetoMsec(input) {
         );
       }
     } else return (matches[1] ? -1 : 1) * (matches[2] * 1000000);
-  } catch (e) {
+  } catch {
     return 0;
   }
 }

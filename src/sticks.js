@@ -24,9 +24,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       stickSurroundRadius: 0,
     };
 
-  let that = this,
-    windowCenterTime,
-    canvasContext = canvas.getContext("2d"),
+  let canvasContext = canvas.getContext("2d"),
     sysConfig = flightLog.getSysConfig(),
     pitchStickCurve = new ExpoCurve(
       0,

@@ -1623,7 +1623,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
   flightLog,
   fieldName,
   value,
-  currentFlightMode,
+  _currentFlightMode,
 ) {
   const { userSettings } = useSettingsStore();
   if (value === undefined) {

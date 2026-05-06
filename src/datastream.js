@@ -46,7 +46,7 @@ ArrayDataStream.prototype.readS8 = function () {
   return signExtend8Bit(this.readByte());
 };
 
-ArrayDataStream.prototype.unreadChar = function (c) {
+ArrayDataStream.prototype.unreadChar = function (_c) {
   this.pos--;
 };
 
