@@ -60,11 +60,11 @@
     <input id="analyserZoomX" class="hidden onlyFullScreenException" type="range" name="analyserZoomX" value="100" min="100" max="500" step="10" />
     <input id="analyserZoomY" class="hidden onlyFullScreenException" type="range" name="analyserZoomY" value="100" min="10" max="1000" step="10" />
     <!-- USlider wrappers positioned by CSS -->
-    <div id="analyserZoomXSlider" class="onlyFullScreen analyser-slider-x">
+    <div id="analyserZoomXSlider" v-show="showSliderX" class="analyser-slider-x">
       <USlider v-model="zoomX" :min="100" :max="500" :step="10" class="w-24" />
     </div>
-    <div id="analyserZoomYSlider" class="onlyFullScreen analyser-slider-y">
-      <USlider v-model="zoomY" :min="10" :max="1000" :step="10" class="w-24" />
+    <div id="analyserZoomYSlider" v-show="showSliderY" class="analyser-slider-y">
+      <USlider v-model="zoomY" :min="10" :max="1000" :step="10" orientation="vertical" />
     </div>
     <input id="analyserSegmentLengthPowerAt2" class="onlyFullScreen text-xs" type="number" name="analyserSegmentLengthPowerAt2" value="9" min="6" max="20" step="1" />
     <label id="analyserSegmentLengthPowerAt2Label" name="analyserSegmentLengthPowerAt2Label" class="onlyFullScreen text-xs text-dimmed">
@@ -87,8 +87,12 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { useAppStore } from "../stores/app.js";
+import { useGraphStore } from "../stores/graph.js";
+
+const appStore = useAppStore();
+const graphStore = useGraphStore();
 
 const spectrumTypeOptions = [
   { label: "Frequency", value: "0" },
@@ -113,6 +117,13 @@ const spectrumType = ref("0");
 const overdrawType = ref("0");
 const zoomX = ref(100);
 const zoomY = ref(100);
+
+// Slider visibility — controlled by Vue instead of CSS onlyFullScreen class
+const zoomYException = ref(false);
+let ySliderObserver = null;
+
+const showSliderX = computed(() => graphStore.hasAnalyserFullscreen);
+const showSliderY = computed(() => graphStore.hasAnalyserFullscreen && !zoomYException.value);
 
 // Sync USelect → hidden native select and dispatch change event for legacy code
 watch(spectrumType, (val) => {
@@ -154,7 +165,6 @@ onMounted(() => {
   const overdrawEl = document.getElementById("overdrawSpectrumTypeSelect");
 
   if (specEl) {
-    // Observe value changes from legacy code via MutationObserver on the value property
     const origSpecDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
     Object.defineProperty(specEl, "value", {
       get() { return origSpecDesc.get.call(this); },
@@ -200,13 +210,24 @@ onMounted(() => {
       },
     });
   }
+
+  // Watch for legacy code toggling onlyFullScreenException on Y slider
+  const ySliderDiv = document.getElementById("analyserZoomYSlider");
+  if (ySliderDiv) {
+    ySliderObserver = new MutationObserver(() => {
+      zoomYException.value = ySliderDiv.classList.contains("onlyFullScreenException");
+    });
+    ySliderObserver.observe(ySliderDiv, { attributes: true, attributeFilter: ["class"] });
+  }
+});
+
+onBeforeUnmount(() => {
+  ySliderObserver?.disconnect();
 });
 
 function triggerImport() {
   document.getElementById("btn-spectrum-import").click();
 }
-
-const appStore = useAppStore();
 
 function toggleFullscreen() {
   appStore.controller?.toggleAnalyserFullscreen?.();

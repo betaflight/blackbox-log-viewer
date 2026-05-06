@@ -104,7 +104,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       if (zoomXSlider) { zoomXSlider.style.left = `${newSize.width - 130}px`; }
       if (zoomYSlider) {
         zoomYSlider.style.left = `${newSize.width - 20}px`;
-        zoomYSlider.style.height = `${Math.min(newSize.height - 40, 200)}px`;
+        zoomYSlider.style.height = `${Math.min(newSize.height - 40, 100)}px`;
       }
       const buttonsElem = document.getElementById("spectrumButtons");
       const isFullscreen = document.documentElement.classList.contains("has-analyser-fullscreen");

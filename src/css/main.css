@@ -351,9 +351,7 @@ html.has-analyser-fullscreen.has-analyser
   top: 5px;
   position: absolute;
   z-index: 9;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  height: 100px;
+  height: 50px;
 }
 
 .analyser input#analyserMinPSD::-webkit-inner-spin-button,
