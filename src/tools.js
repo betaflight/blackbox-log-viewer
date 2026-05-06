@@ -131,34 +131,6 @@ export function parseCommaSeparatedString(string, length) {
 }
 
 /**
- * Browser Zoom Facilities
- **/
-let zoomLevels = [
-  0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5, 1.75, 2.0, 2.5,
-  3.0, 4.0, 5.0,
-];
-
-export function zoomIn() {
-  let currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
-  for (let i = 0; i < zoomLevels.length; i++) {
-    if (zoomLevels[i] > currentZoom) {
-      document.body.style.zoom = zoomLevels[i];
-      return;
-    }
-  }
-}
-
-export function zoomOut() {
-  let currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
-  for (let i = zoomLevels.length - 1; i > 0; i--) {
-    if (zoomLevels[i] < currentZoom) {
-      document.body.style.zoom = zoomLevels[i];
-      return;
-    }
-  }
-}
-
-/**
  * Find the index of `item` in `list`, or if `item` is not contained in `list` then return the index
  * of the next-smaller element (or 0 if `item` is smaller than all values in `list`).
  **/
@@ -375,7 +347,7 @@ function computeAlignedTop(align, targetHeight, popupHeight, margin) {
   return margin;
 }
 
-export var mouseNotification = {
+export const mouseNotification = {
   enabled: true,
   elem: null,
   timeout: null,
@@ -456,40 +428,8 @@ export function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
   }
 }
 
-export function getManifestVersion(manifest) {
-  try {
-    if (!manifest) {
-      manifest = chrome.runtime.getManifest();
-    }
-
-    let version = manifest.version_name;
-    if (!version) {
-      version = manifest.version;
-    }
-
-    return version;
-  } catch (error) {
-    console.log("manifest does not exist, probably not running nw.js");
-    return "-";
-  }
-}
-
 export function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-export function isChromium() {
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
-  if (!navigator.userAgentData) {
-    console.log(navigator.userAgent);
-    return false;
-  }
-
-  console.log(navigator.userAgentData);
-  // https://learn.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-guidance
-  return navigator.userAgentData.brands.some((brand) => {
-    return brand.brand == "Chromium";
-  });
 }
 
 export function triggerDownload(blob, filename) {

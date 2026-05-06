@@ -21,7 +21,6 @@ import {
   constrain,
   validate,
   mouseNotification,
-  getManifestVersion,
   triggerDownload,
 } from "./tools.js";
 import { PrefStorage } from "./pref_storage.js";
@@ -36,19 +35,6 @@ import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
 
-
-
-// these values set the initial dimensions of a secondary window
-// which always opens at the centre of the user's screen
-const NEW_WINDOW_WIDTH = 1000;
-const NEW_WINDOW_HEIGHT = 760;
-
-// these values set the minimum resize dimensions of a secondary window
-// minimum resize dimensions of the initial window are set in package.json
-const INNER_BOUNDS_WIDTH = 930;
-const INNER_BOUNDS_HEIGHT = 480;
-
-const INITIAL_APP_PAGE = "index.html";
 
 function BlackboxLogViewer() {
   function supportsRequiredAPIs() {
