@@ -545,22 +545,6 @@ html.has-log .video-top-controls {
   border-bottom-color: var(--surface-800, hsl(0, 0%, 25%));
 }
 
-.override-button-group {
-  display: flex;
-}
-
-.override-button-group button {
-  flex: 1;
-}
-
-html.has-scaling-override .toggle-scaling,
-html.has-expo-override .toggle-expo,
-html.has-smoothing-override .toggle-smoothing,
-html.has-grid-override .toggle-grid {
-  stroke-opacity: 0.2;
-  fill-opacity: 0.2;
-}
-
 html.video-hidden video {
   display: none;
 }
@@ -595,36 +579,6 @@ html:not(.has-log) .vue-statusbar {
 html:not(.has-gps) .view-map,
 html:not(.has-gps) .map-container {
   display: none !important;
-}
-
-
-div#lap-timer {
-  position: absolute;
-  background-color: var(--surface-100);
-  z-index: 10;
-  top: 5%;
-  left: calc(90% - 233px);
-  border-radius: 6px;
-  padding: 8px;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color, #e5e5e5);
-}
-
-tr.lap-timer-heading td {
-  font-style: italic;
-  border-bottom: 1px solid var(--border-color, #e5e5e5);
-}
-
-table#lap-timer-laps {
-  display: none;
-}
-
-html.hasLaps table#lap-timer-laps {
-  display: table;
-}
-
-div#lap-timer td:first-child {
-  padding-right: 10px;
 }
 
 /*
