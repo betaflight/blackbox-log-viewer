@@ -362,7 +362,7 @@ function onLogoChange(e) {
 }
 
 function onSave() {
-  const raw = JSON.parse(JSON.stringify(local.value));
+  const raw = structuredClone(local.value);
   emit("save", raw);
   open.value = false;
 }

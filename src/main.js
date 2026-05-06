@@ -3,8 +3,6 @@ import "./vendor.js";
 import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
-
-import { defaultUserSettings } from "./user_settings_data.js";
 import { SimpleStats } from "./simple-stats.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
