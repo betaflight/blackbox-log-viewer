@@ -824,17 +824,17 @@ html.isINAV .log-graph-config h3 span {
   color: #0850ac;
 }
 
-:root.dark html.isBF .log-graph-config h3 span {
+html.dark.isBF .log-graph-config h3 span {
   background-color: rgba(255, 187, 0, 0.2);
   color: var(--color-primary-400, #ffd03d);
 }
 
-:root.dark html.isCF .log-graph-config h3 span {
+html.dark.isCF .log-graph-config h3 span {
   background-color: #1a3828;
   color: #d0ffe8;
 }
 
-:root.dark html.isINAV .log-graph-config h3 span {
+html.dark.isINAV .log-graph-config h3 span {
   background-color: rgba(8, 80, 172, 0.2);
   color: #aed0f4;
 }
