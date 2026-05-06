@@ -4,7 +4,8 @@
  * curve = 1.0 is a straight line mapping).
  */
 export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
-  let curve, inputScale, rawInputScale;
+  let curve, inputScale;
+  const rawInputScale = outputRange / inputRange;
 
   function lookupStraightLine(input) {
     return (input + offset) * inputScale;
@@ -32,12 +33,10 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
    * (e.g. the approximation will be too straight near the origin when power < 1.0, but a good fit far from the origin)
    */
   function lookupInterpolatedCurve(input) {
-    let valueInCurve, prevStepIndex;
-
     input += offset;
 
-    valueInCurve = Math.abs(input * inputScale);
-    prevStepIndex = Math.floor(valueInCurve);
+    const valueInCurve = Math.abs(input * inputScale);
+    let prevStepIndex = Math.floor(valueInCurve);
 
     /* If the input value lies beyond the stated input range, use the final
      * two points of the curve to extrapolate out (the "curve" out there is a straight line, though)
@@ -56,8 +55,6 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     return result;
   }
 
-  rawInputScale = outputRange / inputRange;
-
   // If steps argument isn't supplied, use a reasonable default
   if (steps === undefined) {
     steps = 12;
@@ -69,14 +66,13 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
 
     this.lookup = lookupStraightLine;
   } else {
-    let stepSize = 1.0 / (steps - 1),
-      i;
+    const stepSize = 1.0 / (steps - 1);
 
     curve = new Array(steps);
 
     inputScale = (steps - 1) / inputRange;
 
-    for (i = 0; i < steps; i++) {
+    for (let i = 0; i < steps; i++) {
       curve[i] = Math.pow(i * stepSize, power) * outputRange;
     }
 

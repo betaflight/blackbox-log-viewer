@@ -39,34 +39,24 @@ export function IMU(copyFrom) {
 
   function rotateVector(v, delta) {
     // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
-    let v_tmp = { X: v.X, Y: v.Y, Z: v.Z },
-      mat = [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-      ],
-      cosx,
-      sinx,
-      cosy,
-      siny,
-      cosz,
-      sinz,
-      coszcosx,
-      sinzcosx,
-      coszsinx,
-      sinzsinx;
+    const v_tmp = { X: v.X, Y: v.Y, Z: v.Z };
+    const mat = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
 
-    cosx = Math.cos(delta[ROLL]);
-    sinx = Math.sin(delta[ROLL]);
-    cosy = Math.cos(delta[PITCH]);
-    siny = Math.sin(delta[PITCH]);
-    cosz = Math.cos(delta[YAW]);
-    sinz = Math.sin(delta[YAW]);
+    const cosx = Math.cos(delta[ROLL]);
+    const sinx = Math.sin(delta[ROLL]);
+    const cosy = Math.cos(delta[PITCH]);
+    const siny = Math.sin(delta[PITCH]);
+    const cosz = Math.cos(delta[YAW]);
+    const sinz = Math.sin(delta[YAW]);
 
-    coszcosx = cosz * cosx;
-    sinzcosx = sinz * cosx;
-    coszsinx = sinx * cosz;
-    sinzsinx = sinx * sinz;
+    const coszcosx = cosz * cosx;
+    const sinzcosx = sinz * cosx;
+    const coszsinx = sinx * cosz;
+    const sinzsinx = sinx * sinz;
 
     mat[0][0] = cosz * cosy;
     mat[0][1] = -cosy * sinz;
@@ -85,17 +75,17 @@ export function IMU(copyFrom) {
 
   // Use the craft's estimated roll/pitch to compensate for the roll/pitch of the magnetometer reading
   function calculateHeading(vec, roll, pitch) {
-    let cosineRoll = Math.cos(roll),
-      sineRoll = Math.sin(roll),
-      cosinePitch = Math.cos(pitch),
-      sinePitch = Math.sin(pitch),
-      headingX =
-        vec.X * cosinePitch +
-        vec.Y * sineRoll * sinePitch +
-        vec.Z * sinePitch * cosineRoll,
-      headingY = vec.Y * cosineRoll - vec.Z * sineRoll,
-      heading =
-        Math.atan2(headingY, headingX) + (magneticDeclination / 10.0) * RAD; // RAD = pi/180
+    const cosineRoll = Math.cos(roll);
+    const sineRoll = Math.sin(roll);
+    const cosinePitch = Math.cos(pitch);
+    const sinePitch = Math.sin(pitch);
+    const headingX =
+      vec.X * cosinePitch +
+      vec.Y * sineRoll * sinePitch +
+      vec.Z * sinePitch * cosineRoll;
+    const headingY = vec.Y * cosineRoll - vec.Z * sineRoll;
+    let heading =
+      Math.atan2(headingY, headingX) + (magneticDeclination / 10.0) * RAD; // RAD = pi/180
 
     heading += 2 * Math.PI; // positive all the time, we want zero to return pi
     if (heading > 2 * Math.PI) {
@@ -116,10 +106,9 @@ export function IMU(copyFrom) {
     gyroScale,
     _magADC,
   ) {
-    let accMag = 0,
-      deltaTime,
-      scale,
-      deltaGyroAngle = [0, 0, 0];
+    let accMag = 0;
+    let deltaTime;
+    const deltaGyroAngle = [0, 0, 0];
 
     if (this.previousTime === false) {
       deltaTime = 1;
@@ -127,7 +116,7 @@ export function IMU(copyFrom) {
       deltaTime = currentTime - this.previousTime;
     }
 
-    scale = deltaTime * gyroScale;
+    const scale = deltaTime * gyroScale;
     this.previousTime = currentTime;
 
     // Initialization
