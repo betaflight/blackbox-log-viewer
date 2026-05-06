@@ -49,6 +49,7 @@
         <h3
           class="graph-legend-group"
           @click="onGraphClick($event, gi)"
+          @mousedown.middle.prevent="onResetPen(gi, null)"
         >
           <UIcon name="i-lucide-trash-2" class="size-3.5 mr-1 inline-block align-middle" />
           {{ graph.label }}
@@ -62,6 +63,8 @@
             :class="{ highlight: highlightGi === gi && highlightFi === fi }"
             @mouseenter="onFieldHover(gi, fi)"
             @mouseleave="onFieldLeave"
+            @mousedown.middle.prevent="onResetPen(gi, fi)"
+            @wheel.prevent="onFieldWheel($event, gi, fi)"
           >
             <span
               class="graph-legend-field-name"
@@ -247,6 +250,18 @@ import { watch, nextTick } from "vue";
 watch(legendContainer, (el) => {
   if (el) setupDragContainer(el);
 });
+
+// --- Pen reset (middle-click) and field wheel adjustments ---
+function onResetPen(gi, fi) {
+  appStore.controller?.legendResetPen?.(gi, fi);
+}
+
+function onFieldWheel(e, gi, fi) {
+  if (e.shiftKey || e.altKey || e.ctrlKey) {
+    const delta = e.deltaY < 0 ? 1 : -1;
+    appStore.controller?.legendFieldWheel?.(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
+  }
+}
 
 // --- Override toggles ---
 function toggleExpo() {

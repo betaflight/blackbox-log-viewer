@@ -707,21 +707,11 @@ function BlackboxLogViewer() {
     syncToStores();
   }
 
-  function loadFileMessage(fileName) {
-    const loadingEl = document.getElementById("loading-file-text");
-    if (loadingEl) {
-      loadingEl.textContent = `Trying to load file ${fileName}...`;
-      loadingEl.style.display = "";
-    }
-  }
-
   function loadFiles(files) {
     for (const file of files) {
       let isLog = file.name.match(/\.(BBL|TXT|CFL|BFL|LOG)$/i),
         isVideo = file.name.match(/\.(AVI|MOV|MP4|MPEG)$/i),
         isWorkspaces = file.name.match(/\.(JSON)$/i);
-
-      loadFileMessage(file.name);
 
       if (!isLog && !isVideo && !isWorkspaces) {
         if (file.size < 10 * 1024 * 1024)
@@ -1392,12 +1382,7 @@ function BlackboxLogViewer() {
     // userSettings is the reactive object from settingsStore — no global bridge needed
     userSettings = settingsStore.userSettings;
 
-    document
-      .querySelector(".open-graph-configuration-dialog")
-      ?.addEventListener("click", function (e) {
-        e.preventDefault();
-        appStore.graphConfigDialogOpen = true;
-      });
+    // Graph configuration dialog wired via Vue LegendPanel "Graph setup" button
 
     // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
 
@@ -1435,22 +1420,6 @@ function BlackboxLogViewer() {
     window.addEventListener("resize", function () {
       updateCanvasSize();
     });
-
-    function updateHeaderSize() {
-      const topControls = document.querySelector(".video-top-controls");
-      if (!topControls) {
-        return;
-      }
-      const newHeight = topControls.clientHeight - 20;
-      document
-        .querySelectorAll(
-          ".log-graph, .log-graph-config, .log-seek-bar",
-        )
-        .forEach((el) => {
-          el.style.top = `${newHeight}px`;
-        });
-      invalidateGraph();
-    }
 
     function savePenDefaults(graphConfig, graph, field) {
       /**
@@ -1680,41 +1649,7 @@ function BlackboxLogViewer() {
       invalidateGraph();
     }
 
-    document
-      .querySelector(".log-graph-legend")
-      ?.addEventListener("mousedown", function (e) {
-        if (e.button !== 1) {
-          return;
-        } // middle mouse button only
-
-        if (
-          e.target.classList.contains("graph-legend-group") ||
-          e.target.classList.contains("graph-legend-field")
-        ) {
-          const refreshRequired = restorePenDefaults(
-            activeGraphConfig.getGraphs(),
-            e.target.getAttribute("graph"),
-            e.target.getAttribute("field"),
-          );
-
-          if (refreshRequired) {
-            graph.refreshGraphConfig();
-            invalidateGraph();
-            mouseNotification.show(
-              document.querySelector(".log-graph"),
-              null,
-              null,
-              refreshRequired,
-              1000,
-              null,
-              "bottom-right",
-              0,
-            );
-          }
-          e.preventDefault();
-          return;
-        }
-      });
+    // Middle-click pen reset wired via Vue LegendPanel
 
     function handleGraphCanvasWheel(e, delta) {
       const zoomStep = 10 + (e.altKey ? 15 : 0);
@@ -1734,29 +1669,7 @@ function BlackboxLogViewer() {
       e.preventDefault();
     }
 
-    function handleFieldQuickAdjustWheel(e, delta) {
-      const graphs = activeGraphConfig.getGraphs();
-      const graphIdx = e.target.getAttribute("graph");
-      const fieldIdx = e.target.getAttribute("field");
-      const increase = delta >= 0;
-      let refreshRequired = false;
-
-      if (e.shiftKey) {
-        refreshRequired = changePenZoom(graphs, graphIdx, fieldIdx, increase);
-        e.preventDefault();
-      } else if (e.altKey) {
-        refreshRequired = changePenExpo(graphs, graphIdx, fieldIdx, increase);
-        e.preventDefault();
-      } else if (e.ctrlKey) {
-        refreshRequired = changePenSmoothing(
-          graphs,
-          graphIdx,
-          fieldIdx,
-          increase,
-        );
-        e.preventDefault();
-      }
-
+    function applyPenChange(refreshRequired) {
       if (refreshRequired) {
         graph.refreshGraphConfig();
         invalidateGraph();
@@ -1789,15 +1702,8 @@ function BlackboxLogViewer() {
             rawDelta = -1;
           }
           const delta = Math.max(-1, Math.min(1, rawDelta));
-          if (delta !== 0) {
-            if (e.target.id === "graphCanvas") {
-              handleGraphCanvasWheel(e, delta);
-              return;
-            }
-            if (e.target.classList.contains("field-quick-adjust")) {
-              handleFieldQuickAdjustWheel(e, delta);
-              return;
-            }
+          if (delta !== 0 && e.target.id === "graphCanvas") {
+            handleGraphCanvasWheel(e, delta);
           }
         }
       },
@@ -2239,6 +2145,26 @@ function BlackboxLogViewer() {
     this.legendVisibilityChange = function (hidden) {
       onLegendVisbilityChange(hidden);
     };
+    this.legendResetPen = function (gi, fi) {
+      const graphs = activeGraphConfig.getGraphs();
+      const msg = restorePenDefaults(graphs, String(gi), fi != null ? String(fi) : null);
+      applyPenChange(msg);
+    };
+    this.legendFieldWheel = function (gi, fi, delta, shiftKey, altKey, ctrlKey) {
+      const graphs = activeGraphConfig.getGraphs();
+      const g = String(gi);
+      const f = String(fi);
+      const increase = delta >= 0;
+      let msg = false;
+      if (shiftKey) {
+        msg = changePenZoom(graphs, g, f, increase);
+      } else if (altKey) {
+        msg = changePenExpo(graphs, g, f, increase);
+      } else if (ctrlKey) {
+        msg = changePenSmoothing(graphs, g, f, increase);
+      }
+      applyPenChange(msg);
+    };
     this.setPlaybackRate = function (rate) {
       setPlaybackRate(rate, false);
     };
@@ -2389,14 +2315,5 @@ function BlackboxLogViewer() {
   // Register this controller in the store — replaces globalThis.blackboxLogViewer
   appStore.controller = this;
 }
-
-// Close the dropdowns if not clicking a descendant of the dropdown
-document.addEventListener("click", function (e) {
-  if (!e.target.closest(".dropdown")) {
-    document
-      .querySelectorAll(".dropdown.open")
-      .forEach((el) => el.classList.remove("open"));
-  }
-});
 
 const _app = new BlackboxLogViewer(); // NOSONAR — constructor registers itself in appStore.controller
