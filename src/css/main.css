@@ -299,12 +299,27 @@ html.has-analyser-fullscreen.has-analyser
   transition: opacity 500ms ease-in;
 }
 
+.analyser .spectrum-actions {
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  top: 0;
+  left: 340px;
+  z-index: 9;
+  position: absolute;
+}
+
+.analyser:hover .non-shift .spectrum-actions {
+  opacity: 1;
+  height: auto;
+  transition: opacity 500ms ease-in;
+}
+
 .analyser .spectrum-buttons {
   height: 0;
   overflow: hidden;
   opacity: 0;
-  top: 5px;
-  left: 340px;
+  top: 0;
   z-index: 9;
   position: absolute;
   display: flex;
@@ -355,7 +370,7 @@ html.has-analyser-fullscreen.has-analyser
 
 .analyser .analyser-slider-y {
   left: 1085px;
-  top: 5px;
+  top: 30px;
   position: absolute;
   z-index: 9;
   height: 50px;

@@ -102,15 +102,14 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       const zoomXSlider = document.getElementById("analyserZoomXSlider");
       const zoomYSlider = document.getElementById("analyserZoomYSlider");
       if (zoomXSlider) { zoomXSlider.style.left = `${newSize.width - 130}px`; }
+      const buttonsElem = document.getElementById("spectrumButtons");
+      if (buttonsElem) {
+        buttonsElem.style.left = `${newSize.width - 30}px`;
+      }
       if (zoomYSlider) {
         zoomYSlider.style.left = `${newSize.width - 20}px`;
-        zoomYSlider.style.height = `${Math.min(newSize.height - 40, 100)}px`;
-      }
-      const buttonsElem = document.getElementById("spectrumButtons");
-      const isFullscreen = document.documentElement.classList.contains("has-analyser-fullscreen");
-      if (buttonsElem) {
-        // In fullscreen: place buttons before the horizontal slider; otherwise near right edge
-        buttonsElem.style.left = `${newSize.width - (isFullscreen ? 310 : 150)}px`;
+        zoomYSlider.style.top = "30px";
+        zoomYSlider.style.height = `${Math.min(newSize.height - 60, 100)}px`;
       }
       analyserMaxPSD.style.left = `${newSize.width - 90}px`;
       analyserMinPSD.style.left = `${newSize.width - 90}px`;

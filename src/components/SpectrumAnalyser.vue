@@ -30,27 +30,35 @@
         />
       </div>
 
+      <div id="spectrumComparison" class="spectrum-actions">
+        <UDropdownMenu :items="spectrumMenuItems">
+          <UButton size="xs" variant="outline" color="neutral" icon="i-lucide-ellipsis" title="Spectrum actions" :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }" />
+        </UDropdownMenu>
+        <!-- Hidden elements for legacy JS click handlers -->
+        <button id="btn-spectrum-export" class="hidden" />
+        <input type="file" id="btn-spectrum-import" accept=".csv" class="hidden onlyFullScreenException" multiple/>
+        <button id="btn-spectrum-clear" class="hidden" />
+      </div>
+
       <div id="spectrumButtons" class="spectrum-buttons">
-        <div id="spectrumComparison" class="flex gap-1">
-          <UButton id="btn-spectrum-export" size="xs" color="primary" label="Exp" title="Export spectrum to CSV" />
-          <UButton size="xs" color="primary" label="Imp" title="Import spectrum from CSV" @click="triggerImport" />
-          <input type="file" id="btn-spectrum-import" accept=".csv" class="hidden onlyFullScreenException" multiple/>
-          <UButton id="btn-spectrum-clear" size="xs" color="primary" label="Clr" title="Clear imported spectrums" />
-        </div>
         <div class="view-analyser-fullscreen flex items-center" @click="toggleFullscreen">
           <UButton
-            color="primary"
+            variant="outline"
+            color="neutral"
             size="xs"
             class="icon-resize-full"
             icon="i-lucide-maximize-2"
             title="Maximize analyser"
+            :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
           />
           <UButton
-            color="primary"
+            variant="outline"
+            color="neutral"
             size="xs"
             class="icon-resize-small"
             icon="i-lucide-minimize-2"
             title="Minimize analyser"
+            :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
           />
         </div>
       </div>
@@ -225,9 +233,25 @@ onBeforeUnmount(() => {
   ySliderObserver?.disconnect();
 });
 
+function triggerExport() {
+  document.getElementById("btn-spectrum-export")?.click();
+}
+
 function triggerImport() {
   document.getElementById("btn-spectrum-import").click();
 }
+
+function triggerClear() {
+  document.getElementById("btn-spectrum-clear")?.click();
+}
+
+const spectrumMenuItems = [
+  [
+    { label: "Export CSV", icon: "i-lucide-download", onSelect: triggerExport },
+    { label: "Import CSV", icon: "i-lucide-upload", onSelect: triggerImport },
+    { label: "Clear imported", icon: "i-lucide-trash-2", onSelect: triggerClear },
+  ],
+];
 
 function toggleFullscreen() {
   appStore.controller?.toggleAnalyserFullscreen?.();
