@@ -23,6 +23,13 @@
 
       <Teleport to="#vue-view-controls">
         <ViewControls
+          :header-active="headerDialogOpen"
+          :table-active="graphStore.hasTableOverlay"
+          :video-active="appStore.viewVideo"
+          :craft-active="graphStore.hasCraft"
+          :sticks-active="graphStore.hasSticks"
+          :analyser-active="graphStore.hasAnalyser"
+          :map-active="graphStore.hasMap"
           @view-config="onViewConfig"
           @toggle-header="onToggleHeader"
           @toggle-table="onToggleTable"
@@ -92,7 +99,6 @@
       <KeysDialog v-model:open="keysDialogOpen" />
       <UserSettingsDialog
         v-model:open="settingsDialogOpen"
-        :settings="currentUserSettings"
         @save="onSaveSettings"
       />
       <GraphConfigDialog
@@ -119,6 +125,8 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import { useGraphStore } from "./stores/graph.js";
+import { useAppStore } from "./stores/app.js";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -141,6 +149,9 @@ import LegendPanel from "./components/LegendPanel.vue";
 import FieldValuesPanel from "./components/FieldValuesPanel.vue";
 import SeekBarToolbar from "./components/SeekBarToolbar.vue";
 
+const graphStore = useGraphStore();
+const appStore = useAppStore();
+
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
 const keysDialogOpen = ref(false);
@@ -148,7 +159,6 @@ const settingsDialogOpen = ref(false);
 const graphConfigDialogOpen = ref(false);
 const headerDialogOpen = ref(false);
 const videoExportDialogOpen = ref(false);
-const currentUserSettings = ref({});
 const currentFlightLog = ref(null);
 const currentGraphConfig = ref(null);
 const currentSysConfig = ref(null);
@@ -157,7 +167,6 @@ const currentVideoConfig = ref(null);
 
 function refreshLegacyState() {
   const legacy = getLegacy();
-  currentUserSettings.value = globalThis.userSettings || {};
   currentFlightLog.value = legacy?.flightLog ?? null;
   currentGraphConfig.value = legacy?.activeGraphConfig ?? null;
   currentSysConfig.value = legacy?.flightLog?.getSysConfig?.() ?? null;
@@ -175,7 +184,6 @@ function onFilesSelected(files) {
 }
 
 function onOpenSettings() {
-  refreshLegacyState();
   settingsDialogOpen.value = true;
 }
 
@@ -337,7 +345,7 @@ function onGotoBookmark(index) {
 
 // Refresh legacy state when dialogs opened externally (e.g. from legacy JS)
 watch(
-  [graphConfigDialogOpen, headerDialogOpen, settingsDialogOpen, videoExportDialogOpen],
+  [graphConfigDialogOpen, headerDialogOpen, videoExportDialogOpen],
   (vals, prev) => {
     if (vals.some((v, i) => v && !prev[i])) { refreshLegacyState(); }
   },

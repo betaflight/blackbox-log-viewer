@@ -36,9 +36,9 @@ import { useGraphStore } from "./stores/graph.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
+import { useSettingsStore } from "./stores/settings.js";
 
-// TODO: this is a hack, once we move to web fix this
-globalThis.userSettings = null;
+
 
 // these values set the initial dimensions of a secondary window
 // which always opens at the centre of the user's screen
@@ -127,6 +127,7 @@ function BlackboxLogViewer() {
     videoExportInTime = null,
     videoExportOutTime = null,
     markerTime = 0, // New marker time
+    userSettings,
     graphRendersCount = 0,
     seekBarCanvas = document.querySelector(".log-seek-bar canvas"),
     seekBar = new SeekBar(seekBarCanvas),
@@ -148,6 +149,7 @@ function BlackboxLogViewer() {
   const playbackStore = usePlaybackStore(pinia);
   const workspaceStore = useWorkspaceStore(pinia);
   const appStore = useAppStore(pinia);
+  const settingsStore = useSettingsStore(pinia);
 
   function syncToStores() {
     // Log
@@ -166,6 +168,8 @@ function BlackboxLogViewer() {
     graphStore.hasAnalyser = !!hasAnalyser;
     graphStore.hasAnalyserFullscreen = !!hasAnalyserFullscreen;
     graphStore.hasAnalyserSticks = !!hasAnalyserSticks;
+    graphStore.hasCraft = !!userSettings.drawCraft;
+    graphStore.hasSticks = !!userSettings.drawSticks;
     graphStore.hasMap = !!hasMap;
     graphStore.hasMarker = hasMarker;
     graphStore.hasConfig = hasConfig;
@@ -1512,14 +1516,9 @@ function BlackboxLogViewer() {
       }
       invalidateGraph();
     }
-    // Initialize user settings from prefs (replaces legacy UserSettingsDialog onLoad)
-    prefs.get("userSettings", function (item) {
-      if (item) {
-        globalThis.userSettings = { ...defaultUserSettings, ...item };
-      } else {
-        globalThis.userSettings = { ...defaultUserSettings };
-      }
-    });
+    // userSettings is now managed by settingsStore (loaded from prefs on creation)
+    userSettings = settingsStore.userSettings;
+    globalThis.userSettings = userSettings;
 
     document
       .querySelector(".open-graph-configuration-dialog")
@@ -1808,13 +1807,7 @@ function BlackboxLogViewer() {
     }
 
     function saveOneUserSetting(name, value) {
-      prefs.get("userSettings", function (data) {
-        if (!data) {
-          data = {};
-        }
-        data[name] = value;
-        prefs.set("userSettings", data);
-      });
+      settingsStore.saveSetting(name, value);
     }
 
     function toggleOverrideStatus(userSetting, className) {
@@ -2489,8 +2482,9 @@ function BlackboxLogViewer() {
     createNewBlackboxWindow();
   };
   this.saveUserSettings = function (newSettings) {
-    globalThis.userSettings = newSettings;
-    prefs.set("userSettings", newSettings);
+    settingsStore.saveAll(newSettings);
+    userSettings = settingsStore.userSettings;
+    globalThis.userSettings = userSettings;
 
     if (newSettings.darkMode !== undefined) {
       DarkTheme.setMode(newSettings.darkMode);

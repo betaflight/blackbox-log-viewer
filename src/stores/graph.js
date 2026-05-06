@@ -17,6 +17,8 @@ export const useGraphStore = defineStore("graph", () => {
   const hasAnalyser = ref(false);
   const hasAnalyserFullscreen = ref(false);
   const hasAnalyserSticks = ref(false);
+  const hasCraft = ref(false);
+  const hasSticks = ref(false);
   const hasMap = ref(false);
   const hasMarker = ref(false);
   const hasConfig = ref(false);
@@ -49,6 +51,8 @@ export const useGraphStore = defineStore("graph", () => {
     hasAnalyser,
     hasAnalyserFullscreen,
     hasAnalyserSticks,
+    hasCraft,
+    hasSticks,
     hasMap,
     hasMarker,
     hasConfig,

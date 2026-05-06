@@ -293,36 +293,28 @@
 </template>
 
 <script setup>
-import { h, ref, watch, computed, resolveComponent } from "vue";
+import { h, ref, watch, computed, resolveComponent, toRaw } from "vue";
 import UiBox from "./UiBox.vue";
 import { mixerList } from "../user_settings_data.js";
+import { useSettingsStore } from "../stores/settings.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
 
-const props = defineProps({
-  settings: { type: Object, default: () => ({}) },
-});
+const settingsStore = useSettingsStore();
 
 const emit = defineEmits(["save"]);
 
-// Deep-clone settings into local state when dialog opens or settings change
-function cloneSettings(src) {
-  return JSON.parse(JSON.stringify(src)); // NOSONAR — structuredClone fails on Vue reactive proxies
+// Deep-clone store settings into local state for editing
+function cloneSettings() {
+  return JSON.parse(JSON.stringify(toRaw(settingsStore.userSettings))); // NOSONAR — structuredClone fails on Vue reactive proxies
 }
 
-const local = ref(cloneSettings(props.settings));
-
-watch(
-  () => props.settings,
-  (val) => {
-    local.value = cloneSettings(val);
-  },
-);
+const local = ref(cloneSettings());
 
 // Re-clone when dialog opens to pick up any external changes
 watch(open, (val) => {
   if (val) {
-    local.value = cloneSettings(props.settings);
+    local.value = cloneSettings();
   }
 });
 
@@ -370,7 +362,8 @@ function onLogoChange(e) {
 }
 
 function onSave() {
-  emit("save", cloneSettings(local.value));
+  const raw = JSON.parse(JSON.stringify(local.value));
+  emit("save", raw);
   open.value = false;
 }
 

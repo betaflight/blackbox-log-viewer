@@ -14,20 +14,22 @@
       />
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="headerActive ? 'primary' : 'neutral'"
         icon="i-lucide-info"
         size="xs"
-        aria-label="View log header"
-        title="View log header (H)"
+        :aria-label="headerActive ? 'Hide log header' : 'Show log header'"
+        :aria-pressed="headerActive"
+        title="Log header (H)"
         @click="$emit('toggle-header')"
       />
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="tableActive ? 'primary' : 'neutral'"
         icon="i-lucide-table"
         size="xs"
-        aria-label="View table"
-        title="View table (T)"
+        :aria-label="tableActive ? 'Hide table' : 'Show table'"
+        :aria-pressed="tableActive"
+        title="Table (T)"
         @click="$emit('toggle-table')"
       />
     </div>
@@ -38,46 +40,51 @@
     <div class="flex items-center gap-0.5">
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="videoActive ? 'primary' : 'neutral'"
         icon="i-lucide-film"
         size="xs"
-        aria-label="Video"
+        :aria-label="videoActive ? 'Hide video' : 'Show video'"
+        :aria-pressed="videoActive"
         title="Video"
         @click="$emit('toggle-video')"
       />
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="craftActive ? 'primary' : 'neutral'"
         icon="i-lucide-plane"
         size="xs"
-        aria-label="Craft"
+        :aria-label="craftActive ? 'Hide craft' : 'Show craft'"
+        :aria-pressed="craftActive"
         title="Craft"
         @click="$emit('toggle-craft')"
       />
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="sticksActive ? 'primary' : 'neutral'"
         icon="i-lucide-gamepad-2"
         size="xs"
-        aria-label="Sticks"
+        :aria-label="sticksActive ? 'Hide sticks' : 'Show sticks'"
+        :aria-pressed="sticksActive"
         title="Sticks"
         @click="$emit('toggle-sticks')"
       />
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="analyserActive ? 'primary' : 'neutral'"
         icon="i-lucide-bar-chart-3"
         size="xs"
-        aria-label="Analyser"
+        :aria-label="analyserActive ? 'Hide analyser' : 'Show analyser'"
+        :aria-pressed="analyserActive"
         title="Analyser (A)"
         @click="$emit('toggle-analyser')"
       />
       <UButton
         variant="ghost"
-        color="neutral"
+        :color="mapActive ? 'primary' : 'neutral'"
         icon="i-lucide-map-pin"
         size="xs"
-        aria-label="Map"
+        :aria-label="mapActive ? 'Hide map' : 'Show map'"
+        :aria-pressed="mapActive"
         title="Map"
         @click="$emit('toggle-map')"
       />
@@ -86,6 +93,16 @@
 </template>
 
 <script setup>
+defineProps({
+  headerActive: { type: Boolean, default: false },
+  tableActive: { type: Boolean, default: false },
+  videoActive: { type: Boolean, default: false },
+  craftActive: { type: Boolean, default: false },
+  sticksActive: { type: Boolean, default: false },
+  analyserActive: { type: Boolean, default: false },
+  mapActive: { type: Boolean, default: false },
+});
+
 defineEmits([
   "view-config",
   "toggle-header",

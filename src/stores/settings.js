@@ -1,29 +1,42 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { reactive, toRaw } from "vue";
+import { defaultUserSettings } from "../user_settings_data.js";
+import { PrefStorage } from "../pref_storage.js";
+
+const prefs = new PrefStorage();
 
 export const useSettingsStore = defineStore("settings", () => {
-  const userSettings = ref(null);
-  const videoConfig = ref({});
-  const offsetCache = ref([]);
+  const userSettings = reactive({ ...defaultUserSettings });
 
-  function setUserSettings(settings) {
-    userSettings.value = settings;
+  function load() {
+    prefs.get("userSettings", (item) => {
+      if (item) {
+        Object.assign(userSettings, defaultUserSettings, item);
+      }
+    });
   }
 
-  function setVideoConfig(config) {
-    videoConfig.value = config;
+  function saveAll(newSettings) {
+    Object.assign(userSettings, newSettings);
+    prefs.set("userSettings", toRaw(userSettings));
   }
 
-  function setOffsetCache(cache) {
-    offsetCache.value = cache;
+  function saveSetting(key, value) {
+    userSettings[key] = value;
+    prefs.get("userSettings", (data) => {
+      const merged = data || {};
+      merged[key] = value;
+      prefs.set("userSettings", merged);
+    });
   }
+
+  // Load persisted settings on creation
+  load();
 
   return {
     userSettings,
-    videoConfig,
-    offsetCache,
-    setUserSettings,
-    setVideoConfig,
-    setOffsetCache,
+    load,
+    saveAll,
+    saveSetting,
   };
 });
