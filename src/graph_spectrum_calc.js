@@ -302,7 +302,7 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function (
     const psd = this._psd(fftInput, fftChunkLength, 0, "density"); // Using the one segment with all chunks fftChunkLength size, it will extended at power at 2 size inside _psd() - _fft_segmented()
     maxNoise = Math.max(psd.max, maxNoise);
     // The _psd() can extend fft data size. Set psdLength and create matrix by first using
-    if (matrixPsdOutput == undefined) {
+    if (matrixPsdOutput === undefined) {
       psdLength = psd.psdOutput.length;
       matrixPsdOutput = new Array(NUM_VS_BINS)
         .fill(null)
@@ -538,7 +538,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
       for (let i = 0; i < vsIndexes.length; i++) {
         const vsFieldIx = vsIndexes[i];
         let value = chunk.frames[frameIndex][vsFieldIx];
-        if (vsFieldNames == FIELD_RPM_NAMES) {
+        if (vsFieldNames === FIELD_RPM_NAMES) {
           const maxRPM = (MAX_RPM_HZ_VALUE * this._motorPoles) / 3.333;
           if (value > maxRPM) {
             value = maxRPM;
@@ -582,12 +582,12 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
   }
 
   // Use small top margin for RPM axis only. Because it has bad axis view for throttle
-  if (vsFieldNames == FIELD_RPM_NAMES) {
+  if (vsFieldNames === FIELD_RPM_NAMES) {
     maxValue += ((maxValue - minValue) * RPM_AXIS_TOP_MARGIN_PERCENT) / 100;
   }
 
   if (minValue > maxValue) {
-    if (minValue == Infinity) {
+    if (minValue === Infinity) {
       // this should never happen
       minValue = 0;
       maxValue = 100;
@@ -749,22 +749,22 @@ GraphSpectrumCalc._psd = function (
   if (userSettings.analyserHanning) {
     const window = Array(pointsPerSegment).fill(1);
     this._hanningWindow(window, pointsPerSegment);
-    if (scaling == "density") {
+    if (scaling === "density") {
       let skSum = 0;
       for (const value of window) {
         skSum += value ** 2;
       }
       scale = 1 / (this._blackBoxRate * skSum);
-    } else if (scaling == "spectrum") {
+    } else if (scaling === "spectrum") {
       let sum = 0;
       for (const value of window) {
         sum += value;
       }
       scale = 1 / sum ** 2;
     }
-  } else if (scaling == "density") {
+  } else if (scaling === "density") {
     scale = 1 / pointsPerSegment;
-  } else if (scaling == "spectrum") {
+  } else if (scaling === "spectrum") {
     scale = 1 / pointsPerSegment ** 2;
   }
 
@@ -789,9 +789,9 @@ GraphSpectrumCalc._psd = function (
     psdOutput[i] = 0.0;
     for (let j = 0; j < segmentsCount; j++) {
       let p = scale * fftOutput[j][i] ** 2;
-      if (i != 0) {
-        const even = dataCount % 2 == 0;
-        if (!even || (even && i != dataCount - 1)) {
+      if (i !== 0) {
+        const even = dataCount % 2 === 0;
+        if (!even || (even && i !== dataCount - 1)) {
           p *= 2;
         }
       }
@@ -849,7 +849,7 @@ GraphSpectrumCalc._fft_segmented = function (
     }
 
     let fftLength;
-    if (pointsPerSegment != samplesCount) {
+    if (pointsPerSegment !== samplesCount) {
       fftLength = Math.floor(pointsPerSegment / 2);
     } else {
       // Extend the one segment input on power at 2 size

@@ -123,7 +123,7 @@ export function FlightLogGrapher(
   }
 
   function onMouseDown(e) {
-    if (e.which == 1) {
+    if (e.which === 1) {
       //Left mouse button only for seeking
       lastMouseX = e.pageX;
 
@@ -141,7 +141,7 @@ export function FlightLogGrapher(
   }
 
   function onTouchStart(e) {
-    if (e.which == 0) {
+    if (e.which === 0) {
       lastMouseX = e.originalEvent.touches[0].pageX;
 
       //"capture" so we can drag outside the boundaries of canvas
@@ -470,7 +470,7 @@ export function FlightLogGrapher(
     // horizontal lines
     for (let y = 1; y < GRID_LINES; y++) {
       const yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
-      if (yValue != 0 && Math.abs(yValue < plotHeight / 2)) {
+      if (yValue !== 0 && Math.abs(yValue < plotHeight / 2)) {
         canvasContext.moveTo(0, yValue);
         canvasContext.lineTo(canvas.width, yValue);
       }
@@ -521,7 +521,7 @@ export function FlightLogGrapher(
 
       align = align || "left";
       canvasContext.textAlign = align;
-      const labelDirection = align == "left" ? 1 : -1;
+      const labelDirection = align === "left" ? 1 : -1;
 
       canvasContext.lineWidth = 1;
       canvasContext.beginPath();
@@ -722,7 +722,7 @@ export function FlightLogGrapher(
         }
 
         const markerFrequency =
-          (windowCenterTime - markerEvent.time).toFixed(0) != 0
+          (windowCenterTime - markerEvent.time).toFixed(0) !== 0
             ? `${(1000000 / (windowCenterTime - markerEvent.time)).toFixed(
                 0,
               )}Hz`
@@ -969,8 +969,8 @@ export function FlightLogGrapher(
                 ? field.color
                 : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
               field.lineWidth ? field.lineWidth : null,
-              graphConfig.highlightGraphIndex == i &&
-                graphConfig.highlightFieldIndex == j,
+              graphConfig.highlightGraphIndex === i &&
+                graphConfig.highlightFieldIndex === j,
             );
           }
 
@@ -1027,9 +1027,9 @@ export function FlightLogGrapher(
           );
         }
 
-        if (options.craftType == "3D") {
+        if (options.craftType === "3D") {
           craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
-        } else if (options.craftType == "2D") {
+        } else if (options.craftType === "2D") {
           craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
         }
       }
@@ -1134,11 +1134,11 @@ export function FlightLogGrapher(
 
   this.initializeCraftModel = function () {
     // Ensure craftType is a valid value
-    if (["2D", "3D"].indexOf(options.craftType) == -1) {
+    if (["2D", "3D"].indexOf(options.craftType) === -1) {
       options.craftType = defaultOptions.craftType;
     }
 
-    if (options.craftType == "3D") {
+    if (options.craftType === "3D") {
       if (craftCanvas) {
         try {
           craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
@@ -1152,7 +1152,7 @@ export function FlightLogGrapher(
       }
     }
 
-    if (options.craftType == "2D") {
+    if (options.craftType === "2D") {
       craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
     }
   };
