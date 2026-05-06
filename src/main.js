@@ -29,8 +29,8 @@ import { DarkTheme } from "./dark_theme.js";
 import { ThemeColors } from "./theme_colors.js";
 import pinia from "./pinia_instance.js";
 import { useLogStore } from "./stores/log.js";
-import { useGraphStore, GRAPH_MIN_ZOOM, GRAPH_MAX_ZOOM, GRAPH_DEFAULT_ZOOM } from "./stores/graph.js";
-import { usePlaybackStore, GRAPH_STATE_PAUSED, GRAPH_STATE_PLAY, PLAYBACK_MIN_RATE, PLAYBACK_MAX_RATE, PLAYBACK_DEFAULT_RATE } from "./stores/playback.js";
+import { useGraphStore, GRAPH_MIN_ZOOM, GRAPH_MAX_ZOOM } from "./stores/graph.js";
+import { usePlaybackStore, GRAPH_STATE_PAUSED, GRAPH_STATE_PLAY, PLAYBACK_MIN_RATE, PLAYBACK_MAX_RATE } from "./stores/playback.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
@@ -79,16 +79,12 @@ function BlackboxLogViewer() {
   const fieldPresenter = FlightLogFieldPresenter;
   let hasVideo = false;
   let hasLog = false;
-  let hasMarker = false; // add measure feature
-  let hasAnalyser;
-  let hasMap;
-  let hasAnalyserFullscreen;
-  const hasAnalyserSticks = false;
-  let viewVideo = true;
-  let hasTableOverlay = false;
-  let hasConfig = false;
-  let hasConfigOverlay = false;
-  let isFullscreen = false; // New fullscreen feature (to hide table)
+  // hasMarker lives in graphStore.hasMarker
+  // hasAnalyser, hasMap, hasAnalyserFullscreen live in graphStore
+  // hasAnalyserSticks constant false, set in graphStore
+  // viewVideo lives in appStore.viewVideo
+  // hasTableOverlay, hasConfig, hasConfigOverlay live in graphStore
+  // isFullscreen lives in graphStore.isFullscreen
   const video = document.getElementById("logVideo");
   const canvas = document.getElementById("graphCanvas");
   const analyserCanvas = document.getElementById("analyserCanvas");
@@ -98,16 +94,15 @@ function BlackboxLogViewer() {
   let videoOffset = 0.0;
   let videoExportInTime = null;
   let videoExportOutTime = null;
-  let markerTime = 0; // New marker time
+  // markerTime lives in graphStore.markerTime
   let userSettings;
   const seekBarCanvas = document.getElementById("seekbarCanvas");
   const seekBar = new SeekBar(seekBarCanvas);
   const seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar));
-  let seekBarMode = "avgThrottle";
+  // seekBarMode lives in graphStore.seekBarMode
   let animationFrameIsQueued = false;
-  let playbackRate = PLAYBACK_DEFAULT_RATE;
-  let graphZoom = GRAPH_DEFAULT_ZOOM;
-  let lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
+  // playbackRate lives in playbackStore.playbackRate
+  // graphZoom, lastGraphZoom live in graphStore
   const mapGrapher = new MapGrapher();
 
   // --- Pinia store sync ---
@@ -132,26 +127,12 @@ function BlackboxLogViewer() {
     logStore.videoURL = videoURL;
 
     // Graph
-    graphStore.graphZoom = graphZoom;
-    graphStore.lastGraphZoom = lastGraphZoom;
-    graphStore.hasTableOverlay = hasTableOverlay;
-    graphStore.hasAnalyser = !!hasAnalyser;
-    graphStore.hasAnalyserFullscreen = !!hasAnalyserFullscreen;
-    graphStore.hasAnalyserSticks = !!hasAnalyserSticks;
     graphStore.hasCraft = !!userSettings.drawCraft;
     graphStore.hasSticks = !!userSettings.drawSticks;
-    graphStore.hasMap = !!hasMap;
-    graphStore.hasMarker = hasMarker;
-    graphStore.isFullscreen = isFullscreen;
-    graphStore.markerTime = markerTime;
-    graphStore.seekBarMode = seekBarMode;
-
-    // Graph config
     graphStore.activeGraphConfig = activeGraphConfig;
 
     // Playback
     playbackStore.graphState = graphState;
-    playbackStore.playbackRate = playbackRate;
     playbackStore.videoOffset = videoOffset;
     playbackStore.videoExportInTime = videoExportInTime;
     playbackStore.videoExportOutTime = videoExportOutTime;
@@ -161,9 +142,6 @@ function BlackboxLogViewer() {
     workspaceStore.activeWorkspace = activeWorkspace;
     workspaceStore.workspaceGraphConfigs = workspaceGraphConfigs || [];
     workspaceStore.bookmarkTimes = [...bookmarkTimes];
-
-    // App
-    appStore.viewVideo = viewVideo;
   }
 
   // TODO: Figure out if we can open the same file in a new window
@@ -269,11 +247,11 @@ function BlackboxLogViewer() {
         true,
       );
       appStore.graphTimeDisplay = graphTimeText;
-      if (hasMarker) {
+      if (graphStore.hasMarker) {
         const markerText = `Marker Offset ${formatTime(
-          (currentBlackboxTime - markerTime) / 1000,
+          (currentBlackboxTime - graphStore.markerTime) / 1000,
           true,
-        )}ms ${(1000000 / (currentBlackboxTime - markerTime)).toFixed(0)}Hz`;
+        )}ms ${(1000000 / (currentBlackboxTime - graphStore.markerTime)).toFixed(0)}Hz`;
         appStore.statusMarkerOffset = markerText;
       }
 
@@ -303,7 +281,7 @@ function BlackboxLogViewer() {
         delta = 0;
       } else {
         delta = Math.floor(
-          ((now - lastRenderTime) * 1000 * playbackRate) / 100,
+          ((now - lastRenderTime) * 1000 * playbackStore.playbackRate) / 100,
         );
       }
 
@@ -364,7 +342,6 @@ function BlackboxLogViewer() {
   }
 
   function setSeekBarMode(mode) {
-    seekBarMode = mode;
     graphStore.seekBarMode = mode;
     if (flightLog) {
       const activity = flightLog.getActivitySummary();
@@ -462,7 +439,7 @@ function BlackboxLogViewer() {
 
     seekBar.setActivity(
       activity.times,
-      activity[seekBarMode],
+      activity[graphStore.seekBarMode],
       activity.hasEvent,
     );
     seekBar.repaint();
@@ -543,24 +520,22 @@ function BlackboxLogViewer() {
 
   function setPlaybackRate(rate, _updateUi) {
     if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
-      playbackRate = rate;
+      playbackStore.playbackRate = rate;
 
       if (video) {
         video.playbackRate = rate / 100;
       }
     }
-
-    playbackStore.playbackRate = playbackRate;
   }
 
   function setGraphZoom(zoom, _updateUi) {
     if (zoom == null) {
       // go back to last zoom value
-      zoom = lastGraphZoom;
+      zoom = graphStore.lastGraphZoom;
     }
     if (zoom >= GRAPH_MIN_ZOOM && zoom <= GRAPH_MAX_ZOOM) {
-      lastGraphZoom = graphZoom;
-      graphZoom = zoom;
+      graphStore.lastGraphZoom = graphStore.graphZoom;
+      graphStore.graphZoom = zoom;
 
       if (graph) {
         graph.setGraphZoom(zoom / 100);
@@ -568,28 +543,24 @@ function BlackboxLogViewer() {
       }
     }
 
-    graphStore.graphZoom = graphZoom;
-    graphStore.lastGraphZoom = lastGraphZoom;
   }
 
   function showConfigFile(state) {
-    if (hasConfig) {
+    if (graphStore.hasConfig) {
       if (state == null) {
-        hasConfigOverlay = !hasConfigOverlay;
+        graphStore.hasConfigOverlay = !graphStore.hasConfigOverlay;
       } else {
-        hasConfigOverlay = !!state;
+        graphStore.hasConfigOverlay = !!state;
       }
-      graphStore.hasConfigOverlay = hasConfigOverlay;
     }
   }
 
   function showValueTable(state) {
     if (state == null) {
-      hasTableOverlay = !hasTableOverlay;
+      graphStore.hasTableOverlay = !graphStore.hasTableOverlay;
     } else {
-      hasTableOverlay = !!state;
+      graphStore.hasTableOverlay = !!state;
     }
-    graphStore.hasTableOverlay = hasTableOverlay;
     updateValuesChart();
   }
 
@@ -679,7 +650,7 @@ function BlackboxLogViewer() {
     updateCanvasSize();
 
     setGraphState(GRAPH_STATE_PAUSED);
-    setGraphZoom(graphZoom, true);
+    setGraphZoom(graphStore.graphZoom, true);
     syncToStores();
   }
 
@@ -737,12 +708,11 @@ function BlackboxLogViewer() {
             configurationDefaults.loadFile(file);
           } else {
             _configuration = new Configuration(file);
-            hasConfig = true;
             graphStore.hasConfig = true;
           }
         } catch {
           _configuration = null;
-          hasConfig = false;
+          graphStore.hasConfig = false;
         }
         return;
       }
@@ -766,8 +736,7 @@ function BlackboxLogViewer() {
       }
 
       renderLogFileInfo(file);
-      seekBarMode = "avgThrottle";
-      graphStore.seekBarMode = seekBarMode;
+      graphStore.seekBarMode = "avgThrottle";
       currentOffsetCache.log = file.name; // store the name of the loaded log file
       currentOffsetCache.index = null; // and clear the index
 
@@ -781,7 +750,7 @@ function BlackboxLogViewer() {
       selectLog(null);
 
       if (graph) {
-        graph.setAnalyser(hasAnalyserFullscreen);
+        graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       }
     };
 
@@ -807,8 +776,8 @@ function BlackboxLogViewer() {
     video.volume = 1.0;
     video.src = videoURL;
 
-    // Reapply the last playbackRate to the new video
-    setPlaybackRate(playbackRate, true);
+    // Reapply the last playbackStore.playbackRate to the new video
+    setPlaybackRate(playbackStore.playbackRate, true);
   }
 
   function videoLoaded(_e) {
@@ -876,18 +845,18 @@ function BlackboxLogViewer() {
     const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
     if (toggleAnalizer) {
       if (lockAnalyserHide) {
-        hasAnalyser = true;
+        graphStore.hasAnalyser = true;
       } else {
-        hasAnalyser = !hasAnalyser;
+        graphStore.hasAnalyser = !graphStore.hasAnalyser;
       }
     } else {
       activeGraphConfig.selectedFieldName = fieldName;
       activeGraphConfig.selectedGraphIndex = gi;
       activeGraphConfig.selectedFieldIndex = fi;
-      hasAnalyser = true;
+      graphStore.hasAnalyser = true;
     }
-    graph.setDrawAnalyser(hasAnalyser, ctrlKey);
-    prefs.set("hasAnalyser", hasAnalyser);
+    graph.setDrawAnalyser(graphStore.hasAnalyser, ctrlKey);
+    prefs.set("hasAnalyser", graphStore.hasAnalyser);
     invalidateGraph();
   }
 
@@ -904,18 +873,15 @@ function BlackboxLogViewer() {
   }
 
   function setMarker(state) {
-    hasMarker = state;
+    graphStore.hasMarker = state;
   }
 
-  function _setFullscreen(state) {
-    isFullscreen = state;
-  }
 
   this.getMarker = function () {
     // get marker field
     return {
-      state: hasMarker,
-      time: markerTime,
+      state: graphStore.hasMarker,
+      time: graphStore.markerTime,
     };
   };
 
@@ -1149,11 +1115,10 @@ function BlackboxLogViewer() {
       }
     });
 
-    hasTableOverlay = false;
     graphStore.hasTableOverlay = false;
 
     // Reset the analyser window on application startup.
-    hasAnalyser = false;
+    graphStore.hasAnalyser = false;
 
     // File open and new window wired via Vue AppToolbar
 
@@ -1246,17 +1211,17 @@ function BlackboxLogViewer() {
     };
 
     const logSmartSync = function () {
-      if (hasMarker && hasVideo && hasLog) {
+      if (graphStore.hasMarker && hasVideo && hasLog) {
         try {
           setVideoOffset(
-            videoOffset + (currentBlackboxTime - markerTime) / 1000000,
+            videoOffset + (currentBlackboxTime - graphStore.markerTime) / 1000000,
             true,
           );
         } catch {
           console.log("Failed to set video offset");
         }
       }
-      setMarker(!hasMarker);
+      setMarker(!graphStore.hasMarker);
       invalidateGraph();
     };
     // Sync controls wired via Vue SyncPanel bridge
@@ -1318,7 +1283,7 @@ function BlackboxLogViewer() {
       }
     };
     this.gotoMarker = function () {
-      setCurrentBlackboxTime(markerTime);
+      setCurrentBlackboxTime(graphStore.markerTime);
       invalidateGraph();
     };
     this.showConfigFile = function () {
@@ -1579,13 +1544,13 @@ function BlackboxLogViewer() {
       const zoomStep = 10 + (e.altKey ? 15 : 0);
       if (delta < 0) {
         if (e.altKey || e.shiftKey) {
-          setGraphZoom(graphZoom - zoomStep, true);
+          setGraphZoom(graphStore.graphZoom - zoomStep, true);
         } else {
           logJumpBack(0.1);
         }
       } else {
         if (e.altKey || e.shiftKey) {
-          setGraphZoom(graphZoom + zoomStep, true);
+          setGraphZoom(graphStore.graphZoom + zoomStep, true);
         } else {
           logJumpForward(0.1);
         }
@@ -1674,17 +1639,17 @@ function BlackboxLogViewer() {
 
     function handleAnalyserKey(shifted) {
       if (!shifted) {
-        hasAnalyser =
-          activeGraphConfig.selectedFieldName == null ? false : !hasAnalyser;
-        if (!hasAnalyser) {
-          hasAnalyserFullscreen = false;
+        graphStore.hasAnalyser =
+          activeGraphConfig.selectedFieldName == null ? false : !graphStore.hasAnalyser;
+        if (!graphStore.hasAnalyser) {
+          graphStore.hasAnalyserFullscreen = false;
           graph.setAnalyser(false);
         }
-        graph.setDrawAnalyser(hasAnalyser);
-        prefs.set("hasAnalyser", hasAnalyser);
+        graph.setDrawAnalyser(graphStore.hasAnalyser);
+        prefs.set("hasAnalyser", graphStore.hasAnalyser);
       } else {
-        hasAnalyserFullscreen = hasAnalyser ? !hasAnalyserFullscreen : false;
-        graph.setAnalyser(hasAnalyserFullscreen);
+        graphStore.hasAnalyserFullscreen = graphStore.hasAnalyser ? !graphStore.hasAnalyserFullscreen : false;
+        graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       }
       invalidateGraph();
     }
@@ -1715,9 +1680,9 @@ function BlackboxLogViewer() {
       if (e.altKey) {
         logSmartSync();
       } else {
-        markerTime = currentBlackboxTime;
-        setMarker(!hasMarker);
-        appStore.statusMarkerOffset = hasMarker
+        graphStore.markerTime = currentBlackboxTime;
+        setMarker(!graphStore.hasMarker);
+        appStore.statusMarkerOffset = graphStore.hasMarker
           ? `Marker Offset ${formatTime(0)}ms`
           : "";
         invalidateGraph();
@@ -1750,7 +1715,7 @@ function BlackboxLogViewer() {
           if (lastGraphConfig != null) {
             newGraphConfig(lastGraphConfig);
           }
-        } else if (graphZoom === GRAPH_MIN_ZOOM) {
+        } else if (graphStore.graphZoom === GRAPH_MIN_ZOOM) {
           setGraphZoom(null, true);
         } else {
           setGraphZoom(GRAPH_MIN_ZOOM, true);
@@ -1844,14 +1809,14 @@ function BlackboxLogViewer() {
           break;
         case "ArrowLeft":
           if (e.shiftKey) {
-            setGraphZoom(graphZoom - 10 - (e.altKey ? 15 : 0), true);
+            setGraphZoom(graphStore.graphZoom - 10 - (e.altKey ? 15 : 0), true);
           } else {
             logJumpBack(null, e.altKey);
           }
           break;
         case "ArrowRight":
           if (e.shiftKey) {
-            setGraphZoom(graphZoom + 10 + (e.altKey ? 15 : 0), true);
+            setGraphZoom(graphStore.graphZoom + 10 + (e.altKey ? 15 : 0), true);
           } else {
             logJumpForward(null, e.altKey);
           }
@@ -1952,8 +1917,7 @@ function BlackboxLogViewer() {
 
     // View toggle bridges
     this.toggleVideo = function () {
-      viewVideo = !viewVideo;
-      appStore.viewVideo = viewVideo;
+      appStore.viewVideo = !appStore.viewVideo;
     };
     this.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
@@ -1981,40 +1945,39 @@ function BlackboxLogViewer() {
     };
     this.toggleAnalyser = function () {
       if (activeGraphConfig.selectedFieldName != null) {
-        hasAnalyser = !hasAnalyser;
+        graphStore.hasAnalyser = !graphStore.hasAnalyser;
       } else {
         const graphs = activeGraphConfig.getGraphs();
         if (graphs.length === 0 || graphs[0].fields.length === 0) {
-          hasAnalyser = false;
+          graphStore.hasAnalyser = false;
         } else {
           activeGraphConfig.selectedFieldName =
             graphs[0].fields[0].friendlyName;
           activeGraphConfig.selectedGraphIndex = 0;
           activeGraphConfig.selectedFieldIndex = 0;
-          hasAnalyser = true;
+          graphStore.hasAnalyser = true;
         }
       }
-      if (!hasAnalyser) {
-        hasAnalyserFullscreen = false;
+      if (!graphStore.hasAnalyser) {
+        graphStore.hasAnalyserFullscreen = false;
         graph.setAnalyser(false);
       }
-      graph.setDrawAnalyser(hasAnalyser);
-      prefs.set("hasAnalyser", hasAnalyser);
+      graph.setDrawAnalyser(graphStore.hasAnalyser);
+      prefs.set("hasAnalyser", graphStore.hasAnalyser);
       invalidateGraph();
     };
     this.toggleMap = function () {
-      hasMap = !hasMap;
-      graphStore.hasMap = hasMap;
-      prefs.set("hasMap", hasMap);
+      graphStore.hasMap = !graphStore.hasMap;
+      prefs.set("hasMap", graphStore.hasMap);
       if (flightLog?.hasGpsData()) {
         mapGrapher.initialize();
       }
     };
     this.toggleAnalyserFullscreen = function () {
-      if (hasAnalyser) {
-        hasAnalyserFullscreen = !hasAnalyserFullscreen;
-      } else hasAnalyserFullscreen = false;
-      graph.setAnalyser(hasAnalyserFullscreen);
+      if (graphStore.hasAnalyser) {
+        graphStore.hasAnalyserFullscreen = !graphStore.hasAnalyserFullscreen;
+      } else graphStore.hasAnalyserFullscreen = false;
+      graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       invalidateGraph();
     };
     this.toggleSmoothing = function () {
@@ -2111,7 +2074,7 @@ function BlackboxLogViewer() {
     this.selectLogIndex = function (index) {
       selectLog(Number.parseInt(index, 10));
       if (graph) {
-        graph.setAnalyser(hasAnalyserFullscreen);
+        graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       }
     };
     this.switchWorkspace = function (id) {
@@ -2160,10 +2123,10 @@ function BlackboxLogViewer() {
       graphConfig: activeGraphConfig,
       inTime: videoExportInTime,
       outTime: videoExportOutTime,
-      flightVideo: hasVideo && viewVideo ? video.cloneNode() : false,
+      flightVideo: hasVideo && appStore.viewVideo ? video.cloneNode() : false,
       flightVideoOffset: videoOffset,
       hasCraft: userSettings.drawCraft,
-      hasAnalyser: hasAnalyser,
+      hasAnalyser: graphStore.hasAnalyser,
       hasSticks: userSettings.drawSticks,
     };
   };
