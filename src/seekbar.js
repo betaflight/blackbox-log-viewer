@@ -84,22 +84,26 @@ export function SeekBar(canvas) {
     return canvas.getBoundingClientRect().left + window.scrollX;
   }
 
+  let cancelMouseDrag = null;
+  let cancelTouchDrag = null;
+
   function onMouseMove(e) {
-    if (e.which === 1) { seekToDOMPixel(e.pageX - getCanvasOffsetLeft()); }
+    if (e.button === 0) { seekToDOMPixel(e.pageX - getCanvasOffsetLeft()); }
   }
 
   function onMouseDown(e) {
     e.preventDefault();
 
-    if (e.which === 1) {
+    if (e.button === 0) {
       seekToDOMPixel(e.pageX - getCanvasOffsetLeft());
-
       document.body.addEventListener("mousemove", onMouseMove);
 
       function onMouseUp() {
         document.body.removeEventListener("mousemove", onMouseMove);
         document.body.removeEventListener("mouseup", onMouseUp);
+        cancelMouseDrag = null;
       }
+      cancelMouseDrag = onMouseUp;
       document.body.addEventListener("mouseup", onMouseUp);
     }
   }
@@ -114,14 +118,17 @@ export function SeekBar(canvas) {
     e.preventDefault();
 
     seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
-
     document.body.addEventListener("touchmove", onTouchMove);
 
     function onTouchEnd() {
       document.body.removeEventListener("touchmove", onTouchMove);
       document.body.removeEventListener("touchend", onTouchEnd);
+      document.body.removeEventListener("touchcancel", onTouchEnd);
+      cancelTouchDrag = null;
     }
+    cancelTouchDrag = onTouchEnd;
     document.body.addEventListener("touchend", onTouchEnd);
+    document.body.addEventListener("touchcancel", onTouchEnd);
   }
 
   canvas.addEventListener("touchstart", onTouchStart);
@@ -129,6 +136,8 @@ export function SeekBar(canvas) {
   this.destroy = function () {
     canvas.removeEventListener("mousedown", onMouseDown);
     canvas.removeEventListener("touchstart", onTouchStart);
+    if (cancelMouseDrag) { cancelMouseDrag(); }
+    if (cancelTouchDrag) { cancelTouchDrag(); }
   };
 
   this.resize = function (width, height) {
