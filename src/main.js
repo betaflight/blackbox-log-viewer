@@ -2236,11 +2236,13 @@ function BlackboxLogViewer() {
     };
     this.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
+      graphStore.hasCraft = userSettings.drawCraft;
       html.classList.toggle("has-craft", userSettings.drawCraft);
       saveOneUserSetting("drawCraft", userSettings.drawCraft);
     };
     this.toggleSticks = function () {
       userSettings.drawSticks = !userSettings.drawSticks;
+      graphStore.hasSticks = userSettings.drawSticks;
       graph.setDrawSticks(userSettings.drawSticks);
       html.classList.toggle("has-sticks", userSettings.drawSticks);
       saveOneUserSetting("drawSticks", userSettings.drawSticks);
