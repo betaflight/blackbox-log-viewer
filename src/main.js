@@ -1282,7 +1282,7 @@ function BlackboxLogViewer() {
       if (item) {
         workspaceGraphConfigs = upgradeWorkspaceFormat(item);
       } else {
-        workspaceGraphConfigs = ctzsnoozeWorkspace;
+        workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
       }
     });
 
@@ -2353,7 +2353,7 @@ function BlackboxLogViewer() {
       onSaveWorkspace(id, title);
     };
     this.applyDefaultWorkspace = function (index) {
-      const presets = [null, ctzsnoozeWorkspace, supaflyWorkspace];
+      const presets = [null, structuredClone(ctzsnoozeWorkspace), structuredClone(supaflyWorkspace)];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
       }
