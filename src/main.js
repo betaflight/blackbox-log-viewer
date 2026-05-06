@@ -247,101 +247,49 @@ function BlackboxLogViewer() {
   }
 
   function updateValuesChart() {
-    let table = document.querySelector(".log-field-values table"),
-      tbody = table.querySelector("tbody"),
-      i,
-      frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
+    let frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
       fieldNames = flightLog.getMainFieldNames();
-
-    tbody.innerHTML = "";
 
     if (frame) {
       let currentFlightMode =
         frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
 
       if (hasTable || hasTableOverlay) {
-        // Only redraw the table if it is enabled
+        const debugMode = flightLog.getSysConfig().debug_mode;
+        const rowCount = Math.ceil(fieldNames.length / 2);
+        const values = [];
 
-        let rows = [],
-          rowCount = Math.ceil(fieldNames.length / 2);
-
-        for (i = 0; i < rowCount; i++) {
-          let row =
-              `<tr>` +
-              `<td>${fieldPresenter.fieldNameToFriendly(
-                fieldNames[i],
-                flightLog.getSysConfig().debug_mode,
-              )}</td>` +
-              `<td class="raw-value">${atMost2DecPlaces(frame[i])}</td>` +
-              `<td>${fieldPresenter.decodeFieldToFriendly(
-                flightLog,
-                fieldNames[i],
-                frame[i],
-                currentFlightMode,
-              )}</td>`,
-            secondColumn = i + rowCount;
-
+        for (let i = 0; i < rowCount; i++) {
+          const row = {
+            name1: fieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
+            raw1: atMost2DecPlaces(frame[i]),
+            decoded1: fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode),
+          };
+          const secondColumn = i + rowCount;
           if (secondColumn < fieldNames.length) {
-            row +=
-              `<td>${fieldPresenter.fieldNameToFriendly(
-                fieldNames[secondColumn],
-                flightLog.getSysConfig().debug_mode,
-              )}</td>` +
-              `<td>${atMost2DecPlaces(frame[secondColumn])}</td>` +
-              `<td>${fieldPresenter.decodeFieldToFriendly(
-                flightLog,
-                fieldNames[secondColumn],
-                frame[secondColumn],
-                currentFlightMode,
-              )}</td>`;
+            row.name2 = fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn], debugMode);
+            row.raw2 = atMost2DecPlaces(frame[secondColumn]);
+            row.decoded2 = fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn], currentFlightMode);
           }
-
-          row += "</tr>";
-
-          rows.push(row);
+          values.push(row);
         }
-
-        tbody.insertAdjacentHTML("beforeend", rows.join(""));
+        logStore.fieldValues = values;
 
         const statRows = [];
-        const statsTable = document.querySelector(
-          ".log-field-values #stats-table",
-        );
-        const statsTbody = statsTable.querySelector("tbody");
-        statsTbody.innerHTML = "";
         const stats = SimpleStats(flightLog).calculate();
         for (const field of Object.keys(stats)) {
           const stat = stats[field];
           if (stat === undefined) {
             continue;
           }
-          const name = fieldPresenter.fieldNameToFriendly(
-            stat.name,
-            flightLog.getSysConfig().debug_mode,
-          );
-          const minRaw = atMost2DecPlaces(stat.min);
-          const minVal = FlightLogFieldPresenter.decodeFieldToFriendly(
-            flightLog,
-            stat.name,
-            stat.min,
-          );
-          const maxRaw = atMost2DecPlaces(stat.max);
-          const maxVal = FlightLogFieldPresenter.decodeFieldToFriendly(
-            flightLog,
-            stat.name,
-            stat.max,
-          );
-          const meanRaw = atMost2DecPlaces(stat.mean);
-          const meanVal = FlightLogFieldPresenter.decodeFieldToFriendly(
-            flightLog,
-            stat.name,
-            stat.mean,
-          );
-          statRows.push(
-            `<tr><td>${name}</td><td>${minVal} (${minRaw})</td><td>${maxVal} (${maxRaw})</td><td>${meanVal} (${meanRaw})</td></tr>`,
-          );
+          statRows.push({
+            name: fieldPresenter.fieldNameToFriendly(stat.name, debugMode),
+            min: `${FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.min)} (${atMost2DecPlaces(stat.min)})`,
+            max: `${FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.max)} (${atMost2DecPlaces(stat.max)})`,
+            mean: `${FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.mean)} (${atMost2DecPlaces(stat.mean)})`,
+          });
         }
-        statsTbody.insertAdjacentHTML("beforeend", statRows.join(""));
+        logStore.fieldStats = statRows;
       }
 
       // Update flight mode flags on status bar

@@ -500,22 +500,6 @@ html.has-analyser-fullscreen.has-analyser
   display: block;
 }
 
-/* Basic table styling (replaces Bootstrap .table .table-condensed) */
-.log-field-values table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: var(--surface-0);
-  overflow-y: auto;
-}
-
-.log-field-values th,
-.log-field-values td {
-  width: 15%;
-  padding: 3px 5px;
-  text-align: left;
-}
-
-.log-field-values td,
 .configuration-file li {
   font-family: monospace;
   font-size: small;
@@ -523,14 +507,6 @@ html.has-analyser-fullscreen.has-analyser
 }
 
 .configuration-file li:nth-child(even) {
-  background-color: var(--surface-100);
-}
-
-.log-field-values .raw-value {
-  max-width: 5em;
-}
-
-.log-field-values tr:nth-child(even) {
   background-color: var(--surface-100);
 }
 

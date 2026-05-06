@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, shallowRef, computed } from "vue";
 
 export const useLogStore = defineStore("log", () => {
   const flightLog = ref(null);
@@ -8,6 +8,10 @@ export const useLogStore = defineStore("log", () => {
   const hasLog = ref(false);
   const hasVideo = ref(false);
   const videoURL = ref(null);
+
+  // Field values table data (updated by updateValuesChart in main.js)
+  const fieldValues = shallowRef([]);
+  const fieldStats = shallowRef([]);
 
   const minTime = computed(() => flightLog.value?.getMinTime() ?? 0);
   const maxTime = computed(() => flightLog.value?.getMaxTime() ?? 0);
@@ -37,6 +41,8 @@ export const useLogStore = defineStore("log", () => {
     hasLog,
     hasVideo,
     videoURL,
+    fieldValues,
+    fieldStats,
     minTime,
     maxTime,
     setFlightLog,
