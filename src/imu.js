@@ -191,34 +191,14 @@ export function IMU(copyFrom) {
       ),
     };
 
-    if (false && magADC) {
-      //TODO temporarily disabled
-      rotateVector(this.estimateMag, deltaGyroAngle);
-
-      this.estimateMag.X =
-        (this.estimateMag.X * gyro_cmpfm_factor + magADC[0]) *
-        INV_GYR_CMPFM_FACTOR;
-      this.estimateMag.Y =
-        (this.estimateMag.Y * gyro_cmpfm_factor + magADC[1]) *
-        INV_GYR_CMPFM_FACTOR;
-      this.estimateMag.Z =
-        (this.estimateMag.Z * gyro_cmpfm_factor + magADC[2]) *
-        INV_GYR_CMPFM_FACTOR;
-
-      attitude.heading = calculateHeading(
-        this.estimateMag,
-        attitude.roll,
-        attitude.pitch,
-      );
-    } else {
-      rotateVector(this.EstN, deltaGyroAngle);
-      normalizeVector(this.EstN, this.EstN);
-      attitude.heading = calculateHeading(
-        this.EstN,
-        attitude.roll,
-        attitude.pitch,
-      );
-    }
+    //TODO magnetometer heading disabled — only EstN heading used
+    rotateVector(this.EstN, deltaGyroAngle);
+    normalizeVector(this.EstN, this.EstN);
+    attitude.heading = calculateHeading(
+      this.EstN,
+      attitude.roll,
+      attitude.pitch,
+    );
 
     return attitude;
   };

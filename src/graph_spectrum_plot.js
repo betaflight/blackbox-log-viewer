@@ -1117,7 +1117,6 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
       "rgba(255,0,0,0.50)",
       3,
     );
-    offset++;
   }
 
   this._drawRateWarning(canvasCtx);
@@ -1399,7 +1398,7 @@ GraphSpectrumPlot._drawInterestFrequency = function (
   stroke,
   lineWidth,
 ) {
-  let interestLabel = "";
+  let interestLabel;
   if (
     this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
     label != ""
@@ -1635,7 +1634,7 @@ GraphSpectrumPlot._drawMousePosition = function (
   mouseX = Math.max(mouseX, marginLeft);
   mouseY = Math.min(mouseY, HEIGHT);
 
-  let mouseFrequency = 0;
+  let mouseFrequency;
 
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||

@@ -1902,10 +1902,10 @@ export function FlightLogParser(logData) {
    * call resetDataState() first.
    */
   this.parseLogData = function (raw, startOffset, endOffset) {
-    let looksLikeFrameCompleted = false,
+    let looksLikeFrameCompleted,
       prematureEof = false,
       frameStart = 0,
-      frameType = null,
+      frameType,
       lastFrameType = null;
 
     invalidateMainStream();

@@ -720,7 +720,6 @@ export function FlightLogGrapher(
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
       canvasContext.fillStyle = ThemeColors.getGraphText();
       canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;
-      shouldSetFont = false;
     }
 
     // Draw Marker Event Line

@@ -441,19 +441,9 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
 };
 
 GraphSpectrumCalc._getFlightChunks = function () {
-  let logStart = 0;
-  if (this._analyserTimeRange.in) {
-    logStart = this._analyserTimeRange.in;
-  } else {
-    logStart = this._flightLog.getMinTime();
-  }
+  let logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
 
-  let logEnd = 0;
-  if (this._analyserTimeRange.out) {
-    logEnd = this._analyserTimeRange.out;
-  } else {
-    logEnd = this._flightLog.getMaxTime();
-  }
+  let logEnd = this._analyserTimeRange.out || this._flightLog.getMaxTime();
 
   // Limit size
   logEnd =
