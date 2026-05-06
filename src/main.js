@@ -115,7 +115,6 @@ function BlackboxLogViewer() {
     analyserCanvas = document.getElementById("analyserCanvas"),
     stickCanvas = document.getElementById("stickCanvas"),
     craftCanvas = document.getElementById("craftCanvas"),
-    html = document.documentElement,
     videoURL = false,
     videoOffset = 0.0,
     videoExportInTime = null,
@@ -152,6 +151,7 @@ function BlackboxLogViewer() {
     logStore.currentBlackboxTime = currentBlackboxTime;
     logStore.hasLog = hasLog;
     logStore.hasVideo = hasVideo;
+    logStore.hasGps = !!flightLog?.hasGpsData?.();
     logStore.videoURL = videoURL;
 
     // Graph
@@ -492,7 +492,6 @@ function BlackboxLogViewer() {
     seekBar.repaint();
 
     // Add flightLog to map
-    html.classList.toggle("has-gps", flightLog.hasGpsData());
     if (flightLog.hasGpsData()) {
       mapGrapher.setFlightLog(flightLog);
     }
@@ -808,21 +807,6 @@ function BlackboxLogViewer() {
 
       hasLog = true;
       logStore.hasLog = true;
-      html.classList.toggle("has-log", hasLog);
-      html.classList.toggle("has-craft", userSettings.drawCraft);
-      html.classList.toggle("has-sticks", userSettings.drawSticks);
-      html.classList.toggle(
-        "has-expo-override",
-        userSettings.graphExpoOverride,
-      );
-      html.classList.toggle(
-        "has-smoothing-override",
-        userSettings.graphSmoothOverride,
-      );
-      html.classList.toggle(
-        "has-grid-override",
-        userSettings.graphSmoothOverride,
-      );
 
       setTimeout(function () {
         globalThis.dispatchEvent(new Event("resize"));
@@ -831,7 +815,6 @@ function BlackboxLogViewer() {
       selectLog(null);
 
       if (graph) {
-        html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
         graph.setAnalyser(hasAnalyserFullscreen);
       }
     };
@@ -864,7 +847,6 @@ function BlackboxLogViewer() {
 
   function videoLoaded(e) {
     hasVideo = true;
-    html.classList.toggle("has-video", hasVideo);
 
     syncToStores();
     setGraphState(GRAPH_STATE_PAUSED);
@@ -939,7 +921,6 @@ function BlackboxLogViewer() {
       hasAnalyser = true;
     }
     graph.setDrawAnalyser(hasAnalyser, ctrlKey);
-    html.classList.toggle("has-analyser", hasAnalyser);
     prefs.set("hasAnalyser", hasAnalyser);
     invalidateGraph();
   }
@@ -957,15 +938,11 @@ function BlackboxLogViewer() {
   }
 
   function setMarker(state) {
-    // update marker field
     hasMarker = state;
-    html.classList.toggle("has-marker", state);
   }
 
   function setFullscreen(state) {
-    // update fullscreen status
     isFullscreen = state;
-    html.classList.toggle("is-fullscreen", state);
   }
 
   this.getMarker = function () {
@@ -1263,7 +1240,6 @@ function BlackboxLogViewer() {
 
     // Reset the analyser window on application startup.
     hasAnalyser = false;
-    html.classList.toggle("has-analyser", hasAnalyser);
 
     // File open and new window wired via Vue AppToolbar
 
@@ -1696,9 +1672,8 @@ function BlackboxLogViewer() {
       settingsStore.saveSetting(name, value);
     }
 
-    function toggleOverrideStatus(userSetting, className) {
-      userSettings[userSetting] = !userSettings[userSetting]; // toggle current setting
-      html.classList.toggle(className, userSettings[userSetting]);
+    function toggleOverrideStatus(userSetting) {
+      userSettings[userSetting] = !userSettings[userSetting];
       saveOneUserSetting(userSetting, userSettings[userSetting]);
       graph.refreshOptions(userSettings);
       graph.refreshGraphConfig();
@@ -1873,15 +1848,12 @@ function BlackboxLogViewer() {
           activeGraphConfig.selectedFieldName == null ? false : !hasAnalyser;
         if (!hasAnalyser) {
           hasAnalyserFullscreen = false;
-          html.classList.remove("has-analyser-fullscreen");
           graph.setAnalyser(false);
         }
         graph.setDrawAnalyser(hasAnalyser);
-        html.classList.toggle("has-analyser", hasAnalyser);
         prefs.set("hasAnalyser", hasAnalyser);
       } else {
         hasAnalyserFullscreen = hasAnalyser ? !hasAnalyserFullscreen : false;
-        html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
         graph.setAnalyser(hasAnalyserFullscreen);
       }
       invalidateGraph();
@@ -1962,10 +1934,7 @@ function BlackboxLogViewer() {
     function handleKeySave(e, shifted) {
       try {
         if (!shifted) {
-          toggleOverrideStatus(
-            "graphSmoothOverride",
-            "has-smoothing-override",
-          );
+          toggleOverrideStatus("graphSmoothOverride");
         } else if (e.altKey) {
           makeScreenshot();
         } else if (e.shiftKey) {
@@ -1980,10 +1949,10 @@ function BlackboxLogViewer() {
       e.preventDefault();
     }
 
-    function handleKeyOverride(settingKey, cssClass, e, shifted) {
+    function handleKeyOverride(settingKey, e, shifted) {
       try {
         if (!shifted) {
-          toggleOverrideStatus(settingKey, cssClass);
+          toggleOverrideStatus(settingKey);
         }
       } catch {
         // Intentionally ignored — override gracefully degrades when graph state is incomplete
@@ -2022,10 +1991,10 @@ function BlackboxLogViewer() {
       KeyZ: handleKeyZoom,
       KeyS: handleKeySave,
       KeyX(e, shifted) {
-        handleKeyOverride("graphExpoOverride", "has-expo-override", e, shifted);
+        handleKeyOverride("graphExpoOverride", e, shifted);
       },
       KeyG(e, shifted) {
-        handleKeyOverride("graphGridOverride", "has-grid-override", e, shifted);
+        handleKeyOverride("graphGridOverride", e, shifted);
       },
     };
 
@@ -2175,19 +2144,16 @@ function BlackboxLogViewer() {
     this.toggleVideo = function () {
       viewVideo = !viewVideo;
       appStore.viewVideo = viewVideo;
-      html.classList.toggle("video-hidden", !viewVideo);
     };
     this.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
       graphStore.hasCraft = userSettings.drawCraft;
-      html.classList.toggle("has-craft", userSettings.drawCraft);
       saveOneUserSetting("drawCraft", userSettings.drawCraft);
     };
     this.toggleSticks = function () {
       userSettings.drawSticks = !userSettings.drawSticks;
       graphStore.hasSticks = userSettings.drawSticks;
       graph.setDrawSticks(userSettings.drawSticks);
-      html.classList.toggle("has-sticks", userSettings.drawSticks);
       saveOneUserSetting("drawSticks", userSettings.drawSticks);
       invalidateGraph();
     };
@@ -2220,18 +2186,15 @@ function BlackboxLogViewer() {
       }
       if (!hasAnalyser) {
         hasAnalyserFullscreen = false;
-        html.classList.remove("has-analyser-fullscreen");
         graph.setAnalyser(false);
       }
       graph.setDrawAnalyser(hasAnalyser);
-      html.classList.toggle("has-analyser", hasAnalyser);
       prefs.set("hasAnalyser", hasAnalyser);
       invalidateGraph();
     };
     this.toggleMap = function () {
       hasMap = !hasMap;
       graphStore.hasMap = hasMap;
-      html.classList.toggle("has-map", hasMap);
       prefs.set("hasMap", hasMap);
       if (flightLog?.hasGpsData()) {
         mapGrapher.initialize();
@@ -2241,20 +2204,17 @@ function BlackboxLogViewer() {
       if (hasAnalyser) {
         hasAnalyserFullscreen = !hasAnalyserFullscreen;
       } else hasAnalyserFullscreen = false;
-      hasAnalyserFullscreen
-        ? html.classList.add("has-analyser-fullscreen")
-        : html.classList.remove("has-analyser-fullscreen");
       graph.setAnalyser(hasAnalyserFullscreen);
       invalidateGraph();
     };
     this.toggleSmoothing = function () {
-      toggleOverrideStatus("graphSmoothOverride", "has-smoothing-override");
+      toggleOverrideStatus("graphSmoothOverride");
     };
     this.toggleExpo = function () {
-      toggleOverrideStatus("graphExpoOverride", "has-expo-override");
+      toggleOverrideStatus("graphExpoOverride");
     };
     this.toggleGrid = function () {
-      toggleOverrideStatus("graphGridOverride", "has-grid-override");
+      toggleOverrideStatus("graphGridOverride");
     };
     this.legendHighlight = function (gi, fi) {
       onLegendHighlightChange(gi, fi);
@@ -2321,7 +2281,6 @@ function BlackboxLogViewer() {
     this.selectLogIndex = function (index) {
       selectLog(Number.parseInt(index, 10));
       if (graph) {
-        html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
         graph.setAnalyser(hasAnalyserFullscreen);
       }
     };

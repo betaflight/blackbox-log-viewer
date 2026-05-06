@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watchEffect } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { useLogStore } from "./stores/log.js";
@@ -160,6 +160,25 @@ const settingsStore = useSettingsStore();
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
+
+// Centralized CSS class binding — replaces 27 imperative html.classList calls in main.js
+watchEffect(() => {
+  const cl = document.documentElement.classList;
+  cl.toggle("has-log", logStore.hasLog);
+  cl.toggle("has-video", logStore.hasVideo);
+  cl.toggle("has-gps", logStore.hasGps);
+  cl.toggle("has-craft", graphStore.hasCraft);
+  cl.toggle("has-sticks", graphStore.hasSticks);
+  cl.toggle("has-analyser", graphStore.hasAnalyser);
+  cl.toggle("has-analyser-fullscreen", graphStore.hasAnalyserFullscreen);
+  cl.toggle("has-map", graphStore.hasMap);
+  cl.toggle("has-marker", graphStore.hasMarker);
+  cl.toggle("is-fullscreen", graphStore.isFullscreen);
+  cl.toggle("video-hidden", !appStore.viewVideo);
+  cl.toggle("has-expo-override", !!settingsStore.userSettings.graphExpoOverride);
+  cl.toggle("has-smoothing-override", !!settingsStore.userSettings.graphSmoothOverride);
+  cl.toggle("has-grid-override", !!settingsStore.userSettings.graphGridOverride);
+});
 
 // Derived state from stores
 const sysConfig = computed(() => logStore.flightLog?.getSysConfig?.() ?? null);

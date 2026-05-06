@@ -7,6 +7,7 @@ export const useLogStore = defineStore("log", () => {
   const currentBlackboxTime = ref(0);
   const hasLog = ref(false);
   const hasVideo = ref(false);
+  const hasGps = ref(false);
   const videoURL = ref(null);
 
   // Field values table data (updated by updateValuesChart in main.js)
@@ -45,6 +46,7 @@ export const useLogStore = defineStore("log", () => {
     currentBlackboxTime,
     hasLog,
     hasVideo,
+    hasGps,
     videoURL,
     fieldValues,
     fieldStats,
