@@ -27,49 +27,44 @@ export function FlightLogGrapher(
 ) {
   const { controller } = useAppStore();
 
-  let DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
-    drawingParams = {
-      fontSizePIDTableLabel: null,
-      fontSizeAxisLabel: null,
-      fontSizeFrameLabel: null,
-      fontSizeEventLabel: null,
+  const DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif";
+  let drawingParams = {
+    fontSizePIDTableLabel: null,
+    fontSizeAxisLabel: null,
+    fontSizeFrameLabel: null,
+    fontSizeEventLabel: null,
 
-      plotLineWidth: null,
-    },
-    // How far the center of the craft is from the top of the canvas, as a portion of height
-    // CRAFT_POSITION_Y_PROPORTION         =  parseInt(options.craft.top) / 100.0 ||0.2,
+    plotLineWidth: null,
+  };
+  const lineColors = [
+    "#fb8072", // Red
+    "#8dd3c7", // Cyan
+    "#ffffb3", // Yellow
+    "#bebada", // Purple
+    "#80b1d3",
+    "#fdb462",
+    "#b3de69",
+    "#fccde5",
+    "#d9d9d9",
+    "#bc80bd",
+    "#ccebc5",
+    "#ffed6f",
+  ];
+  const WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
 
-    lineColors = [
-      "#fb8072", // Red
-      "#8dd3c7", // Cyan
-      "#ffffb3", // Yellow
-      "#bebada", // Purple
-      "#80b1d3",
-      "#fdb462",
-      "#b3de69",
-      "#fccde5",
-      "#d9d9d9",
-      "#bc80bd",
-      "#ccebc5",
-      "#ffed6f",
-    ],
-    WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
-
-  let windowStartTime,
-    windowCenterTime,
-    windowEndTime,
-    canvasContext = canvas.getContext("2d"),
-    defaultOptions = {
-      gapless: false,
-      craftType: "3D",
-      drawPidTable: true,
-      drawSticks: true,
-      drawTime: true,
-      drawAnalyser: true, // add an analyser option
-      analyserSampleRate: 2000 /*Hz*/, // the loop time for the log
-      eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
-    },
-    windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
+  let windowStartTime, windowCenterTime, windowEndTime;
+  const canvasContext = canvas.getContext("2d");
+  const defaultOptions = {
+    gapless: false,
+    craftType: "3D",
+    drawPidTable: true,
+    drawSticks: true,
+    drawTime: true,
+    drawAnalyser: true, // add an analyser option
+    analyserSampleRate: 2000 /*Hz*/, // the loop time for the log
+    eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
+  };
+  let windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
     idents,
     graphs = [],
     inTime = false,
@@ -79,9 +74,8 @@ export function FlightLogGrapher(
     craft3D = null,
     craft2D = null,
     analyser = null /* define a new spectrum analyser */,
-    watermarkLogo /* Watermark feature */,
-    lapTimer /* LapTimer feature */,
-    that = this;
+    watermarkLogo /* Watermark feature */;
+  const that = this;
 
   this.onSeek = null;
 
@@ -164,9 +158,8 @@ export function FlightLogGrapher(
   }
 
   function identifyFields() {
-    let motorGraphColorIndex = 0,
-      fieldIndex,
-      fieldNames = flightLog.getMainFieldNames();
+    let motorGraphColorIndex = 0, fieldIndex;
+    const fieldNames = flightLog.getMainFieldNames();
 
     idents = {
       rcCommandFields: [],
@@ -195,8 +188,8 @@ export function FlightLogGrapher(
     };
 
     for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
-      let fieldName = fieldNames[fieldIndex],
-        matches;
+      const fieldName = fieldNames[fieldIndex];
+      let matches;
 
       if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
         const motorIndex = matches[1];
@@ -322,14 +315,13 @@ export function FlightLogGrapher(
     lineWidth,
     highlight,
   ) {
-    let GAP_WARNING_BOX_RADIUS = 3,
-      chunkIndex,
-      frameIndex,
-      drawingLine = false,
+    const GAP_WARNING_BOX_RADIUS = 3;
+    let chunkIndex, frameIndex;
+    let drawingLine = false,
       notInBounds = -5, // when <0, then line is always drawn, (this allows us to paritially dash the line when the bounds is exceeded)
-      inGap = false,
-      yScale = -plotHeight,
-      xScale = canvas.width / windowWidthMicros;
+      inGap = false;
+    const yScale = -plotHeight;
+    const xScale = canvas.width / windowWidthMicros;
 
     //Draw points from this line until we leave the window
 
@@ -351,16 +343,14 @@ export function FlightLogGrapher(
       const chunk = chunks[chunkIndex];
 
       for (; frameIndex < chunk.frames.length; frameIndex++) {
-        let fieldValue = chunk.frames[frameIndex][fieldIndex],
-          frameTime =
-            chunk.frames[frameIndex][
-              FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
-            ],
-          nextX,
-          nextY;
+        const fieldValue = chunk.frames[frameIndex][fieldIndex];
+        const frameTime =
+          chunk.frames[frameIndex][
+            FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
+          ];
 
-        nextY = curve.lookup(fieldValue) * yScale;
-        nextX = (frameTime - windowStartTime) * xScale;
+        let nextY = curve.lookup(fieldValue) * yScale;
+        const nextX = (frameTime - windowStartTime) * xScale;
 
         // clamp the Y to the range of the graph to prevent bleed into next graph if zoomed in (for example)
 
@@ -673,13 +663,12 @@ export function FlightLogGrapher(
   }
 
   function drawEvents(chunks) {
-    let /*
-       * Also draw events that are a little left of the window, so that their labels don't suddenly
-       * disappear when they scroll out of view:
-       */
-      BEGIN_MARGIN_MICROSECONDS = 100000,
-      shouldSetFont = true,
-      sequenceNum = 0;
+    /*
+     * Also draw events that are a little left of the window, so that their labels don't suddenly
+     * disappear when they scroll out of view:
+     */
+    const BEGIN_MARGIN_MICROSECONDS = 100000;
+    let shouldSetFont = true, sequenceNum = 0;
 
     for (let i = 0; i < chunks.length; i++) {
       const events = chunks[i].events;
@@ -922,13 +911,11 @@ export function FlightLogGrapher(
       }
     }
 
-    let chunks = flightLog.getSmoothedChunksInTimeRange(
-        windowStartTime,
-        windowEndTime,
-      ),
-      startFrameIndex,
-      i,
-      j;
+    const chunks = flightLog.getSmoothedChunksInTimeRange(
+      windowStartTime,
+      windowEndTime,
+    );
+    let startFrameIndex, i, j;
 
     if (chunks.length) {
       //Find the first sample that lies inside the window
@@ -1074,12 +1061,8 @@ export function FlightLogGrapher(
   };
 
   this.refreshGraphConfig = function () {
-    let smoothing = {},
-      heightSum = 0,
-      allocatedHeight,
-      graphHeight,
-      i,
-      graph;
+    const smoothing = {};
+    let heightSum = 0, allocatedHeight, graphHeight, i, graph;
 
     graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs())); // NOSONAR — structuredClone fails on Vue reactive proxies
 
@@ -1290,7 +1273,7 @@ export function FlightLogGrapher(
   analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
 
   /* Create the Lap Timer object */
-  lapTimer = new LapTimer();
+  const lapTimer = new LapTimer();
 
   //Handle dragging events
   canvas.addEventListener("mousedown", onMouseDown);
