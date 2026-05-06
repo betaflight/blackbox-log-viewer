@@ -191,7 +191,7 @@ function BlackboxLogViewer() {
      */
     const videoOffsetDisplay =
       (videoOffset >= 0 ? "+" : "") +
-      (videoOffset.toFixed(3) != videoOffset
+      (videoOffset.toFixed(3) !== videoOffset
         ? videoOffset.toFixed(3)
         : videoOffset);
     appStore.videoOffsetDisplay = videoOffsetDisplay;
@@ -203,7 +203,7 @@ function BlackboxLogViewer() {
   }
 
   function isInteger(value) {
-    return (value | 0) == value || Math.trunc(value) == value;
+    return (value | 0) === value || Math.trunc(value) === value;
   }
 
   function atMost2DecPlaces(value) {
@@ -296,7 +296,7 @@ function BlackboxLogViewer() {
 
     if (hasVideo) {
       currentBlackboxTime = blackboxTimeFromVideoTime();
-    } else if (graphState == GRAPH_STATE_PLAY) {
+    } else if (graphState === GRAPH_STATE_PLAY) {
       let delta;
 
       if (lastRenderTime === false) {
@@ -326,7 +326,7 @@ function BlackboxLogViewer() {
 
     updateValuesChartRateLimited();
 
-    if (graphState == GRAPH_STATE_PLAY) {
+    if (graphState === GRAPH_STATE_PLAY) {
       lastRenderTime = now;
 
       seekBarRepaintRateLimited();
@@ -707,9 +707,9 @@ function BlackboxLogViewer() {
     // finally, see if there is an offsetCache value already, and auto set the offset
     for (const cahesOffset of offsetCache) {
       if (
-        currentOffsetCache.log == cahesOffset.log &&
-        currentOffsetCache.index == cahesOffset.index &&
-        currentOffsetCache.video == cahesOffset.video
+        currentOffsetCache.log === cahesOffset.log &&
+        currentOffsetCache.index === cahesOffset.index &&
+        currentOffsetCache.video === cahesOffset.video
       ) {
         setVideoOffset(cahesOffset.offset, true);
       }
@@ -927,7 +927,7 @@ function BlackboxLogViewer() {
         for (let i = 0; i <= 9; i++) {
           if (bookmarkTimes[i] != null) {
             bookmarks[i] = {
-              state: bookmarkTimes[i] != 0,
+              state: bookmarkTimes[i] !== 0,
               time: bookmarkTimes[i],
             };
           } else bookmarks[i] = null;
@@ -1234,7 +1234,7 @@ function BlackboxLogViewer() {
     };
 
     logPlayPause = function () {
-      if (graphState == GRAPH_STATE_PAUSED) {
+      if (graphState === GRAPH_STATE_PAUSED) {
         setGraphState(GRAPH_STATE_PLAY);
       } else {
         setGraphState(GRAPH_STATE_PAUSED);
@@ -1291,7 +1291,7 @@ function BlackboxLogViewer() {
     function zoomGraphConfig(index) {
       // Put each of the fields onto one graph and clear the others
 
-      if (graphConfig.length == 1) {
+      if (graphConfig.length === 1) {
         // if there is only one graph, then return to previous configuration
         if (lastGraphConfig != null) {
           newGraphConfig(lastGraphConfig);
@@ -2012,7 +2012,7 @@ function BlackboxLogViewer() {
         hasAnalyser = !hasAnalyser;
       } else {
         const graphs = activeGraphConfig.getGraphs();
-        if (graphs.length == 0 || graphs[0].fields.length == 0) {
+        if (graphs.length === 0 || graphs[0].fields.length === 0) {
           hasAnalyser = false;
         } else {
           activeGraphConfig.selectedFieldName =

@@ -47,7 +47,7 @@ export function GraphConfig(graphConfig) {
     const matches = field.name.match(/^(.+)\[all\]$/);
     const logFieldNames = flightLog.getMainFieldNames();
     const fields = [];
-    const setupColor = field?.color == -1;
+    const setupColor = field?.color === -1;
     if (matches) {
       const nameRoot = matches[1],
         nameRegex = new RegExp(`^${escapeRegExp(nameRoot)}\\[[0-9]+\\]$`);
@@ -102,7 +102,7 @@ export function GraphConfig(graphConfig) {
     if (field.curve === undefined || forceNewCurve) {
       field.curve = defaultCurve;
     } else {
-      if (field.curve.MinMax == undefined)
+      if (field.curve.MinMax === undefined)
         field.curve.MinMax = defaultCurve.MinMax;
     }
 
@@ -249,7 +249,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       max = Math.max(mm.max, max);
     }
 
-    if (min != Number.MAX_VALUE && max != -Number.MAX_VALUE) {
+    if (min !== Number.MAX_VALUE && max !== -Number.MAX_VALUE) {
       return { min: min, max: max };
     }
 
@@ -346,7 +346,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 16,
         },
       };
-    } else if (fieldName == "rcCommands[3]") {
+    } else if (fieldName === "rcCommands[3]") {
       // Throttle scaled
       return {
         power: 1 /* Make this 1 to scale linearly */,
@@ -376,7 +376,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 100,
         },
       };
-    } else if (fieldName == "rcCommand[3]") {
+    } else if (fieldName === "rcCommand[3]") {
       // Throttle
       return {
         power: 1,
@@ -393,7 +393,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 2000,
         },
       };
-    } else if (fieldName == "heading[2]") {
+    } else if (fieldName === "heading[2]") {
       return {
         power: 1,
         MinMax: {
@@ -425,7 +425,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 100,
         },
       };
-    } else if (fieldName == "GPS_ground_course") {
+    } else if (fieldName === "GPS_ground_course") {
       return {
         power: 1,
         MinMax: {
@@ -433,7 +433,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 360,
         },
       };
-    } else if (fieldName == "GPS_numSat") {
+    } else if (fieldName === "GPS_numSat") {
       return {
         power: 1,
         MinMax: {
@@ -441,7 +441,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 40,
         },
       };
-    } else if (fieldName == "GPS_speed") {
+    } else if (fieldName === "GPS_speed") {
       return {
         power: 1,
         MinMax: {
@@ -449,7 +449,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 100,
         },
       };
-    } else if (fieldName == "gpsHomeAzimuth") {
+    } else if (fieldName === "gpsHomeAzimuth") {
       return {
         power: 1,
         MinMax: {
@@ -465,7 +465,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 25,
         },
       };
-    } else if (fieldName == "gpsTrajectoryTiltAngle") {
+    } else if (fieldName === "gpsTrajectoryTiltAngle") {
       return {
         power: 1,
         MinMax: {
@@ -1516,7 +1516,7 @@ GraphConfig.getMinMaxForFieldDuringWindowTimeInterval = function (
     minTime,
     maxTime,
   );
-  if (mm == undefined)
+  if (mm === undefined)
     return {
       min: -500,
       max: 500,
@@ -1551,15 +1551,15 @@ GraphConfig.getMinMaxForFieldDuringMarkedInterval = function (
 ) {
   let minTime = logGrapher.getMarkedInTime();
   let maxTime = logGrapher.getMarkedOutTime();
-  if (minTime == false) minTime = flightLog.getMinTime();
-  if (maxTime == false) maxTime = flightLog.getMaxTime();
+  if (minTime === false) minTime = flightLog.getMinTime();
+  if (maxTime === false) maxTime = flightLog.getMaxTime();
 
   const mm = flightLog.getMinMaxForFieldDuringTimeInterval(
     fieldName,
     minTime,
     maxTime,
   );
-  if (mm == undefined)
+  if (mm === undefined)
     return {
       min: -500,
       max: 500,
@@ -1586,7 +1586,7 @@ GraphConfig.getMinMaxForFieldDuringMarkedInterval = function (
  */
 GraphConfig.getMinMaxForFieldDuringAllTime = function (flightLog, fieldName) {
   const mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
-  if (mm.min == Number.MAX_VALUE || mm.max == -Number.MAX_VALUE) {
+  if (mm.min === Number.MAX_VALUE || mm.max === -Number.MAX_VALUE) {
     return {
       min: -500,
       max: 500,
@@ -1710,7 +1710,7 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
     if (graphNames !== undefined) {
       found = false;
       for (const name of graphNames) {
-        if (srcGraph.label == name) {
+        if (srcGraph.label === name) {
           found = true;
           break;
         }
