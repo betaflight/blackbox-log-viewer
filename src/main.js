@@ -2041,6 +2041,7 @@ function BlackboxLogViewer() {
 
     function handleKeyConfig(e, shifted) {
       if (!shifted) {
+        globalThis.vueApp.headerDialogOpen = false;
         showValueTable(false);
         showConfigFile();
         e.preventDefault();
@@ -2049,6 +2050,7 @@ function BlackboxLogViewer() {
 
     function handleKeyTable(e, shifted) {
       if (!shifted) {
+        globalThis.vueApp.headerDialogOpen = false;
         showValueTable();
         showConfigFile(false);
         invalidateGraph();
@@ -2118,6 +2120,10 @@ function BlackboxLogViewer() {
       },
       KeyH(e, shifted) {
         if (!shifted) {
+          if (!globalThis.vueApp.headerDialogOpen) {
+            showValueTable(false);
+            showConfigFile(false);
+          }
           globalThis.vueApp.headerDialogOpen =
             !globalThis.vueApp.headerDialogOpen;
           e.preventDefault();
@@ -2306,6 +2312,10 @@ function BlackboxLogViewer() {
     this.viewConfig = function () {
       showValueTable(false);
       showConfigFile();
+    };
+    this.closeOverlays = function () {
+      showValueTable(false);
+      showConfigFile(false);
     };
     this.toggleAnalyser = function () {
       if (activeGraphConfig.selectedFieldName != null) {

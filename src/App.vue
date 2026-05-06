@@ -206,17 +206,20 @@ function onNewWindow() {
 }
 
 function onViewConfig() {
-  getLegacy()?.viewConfig?.();
+  headerDialogOpen.value = false;
+  getLegacy()?.closeOverlays?.();
 }
 
 function onToggleHeader() {
   if (!headerDialogOpen.value) {
     refreshLegacyState();
+    getLegacy()?.closeOverlays?.();
   }
   headerDialogOpen.value = !headerDialogOpen.value;
 }
 
 function onToggleTable() {
+  headerDialogOpen.value = false;
   getLegacy()?.toggleTable?.();
 }
 
