@@ -1933,6 +1933,11 @@ function BlackboxLogViewer() {
       if (!shifted) {
         hasAnalyser =
           activeGraphConfig.selectedFieldName == null ? false : !hasAnalyser;
+        if (!hasAnalyser) {
+          hasAnalyserFullscreen = false;
+          html.classList.remove("has-analyser-fullscreen");
+          graph.setAnalyser(false);
+        }
         graph.setDrawAnalyser(hasAnalyser);
         html.classList.toggle("has-analyser", hasAnalyser);
         prefs.set("hasAnalyser", hasAnalyser);
@@ -2274,6 +2279,11 @@ function BlackboxLogViewer() {
           activeGraphConfig.selectedFieldIndex = 0;
           hasAnalyser = true;
         }
+      }
+      if (!hasAnalyser) {
+        hasAnalyserFullscreen = false;
+        html.classList.remove("has-analyser-fullscreen");
+        graph.setAnalyser(false);
       }
       graph.setDrawAnalyser(hasAnalyser);
       html.classList.toggle("has-analyser", hasAnalyser);
