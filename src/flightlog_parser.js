@@ -534,7 +534,7 @@ export function FlightLogParser(logData) {
     let separatorPos = false;
     let matches;
 
-    if (stream.peekChar() != " ") return;
+    if (stream.peekChar() !== " ") return;
 
     //Skip the leading space
     stream.readChar();
@@ -546,14 +546,14 @@ export function FlightLogParser(logData) {
       stream.pos < lineStart + 1024 && stream.pos < stream.end;
       stream.pos++
     ) {
-      if (separatorPos === false && stream.data[stream.pos] == COLON)
+      if (separatorPos === false && stream.data[stream.pos] === COLON)
         separatorPos = stream.pos;
 
-      if (stream.data[stream.pos] == NEWLINE || stream.data[stream.pos] === 0)
+      if (stream.data[stream.pos] === NEWLINE || stream.data[stream.pos] === 0)
         break;
     }
 
-    if (stream.data[stream.pos] != NEWLINE || separatorPos === false) return;
+    if (stream.data[stream.pos] !== NEWLINE || separatorPos === false) return;
 
     const lineEnd = stream.pos;
 
@@ -765,9 +765,9 @@ export function FlightLogParser(logData) {
       case "yawRateAccelLimit":
       case "rateAccelLimit":
         if (
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+          (that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
             semver.gte(that.sysConfig.firmwareVersion, "3.1.0")) ||
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+          (that.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
             semver.gte(that.sysConfig.firmwareVersion, "2.0.0"))
         ) {
           that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 1000;
@@ -784,9 +784,9 @@ export function FlightLogParser(logData) {
       case "dterm_lpf_hz":
       case "dterm_lpf2_hz":
         if (
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+          (that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
             semver.gte(that.sysConfig.firmwareVersion, "3.0.1")) ||
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+          (that.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
             semver.gte(that.sysConfig.firmwareVersion, "2.0.0"))
         ) {
           that.sysConfig[fieldName] = parseInt(fieldValue, 10);
@@ -798,9 +798,9 @@ export function FlightLogParser(logData) {
       case "gyro_notch_hz":
       case "gyro_notch_cutoff":
         if (
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+          (that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
             semver.gte(that.sysConfig.firmwareVersion, "3.0.1")) ||
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+          (that.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
             semver.gte(that.sysConfig.firmwareVersion, "2.0.0"))
         ) {
           that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
@@ -911,9 +911,9 @@ export function FlightLogParser(logData) {
          * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
          * match the legacy format so we can use a consistent IMU for all firmware types: */
         if (
-          that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
-          that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
-          that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT
+          that.sysConfig.firmwareType === FIRMWARE_TYPE_INAV ||
+          that.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT ||
+          that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT
         ) {
           that.sysConfig.gyroScale =
             that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
@@ -1056,7 +1056,7 @@ export function FlightLogParser(logData) {
     let acceptFrame = true;
 
     // Do we have a previous frame to use as a reference to validate field values against?
-    if (!raw && lastMainFrameIteration != -1) {
+    if (!raw && lastMainFrameIteration !== -1) {
       /*
        * Check that iteration count and time didn't move backwards, and didn't move forward too much.
        */
@@ -1112,9 +1112,9 @@ export function FlightLogParser(logData) {
     mainHistory[2] = mainHistory[0];
 
     // And advance the current frame into an empty space ready to be filled
-    if (mainHistory[0] == mainHistoryRing[0])
+    if (mainHistory[0] === mainHistoryRing[0])
       mainHistory[0] = mainHistoryRing[1];
-    else if (mainHistory[0] == mainHistoryRing[1])
+    else if (mainHistory[0] === mainHistoryRing[1])
       mainHistory[0] = mainHistoryRing[2];
     else mainHistory[0] = mainHistoryRing[0];
     return mainStreamIsValid;
@@ -1158,7 +1158,7 @@ export function FlightLogParser(logData) {
     while (i < frameDef.count) {
       let value;
 
-      if (predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_INC) {
+      if (predictor[i] === FLIGHT_LOG_FIELD_PREDICTOR_INC) {
         current[i] = skippedFrames + 1;
 
         if (previous) current[i] += previous[i];
@@ -1224,7 +1224,7 @@ export function FlightLogParser(logData) {
           case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
             //How many fields are in this encoded group? Check the subsequent field encodings:
             for (j = i + 1; j < i + 8 && j < frameDef.count; j++)
-              if (encoding[j] != FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) break;
+              if (encoding[j] !== FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) break;
 
             groupCount = j - i;
 
@@ -1368,9 +1368,9 @@ export function FlightLogParser(logData) {
       mainHistory[1] = mainHistory[0];
 
       // And advance the current frame into an empty space ready to be filled
-      if (mainHistory[0] == mainHistoryRing[0])
+      if (mainHistory[0] === mainHistoryRing[0])
         mainHistory[0] = mainHistoryRing[1];
-      else if (mainHistory[0] == mainHistoryRing[1])
+      else if (mainHistory[0] === mainHistoryRing[1])
         mainHistory[0] = mainHistoryRing[2];
       else mainHistory[0] = mainHistoryRing[0];
     }
@@ -1480,7 +1480,7 @@ export function FlightLogParser(logData) {
     let count = 0,
       frameIndex;
 
-    if (lastMainFrameIteration == -1) {
+    if (lastMainFrameIteration === -1) {
       // Haven't parsed a frame yet so there's no frames to skip
       return 0;
     } else {
@@ -1504,7 +1504,7 @@ export function FlightLogParser(logData) {
     let count = 0,
       frameIndex;
 
-    if (lastMainFrameIteration == -1) {
+    if (lastMainFrameIteration === -1) {
       // Haven't parsed a frame yet so there's no frames to skip
       return 0;
     } else {
@@ -1692,7 +1692,7 @@ export function FlightLogParser(logData) {
       case FlightLogEvent.LOG_END: {
         const endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
 
-        if (endMessage == END_OF_LOG_MESSAGE) {
+        if (endMessage === END_OF_LOG_MESSAGE) {
           //Adjust the end of stream so we stop reading, this log is done
           stream.end = stream.pos;
         } else {
@@ -1747,8 +1747,8 @@ export function FlightLogParser(logData) {
     return (
       frameDef &&
       frameDef.count > 0 &&
-      frameDef.encoding.length == frameDef.count &&
-      frameDef.predictor.length == frameDef.count
+      frameDef.encoding.length === frameDef.count &&
+      frameDef.predictor.length === frameDef.count
     );
   }
 
@@ -1830,9 +1830,9 @@ export function FlightLogParser(logData) {
        */
       for (let i = 1; i < this.frameDefs.G.count; i++) {
         if (
-          this.frameDefs.G.predictor[i - 1] ==
+          this.frameDefs.G.predictor[i - 1] ===
             FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
-          this.frameDefs.G.predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD
+          this.frameDefs.G.predictor[i] === FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD
         ) {
           this.frameDefs.G.predictor[i] =
             FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
@@ -1857,7 +1857,7 @@ export function FlightLogParser(logData) {
    * (The data is stored in gpsHomeHistory[1])
    */
   this.setGPSHomeHistory = function (newGPSHome) {
-    if (newGPSHome.length == that.frameDefs.H.count) {
+    if (newGPSHome.length === that.frameDefs.H.count) {
       //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
       for (let i = 0; i < newGPSHome.length; i++) {
         gpsHomeHistory[1][i] = newGPSHome[i];
@@ -1895,7 +1895,7 @@ export function FlightLogParser(logData) {
 
         // Is this the beginning of a new frame?
         looksLikeFrameCompleted =
-          getFrameType(command) || (!prematureEof && command == EOF);
+          getFrameType(command) || (!prematureEof && command === EOF);
 
         if (!this.stats.frame[lastFrameType.marker]) {
           this.stats.frame[lastFrameType.marker] = {
@@ -1955,13 +1955,13 @@ export function FlightLogParser(logData) {
         }
       }
 
-      if (command == EOF) break;
+      if (command === EOF) break;
 
       frameStart = stream.pos - 1;
       frameType = getFrameType(command);
 
       // Reject the frame if it is one that we have no definitions for in the header
-      if (frameType && (command == "E" || that.frameDefs[command])) {
+      if (frameType && (command === "E" || that.frameDefs[command])) {
         lastFrameType = frameType;
         frameType.parse(raw);
 
