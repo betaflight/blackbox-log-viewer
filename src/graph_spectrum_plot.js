@@ -35,7 +35,7 @@ export const SPECTRUM_OVERDRAW_TYPE = {
   AUTO: 5,
 };
 
-export const GraphSpectrumPlot = globalThis.GraphSpectrumPlot || {
+export const GraphSpectrumPlot = {
   _isFullScreen: false,
   _cachedCanvas: null,
   _cachedDataCanvas: null,

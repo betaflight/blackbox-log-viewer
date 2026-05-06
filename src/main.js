@@ -2096,10 +2096,6 @@ function BlackboxLogViewer() {
   // Bridge API — expose key functions for Vue components during migration
   this.loadFiles = loadFiles;
   this.invalidateGraph = invalidateGraph;
-  Object.defineProperty(this, "flightLog", { get: () => flightLog });
-  Object.defineProperty(this, "activeGraphConfig", {
-    get: () => activeGraphConfig,
-  });
   this.newGraphConfig = function (newConfig, redrawChart) {
     newGraphConfig(newConfig, !redrawChart);
   };
@@ -2134,7 +2130,6 @@ function BlackboxLogViewer() {
     videoConfig = newConfig;
     prefs.set("videoConfig", newConfig);
   };
-  Object.defineProperty(this, "videoConfig", { get: () => videoConfig });
   // Playback
   this.logPlayPause = function () {
     logPlayPause();
