@@ -69,7 +69,7 @@ export function ImportedCurves(curvesChanged) {
           _curvesData.push(curve);
           curvesChanged();
         } catch (e) {
-          alert("Curves data import error: " + e.message);
+          alert(`Curves data import error: ${e.message}`);
           return;
         }
       };

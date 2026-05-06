@@ -1723,10 +1723,9 @@ GraphSpectrumPlot._drawMousePosition = function (
         this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
         this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
       ) {
-        const label =
-          Math.round(
+        const label = `${Math.round(
             this.getValueFromMatrixFFT(mouseFrequency, vsArgValue),
-          ).toString() + "dBm/Hz";
+          )}dBm/Hz`;
         this._drawAxisLabel(canvasCtx, label, mouseX - 30, mouseY - 4, "left");
       }
     }

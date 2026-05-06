@@ -257,7 +257,6 @@ export function FlightLogParser(logData) {
       mag_hardware: null, // Magnetometer Hardware type
       gyro_cal_on_first_arm: null, // Gyro Calibrate on first arm
       vbat_pid_compensation: null, // VBAT PID compensation
-      rate_limits: [null, null, null], // RC Rate limits
       rc_smoothing: null, // RC Control Smoothing
       rc_interpolation: null, // RC Control Interpolation type
       rc_interpolation_channels: null, // RC Control Interpotlation channels
@@ -667,7 +666,6 @@ export function FlightLogParser(logData) {
       case "rc_smoothing_auto_factor_throttle":
       case "rc_smoothing_feedforward_hz":
       case "rc_smoothing_setpoint_hz":
-      case "rc_smoothing_feedforward_hz":
       case "rc_smoothing_throttle_hz":
       case "superExpoYawMode":
       case "features":
@@ -748,20 +746,16 @@ export function FlightLogParser(logData) {
       case "simplified_pitch_d_gain":
       case "simplified_pitch_pi_gain":
       case "simplified_master_multiplier":
-
       case "simplified_dterm_filter":
       case "simplified_dterm_filter_multiplier":
       case "simplified_gyro_filter":
       case "simplified_gyro_filter_multiplier":
-
       case "motor_output_limit":
       case "throttle_limit_type":
       case "throttle_limit_percent":
       case "throttle_boost":
       case "throttle_boost_cutoff":
-
       case "motor_poles":
-
       case "blackbox_high_resolution":
         that.sysConfig[fieldName] = parseInt(fieldValue, 10);
         break;
@@ -831,6 +825,7 @@ export function FlightLogParser(logData) {
       case "motor_idle":
       case "digitalIdleOffset":
         that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
+        break;
 
       /**  Legacy firmware log headers **/
       case "dterm_cut_hz":
@@ -863,7 +858,6 @@ export function FlightLogParser(logData) {
       case "levelPID":
       case "velPID":
       case "motorOutput":
-      case "rate_limits":
       case "rc_smoothing_cutoffs":
       case "rc_smoothing_active_cutoffs":
       case "rc_smoothing_active_cutoffs_ff_sp_thr":
@@ -890,35 +884,39 @@ export function FlightLogParser(logData) {
         that.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3); //[parseInt(fieldValue, 10), null, null];
         break;
       case "d_min":
-      case "d_max":
+      case "d_max": {
         // Add D MAX values as Derivative numbers to PID array
         let dMaxValues = parseCommaSeparatedString(fieldValue);
         that.sysConfig["rollPID"].push(dMaxValues[0]);
         that.sysConfig["pitchPID"].push(dMaxValues[1]);
         that.sysConfig["yawPID"].push(dMaxValues[2]);
         break;
-      case "ff_weight":
+      }
+      case "ff_weight": {
         // Add feedforward values to the PID array
         let ffValues = parseCommaSeparatedString(fieldValue);
         that.sysConfig["rollPID"].push(ffValues[0]);
         that.sysConfig["pitchPID"].push(ffValues[1]);
         that.sysConfig["yawPID"].push(ffValues[2]);
         break;
+      }
 
       /* End of CSV packed values */
 
-      case "vbatcellvoltage":
+      case "vbatcellvoltage": {
         let vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
         that.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
         that.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
         that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
         break;
+      }
       case "currentMeter":
-      case "currentSensor":
+      case "currentSensor": {
         let currentMeterParams = parseCommaSeparatedString(fieldValue);
         that.sysConfig.currentMeterOffset = currentMeterParams[0];
         that.sysConfig.currentMeterScale = currentMeterParams[1];
         break;
+      }
       case "gyro.scale":
       case "gyro_scale":
         that.sysConfig.gyroScale = hexToFloat(fieldValue);
@@ -1211,7 +1209,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32:
             stream.readTag2_3S32(values);
 
@@ -1227,7 +1224,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE:
             stream.readTag2_3SVariable(values);
 
@@ -1243,7 +1239,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
             //How many fields are in this encoded group? Check the subsequent field encodings:
             for (j = i + 1; j < i + 8 && j < frameDef.count; j++)
@@ -1264,7 +1259,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_NULL:
             //Nothing to read
             value = 0;

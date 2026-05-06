@@ -464,7 +464,7 @@ export function FlightLog(logData) {
           if (frameValid || (frameType == "G" && frame)) {
             switch (frameType) {
               case "P":
-              case "I":
+              case "I": {
                 //The parser re-uses the "frame" array so we must copy that data somewhere else
 
                 let numOutputFields =
@@ -526,6 +526,7 @@ export function FlightLog(logData) {
                 mainFrameIndex++;
 
                 break;
+              }
               case "E":
                 if (frame.event == FlightLogEvent.LOGGING_RESUME) {
                   chunk.gapStartsHere[mainFrameIndex - 1] = true;

@@ -1689,13 +1689,13 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "eRPM[4]":
     case "eRPM[5]":
     case "eRPM[6]":
-    case "eRPM[7]":
+    case "eRPM[7]": {
       let motor_poles = flightLog.getSysConfig()["motor_poles"];
       return `${((value * 200) / motor_poles).toFixed(0)} rpm / ${(
         (value * 3.333) /
         motor_poles
       ).toFixed(1)} hz`;
-
+    }
     case "rcCommands[0]":
     case "rcCommands[1]":
     case "rcCommands[2]":
@@ -1850,6 +1850,8 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
           return `${((value / 100) * 3.6).toFixed(2)} kph`;
         case 3:
           return `${((value / 100) * 2.2369).toFixed(2)} mph`;
+        default:
+          return `${(value / 100).toFixed(2)} m/s`;
       }
     case "GPS_ground_course":
       return `${(value / 10).toFixed(1)} °`;
@@ -2015,20 +2017,16 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
         if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2025.12.0")) {
           switch (fieldName) {
             case "debug[0]": // gyro pre dyn notch [for gyro debug axis]
-              return (
-                Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s"
-              );
+              return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
             default:
-              return value.toFixed(0) + " Hz";
+              return `${value.toFixed(0)} Hz`;
           }
         } else {
           switch (fieldName) {
             case "debug[3]": // gyro pre dyn notch [for gyro debug axis]
-              return (
-                Math.round(flightLog.gyroRawToDegreesPerSecond(value)) + " °/s"
-              );
+              return `${Math.round(flightLog.gyroRawToDegreesPerSecond(value))} °/s`;
             default:
-              return value.toFixed(0) + " Hz";
+              return `${value.toFixed(0)} Hz`;
           }
         }
       case "RTH":
@@ -2429,8 +2427,6 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
 
   const highResolutionScale =
     flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0 ? 10 : 1;
-  const highResolutionAddPrecision =
-    flightLog && flightLog.getSysConfig().blackbox_high_resolution > 0 ? 1 : 0;
 
   switch (fieldName) {
     case "time":
@@ -2484,12 +2480,12 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
     case "eRPM[4]":
     case "eRPM[5]":
     case "eRPM[6]":
-    case "eRPM[7]":
+    case "eRPM[7]": {
       let motor_poles = flightLog.getSysConfig()["motor_poles"];
       return toFriendly
         ? (value * 200) / motor_poles
         : (value * motor_poles) / 200;
-
+    }
     case "axisSum[0]":
     case "axisSum[1]":
     case "axisSum[2]":
@@ -2610,6 +2606,8 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
           return toFriendly ? (value / 100) * 3.6 : (100 * value) / 3.6; // kph
         case 3:
           return toFriendly ? (value / 100) * 2.2369 : (value * 100) / 2.2369; //mph
+        default:
+          return toFriendly ? value / 100 : value * 100; // m/s
       }
     case "GPS_ground_course":
       return toFriendly ? value / 10 : value * 10;
@@ -2839,9 +2837,10 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           default:
             return value;
         }
-      case "DSHOT_RPM_TELEMETRY":
+      case "DSHOT_RPM_TELEMETRY": {
         let pole = flightLog.getSysConfig()["motor_poles"];
         return toFriendly ? (value * 200) / pole : (value * pole) / 200;
+      }
       case "RPM_FILTER":
         return toFriendly ? value * 60 : value / 60;
       case "D_MAX":

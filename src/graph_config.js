@@ -50,7 +50,7 @@ export function GraphConfig(graphConfig) {
     const setupColor = field?.color == -1;
     if (matches) {
       const nameRoot = matches[1],
-        nameRegex = new RegExp(`^${escapeRegExp(nameRoot)}\[[0-9]+\]$`);
+        nameRegex = new RegExp(`^${escapeRegExp(nameRoot)}\\[[0-9]+\\]$`);
       let colorIndex = 0;
       for (const fieldName of logFieldNames) {
         if (fieldName.match(nameRegex)) {

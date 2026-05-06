@@ -352,10 +352,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       let fileName = (appStore.logFilename || "").split(".")[0];
       switch (userSettings.spectrumType) {
         case SPECTRUM_TYPE.FREQUENCY:
-          fileName = fileName + "_sp";
+          fileName = `${fileName}_sp`;
           break;
         case SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY:
-          fileName = fileName + "_psd";
+          fileName = `${fileName}_psd`;
           break;
       }
       return fileName;

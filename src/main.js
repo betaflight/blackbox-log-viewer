@@ -69,7 +69,7 @@ function BlackboxLogViewer() {
     flightLogDataArray,
     graph = null,
     prefs = new PrefStorage(),
-    configuration = null, // is their an associated dump file ?
+    _configuration = null, // is their an associated dump file ?
     configurationDefaults = new ConfigurationDefaults(prefs), // configuration defaults
     // User's video render config:
     videoConfig = {},
@@ -176,7 +176,7 @@ function BlackboxLogViewer() {
   }
 
   // TODO: Figure out if we can open the same file in a new window
-  function createNewBlackboxWindow(fileToOpen) {
+  function createNewBlackboxWindow(_fileToOpen) {
     globalThis.open(globalThis.location.href, "_blank").focus();
   }
 
@@ -550,7 +550,7 @@ function BlackboxLogViewer() {
     }
   }
 
-  function setPlaybackRate(rate, updateUi) {
+  function setPlaybackRate(rate, _updateUi) {
     if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
       playbackRate = rate;
 
@@ -562,7 +562,7 @@ function BlackboxLogViewer() {
     playbackStore.playbackRate = playbackRate;
   }
 
-  function setGraphZoom(zoom, updateUi) {
+  function setGraphZoom(zoom, _updateUi) {
     if (zoom == null) {
       // go back to last zoom value
       zoom = lastGraphZoom;
@@ -745,12 +745,12 @@ function BlackboxLogViewer() {
           if (file.name.match(/default/i)) {
             configurationDefaults.loadFile(file);
           } else {
-            configuration = new Configuration(file);
+            _configuration = new Configuration(file);
             hasConfig = true;
             graphStore.hasConfig = true;
           }
-        } catch (e) {
-          configuration = null;
+        } catch {
+          _configuration = null;
           hasConfig = false;
         }
         return;
@@ -820,7 +820,7 @@ function BlackboxLogViewer() {
     setPlaybackRate(playbackRate, true);
   }
 
-  function videoLoaded(e) {
+  function videoLoaded(_e) {
     hasVideo = true;
 
     syncToStores();
@@ -870,7 +870,7 @@ function BlackboxLogViewer() {
         }
       }
       graphStore.legendValues = vals;
-    } catch (e) {
+    } catch {
       console.log("Cannot update legend with values");
     }
   }
@@ -916,7 +916,7 @@ function BlackboxLogViewer() {
     hasMarker = state;
   }
 
-  function setFullscreen(state) {
+  function _setFullscreen(state) {
     isFullscreen = state;
   }
 
@@ -943,7 +943,7 @@ function BlackboxLogViewer() {
         }
       }
       return bookmarks;
-    } catch (e) {
+    } catch {
       return null;
     }
   };
@@ -1121,6 +1121,8 @@ function BlackboxLogViewer() {
     invalidateGraph();
   });
 
+  let logJumpBack, logJumpForward, logJumpStart, logJumpEnd, logPlayPause;
+
   // Initialize on DOM ready (modules are deferred, DOM is ready)
   {
     // Initialize dark theme
@@ -1172,7 +1174,7 @@ function BlackboxLogViewer() {
 
     // File open and new window wired via Vue AppToolbar
 
-    let logJumpBack = function (fast, slow) {
+    logJumpBack = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
       if (fast != null) {
         scrollTime =
@@ -1202,7 +1204,7 @@ function BlackboxLogViewer() {
     };
     // Playback buttons wired via Vue PlaybackControls bridge
 
-    let logJumpForward = function (fast, slow) {
+    logJumpForward = function (fast, slow) {
       let scrollTime = SMALL_JUMP_TIME;
       if (fast != null) {
         scrollTime =
@@ -1230,17 +1232,17 @@ function BlackboxLogViewer() {
 
       setGraphState(GRAPH_STATE_PAUSED);
     };
-    let logJumpStart = function () {
+    logJumpStart = function () {
       setCurrentBlackboxTime(flightLog.getMinTime());
       setGraphState(GRAPH_STATE_PAUSED);
     };
 
-    let logJumpEnd = function () {
+    logJumpEnd = function () {
       setCurrentBlackboxTime(flightLog.getMaxTime());
       setGraphState(GRAPH_STATE_PAUSED);
     };
 
-    let logPlayPause = function () {
+    logPlayPause = function () {
       if (graphState == GRAPH_STATE_PAUSED) {
         setGraphState(GRAPH_STATE_PLAY);
       } else {
@@ -1267,7 +1269,7 @@ function BlackboxLogViewer() {
             videoOffset + (currentBlackboxTime - markerTime) / 1000000,
             true,
           );
-        } catch (e) {
+        } catch {
           console.log("Failed to set video offset");
         }
       }
