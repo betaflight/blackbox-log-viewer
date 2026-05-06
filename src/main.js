@@ -29,8 +29,8 @@ import { DarkTheme } from "./dark_theme.js";
 import { ThemeColors } from "./theme_colors.js";
 import pinia from "./pinia_instance.js";
 import { useLogStore } from "./stores/log.js";
-import { useGraphStore } from "./stores/graph.js";
-import { usePlaybackStore } from "./stores/playback.js";
+import { useGraphStore, GRAPH_MIN_ZOOM, GRAPH_MAX_ZOOM, GRAPH_DEFAULT_ZOOM } from "./stores/graph.js";
+import { usePlaybackStore, GRAPH_STATE_PAUSED, GRAPH_STATE_PLAY, PLAYBACK_MIN_RATE, PLAYBACK_MAX_RATE, PLAYBACK_DEFAULT_RATE } from "./stores/playback.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
@@ -52,15 +52,7 @@ function BlackboxLogViewer() {
     );
   }
 
-  const GRAPH_STATE_PAUSED = 0,
-    GRAPH_STATE_PLAY = 1,
-    SMALL_JUMP_TIME = 100 * 1000,
-    PLAYBACK_MIN_RATE = 10,
-    PLAYBACK_MAX_RATE = 300,
-    PLAYBACK_DEFAULT_RATE = 100,
-    GRAPH_MIN_ZOOM = 1,
-    GRAPH_MAX_ZOOM = 1000,
-    GRAPH_DEFAULT_ZOOM = 100;
+  const SMALL_JUMP_TIME = 100 * 1000;
 
   let graphState = GRAPH_STATE_PAUSED;
   let currentBlackboxTime = 0;

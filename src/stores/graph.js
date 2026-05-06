@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import { ref, shallowRef } from "vue";
 
-const GRAPH_MIN_ZOOM = 1;
-const GRAPH_MAX_ZOOM = 1000;
-const GRAPH_DEFAULT_ZOOM = 100;
+export const GRAPH_MIN_ZOOM = 1;
+export const GRAPH_MAX_ZOOM = 1000;
+export const GRAPH_DEFAULT_ZOOM = 100;
 
 export const useGraphStore = defineStore("graph", () => {
   const graphConfig = ref(null);
@@ -85,8 +85,5 @@ export const useGraphStore = defineStore("graph", () => {
     seekBarMode,
     setGraphZoom,
     quickZoomToggle,
-    GRAPH_MIN_ZOOM,
-    GRAPH_MAX_ZOOM,
-    GRAPH_DEFAULT_ZOOM,
   };
 });

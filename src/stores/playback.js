@@ -1,12 +1,12 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
-const GRAPH_STATE_PAUSED = 0;
-const GRAPH_STATE_PLAY = 1;
-const PLAYBACK_MIN_RATE = 10;
-const PLAYBACK_MAX_RATE = 300;
-const PLAYBACK_DEFAULT_RATE = 100;
-const PLAYBACK_RATE_STEP = 5;
+export const GRAPH_STATE_PAUSED = 0;
+export const GRAPH_STATE_PLAY = 1;
+export const PLAYBACK_MIN_RATE = 10;
+export const PLAYBACK_MAX_RATE = 300;
+export const PLAYBACK_DEFAULT_RATE = 100;
+export const PLAYBACK_RATE_STEP = 5;
 
 export const usePlaybackStore = defineStore("playback", () => {
   const graphState = ref(GRAPH_STATE_PAUSED);
@@ -59,11 +59,5 @@ export const usePlaybackStore = defineStore("playback", () => {
     togglePlayPause,
     setPlaybackRate,
     setVideoOffset,
-    GRAPH_STATE_PAUSED,
-    GRAPH_STATE_PLAY,
-    PLAYBACK_MIN_RATE,
-    PLAYBACK_MAX_RATE,
-    PLAYBACK_DEFAULT_RATE,
-    PLAYBACK_RATE_STEP,
   };
 });
