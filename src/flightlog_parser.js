@@ -161,9 +161,9 @@ export function FlightLogParser(logData) {
     ];
 
   //Private variables:
-  let that = this,
-    dataVersion,
-    defaultSysConfig = {
+  const that = this;
+  let dataVersion;
+  const defaultSysConfig = {
       frameIntervalI: 32,
       frameIntervalPNum: 1,
       frameIntervalPDenom: 1,
@@ -181,12 +181,11 @@ export function FlightLogParser(logData) {
       currentMeterOffset: 0,
       currentMeterScale: 400,
       deviceUID: null,
-    },
-    // Blackbox log header parameter names.
-    // each name should exist in the blackbox log of the current firmware, or
-    // be an older name which is translated into a current name in the table below
-
-    defaultSysConfigExtension = {
+    };
+  // Blackbox log header parameter names.
+  // each name should exist in the blackbox log of the current firmware, or
+  // be an older name which is translated into a current name in the table below
+  const defaultSysConfigExtension = {
       abs_control_gain: null, // Absolute control gain
       anti_gravity_gain: null, // Anti gravity gain
       anti_gravity_p_gain: null, // Anti gravity P gain
@@ -355,12 +354,11 @@ export function FlightLogParser(logData) {
       chirp_frequency_end_deci_hz: null,
       chirp_time_seconds: null,
       unknownHeaders: [], // Unknown Extra Headers
-    },
-    // Translation of the field values name to the sysConfig var where it must be stored
-    // on the left are field names from the latest versions of blackbox.c
-    // on the right are older field names that must exist in the list above
-
-    translationValues = {
+    };
+  // Translation of the field values name to the sysConfig var where it must be stored
+  // on the left are field names from the latest versions of blackbox.c
+  // on the right are older field names that must exist in the list above
+  const translationValues = {
       acc_limit_yaw: "yawRateAccelLimit",
       accel_limit: "rateAccelLimit",
       acc_limit: "rateAccelLimit",
@@ -453,31 +451,26 @@ export function FlightLogParser(logData) {
       multi_gyro_combined: "dual_gyro_combined",
       multi_gyro_diff: "dual_gyro_diff",
       multi_gyro_scaled: "dual_gyro_scaled",
-    },
-    frameTypes,
-    // Blackbox state:
-    mainHistoryRing,
-    /* Points into blackboxHistoryRing to give us a circular buffer.
-     *
-     * 0 - space to decode new frames into, 1 - previous frame, 2 - previous previous frame
-     *
-     * Previous frame pointers are null when no valid history exists of that age.
-     */
-    mainHistory = [null, null, null],
-    mainStreamIsValid = false,
-    gpsHomeHistory = new Array(2), // 0 - space to decode new frames into, 1 - previous frame
-    gpsHomeIsValid = false,
-    //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
-    lastEvent,
-    lastGPS,
-    lastSlow,
-    // How many intentionally un-logged frames did we skip over before we decoded the current frame?
-    lastSkippedFrames,
-    // Details about the last main frame that was successfully parsed
-    lastMainFrameIteration,
-    lastMainFrameTime,
-    //The actual log data stream we're reading:
-    stream;
+    };
+  // frameTypes and stream are initialized at the end of the constructor (after function definitions)
+  // Blackbox state:
+  let mainHistoryRing;
+  /* Points into blackboxHistoryRing to give us a circular buffer.
+   *
+   * 0 - space to decode new frames into, 1 - previous frame, 2 - previous previous frame
+   *
+   * Previous frame pointers are null when no valid history exists of that age.
+   */
+  const mainHistory = [null, null, null];
+  let mainStreamIsValid = false;
+  let gpsHomeHistory = new Array(2); // 0 - space to decode new frames into, 1 - previous frame
+  let gpsHomeIsValid = false;
+  //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
+  let lastEvent, lastGPS, lastSlow;
+  // How many intentionally un-logged frames did we skip over before we decoded the current frame?
+  let lastSkippedFrames;
+  // Details about the last main frame that was successfully parsed
+  let lastMainFrameIteration, lastMainFrameTime;
 
   //Public fields:
 
@@ -537,20 +530,16 @@ export function FlightLogParser(logData) {
   }
 
   function parseHeaderLine() {
-    let COLON = ":".charCodeAt(0),
-      fieldName,
-      fieldValue,
-      lineStart,
-      lineEnd,
-      separatorPos = false,
-      matches;
+    const COLON = ":".charCodeAt(0);
+    let separatorPos = false;
+    let matches;
 
     if (stream.peekChar() != " ") return;
 
     //Skip the leading space
     stream.readChar();
 
-    lineStart = stream.pos;
+    const lineStart = stream.pos;
 
     for (
       ;
@@ -566,18 +555,16 @@ export function FlightLogParser(logData) {
 
     if (stream.data[stream.pos] != NEWLINE || separatorPos === false) return;
 
-    lineEnd = stream.pos;
-
-    fieldName = asciiArrayToString(
-      stream.data.subarray(lineStart, separatorPos),
-    );
-    fieldValue = asciiArrayToString(
-      stream.data.subarray(separatorPos + 1, lineEnd),
-    );
+    const lineEnd = stream.pos;
 
     // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
     // In this way is easier to maintain the code
-    fieldName = translateFieldName(fieldName);
+    const fieldName = translateFieldName(
+      asciiArrayToString(stream.data.subarray(lineStart, separatorPos)),
+    );
+    const fieldValue = asciiArrayToString(
+      stream.data.subarray(separatorPos + 1, lineEnd),
+    );
 
     switch (fieldName) {
       case "I interval":
@@ -983,9 +970,8 @@ export function FlightLogParser(logData) {
         break;
       default:
         if ((matches = fieldName.match(/^Field (.) (.+)$/))) {
-          let frameName = matches[1],
-            frameInfo = matches[2],
-            frameDef;
+          const frameName = matches[1];
+          const frameInfo = matches[2];
 
           if (!that.frameDefs[frameName]) {
             that.frameDefs[frameName] = {
@@ -998,7 +984,7 @@ export function FlightLogParser(logData) {
             };
           }
 
-          frameDef = that.frameDefs[frameName];
+          const frameDef = that.frameDefs[frameName];
 
           switch (frameInfo) {
             case "predictor":
@@ -1051,11 +1037,9 @@ export function FlightLogParser(logData) {
    * Use data from the given frame to update field statistics for the given frame type.
    */
   function updateFieldStatistics(frameType, frame) {
-    let i, fieldStats;
+    const fieldStats = that.stats.frame[frameType].field;
 
-    fieldStats = that.stats.frame[frameType].field;
-
-    for (i = 0; i < frame.length; i++) {
+    for (let i = 0; i < frame.length; i++) {
       if (!fieldStats[i]) {
         fieldStats[i] = {
           max: frame[i],
@@ -1165,12 +1149,10 @@ export function FlightLogParser(logData) {
     skippedFrames,
     raw,
   ) {
-    let predictor = frameDef.predictor,
+    const predictor = frameDef.predictor,
       encoding = frameDef.encoding,
-      values = new Array(8),
-      i,
-      j,
-      groupCount;
+      values = new Array(8);
+    let i, j, groupCount;
 
     i = 0;
     while (i < frameDef.count) {
@@ -1909,8 +1891,7 @@ export function FlightLogParser(logData) {
       const command = stream.readChar();
 
       if (lastFrameType) {
-        let lastFrameSize = stream.pos - frameStart,
-          frameTypeStats;
+        const lastFrameSize = stream.pos - frameStart;
 
         // Is this the beginning of a new frame?
         looksLikeFrameCompleted =
@@ -1929,7 +1910,7 @@ export function FlightLogParser(logData) {
           };
         }
 
-        frameTypeStats = this.stats.frame[lastFrameType.marker];
+        const frameTypeStats = this.stats.frame[lastFrameType.marker];
         // If we see what looks like the beginning of a new frame, assume that the previous frame was valid:
         if (
           lastFrameSize <= FLIGHT_LOG_MAX_FRAME_LENGTH &&
@@ -1999,7 +1980,7 @@ export function FlightLogParser(logData) {
     return true;
   };
 
-  frameTypes = {
+  const frameTypes = {
     I: { marker: "I", parse: parseIntraframe, complete: completeIntraframe },
     P: { marker: "P", parse: parseInterframe, complete: completeInterframe },
     G: { marker: "G", parse: parseGPSFrame, complete: completeGPSFrame },
@@ -2012,7 +1993,7 @@ export function FlightLogParser(logData) {
     E: { marker: "E", parse: parseEventFrame, complete: completeEventFrame },
   };
 
-  stream = new ArrayDataStream(logData);
+  const stream = new ArrayDataStream(logData);
 }
 
 FlightLogParser.prototype.resetStats = function () {
