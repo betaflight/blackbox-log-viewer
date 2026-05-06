@@ -5,15 +5,18 @@
     :ui="{
       thead: srOnly ? 'sr-only' : '',
       base: 'w-full',
-      th: 'py-1 text-xs',
-      td: 'py-0.5 text-xs',
+      th: 'py-1 px-1 text-xs text-center',
+      td: 'py-0.5 px-1 text-xs',
       tr: 'border-b border-default',
     }"
   >
+    <template #label-header>
+      <span class="text-left block">Axis</span>
+    </template>
     <template #label-cell="{ row }">
       <span
         :class="{ 'opacity-40': row.original.missing }"
-        class="font-medium"
+        class="font-medium text-left block"
         >{{ row.original.label }}</span
       >
     </template>

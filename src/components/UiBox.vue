@@ -5,20 +5,30 @@
   >
     <div
       v-if="title"
-      :class="`flex gap-2 items-center absolute top-0 left-4 translate-y-[-50%] p-1 px-3 rounded-full text-black text-[13px] font-semibold ${typeClass.pill}`"
+      :class="[
+        'flex gap-2 items-center absolute top-0 left-4 translate-y-[-50%] p-1 px-3 rounded-full text-black text-[13px] font-semibold',
+        typeClass.pill,
+        collapsible ? 'cursor-pointer select-none' : '',
+      ]"
+      @click="collapsible && toggle()"
     >
+      <UIcon
+        v-if="collapsible"
+        :name="expanded ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+        class="size-3.5"
+      />
       {{ title }}
       <slot name="title" />
       <HelpIcon v-if="help" :text="help" />
     </div>
-    <div :class="`flex flex-col p-3 gap-2 ${title ? 'pt-6' : ''}`">
+    <div v-show="expanded" :class="`flex flex-col p-3 gap-2 ${title ? 'pt-6' : ''}`">
       <slot />
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import HelpIcon from "./HelpIcon.vue";
 
 const props = defineProps({
@@ -30,7 +40,15 @@ const props = defineProps({
     validator: (v) => ["default", "success", "warning", "error", "neutral"].includes(v),
   },
   highlight: { type: Boolean, default: false },
+  collapsible: { type: Boolean, default: false },
+  collapsed: { type: Boolean, default: false },
 });
+
+const expanded = ref(!props.collapsed);
+
+function toggle() {
+  expanded.value = !expanded.value;
+}
 
 const typeClass = computed(() =>
   ({

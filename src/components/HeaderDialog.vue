@@ -4,191 +4,171 @@
     class="fixed top-[135px] left-[15px] right-[15px] bottom-[80px] flex flex-col bg-default border border-default rounded-lg shadow-lg"
   >
     <div class="flex items-center gap-3 px-4 py-2 border-b border-default shrink-0">
-      <div class="flex-1">
+      <div class="flex-1 min-w-0">
         <h4 class="font-semibold">{{ craftName }}</h4>
-        <h5 v-if="revision" class="text-sm text-dimmed">{{ revision }}</h5>
-        <h5 v-if="boardInfo" class="text-sm text-dimmed">{{ boardInfo }}</h5>
+        <div v-if="revision || boardInfo" class="flex items-center gap-2 flex-wrap text-xs text-dimmed mt-0.5">
+          <span v-if="revision">{{ revision }}</span>
+          <span v-if="revision && boardInfo" class="opacity-30">|</span>
+          <span v-if="boardInfo">{{ boardInfo }}</span>
+        </div>
       </div>
+      <div class="flex items-center gap-0.5">
+        <UIcon name="i-lucide-columns-3" class="size-4 text-dimmed mr-1" />
+        <button
+          v-for="n in [2, 3, 4, 5, 6]"
+          :key="n"
+          class="size-5 rounded text-[11px] leading-none font-medium"
+          :class="
+            cols === n
+              ? 'bg-primary text-black'
+              : 'text-dimmed hover:text-highlighted hover:bg-elevated'
+          "
+          :title="`${n} columns`"
+          @click="cols = cols === n ? null : n"
+        >
+          {{ n }}
+        </button>
+      </div>
+      <UButton
+        variant="ghost"
+        color="neutral"
+        icon="i-lucide-clipboard-copy"
+        size="xs"
+        title="Copy all parameters to clipboard"
+        @click="copyToClipboard"
+      />
       <UButton
         variant="outline"
         color="neutral"
         icon="i-lucide-x"
         label="Close"
         size="xs"
-        class="ml-auto"
         @click="open = false"
       />
     </div>
 
-    <div class="overflow-y-auto flex-1 p-4">
+    <div class="overflow-y-auto flex-1 p-4 font-mono text-xs">
+      <!-- Main 6-column grid -->
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pb-6 font-mono text-xs"
+        class="grid gap-4"
+        :class="cols ? '' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'"
+        :style="cols ? { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` } : {}"
       >
-        <!-- Column 1: PIDs & Rates -->
+        <!-- Column 1: PIDs -->
         <div class="flex flex-col gap-4">
-          <UiBox title="PID Settings">
+          <UiBox title="PID Settings" collapsible>
             <PidTable :rows="mainPids" :showDMax="showDMax" />
           </UiBox>
 
-          <UiBox v-if="showBaroPids" title="Baro">
+          <UiBox v-if="showBaroPids" title="Baro" collapsible>
             <PidTable :rows="baroPids" :showDMax="false" srOnly />
           </UiBox>
 
-          <UiBox v-if="showMagPids" title="Mag">
+          <UiBox v-if="showMagPids" title="Mag" collapsible>
             <PidTable :rows="magPids" :showDMax="false" srOnly />
           </UiBox>
 
-          <UiBox v-if="showGpsPids" title="GPS">
+          <UiBox v-if="showGpsPids" title="GPS" collapsible>
             <PidTable :rows="gpsPids" :showDMax="false" srOnly />
           </UiBox>
 
-          <UiBox v-if="pidSliderParams.length > 0" title="PID Sliders">
+          <UiBox v-if="pidSliderParams.length > 0" title="PID Sliders" collapsible>
             <ParamTable :params="pidSliderParams" />
           </UiBox>
 
-          <UiBox v-if="feedforwardParams.length > 0" title="Feedforward">
+          <UiBox v-if="feedforwardParams.length > 0" title="Feedforward" collapsible>
             <ParamTable :params="feedforwardParams" />
           </UiBox>
+        </div>
 
-          <UiBox title="Rates">
+        <!-- Column 2: Rates -->
+        <div class="flex flex-col gap-4">
+          <UiBox title="Rates" collapsible>
             <ParamTable :params="rateParams" />
           </UiBox>
 
-          <UiBox v-if="dMaxParams.length > 0" title="D Max">
+          <UiBox v-if="dMaxParams.length > 0" title="D Max" collapsible>
             <ParamTable :params="dMaxParams" />
           </UiBox>
 
-          <UiBox v-if="rateLimitParams.length > 0" title="Rate Limits">
+          <UiBox v-if="rateLimitParams.length > 0" title="Rate Limits" collapsible>
             <ParamTable :params="rateLimitParams" />
           </UiBox>
-        </div>
 
-        <!-- Column 2: Parameters -->
-        <div class="flex flex-col gap-4">
-          <UiBox title="Parameters">
-            <ParamTable :params="generalParams" />
-          </UiBox>
-
-          <UiBox v-if="antiGravityParams.length > 0" title="Anti Gravity">
+          <UiBox v-if="antiGravityParams.length > 0" title="Anti Gravity" collapsible>
             <ParamTable :params="antiGravityParams" />
           </UiBox>
 
-          <UiBox title="Motor / ESC">
-            <ParamTable :params="motorParams" />
-          </UiBox>
-        </div>
-
-        <!-- Column 3: Filters -->
-        <div class="flex flex-col gap-4">
-          <UiBox title="Gyro Filters">
-            <ParamTable :params="gyroFilterParams" />
-          </UiBox>
-
-          <UiBox title="D-Term Filters">
-            <ParamTable :params="dtermFilterParams" />
-          </UiBox>
-
-          <UiBox v-if="dynNotchParams.length > 0" title="Dynamic Notch">
-            <ParamTable :params="dynNotchParams" />
-          </UiBox>
-
-          <UiBox v-if="rpmFilterParams.length > 0" title="RPM Filter">
-            <ParamTable :params="rpmFilterParams" />
-          </UiBox>
-
-          <UiBox v-if="rcSmoothingParams.length > 0" title="RC Smoothing">
-            <ParamTable :params="rcSmoothingParams" />
-          </UiBox>
-
-          <UiBox v-if="otherParams.length > 0" title="Other">
+          <UiBox v-if="otherParams.length > 0" title="Other" collapsible>
             <ParamTable :params="otherParams" />
           </UiBox>
         </div>
 
-        <!-- Column 4: Features & Fields -->
+        <!-- Column 3: Parameters -->
         <div class="flex flex-col gap-4">
-          <UiBox v-if="featuresList.length > 0" title="Features">
-            <UTable
-              :data="featuresList"
-              :columns="featureColumns"
-              :ui="{
-                thead: 'sr-only',
-                base: 'w-full',
-                td: 'py-0.5 text-xs',
-                tr: 'border-b border-default',
-              }"
-            >
-              <template #enabled-cell="{ row }">
-                <UIcon
-                  v-if="row.original.enabled"
-                  name="i-lucide-check"
-                  class="size-3.5 text-green-500"
-                />
-                <UIcon
-                  v-else
-                  name="i-lucide-minus"
-                  class="size-3.5 text-muted"
-                />
-              </template>
-              <template #name-cell="{ row }">
-                <span class="font-medium">{{ row.original.name }}</span>
-              </template>
-              <template #description-cell="{ row }">
-                <span class="text-dimmed text-xs">{{
-                  row.original.description
-                }}</span>
-              </template>
-            </UTable>
-          </UiBox>
-
-          <UiBox v-if="disabledFieldsList.length > 0" title="Disabled Fields">
-            <UTable
-              :data="disabledFieldsList"
-              :columns="featureColumns"
-              :ui="{
-                thead: 'sr-only',
-                base: 'w-full',
-                td: 'py-0.5 text-xs',
-                tr: 'border-b border-default',
-              }"
-            >
-              <template #enabled-cell="{ row }">
-                <UIcon
-                  v-if="row.original.enabled"
-                  name="i-lucide-check"
-                  class="size-3.5 text-green-500"
-                />
-                <UIcon
-                  v-else
-                  name="i-lucide-minus"
-                  class="size-3.5 text-muted"
-                />
-              </template>
-              <template #name-cell="{ row }">
-                <span class="font-medium">{{ row.original.name }}</span>
-              </template>
-              <template #description-cell="{ row }">
-                <span class="text-dimmed text-xs">{{
-                  row.original.description
-                }}</span>
-              </template>
-            </UTable>
-          </UiBox>
-
-          <UiBox v-if="unknownHeaders.length > 0" title="Unknown Headers">
-            <ParamTable :params="unknownHeaders" />
+          <UiBox title="Parameters" collapsible>
+            <ParamTable :params="generalParams" />
           </UiBox>
         </div>
+
+        <!-- Column 4: Motor / ESC -->
+        <div class="flex flex-col gap-4">
+          <UiBox title="Motor / ESC" collapsible>
+            <ParamTable :params="motorParams" />
+          </UiBox>
+        </div>
+
+        <!-- Column 5: Gyro Filters -->
+        <div class="flex flex-col gap-4">
+          <UiBox title="Gyro Filters" collapsible>
+            <ParamTable :params="gyroFilterParams" />
+          </UiBox>
+
+          <UiBox v-if="dynNotchParams.length > 0" title="Dynamic Notch" collapsible>
+            <ParamTable :params="dynNotchParams" />
+          </UiBox>
+
+          <UiBox v-if="rpmFilterParams.length > 0" title="RPM Filter" collapsible>
+            <ParamTable :params="rpmFilterParams" />
+          </UiBox>
+        </div>
+
+        <!-- Column 6: D-Term Filters -->
+        <div class="flex flex-col gap-4">
+          <UiBox title="D-Term Filters" collapsible>
+            <ParamTable :params="dtermFilterParams" />
+          </UiBox>
+
+          <UiBox v-if="rcSmoothingParams.length > 0" title="RC Smoothing" collapsible>
+            <ParamTable :params="rcSmoothingParams" />
+          </UiBox>
+        </div>
+      </div>
+
+      <!-- Full-width sections below the grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mt-4">
+        <UiBox v-if="featuresList.length > 0" title="Features" collapsible>
+          <FeatureTable :data="featuresList" />
+        </UiBox>
+
+        <UiBox v-if="disabledFieldsList.length > 0" title="Disabled Fields" collapsible>
+          <FeatureTable :data="disabledFieldsList" />
+        </UiBox>
+
+        <UiBox v-if="unknownHeaders.length > 0" title="Unknown Headers" collapsible collapsed>
+          <ParamTable :params="unknownHeaders" />
+        </UiBox>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import UiBox from "./UiBox.vue";
 import ParamTable from "./ParamTable.vue";
 import PidTable from "./PidTable.vue";
+import FeatureTable from "./FeatureTable.vue";
 import {
   OFF_ON,
   FAST_PROTOCOL,
@@ -217,18 +197,11 @@ import {
 } from "../flightlog_fielddefs";
 
 const open = defineModel("open", { type: Boolean, default: false });
+const cols = ref(null);
 
 const props = defineProps({
   sysConfig: { type: Object, default: null },
 });
-
-// --- Feature table columns ---
-
-const featureColumns = [
-  { accessorKey: "enabled", header: "Status" },
-  { accessorKey: "name", header: "Feature" },
-  { accessorKey: "description", header: "Description" },
-];
 
 // --- Helpers ---
 
@@ -279,6 +252,30 @@ function bitmaskVal(data, totalBits = 8) {
 
 function param(name, value, opts = {}) {
   return { name, value: value ?? "-", missing: value == null, ...opts };
+}
+
+// --- Copy to clipboard ---
+
+function formatParams(title, params) {
+  if (!params.length) { return ""; }
+  const lines = params.map((p) => `  ${p.name}: ${p.value}`).join("\n");
+  return `${title}\n${lines}\n`;
+}
+
+function copyToClipboard() {
+  const sections = [
+    formatParams("PID Settings", mainPids.value.map((r) => ({ name: r.label, value: `P=${r.p} I=${r.i} D=${r.d}${showDMax.value ? ` DMax=${r.dMax}` : ""} FF=${r.f}` }))),
+    formatParams("Rates", rateParams.value),
+    formatParams("Parameters", generalParams.value),
+    formatParams("Motor / ESC", motorParams.value),
+    formatParams("Gyro Filters", gyroFilterParams.value),
+    formatParams("D-Term Filters", dtermFilterParams.value),
+    formatParams("Dynamic Notch", dynNotchParams.value),
+    formatParams("RPM Filter", rpmFilterParams.value),
+    formatParams("RC Smoothing", rcSmoothingParams.value),
+  ];
+  const text = `${craftName.value}\n${revision.value}\n${boardInfo.value}\n\n${sections.filter(Boolean).join("\n")}`;
+  navigator.clipboard.writeText(text);
 }
 
 // --- Header ---
