@@ -1522,7 +1522,7 @@ FlightLogFieldPresenter.presentFlags = function (flags, flagNames) {
     result = "";
 
   while (flags > 0) {
-    if ((flags & 1) != 0) {
+    if ((flags & 1) !== 0) {
       if (printedFlag) {
         result += "|";
       } else {
@@ -1768,9 +1768,9 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
 
     case "amperageLatest":
       if (
-        (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+        (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
           semver.gte(flightLog.getSysConfig().firmwareVersion, "3.1.7")) ||
-        (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+        (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
           semver.gte(flightLog.getSysConfig().firmwareVersion, "2.0.0"))
       ) {
         return (
@@ -1778,7 +1778,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
           `, ${(value / 100 / flightLog.getNumMotors()).toFixed(2)} A/motor`
         );
       } else if (
-        flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+        flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
         semver.gte(flightLog.getSysConfig().firmwareVersion, "3.1.0")
       ) {
         return (
@@ -2534,14 +2534,14 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
 
     case "amperageLatest":
       if (
-        (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+        (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
           semver.gte(flightLog.getSysConfig().firmwareVersion, "3.1.7")) ||
-        (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+        (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
           semver.gte(flightLog.getSysConfig().firmwareVersion, "2.0.0"))
       ) {
         return toFriendly ? value / 100 : value * 100;
       } else if (
-        flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+        flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
         semver.gte(flightLog.getSysConfig().firmwareVersion, "3.1.0")
       ) {
         return toFriendly ? value / 100 : value * 100;

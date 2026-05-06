@@ -224,7 +224,7 @@ export function stringLoopTime(
       )}kHz`;
       if (unsynced_fast_pwm != null) {
         returnString +=
-          unsynced_fast_pwm == 0
+          unsynced_fast_pwm === 0
             ? "/SYNCED"
             : motor_pwm_rate != null
               ? `/${parseFloat((motor_pwm_rate / 1000).toFixed(3))}kHz`
@@ -242,7 +242,7 @@ export function stringTimetoMsec(input) {
 
     if (matches.length > 2) {
       // there is a placeholder - either : or .
-      if (matches[3] == ":") {
+      if (matches[3] === ":") {
         // time has been entered MM:SS.SSS
         return (
           (matches[1] ? -1 : 1) *
@@ -414,14 +414,14 @@ export function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
    ***/
   if (cf_version === undefined) {
     return (
-      sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+      sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
       semver.gte(sysConfig.firmwareVersion, bf_version)
     );
   } else {
     return (
-      (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+      (sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
         semver.gte(sysConfig.firmwareVersion, bf_version)) ||
-      (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+      (sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
         semver.gte(sysConfig.firmwareVersion, cf_version))
     );
   }
