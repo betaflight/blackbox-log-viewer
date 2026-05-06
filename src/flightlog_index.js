@@ -6,14 +6,14 @@ import "./decoders";
 
 export function FlightLogIndex(logData) {
   //Private:
-  let that = this,
-    logBeginOffsets = false,
-    intraframeDirectories = false;
+  const that = this;
+  let logBeginOffsets = false;
+  let intraframeDirectories = false;
 
   function buildLogOffsetsIndex() {
-    let stream = new ArrayDataStream(logData),
-      i,
-      logStart;
+    const stream = new ArrayDataStream(logData);
+    let i;
+    let logStart;
 
     logBeginOffsets = [];
 
@@ -42,31 +42,31 @@ export function FlightLogIndex(logData) {
     intraframeDirectories = [];
 
     for (let i = 0; i < that.getLogCount(); i++) {
-      let intraIndex = {
-          times: [],
-          offsets: [],
-          avgThrottle: [],
-          maxRC: [],
-          maxMotorDiff: [],
-          initialIMU: [],
-          initialSlow: [],
-          initialGPSHome: [],
-          initialGPS: [],
-          hasEvent: [],
-          minTime: false,
-          maxTime: false,
-          unLoggedTime: 0,
-        },
-        imu = new IMU(),
-        iframeCount = 0,
-        motorFields = [],
-        maxRCFields = [],
-        throttleTotal,
-        rcTotal,
-        maxMotor,
-        minMotor,
-        parsedHeader,
-        sawEndMarker = false;
+      const intraIndex = {
+        times: [],
+        offsets: [],
+        avgThrottle: [],
+        maxRC: [],
+        maxMotorDiff: [],
+        initialIMU: [],
+        initialSlow: [],
+        initialGPSHome: [],
+        initialGPS: [],
+        hasEvent: [],
+        minTime: false,
+        maxTime: false,
+        unLoggedTime: 0,
+      };
+      const imu = new IMU();
+      let iframeCount = 0;
+      const motorFields = [];
+      const maxRCFields = [];
+      let throttleTotal;
+      let rcTotal;
+      let maxMotor;
+      let minMotor;
+      let parsedHeader;
+      let sawEndMarker = false;
 
       try {
         parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
@@ -80,26 +80,26 @@ export function FlightLogIndex(logData) {
 
       // Only attempt to parse the log if the header wasn't corrupt
       if (parsedHeader) {
-        let sysConfig = parser.sysConfig,
-          mainFrameDef = parser.frameDefs.I,
-          gyroADC = [
-            mainFrameDef.nameToIndex["gyroADC[0]"],
-            mainFrameDef.nameToIndex["gyroADC[1]"],
-            mainFrameDef.nameToIndex["gyroADC[2]"],
-          ],
-          accSmooth = [
-            mainFrameDef.nameToIndex["accSmooth[0]"],
-            mainFrameDef.nameToIndex["accSmooth[1]"],
-            mainFrameDef.nameToIndex["accSmooth[2]"],
-          ],
-          magADC = [
-            mainFrameDef.nameToIndex["magADC[0]"],
-            mainFrameDef.nameToIndex["magADC[1]"],
-            mainFrameDef.nameToIndex["magADC[2]"],
-          ],
-          lastSlow = [],
-          lastGPSHome = [],
-          lastGPS = [];
+        const sysConfig = parser.sysConfig;
+        const mainFrameDef = parser.frameDefs.I;
+        const gyroADC = [
+          mainFrameDef.nameToIndex["gyroADC[0]"],
+          mainFrameDef.nameToIndex["gyroADC[1]"],
+          mainFrameDef.nameToIndex["gyroADC[2]"],
+        ];
+        const accSmooth = [
+          mainFrameDef.nameToIndex["accSmooth[0]"],
+          mainFrameDef.nameToIndex["accSmooth[1]"],
+          mainFrameDef.nameToIndex["accSmooth[2]"],
+        ];
+        let magADC = [
+          mainFrameDef.nameToIndex["magADC[0]"],
+          mainFrameDef.nameToIndex["magADC[1]"],
+          mainFrameDef.nameToIndex["magADC[2]"],
+        ];
+        let lastSlow = [];
+        let lastGPSHome = [];
+        let lastGPS = [];
 
         // Identify motor fields so they can be used to show the activity summary bar
         for (let j = 0; j < 8; j++) {
@@ -269,26 +269,26 @@ export function FlightLogIndex(logData) {
   this.loadFromJSON = function (_json) {};
 
   this.saveToJSON = function () {
-    let intraframeDirectories = this.getIntraframeDirectories(),
-      i,
-      j,
-      resultIndexes = new Array(intraframeDirectories.length);
+    const intraframeDirectories = this.getIntraframeDirectories();
+    let i;
+    let j;
+    const resultIndexes = new Array(intraframeDirectories.length);
 
     for (i = 0; i < intraframeDirectories.length; i++) {
-      let lastTime,
-        lastLastTime,
-        lastOffset,
-        lastLastOffset,
-        sourceIndex = intraframeDirectories[i],
-        resultIndex = {
-          times: new Array(sourceIndex.times.length),
-          offsets: new Array(sourceIndex.offsets.length),
-          minTime: sourceIndex.minTime,
-          maxTime: sourceIndex.maxTime,
-          avgThrottle: new Array(sourceIndex.avgThrottle.length),
-          maxRC: new Array(sourceIndex.maxRC.length),
-          maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length),
-        };
+      let lastTime;
+      let lastLastTime;
+      let lastOffset;
+      let lastLastOffset;
+      const sourceIndex = intraframeDirectories[i];
+      const resultIndex = {
+        times: new Array(sourceIndex.times.length),
+        offsets: new Array(sourceIndex.offsets.length),
+        minTime: sourceIndex.minTime,
+        maxTime: sourceIndex.maxTime,
+        avgThrottle: new Array(sourceIndex.avgThrottle.length),
+        maxRC: new Array(sourceIndex.maxRC.length),
+        maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length),
+      };
 
       if (sourceIndex.times.length > 0) {
         resultIndex.times[0] = sourceIndex.times[0];

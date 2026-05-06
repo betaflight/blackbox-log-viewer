@@ -62,62 +62,61 @@ function BlackboxLogViewer() {
     GRAPH_MAX_ZOOM = 1000,
     GRAPH_DEFAULT_ZOOM = 100;
 
-  let graphState = GRAPH_STATE_PAUSED,
-    currentBlackboxTime = 0,
-    lastRenderTime = false,
-    flightLog,
-    flightLogDataArray,
-    graph = null,
-    prefs = new PrefStorage(),
-    _configuration = null, // is their an associated dump file ?
-    configurationDefaults = new ConfigurationDefaults(prefs), // configuration defaults
-    // User's video render config:
-    videoConfig = {},
-    // JSON graph configuration:
-    graphConfig = null,
-    offsetCache = [], // Storage for the offset cache (last 20 files)
-    currentOffsetCache = { log: null, index: null, video: null, offset: null },
-    // JSON array of graph configurations for New Workspaces feature
-    lastGraphConfig = null, // Undo feature - go back to last configuration.
-    workspaceGraphConfigs = [], // Workspaces
-    activeWorkspace = 1, // Active Workspace
-    bookmarkTimes = [], // Empty array for bookmarks (times)
-    // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
-    activeGraphConfig = new GraphConfig(),
-    fieldPresenter = FlightLogFieldPresenter,
-    hasVideo = false,
-    hasLog = false,
-    hasMarker = false, // add measure feature
-    hasAnalyser,
-    hasMap,
-    hasAnalyserFullscreen,
-    hasAnalyserSticks = false,
-    viewVideo = true,
-    hasTableOverlay = false,
-    hasConfig = false,
-    hasConfigOverlay = false,
-    isFullscreen = false, // New fullscreen feature (to hide table)
-    video = document.querySelector(".log-graph video"),
-    canvas = document.getElementById("graphCanvas"),
-    analyserCanvas = document.getElementById("analyserCanvas"),
-    stickCanvas = document.getElementById("stickCanvas"),
-    craftCanvas = document.getElementById("craftCanvas"),
-    videoURL = false,
-    videoOffset = 0.0,
-    videoExportInTime = null,
-    videoExportOutTime = null,
-    markerTime = 0, // New marker time
-    userSettings,
-    seekBarCanvas = document.querySelector(".log-seek-bar canvas"),
-    seekBar = new SeekBar(seekBarCanvas),
-    seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar)),
-    seekBarMode = "avgThrottle",
-    updateValuesChartRateLimited,
-    animationFrameIsQueued = false,
-    playbackRate = PLAYBACK_DEFAULT_RATE,
-    graphZoom = GRAPH_DEFAULT_ZOOM,
-    lastGraphZoom = GRAPH_DEFAULT_ZOOM, // QuickZoom function.
-    mapGrapher = new MapGrapher();
+  let graphState = GRAPH_STATE_PAUSED;
+  let currentBlackboxTime = 0;
+  let lastRenderTime = false;
+  let flightLog;
+  let flightLogDataArray;
+  let graph = null;
+  const prefs = new PrefStorage();
+  let _configuration = null; // is their an associated dump file ?
+  const configurationDefaults = new ConfigurationDefaults(prefs); // configuration defaults
+  // User's video render config:
+  let videoConfig = {};
+  // JSON graph configuration:
+  let graphConfig = null;
+  let offsetCache = []; // Storage for the offset cache (last 20 files)
+  const currentOffsetCache = { log: null, index: null, video: null, offset: null };
+  // JSON array of graph configurations for New Workspaces feature
+  let lastGraphConfig = null; // Undo feature - go back to last configuration.
+  let workspaceGraphConfigs = []; // Workspaces
+  let activeWorkspace = 1; // Active Workspace
+  let bookmarkTimes = []; // Empty array for bookmarks (times)
+  // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
+  const activeGraphConfig = new GraphConfig();
+  const fieldPresenter = FlightLogFieldPresenter;
+  let hasVideo = false;
+  let hasLog = false;
+  let hasMarker = false; // add measure feature
+  let hasAnalyser;
+  let hasMap;
+  let hasAnalyserFullscreen;
+  const hasAnalyserSticks = false;
+  let viewVideo = true;
+  let hasTableOverlay = false;
+  let hasConfig = false;
+  let hasConfigOverlay = false;
+  let isFullscreen = false; // New fullscreen feature (to hide table)
+  const video = document.querySelector(".log-graph video");
+  const canvas = document.getElementById("graphCanvas");
+  const analyserCanvas = document.getElementById("analyserCanvas");
+  const stickCanvas = document.getElementById("stickCanvas");
+  const craftCanvas = document.getElementById("craftCanvas");
+  let videoURL = false;
+  let videoOffset = 0.0;
+  let videoExportInTime = null;
+  let videoExportOutTime = null;
+  let markerTime = 0; // New marker time
+  let userSettings;
+  const seekBarCanvas = document.querySelector(".log-seek-bar canvas");
+  const seekBar = new SeekBar(seekBarCanvas);
+  const seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar));
+  let seekBarMode = "avgThrottle";
+  let animationFrameIsQueued = false;
+  let playbackRate = PLAYBACK_DEFAULT_RATE;
+  let graphZoom = GRAPH_DEFAULT_ZOOM;
+  let lastGraphZoom = GRAPH_DEFAULT_ZOOM; // QuickZoom function.
+  const mapGrapher = new MapGrapher();
 
   // --- Pinia store sync ---
   // Initialize stores outside Vue component context using the shared Pinia instance.
@@ -293,7 +292,7 @@ function BlackboxLogViewer() {
     }
   }
 
-  updateValuesChartRateLimited = throttle(250, updateValuesChart);
+  const updateValuesChartRateLimited = throttle(250, updateValuesChart);
 
   function animationLoop() {
     const now = Date.now();
@@ -694,9 +693,9 @@ function BlackboxLogViewer() {
 
   function loadFiles(files) {
     for (const file of files) {
-      let isLog = file.name.match(/\.(BBL|TXT|CFL|BFL|LOG)$/i),
-        isVideo = file.name.match(/\.(AVI|MOV|MP4|MPEG)$/i),
-        isWorkspaces = file.name.match(/\.(JSON)$/i);
+      let isLog = file.name.match(/\.(BBL|TXT|CFL|BFL|LOG)$/i);
+      let isVideo = file.name.match(/\.(AVI|MOV|MP4|MPEG)$/i);
+      const isWorkspaces = file.name.match(/\.(JSON)$/i);
 
       if (!isLog && !isVideo && !isWorkspaces) {
         if (file.size < 10 * 1024 * 1024)
