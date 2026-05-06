@@ -60,7 +60,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     steps = 12;
   }
 
-  if (steps <= 2 || power == 1.0) {
+  if (steps <= 2 || power === 1.0) {
     //Curve is actually a straight line
     inputScale = outputRange / inputRange;
 

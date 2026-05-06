@@ -25,7 +25,7 @@ export function ImportedCurves(curvesChanged) {
     let importsLeft = MAX_IMPORT_COUNT - _curvesData.length;
 
     for (const file of files) {
-      if (importsLeft-- == 0) {
+      if (importsLeft-- === 0) {
         break;
       }
       const reader = new FileReader();
@@ -44,7 +44,7 @@ export function ImportedCurves(curvesChanged) {
 
           stringRows.shift();
           //remove bad last row
-          if (stringRows.at(-1) == "") {
+          if (stringRows.at(-1) === "") {
             stringRows.pop();
           }
 

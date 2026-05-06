@@ -19,7 +19,7 @@ export function Craft3D(flightLog, canvas, propColors) {
     numMotors = customMix.motorOrder.length;
   }
 
-  const propRadius = numMotors == 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
+  const propRadius = numMotors === 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
     craftMaterial = new THREE.MeshLambertMaterial({ color: 0xa0a0a0 }),
     arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x404040 }),
     propMaterials = new Array(propColors),
@@ -43,7 +43,7 @@ export function Craft3D(flightLog, canvas, propColors) {
       } else {
         const shape = new THREE.Shape();
 
-        if (i == NUM_PROP_LEVELS - 1) {
+        if (i === NUM_PROP_LEVELS - 1) {
           //work around three.js bug that requires the initial point to be on the radius to complete a full circle
           shape.moveTo(propRadius, 0);
           shape.absarc(
@@ -320,7 +320,7 @@ export function Craft3D(flightLog, canvas, propColors) {
   };
 
   this.resize = function (width, height) {
-    if (canvas.width != width || canvas.height != height) {
+    if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
 

@@ -349,7 +349,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const dbStep = 10;
   const minY = Math.floor(minimum / dbStep) * dbStep;
   let maxY = (Math.floor(maximum / dbStep) + 1) * dbStep;
-  if (minY == maxY) {
+  if (minY === maxY) {
     maxY = minY + 1; // prevent divide by zero
   }
   //Store vsRange for _drawMousePosition
@@ -1401,7 +1401,7 @@ GraphSpectrumPlot._drawInterestFrequency = function (
   let interestLabel;
   if (
     this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
-    label != ""
+    label !== ""
   ) {
     const psdValue = this.getPSDbyFreq(frequency);
     interestLabel = `${label}: (${frequency.toFixed(0)}Hz, ${psdValue.toFixed(0)}dBm/Hz)`;
@@ -1687,7 +1687,7 @@ GraphSpectrumPlot._drawMousePosition = function (
 
       if (
         this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
-        this._importedPSD.curvesCount() == 0
+        this._importedPSD.curvesCount() === 0
       ) {
         // single PSD spectrum
         const currentPSD = this.getPSDbyFreq(mouseFrequency);
@@ -1834,7 +1834,7 @@ GraphSpectrumPlot.setLogRateWarningInfo = function (logRateInfo) {
 };
 
 GraphSpectrumPlot._drawRateWarning = function (canvasCtx) {
-  if (this._logRateWarning != undefined) {
+  if (this._logRateWarning !== undefined) {
     canvasCtx.save();
 
     canvasCtx.font = `${

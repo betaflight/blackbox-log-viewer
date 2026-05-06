@@ -234,7 +234,7 @@ function work(
   const p = factors.shift();
   const m = factors.shift();
 
-  if (m == 1) {
+  if (m === 1) {
     for (let i = 0; i < p * m; i++) {
       const x0_r = f[2 * (fOffset + fStride * inputStride * i)],
         x0_i = f[2 * (fOffset + fStride * inputStride * i) + 1];
@@ -353,7 +353,7 @@ FFTComplex.prototype.process = function (
   outputStride = ~~outputStride;
   inputStride = ~~inputStride;
 
-  const type = t == "real" ? t : "complex";
+  const type = t === "real" ? t : "complex";
 
   if (outputStride < 1) {
     throw new RangeError(
@@ -371,7 +371,7 @@ FFTComplex.prototype.process = function (
     );
   }
 
-  if (type == "real") {
+  if (type === "real") {
     for (let i = 0; i < this.state.n; i++) {
       const x0_r = input[inputOffset + inputStride * i];
       this.state.scratch[2 * i] = x0_r;
@@ -390,7 +390,7 @@ FFTComplex.prototype.process = function (
       this.state,
     );
   } else {
-    if (input == output) {
+    if (input === output) {
       work(
         this.state.scratch,
         0,

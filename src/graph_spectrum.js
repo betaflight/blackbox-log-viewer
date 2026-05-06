@@ -45,10 +45,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       userSettings.spectrumType || SPECTRUM_TYPE.FREQUENCY;
     userSettings.overdrawSpectrumType =
       userSettings.overdrawSpectrumType || SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS;
-    if (userSettings.psdHeatmapMin == undefined) {
+    if (userSettings.psdHeatmapMin === undefined) {
       userSettings.psdHeatmapMin = DEFAULT_PSD_HEATMAP_MIN;
     }
-    if (userSettings.psdHeatmapMax == undefined) {
+    if (userSettings.psdHeatmapMax === undefined) {
       userSettings.psdHeatmapMax = DEFAULT_PSD_HEATMAP_MAX;
     }
 
@@ -61,7 +61,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     );
 
     this.setFullscreen = function (size) {
-      isFullscreen = size == true;
+      isFullscreen = size === true;
       GraphSpectrumPlot.setFullScreen(isFullscreen);
       that.resize();
     };
@@ -172,8 +172,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
         GraphSpectrumPlot.isImportedCurvesMaxCount() &&
         userSettings.spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY;
       let shouldReload =
-        fftData == null ||
-        (fieldIndex != fftData.fieldIndex && !isMaxCountOfImportedPSD) ||
+        fftData === null ||
+        (fieldIndex !== fftData.fieldIndex && !isMaxCountOfImportedPSD) ||
         dataReload;
 
       if (

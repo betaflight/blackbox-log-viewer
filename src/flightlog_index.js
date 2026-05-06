@@ -22,7 +22,7 @@ export function FlightLogIndex(logData) {
         FlightLogParser.prototype.FLIGHT_LOG_START_MARKER,
       );
 
-      if (logStart == -1) {
+      if (logStart === -1) {
         //No more logs found in the file
         logBeginOffsets.push(stream.end);
         break;
@@ -149,7 +149,7 @@ export function FlightLogIndex(logData) {
                 intraIndex.maxTime = frameTime;
               }
 
-              if (frameType == "I") {
+              if (frameType === "I") {
                 // Start a new chunk on every 4th I-frame
                 if (iframeCount % 4 === 0) {
                   // Log the beginning of the new chunk
@@ -217,11 +217,11 @@ export function FlightLogIndex(logData) {
                 intraIndex.hasEvent[intraIndex.times.length - 1] = true;
               }
 
-              if (frame.event == FlightLogEvent.LOG_END) {
+              if (frame.event === FlightLogEvent.LOG_END) {
                 sawEndMarker = true;
               }
 
-              if (frame.event == FlightLogEvent.LOGGING_RESUME) {
+              if (frame.event === FlightLogEvent.LOGGING_RESUME) {
                 if (frameTime) {
                   intraIndex.unLoggedTime += frame.data.currentTime - frameTime;
                 }

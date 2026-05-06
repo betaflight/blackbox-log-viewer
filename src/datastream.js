@@ -73,7 +73,7 @@ ArrayDataStream.prototype.readUnsignedVB = function () {
   for (i = 0; i < 5; i++) {
     b = this.readByte();
 
-    if (b == EOF) return 0;
+    if (b === EOF) return 0;
 
     result = result | ((b & ~0x80) << shift);
 
@@ -146,10 +146,10 @@ ArrayDataStream.prototype.nextOffsetOf = function (needle) {
   let i, j;
 
   for (i = this.pos; i <= this.end - needle.length; i++) {
-    if (this.data[i] == needle[0]) {
-      for (j = 1; j < needle.length && this.data[i + j] == needle[j]; j++);
+    if (this.data[i] === needle[0]) {
+      for (j = 1; j < needle.length && this.data[i + j] === needle[j]; j++);
 
-      if (j == needle.length) return i;
+      if (j === needle.length) return i;
     }
   }
 

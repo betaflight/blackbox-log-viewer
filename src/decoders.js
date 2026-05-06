@@ -273,7 +273,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function (values) {
 ArrayDataStream.prototype.readTag8_8SVB = function (values, valueCount) {
   let i, header;
 
-  if (valueCount == 1) {
+  if (valueCount === 1) {
     values[0] = this.readSignedVB();
   } else {
     header = this.readByte();

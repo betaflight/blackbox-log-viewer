@@ -161,7 +161,7 @@ export function FlightLogVideoRenderer(
 
     if (logParameters.flightVideo) {
       const renderFrames = function (frameCount) {
-        if (frameCount == 0) {
+        if (frameCount === 0) {
           completeChunk();
           return;
         }

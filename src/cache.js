@@ -15,7 +15,7 @@ export function FIFOCache(initialCapacity) {
 
   function removeFromQueue(key) {
     for (let i = 0; i < queue.length; i++) {
-      if (queue[i] == key) {
+      if (queue[i] === key) {
         //Assume there's only one copy to remove:
         for (let j = i; j < queue.length - 1; j++) {
           queue[j] = queue[j + 1];

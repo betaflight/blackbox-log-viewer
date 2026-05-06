@@ -295,7 +295,7 @@ export function SeekBar(canvas) {
   }
 
   this.repaint = function () {
-    if (canvas.width == 0 || canvas.height == 0) return;
+    if (canvas.width === 0 || canvas.height === 0) return;
 
     if (!backgroundValid) {
       dirtyRegion = false;
@@ -322,7 +322,7 @@ export function SeekBar(canvas) {
     const cursorX = (current - min) / pixelTimeStep + BAR_INSET;
     let cursorWidth = 0;
 
-    if (currentWindow != 0) {
+    if (currentWindow !== 0) {
       cursorWidth = currentWindow / 2 / pixelTimeStep;
     }
 
