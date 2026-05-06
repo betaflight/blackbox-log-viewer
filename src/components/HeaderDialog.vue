@@ -212,6 +212,8 @@ import {
   SIMPLIFIED_PIDS_MODE,
   THROTTLE_LIMIT_TYPE,
   DEBUG_MODE,
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_INAV,
 } from "../flightlog_fielddefs";
 
 const open = defineModel("open", { type: Boolean, default: false });

@@ -5,6 +5,8 @@ import {
   FLIGHT_LOG_FLIGHT_STATE_NAME,
   FLIGHT_LOG_FAILSAFE_PHASE_NAME,
   FFT_CALC_STEPS,
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
 } from "./flightlog_fielddefs";
 import { formatTime } from "./tools";
 import { useSettingsStore } from "./stores/settings.js";

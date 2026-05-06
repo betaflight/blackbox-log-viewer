@@ -8,6 +8,13 @@ function makeReadOnly(x) {
   return x;
 }
 
+// Firmware type constants
+export const FIRMWARE_TYPE_UNKNOWN = 0;
+export const FIRMWARE_TYPE_BASEFLIGHT = 1;
+export const FIRMWARE_TYPE_CLEANFLIGHT = 2;
+export const FIRMWARE_TYPE_BETAFLIGHT = 3;
+export const FIRMWARE_TYPE_INAV = 4;
+
 // Some constants used at different places
 export const MAX_MOTOR_NUMBER = 8;
 export const DSHOT_MIN_VALUE = 48;

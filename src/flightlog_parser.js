@@ -1,5 +1,13 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-import { adjustFieldDefsList, FlightLogEvent } from "./flightlog_fielddefs";
+import {
+  adjustFieldDefsList,
+  FlightLogEvent,
+  FIRMWARE_TYPE_UNKNOWN,
+  FIRMWARE_TYPE_BASEFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_INAV,
+} from "./flightlog_fielddefs";
 import { ArrayDataStream } from "./datastream";
 import "./decoders";
 import {
@@ -11,12 +19,6 @@ import {
   stringHasComma,
   parseCommaSeparatedString,
 } from "./tools";
-
-globalThis.FIRMWARE_TYPE_UNKNOWN = 0;
-globalThis.FIRMWARE_TYPE_BASEFLIGHT = 1;
-globalThis.FIRMWARE_TYPE_CLEANFLIGHT = 2;
-globalThis.FIRMWARE_TYPE_BETAFLIGHT = 3;
-globalThis.FIRMWARE_TYPE_INAV = 4;
 
 const FIRMWARE_CLASSES = ["isBaseF", "isCF", "isBF", "isINAV"];
 

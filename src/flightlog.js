@@ -9,6 +9,9 @@ import {
   AXIS,
   FAST_PROTOCOL,
   SUPER_EXPO_YAW,
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
+  FIRMWARE_TYPE_INAV,
 } from "./flightlog_fielddefs";
 import { IMU } from "./imu";
 import { FIFOCache } from "./cache";

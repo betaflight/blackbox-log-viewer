@@ -1,3 +1,8 @@
+import {
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
+} from "./flightlog_fielddefs";
+
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
 export function hexToFloat(string) {
   let arr = new Uint32Array(1);
