@@ -576,17 +576,17 @@ export function FlightLogParser(logData) {
         if (that.sysConfig.frameIntervalI < 1)
           that.sysConfig.frameIntervalI = 1;
         break;
-      case "P interval":
-        matches = /(\d+)\/(\d+)/.exec(fieldValue);
-
-        if (matches) {
-          that.sysConfig.frameIntervalPNum = parseInt(matches[1], 10);
-          that.sysConfig.frameIntervalPDenom = parseInt(matches[2], 10);
+      case "P interval": {
+        const slashIdx = fieldValue.indexOf("/");
+        if (slashIdx !== -1) {
+          that.sysConfig.frameIntervalPNum = parseInt(fieldValue.substring(0, slashIdx), 10);
+          that.sysConfig.frameIntervalPDenom = parseInt(fieldValue.substring(slashIdx + 1), 10);
         } else {
           that.sysConfig.frameIntervalPNum = 1;
           that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
         }
         break;
+      }
       case "P denom":
       case "P ratio":
         // Don't do nothing with this, because is the same than frameIntervalI/frameIntervalPDenom so we don't need it
@@ -927,7 +927,7 @@ export function FlightLogParser(logData) {
         //TODO Unify this somehow...
 
         // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
-        const matches = /(.*flight).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
+        const matches = /((?:Beta|Race|Clean|Base|Butter)flight)\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
         if (matches != null) {
           // Detecting Betaflight requires looking at the revision string
           if (matches[1] === "Betaflight") {
