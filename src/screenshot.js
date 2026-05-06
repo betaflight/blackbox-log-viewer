@@ -1,19 +1,19 @@
 import html2canvas from "html2canvas";
+import { useAppStore } from "./stores/app.js";
 
 export function makeScreenshot() {
-  let el = document.querySelector("#screenshot-frame"),
-    now = new Date(),
-    timestamp = `${now.getFullYear()}${`00${now.getMonth() + 1}`.slice(
-      -2,
-    )}${`00${now.getDate()}`.slice(-2)}-${`00${now.getHours()}`.slice(
-      -2,
-    )}${`00${now.getMinutes()}`.slice(-2)}${`00${now.getSeconds()}`.slice(-2)}`,
-    logFilenameEl = document.querySelector(".log-filename"),
-    baseFilename = (logFilenameEl?.textContent || "").trim().replace(".", "_") || "blackbox-log",
-    defaultFilename = `${baseFilename}-${timestamp}.png`;
+  const el = document.querySelector("#screenshot-frame");
+  const now = new Date();
+  const timestamp = `${now.getFullYear()}${`00${now.getMonth() + 1}`.slice(
+    -2,
+  )}${`00${now.getDate()}`.slice(-2)}-${`00${now.getHours()}`.slice(
+    -2,
+  )}${`00${now.getMinutes()}`.slice(-2)}${`00${now.getSeconds()}`.slice(-2)}`;
+  const baseFilename =
+    useAppStore().logFilename?.replace(".", "_") || "blackbox-log";
+  const defaultFilename = `${baseFilename}-${timestamp}.png`;
   html2canvas(el).then((canvas) => {
-    globalThis.canv = canvas;
-    let anchor = document.createElement("a");
+    const anchor = document.createElement("a");
     anchor.download = defaultFilename;
     anchor.href = canvas.toDataURL();
     anchor.click();

@@ -22,6 +22,7 @@ import {
   validate,
   mouseNotification,
   getManifestVersion,
+  triggerDownload,
 } from "./tools.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
@@ -994,31 +995,7 @@ function BlackboxLogViewer() {
       data = JSON.stringify(workspaceGraphConfigs, undefined, 4);
     }
 
-    const blob = new Blob([data], { type: "text/json" }),
-      e = document.createEvent("MouseEvents"),
-      a = document.createElement("a");
-
-    a.download = file;
-    a.href = globalThis.URL.createObjectURL(blob);
-    a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
-    e.initMouseEvent(
-      "click",
-      true,
-      false,
-      globalThis,
-      0,
-      0,
-      0,
-      0,
-      0,
-      false,
-      false,
-      false,
-      false,
-      0,
-      null,
-    );
-    a.dispatchEvent(e);
+    triggerDownload(new Blob([data], { type: "text/json" }), file);
   }
 
   function upgradeWorkspaceFormat(oldFormat) {
@@ -1077,30 +1054,8 @@ function BlackboxLogViewer() {
         console.debug("Empty data, nothing to save");
         return;
       }
-      const blob = new Blob([data], { type: fileType }),
-        e = document.createEvent("MouseEvents"),
-        a = document.createElement("a");
-      a.download = file || `${appStore.logFilename}.${fileExtension}`;
-      a.href = globalThis.URL.createObjectURL(blob);
-      a.dataset.downloadurl = [fileType, a.download, a.href].join(":");
-      e.initMouseEvent(
-        "click",
-        true,
-        false,
-        globalThis,
-        0,
-        0,
-        0,
-        0,
-        0,
-        false,
-        false,
-        false,
-        false,
-        0,
-        null,
-      );
-      a.dispatchEvent(e);
+      const filename = file || `${appStore.logFilename}.${fileExtension}`;
+      triggerDownload(new Blob([data], { type: fileType }), filename);
     };
     return callback;
   }

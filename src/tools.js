@@ -491,3 +491,11 @@ export function isChromium() {
     return brand.brand == "Chromium";
   });
 }
+
+export function triggerDownload(blob, filename) {
+  const a = document.createElement("a");
+  a.download = filename;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
