@@ -93,7 +93,6 @@ a:hover {
 /*** end toolbar expansion ***/
 
 /* Shared input styling for legacy generated elements */
-.configuration-filter,
 select.log-index {
   display: block;
   width: 100%;
@@ -105,7 +104,6 @@ select.log-index {
   border-radius: 3px;
 }
 
-.configuration-filter:focus,
 select.log-index:focus {
   border-color: var(--input-border-focus);
   outline: 0;
@@ -519,58 +517,8 @@ html.has-analyser-fullscreen.has-analyser
   display: block;
 }
 
-.configuration-file li {
-  font-family: monospace;
-  font-size: small;
-  margin-left: 10px;
-}
-
-.configuration-file li:nth-child(even) {
-  background-color: var(--surface-100);
-}
-
-
-
-html:not(.has-config-overlay) .configuration-file,
 html:not(.has-marker) .marker-offset {
   display: none;
-}
-
-.configuration-changed {
-  background-color: var(--error-transparent-2);
-}
-
-.configuration-file h3 {
-  background-color: var(--primary-transparent-2);
-  margin-top: 2px;
-  padding: 5px;
-}
-
-.configuration-close {
-  float: right;
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-html.has-config .configuration-file {
-  position: fixed;
-  top: 110px;
-  left: 15px;
-  width: calc(100% - 30px);
-  padding: 9px;
-  background-color: var(--surface-0);
-  border: 1px solid var(--border-color, #e5e5e5);
-  border-radius: 6px;
-  bottom: 80px;
-  overflow-y: hidden;
-}
-
-html.has-config .configuration-list {
-  height: 580px;
-  overflow: hidden;
-  overflow-y: scroll;
-  margin-top: 5px;
-  min-width: 13em;
 }
 
 .graph-legend-field {
@@ -789,15 +737,6 @@ html:not(.has-log) .vue-statusbar {
 html:not(.has-gps) .view-map,
 html:not(.has-gps) .map-container {
   display: none !important;
-}
-
-/* Legacy status-bar configuration file name (used by configuration.js) */
-#status-bar .configuration-file-name {
-  cursor: pointer;
-}
-
-html:not(.has-config) #status-bar .configuration-file-name {
-  display: none;
 }
 
 .log-graph-config h3 span {

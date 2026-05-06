@@ -1,97 +1,23 @@
 /**
  * Configuration
  *
- * Handle loading and display of configuration file
- *
+ * Handle loading of configuration dump/diff files.
+ * Parsed lines are pushed to graphStore for Vue rendering.
  */
 
-export function Configuration(file, _configurationDefaults, showConfigFile) {
+import { useGraphStore } from "./stores/graph.js";
+
+export function Configuration(file) {
   let fileData;
-  let fileLinesArray;
-
-  function renderFileContentList(configurationList, filter) {
-    // Clear existing items
-    configurationList.querySelectorAll("li").forEach((li) => li.remove());
-
-    for (let i = 0; i < fileLinesArray.length; i++) {
-      if (!filter || filter.length < 1) {
-        const li = document.createElement("li");
-        li.className = "configuration-row";
-        if (fileLinesArray[i].length === 0) {
-          li.style.backgroundColor = "white";
-          li.style.height = "10px";
-          li.innerHTML = "&nbsp";
-        } else {
-          li.textContent = fileLinesArray[i];
-        }
-        configurationList.appendChild(li);
-      } else {
-        try {
-          let regFilter = new RegExp(`(.*)(${filter})(.*)`, "i");
-          let highLight = fileLinesArray[i].match(regFilter);
-          if (highLight !== null) {
-            const li = document.createElement("li");
-            li.className = "configuration-row";
-            li.innerHTML = `${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}`;
-            configurationList.appendChild(li);
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-    }
-  }
-
-  function renderFileContents() {
-    const existingElem = document.querySelector(".configuration-file");
-    if (!existingElem) {
-      return;
-    }
-
-    const configurationDiv = document.createElement("div");
-    configurationDiv.className = "configuration-file";
-    configurationDiv.innerHTML =
-      `<div class="configuration-header">` +
-      `<h4>${file.name}<span class="configuration-close" style="cursor:pointer;margin-left:8px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></h4>` +
-      `<input type="text" class="configuration-filter" placeholder="Enter filter" size="5"/>` +
-      `</div>` +
-      `<div><ul class="list-none pl-0 configuration-list"></ul></div>`;
-
-    existingElem.replaceWith(configurationDiv);
-
-    const configurationList = configurationDiv.querySelector(".configuration-list");
-    renderFileContentList(configurationList, null);
-
-    const statusBarFileName = document.querySelector("#status-bar .configuration-file-name");
-    if (statusBarFileName) {
-      statusBarFileName.textContent = file.name;
-    }
-
-    configurationDiv.querySelector(".configuration-close")?.addEventListener("click", function () {
-      if (showConfigFile) {
-        showConfigFile(false);
-      }
-    });
-  }
 
   function loadFile(file) {
-    let reader = new FileReader();
     fileData = file;
+    const reader = new FileReader();
 
     reader.onload = function (e) {
-      let data = e.target.result;
-      fileLinesArray = data.split("\n");
-
-      renderFileContents();
-
-      const filterInput = document.querySelector(".configuration-filter");
-      if (filterInput) {
-        filterInput.addEventListener("keyup", function () {
-          const newFilter = filterInput.value;
-          const configurationList = document.querySelector(".configuration-list");
-          renderFileContentList(configurationList, newFilter);
-        });
-      }
+      const graphStore = useGraphStore();
+      graphStore.configLines = e.target.result.split("\n");
+      graphStore.configFileName = file.name;
     };
 
     reader.readAsText(file);
@@ -107,12 +33,10 @@ export function Configuration(file, _configurationDefaults, showConfigFile) {
 export function ConfigurationDefaults(prefs) {
   // Special configuration file that handles default values only
 
-  // Private Variables
-  let fileData; // configuration file information
-  let fileLinesArray = null; // Store the contents of the file globally
+  let fileData;
+  let fileLinesArray = null;
 
   function loadFileFromCache() {
-    // Get the file from the cache if it exists
     prefs.get("configurationDefaults", function (item) {
       if (item) {
         fileLinesArray = item;
@@ -123,20 +47,17 @@ export function ConfigurationDefaults(prefs) {
   }
 
   this.loadFile = function (file) {
-    let reader = new FileReader();
-    fileData = file; // Store the data locally;
+    const reader = new FileReader();
+    fileData = file;
 
     reader.onload = function (e) {
-      let data = e.target.result; // all the data
-      fileLinesArray = data.split("\n"); // separated into lines
-
-      prefs.set("configurationDefaults", fileLinesArray); // and store it to the cache
+      fileLinesArray = e.target.result.split("\n");
+      prefs.set("configurationDefaults", fileLinesArray);
     };
 
     reader.readAsText(file);
   };
 
-  // Public variables and functions
   this.getFile = function () {
     return fileData;
   };
@@ -146,24 +67,21 @@ export function ConfigurationDefaults(prefs) {
   };
 
   this.hasDefaults = function () {
-    return fileLinesArray !== null; // is there a default file array
+    return fileLinesArray !== null;
   };
 
   this.isDefault = function (line) {
-    // Returns the default line equivalent
-
     if (!fileLinesArray) {
-      return true; // by default, lines are the same if there is no default file loaded
+      return true;
     }
-
     for (let i = 0; i < fileLinesArray.length; i++) {
       if (line !== fileLinesArray[i]) {
-        continue; // not the same line, keep looking
+        continue;
       }
-      return true; // line is same as default
+      return true;
     }
-    return false; // line not the same as default or not found
+    return false;
   };
 
-  loadFileFromCache(); // configuration file loaded
+  loadFileFromCache();
 }

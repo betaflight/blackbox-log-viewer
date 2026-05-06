@@ -167,8 +167,6 @@ function BlackboxLogViewer() {
     graphStore.hasSticks = !!userSettings.drawSticks;
     graphStore.hasMap = !!hasMap;
     graphStore.hasMarker = hasMarker;
-    graphStore.hasConfig = hasConfig;
-    graphStore.hasConfigOverlay = hasConfigOverlay;
     graphStore.isFullscreen = isFullscreen;
     graphStore.markerTime = markerTime;
     graphStore.seekBarMode = seekBarMode;
@@ -673,13 +671,11 @@ function BlackboxLogViewer() {
   function showConfigFile(state) {
     if (hasConfig) {
       if (state == null) {
-        // no state specified, just toggle
         hasConfigOverlay = !hasConfigOverlay;
       } else {
-        //state defined, just set item
-        hasConfigOverlay = state ? true : false;
+        hasConfigOverlay = !!state;
       }
-      html.classList.toggle("has-config-overlay", hasConfigOverlay);
+      graphStore.hasConfigOverlay = hasConfigOverlay;
     }
   }
 
@@ -846,13 +842,9 @@ function BlackboxLogViewer() {
           if (file.name.match(/default/i)) {
             configurationDefaults.loadFile(file);
           } else {
-            configuration = new Configuration(
-              file,
-              configurationDefaults,
-              showConfigFile,
-            ); // the configuration class will actually re-open the file as a text object.
+            configuration = new Configuration(file);
             hasConfig = true;
-            html.classList.toggle("has-config", hasConfig);
+            graphStore.hasConfig = true;
           }
         } catch (e) {
           configuration = null;

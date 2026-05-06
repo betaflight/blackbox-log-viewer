@@ -85,6 +85,7 @@
         <LegendPanel />
       </Teleport>
       <FieldValuesPanel />
+      <ConfigurationPanel />
       <Teleport to="#vue-seekbar-toolbar">
         <SeekBarToolbar />
       </Teleport>
@@ -148,6 +149,7 @@ import VideoExportDialog from "./components/VideoExportDialog.vue";
 import SpectrumAnalyser from "./components/SpectrumAnalyser.vue";
 import LegendPanel from "./components/LegendPanel.vue";
 import FieldValuesPanel from "./components/FieldValuesPanel.vue";
+import ConfigurationPanel from "./components/ConfigurationPanel.vue";
 import SeekBarToolbar from "./components/SeekBarToolbar.vue";
 
 const graphStore = useGraphStore();

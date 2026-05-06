@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 
 const GRAPH_MIN_ZOOM = 1;
 const GRAPH_MAX_ZOOM = 1000;
@@ -22,6 +22,8 @@ export const useGraphStore = defineStore("graph", () => {
   const hasMarker = ref(false);
   const hasConfig = ref(false);
   const hasConfigOverlay = ref(false);
+  const configFileName = ref("");
+  const configLines = shallowRef([]);
   const isFullscreen = ref(false);
   const markerTime = ref(0);
   const seekBarMode = ref("avgThrottle");
@@ -55,6 +57,8 @@ export const useGraphStore = defineStore("graph", () => {
     hasMarker,
     hasConfig,
     hasConfigOverlay,
+    configFileName,
+    configLines,
     isFullscreen,
     markerTime,
     seekBarMode,
