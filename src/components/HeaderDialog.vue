@@ -22,101 +22,24 @@
 
     <div class="overflow-y-auto flex-1 p-4">
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pb-6 text-[0.8rem]"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pb-6 font-mono text-xs"
       >
         <!-- Column 1: PIDs & Rates -->
         <div class="flex flex-col gap-4">
           <UiBox title="PID Settings">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-default text-xs text-dimmed">
-                  <th class="text-left py-1" />
-                  <th class="text-center py-1">P</th>
-                  <th class="text-center py-1">I</th>
-                  <th v-if="showDMax" class="text-center py-1">D Max</th>
-                  <th class="text-center py-1">D</th>
-                  <th v-if="!showDMax" class="text-center py-1" />
-                  <th class="text-center py-1">FF</th>
-                </tr>
-              </thead>
-              <tbody>
-                <PidRow
-                  v-for="row in mainPids"
-                  :key="row.label"
-                  :row="row"
-                  :showDMax="showDMax"
-                />
-              </tbody>
-            </table>
+            <PidTable :rows="mainPids" :showDMax="showDMax" />
           </UiBox>
 
           <UiBox v-if="showBaroPids" title="Baro">
-            <table class="w-full text-sm">
-              <thead class="sr-only">
-                <tr>
-                  <th>Axis</th>
-                  <th>P</th>
-                  <th>I</th>
-                  <th>D</th>
-                  <th />
-                  <th>FF</th>
-                </tr>
-              </thead>
-              <tbody>
-                <PidRow
-                  v-for="row in baroPids"
-                  :key="row.label"
-                  :row="row"
-                  :showDMax="false"
-                />
-              </tbody>
-            </table>
+            <PidTable :rows="baroPids" :showDMax="false" srOnly />
           </UiBox>
 
           <UiBox v-if="showMagPids" title="Mag">
-            <table class="w-full text-sm">
-              <thead class="sr-only">
-                <tr>
-                  <th>Axis</th>
-                  <th>P</th>
-                  <th>I</th>
-                  <th>D</th>
-                  <th />
-                  <th>FF</th>
-                </tr>
-              </thead>
-              <tbody>
-                <PidRow
-                  v-for="row in magPids"
-                  :key="row.label"
-                  :row="row"
-                  :showDMax="false"
-                />
-              </tbody>
-            </table>
+            <PidTable :rows="magPids" :showDMax="false" srOnly />
           </UiBox>
 
           <UiBox v-if="showGpsPids" title="GPS">
-            <table class="w-full text-sm">
-              <thead class="sr-only">
-                <tr>
-                  <th>Axis</th>
-                  <th>P</th>
-                  <th>I</th>
-                  <th>D</th>
-                  <th />
-                  <th>FF</th>
-                </tr>
-              </thead>
-              <tbody>
-                <PidRow
-                  v-for="row in gpsPids"
-                  :key="row.label"
-                  :row="row"
-                  :showDMax="false"
-                />
-              </tbody>
-            </table>
+            <PidTable :rows="gpsPids" :showDMax="false" srOnly />
           </UiBox>
 
           <UiBox v-if="pidSliderParams.length > 0" title="PID Sliders">
@@ -188,11 +111,10 @@
             <UTable
               :data="featuresList"
               :columns="featureColumns"
-              class="text-sm"
               :ui="{
                 thead: 'sr-only',
                 base: 'w-full',
-                td: 'py-0.5',
+                td: 'py-0.5 text-xs',
                 tr: 'border-b border-default',
               }"
             >
@@ -223,11 +145,10 @@
             <UTable
               :data="disabledFieldsList"
               :columns="featureColumns"
-              class="text-sm"
               :ui="{
                 thead: 'sr-only',
                 base: 'w-full',
-                td: 'py-0.5',
+                td: 'py-0.5 text-xs',
                 tr: 'border-b border-default',
               }"
             >
@@ -264,9 +185,10 @@
 </template>
 
 <script setup>
-import { computed, h } from "vue";
+import { computed } from "vue";
 import UiBox from "./UiBox.vue";
 import ParamTable from "./ParamTable.vue";
+import PidTable from "./PidTable.vue";
 import {
   OFF_ON,
   FAST_PROTOCOL,
@@ -297,42 +219,6 @@ const open = defineModel("open", { type: Boolean, default: false });
 const props = defineProps({
   sysConfig: { type: Object, default: null },
 });
-
-// --- Functional sub-components ---
-
-const PidRow = (props) => {
-  const { row, showDMax } = props;
-  const cells = [
-    h("td", { class: "py-1 font-medium" }, row.label),
-    h("td", { class: "text-center py-1" }, fmtPid(row.p)),
-    h("td", { class: "text-center py-1" }, fmtPid(row.i)),
-  ];
-  if (showDMax) {
-    cells.push(h("td", { class: "text-center py-1" }, fmtPid(row.dMax)));
-  }
-  cells.push(h("td", { class: "text-center py-1" }, fmtPid(row.d)));
-  if (!showDMax) {
-    cells.push(h("td"));
-  }
-  cells.push(h("td", { class: "text-center py-1" }, fmtPid(row.f)));
-  return h(
-    "tr",
-    {
-      class: row.missing
-        ? "opacity-40 border-b border-default"
-        : "border-b border-default",
-    },
-    cells,
-  );
-};
-PidRow.props = ["row", "showDMax"];
-
-function fmtPid(val) {
-  if (val == null) {
-    return "-";
-  }
-  return typeof val === "number" ? val.toFixed(0) : String(val);
-}
 
 // --- Feature table columns ---
 

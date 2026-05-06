@@ -2,11 +2,10 @@
   <UTable
     :data="params"
     :columns="columns"
-    class="text-sm"
     :ui="{
       thead: 'sr-only',
       base: 'w-full',
-      td: 'py-0.5',
+      td: 'py-0.5 text-xs',
       tr: 'border-b border-default',
     }"
   >
