@@ -1,3 +1,4 @@
+import semver from "semver";
 import { FlightLogIndex } from "./flightlog_index";
 import { FlightLogParser } from "./flightlog_parser";
 import { GPS_transform } from "./gps_transform";

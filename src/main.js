@@ -108,7 +108,6 @@ function BlackboxLogViewer() {
     videoExportOutTime = null,
     markerTime = 0, // New marker time
     userSettings,
-    graphRendersCount = 0,
     seekBarCanvas = document.querySelector(".log-seek-bar canvas"),
     seekBar = new SeekBar(seekBarCanvas),
     seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar)),
@@ -326,7 +325,6 @@ function BlackboxLogViewer() {
     }
 
     graph.render(currentBlackboxTime);
-    graphRendersCount++;
 
     seekBar.setCurrentTime(currentBlackboxTime);
     seekBar.setWindow(graph.getWindowWidthTime());

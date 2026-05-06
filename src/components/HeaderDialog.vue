@@ -164,6 +164,7 @@
 </template>
 
 <script setup>
+import semver from "semver";
 import { computed, ref } from "vue";
 import UiBox from "./UiBox.vue";
 import ParamTable from "./ParamTable.vue";

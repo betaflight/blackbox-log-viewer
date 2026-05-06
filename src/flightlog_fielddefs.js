@@ -1,3 +1,5 @@
+import semver from "semver";
+
 function makeReadOnly(x) {
   // Make read-only if browser supports it:
   if (Object.freeze) {

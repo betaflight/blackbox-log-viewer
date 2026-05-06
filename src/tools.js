@@ -1,3 +1,4 @@
+import semver from "semver";
 import {
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_CLEANFLIGHT,

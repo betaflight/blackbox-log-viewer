@@ -1,3 +1,4 @@
+import semver from "semver";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import {
   adjustFieldDefsList,
