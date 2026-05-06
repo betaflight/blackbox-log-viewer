@@ -1,4 +1,5 @@
 import { FlightLogGrapher } from "./grapher";
+import { triggerDownload } from "./tools.js";
 import { useSettingsStore } from "./stores/settings.js";
 
 /**
@@ -165,7 +166,7 @@ export function FlightLogVideoRenderer(
   function finishRender() {
     videoWriter.complete().then(function (webM) {
       if (webM) {
-        globalThis.saveAs(webM, "video.webm");
+        triggerDownload(webM, "video.webm");
       }
 
       notifyCompletion(true, frameIndex);
