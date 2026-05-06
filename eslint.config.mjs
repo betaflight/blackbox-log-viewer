@@ -40,7 +40,7 @@ export default [
       "no-dupe-keys": "error",
       "no-irregular-whitespace": "error",
       "no-case-declarations": "error",
-      eqeqeq: ["warn", "smart"],
+      eqeqeq: ["error", "smart"],
       "prefer-const": "error",
       "prefer-template": "error",
       "comma-dangle": ["error", "always-multiline"],
