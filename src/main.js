@@ -2407,10 +2407,10 @@ function BlackboxLogViewer() {
     logPlayPause();
   };
   this.logJumpBack = function () {
-    logJumpBack(false);
+    logJumpBack(null);
   };
   this.logJumpForward = function () {
-    logJumpForward(false);
+    logJumpForward(null);
   };
   this.logJumpStart = function () {
     logJumpStart();
