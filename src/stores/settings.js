@@ -23,11 +23,7 @@ export const useSettingsStore = defineStore("settings", () => {
 
   function saveSetting(key, value) {
     userSettings[key] = value;
-    prefs.get("userSettings", (data) => {
-      const merged = data || {};
-      merged[key] = value;
-      prefs.set("userSettings", merged);
-    });
+    prefs.set("userSettings", { ...toRaw(userSettings) });
   }
 
   // Load persisted settings on creation
