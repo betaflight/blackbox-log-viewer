@@ -923,7 +923,7 @@ export function FlightLogParser(logData) {
         //TODO Unify this somehow...
 
         // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
-        const matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
+        const matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(?:\.(\d+))?/i);
         if (matches != null) {
           // Detecting Betaflight requires looking at the revision string
           if (matches[1] === "Betaflight") {
@@ -932,18 +932,18 @@ export function FlightLogParser(logData) {
 
           that.sysConfig.firmware = `${parseInt(matches[2], 10)}.${parseInt(matches[3], 10)}`;
           that.sysConfig.firmwarePatch =
-            matches[5] != null ? parseInt(matches[5], 10) : "0";
+            matches[4] != null ? parseInt(matches[4], 10) : "0";
           that.sysConfig.firmwareVersion = `${that.sysConfig.firmware}.${that.sysConfig.firmwarePatch}`;
         } else {
           /*
            * Try to detect INAV
            */
-          const matches = fieldValue.match(/(INAV).* (\d+)\.(\d+).(\d+)*/i);
+          const matches = fieldValue.match(/(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i);
           if (matches != null) {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
             that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
             that.sysConfig.firmwarePatch =
-              matches[5] != null ? parseInt(matches[5], 10) : "";
+              matches[4] != null ? parseInt(matches[4], 10) : "";
           } else {
             // Legacy firmware versions
             that.sysConfig.firmwareVersion = "0.0.0";

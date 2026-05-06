@@ -271,7 +271,7 @@ export function validate(value, defaultValue) {
   return value != null ? value : defaultValue;
 }
 
-export function roundRect(ctx, x, y, width, height, radius = 5, fill, stroke = true) {
+export function roundRect(ctx, x, y, width, height, radius = 5, fill = true, stroke = true) {
   if (typeof radius === "number") {
     radius = { tl: radius, tr: radius, br: radius, bl: radius };
   } else {
