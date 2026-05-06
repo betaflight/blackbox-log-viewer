@@ -46,7 +46,7 @@
 /**
  * Dark Theme Overrides
  */
-body.dark-theme {
+:root.dark {
   --surface-0: hsl(0, 0%, 4%);
   --surface-100: #181818;
   --surface-200: hsl(0, 0%, 13%);

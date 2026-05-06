@@ -8,8 +8,8 @@
  * - AUTO (2): Follow system preference via prefers-color-scheme
  *
  * The theme preference is stored via PrefStorage and persists across sessions.
- * When the theme changes, the dark-theme class is toggled on the body element,
- * triggering CSS variable overrides and causing canvas elements to redraw.
+ * When the theme changes, appStore.darkThemeEnabled is set, and App.vue's
+ * watchEffect toggles the .dark class on the root element for CSS variable overrides.
  */
 
 import { useAppStore } from "./stores/app.js";

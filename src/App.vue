@@ -171,7 +171,6 @@ watchEffect(() => {
   cl.toggle("has-grid-override", !!settingsStore.userSettings.graphGridOverride);
   // Dark theme
   cl.toggle("dark", appStore.darkThemeEnabled);
-  document.body.classList.toggle("dark-theme", appStore.darkThemeEnabled);
   // Firmware type (map icon color filters)
   const fwClass = logStore.firmwareClass;
   for (const c of FIRMWARE_CLASSES) {
