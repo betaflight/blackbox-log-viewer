@@ -63,21 +63,10 @@ GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
     this._blackBoxRate = Math.round(this._actualeRate);
 
   if (this._BetaflightRate !== this._blackBoxRate) {
-    const lograteEl = document.querySelector(".actual-lograte");
-    if (lograteEl) {
-      lograteEl.textContent =
-        this._actualeRate.toFixed(0) +
-        "/" +
-        this._BetaflightRate.toFixed(0) +
-        "Hz";
-    }
     return {
       actualRate: this._actualeRate,
       betaflightRate: this._BetaflightRate,
     };
-  } else {
-    const lograteEl2 = document.querySelector(".actual-lograte");
-    if (lograteEl2) { lograteEl2.textContent = ""; }
   }
 
   return undefined;

@@ -13,6 +13,11 @@ export const useLogStore = defineStore("log", () => {
   const fieldValues = shallowRef([]);
   const fieldStats = shallowRef([]);
 
+  // Log index picker (multiple logs in one file)
+  const logIndexEntries = shallowRef([]);
+  // Each: { label, value, disabled }
+  const activeLogIndex = ref(0);
+
   const minTime = computed(() => flightLog.value?.getMinTime() ?? 0);
   const maxTime = computed(() => flightLog.value?.getMaxTime() ?? 0);
 
@@ -43,6 +48,8 @@ export const useLogStore = defineStore("log", () => {
     videoURL,
     fieldValues,
     fieldStats,
+    logIndexEntries,
+    activeLogIndex,
     minTime,
     maxTime,
     setFlightLog,

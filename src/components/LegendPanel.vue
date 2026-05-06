@@ -23,7 +23,18 @@
       />
     </div>
 
-    <div class="log-index"></div>
+    <div v-if="logStore.logIndexEntries.length > 1" class="mb-2">
+      <USelect
+        :model-value="logStore.activeLogIndex"
+        :items="logStore.logIndexEntries"
+        size="xs"
+        class="w-full"
+        @update:model-value="onLogIndexChange"
+      />
+    </div>
+    <div v-else-if="logStore.logIndexEntries.length === 1" class="text-xs text-[var(--text-secondary)] mb-2">
+      {{ logStore.logIndexEntries[0].label }}
+    </div>
 
     <div ref="legendContainer" class="log-graph-legend">
       <div
@@ -120,9 +131,11 @@
 import { ref, computed } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 import { useAppStore } from "../stores/app.js";
+import { useLogStore } from "../stores/log.js";
 
 const graphStore = useGraphStore();
 const appStore = useAppStore();
+const logStore = useLogStore();
 const legendContainer = ref(null);
 
 const legendValues = computed(() => graphStore.legendValues);
@@ -250,5 +263,9 @@ function toggleGrid() {
 
 function openGraphConfig() {
   appStore.graphConfigDialogOpen = true;
+}
+
+function onLogIndexChange(val) {
+  appStore.controller?.selectLogIndex?.(val);
 }
 </script>

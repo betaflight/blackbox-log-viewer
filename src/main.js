@@ -387,64 +387,24 @@ function BlackboxLogViewer() {
     }
   }
 
-  function renderSeekBarPicker() {
-    const seekBarContainer = document.querySelector(".seekBar-selection"),
-      seekBarItems = [
-        ["avgThrottle", "Average motor throttle"],
-        ["maxRC", "Maximum stick input"],
-        ["maxMotorDiff", "Maximum motor differential"],
-      ];
-    seekBarContainer.innerHTML = "";
-    const seekBarPicker = document.createElement("select");
-    seekBarPicker.id = "seekbarTypeSelect";
-    seekBarPicker.className = "seekbarTypeSelect";
-    seekBarPicker.addEventListener("change", function () {
-      const activity = flightLog.getActivitySummary(),
-        displayItem = this.value;
-      seekBarMode = displayItem;
-      seekBar.setActivity(
-        activity.times,
-        activity[displayItem],
-        activity.hasEvent,
-      );
+  function setSeekBarMode(mode) {
+    seekBarMode = mode;
+    graphStore.seekBarMode = mode;
+    if (flightLog) {
+      const activity = flightLog.getActivitySummary();
+      seekBar.setActivity(activity.times, activity[mode], activity.hasEvent);
       seekBar.repaint();
-    });
-    for (const item of seekBarItems) {
-      const option = document.createElement("option");
-      option.textContent = item[1];
-      option.value = item[0];
-      seekBarPicker.appendChild(option);
     }
-    seekBarContainer.appendChild(seekBarPicker);
   }
 
   function renderLogFileInfo(file) {
     appStore.logFilename = file.name;
 
-    const logIndexContainer = document.querySelector(".log-index"),
-      logCount = flightLog.getLogCount();
-
-    logIndexContainer.innerHTML = "";
-
-    const logIndexPicker = document.createElement("select");
-    logIndexPicker.className = "log-index no-wheel";
-    if (logCount > 1) {
-      logIndexPicker.addEventListener("change", function () {
-        selectLog(Number.parseInt(this.value, 10));
-        if (graph) {
-          html.classList.toggle(
-            "has-analyser-fullscreen",
-            hasAnalyserFullscreen,
-          );
-          graph.setAnalyser(hasAnalyserFullscreen);
-        }
-      });
-    }
-
+    const logCount = flightLog.getLogCount();
+    const entries = [];
     for (let index = 0; index < logCount; index++) {
-      let logLabel;
       const error = flightLog.getLogError(index);
-
+      let logLabel;
       if (error) {
         logLabel = error;
       } else {
@@ -461,55 +421,26 @@ function BlackboxLogViewer() {
           false,
         )}]`;
       }
-
-      if (logCount > 1) {
-        const option = document.createElement("option");
-        option.textContent = `${index + 1}/${flightLog.getLogCount()}: ${logLabel}`;
-        option.value = index;
-        if (error) {
-          option.disabled = true;
-        }
-        logIndexPicker.appendChild(option);
-      } else {
-        const holder = document.createElement("div");
-        holder.className = "log-index-static no-wheel";
-        holder.textContent = logLabel;
-        logIndexContainer.appendChild(holder);
-      }
+      const label = logCount > 1
+        ? `${index + 1}/${logCount}: ${logLabel}`
+        : logLabel;
+      entries.push({ label, value: index, disabled: !!error });
     }
-
-    if (logCount > 1) {
-      logIndexPicker.value = 0;
-      logIndexContainer.appendChild(logIndexPicker);
-    }
+    logStore.logIndexEntries = entries;
+    logStore.activeLogIndex = 0;
   }
 
   /**
    * Update the metadata displays to show information about the currently selected log index.
    */
   function renderSelectedLogInfo() {
-    const logIndexSelect = document.querySelector(
-      ".log-index select, select.log-index",
-    );
-    if (logIndexSelect) {
-      logIndexSelect.value = flightLog.getLogIndex();
-    }
+    logStore.activeLogIndex = flightLog.getLogIndex();
 
     if (flightLog.getNumCellsEstimate()) {
-      const cellsText = `${flightLog.getNumCellsEstimate()}S (${Number(
+      appStore.statusCells = `${flightLog.getNumCellsEstimate()}S (${Number(
         flightLog.getReferenceVoltageMillivolts() / 1000,
       ).toFixed(2)}V)`;
-      document
-        .querySelectorAll(".log-cells")
-        .forEach((el) => (el.textContent = cellsText));
-      document
-        .querySelectorAll(".log-cells-header,.log-cells")
-        .forEach((el) => (el.style.display = "block"));
-      appStore.statusCells = cellsText;
     } else {
-      document
-        .querySelectorAll(".log-cells-header,.log-cells")
-        .forEach((el) => (el.style.display = "none"));
       appStore.statusCells = "";
     }
 
@@ -870,7 +801,8 @@ function BlackboxLogViewer() {
       }
 
       renderLogFileInfo(file);
-      renderSeekBarPicker();
+      seekBarMode = "avgThrottle";
+      graphStore.seekBarMode = seekBarMode;
       currentOffsetCache.log = file.name; // store the name of the loaded log file
       currentOffsetCache.index = null; // and clear the index
 
@@ -2381,6 +2313,16 @@ function BlackboxLogViewer() {
           setCurrentBlackboxTime(newTime);
         }
         invalidateGraph();
+      }
+    };
+    this.setSeekBarMode = function (mode) {
+      setSeekBarMode(mode);
+    };
+    this.selectLogIndex = function (index) {
+      selectLog(Number.parseInt(index, 10));
+      if (graph) {
+        html.classList.toggle("has-analyser-fullscreen", hasAnalyserFullscreen);
+        graph.setAnalyser(hasAnalyserFullscreen);
       }
     };
     this.switchWorkspace = function (id) {

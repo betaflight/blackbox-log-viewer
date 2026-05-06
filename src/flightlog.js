@@ -1379,18 +1379,6 @@ export function FlightLog(logData) {
       logIndexes.getLogBeginOffset(index + 1),
     );
 
-    // Hide the header button if we are not using betaflight
-    switch (this.getSysConfig().firmwareType) {
-      case FIRMWARE_TYPE_BETAFLIGHT:
-      case FIRMWARE_TYPE_INAV:
-        document.querySelectorAll(".open-header-dialog").forEach((el) => el.style.display = "");
-        break;
-
-      default:
-        document.querySelectorAll(".open-header-dialog").forEach((el) => el.style.display = "none");
-        break;
-    }
-
     buildFieldNames();
 
     estimateNumMotors();

@@ -63,11 +63,6 @@ a:hover {
     font-size: 115%;
   }
 
-  div.log-index div.log-index-static {
-    min-height: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-  }
 
   .video-top-controls {
     height: 28px;
@@ -91,23 +86,6 @@ a:hover {
 }
 
 /*** end toolbar expansion ***/
-
-/* Shared input styling for legacy generated elements */
-select.log-index {
-  display: block;
-  width: 100%;
-  padding: 4px 8px;
-  font-size: 13px;
-  color: var(--text-primary);
-  background-color: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 3px;
-}
-
-select.log-index:focus {
-  border-color: var(--input-border-focus);
-  outline: 0;
-}
 
 .app-main-pane {
   position: fixed;
@@ -373,18 +351,13 @@ html.has-sticks #stickCanvas {
   left: 20px;
 }
 
-.log-seek-bar #seekbarTypeSelect,
-.log-seek-bar .seekBar-selection {
-  display: none;
-}
-
-.log-seek-bar:hover .non-shift #seekbarTypeUSelect {
+.log-seek-bar:hover .non-shift #seekbarType {
   opacity: 1;
   height: auto;
   transition: opacity 500ms ease-in;
 }
 
-.log-seek-bar #seekbarTypeUSelect {
+.log-seek-bar #seekbarType {
   height: 0;
   overflow: hidden;
   opacity: 0;
@@ -671,8 +644,4 @@ div#lap-timer td:first-child {
   color: var(--text-inverse);
   background-color: var(--surface-800);
   border-radius: 4px;
-}
-
-.actual-lograte {
-  color: var(--color-error-500, #ef4444);
 }
