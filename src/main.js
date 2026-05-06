@@ -810,9 +810,8 @@ function BlackboxLogViewer() {
       const currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
       const graphs = activeGraphConfig.getGraphs();
       const vals = {};
-      for (let i = 0; i < graphs.length; i++) {
-        for (let j = 0; j < graphs[i].fields.length; j++) {
-          const field = graphs[i].fields[j];
+      for (const graph of graphs) {
+        for (const field of graph.fields) {
           let value = frame[flightLog.getMainFieldIndexByName(field.name)];
           if (userSettings.legendUnits) {
             value = FlightLogFieldPresenter.decodeFieldToFriendly(

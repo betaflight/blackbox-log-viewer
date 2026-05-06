@@ -578,12 +578,12 @@ export function FlightLogParser(logData) {
         break;
       case "P interval": {
         const slashIdx = fieldValue.indexOf("/");
-        if (slashIdx !== -1) {
-          that.sysConfig.frameIntervalPNum = parseInt(fieldValue.substring(0, slashIdx), 10);
-          that.sysConfig.frameIntervalPDenom = parseInt(fieldValue.substring(slashIdx + 1), 10);
-        } else {
+        if (slashIdx === -1) {
           that.sysConfig.frameIntervalPNum = 1;
-          that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
+          that.sysConfig.frameIntervalPDenom = Number.parseInt(fieldValue, 10);
+        } else {
+          that.sysConfig.frameIntervalPNum = Number.parseInt(fieldValue.substring(0, slashIdx), 10);
+          that.sysConfig.frameIntervalPDenom = Number.parseInt(fieldValue.substring(slashIdx + 1), 10);
         }
         break;
       }

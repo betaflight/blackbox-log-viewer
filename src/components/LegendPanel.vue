@@ -155,7 +155,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 import { useAppStore } from "../stores/app.js";
 import { useLogStore } from "../stores/log.js";
@@ -187,14 +187,14 @@ function onFieldLeave() {
 
 // --- Field click → analyser selection ---
 function onFieldClick(e, gi, fi, field) {
-  if (e.button !== 0 || e.altKey) return;
+  if (e.button !== 0 || e.altKey) { return; }
   appStore.controller?.legendSelect?.(gi, fi, field.friendlyName, e.ctrlKey);
   e.preventDefault();
 }
 
 // --- Graph title click → zoom/expand ---
 function onGraphClick(e, gi) {
-  if (e.button !== 0) return;
+  if (e.button !== 0) { return; }
   if (e.altKey) {
     appStore.controller?.legendExpand?.(gi);
   } else {
@@ -236,16 +236,16 @@ function onDragEnd(e) {
 
 // Dragover/drop on the container
 function setupDragContainer(el) {
-  if (!el) return;
+  if (!el) { return; }
   el.addEventListener("dragover", (e) => {
     e.preventDefault();
     const dragging = el.querySelector(".dragging");
-    if (!dragging) return;
+    if (!dragging) { return; }
     const afterElement = getDragAfterElement(el, e.clientY);
-    if (!afterElement) {
-      el.appendChild(dragging);
-    } else {
+    if (afterElement) {
       afterElement.before(dragging);
+    } else {
+      el.appendChild(dragging);
     }
   });
   el.addEventListener("drop", (e) => {
@@ -272,9 +272,8 @@ function getDragAfterElement(container, y) {
 }
 
 // Setup dragover/drop when container is mounted
-import { watch, nextTick } from "vue";
 watch(legendContainer, (el) => {
-  if (el) setupDragContainer(el);
+  if (el) { setupDragContainer(el); }
 });
 
 // --- Pen reset (middle-click) and field wheel adjustments ---

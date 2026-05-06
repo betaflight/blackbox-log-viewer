@@ -265,7 +265,10 @@ function formatParams(title, params) {
 
 function copyToClipboard() {
   const sections = [
-    formatParams("PID Settings", mainPids.value.map((r) => ({ name: r.label, value: `P=${r.p} I=${r.i} D=${r.d}${showDMax.value ? ` DMax=${r.dMax}` : ""} FF=${r.f}` }))),
+    formatParams("PID Settings", mainPids.value.map((r) => {
+      const dMax = showDMax.value ? ` DMax=${r.dMax}` : "";
+      return { name: r.label, value: `P=${r.p} I=${r.i} D=${r.d}${dMax} FF=${r.f}` };
+    })),
     formatParams("Rates", rateParams.value),
     formatParams("Parameters", generalParams.value),
     formatParams("Motor / ESC", motorParams.value),

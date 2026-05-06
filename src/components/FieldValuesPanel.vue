@@ -96,13 +96,13 @@ const valueColumns = [
 const NUM_COLUMNS = 3;
 const valueChunks = computed(() => {
   const data = logStore.fieldValues;
-  if (!data.length) return [];
+  if (!data.length) { return []; }
   const indexed = data.map((row, i) => ({ ...row, idx: i + 1 }));
   const size = Math.ceil(indexed.length / NUM_COLUMNS);
   const chunks = [];
   for (let i = 0; i < NUM_COLUMNS; i++) {
     const chunk = indexed.slice(i * size, (i + 1) * size);
-    if (chunk.length) chunks.push(chunk);
+    if (chunk.length) { chunks.push(chunk); }
   }
   return chunks;
 });

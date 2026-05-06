@@ -713,9 +713,9 @@ export function FlightLogGrapher(
 
         const timeDelta = windowCenterTime - markerEvent.time;
         const markerFrequency =
-          timeDelta !== 0
-            ? `${(1000000 / timeDelta).toFixed(0)}Hz`
-            : "";
+          timeDelta === 0
+            ? ""
+            : `${(1000000 / timeDelta).toFixed(0)}Hz`;
         drawEvent(
           {
             event: FlightLogEvent.CUSTOM_BLANK, // Blank doesnt show a vertical line

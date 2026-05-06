@@ -347,8 +347,8 @@ FFTComplex.prototype.process = function (
   inputStride,
   t,
 ) {
-  outputStride = ~~outputStride;
-  inputStride = ~~inputStride;
+  outputStride = Math.trunc(outputStride);
+  inputStride = Math.trunc(inputStride);
 
   const type = t === "real" ? t : "complex";
 
@@ -372,7 +372,7 @@ FFTComplex.prototype.process = function (
     for (let i = 0; i < this.state.n; i++) {
       const x0_r = input[inputOffset + inputStride * i];
       this.state.scratch[2 * i] = x0_r;
-      this.state.scratch[2 * i + 1] = 0.0;
+      this.state.scratch[2 * i + 1] = 0;
     }
 
     work(

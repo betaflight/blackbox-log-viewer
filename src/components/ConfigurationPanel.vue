@@ -47,7 +47,7 @@ const graphStore = useGraphStore();
 const filter = ref("");
 
 function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
 function highlightHtml(line) {
@@ -56,7 +56,7 @@ function highlightHtml(line) {
 
 const filteredLines = computed(() => {
   const lines = graphStore.configLines;
-  if (!lines.length) return [];
+  if (!lines.length) { return []; }
 
   if (!filter.value) {
     return lines.map((text) => ({
