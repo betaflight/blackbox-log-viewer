@@ -145,7 +145,7 @@ export function Craft2D(flightLog, canvas, propColors) {
           craftParameters.motors.push({
             x: Math.cos((i / numMotors) * Math.PI * 2),
             y: Math.sin((i / numMotors) * Math.PI * 2),
-            direction: Math.pow(-1, i),
+            direction: (-1) ** i,
             color: propColors[i],
           });
         }

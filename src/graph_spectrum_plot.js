@@ -849,7 +849,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.GYRO_FILTERS ||
     (this._overdrawType === SPECTRUM_OVERDRAW_TYPE.AUTO &&
-      this._fftData.fieldName.toLowerCase().indexOf("gyro") !== -1)
+      this._fftData.fieldName.toLowerCase().includes("gyro"))
   ) {
     // Dynamic gyro lpf
     if (
@@ -977,7 +977,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.YAW_FILTERS ||
     (this._overdrawType === SPECTRUM_OVERDRAW_TYPE.AUTO &&
-      this._fftData.fieldName.toLowerCase().indexOf("yaw") !== -1)
+      this._fftData.fieldName.toLowerCase().includes("yaw"))
   ) {
     if (this._sysConfig.yaw_lpf_hz != null && this._sysConfig.yaw_lpf_hz > 0) {
       this._drawLowpassFilter(
@@ -999,7 +999,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
       this._overdrawType === SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
       this._overdrawType === SPECTRUM_OVERDRAW_TYPE.DTERM_FILTERS ||
       (this._overdrawType === SPECTRUM_OVERDRAW_TYPE.AUTO &&
-        this._fftData.fieldName.toLowerCase().indexOf("pid d") !== -1)
+        this._fftData.fieldName.toLowerCase().includes("pid d"))
     ) {
       // Dynamic dterm lpf
       if (

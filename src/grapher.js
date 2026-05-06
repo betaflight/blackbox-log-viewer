@@ -1134,7 +1134,7 @@ export function FlightLogGrapher(
 
   this.initializeCraftModel = function () {
     // Ensure craftType is a valid value
-    if (["2D", "3D"].indexOf(options.craftType) === -1) {
+    if (!["2D", "3D"].includes(options.craftType)) {
       options.craftType = defaultOptions.craftType;
     }
 

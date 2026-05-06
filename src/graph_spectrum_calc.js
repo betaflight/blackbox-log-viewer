@@ -96,7 +96,7 @@ GraphSpectrumCalc.setDataBuffer = function (fieldIndex, curve, fieldName) {
 };
 
 GraphSpectrumCalc.getNearPower2Value = function (size) {
-  return Math.pow(2, Math.ceil(Math.log2(size)));
+  return 2 ** Math.ceil(Math.log2(size));
 };
 
 GraphSpectrumCalc.dataLoadFrequency = function () {
@@ -385,11 +385,11 @@ GraphSpectrumCalc.dataLoadPowerSpectralDensityVsRpm = function () {
 GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
   // Detect the axis
   let axisIndex;
-  if (this._dataBuffer.fieldName.indexOf("[roll]") >= 0) {
+  if (this._dataBuffer.fieldName.includes("[roll]")) {
     axisIndex = 0;
-  } else if (this._dataBuffer.fieldName.indexOf("[pitch]") >= 0) {
+  } else if (this._dataBuffer.fieldName.includes("[pitch]")) {
     axisIndex = 1;
-  } else if (this._dataBuffer.fieldName.indexOf("[yaw]") >= 0) {
+  } else if (this._dataBuffer.fieldName.includes("[yaw]")) {
     axisIndex = 2;
   }
 

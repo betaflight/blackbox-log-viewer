@@ -1519,7 +1519,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
       if (sysConfig["rc_expo"][axis]) {
         const expof = sysConfig["rc_expo"][axis] / 100;
         rcCommandf =
-          rcCommandf * Math.pow(rcCommandfAbs, RC_EXPO_POWER) * expof +
+          rcCommandf * rcCommandfAbs ** RC_EXPO_POWER * expof +
           rcCommandf * (1 - expof);
       }
 

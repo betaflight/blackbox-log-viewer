@@ -73,7 +73,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     inputScale = (steps - 1) / inputRange;
 
     for (let i = 0; i < steps; i++) {
-      curve[i] = Math.pow(i * stepSize, power) * outputRange;
+      curve[i] = (i * stepSize) ** power * outputRange;
     }
 
     this.lookup = lookupInterpolatedCurve;
