@@ -4,7 +4,7 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["src/vendor/", "dist/", "public/"],
+    ignores: ["src/vendor/", "dist/", "public/", "test/"],
   },
   js.configs.recommended,
   eslintConfigPrettier,
