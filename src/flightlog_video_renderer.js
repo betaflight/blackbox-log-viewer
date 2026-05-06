@@ -101,58 +101,6 @@ export function FlightLogVideoRenderer(
     }
   }
 
-  function supportsFileWriter() {
-    return !!(chrome && chrome.fileSystem);
-  }
-
-  /**
-   * Returns a Promise that resolves to a FileWriter for the file the user chose, or fails if the user cancels/
-   * something else bad happens.
-   */
-  function openFileForWrite(suggestedName, _onComplete) {
-    return new Promise(function (resolve, reject) {
-      chrome.fileSystem.chooseEntry(
-        {
-          type: "saveFile",
-          suggestedName: suggestedName,
-          accepts: [{ extensions: ["webm"], description: "WebM video" }],
-        },
-        function (fileEntry) {
-          let error = chrome.runtime.lastError;
-
-          if (error) {
-            if (error.message == "User cancelled") {
-              reject(null);
-            } else {
-              reject(error.message);
-            }
-          } else {
-            fileEntry.createWriter(
-              function (fileWriter) {
-                fileWriter.onerror = function (e) {
-                  console.error(e);
-                };
-
-                fileWriter.onwriteend = function () {
-                  fileWriter.onwriteend = null;
-
-                  resolve(fileWriter);
-                };
-
-                // If the file already existed then we need to truncate it to avoid doing a partial rewrite
-                fileWriter.truncate(0);
-              },
-              function (e) {
-                // File is not readable or does not exist!
-                reject(e);
-              },
-            );
-          }
-        },
-      );
-    });
-  }
-
   function notifyCompletion(success, frameCount) {
     removeVisibilityHandler();
 
@@ -282,27 +230,10 @@ export function FlightLogVideoRenderer(
 
     installVisibilityHandler();
 
-    let webMOptions = {
+    videoWriter = new WebMWriter({
       frameRate: videoOptions.frameRate,
-    };
-
-    if (supportsFileWriter()) {
-      openFileForWrite("video.webm").then(
-        function (fileWriter) {
-          webMOptions.fileWriter = fileWriter;
-
-          videoWriter = new WebMWriter(webMOptions);
-          renderChunk();
-        },
-        function (error) {
-          console.error(error);
-          notifyCompletion(false);
-        },
-      );
-    } else {
-      videoWriter = new WebMWriter(webMOptions);
-      renderChunk();
-    }
+    });
+    renderChunk();
   };
 
   /**
@@ -313,11 +244,11 @@ export function FlightLogVideoRenderer(
   };
 
   /**
-   * Returns true if the video can be saved directly to disk (bypassing memory caching). If so, the user
-   * will be prompted for a filename when the start() method is called.
+   * Returns true if the video can be saved directly to disk (bypassing memory caching).
+   * Chrome Apps fileSystem API is removed — always returns false in PWA mode.
    */
   this.willWriteDirectToDisk = function () {
-    return supportsFileWriter();
+    return false;
   };
 
   canvas.width = videoOptions.width;

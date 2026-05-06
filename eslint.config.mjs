@@ -12,7 +12,10 @@ export default [
       sourceType: "module",
       globals: {
         ...globals.browser,
-        ...globals.jquery,
+        THREE: "readonly", // vendored three.min.js (r70, loaded via <script>)
+        L: "readonly", // Leaflet (loaded via <script>)
+        chrome: "readonly", // Chrome/Electron extension APIs (pref_storage.js)
+        __APP_VERSION__: "readonly", // Vite define
       },
     },
     rules: {
