@@ -31,7 +31,7 @@ export default defineConfig({
         },
         tooltip: {
           slots: {
-            content: "ring-2 ring-primary max-w-sm lg:max-w-lg h-fit",
+            content: "z-[300] ring-2 ring-primary max-w-sm lg:max-w-lg h-fit",
             arrow: "fill-primary",
             text: "whitespace-normal",
           },

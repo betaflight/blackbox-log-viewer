@@ -26,7 +26,7 @@ const props = defineProps({
   help: { type: String, default: null },
   type: {
     type: String,
-    default: "neutral",
+    default: "default",
     validator: (v) => ["default", "success", "warning", "error", "neutral"].includes(v),
   },
   highlight: { type: Boolean, default: false },
