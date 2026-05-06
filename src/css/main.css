@@ -31,8 +31,7 @@ a:hover {
     padding-top: 6px;
   }
 
-  .graph-row,
-  .log-field-values {
+  .graph-row {
     top: 130px !important;
   }
 }
@@ -530,20 +529,7 @@ html.has-analyser-fullscreen.has-analyser
   background-color: var(--surface-100);
 }
 
-html.has-table-overlay .log-field-values {
-  position: fixed;
-  top: 135px;
-  left: 15px;
-  width: calc(100% - 30px);
-  display: block;
-  padding: 9px;
-  font-size: small;
-  background-color: var(--surface-0);
-  border: 1px solid var(--border-color, #e5e5e5);
-  border-radius: 6px;
-  bottom: 80px;
-  overflow-y: auto;
-}
+
 
 html:not(.has-config-overlay) .configuration-file,
 html:not(.has-marker) .marker-offset {
@@ -722,13 +708,6 @@ html.has-log .log-seek-bar {
 
 .log-workspace-panel {
   width: 200px;
-}
-
-.log-field-values {
-  display: none;
-}
-html.has-log:not(.is-fullscreen).has-table .log-field-values {
-  display: block;
 }
 
 .video-top-controls,

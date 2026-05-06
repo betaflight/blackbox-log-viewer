@@ -12,7 +12,6 @@ export const useGraphStore = defineStore("graph", () => {
   const graphZoom = ref(GRAPH_DEFAULT_ZOOM);
   const lastGraphZoom = ref(GRAPH_DEFAULT_ZOOM);
 
-  const hasTable = ref(true);
   const hasTableOverlay = ref(false);
   const hasAnalyser = ref(false);
   const hasAnalyserFullscreen = ref(false);
@@ -46,7 +45,6 @@ export const useGraphStore = defineStore("graph", () => {
     lastGraphConfig,
     graphZoom,
     lastGraphZoom,
-    hasTable,
     hasTableOverlay,
     hasAnalyser,
     hasAnalyserFullscreen,

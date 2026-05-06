@@ -103,14 +103,12 @@ function BlackboxLogViewer() {
     hasVideo = false,
     hasLog = false,
     hasMarker = false, // add measure feature
-    hasTable = true,
     hasAnalyser,
     hasMap,
     hasAnalyserFullscreen,
     hasAnalyserSticks = false,
     viewVideo = true,
     hasTableOverlay = false,
-    hadTable,
     hasConfig = false,
     hasConfigOverlay = false,
     isFullscreen = false, // New fullscreen feature (to hide table)
@@ -161,7 +159,6 @@ function BlackboxLogViewer() {
     // Graph
     graphStore.graphZoom = graphZoom;
     graphStore.lastGraphZoom = lastGraphZoom;
-    graphStore.hasTable = hasTable;
     graphStore.hasTableOverlay = hasTableOverlay;
     graphStore.hasAnalyser = !!hasAnalyser;
     graphStore.hasAnalyserFullscreen = !!hasAnalyserFullscreen;
@@ -254,24 +251,16 @@ function BlackboxLogViewer() {
       let currentFlightMode =
         frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
 
-      if (hasTable || hasTableOverlay) {
+      if (graphStore.hasTableOverlay) {
         const debugMode = flightLog.getSysConfig().debug_mode;
-        const rowCount = Math.ceil(fieldNames.length / 2);
         const values = [];
 
-        for (let i = 0; i < rowCount; i++) {
-          const row = {
-            name1: fieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
-            raw1: atMost2DecPlaces(frame[i]),
-            decoded1: fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode),
-          };
-          const secondColumn = i + rowCount;
-          if (secondColumn < fieldNames.length) {
-            row.name2 = fieldPresenter.fieldNameToFriendly(fieldNames[secondColumn], debugMode);
-            row.raw2 = atMost2DecPlaces(frame[secondColumn]);
-            row.decoded2 = fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[secondColumn], frame[secondColumn], currentFlightMode);
-          }
-          values.push(row);
+        for (let i = 0; i < fieldNames.length; i++) {
+          values.push({
+            name: fieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
+            raw: atMost2DecPlaces(frame[i]),
+            decoded: fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode),
+          });
         }
         logStore.fieldValues = values;
 
@@ -696,13 +685,11 @@ function BlackboxLogViewer() {
 
   function showValueTable(state) {
     if (state == null) {
-      // no state specified, just toggle
       hasTableOverlay = !hasTableOverlay;
     } else {
-      //state defined, just set item
-      hasTableOverlay = state ? true : false;
+      hasTableOverlay = !!state;
     }
-    html.classList.toggle("has-table-overlay", hasTableOverlay);
+    graphStore.hasTableOverlay = hasTableOverlay;
     updateValuesChart();
   }
 
@@ -900,7 +887,6 @@ function BlackboxLogViewer() {
       hasLog = true;
       logStore.hasLog = true;
       html.classList.toggle("has-log", hasLog);
-      html.classList.toggle("has-table", hasTable);
       html.classList.toggle("has-craft", userSettings.drawCraft);
       html.classList.toggle("has-sticks", userSettings.drawSticks);
       html.classList.toggle(
@@ -1310,8 +1296,8 @@ function BlackboxLogViewer() {
            }
         });
         */
-    hasTable = false;
-    html.classList.toggle("has-table", hasTable);
+    hasTableOverlay = false;
+    graphStore.hasTableOverlay = false;
 
     // Reset the analyser window on application startup.
     hasAnalyser = false;
@@ -1530,7 +1516,7 @@ function BlackboxLogViewer() {
       const newHeight = topControls.clientHeight - 20;
       document
         .querySelectorAll(
-          ".log-graph, .log-graph-config, .log-seek-bar, .log-field-values",
+          ".log-graph, .log-graph-config, .log-seek-bar",
         )
         .forEach((el) => {
           el.style.top = `${newHeight}px`;

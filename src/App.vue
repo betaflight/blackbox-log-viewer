@@ -84,9 +84,7 @@
       <Teleport to="#vue-legend-panel">
         <LegendPanel />
       </Teleport>
-      <Teleport to="#vue-field-values">
-        <FieldValuesPanel />
-      </Teleport>
+      <FieldValuesPanel />
       <Teleport to="#vue-seekbar-toolbar">
         <SeekBarToolbar />
       </Teleport>
