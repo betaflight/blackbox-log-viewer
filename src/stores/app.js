@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 
 export const useAppStore = defineStore("app", () => {
   const legendHidden = ref(false);
@@ -18,6 +18,16 @@ export const useAppStore = defineStore("app", () => {
   const statusViewerVersion = ref("-");
   const graphTimeDisplay = ref("1.0");
   const videoOffsetDisplay = ref("+0.0");
+
+  // Dialog open states (shared between legacy JS and Vue)
+  const graphConfigDialogOpen = ref(false);
+  const headerDialogOpen = ref(false);
+  const videoExportDialogOpen = ref(false);
+  const settingsDialogOpen = ref(false);
+  const keysDialogOpen = ref(false);
+
+  // Legacy controller reference (BlackboxLogViewer instance)
+  const controller = shallowRef(null);
 
   function setLegendHidden(hidden) {
     legendHidden.value = hidden;
@@ -40,6 +50,12 @@ export const useAppStore = defineStore("app", () => {
     statusViewerVersion,
     graphTimeDisplay,
     videoOffsetDisplay,
+    graphConfigDialogOpen,
+    headerDialogOpen,
+    videoExportDialogOpen,
+    settingsDialogOpen,
+    keysDialogOpen,
+    controller,
     setLegendHidden,
     setViewVideo,
   };

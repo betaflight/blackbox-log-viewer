@@ -23,7 +23,7 @@
 
       <Teleport to="#vue-view-controls">
         <ViewControls
-          :header-active="headerDialogOpen"
+          :header-active="appStore.headerDialogOpen"
           :table-active="graphStore.hasTableOverlay"
           :video-active="appStore.viewVideo"
           :craft-active="graphStore.hasCraft"
@@ -96,27 +96,27 @@
       <SeekBarCanvas v-show="false" ref="seekBarRef" />
 
       <!-- Dialogs -->
-      <KeysDialog v-model:open="keysDialogOpen" />
+      <KeysDialog v-model:open="appStore.keysDialogOpen" />
       <UserSettingsDialog
-        v-model:open="settingsDialogOpen"
+        v-model:open="appStore.settingsDialogOpen"
         @save="onSaveSettings"
       />
       <GraphConfigDialog
-        v-model:open="graphConfigDialogOpen"
-        :flightLog="currentFlightLog"
-        :graphConfig="currentGraphConfig"
+        v-model:open="appStore.graphConfigDialogOpen"
+        :flightLog="logStore.flightLog"
+        :graphConfig="graphStore.activeGraphConfig"
         @save="onGraphConfigSave"
         @update="onGraphConfigUpdate"
       />
       <HeaderDialog
-        v-model:open="headerDialogOpen"
-        :sysConfig="currentSysConfig"
+        v-model:open="appStore.headerDialogOpen"
+        :sysConfig="sysConfig"
       />
       <VideoExportDialog
-        v-model:open="videoExportDialogOpen"
-        :flightLog="currentFlightLog"
+        v-model:open="appStore.videoExportDialogOpen"
+        :flightLog="logStore.flightLog"
         :logParameters="videoExportParams"
-        :videoConfig="currentVideoConfig"
+        :videoConfig="playbackStore.videoConfig"
         @save-config="onSaveVideoConfig"
       />
     </div>
@@ -124,9 +124,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, computed } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
+import { useLogStore } from "./stores/log.js";
+import { usePlaybackStore } from "./stores/playback.js";
+import { useSettingsStore } from "./stores/settings.js";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -151,212 +154,194 @@ import SeekBarToolbar from "./components/SeekBarToolbar.vue";
 
 const graphStore = useGraphStore();
 const appStore = useAppStore();
+const logStore = useLogStore();
+const playbackStore = usePlaybackStore();
+const settingsStore = useSettingsStore();
 
 const graphCanvasRef = ref(null);
 const seekBarRef = ref(null);
-const keysDialogOpen = ref(false);
-const settingsDialogOpen = ref(false);
-const graphConfigDialogOpen = ref(false);
-const headerDialogOpen = ref(false);
-const videoExportDialogOpen = ref(false);
-const currentFlightLog = ref(null);
-const currentGraphConfig = ref(null);
-const currentSysConfig = ref(null);
+
+// Derived state from stores
+const sysConfig = computed(() => logStore.flightLog?.getSysConfig?.() ?? null);
+
+// Video export params — built at dialog open time from store state
 const videoExportParams = ref(null);
-const currentVideoConfig = ref(null);
 
-function refreshLegacyState() {
-  const legacy = getLegacy();
-  currentFlightLog.value = legacy?.flightLog ?? null;
-  currentGraphConfig.value = legacy?.activeGraphConfig ?? null;
-  currentSysConfig.value = legacy?.flightLog?.getSysConfig?.() ?? null;
-  videoExportParams.value = legacy?.getVideoExportParams?.() ?? null;
-  currentVideoConfig.value = legacy?.videoConfig ?? null;
-}
-
-// Bridge helper — access legacy BlackboxLogViewer instance
-function getLegacy() {
-  return globalThis.blackboxLogViewer;
+function getController() {
+  return appStore.controller;
 }
 
 function onFilesSelected(files) {
-  getLegacy()?.loadFiles(files);
+  getController()?.loadFiles(files);
 }
 
 function onOpenSettings() {
-  settingsDialogOpen.value = true;
+  appStore.settingsDialogOpen = true;
 }
 
 function onOpenKeys() {
-  keysDialogOpen.value = true;
+  appStore.keysDialogOpen = true;
 }
 
 function onExportCsv() {
-  getLegacy()?.exportCsv?.();
+  getController()?.exportCsv?.();
 }
 
 function onExportGpx() {
-  getLegacy()?.exportGpx?.();
+  getController()?.exportGpx?.();
 }
 
 function onExportVideo() {
-  getLegacy()?.pauseForExport?.();
-  refreshLegacyState();
-  videoExportDialogOpen.value = true;
+  getController()?.pauseForExport?.();
+  // Build export params from store state
+  const video = document.querySelector(".log-graph video");
+  videoExportParams.value = {
+    graphConfig: graphStore.activeGraphConfig,
+    inTime: playbackStore.videoExportInTime,
+    outTime: playbackStore.videoExportOutTime,
+    flightVideo: logStore.hasVideo && appStore.viewVideo ? video?.cloneNode() : false,
+    flightVideoOffset: playbackStore.videoOffset,
+    hasCraft: settingsStore.userSettings.drawCraft,
+    hasAnalyser: graphStore.hasAnalyser,
+    hasSticks: settingsStore.userSettings.drawSticks,
+  };
+  appStore.videoExportDialogOpen = true;
 }
 
 function onExportWorkspaces() {
-  getLegacy()?.exportWorkspaces?.();
+  getController()?.exportWorkspaces?.();
 }
 
 function onNewWindow() {
-  getLegacy()?.openNewWindow?.();
+  getController()?.openNewWindow?.();
 }
 
 function onViewConfig() {
-  headerDialogOpen.value = false;
-  getLegacy()?.closeOverlays?.();
+  appStore.headerDialogOpen = false;
+  getController()?.closeOverlays?.();
 }
 
 function onToggleHeader() {
-  if (!headerDialogOpen.value) {
-    refreshLegacyState();
-    getLegacy()?.closeOverlays?.();
+  if (!appStore.headerDialogOpen) {
+    getController()?.closeOverlays?.();
   }
-  headerDialogOpen.value = !headerDialogOpen.value;
+  appStore.headerDialogOpen = !appStore.headerDialogOpen;
 }
 
 function onToggleTable() {
-  headerDialogOpen.value = false;
-  getLegacy()?.toggleTable?.();
+  appStore.headerDialogOpen = false;
+  getController()?.toggleTable?.();
 }
 
 function onToggleVideo() {
-  getLegacy()?.toggleVideo?.();
+  getController()?.toggleVideo?.();
 }
 
 function onToggleCraft() {
-  getLegacy()?.toggleCraft?.();
+  getController()?.toggleCraft?.();
 }
 
 function onToggleSticks() {
-  getLegacy()?.toggleSticks?.();
+  getController()?.toggleSticks?.();
 }
 
 function onToggleAnalyser() {
-  getLegacy()?.toggleAnalyser?.();
+  getController()?.toggleAnalyser?.();
 }
 
 function onToggleMap() {
-  getLegacy()?.toggleMap?.();
+  getController()?.toggleMap?.();
 }
 
 function onRateChange(rate) {
-  getLegacy()?.setPlaybackRate?.(rate);
+  getController()?.setPlaybackRate?.(rate);
 }
 
 function onZoomChange(zoom) {
-  getLegacy()?.setGraphZoom?.(zoom);
+  getController()?.setGraphZoom?.(zoom);
 }
 
 function onSyncBack() {
-  getLegacy()?.logSyncBack?.();
+  getController()?.logSyncBack?.();
 }
 
 function onSyncForward() {
-  getLegacy()?.logSyncForward?.();
+  getController()?.logSyncForward?.();
 }
 
 function onSyncHere() {
-  getLegacy()?.logSyncHere?.();
+  getController()?.logSyncHere?.();
 }
 
 function onSmartSync() {
-  getLegacy()?.logSmartSync?.();
+  getController()?.logSmartSync?.();
 }
 
 function onOffsetChange(val) {
-  getLegacy()?.setVideoOffsetValue?.(val);
+  getController()?.setVideoOffsetValue?.(val);
 }
 
 function onTimeChange(timeStr) {
-  getLegacy()?.setGraphTime?.(timeStr);
+  getController()?.setGraphTime?.(timeStr);
 }
 
 function onPlayPause() {
-  getLegacy()?.logPlayPause?.();
+  getController()?.logPlayPause?.();
 }
 
 function onJumpStart() {
-  getLegacy()?.logJumpStart?.();
+  getController()?.logJumpStart?.();
 }
 
 function onJumpEnd() {
-  getLegacy()?.logJumpEnd?.();
+  getController()?.logJumpEnd?.();
 }
 
 function onStepBack() {
-  getLegacy()?.logJumpBack?.();
+  getController()?.logJumpBack?.();
 }
 
 function onStepForward() {
-  getLegacy()?.logJumpForward?.();
+  getController()?.logJumpForward?.();
 }
 
 function onVideoJumpStart() {
-  getLegacy()?.videoJumpStart?.();
+  getController()?.videoJumpStart?.();
 }
 
 function onVideoJumpEnd() {
-  getLegacy()?.videoJumpEnd?.();
+  getController()?.videoJumpEnd?.();
 }
 
 function onSaveSettings(newSettings) {
-  getLegacy()?.saveUserSettings?.(newSettings);
+  getController()?.saveUserSettings?.(newSettings);
 }
 
 function onGraphConfigSave(newConfig) {
-  getLegacy()?.newGraphConfig?.(newConfig, true);
+  getController()?.newGraphConfig?.(newConfig, true);
 }
 
 function onGraphConfigUpdate(newConfig) {
-  getLegacy()?.newGraphConfig?.(newConfig, false);
+  getController()?.newGraphConfig?.(newConfig, false);
 }
 
 function onSaveVideoConfig(cfg) {
-  getLegacy()?.saveVideoConfig?.(cfg);
+  getController()?.saveVideoConfig?.(cfg);
 }
 
 function onSwitchWorkspace(id) {
-  getLegacy()?.switchWorkspace?.(id);
+  getController()?.switchWorkspace?.(id);
 }
 
 function onSaveWorkspace(id, title) {
-  getLegacy()?.saveWorkspace?.(id, title);
+  getController()?.saveWorkspace?.(id, title);
 }
 
 function onApplyDefaultWorkspace(index) {
-  getLegacy()?.applyDefaultWorkspace?.(index);
+  getController()?.applyDefaultWorkspace?.(index);
 }
 
 function onGotoBookmark(index) {
-  getLegacy()?.gotoBookmark?.(index + 1);
+  getController()?.gotoBookmark?.(index + 1);
 }
-
-// Refresh legacy state when dialogs opened externally (e.g. from legacy JS)
-watch(
-  [graphConfigDialogOpen, headerDialogOpen, videoExportDialogOpen],
-  (vals, prev) => {
-    if (vals.some((v, i) => v && !prev[i])) { refreshLegacyState(); }
-  },
-);
-
-// Expose for external access during migration
-defineExpose({
-  keysDialogOpen,
-  settingsDialogOpen,
-  graphConfigDialogOpen,
-  headerDialogOpen,
-  videoExportDialogOpen,
-});
 </script>

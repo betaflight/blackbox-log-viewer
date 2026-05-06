@@ -14,6 +14,7 @@ export const usePlaybackStore = defineStore("playback", () => {
   const videoOffset = ref(0);
   const videoExportInTime = ref(null);
   const videoExportOutTime = ref(null);
+  const videoConfig = ref({ width: 1280, height: 720, frameRate: 30, videoDim: 0.4 });
 
   const isPlaying = computed(() => graphState.value === GRAPH_STATE_PLAY);
   const isPaused = computed(() => graphState.value === GRAPH_STATE_PAUSED);
@@ -50,6 +51,7 @@ export const usePlaybackStore = defineStore("playback", () => {
     videoOffset,
     videoExportInTime,
     videoExportOutTime,
+    videoConfig,
     isPlaying,
     isPaused,
     play,

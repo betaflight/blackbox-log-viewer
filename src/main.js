@@ -176,12 +176,16 @@ function BlackboxLogViewer() {
     graphStore.markerTime = markerTime;
     graphStore.seekBarMode = seekBarMode;
 
+    // Graph config
+    graphStore.activeGraphConfig = activeGraphConfig;
+
     // Playback
     playbackStore.graphState = graphState;
     playbackStore.playbackRate = playbackRate;
     playbackStore.videoOffset = videoOffset;
     playbackStore.videoExportInTime = videoExportInTime;
     playbackStore.videoExportOutTime = videoExportOutTime;
+    playbackStore.videoConfig = videoConfig;
 
     // Workspace
     workspaceStore.activeWorkspace = activeWorkspace;
@@ -1520,7 +1524,7 @@ function BlackboxLogViewer() {
       .querySelector(".open-graph-configuration-dialog")
       ?.addEventListener("click", function (e) {
         e.preventDefault();
-        globalThis.vueApp.graphConfigDialogOpen = true;
+        appStore.graphConfigDialogOpen = true;
       });
 
     // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
@@ -2030,7 +2034,7 @@ function BlackboxLogViewer() {
 
     function handleKeyConfig(e, shifted) {
       if (!shifted) {
-        globalThis.vueApp.headerDialogOpen = false;
+        appStore.headerDialogOpen = false;
         showValueTable(false);
         showConfigFile();
         e.preventDefault();
@@ -2039,7 +2043,7 @@ function BlackboxLogViewer() {
 
     function handleKeyTable(e, shifted) {
       if (!shifted) {
-        globalThis.vueApp.headerDialogOpen = false;
+        appStore.headerDialogOpen = false;
         showValueTable();
         showConfigFile(false);
         invalidateGraph();
@@ -2109,12 +2113,12 @@ function BlackboxLogViewer() {
       },
       KeyH(e, shifted) {
         if (!shifted) {
-          if (!globalThis.vueApp.headerDialogOpen) {
+          if (!appStore.headerDialogOpen) {
             showValueTable(false);
             showConfigFile(false);
           }
-          globalThis.vueApp.headerDialogOpen =
-            !globalThis.vueApp.headerDialogOpen;
+          appStore.headerDialogOpen =
+            !appStore.headerDialogOpen;
           e.preventDefault();
         }
       },
@@ -2491,6 +2495,9 @@ function BlackboxLogViewer() {
       updateCanvasSize();
     }
   };
+
+  // Register this controller in the store — replaces globalThis.blackboxLogViewer
+  appStore.controller = this;
 }
 
 // Close the dropdowns if not clicking a descendant of the dropdown
@@ -2502,7 +2509,4 @@ document.addEventListener("click", function (e) {
   }
 });
 
-globalThis.blackboxLogViewer = new BlackboxLogViewer();
-if (globalThis.window !== undefined) {
-  globalThis.window.blackboxLogViewer = globalThis.blackboxLogViewer;
-}
+new BlackboxLogViewer();

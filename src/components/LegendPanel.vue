@@ -44,19 +44,19 @@
 </template>
 
 <script setup>
-function getLegacy() {
-  return globalThis.blackboxLogViewer;
-}
+import { useAppStore } from "../stores/app.js";
+
+const appStore = useAppStore();
 
 function toggleExpo() {
-  getLegacy()?.toggleExpo?.();
+  appStore.controller?.toggleExpo?.();
 }
 
 function toggleSmoothing() {
-  getLegacy()?.toggleSmoothing?.();
+  appStore.controller?.toggleSmoothing?.();
 }
 
 function toggleGrid() {
-  getLegacy()?.toggleGrid?.();
+  appStore.controller?.toggleGrid?.();
 }
 </script>

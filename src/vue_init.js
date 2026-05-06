@@ -10,7 +10,4 @@ app.use(pinia);
 app.use(getNuxtUiRouter());
 app.use(ui);
 
-const vm = app.mount("#vue-app");
-
-// Expose Vue app instance for legacy code bridge
-globalThis.vueApp = vm;
+app.mount("#vue-app");

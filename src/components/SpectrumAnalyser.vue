@@ -88,6 +88,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from "vue";
+import { useAppStore } from "../stores/app.js";
 
 const spectrumTypeOptions = [
   { label: "Frequency", value: "0" },
@@ -205,7 +206,9 @@ function triggerImport() {
   document.getElementById("btn-spectrum-import").click();
 }
 
+const appStore = useAppStore();
+
 function toggleFullscreen() {
-  globalThis.blackboxLogViewer?.toggleAnalyserFullscreen?.();
+  appStore.controller?.toggleAnalyserFullscreen?.();
 }
 </script>

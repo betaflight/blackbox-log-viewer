@@ -13,6 +13,7 @@ import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
 import { ExpoCurve } from "./expo";
 import { leftPad, formatTime } from "./tools";
+import { useAppStore } from "./stores/app.js";
 import { ThemeColors } from "./theme_colors";
 
 export function FlightLogGrapher(
@@ -24,6 +25,8 @@ export function FlightLogGrapher(
   analyserCanvas,
   options,
 ) {
+  const { controller } = useAppStore();
+
   let PID_P = 0,
     PID_I = 1,
     PID_D = 2,
@@ -281,7 +284,7 @@ export function FlightLogGrapher(
     lapTimer.refresh(
       windowCenterTime,
       3600 * 1000000 /*a long time*/,
-      blackboxLogViewer.getBookmarkTimes(),
+      controller.getBookmarkTimes(),
     );
     lapTimer.drawCanvas(canvas, options);
   }
@@ -712,8 +715,8 @@ export function FlightLogGrapher(
 
     // Add custom markers
 
-    let markerEvent = blackboxLogViewer.getMarker();
-    let bookmarkEvents = blackboxLogViewer.getBookmarks();
+    let markerEvent = controller.getMarker();
+    let bookmarkEvents = controller.getBookmarks();
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
       canvasContext.fillStyle = ThemeColors.getGraphText();
       canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;

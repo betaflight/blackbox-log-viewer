@@ -12,6 +12,8 @@
  * triggering CSS variable overrides and causing canvas elements to redraw.
  */
 
+import { useAppStore } from "./stores/app.js";
+
 export const DarkTheme = {
   // Preference key name
   configName: "darkTheme",
@@ -110,7 +112,7 @@ export const DarkTheme = {
     this.apply();
 
     // Notify the application that theme has changed so canvas can redraw
-    globalThis.blackboxLogViewer?.refreshGraph?.();
+    useAppStore().controller?.refreshGraph?.();
 
     if (typeof callback === "function") {
       callback();
