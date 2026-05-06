@@ -36,7 +36,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
 
   this.resize = function (width, height) {
     // Resize canvas if size changed
-    if (canvas.width != width || canvas.height != height) {
+    if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
     }
@@ -183,21 +183,21 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         );
 
         //Draw vertical stick label
-        canvasContext.textAlign = i == 0 ? "right" : "left";
+        canvasContext.textAlign = i === 0 ? "right" : "left";
         canvasContext.fillText(
           stickLabel[i * 2 + 1],
-          (i == 0 ? -1 : 1) * (radi + drawingParams.stickSpacing),
+          (i === 0 ? -1 : 1) * (radi + drawingParams.stickSpacing),
           drawingParams.fontSizeValueLabel / 2,
         );
 
         // put the mode label on the throttle stick
         if (
-          (i == 0 &&
-            (userSettings.stickMode == STICK_MODE_2 ||
-              userSettings.stickMode == STICK_MODE_4)) ||
-          (i == 1 &&
-            (userSettings.stickMode == STICK_MODE_1 ||
-              userSettings.stickMode == STICK_MODE_3))
+          (i === 0 &&
+            (userSettings.stickMode === STICK_MODE_2 ||
+              userSettings.stickMode === STICK_MODE_4)) ||
+          (i === 1 &&
+            (userSettings.stickMode === STICK_MODE_1 ||
+              userSettings.stickMode === STICK_MODE_3))
         ) {
           //Draw stick mode label
 
@@ -265,7 +265,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         frame[rcCommandFields[stickIndex]] / highResolutionScale;
       if (stickLabel != null) {
         rcCommandLabels[stickIndex] = `${
-          rcCommand[stickIndex] * (stickIndex == 2 ? -1 : 1)
+          rcCommand[stickIndex] * (stickIndex === 2 ? -1 : 1)
         }`; // correct the value for Yaw being inverted
         if (userSettings.stickUnits != null) {
           if (userSettings.stickUnits) {
