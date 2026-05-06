@@ -9,7 +9,8 @@ export function makeScreenshot() {
       -2,
     )}${`00${now.getMinutes()}`.slice(-2)}${`00${now.getSeconds()}`.slice(-2)}`,
     logFilenameEl = document.querySelector(".log-filename"),
-    defaultFilename = `${(logFilenameEl?.textContent || "").replace(".", "_")}-${timestamp}.png`;
+    baseFilename = (logFilenameEl?.textContent || "").trim().replace(".", "_") || "blackbox-log",
+    defaultFilename = `${baseFilename}-${timestamp}.png`;
   html2canvas(el).then((canvas) => {
     globalThis.canv = canvas;
     let anchor = document.createElement("a");
