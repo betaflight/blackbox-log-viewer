@@ -33,23 +33,23 @@ import {
  * Window based smoothing of fields is offered.
  */
 export function FlightLog(logData) {
-  let ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/,
-    that = this,
-    logIndex = 0,
-    logIndexes = new FlightLogIndex(logData),
-    parser = new FlightLogParser(logData),
-    iframeDirectory,
-    // We cache these details so they don't have to be recomputed on every request:
-    numCells = false,
-    numMotors = false,
-    fieldNames = [],
-    fieldNameToIndex = {},
-    chunkCache = new FIFOCache(2),
-    // Map from field indexes to smoothing window size in microseconds
-    fieldSmoothing = {},
-    maxSmoothing = 0,
-    smoothedCache = new FIFOCache(2),
-    gpsTransform = null;
+  const ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/;
+  const that = this;
+  let logIndex = 0;
+  const logIndexes = new FlightLogIndex(logData);
+  const parser = new FlightLogParser(logData);
+  let iframeDirectory;
+  // We cache these details so they don't have to be recomputed on every request:
+  let numCells = false,
+    numMotors = false;
+  let fieldNames = [],
+    fieldNameToIndex = {};
+  const chunkCache = new FIFOCache(2);
+  // Map from field indexes to smoothing window size in microseconds
+  let fieldSmoothing = {},
+    maxSmoothing = 0;
+  const smoothedCache = new FIFOCache(2);
+  let gpsTransform = null;
 
   //Public fields:
   this.parser = parser;
@@ -334,8 +334,8 @@ export function FlightLog(logData) {
   }
 
   function estimateNumCells() {
-    let i,
-      sysConfig = that.getSysConfig();
+    const sysConfig = that.getSysConfig();
+    let i;
 
     let refVoltage;
     if (firmwareGreaterOrEqual(sysConfig, "3.1.0", "2.0.0")) {
@@ -439,15 +439,15 @@ export function FlightLog(logData) {
         // We need to store this in the chunk so we can refer to it later when we inject computed fields
         chunk.initialIMU = iframeDirectory.initialIMU[chunkIndex];
 
-        let mainFrameIndex = 0,
-          slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0,
-          lastSlow = parser.frameDefs.S
-            ? iframeDirectory.initialSlow[chunkIndex].slice(0)
-            : [],
-          lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count - 1 : 0, // -1 since we exclude the time field
-          lastGPS = parser.frameDefs.G
-            ? iframeDirectory.initialGPS[chunkIndex].slice(0)
-            : [];
+        let mainFrameIndex = 0;
+        const slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0;
+        const lastSlow = parser.frameDefs.S
+          ? iframeDirectory.initialSlow[chunkIndex].slice(0)
+          : [];
+        const lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count - 1 : 0; // -1 since we exclude the time field
+        const lastGPS = parser.frameDefs.G
+          ? iframeDirectory.initialGPS[chunkIndex].slice(0)
+          : [];
 
         parser.onFrameReady = function (
           frameValid,
@@ -782,9 +782,9 @@ export function FlightLog(logData) {
         const chunkIMU = new IMU(sourceChunk.initialIMU);
 
         for (let i = 0; i < sourceChunk.frames.length; i++) {
-          let srcFrame = sourceChunk.frames[i],
-            destFrame = destChunk.frames[i],
-            fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
+          const srcFrame = sourceChunk.frames[i];
+          const destFrame = destChunk.frames[i];
+          let fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
           if (imuQuaternion) {
             const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
@@ -1062,30 +1062,26 @@ export function FlightLog(logData) {
    * in the chunks will at least span the range given by [startTime...endTime].
    */
   this.getSmoothedChunksInTimeRange = function (startTime, endTime) {
-    let sourceChunks,
-      resultChunks,
-      chunkAlreadyDone,
-      allDone,
-      timeFieldIndex = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME;
+    const timeFieldIndex = FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME;
 
     //if (maxSmoothing == 0) // TODO We can't bail early because we do things like add fields to the chunks at the end
     //    return this.getChunksInTimeRange(startTime, endTime);
 
-    let /*
-       * Ensure that the range that the caller asked for can be fully smoothed by expanding the request
-       * for source chunks on either side of the range asked for (to smooth the chunks on the edges, we
-       * need to be able to see their neighbors)
-       */
-      leadingROChunks = 1,
-      trailingROChunks = 1,
-      startIndex =
-        binarySearchOrPrevious(
-          iframeDirectory.times,
-          startTime - maxSmoothing,
-        ) - leadingROChunks,
-      endIndex =
-        binarySearchOrNext(iframeDirectory.times, endTime + maxSmoothing) +
-        trailingROChunks;
+    /*
+     * Ensure that the range that the caller asked for can be fully smoothed by expanding the request
+     * for source chunks on either side of the range asked for (to smooth the chunks on the edges, we
+     * need to be able to see their neighbors)
+     */
+    let leadingROChunks = 1,
+      trailingROChunks = 1;
+    let startIndex =
+      binarySearchOrPrevious(
+        iframeDirectory.times,
+        startTime - maxSmoothing,
+      ) - leadingROChunks;
+    let endIndex =
+      binarySearchOrNext(iframeDirectory.times, endTime + maxSmoothing) +
+      trailingROChunks;
 
     /*
      * If our expanded source chunk range exceeds the actual source chunks available, trim down our leadingROChunks
@@ -1102,17 +1098,17 @@ export function FlightLog(logData) {
       endIndex = iframeDirectory.offsets.length - 1;
     }
 
-    sourceChunks = getChunksInIndexRange(startIndex, endIndex);
+    const sourceChunks = getChunksInIndexRange(startIndex, endIndex);
 
     verifyChunkIndexes(sourceChunks);
 
     //Create an independent copy of the raw frame data to smooth out:
-    resultChunks = new Array(
+    const resultChunks = new Array(
       sourceChunks.length - leadingROChunks - trailingROChunks,
     );
-    chunkAlreadyDone = new Array(sourceChunks.length);
+    const chunkAlreadyDone = new Array(sourceChunks.length);
 
-    allDone = true;
+    let allDone = true;
 
     //Don't smooth the edge chunks since they can't be fully smoothed
     for (
@@ -1120,8 +1116,8 @@ export function FlightLog(logData) {
       i < sourceChunks.length - trailingROChunks;
       i++
     ) {
-      let sourceChunk = sourceChunks[i],
-        resultChunk = smoothedCache.get(sourceChunk.index);
+      const sourceChunk = sourceChunks[i];
+      let resultChunk = smoothedCache.get(sourceChunk.index);
 
       chunkAlreadyDone[i] = resultChunk ? true : false;
 
@@ -1174,10 +1170,9 @@ export function FlightLog(logData) {
 
     if (!allDone) {
       for (const fieldIndex in fieldSmoothing) {
-        let radius = fieldSmoothing[fieldIndex],
-          //The position we're currently computing the smoothed value for:
-          centerChunkIndex,
-          centerFrameIndex;
+        const radius = fieldSmoothing[fieldIndex];
+        //The position we're currently computing the smoothed value for:
+        let centerChunkIndex, centerFrameIndex;
 
         //The outer two loops are used to begin a new partition to smooth within
         // Don't bother to smooth the first and last source chunks, since we can't smooth them completely
@@ -1394,8 +1389,8 @@ export function FlightLog(logData) {
   };
 
   this.getMinMaxForFieldDuringAllTime = function (field_name) {
-    let stats = this.getStats(),
-      min = Number.MAX_VALUE,
+    const stats = this.getStats();
+    let min = Number.MAX_VALUE,
       max = -Number.MAX_VALUE;
 
     const fieldIndex = this.getMainFieldIndexByName(field_name),
@@ -1758,8 +1753,8 @@ FlightLog.prototype.vbatADCToMillivolts = function (vbatADC) {
 };
 
 FlightLog.prototype.amperageADCToMillivolts = function (amperageADC) {
-  let ADCVREF = 33,
-    millivolts = (amperageADC * ADCVREF * 100) / 4095;
+  const ADCVREF = 33;
+  let millivolts = (amperageADC * ADCVREF * 100) / 4095;
 
   millivolts -= this.getSysConfig().currentMeterOffset;
 
