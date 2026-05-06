@@ -3,6 +3,9 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import globals from "globals";
 
 export default [
+  {
+    ignores: ["src/vendor/", "dist/", "public/"],
+  },
   js.configs.recommended,
   eslintConfigPrettier,
   {
