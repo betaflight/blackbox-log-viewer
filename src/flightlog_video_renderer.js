@@ -1,3 +1,4 @@
+import WebMWriter from "webm-writer";
 import { FlightLogGrapher } from "./grapher";
 import { triggerDownload } from "./tools.js";
 import { useSettingsStore } from "./stores/settings.js";

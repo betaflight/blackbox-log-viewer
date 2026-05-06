@@ -30,7 +30,8 @@
     "semver": "^7.7.4",
     "throttle-debounce": "^5.0.0",
     "vue": "^3.5.33",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "webm-writer": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

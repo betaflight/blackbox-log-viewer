@@ -1,3 +1,4 @@
+import { FFTComplex } from "./fft_complex.js";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { useSettingsStore } from "./stores/settings.js";
 
@@ -176,7 +177,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function (
     .fill(null)
     .map(() => new Float64Array(fftBufferSize * 2));
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
-  const fft = new FFT.complex(fftBufferSize, false);
+  const fft = new FFTComplex(fftBufferSize, false);
   const fftInput = new Float64Array(fftBufferSize);
   const fftOutput = new Float64Array(fftBufferSize * 2);
 
@@ -683,7 +684,7 @@ GraphSpectrumCalc._fft = function (samples, type) {
 
   const fftLength = samples.length;
   const fftOutput = new Float64Array(fftLength * 2);
-  const fft = new FFT.complex(fftLength, false);
+  const fft = new FFTComplex(fftLength, false);
 
   fft.simple(fftOutput, samples, type);
 
