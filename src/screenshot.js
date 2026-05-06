@@ -2,7 +2,7 @@ import html2canvas from "html2canvas";
 import { useAppStore } from "./stores/app.js";
 
 export function makeScreenshot() {
-  const el = document.querySelector("#screenshot-frame");
+  const el = document.getElementById("screenshot-frame");
   const now = new Date();
   const timestamp = `${now.getFullYear()}${`00${now.getMonth() + 1}`.slice(
     -2,

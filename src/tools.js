@@ -354,7 +354,7 @@ export const mouseNotification = {
     if (!this.enabled) return false;
 
     if (!this.elem) {
-      this.elem = document.querySelector(".mouseNotification");
+      this.elem = document.getElementById("mouseNotification");
     }
 
     messageClass = messageClass || "mouseNotification-box";

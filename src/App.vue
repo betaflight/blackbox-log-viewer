@@ -90,10 +90,6 @@
         <SeekBarToolbar />
       </Teleport>
 
-      <!-- Still hidden — kept for future phases -->
-      <GraphCanvas v-show="false" ref="graphCanvasRef" />
-      <SeekBarCanvas v-show="false" ref="seekBarRef" />
-
       <!-- Dialogs -->
       <KeysDialog v-model:open="appStore.keysDialogOpen" />
       <UserSettingsDialog
@@ -123,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from "vue";
+import { ref, computed, watchEffect, onMounted, onUnmounted } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
@@ -139,8 +135,6 @@ import ZoomPanel from "./components/ZoomPanel.vue";
 import SyncPanel from "./components/SyncPanel.vue";
 import WorkspacePanel from "./components/WorkspacePanel.vue";
 import StatusBar from "./components/StatusBar.vue";
-import GraphCanvas from "./components/GraphCanvas.vue";
-import SeekBarCanvas from "./components/SeekBarCanvas.vue";
 import KeysDialog from "./components/KeysDialog.vue";
 import UserSettingsDialog from "./components/UserSettingsDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
@@ -157,9 +151,6 @@ const appStore = useAppStore();
 const logStore = useLogStore();
 const playbackStore = usePlaybackStore();
 const settingsStore = useSettingsStore();
-
-const graphCanvasRef = ref(null);
-const seekBarRef = ref(null);
 
 // Centralized CSS class binding — replaces 27 imperative html.classList calls in main.js
 watchEffect(() => {
@@ -219,19 +210,9 @@ function onExportGpx() {
 }
 
 function onExportVideo() {
-  getController()?.pauseForExport?.();
-  // Build export params from store state
-  const video = document.querySelector(".log-graph video");
-  videoExportParams.value = {
-    graphConfig: graphStore.activeGraphConfig,
-    inTime: playbackStore.videoExportInTime,
-    outTime: playbackStore.videoExportOutTime,
-    flightVideo: logStore.hasVideo && appStore.viewVideo ? video?.cloneNode() : false,
-    flightVideoOffset: playbackStore.videoOffset,
-    hasCraft: settingsStore.userSettings.drawCraft,
-    hasAnalyser: graphStore.hasAnalyser,
-    hasSticks: settingsStore.userSettings.drawSticks,
-  };
+  const ctrl = getController();
+  ctrl?.pauseForExport?.();
+  videoExportParams.value = ctrl?.getVideoExportParams?.() ?? null;
   appStore.videoExportDialogOpen = true;
 }
 
@@ -371,4 +352,26 @@ function onApplyDefaultWorkspace(index) {
 function onGotoBookmark(index) {
   getController()?.gotoBookmark?.(index + 1);
 }
+
+// Drag-and-drop file loading (window-level)
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "copy";
+}
+function onDrop(e) {
+  e.preventDefault();
+  const item = e.dataTransfer.items[0];
+  const entry = item.webkitGetAsEntry();
+  if (entry.isFile) {
+    getController()?.loadFiles([e.dataTransfer.files[0]]);
+  }
+}
+onMounted(() => {
+  document.addEventListener("dragover", onDragOver);
+  document.addEventListener("drop", onDrop);
+});
+onUnmounted(() => {
+  document.removeEventListener("dragover", onDragOver);
+  document.removeEventListener("drop", onDrop);
+});
 </script>

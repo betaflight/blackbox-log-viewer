@@ -89,7 +89,7 @@ function BlackboxLogViewer() {
   let hasConfig = false;
   let hasConfigOverlay = false;
   let isFullscreen = false; // New fullscreen feature (to hide table)
-  const video = document.querySelector(".log-graph video");
+  const video = document.getElementById("logVideo");
   const canvas = document.getElementById("graphCanvas");
   const analyserCanvas = document.getElementById("analyserCanvas");
   const stickCanvas = document.getElementById("stickCanvas");
@@ -100,7 +100,7 @@ function BlackboxLogViewer() {
   let videoExportOutTime = null;
   let markerTime = 0; // New marker time
   let userSettings;
-  const seekBarCanvas = document.querySelector(".log-seek-bar canvas");
+  const seekBarCanvas = document.getElementById("seekbarCanvas");
   const seekBar = new SeekBar(seekBarCanvas);
   const seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar));
   let seekBarMode = "avgThrottle";
@@ -1149,14 +1149,6 @@ function BlackboxLogViewer() {
       }
     });
 
-    /* Always start with the table hidden
-        prefs.get('hasTable', function(item) {
-           if (item) {
-               hasTable = item;
-               html.classList.toggle("has-table", hasTable);
-           }
-        });
-        */
     hasTableOverlay = false;
     graphStore.hasTableOverlay = false;
 
@@ -1606,7 +1598,7 @@ function BlackboxLogViewer() {
         graph.refreshGraphConfig();
         invalidateGraph();
         mouseNotification.show(
-          document.querySelector(".log-graph"),
+          document.getElementById("log-graph"),
           null,
           null,
           refreshRequired,
@@ -1918,27 +1910,7 @@ function BlackboxLogViewer() {
 
     seekBar.onSeek = setCurrentBlackboxTime;
 
-    /* drag and drop support */
-
-    globalThis.ondragover = function (e) {
-      // prevent default behavior from changing page on dropped file
-      // NOTE: ondrop events WILL NOT WORK if you do not "preventDefault" in the ondragover event!!
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "copy";
-      return false;
-    };
-
-    globalThis.ondrop = function (e) {
-      e.preventDefault();
-
-      const item = e.dataTransfer.items[0];
-      const entry = item.webkitGetAsEntry();
-      if (entry.isFile) {
-        const file = e.dataTransfer.files[0];
-        loadFiles([file]);
-      }
-      return false;
-    };
+    // Drag-and-drop wired via App.vue
 
     if ("launchQueue" in globalThis) {
       launchQueue.setConsumer(async (launchParams) => {
