@@ -204,7 +204,7 @@ export function FlightLogGrapher(
     };
 
     for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
-      var fieldName = fieldNames[fieldIndex],
+      let fieldName = fieldNames[fieldIndex],
         matches;
 
       if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
@@ -220,20 +220,20 @@ export function FlightLogGrapher(
           idents.rcCommandFields[rcCommandIndex] = fieldIndex;
         }
       } else if ((matches = fieldName.match(/^axisPID\[(\d+)]$/))) {
-        var axisIndex = matches[1];
+        let axisIndex = matches[1];
 
         idents.axisPIDSum[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^axis(.)\[(\d+)]$/))) {
-        var axisIndex = matches[2];
+        let axisIndex = matches[2];
 
         idents.axisPIDFields[matches[1]] = axisIndex;
         idents.hasPIDs = true;
       } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
-        var axisIndex = matches[1];
+        let axisIndex = matches[1];
 
         idents.gyroFields[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^accSmooth\[(\d+)]$/))) {
-        var axisIndex = matches[1];
+        let axisIndex = matches[1];
 
         idents.accFields[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^servo\[(\d+)]$/))) {
@@ -362,7 +362,7 @@ export function FlightLogGrapher(
       let chunk = chunks[chunkIndex];
 
       for (; frameIndex < chunk.frames.length; frameIndex++) {
-        var fieldValue = chunk.frames[frameIndex][fieldIndex],
+        let fieldValue = chunk.frames[frameIndex][fieldIndex],
           frameTime =
             chunk.frames[frameIndex][
               FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
@@ -692,7 +692,7 @@ export function FlightLogGrapher(
       shouldSetFont = true,
       sequenceNum = 0;
 
-    for (var i = 0; i < chunks.length; i++) {
+    for (let i = 0; i < chunks.length; i++) {
       let events = chunks[i].events;
 
       for (let j = 0; j < events.length; j++) {
@@ -767,7 +767,7 @@ export function FlightLogGrapher(
 
     // Draw Bookmarks Event Line
     if (bookmarkEvents != null) {
-      for (var i = 0; i <= 9; i++) {
+      for (let i = 0; i <= 9; i++) {
         if (bookmarkEvents[i] != null) {
           if (bookmarkEvents[i].state)
             if (
@@ -964,7 +964,7 @@ export function FlightLogGrapher(
 
       // Plot graphs
       for (i = 0; i < graphs.length; i++) {
-        var graph = graphs[i];
+        let graph = graphs[i];
 
         canvasContext.save();
         {
@@ -984,7 +984,7 @@ export function FlightLogGrapher(
             if (graphConfig.isGraphFieldHidden(i, j)) {
               continue;
             }
-            var field = graph.fields[j];
+            let field = graph.fields[j];
             plotField(
               chunks,
               startFrameIndex,
@@ -1064,8 +1064,8 @@ export function FlightLogGrapher(
       if (options.drawAnalyser && graphConfig.selectedFieldName) {
         try {
           // If we do not select a graph/field, then the analyser is hidden
-          var graph = graphs[graphConfig.selectedGraphIndex];
-          var field = graph.fields[graphConfig.selectedFieldIndex];
+          let graph = graphs[graphConfig.selectedGraphIndex];
+          let field = graph.fields[graphConfig.selectedFieldIndex];
           analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
         } catch (err) {
           console.log(`Cannot plot analyser ${err}`);

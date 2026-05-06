@@ -113,7 +113,7 @@ export function Craft3D(flightLog, canvas, propColors) {
       MOTOR_BEVEL_DEPTH_RATIO = 0.04,
       ARM_WIDTH = 2 * Math.sin(ARM_WIDTH_RADIANS) * HUB_RADIUS;
 
-    for (i = 0; i < numMotors; i++) {
+    for (let i = 0; i < numMotors; i++) {
       let armStart = (i / numMotors) * Math.PI * 2 - ARM_WIDTH_RADIANS,
         armEnd = armStart + ARM_WIDTH_RADIANS * 2;
 
@@ -160,8 +160,8 @@ export function Craft3D(flightLog, canvas, propColors) {
       armVectorY *= ARM_LENGTH;
 
       // Draw one half of the arm:
-      for (var j = 0; j < armPoints.length; j++) {
-        var point = armPoints[j];
+      for (let j = 0; j < armPoints.length; j++) {
+        let point = armPoints[j];
         path.lineTo(
           point.length * armVectorX - point.width * crossArmX,
           point.length * armVectorY - point.width * crossArmY,
@@ -169,8 +169,8 @@ export function Craft3D(flightLog, canvas, propColors) {
       }
 
       // And flip the points to draw the other half:
-      for (var j = armPoints.length - 1; j >= 0; j--) {
-        var point = armPoints[j];
+      for (let j = armPoints.length - 1; j >= 0; j--) {
+        let point = armPoints[j];
         path.lineTo(
           point.length * armVectorX + point.width * crossArmX,
           point.length * armVectorY + point.width * crossArmY,
@@ -227,11 +227,11 @@ export function Craft3D(flightLog, canvas, propColors) {
   camera.position.y = 0;
   camera.position.z = 5;
 
-  for (var i = 0; i < propColors.length; i++) {
+  for (let i = 0; i < propColors.length; i++) {
     propMaterials[i] = new THREE.MeshLambertMaterial({ color: propColors[i] });
   }
 
-  for (var i = 0; i < numMotors; i++) {
+  for (let i = 0; i < numMotors; i++) {
     let propShell = new THREE.Mesh(
       propGeometry[propGeometry.length - 1],
       propShellMaterial,
@@ -267,7 +267,7 @@ export function Craft3D(flightLog, canvas, propColors) {
         break;
       default:
         motorOrder = new Array(numMotors);
-        for (var i = 0; i < numMotors; i++) {
+        for (let i = 0; i < numMotors; i++) {
           motorOrder[i] = i;
         }
         yawOffset = 0;

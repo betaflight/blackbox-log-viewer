@@ -133,7 +133,7 @@ export function LapTimer() {
 
         lapTime.laps = []; // Clear the array
 
-        for (var i = 0; i < bookmarkTimesSorted.length - 1; i++) {
+        for (let i = 0; i < bookmarkTimesSorted.length - 1; i++) {
           if (i > 0 && currentTime >= bookmarkTimesSorted[0]) {
             // Calculate all the laps so far
             lapTime.laps.push(
@@ -164,7 +164,7 @@ export function LapTimer() {
 
         if (lapTime.laps.length > 0 && currentTime > bookmarkTimesSorted[0]) {
           lapTime.best = maxTime;
-          for (var i = 0; i < lapTime.laps.length; i++) {
+          for (let i = 0; i < lapTime.laps.length; i++) {
             if (lapTime.laps[i] < lapTime.best) {
               lapTime.best = lapTime.laps[i];
             }

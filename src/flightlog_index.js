@@ -43,7 +43,7 @@ export function FlightLogIndex(logData) {
     intraframeDirectories = [];
 
     for (let i = 0; i < that.getLogCount(); i++) {
-      var intraIndex = {
+      let intraIndex = {
           times: [],
           offsets: [],
           avgThrottle: [],
@@ -86,7 +86,7 @@ export function FlightLogIndex(logData) {
 
       // Only attempt to parse the log if the header wasn't corrupt
       if (parsedHeader) {
-        var sysConfig = parser.sysConfig,
+        let sysConfig = parser.sysConfig,
           mainFrameDef = parser.frameDefs.I,
           gyroADC = [
             mainFrameDef.nameToIndex["gyroADC[0]"],
@@ -281,7 +281,7 @@ export function FlightLogIndex(logData) {
       resultIndexes = new Array(intraframeDirectories.length);
 
     for (i = 0; i < intraframeDirectories.length; i++) {
-      var lastTime,
+      let lastTime,
         lastLastTime,
         lastOffset,
         lastLastOffset,

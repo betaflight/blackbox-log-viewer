@@ -93,9 +93,9 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       yawStickMax: yawStickMax,
     });
 
+    let stickPositionsTrail = [];
     if (userSettings.stickTrails) {
       // Get the stick trail data
-      var stickPositionsTrail = [];
       if (chunks && startFrameIndex) {
         // we have the data for the stick trails
 

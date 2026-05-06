@@ -514,7 +514,7 @@ export function FlightLogParser(logData) {
    */
   function translateLegacyFieldNames(names) {
     for (let i = 0; i < names.length; i++) {
-      var matches;
+      let matches;
 
       if ((matches = names[i].match(/^gyroData(.+)$/))) {
         names[i] = `gyroADC${matches[1]}`;
@@ -540,7 +540,7 @@ export function FlightLogParser(logData) {
   }
 
   function parseHeaderLine() {
-    var COLON = ":".charCodeAt(0),
+    let COLON = ":".charCodeAt(0),
       fieldName,
       fieldValue,
       lineStart,
@@ -896,14 +896,14 @@ export function FlightLogParser(logData) {
       case "d_min":
       case "d_max":
         // Add D MAX values as Derivative numbers to PID array
-        var dMaxValues = parseCommaSeparatedString(fieldValue);
+        let dMaxValues = parseCommaSeparatedString(fieldValue);
         that.sysConfig["rollPID"].push(dMaxValues[0]);
         that.sysConfig["pitchPID"].push(dMaxValues[1]);
         that.sysConfig["yawPID"].push(dMaxValues[2]);
         break;
       case "ff_weight":
         // Add feedforward values to the PID array
-        var ffValues = parseCommaSeparatedString(fieldValue);
+        let ffValues = parseCommaSeparatedString(fieldValue);
         that.sysConfig["rollPID"].push(ffValues[0]);
         that.sysConfig["pitchPID"].push(ffValues[1]);
         that.sysConfig["yawPID"].push(ffValues[2]);
@@ -912,14 +912,14 @@ export function FlightLogParser(logData) {
       /* End of CSV packed values */
 
       case "vbatcellvoltage":
-        var vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
+        let vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
         that.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
         that.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
         that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
         break;
       case "currentMeter":
       case "currentSensor":
-        var currentMeterParams = parseCommaSeparatedString(fieldValue);
+        let currentMeterParams = parseCommaSeparatedString(fieldValue);
         that.sysConfig.currentMeterOffset = currentMeterParams[0];
         that.sysConfig.currentMeterScale = currentMeterParams[1];
         break;
@@ -938,11 +938,11 @@ export function FlightLogParser(logData) {
             that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
         }
         break;
-      case "Firmware revision":
+      case "Firmware revision": {
         //TODO Unify this somehow...
 
         // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
-        var matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
+        let matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
         if (matches != null) {
           // Detecting Betaflight requires looking at the revision string
           if (matches[1] === "Betaflight") {
@@ -957,7 +957,7 @@ export function FlightLogParser(logData) {
           /*
            * Try to detect INAV
            */
-          var matches = fieldValue.match(/(INAV).* (\d+)\.(\d+).(\d+)*/i);
+          let matches = fieldValue.match(/(INAV).* (\d+)\.(\d+).(\d+)*/i);
           if (matches != null) {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
             that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
@@ -973,6 +973,7 @@ export function FlightLogParser(logData) {
         that.sysConfig[fieldName] = fieldValue;
 
         break;
+      }
       case "Product":
       case "Blackbox version":
       case "Firmware date":
@@ -1179,7 +1180,7 @@ export function FlightLogParser(logData) {
 
     i = 0;
     while (i < frameDef.count) {
-      var value;
+      let value;
 
       if (predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_INC) {
         current[i] = skippedFrames + 1;
@@ -1635,10 +1636,10 @@ export function FlightLogParser(logData) {
       case FlightLogEvent.DISARM:
         lastEvent.data.reason = stream.readUnsignedVB();
         break;
-      case FlightLogEvent.AUTOTUNE_CYCLE_START:
+      case FlightLogEvent.AUTOTUNE_CYCLE_START: {
         lastEvent.data.phase = stream.readByte();
 
-        var cycleAndRising = stream.readByte();
+        let cycleAndRising = stream.readByte();
 
         lastEvent.data.cycle = cycleAndRising & 0x7f;
         lastEvent.data.rising = (cycleAndRising >> 7) & 0x01;
@@ -1647,6 +1648,7 @@ export function FlightLogParser(logData) {
         lastEvent.data.i = stream.readByte();
         lastEvent.data.d = stream.readByte();
         break;
+      }
       case FlightLogEvent.AUTOTUNE_CYCLE_RESULT:
         lastEvent.data.overshot = stream.readByte();
         lastEvent.data.p = stream.readByte();
@@ -1668,8 +1670,8 @@ export function FlightLogParser(logData) {
         lastEvent.data.gyroAVG = stream.readSignedVB();
         lastEvent.data.newP = stream.readS16();
         break;
-      case FlightLogEvent.INFLIGHT_ADJUSTMENT:
-        var tmp = stream.readU8();
+      case FlightLogEvent.INFLIGHT_ADJUSTMENT: {
+        let tmp = stream.readU8();
         lastEvent.data.name = "Unknown";
         lastEvent.data.func = tmp & 127;
         lastEvent.data.value =
@@ -1688,9 +1690,10 @@ export function FlightLogParser(logData) {
             Math.round(lastEvent.data.value * scale * 10000) / 10000;
         }
         break;
-      case FlightLogEvent.TWITCH_TEST:
+      }
+      case FlightLogEvent.TWITCH_TEST: {
         //lastEvent.data.stage = stream.readU8();
-        var tmp = stream.readU8();
+        let tmp = stream.readU8();
         switch (tmp) {
           case 1:
             lastEvent.data.name = "Response Time->";
@@ -1709,12 +1712,13 @@ export function FlightLogParser(logData) {
         }
         lastEvent.data.value = uint32ToFloat(stream.readU32());
         break;
+      }
       case FlightLogEvent.LOGGING_RESUME:
         lastEvent.data.logIteration = stream.readUnsignedVB();
         lastEvent.data.currentTime = stream.readUnsignedVB();
         break;
-      case FlightLogEvent.LOG_END:
-        var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
+      case FlightLogEvent.LOG_END: {
+        let endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
 
         if (endMessage == END_OF_LOG_MESSAGE) {
           //Adjust the end of stream so we stop reading, this log is done
@@ -1727,6 +1731,7 @@ export function FlightLogParser(logData) {
           lastEvent = null;
         }
         break;
+      }
       default:
         lastEvent = null;
     }
@@ -1914,7 +1919,7 @@ export function FlightLogParser(logData) {
       let command = stream.readChar();
 
       if (lastFrameType) {
-        var lastFrameSize = stream.pos - frameStart,
+        let lastFrameSize = stream.pos - frameStart,
           frameTypeStats;
 
         // Is this the beginning of a new frame?

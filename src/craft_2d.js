@@ -49,7 +49,7 @@ export function Craft2D(flightLog, canvas, propColors) {
         break;
       default:
         motorOrder = new Array(numMotors);
-        for (var i = 0; i < numMotors; i++) {
+        for (let i = 0; i < numMotors; i++) {
           motorOrder[i] = i;
         }
         yawOffset = 0;
@@ -175,7 +175,7 @@ export function Craft2D(flightLog, canvas, propColors) {
 
     canvasContext.beginPath();
 
-    for (i = 0; i < numMotors; i++) {
+    for (let i = 0; i < numMotors; i++) {
       canvasContext.moveTo(0, 0);
 
       canvasContext.lineTo(
@@ -205,7 +205,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     canvasContext.fillStyle = craftColor;
     canvasContext.fill();
 
-    for (i = 0; i < numMotors; i++) {
+    for (let i = 0; i < numMotors; i++) {
       let motorValue = frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]];
 
       canvasContext.save();
@@ -261,7 +261,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     canvasContext.restore();
   };
 
-  for (var i = 0; i < propColors.length; i++) {
+  for (let i = 0; i < propColors.length; i++) {
     shadeColors.push(makeColorHalfStrength(propColors[i]));
   }
 
