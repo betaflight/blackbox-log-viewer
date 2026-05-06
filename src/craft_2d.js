@@ -20,10 +20,10 @@ export function Craft2D(flightLog, canvas, propColors) {
     numMotors = customMix.motorOrder.length;
   }
 
-  let shadeColors = [],
-    craftColor = "rgb(76,76,76)",
-    armLength,
-    bladeRadius;
+  const shadeColors = [];
+  const craftColor = "rgb(76,76,76)";
+  let armLength;
+  let bladeRadius;
 
   let motorOrder, yawOffset;
 

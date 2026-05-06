@@ -129,32 +129,32 @@ export function Craft3D(flightLog, canvas, propColors) {
         );
       }
 
-      let // Unit vector pointing through the center of the arm
-        armVectorX = Math.cos(armStart + ARM_WIDTH_RADIANS),
-        armVectorY = Math.sin(armStart + ARM_WIDTH_RADIANS),
-        // Vector at right angles scaled for the arm width
-        crossArmX = -armVectorY * ARM_WIDTH * 0.5,
-        crossArmY = armVectorX * ARM_WIDTH * 0.5,
-        armPoints = [
-          // Make the first part of the arms parallel by spacing the ends the same amount as the beginnings
-          {
-            length: 1 - MOTOR_MOUNT_LENGTH_RATIO - MOTOR_BEVEL_DEPTH_RATIO,
-            width: 1,
-          },
-          {
-            length: 1 - MOTOR_MOUNT_LENGTH_RATIO,
-            width: MOTOR_MOUNT_WIDTH_RATIO,
-          },
-          {
-            length: 1 + MOTOR_MOUNT_LENGTH_RATIO,
-            width: MOTOR_MOUNT_WIDTH_RATIO,
-          },
-          // Bevel after end of motor mount
-          {
-            length: 1 + MOTOR_MOUNT_LENGTH_RATIO + MOTOR_BEVEL_DEPTH_RATIO,
-            width: 1,
-          },
-        ];
+      // Unit vector pointing through the center of the arm
+      let armVectorX = Math.cos(armStart + ARM_WIDTH_RADIANS);
+      let armVectorY = Math.sin(armStart + ARM_WIDTH_RADIANS);
+      // Vector at right angles scaled for the arm width
+      const crossArmX = -armVectorY * ARM_WIDTH * 0.5;
+      const crossArmY = armVectorX * ARM_WIDTH * 0.5;
+      const armPoints = [
+        // Make the first part of the arms parallel by spacing the ends the same amount as the beginnings
+        {
+          length: 1 - MOTOR_MOUNT_LENGTH_RATIO - MOTOR_BEVEL_DEPTH_RATIO,
+          width: 1,
+        },
+        {
+          length: 1 - MOTOR_MOUNT_LENGTH_RATIO,
+          width: MOTOR_MOUNT_WIDTH_RATIO,
+        },
+        {
+          length: 1 + MOTOR_MOUNT_LENGTH_RATIO,
+          width: MOTOR_MOUNT_WIDTH_RATIO,
+        },
+        // Bevel after end of motor mount
+        {
+          length: 1 + MOTOR_MOUNT_LENGTH_RATIO + MOTOR_BEVEL_DEPTH_RATIO,
+          width: 1,
+        },
+      ];
 
       armVectorX *= ARM_LENGTH;
       armVectorY *= ARM_LENGTH;
@@ -192,20 +192,20 @@ export function Craft3D(flightLog, canvas, propColors) {
     return craftMesh;
   }
 
-  let scene = new THREE.Scene(),
-    camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000),
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }),
-    light = new THREE.HemisphereLight(0xe4e4ff, 0x405040, 1.1),
-    craft = new THREE.Object3D(),
-    craftParent = new THREE.Object3D(),
-    craftMesh = buildCraft(),
-    arrowMesh = buildArrow(),
-    propGeometry = buildPropGeometry(),
-    props = new Array(numMotors),
-    propShells = new Array(numMotors),
-    motorOrder,
-    sysInfo = flightLog.getSysConfig(),
-    yawOffset;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+  const light = new THREE.HemisphereLight(0xe4e4ff, 0x405040, 1.1);
+  const craft = new THREE.Object3D();
+  const craftParent = new THREE.Object3D();
+  const craftMesh = buildCraft();
+  const arrowMesh = buildArrow();
+  const propGeometry = buildPropGeometry();
+  const props = new Array(numMotors);
+  const propShells = new Array(numMotors);
+  let motorOrder;
+  const sysInfo = flightLog.getSysConfig();
+  let yawOffset;
 
   // The craft object will hold the props and craft body
   // We'll rotate this to bring the front direction of the model to the correct position

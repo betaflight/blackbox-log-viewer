@@ -250,9 +250,9 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
   };
 
   function getStickValues(frame, stickPositions, stickLabel, config) {
-    let stickIndex,
-      rcCommand = [],
-      rcCommandLabels = [];
+    let stickIndex;
+    const rcCommand = [];
+    const rcCommandLabels = [];
 
     const highResolutionScale =
       flightLog.getSysConfig().blackbox_high_resolution > 0 ? 10 : 1;
