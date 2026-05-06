@@ -315,7 +315,7 @@ export function GraphLegend(
       el.style.display = "none";
     });
     document.querySelectorAll(".log-open-legend-dialog").forEach((el) => {
-      el.style.display = "";
+      el.style.display = "inline-block";
     });
 
     if (onVisibilityChange) {

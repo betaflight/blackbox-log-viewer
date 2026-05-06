@@ -139,13 +139,20 @@ select.log-index:focus {
 }
 
 .log-open-legend-dialog {
-  float: right;
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  z-index: 5;
   color: var(--text-secondary);
-  padding-right: 14px;
-  padding-top: 8px;
   font-size: 14px;
   display: none;
   cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 150ms;
+}
+
+.log-open-legend-dialog:hover {
+  opacity: 1;
 }
 
 .log-graph-legend {
