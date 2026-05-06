@@ -24,6 +24,14 @@ export const useGraphStore = defineStore("graph", () => {
   const hasConfigOverlay = ref(false);
   const configFileName = ref("");
   const configLines = shallowRef([]);
+
+  // Legend
+  const legendVisible = ref(true);
+  const legendTitle = ref("Legend");
+  const legendGraphs = shallowRef([]);
+  // Each: { label, fields: [{ name, friendlyName, color, hidden }] }
+  const legendValues = shallowRef({});
+  // Map of fieldName → { value, settings }
   const isFullscreen = ref(false);
   const markerTime = ref(0);
   const seekBarMode = ref("avgThrottle");
@@ -59,6 +67,10 @@ export const useGraphStore = defineStore("graph", () => {
     hasConfigOverlay,
     configFileName,
     configLines,
+    legendVisible,
+    legendTitle,
+    legendGraphs,
+    legendValues,
     isFullscreen,
     markerTime,
     seekBarMode,

@@ -11,7 +11,6 @@ import { GpxExporter } from "./gpx-exporter.js";
 import { CsvExporter } from "./csv-exporter.js";
 import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
 import supaflyWorkspace from "./ws_supafly.json";
-import { GraphLegend } from "./graph_legend.js";
 import { FlightLog } from "./flightlog.js";
 import { FlightLogParser } from "./flightlog_parser.js";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter.js";
@@ -98,7 +97,6 @@ function BlackboxLogViewer() {
     bookmarkTimes = [], // Empty array for bookmarks (times)
     // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
     activeGraphConfig = new GraphConfig(),
-    graphLegend = null,
     fieldPresenter = FlightLogFieldPresenter,
     hasVideo = false,
     hasLog = false,
@@ -303,8 +301,8 @@ function BlackboxLogViewer() {
       }
 
       // Update the Legend Values
-      if (graphLegend) {
-        graphLegend.updateValues(flightLog, frame);
+      if (graphStore.legendVisible) {
+        updateLegendValues(flightLog, frame);
       }
     }
   }
@@ -949,21 +947,64 @@ function BlackboxLogViewer() {
     alert(errorMessage);
   }
 
+  function buildLegendGraphs() {
+    const graphs = activeGraphConfig.getGraphs();
+    graphStore.legendGraphs = graphs.map((g, gi) => ({
+      label: g.label,
+      fields: g.fields.map((f, fi) => ({
+        name: f.name,
+        friendlyName: f.friendlyName,
+        color: f.color,
+        hidden: activeGraphConfig.isGraphFieldHidden(gi, fi),
+      })),
+    }));
+  }
+
+  function updateLegendValues(flightLog, frame) {
+    try {
+      const currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+      const graphs = activeGraphConfig.getGraphs();
+      const vals = {};
+      for (let i = 0; i < graphs.length; i++) {
+        for (let j = 0; j < graphs[i].fields.length; j++) {
+          const field = graphs[i].fields[j];
+          let value = frame[flightLog.getMainFieldIndexByName(field.name)];
+          if (userSettings.legendUnits) {
+            value = FlightLogFieldPresenter.decodeFieldToFriendly(
+              flightLog, field.name, value, currentFlightMode,
+            );
+          } else if (value % 1 !== 0) {
+            value = value.toFixed(2);
+          }
+          const settings = `Z100 E${(field.curve.power * 100).toFixed(0)} S${(field.smoothing / 100).toFixed(0)}`;
+          vals[field.name] = { value: value ?? "", settings };
+        }
+      }
+      graphStore.legendValues = vals;
+    } catch (e) {
+      console.log("Cannot update legend with values");
+    }
+  }
+
   function onLegendVisbilityChange(hidden) {
     prefs.set("log-legend-hidden", hidden);
     updateCanvasSize();
   }
 
-  function onLegendSelectionChange(toggleAnalizer, ctrlKey) {
+  function onLegendSelectionChange(gi, fi, fieldName, ctrlKey) {
+    const toggleAnalizer = activeGraphConfig.selectedFieldName === fieldName;
     const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
     if (toggleAnalizer) {
       if (lockAnalyserHide) {
-        hasAnalyser = true; // Do not hide analyser when ctrlKey is pressed or it has many spectrums
+        hasAnalyser = true;
       } else {
-        hasAnalyser = !hasAnalyser; // Toggle the analyser state
+        hasAnalyser = !hasAnalyser;
       }
     } else {
-      hasAnalyser = true; // Default to true when toggleAnalizer is false
+      activeGraphConfig.selectedFieldName = fieldName;
+      activeGraphConfig.selectedGraphIndex = gi;
+      activeGraphConfig.selectedFieldIndex = fi;
+      hasAnalyser = true;
     }
     graph.setDrawAnalyser(hasAnalyser, ctrlKey);
     html.classList.toggle("has-analyser", hasAnalyser);
@@ -971,7 +1012,15 @@ function BlackboxLogViewer() {
     invalidateGraph();
   }
 
-  function onLegendHighlightChange() {
+  function onLegendHighlightChange(gi, fi) {
+    activeGraphConfig.highlightGraphIndex = gi;
+    activeGraphConfig.highlightFieldIndex = fi;
+    invalidateGraph();
+  }
+
+  function onLegendToggleField(gi, fi) {
+    activeGraphConfig.toggleGraphField(gi, fi);
+    buildLegendGraphs();
     invalidateGraph();
   }
 
@@ -1216,8 +1265,7 @@ function BlackboxLogViewer() {
       newWorkspaces[newActiveId].graphConfig
     ) {
       newGraphConfig(newWorkspaces[newActiveId].graphConfig);
-      document.getElementById("legend_title").textContent =
-        newWorkspaces[newActiveId].title;
+      graphStore.legendTitle = newWorkspaces[newActiveId].title;
     }
   }
 
@@ -1231,6 +1279,7 @@ function BlackboxLogViewer() {
   }
 
   activeGraphConfig.addListener(function () {
+    buildLegendGraphs();
     invalidateGraph();
   });
 
@@ -1239,21 +1288,10 @@ function BlackboxLogViewer() {
     // Initialize dark theme
     DarkTheme.init(prefs);
 
-    // Bootstrap tooltips/dropdowns no longer initialized — replaced by Vue/CSS
-
     // Version information
     appStore.statusViewerVersion = `v${__APP_VERSION__}`;
 
-    graphLegend = new GraphLegend(
-      document.querySelector(".log-graph-legend"),
-      activeGraphConfig,
-      onLegendVisbilityChange,
-      onLegendSelectionChange,
-      onLegendHighlightChange,
-      zoomGraphConfig,
-      expandGraphConfig,
-      newGraphConfig,
-    );
+    buildLegendGraphs();
 
     // initial load of the configuration defaults if we have them
     prefs.get("workspaceGraphConfigs", function (item) {
@@ -1276,7 +1314,7 @@ function BlackboxLogViewer() {
 
     prefs.get("log-legend-hidden", function (item) {
       if (item) {
-        graphLegend.hide();
+        graphStore.legendVisible = false;
       }
     });
 
@@ -2295,6 +2333,29 @@ function BlackboxLogViewer() {
     };
     this.toggleGrid = function () {
       toggleOverrideStatus("graphGridOverride", "has-grid-override");
+    };
+    this.legendHighlight = function (gi, fi) {
+      onLegendHighlightChange(gi, fi);
+    };
+    this.legendSelect = function (gi, fi, fieldName, ctrlKey) {
+      onLegendSelectionChange(gi, fi, fieldName, ctrlKey);
+    };
+    this.legendZoom = function (gi) {
+      zoomGraphConfig(gi);
+    };
+    this.legendExpand = function (gi) {
+      expandGraphConfig(gi);
+    };
+    this.legendToggleField = function (gi, fi) {
+      onLegendToggleField(gi, fi);
+    };
+    this.legendReorder = function (newOrder) {
+      const oldGraphs = graphConfig;
+      const newGraphs = newOrder.map((i) => oldGraphs[i]);
+      newGraphConfig(newGraphs);
+    };
+    this.legendVisibilityChange = function (hidden) {
+      onLegendVisbilityChange(hidden);
     };
     this.setPlaybackRate = function (rate) {
       setPlaybackRate(rate, false);

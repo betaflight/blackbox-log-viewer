@@ -131,27 +131,6 @@ select.log-index:focus {
   display: none;
 }
 
-.log-close-legend-dialog {
-  cursor: pointer;
-}
-
-.log-open-legend-dialog {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  z-index: 5;
-  color: var(--text-secondary);
-  font-size: 14px;
-  display: none;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 150ms;
-}
-
-.log-open-legend-dialog:hover {
-  opacity: 1;
-}
-
 .log-graph-legend {
   font-size: 85%;
   flex-grow: 1;
@@ -739,43 +718,6 @@ html:not(.has-gps) .map-container {
   display: none !important;
 }
 
-.log-graph-config h3 span {
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-right: 3px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-html.isBF .log-graph-config h3 span {
-  background-color: var(--color-primary-100, #fff3cc);
-  color: var(--color-primary-800, #8a5a00);
-}
-
-html.isCF .log-graph-config h3 span {
-  background-color: #d9f2e3;
-  color: #006b28;
-}
-
-html.isINAV .log-graph-config h3 span {
-  background-color: #d9e6f7;
-  color: #0850ac;
-}
-
-html.dark.isBF .log-graph-config h3 span {
-  background-color: rgba(255, 187, 0, 0.2);
-  color: var(--color-primary-400, #ffd03d);
-}
-
-html.dark.isCF .log-graph-config h3 span {
-  background-color: #1a3828;
-  color: #d0ffe8;
-}
-
-html.dark.isINAV .log-graph-config h3 span {
-  background-color: rgba(8, 80, 172, 0.2);
-  color: #aed0f4;
-}
 
 div#lap-timer {
   position: absolute;
