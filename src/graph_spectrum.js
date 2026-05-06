@@ -26,8 +26,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     DEFAULT_PSD_HEATMAP_MIN = -40,
     DEFAULT_PSD_HEATMAP_MAX = 10,
     DEFAULT_PSD_SEGMENT_LENGTH_POWER = 9;
-  let analyserZoomX = 1.0,
-    analyserZoomY = 1.0,
+  let analyserZoomX = 1,
+    analyserZoomY = 1,
     dataReload = false,
     fftData = null,
     addSpectrumForComparison = false;
@@ -259,7 +259,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     });
 
     this.resetZoomX = function () {
-      analyserZoomX = 1.0;
+      analyserZoomX = 1;
       GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
       that.refresh();
     };
@@ -271,7 +271,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     });
 
     this.resetZoomY = function () {
-      analyserZoomY = 1.0;
+      analyserZoomY = 1;
       GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
       that.refresh();
     };

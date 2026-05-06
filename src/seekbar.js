@@ -295,7 +295,9 @@ export function SeekBar(canvas) {
   }
 
   this.repaint = function () {
-    if (canvas.width === 0 || canvas.height === 0) return;
+    if (canvas.width === 0 || canvas.height === 0) {
+      return;
+    }
 
     if (!backgroundValid) {
       dirtyRegion = false;

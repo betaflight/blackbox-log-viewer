@@ -23,6 +23,19 @@ import {
   firmwareGreaterOrEqual,
 } from "./tools";
 
+/*
+ * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
+ */
+function verifyChunkIndexes(_chunks) {
+  // Uncomment for debugging...
+  /*
+      for (let i = 0; i < chunks.length - 1; i++) {
+          if (chunks[i].index + 1 != chunks[i+1].index) {
+              console.log("Bad chunk index, bug in chunk caching");
+          }
+      }*/
+}
+
 /**
  * Uses a FlightLogParser to provide on-demand parsing (and caching) of the flight data log.
  *
@@ -515,8 +528,8 @@ export function FlightLog(logData) {
                 }
                 // destFrame_currentIndex += lastGPSLength; Add this line if you wish to add more fields.
 
-                for (let i = 0; i < eventNeedsTimestamp.length; i++) {
-                  eventNeedsTimestamp[i].time =
+                for (const event of eventNeedsTimestamp) {
+                  event.time =
                     frame[
                       FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
                     ];
@@ -816,11 +829,11 @@ export function FlightLog(logData) {
               wy = q.w * q.y,
               zz = q.z ** 2,
               wz = q.w * q.z;
-            const roll = Math.atan2(+2.0 * (wx + yz), +1.0 - 2.0 * (xx + yy));
-            const pitch = 0.5 * Math.PI - Math.acos(+2.0 * (wy - xz));
-            let heading = -Math.atan2(+2.0 * (wz + xy), +1.0 - 2.0 * (yy + zz));
+            const roll = Math.atan2(+2 * (wx + yz), +1 - 2 * (xx + yy));
+            const pitch = 0.5 * Math.PI - Math.acos(+2 * (wy - xz));
+            let heading = -Math.atan2(+2 * (wz + xy), +1 - 2 * (yy + zz));
             if (heading < 0) {
-              heading += 2.0 * Math.PI;
+              heading += 2 * Math.PI;
             }
 
             destFrame[fieldIndex++] = roll;
@@ -1042,19 +1055,6 @@ export function FlightLog(logData) {
         delete chunk.needsEventTimes;
       }
     }
-  }
-
-  /*
-   * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
-   */
-  function verifyChunkIndexes(_chunks) {
-    // Uncomment for debugging...
-    /*
-        for (let i = 0; i < chunks.length - 1; i++) {
-            if (chunks[i].index + 1 != chunks[i+1].index) {
-                console.log("Bad chunk index, bug in chunk caching");
-            }
-        }*/
   }
 
   /**
@@ -1431,7 +1431,9 @@ export function FlightLog(logData) {
       maxValue = -Number.MAX_VALUE;
 
     const fieldIndex = this.getMainFieldIndexByName(field_name);
-    if (chunks.length === 0 || fieldIndex === undefined) return undefined;
+    if (chunks.length === 0 || fieldIndex === undefined) {
+      return undefined;
+    }
 
     //Find the first sample that lies inside the window
     for (
@@ -1762,7 +1764,7 @@ FlightLog.prototype.amperageADCToMillivolts = function (amperageADC) {
 
 FlightLog.prototype.getFlightMode = function (currentFlightMode) {
   return {
-    Arm: (currentFlightMode & (1 << 0)) !== 0,
+    Arm: (currentFlightMode & 1) !== 0,
     Angle: (currentFlightMode & (1 << 1)) !== 0,
     Horizon: (currentFlightMode & (1 << 2)) !== 0,
     Baro: (currentFlightMode & (1 << 3)) !== 0,
@@ -1798,7 +1800,7 @@ FlightLog.prototype.getFlightMode = function (currentFlightMode) {
 
 FlightLog.prototype.getFeatures = function (enabledFeatures) {
   return {
-    RX_PPM: (enabledFeatures & (1 << 0)) !== 0,
+    RX_PPM: (enabledFeatures & 1) !== 0,
     VBAT: (enabledFeatures & (1 << 1)) !== 0,
     INFLIGHT_ACC_CAL: (enabledFeatures & (1 << 2)) !== 0,
     RX_SERIAL: (enabledFeatures & (1 << 3)) !== 0,

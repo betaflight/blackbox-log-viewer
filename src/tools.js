@@ -24,7 +24,7 @@ export function uint32ToFloat(value) {
 }
 
 export function asciiArrayToString(arr) {
-  return String.fromCharCode(...arr);
+  return String.fromCodePoint(...arr);
 }
 
 export function asciiStringToByteArray(s) {
@@ -238,7 +238,7 @@ export function stringLoopTime(
 
 export function stringTimetoMsec(input) {
   try {
-    const matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
+    const matches = input.match(/(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/);
 
     if (matches.length > 2) {
       // there is a placeholder - either : or .

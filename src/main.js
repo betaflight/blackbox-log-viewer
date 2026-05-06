@@ -36,6 +36,11 @@ import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
 
 
+// TODO: Figure out if we can open the same file in a new window
+function createNewBlackboxWindow(_fileToOpen) {
+  globalThis.open(globalThis.location.href, "_blank").focus();
+}
+
 function BlackboxLogViewer() {
   function supportsRequiredAPIs() {
     return (
@@ -91,7 +96,7 @@ function BlackboxLogViewer() {
   const stickCanvas = document.getElementById("stickCanvas");
   const craftCanvas = document.getElementById("craftCanvas");
   let videoURL = false;
-  let videoOffset = 0.0;
+  let videoOffset = 0;
   let videoExportInTime = null;
   let videoExportOutTime = null;
   // markerTime lives in graphStore.markerTime
@@ -144,11 +149,6 @@ function BlackboxLogViewer() {
     workspaceStore.bookmarkTimes = [...bookmarkTimes];
   }
 
-  // TODO: Figure out if we can open the same file in a new window
-  function createNewBlackboxWindow(_fileToOpen) {
-    globalThis.open(globalThis.location.href, "_blank").focus();
-  }
-
   function blackboxTimeFromVideoTime() {
     return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
   }
@@ -168,10 +168,7 @@ function BlackboxLogViewer() {
      * an offset
      */
     const videoOffsetDisplay =
-      (videoOffset >= 0 ? "+" : "") +
-      (videoOffset.toFixed(3) !== videoOffset
-        ? videoOffset.toFixed(3)
-        : videoOffset);
+      (videoOffset >= 0 ? "+" : "") + videoOffset.toFixed(3);
     appStore.videoOffsetDisplay = videoOffsetDisplay;
 
     playbackStore.videoOffset = videoOffset;
@@ -181,7 +178,7 @@ function BlackboxLogViewer() {
   }
 
   function isInteger(value) {
-    return (value | 0) === value || Math.trunc(value) === value;
+    return Math.trunc(value) === value;
   }
 
   function atMost2DecPlaces(value) {
@@ -693,11 +690,11 @@ function BlackboxLogViewer() {
     reader.onload = function (e) {
       const bytes = e.target.result;
 
-      const fileContents = String.fromCharCode(
+      const fileContents = String.fromCodePoint(
         ...new Uint8Array(bytes, 0, 100),
       );
 
-      if (fileContents.match(/# dump|# diff/i)) {
+      if (/# dump|# diff/i.exec(fileContents)) {
         // this is actually a configuration file
         try {
           // Firstly, is this a configuration defaults file
@@ -1975,7 +1972,9 @@ function BlackboxLogViewer() {
     this.toggleAnalyserFullscreen = function () {
       if (graphStore.hasAnalyser) {
         graphStore.hasAnalyserFullscreen = !graphStore.hasAnalyserFullscreen;
-      } else graphStore.hasAnalyserFullscreen = false;
+      } else {
+        graphStore.hasAnalyserFullscreen = false;
+      }
       graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       invalidateGraph();
     };
@@ -2013,7 +2012,7 @@ function BlackboxLogViewer() {
     };
     this.legendResetPen = function (gi, fi) {
       const graphs = activeGraphConfig.getGraphs();
-      const msg = restorePenDefaults(graphs, String(gi), fi != null ? String(fi) : null);
+      const msg = restorePenDefaults(graphs, String(gi), fi == null ? null : String(fi));
       applyPenChange(msg);
     };
     this.legendFieldWheel = function (gi, fi, delta, shiftKey, altKey, ctrlKey) {

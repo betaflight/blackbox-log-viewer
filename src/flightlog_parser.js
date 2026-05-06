@@ -530,11 +530,13 @@ export function FlightLogParser(logData) {
   }
 
   function parseHeaderLine() {
-    const COLON = ":".charCodeAt(0);
+    const COLON = ":".codePointAt(0);
     let separatorPos = false;
     let matches;
 
-    if (stream.peekChar() !== " ") return;
+    if (stream.peekChar() !== " ") {
+      return;
+    }
 
     //Skip the leading space
     stream.readChar();
@@ -553,7 +555,9 @@ export function FlightLogParser(logData) {
         break;
     }
 
-    if (stream.data[stream.pos] !== NEWLINE || separatorPos === false) return;
+    if (stream.data[stream.pos] !== NEWLINE || separatorPos === false) {
+      return;
+    }
 
     const lineEnd = stream.pos;
 
@@ -573,7 +577,7 @@ export function FlightLogParser(logData) {
           that.sysConfig.frameIntervalI = 1;
         break;
       case "P interval":
-        matches = fieldValue.match(/(\d+)\/(\d+)/);
+        matches = /(\d+)\/(\d+)/.exec(fieldValue);
 
         if (matches) {
           that.sysConfig.frameIntervalPNum = parseInt(matches[1], 10);
@@ -923,27 +927,27 @@ export function FlightLogParser(logData) {
         //TODO Unify this somehow...
 
         // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
-        const matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(?:\.(\d+))?/i);
+        const matches = /(.*flight).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
         if (matches != null) {
           // Detecting Betaflight requires looking at the revision string
           if (matches[1] === "Betaflight") {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
           }
 
-          that.sysConfig.firmware = `${parseInt(matches[2], 10)}.${parseInt(matches[3], 10)}`;
+          that.sysConfig.firmware = `${Number.parseInt(matches[2], 10)}.${Number.parseInt(matches[3], 10)}`;
           that.sysConfig.firmwarePatch =
-            matches[4] != null ? parseInt(matches[4], 10) : "0";
+            matches[4] ? Number.parseInt(matches[4], 10) : "0";
           that.sysConfig.firmwareVersion = `${that.sysConfig.firmware}.${that.sysConfig.firmwarePatch}`;
         } else {
           /*
            * Try to detect INAV
            */
-          const matches = fieldValue.match(/(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i);
+          const matches = /(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
           if (matches != null) {
             that.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
             that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
             that.sysConfig.firmwarePatch =
-              matches[4] != null ? parseInt(matches[4], 10) : "";
+              matches[4] ? Number.parseInt(matches[4], 10) : "";
           } else {
             // Legacy firmware versions
             that.sysConfig.firmwareVersion = "0.0.0";
@@ -1223,8 +1227,11 @@ export function FlightLogParser(logData) {
             continue;
           case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
             //How many fields are in this encoded group? Check the subsequent field encodings:
-            for (j = i + 1; j < i + 8 && j < frameDef.count; j++)
-              if (encoding[j] !== FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) break;
+            for (j = i + 1; j < i + 8 && j < frameDef.count; j++) {
+              if (encoding[j] !== FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) {
+                break;
+              }
+            }
 
             groupCount = j - i;
 
@@ -1955,7 +1962,9 @@ export function FlightLogParser(logData) {
         }
       }
 
-      if (command === EOF) break;
+      if (command === EOF) {
+        break;
+      }
 
       frameStart = stream.pos - 1;
       frameType = getFrameType(command);

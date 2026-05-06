@@ -84,7 +84,7 @@ export function FlightLogGrapher(
   };
 
   function extend(base, top) {
-    return Object.assign({}, base, top);
+    return { ...base, ...top };
   }
 
   function onMouseMove(e) {
@@ -242,13 +242,13 @@ export function FlightLogGrapher(
 
   function drawWaterMark() {
     canvasContext.save();
-    canvasContext.globalAlpha = parseInt(options.watermark.transparency, 10) / 100;
+    canvasContext.globalAlpha = Number.parseInt(options.watermark.transparency, 10) / 100;
     canvasContext.drawImage(
       watermarkLogo,
-      (parseInt(options.watermark.left, 10) / 100) * canvas.width,
-      (parseInt(options.watermark.top, 10) / 100) * canvas.height,
-      (parseInt(options.watermark.size, 10) / 100) * watermarkLogo.width,
-      (parseInt(options.watermark.size, 10) / 100) * watermarkLogo.height,
+      (Number.parseInt(options.watermark.left, 10) / 100) * canvas.width,
+      (Number.parseInt(options.watermark.top, 10) / 100) * canvas.height,
+      (Number.parseInt(options.watermark.size, 10) / 100) * watermarkLogo.width,
+      (Number.parseInt(options.watermark.size, 10) / 100) * watermarkLogo.height,
     );
     canvasContext.restore();
   }
@@ -460,7 +460,7 @@ export function FlightLogGrapher(
     // horizontal lines
     for (let y = 1; y < GRID_LINES; y++) {
       const yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
-      if (yValue !== 0 && Math.abs(yValue < plotHeight / 2)) {
+      if (yValue !== 0 && Math.abs(yValue) < plotHeight / 2) {
         canvasContext.moveTo(0, yValue);
         canvasContext.lineTo(canvas.width, yValue);
       }
@@ -660,15 +660,15 @@ export function FlightLogGrapher(
     const BEGIN_MARGIN_MICROSECONDS = 100000;
     let shouldSetFont = true, sequenceNum = 0;
 
-    for (let i = 0; i < chunks.length; i++) {
-      const events = chunks[i].events;
+    for (const chunk of chunks) {
+      const events = chunk.events;
 
-      for (let j = 0; j < events.length; j++) {
-        if (events[j].time > windowEndTime) {
+      for (const event of events) {
+        if (event.time > windowEndTime) {
           return;
         }
 
-        if (events[j].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
+        if (event.time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
           // Avoid setting the font if we don't draw any events
           if (shouldSetFont) {
             canvasContext.fillStyle = ThemeColors.getGraphText();
@@ -676,7 +676,7 @@ export function FlightLogGrapher(
             shouldSetFont = false;
           }
 
-          drawEvent(events[j], sequenceNum++);
+          drawEvent(event, sequenceNum++);
         }
       }
     }
@@ -711,11 +711,10 @@ export function FlightLogGrapher(
           );
         }
 
+        const timeDelta = windowCenterTime - markerEvent.time;
         const markerFrequency =
-          (windowCenterTime - markerEvent.time).toFixed(0) !== 0
-            ? `${(1000000 / (windowCenterTime - markerEvent.time)).toFixed(
-                0,
-              )}Hz`
+          timeDelta !== 0
+            ? `${(1000000 / timeDelta).toFixed(0)}Hz`
             : "";
         drawEvent(
           {
@@ -839,9 +838,9 @@ export function FlightLogGrapher(
     canvas.height = height;
 
     const sticksHeight =
-      (canvas.height * parseInt(options.sticks.size, 10)) / 2 / 100.0;
+      (canvas.height * Number.parseInt(options.sticks.size, 10)) / 2 / 100;
     // The total width available to draw both sticks in:
-    const sticksWidth = (canvas.width * parseInt(options.sticks.size, 10)) / 100.0;
+    const sticksWidth = (canvas.width * Number.parseInt(options.sticks.size, 10)) / 100;
 
     if (sticks) {
       sticks.resize(sticksWidth, sticksHeight);
@@ -859,7 +858,7 @@ export function FlightLogGrapher(
       0,
     )}px`;
 
-    const craftSize = canvas.height * (parseInt(options.craft.size, 10) / 100.0);
+    const craftSize = canvas.height * (Number.parseInt(options.craft.size, 10) / 100);
 
     if (craft2D) {
       craft2D.resize(craftSize, craftSize);
@@ -869,11 +868,11 @@ export function FlightLogGrapher(
 
     // Position the craft canvas according to options
     craftCanvas.style.left = `${Math.max(
-      (canvas.width * parseInt(options.craft.left, 10)) / 100.0 - craftSize / 2,
+      (canvas.width * Number.parseInt(options.craft.left, 10)) / 100 - craftSize / 2,
       0,
     )}px`;
     craftCanvas.style.top = `${Math.max(
-      (canvas.height * parseInt(options.craft.top, 10)) / 100.0 - craftSize / 2,
+      (canvas.height * Number.parseInt(options.craft.top, 10)) / 100 - craftSize / 2,
       0,
     )}px`;
 

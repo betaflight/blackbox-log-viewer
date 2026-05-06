@@ -60,13 +60,13 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     steps = 12;
   }
 
-  if (steps <= 2 || power === 1.0) {
+  if (steps <= 2 || power === 1) {
     //Curve is actually a straight line
     inputScale = outputRange / inputRange;
 
     this.lookup = lookupStraightLine;
   } else {
-    const stepSize = 1.0 / (steps - 1);
+    const stepSize = 1 / (steps - 1);
 
     curve = new Array(steps);
 

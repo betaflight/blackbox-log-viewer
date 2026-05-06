@@ -259,8 +259,8 @@ export function Craft2D(flightLog, canvas, propColors) {
     canvasContext.restore();
   };
 
-  for (let i = 0; i < propColors.length; i++) {
-    shadeColors.push(makeColorHalfStrength(propColors[i]));
+  for (const propColor of propColors) {
+    shadeColors.push(makeColorHalfStrength(propColor));
   }
 
   decide2DCraftParameters();

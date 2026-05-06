@@ -849,15 +849,15 @@ GraphSpectrumCalc._fft_segmented = function (
     }
 
     let fftLength;
-    if (pointsPerSegment !== samplesCount) {
-      fftLength = Math.floor(pointsPerSegment / 2);
-    } else {
+    if (pointsPerSegment === samplesCount) {
       // Extend the one segment input on power at 2 size
       const fftSize = this.getNearPower2Value(pointsPerSegment);
       const power2Input = new Float64Array(fftSize);
       power2Input.set(fftInput);
       fftInput = power2Input;
       fftLength = fftSize / 2;
+    } else {
+      fftLength = Math.floor(pointsPerSegment / 2);
     }
 
     const fftComplex = this._fft(fftInput);

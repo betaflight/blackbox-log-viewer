@@ -50,7 +50,7 @@ export function GraphConfig(graphConfig) {
     const setupColor = field?.color === -1;
     if (matches) {
       const nameRoot = matches[1],
-        nameRegex = new RegExp(`^${escapeRegExp(nameRoot)}\\[[0-9]+\\]$`);
+        nameRegex = new RegExp(String.raw`^${escapeRegExp(nameRoot)}\[[0-9]+\]$`);
       let colorIndex = 0;
       for (const fieldName of logFieldNames) {
         if (fieldName.match(nameRegex)) {
@@ -101,9 +101,8 @@ export function GraphConfig(graphConfig) {
     );
     if (field.curve === undefined || forceNewCurve) {
       field.curve = defaultCurve;
-    } else {
-      if (field.curve.MinMax === undefined)
-        field.curve.MinMax = defaultCurve.MinMax;
+    } else if (field.curve.MinMax === undefined) {
+      field.curve.MinMax = defaultCurve.MinMax;
     }
 
     if (field.smoothing === undefined) {
@@ -1551,8 +1550,8 @@ GraphConfig.getMinMaxForFieldDuringMarkedInterval = function (
 ) {
   let minTime = logGrapher.getMarkedInTime();
   let maxTime = logGrapher.getMarkedOutTime();
-  if (minTime === false) minTime = flightLog.getMinTime();
-  if (maxTime === false) maxTime = flightLog.getMaxTime();
+  if (minTime === false) { minTime = flightLog.getMinTime(); }
+  if (maxTime === false) { maxTime = flightLog.getMaxTime(); }
 
   const mm = flightLog.getMinMaxForFieldDuringTimeInterval(
     fieldName,

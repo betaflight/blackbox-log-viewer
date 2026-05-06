@@ -11,7 +11,7 @@ export function IMU(copyFrom) {
     //Settings that would normally be set by the user in MW config:
     gyro_cmpf_factor = 600,
     magneticDeclination = 0, // user to set to local declination in degrees * 10
-    INV_GYR_CMPF_FACTOR = 1.0 / (gyro_cmpf_factor + 1.0);
+    INV_GYR_CMPF_FACTOR = 1 / (gyro_cmpf_factor + 1);
 
   // **************************************************
   // Simplified IMU based on "Complementary Filter"
@@ -28,7 +28,7 @@ export function IMU(copyFrom) {
   // **************************************************
 
   function normalizeVector(src, dest) {
-    const length = Math.sqrt(src.X * src.X + src.Y * src.Y + src.Z * src.Z);
+    const length = Math.hypot(src.X, src.Y, src.Z);
 
     if (length !== 0) {
       dest.X = src.X / length;

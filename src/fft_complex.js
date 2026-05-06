@@ -278,7 +278,7 @@ export function FFTComplex(n, inverse) {
     throw new RangeError("FFTComplex requires both `n` and `inverse` arguments");
   }
 
-  n = ~~n;
+  n = Math.trunc(n);
   inverse = !!inverse;
 
   if (n < 1) {
@@ -328,8 +328,7 @@ export function FFTComplex(n, inverse) {
 
     n /= p;
 
-    state.factors.push(p);
-    state.factors.push(n);
+    state.factors.push(p, n);
   }
 
   this.state = state;
@@ -387,38 +386,36 @@ FFTComplex.prototype.process = function (
       this.state.factors.slice(),
       this.state,
     );
-  } else {
-    if (input === output) {
-      work(
-        this.state.scratch,
-        0,
-        1,
-        input,
-        inputOffset,
-        1,
-        inputStride,
-        this.state.factors.slice(),
-        this.state,
-      );
+  } else if (input === output) {
+    work(
+      this.state.scratch,
+      0,
+      1,
+      input,
+      inputOffset,
+      1,
+      inputStride,
+      this.state.factors.slice(),
+      this.state,
+    );
 
-      for (let i = 0; i < this.state.n; i++) {
-        const x0_r = this.state.scratch[2 * i],
-          x0_i = this.state.scratch[2 * i + 1];
-        output[2 * (outputOffset + outputStride * i)] = x0_r;
-        output[2 * (outputOffset + outputStride * i) + 1] = x0_i;
-      }
-    } else {
-      work(
-        output,
-        outputOffset,
-        outputStride,
-        input,
-        inputOffset,
-        1,
-        inputStride,
-        this.state.factors.slice(),
-        this.state,
-      );
+    for (let i = 0; i < this.state.n; i++) {
+      const x0_r = this.state.scratch[2 * i],
+        x0_i = this.state.scratch[2 * i + 1];
+      output[2 * (outputOffset + outputStride * i)] = x0_r;
+      output[2 * (outputOffset + outputStride * i) + 1] = x0_i;
     }
+  } else {
+    work(
+      output,
+      outputOffset,
+      outputStride,
+      input,
+      inputOffset,
+      1,
+      inputStride,
+      this.state.factors.slice(),
+      this.state,
+    );
   }
 };

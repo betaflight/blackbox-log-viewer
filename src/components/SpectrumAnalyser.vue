@@ -141,11 +141,11 @@ watch(zoomX, (val) => getAnalyser()?.setZoomX(val));
 watch(zoomY, (val) => getAnalyser()?.setZoomY(val));
 watch(minPSD, (val) => {
   getAnalyser()?.setMinPSD(val);
-  if (lowLevelPSD.value < val) lowLevelPSD.value = val;
+  if (lowLevelPSD.value < val) { lowLevelPSD.value = val; }
 });
 watch(maxPSD, (val) => {
   getAnalyser()?.setMaxPSD(val);
-  if (lowLevelPSD.value > val) lowLevelPSD.value = val;
+  if (lowLevelPSD.value > val) { lowLevelPSD.value = val; }
 });
 watch(lowLevelPSD, (val) => getAnalyser()?.setLowLevelPSD(val));
 watch(segmentLength, (val) => getAnalyser()?.setSegmentLength(val));

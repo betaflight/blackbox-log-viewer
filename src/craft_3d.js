@@ -160,8 +160,7 @@ export function Craft3D(flightLog, canvas, propColors) {
       armVectorY *= ARM_LENGTH;
 
       // Draw one half of the arm:
-      for (let j = 0; j < armPoints.length; j++) {
-        const point = armPoints[j];
+      for (const point of armPoints) {
         path.lineTo(
           point.length * armVectorX - point.width * crossArmX,
           point.length * armVectorY - point.width * crossArmY,
