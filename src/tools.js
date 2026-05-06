@@ -6,19 +6,19 @@ import {
 
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
 export function hexToFloat(string) {
-  let arr = new Uint32Array(1);
+  const arr = new Uint32Array(1);
   arr[0] = parseInt(string, 16);
 
-  let floatArr = new Float32Array(arr.buffer);
+  const floatArr = new Float32Array(arr.buffer);
 
   return floatArr[0];
 }
 
 export function uint32ToFloat(value) {
-  let arr = new Uint32Array(1);
+  const arr = new Uint32Array(1);
   arr[0] = value;
 
-  let floatArr = new Float32Array(arr.buffer);
+  const floatArr = new Float32Array(arr.buffer);
 
   return floatArr[0];
 }
@@ -28,7 +28,7 @@ export function asciiArrayToString(arr) {
 }
 
 export function asciiStringToByteArray(s) {
-  let bytes = [];
+  const bytes = [];
 
   for (let i = 0; i < s.length; i++) bytes.push(s.charCodeAt(i));
 
@@ -240,7 +240,7 @@ export function stringLoopTime(
 
 export function stringTimetoMsec(input) {
   try {
-    let matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
+    const matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
 
     if (matches.length > 2) {
       // there is a placeholder - either : or .
@@ -283,8 +283,8 @@ export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
   if (typeof radius === "number") {
     radius = { tl: radius, tr: radius, br: radius, bl: radius };
   } else {
-    let defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
-    for (let side in defaultRadius) {
+    const defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
+    for (const side in defaultRadius) {
       radius[side] = radius[side] || defaultRadius[side];
     }
   }
@@ -370,7 +370,7 @@ export const mouseNotification = {
     let popupRect = this.elem.getBoundingClientRect();
     const targetEl =
       target instanceof Element ? target : document.querySelector(target);
-    let targetRect = targetEl.getBoundingClientRect();
+    const targetRect = targetEl.getBoundingClientRect();
 
     // reposition the notification
     if (align != null) {

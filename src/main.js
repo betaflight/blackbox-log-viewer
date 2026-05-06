@@ -52,7 +52,7 @@ function BlackboxLogViewer() {
     );
   }
 
-  let GRAPH_STATE_PAUSED = 0,
+  const GRAPH_STATE_PAUSED = 0,
     GRAPH_STATE_PLAY = 1,
     SMALL_JUMP_TIME = 100 * 1000,
     PLAYBACK_MIN_RATE = 10,
@@ -226,11 +226,11 @@ function BlackboxLogViewer() {
   }
 
   function updateValuesChart() {
-    let frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
+    const frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
       fieldNames = flightLog.getMainFieldNames();
 
     if (frame) {
-      let currentFlightMode =
+      const currentFlightMode =
         frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
 
       if (graphStore.hasTableOverlay) {
@@ -296,7 +296,7 @@ function BlackboxLogViewer() {
   updateValuesChartRateLimited = throttle(250, updateValuesChart);
 
   function animationLoop() {
-    let now = Date.now();
+    const now = Date.now();
 
     if (!graph) {
       animationFrameIsQueued = false;
@@ -1250,19 +1250,19 @@ function BlackboxLogViewer() {
       }
     };
 
-    let logSyncHere = function () {
+    const logSyncHere = function () {
       setVideoOffset(video.currentTime, true);
     };
 
-    let logSyncBack = function () {
+    const logSyncBack = function () {
       setVideoOffset(videoOffset - 1 / 15, true);
     };
 
-    let logSyncForward = function () {
+    const logSyncForward = function () {
       setVideoOffset(videoOffset + 1 / 15, true);
     };
 
-    let logSmartSync = function () {
+    const logSmartSync = function () {
       if (hasMarker && hasVideo && hasLog) {
         try {
           setVideoOffset(

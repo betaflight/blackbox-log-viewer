@@ -67,7 +67,7 @@ export function FlightLog(logData) {
    * was encountered.
    */
   this.getLogError = function (logIndex) {
-    let error = logIndexes.getIntraframeDirectory(logIndex).error;
+    const error = logIndexes.getIntraframeDirectory(logIndex).error;
 
     if (error) return error;
 
@@ -94,7 +94,7 @@ export function FlightLog(logData) {
    * that the flightlog presents as one merged frame.
    */
   this.getStats = function (logIndex) {
-    let rawStats = getRawStats(logIndex);
+    const rawStats = getRawStats(logIndex);
 
     if (rawStats.field === undefined) {
       rawStats.field = [];
@@ -168,7 +168,7 @@ export function FlightLog(logData) {
    * Return a coarse summary of throttle position and events across the entire log.
    */
   this.getActivitySummary = function () {
-    let directory = logIndexes.getIntraframeDirectory(logIndex);
+    const directory = logIndexes.getIntraframeDirectory(logIndex);
 
     return {
       times: directory.times,
@@ -191,7 +191,7 @@ export function FlightLog(logData) {
   };
 
   this.getFrameAtTime = function (startTime) {
-    let chunks = this.getChunksInTimeRange(startTime, startTime),
+    const chunks = this.getChunksInTimeRange(startTime, startTime),
       chunk = chunks[0];
 
     if (chunk) {
@@ -210,7 +210,7 @@ export function FlightLog(logData) {
   };
 
   this.getSmoothedFrameAtTime = function (startTime) {
-    let chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
+    const chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
       chunk = chunks[0];
 
     if (chunk) {
@@ -229,7 +229,7 @@ export function FlightLog(logData) {
   };
 
   this.getCurrentFrameAtTime = function (startTime) {
-    let chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
+    const chunks = this.getSmoothedChunksInTimeRange(startTime, startTime),
       chunk = chunks[0];
 
     if (chunk) {
@@ -370,7 +370,7 @@ export function FlightLog(logData) {
    * When the cache misses, this will result in parsing the original log file to create chunks.
    */
   function getChunksInIndexRange(startIndex, endIndex) {
-    let resultChunks = [],
+    const resultChunks = [],
       eventNeedsTimestamp = [];
 
     if (startIndex < 0) startIndex = 0;
@@ -396,7 +396,7 @@ export function FlightLog(logData) {
       // Did we cache this chunk already?
       if (chunk) {
         // Use the first event in the chunk to fill in event times at the trailing end of the previous one
-        let frame = chunk.frames[0];
+        const frame = chunk.frames[0];
 
         for (let i = 0; i < eventNeedsTimestamp.length; i++) {
           eventNeedsTimestamp[i].time =
@@ -467,7 +467,7 @@ export function FlightLog(logData) {
               case "I": {
                 //The parser re-uses the "frame" array so we must copy that data somewhere else
 
-                let numOutputFields =
+                const numOutputFields =
                   frame.length +
                   slowFrameLength +
                   lastGPSLength +
@@ -612,7 +612,7 @@ export function FlightLog(logData) {
    * Each chunk is an array of log frames.
    */
   this.getChunksInTimeRange = function (startTime, endTime) {
-    let startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime),
+    const startIndex = binarySearchOrPrevious(iframeDirectory.times, startTime),
       endIndex = binarySearchOrPrevious(iframeDirectory.times, endTime);
 
     return getChunksInIndexRange(startIndex, endIndex);
@@ -628,7 +628,7 @@ export function FlightLog(logData) {
 
     maxSmoothing = 0;
 
-    for (let fieldIndex in newSmoothing) {
+    for (const fieldIndex in newSmoothing) {
       if (newSmoothing[fieldIndex] > maxSmoothing) {
         maxSmoothing = newSmoothing[fieldIndex];
       }
@@ -774,7 +774,7 @@ export function FlightLog(logData) {
       destChunkIndex < destChunks.length;
       sourceChunkIndex++, destChunkIndex++
     ) {
-      let destChunk = destChunks[destChunkIndex],
+      const destChunk = destChunks[destChunkIndex],
         sourceChunk = sourceChunks[sourceChunkIndex];
 
       if (!destChunk.hasAdditionalFields) {
@@ -816,8 +816,8 @@ export function FlightLog(logData) {
               wy = q.w * q.y,
               zz = q.z ** 2,
               wz = q.w * q.z;
-            let roll = Math.atan2(+2.0 * (wx + yz), +1.0 - 2.0 * (xx + yy));
-            let pitch = 0.5 * Math.PI - Math.acos(+2.0 * (wy - xz));
+            const roll = Math.atan2(+2.0 * (wx + yz), +1.0 - 2.0 * (xx + yy));
+            const pitch = 0.5 * Math.PI - Math.acos(+2.0 * (wy - xz));
             let heading = -Math.atan2(+2.0 * (wz + xy), +1.0 - 2.0 * (yy + zz));
             if (heading < 0) {
               heading += 2.0 * Math.PI;
@@ -869,7 +869,7 @@ export function FlightLog(logData) {
                   : 0);
 
               // Limit the PID sum by the limits defined in the header
-              let pidLimit =
+              const pidLimit =
                 axis < AXIS.YAW
                   ? sysConfig.pidSumLimit
                   : sysConfig.pidSumLimitYaw;
@@ -883,10 +883,10 @@ export function FlightLog(logData) {
           }
 
           // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
-          let currentFlightMode = srcFrame[flightModeFlagsIndex];
+          const currentFlightMode = srcFrame[flightModeFlagsIndex];
 
           // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
-          let fieldIndexRcCommands = fieldIndex;
+          const fieldIndexRcCommands = fieldIndex;
 
           if (!that.isFieldDisabled().SETPOINT) {
             // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
@@ -930,7 +930,7 @@ export function FlightLog(logData) {
             !that.isFieldDisabled().SETPOINT
           ) {
             for (let axis = 0; axis < 3; axis++) {
-              let gyroADCdegrees =
+              const gyroADCdegrees =
                 gyroADC[axis] !== undefined
                   ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]])
                   : 0;
@@ -1006,17 +1006,17 @@ export function FlightLog(logData) {
      * If we're at the end of the file then we will compute event times for the last chunk, otherwise we'll
      * wait until we have the next chunk to fill in times for this last chunk.
      */
-    let endChunk = processLastChunk ? chunks.length : chunks.length - 1;
+    const endChunk = processLastChunk ? chunks.length : chunks.length - 1;
 
     for (let i = 0; i < endChunk; i++) {
-      let chunk = chunks[i];
+      const chunk = chunks[i];
 
       if (chunk.needsEventTimes) {
         // What is the time of the next frame after the chunk with the trailing events? We'll use that for the event times
         let nextTime;
 
         if (i + 1 < chunks.length) {
-          let nextChunk = chunks[i + 1];
+          const nextChunk = chunks[i + 1];
 
           nextTime =
             nextChunk.frames[0][
@@ -1173,7 +1173,7 @@ export function FlightLog(logData) {
     }
 
     if (!allDone) {
-      for (let fieldIndex in fieldSmoothing) {
+      for (const fieldIndex in fieldSmoothing) {
         let radius = fieldSmoothing[fieldIndex],
           //The position we're currently computing the smoothed value for:
           centerChunkIndex,
@@ -1223,7 +1223,7 @@ export function FlightLog(logData) {
               leftFrameIndex > 0 ||
               (leftFrameIndex === 0 && leftChunkIndex > 0)
             ) {
-              let oldleftChunkIndex = leftChunkIndex,
+              const oldleftChunkIndex = leftChunkIndex,
                 oldleftFrameIndex = leftFrameIndex;
 
               //Try moving it left
@@ -1398,7 +1398,7 @@ export function FlightLog(logData) {
       min = Number.MAX_VALUE,
       max = -Number.MAX_VALUE;
 
-    let fieldIndex = this.getMainFieldIndexByName(field_name),
+    const fieldIndex = this.getMainFieldIndexByName(field_name),
       fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
 
     if (fieldStat) {
@@ -1431,7 +1431,7 @@ export function FlightLog(logData) {
     start_time,
     end_time,
   ) {
-    let chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
+    const chunks = this.getSmoothedChunksInTimeRange(start_time, end_time);
     let startFrameIndex;
     let minValue = Number.MAX_VALUE,
       maxValue = -Number.MAX_VALUE;
@@ -1511,18 +1511,18 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
   axis,
   currentFlightMode,
 ) {
-  let sysConfig = this.getSysConfig();
+  const sysConfig = this.getSysConfig();
 
   if (firmwareGreaterOrEqual(sysConfig, "3.0.0", "2.0.0")) {
     const RC_RATE_INCREMENTAL = 14.54;
     const RC_EXPO_POWER = 3;
 
-    let calculateSetpointRate = function (axis, rc) {
+    const calculateSetpointRate = function (axis, rc) {
       let rcCommandf = rc / 500.0;
-      let rcCommandfAbs = Math.abs(rcCommandf);
+      const rcCommandfAbs = Math.abs(rcCommandf);
 
       if (sysConfig["rc_expo"][axis]) {
-        let expof = sysConfig["rc_expo"][axis] / 100;
+        const expof = sysConfig["rc_expo"][axis] / 100;
         rcCommandf =
           rcCommandf * Math.pow(rcCommandfAbs, RC_EXPO_POWER) * expof +
           rcCommandf * (1 - expof);
@@ -1535,7 +1535,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
 
       let angleRate = 200.0 * rcRate * rcCommandf;
       if (sysConfig.rates[axis]) {
-        let rcSuperfactor =
+        const rcSuperfactor =
           1.0 /
           constrain(
             1.0 - rcCommandfAbs * (sysConfig.rates[axis] / 100.0),
@@ -1551,7 +1551,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
             }
             */
 
-      let limit = sysConfig["rate_limits"][axis];
+      const limit = sysConfig["rate_limits"][axis];
       if (sysConfig.pidController == 0 || limit == null) {
         /* LEGACY */
         return constrain(angleRate * 4.1, -8190.0, 8190.0) >> 2; // Rate limit protection
@@ -1562,13 +1562,13 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
 
     return calculateSetpointRate(axis, value);
   } else if (firmwareGreaterOrEqual(sysConfig, "2.8.0")) {
-    let isSuperExpoActive = function () {
-      let FEATURE_SUPEREXPO_RATES = 1 << 23;
+    const isSuperExpoActive = function () {
+      const FEATURE_SUPEREXPO_RATES = 1 << 23;
 
       return sysConfig.features & FEATURE_SUPEREXPO_RATES;
     };
 
-    let calculateRate = function (value, axis) {
+    const calculateRate = function (value, axis) {
       let angleRate;
 
       if (isSuperExpoActive()) {
@@ -1601,7 +1601,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
 
     const that = this;
 
-    let calculateExpoPlus = function (value, axis) {
+    const calculateExpoPlus = function (value, axis) {
       let propFactor;
       let superExpoFactor;
 
@@ -1751,7 +1751,7 @@ FlightLog.prototype.getReferenceVoltageMillivolts = function () {
 };
 
 FlightLog.prototype.vbatADCToMillivolts = function (vbatADC) {
-  let ADCVREF = 33;
+  const ADCVREF = 33;
 
   // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
   return (vbatADC * ADCVREF * 10 * this.getSysConfig().vbatscale) / 0xfff;

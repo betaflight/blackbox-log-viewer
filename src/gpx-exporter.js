@@ -7,7 +7,7 @@ export function GpxExporter(flightLog) {
    * @param {function} success is a callback triggered when export is done
    */
   function dump(success) {
-    let frames = flightLog
+    const frames = flightLog
         .getChunksInTimeRange(
           flightLog.getMinTime(),
           flightLog.getMaxTime(),

@@ -20,23 +20,23 @@
  */
 
 function butterfly2(output, outputOffset, outputStride, fStride, state, m) {
-  let t = state.twiddle;
+  const t = state.twiddle;
 
   for (let i = 0; i < m; i++) {
-    let s0_r = output[2 * (outputOffset + outputStride * i)],
+    const s0_r = output[2 * (outputOffset + outputStride * i)],
       s0_i = output[2 * (outputOffset + outputStride * i) + 1];
-    let s1_r = output[2 * (outputOffset + outputStride * (i + m))],
+    const s1_r = output[2 * (outputOffset + outputStride * (i + m))],
       s1_i = output[2 * (outputOffset + outputStride * (i + m)) + 1];
 
-    let t1_r = t[2 * fStride * i],
+    const t1_r = t[2 * fStride * i],
       t1_i = t[2 * fStride * i + 1];
 
-    let v1_r = s1_r * t1_r - s1_i * t1_i,
+    const v1_r = s1_r * t1_r - s1_i * t1_i,
       v1_i = s1_r * t1_i + s1_i * t1_r;
 
-    let r0_r = s0_r + v1_r,
+    const r0_r = s0_r + v1_r,
       r0_i = s0_i + v1_i;
-    let r1_r = s0_r - v1_r,
+    const r1_r = s0_r - v1_r,
       r1_i = s0_i - v1_i;
 
     output[2 * (outputOffset + outputStride * i)] = r0_r;
@@ -47,102 +47,102 @@ function butterfly2(output, outputOffset, outputStride, fStride, state, m) {
 }
 
 function butterfly3(output, outputOffset, outputStride, fStride, state, m) {
-  let t = state.twiddle;
-  let m1 = m,
+  const t = state.twiddle;
+  const m1 = m,
     m2 = 2 * m;
-  let fStride1 = fStride,
+  const fStride1 = fStride,
     fStride2 = 2 * fStride;
 
-  let e = t[2 * fStride * m + 1];
+  const e = t[2 * fStride * m + 1];
 
   for (let i = 0; i < m; i++) {
-    let s0_r = output[2 * (outputOffset + outputStride * i)],
+    const s0_r = output[2 * (outputOffset + outputStride * i)],
       s0_i = output[2 * (outputOffset + outputStride * i) + 1];
 
-    let s1_r = output[2 * (outputOffset + outputStride * (i + m1))],
+    const s1_r = output[2 * (outputOffset + outputStride * (i + m1))],
       s1_i = output[2 * (outputOffset + outputStride * (i + m1)) + 1];
-    let t1_r = t[2 * fStride1 * i],
+    const t1_r = t[2 * fStride1 * i],
       t1_i = t[2 * fStride1 * i + 1];
-    let v1_r = s1_r * t1_r - s1_i * t1_i,
+    const v1_r = s1_r * t1_r - s1_i * t1_i,
       v1_i = s1_r * t1_i + s1_i * t1_r;
 
-    let s2_r = output[2 * (outputOffset + outputStride * (i + m2))],
+    const s2_r = output[2 * (outputOffset + outputStride * (i + m2))],
       s2_i = output[2 * (outputOffset + outputStride * (i + m2)) + 1];
-    let t2_r = t[2 * fStride2 * i],
+    const t2_r = t[2 * fStride2 * i],
       t2_i = t[2 * fStride2 * i + 1];
-    let v2_r = s2_r * t2_r - s2_i * t2_i,
+    const v2_r = s2_r * t2_r - s2_i * t2_i,
       v2_i = s2_r * t2_i + s2_i * t2_r;
 
-    let i0_r = v1_r + v2_r,
+    const i0_r = v1_r + v2_r,
       i0_i = v1_i + v2_i;
 
-    let r0_r = s0_r + i0_r,
+    const r0_r = s0_r + i0_r,
       r0_i = s0_i + i0_i;
     output[2 * (outputOffset + outputStride * i)] = r0_r;
     output[2 * (outputOffset + outputStride * i) + 1] = r0_i;
 
-    let i1_r = s0_r - i0_r * 0.5;
-    let i1_i = s0_i - i0_i * 0.5;
+    const i1_r = s0_r - i0_r * 0.5;
+    const i1_i = s0_i - i0_i * 0.5;
 
-    let i2_r = (v1_r - v2_r) * e;
-    let i2_i = (v1_i - v2_i) * e;
+    const i2_r = (v1_r - v2_r) * e;
+    const i2_i = (v1_i - v2_i) * e;
 
-    let r1_r = i1_r - i2_i;
-    let r1_i = i1_i + i2_r;
+    const r1_r = i1_r - i2_i;
+    const r1_i = i1_i + i2_r;
     output[2 * (outputOffset + outputStride * (i + m1))] = r1_r;
     output[2 * (outputOffset + outputStride * (i + m1)) + 1] = r1_i;
 
-    let r2_r = i1_r + i2_i;
-    let r2_i = i1_i - i2_r;
+    const r2_r = i1_r + i2_i;
+    const r2_i = i1_i - i2_r;
     output[2 * (outputOffset + outputStride * (i + m2))] = r2_r;
     output[2 * (outputOffset + outputStride * (i + m2)) + 1] = r2_i;
   }
 }
 
 function butterfly4(output, outputOffset, outputStride, fStride, state, m) {
-  let t = state.twiddle;
-  let m1 = m,
+  const t = state.twiddle;
+  const m1 = m,
     m2 = 2 * m,
     m3 = 3 * m;
-  let fStride1 = fStride,
+  const fStride1 = fStride,
     fStride2 = 2 * fStride,
     fStride3 = 3 * fStride;
 
   for (let i = 0; i < m; i++) {
-    let s0_r = output[2 * (outputOffset + outputStride * i)],
+    const s0_r = output[2 * (outputOffset + outputStride * i)],
       s0_i = output[2 * (outputOffset + outputStride * i) + 1];
 
-    let s1_r = output[2 * (outputOffset + outputStride * (i + m1))],
+    const s1_r = output[2 * (outputOffset + outputStride * (i + m1))],
       s1_i = output[2 * (outputOffset + outputStride * (i + m1)) + 1];
-    let t1_r = t[2 * fStride1 * i],
+    const t1_r = t[2 * fStride1 * i],
       t1_i = t[2 * fStride1 * i + 1];
-    let v1_r = s1_r * t1_r - s1_i * t1_i,
+    const v1_r = s1_r * t1_r - s1_i * t1_i,
       v1_i = s1_r * t1_i + s1_i * t1_r;
 
-    let s2_r = output[2 * (outputOffset + outputStride * (i + m2))],
+    const s2_r = output[2 * (outputOffset + outputStride * (i + m2))],
       s2_i = output[2 * (outputOffset + outputStride * (i + m2)) + 1];
-    let t2_r = t[2 * fStride2 * i],
+    const t2_r = t[2 * fStride2 * i],
       t2_i = t[2 * fStride2 * i + 1];
-    let v2_r = s2_r * t2_r - s2_i * t2_i,
+    const v2_r = s2_r * t2_r - s2_i * t2_i,
       v2_i = s2_r * t2_i + s2_i * t2_r;
 
-    let s3_r = output[2 * (outputOffset + outputStride * (i + m3))],
+    const s3_r = output[2 * (outputOffset + outputStride * (i + m3))],
       s3_i = output[2 * (outputOffset + outputStride * (i + m3)) + 1];
-    let t3_r = t[2 * fStride3 * i],
+    const t3_r = t[2 * fStride3 * i],
       t3_i = t[2 * fStride3 * i + 1];
-    let v3_r = s3_r * t3_r - s3_i * t3_i,
+    const v3_r = s3_r * t3_r - s3_i * t3_i,
       v3_i = s3_r * t3_i + s3_i * t3_r;
 
-    let i0_r = s0_r + v2_r,
+    const i0_r = s0_r + v2_r,
       i0_i = s0_i + v2_i;
-    let i1_r = s0_r - v2_r,
+    const i1_r = s0_r - v2_r,
       i1_i = s0_i - v2_i;
-    let i2_r = v1_r + v3_r,
+    const i2_r = v1_r + v3_r,
       i2_i = v1_i + v3_i;
-    let i3_r = v1_r - v3_r,
+    const i3_r = v1_r - v3_r,
       i3_i = v1_i - v3_i;
 
-    let r0_r = i0_r + i2_r,
+    const r0_r = i0_r + i2_r,
       r0_i = i0_i + i2_i;
 
     let r1_r, r1_i;
@@ -154,7 +154,7 @@ function butterfly4(output, outputOffset, outputStride, fStride, state, m) {
       r1_i = i1_i - i3_r;
     }
 
-    let r2_r = i0_r - i2_r,
+    const r2_r = i0_r - i2_r,
       r2_i = i0_i - i2_i;
 
     let r3_r, r3_i;
@@ -178,13 +178,13 @@ function butterfly4(output, outputOffset, outputStride, fStride, state, m) {
 }
 
 function butterfly(output, outputOffset, outputStride, fStride, state, m, p) {
-  let t = state.twiddle,
+  const t = state.twiddle,
     n = state.n,
     scratch = new Float64Array(2 * p);
 
   for (let u = 0; u < m; u++) {
     for (let q1 = 0, k = u; q1 < p; q1++, k += m) {
-      let x0_r = output[2 * (outputOffset + outputStride * k)],
+      const x0_r = output[2 * (outputOffset + outputStride * k)],
         x0_i = output[2 * (outputOffset + outputStride * k) + 1];
       scratch[2 * q1] = x0_r;
       scratch[2 * q1 + 1] = x0_i;
@@ -193,7 +193,7 @@ function butterfly(output, outputOffset, outputStride, fStride, state, m, p) {
     for (let q1 = 0, k = u; q1 < p; q1++, k += m) {
       let tOffset = 0;
 
-      let x0_r = scratch[0],
+      const x0_r = scratch[0],
         x0_i = scratch[1];
       output[2 * (outputOffset + outputStride * k)] = x0_r;
       output[2 * (outputOffset + outputStride * k) + 1] = x0_i;
@@ -201,17 +201,17 @@ function butterfly(output, outputOffset, outputStride, fStride, state, m, p) {
       for (let q = 1; q < p; q++) {
         tOffset = (tOffset + fStride * k) % n;
 
-        let s0_r = output[2 * (outputOffset + outputStride * k)],
+        const s0_r = output[2 * (outputOffset + outputStride * k)],
           s0_i = output[2 * (outputOffset + outputStride * k) + 1];
 
-        let s1_r = scratch[2 * q],
+        const s1_r = scratch[2 * q],
           s1_i = scratch[2 * q + 1];
-        let t1_r = t[2 * tOffset],
+        const t1_r = t[2 * tOffset],
           t1_i = t[2 * tOffset + 1];
-        let v1_r = s1_r * t1_r - s1_i * t1_i,
+        const v1_r = s1_r * t1_r - s1_i * t1_i,
           v1_i = s1_r * t1_i + s1_i * t1_r;
 
-        let r0_r = s0_r + v1_r,
+        const r0_r = s0_r + v1_r,
           r0_i = s0_i + v1_i;
         output[2 * (outputOffset + outputStride * k)] = r0_r;
         output[2 * (outputOffset + outputStride * k) + 1] = r0_i;
@@ -231,12 +231,12 @@ function work(
   factors,
   state,
 ) {
-  let p = factors.shift();
-  let m = factors.shift();
+  const p = factors.shift();
+  const m = factors.shift();
 
   if (m == 1) {
     for (let i = 0; i < p * m; i++) {
-      let x0_r = f[2 * (fOffset + fStride * inputStride * i)],
+      const x0_r = f[2 * (fOffset + fStride * inputStride * i)],
         x0_i = f[2 * (fOffset + fStride * inputStride * i) + 1];
       output[2 * (outputOffset + outputStride * i)] = x0_r;
       output[2 * (outputOffset + outputStride * i) + 1] = x0_i;
@@ -289,7 +289,7 @@ export function FFTComplex(n, inverse) {
     );
   }
 
-  let state = {
+  const state = {
     n: n,
     inverse: inverse,
     factors: [],
@@ -297,11 +297,11 @@ export function FFTComplex(n, inverse) {
     scratch: new Float64Array(2 * n),
   };
 
-  let t = state.twiddle,
+  const t = state.twiddle,
     theta = (2 * Math.PI) / n;
 
   for (let i = 0; i < n; i++) {
-    let phase = inverse ? theta * i : -theta * i;
+    const phase = inverse ? theta * i : -theta * i;
     t[2 * i] = Math.cos(phase);
     t[2 * i + 1] = Math.sin(phase);
   }
@@ -353,7 +353,7 @@ FFTComplex.prototype.process = function (
   outputStride = ~~outputStride;
   inputStride = ~~inputStride;
 
-  let type = t == "real" ? t : "complex";
+  const type = t == "real" ? t : "complex";
 
   if (outputStride < 1) {
     throw new RangeError(
@@ -373,7 +373,7 @@ FFTComplex.prototype.process = function (
 
   if (type == "real") {
     for (let i = 0; i < this.state.n; i++) {
-      let x0_r = input[inputOffset + inputStride * i];
+      const x0_r = input[inputOffset + inputStride * i];
       this.state.scratch[2 * i] = x0_r;
       this.state.scratch[2 * i + 1] = 0.0;
     }
@@ -404,7 +404,7 @@ FFTComplex.prototype.process = function (
       );
 
       for (let i = 0; i < this.state.n; i++) {
-        let x0_r = this.state.scratch[2 * i],
+        const x0_r = this.state.scratch[2 * i],
           x0_i = this.state.scratch[2 * i + 1];
         output[2 * (outputOffset + outputStride * i)] = x0_r;
         output[2 * (outputOffset + outputStride * i) + 1] = x0_i;

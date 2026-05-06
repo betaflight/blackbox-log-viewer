@@ -123,7 +123,7 @@ GraphSpectrumCalc.setPointsPerSegmentPSD = function (pointsCount) {
 GraphSpectrumCalc.dataLoadPSD = function (_analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
   const totalCount = flightSamples.count; // actual samples, not padded length
-  let pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);
+  const pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);
   // Non-overlapping when single full-segment; otherwise 75% overlap
   const overlapCount =
     pointsPerSegment === totalCount
@@ -441,7 +441,7 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
 };
 
 GraphSpectrumCalc._getFlightChunks = function () {
-  let logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
+  const logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
 
   let logEnd = this._analyserTimeRange.out || this._flightLog.getMaxTime();
 
@@ -536,7 +536,7 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
           chunk.frames[frameIndex][this._dataBuffer.fieldIndex];
       }
       for (let i = 0; i < vsIndexes.length; i++) {
-        let vsFieldIx = vsIndexes[i];
+        const vsFieldIx = vsIndexes[i];
         let value = chunk.frames[frameIndex][vsFieldIx];
         if (vsFieldNames == FIELD_RPM_NAMES) {
           const maxRPM = (MAX_RPM_HZ_VALUE * this._motorPoles) / 3.333;

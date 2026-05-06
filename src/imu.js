@@ -4,7 +4,7 @@
 
 export function IMU(copyFrom) {
   // Constants:
-  let RAD = Math.PI / 180.0,
+  const RAD = Math.PI / 180.0,
     ROLL = 0,
     PITCH = 1,
     YAW = 2,
@@ -28,7 +28,7 @@ export function IMU(copyFrom) {
   // **************************************************
 
   function normalizeVector(src, dest) {
-    let length = Math.sqrt(src.X * src.X + src.Y * src.Y + src.Z * src.Z);
+    const length = Math.sqrt(src.X * src.X + src.Y * src.Y + src.Z * src.Z);
 
     if (length !== 0) {
       dest.X = src.X / length;
@@ -155,7 +155,7 @@ export function IMU(copyFrom) {
         INV_GYR_CMPF_FACTOR;
     }
 
-    let attitude = {
+    const attitude = {
       roll: Math.atan2(this.estimateGyro.Y, this.estimateGyro.Z),
       pitch: Math.atan2(
         -this.estimateGyro.X,

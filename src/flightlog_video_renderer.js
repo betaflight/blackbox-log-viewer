@@ -127,14 +127,14 @@ export function FlightLogVideoRenderer(
      * I'd dearly like to run the rendering process in a Web Worker, but workers can't use Canvas because
      * it happens to be a DOM element (and Workers aren't allowed access to the DOM). Stupid!
      */
-    let framesToRender = Math.min(workChunkSize, frameCount - frameIndex);
+    const framesToRender = Math.min(workChunkSize, frameCount - frameIndex);
 
     if (cancel) {
       notifyCompletion(false);
       return;
     }
 
-    let completeChunk = function () {
+    const completeChunk = function () {
         if (events && events.onProgress) {
           events.onProgress(frameIndex, frameCount);
         }
@@ -169,7 +169,7 @@ export function FlightLogVideoRenderer(
       };
 
     if (logParameters.flightVideo) {
-      let renderFrames = function (frameCount) {
+      const renderFrames = function (frameCount) {
         if (frameCount == 0) {
           completeChunk();
           return;
@@ -259,7 +259,7 @@ export function FlightLogVideoRenderer(
     delete logParameters.flightVideo;
   }
 
-  let options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
+  const options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
 
   graph = new FlightLogGrapher(
     flightLog,
@@ -304,12 +304,12 @@ export function FlightLogVideoRenderer(
  * Is video rendering supported on this web browser? We require the ability to encode canvases to WebP.
  */
 FlightLogVideoRenderer.isSupported = function () {
-  let canvas = document.createElement("canvas");
+  const canvas = document.createElement("canvas");
 
   canvas.width = 16;
   canvas.height = 16;
 
-  let encoded = canvas.toDataURL("image/webp", { quality: 0.9 });
+  const encoded = canvas.toDataURL("image/webp", { quality: 0.9 });
 
   return encoded && encoded.match(/^data:image\/webp;/);
 };

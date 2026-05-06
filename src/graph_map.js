@@ -121,7 +121,7 @@ export function MapGrapher() {
     }
 
     this.setFlightLogIndexs();
-    let { latlngs, maxAlt, minAlt } = this.getPolylinesData();
+    const { latlngs, maxAlt, minAlt } = this.getPolylinesData();
 
     const hasGpsData = latlngs.length > 0;
 
@@ -153,7 +153,7 @@ export function MapGrapher() {
   };
 
   this.getPolylinesData = function () {
-    let latlngs = [];
+    const latlngs = [];
     let maxAlt = Number.MIN_VALUE;
     let minAlt = Number.MAX_VALUE;
 
@@ -199,7 +199,7 @@ export function MapGrapher() {
 
     const thresholdIncrement = delta / divider;
 
-    let altThresholds = [];
+    const altThresholds = [];
     let threshold = minAlt;
     for (let i = 0; i < divider; i++) {
       //amount of colors - min and max that are set

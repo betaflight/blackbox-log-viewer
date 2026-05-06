@@ -141,7 +141,7 @@ export function SeekBar(canvas) {
   };
 
   this.resize = function (width, height) {
-    let ratio = globalThis.devicePixelRatio ? globalThis.devicePixelRatio : 1;
+    const ratio = globalThis.devicePixelRatio ? globalThis.devicePixelRatio : 1;
 
     canvas.width = width * ratio;
     canvas.height = height * ratio;
@@ -279,7 +279,7 @@ export function SeekBar(canvas) {
         }
 
         if (outTime !== false) {
-          let barStartX = (outTime - min) / pixelTimeStep + BAR_INSET;
+          const barStartX = (outTime - min) / pixelTimeStep + BAR_INSET;
 
           backgroundContext.fillRect(
             barStartX,

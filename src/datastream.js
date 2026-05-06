@@ -1,6 +1,6 @@
 import { signExtend16Bit, signExtend8Bit } from "./tools";
 
-let EOF = -1;
+const EOF = -1;
 
 /*
  * Take an array of unsigned byte data and present it as a stream with various methods
@@ -94,7 +94,7 @@ ArrayDataStream.prototype.readUnsignedVB = function () {
 };
 
 ArrayDataStream.prototype.readSignedVB = function () {
-  let unsigned = this.readUnsignedVB();
+  const unsigned = this.readUnsignedVB();
 
   // Apply ZigZag decoding to recover the signed value
   return (unsigned >>> 1) ^ -(unsigned & 1);
@@ -112,21 +112,21 @@ ArrayDataStream.prototype.readString = function (length) {
 };
 
 ArrayDataStream.prototype.readS16 = function () {
-  let b1 = this.readByte(),
+  const b1 = this.readByte(),
     b2 = this.readByte();
 
   return signExtend16Bit(b1 | (b2 << 8));
 };
 
 ArrayDataStream.prototype.readU16 = function () {
-  let b1 = this.readByte(),
+  const b1 = this.readByte(),
     b2 = this.readByte();
 
   return b1 | (b2 << 8);
 };
 
 ArrayDataStream.prototype.readU32 = function () {
-  let b1 = this.readByte(),
+  const b1 = this.readByte(),
     b2 = this.readByte(),
     b3 = this.readByte(),
     b4 = this.readByte();

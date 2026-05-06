@@ -1,7 +1,7 @@
 import { formatTime, roundRect } from "./tools";
 
 export function LapTimer() {
-  let lapTime = {
+  const lapTime = {
     current: null,
     last: null,
     best: null,
@@ -26,9 +26,9 @@ export function LapTimer() {
 
   this.drawCanvas = function (canvas, options) {
     // Draw the LapTimes using a canvas
-    let ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
-    let lineHeight = 14, //px
+    const lineHeight = 14, //px
       DEFAULT_FONT_FACE = "8pt Verdana, Arial, sans-serif",
       fgColor = "rgba(191,191,191,1.0)", // Text and highlights color
       bgColor = `rgba(76,76,76,${
@@ -41,7 +41,7 @@ export function LapTimer() {
 
     ctx.save(); // Store the current canvas configuration
 
-    let firstColumnWidth = ctx.measureText("Current").width,
+    const firstColumnWidth = ctx.measureText("Current").width,
       secondColumn = ctx.measureText("XX:XX.XXX").width,
       width = margin + firstColumnWidth + margin + secondColumn + margin; // get the size of the box
 
@@ -127,7 +127,7 @@ export function LapTimer() {
 
     if (currentTime != null && bookmarkTimes != null)
       if (bookmarkTimes.length > 0) {
-        let bookmarkTimesSorted = bookmarkTimes.slice(0);
+        const bookmarkTimesSorted = bookmarkTimes.slice(0);
         bookmarkTimesSorted.push(maxTime); // add end time
         bookmarkTimesSorted.sort((a, b) => a - b); // sort on value (rather than default alphabetically)
 

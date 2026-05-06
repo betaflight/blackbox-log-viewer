@@ -37,6 +37,7 @@ export default [
       "no-dupe-keys": "warn",
       "no-irregular-whitespace": "warn",
       "no-case-declarations": "warn",
+      "prefer-const": "warn",
       "prefer-template": "warn",
       "comma-dangle": ["warn", "always-multiline"],
       semi: ["error", "always"],

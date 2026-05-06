@@ -1690,7 +1690,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case "eRPM[5]":
     case "eRPM[6]":
     case "eRPM[7]": {
-      let motor_poles = flightLog.getSysConfig()["motor_poles"];
+      const motor_poles = flightLog.getSysConfig()["motor_poles"];
       return `${((value * 200) / motor_poles).toFixed(0)} rpm / ${(
         (value * 3.333) /
         motor_poles
@@ -2382,7 +2382,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
 FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
   if (debugMode) {
     if (fieldName.includes("debug")) {
-      let debugModeName = DEBUG_MODE[debugMode];
+      const debugModeName = DEBUG_MODE[debugMode];
       let debugFields;
 
       if (debugModeName) {
@@ -2481,7 +2481,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
     case "eRPM[5]":
     case "eRPM[6]":
     case "eRPM[7]": {
-      let motor_poles = flightLog.getSysConfig()["motor_poles"];
+      const motor_poles = flightLog.getSysConfig()["motor_poles"];
       return toFriendly
         ? (value * 200) / motor_poles
         : (value * motor_poles) / 200;
@@ -2838,7 +2838,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value;
         }
       case "DSHOT_RPM_TELEMETRY": {
-        let pole = flightLog.getSysConfig()["motor_poles"];
+        const pole = flightLog.getSysConfig()["motor_poles"];
         return toFriendly ? (value * 200) / pole : (value * pole) / 200;
       }
       case "RPM_FILTER":

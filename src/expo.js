@@ -47,7 +47,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     }
 
     //Straight-line interpolation between the two curve points
-    let proportion = valueInCurve - prevStepIndex,
+    const proportion = valueInCurve - prevStepIndex,
       result =
         curve[prevStepIndex] +
         (curve[prevStepIndex + 1] - curve[prevStepIndex]) * proportion;

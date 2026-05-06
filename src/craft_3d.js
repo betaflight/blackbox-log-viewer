@@ -3,14 +3,14 @@ import { useSettingsStore } from "./stores/settings.js";
 export function Craft3D(flightLog, canvas, propColors) {
   const { userSettings } = useSettingsStore();
 
-  let // Sets the distance between the center point and the center of the motor mount
+  const // Sets the distance between the center point and the center of the motor mount
     ARM_LENGTH = 1,
     NUM_PROP_LEVELS = 100,
     HUB_RADIUS = ARM_LENGTH * 0.3,
     CRAFT_DEPTH = ARM_LENGTH * 0.08,
     ARROW_DEPTH = CRAFT_DEPTH * 0.5;
 
-  let customMix = userSettings.customMix ?? null;
+  const customMix = userSettings.customMix ?? null;
 
   let numMotors;
   if (customMix === null) {
@@ -19,7 +19,7 @@ export function Craft3D(flightLog, canvas, propColors) {
     numMotors = customMix.motorOrder.length;
   }
 
-  let propRadius = numMotors == 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
+  const propRadius = numMotors == 8 ? 0.37 * ARM_LENGTH : 0.5 * ARM_LENGTH,
     craftMaterial = new THREE.MeshLambertMaterial({ color: 0xa0a0a0 }),
     arrowMaterial = new THREE.MeshLambertMaterial({ color: 0x404040 }),
     propMaterials = new Array(propColors),
@@ -30,7 +30,7 @@ export function Craft3D(flightLog, canvas, propColors) {
     });
 
   function buildPropGeometry() {
-    let props = new Array(NUM_PROP_LEVELS),
+    const props = new Array(NUM_PROP_LEVELS),
       extrudeSettings = {
         amount: 0.1 * propRadius,
         steps: 1,
@@ -41,7 +41,7 @@ export function Craft3D(flightLog, canvas, propColors) {
       if (i === 0) {
         props[i] = new THREE.Geometry();
       } else {
-        let shape = new THREE.Shape();
+        const shape = new THREE.Shape();
 
         if (i == NUM_PROP_LEVELS - 1) {
           //work around three.js bug that requires the initial point to be on the radius to complete a full circle
@@ -73,13 +73,13 @@ export function Craft3D(flightLog, canvas, propColors) {
 
   // Build a direction arrow to go on top of the craft
   function buildArrow() {
-    let ARROW_STALK_RADIUS = HUB_RADIUS * 0.15,
+    const ARROW_STALK_RADIUS = HUB_RADIUS * 0.15,
       ARROW_STALK_LENGTH = HUB_RADIUS * 0.8,
       ARROW_HEAD_RADIUS = HUB_RADIUS * 0.55,
       ARROW_HEAD_LENGTH = HUB_RADIUS * 0.55,
       ARROW_LENGTH = ARROW_STALK_LENGTH + ARROW_HEAD_LENGTH;
 
-    let path = new THREE.Path(),
+    const path = new THREE.Path(),
       offset = -ARROW_LENGTH / 2;
 
     path.moveTo(-ARROW_STALK_RADIUS, 0 + offset);
@@ -90,7 +90,7 @@ export function Craft3D(flightLog, canvas, propColors) {
     path.lineTo(ARROW_STALK_RADIUS, ARROW_STALK_LENGTH + offset);
     path.lineTo(ARROW_STALK_RADIUS, 0 + offset);
 
-    let shape = path.toShapes(true, false),
+    const shape = path.toShapes(true, false),
       extrudeSettings = {
         amount: ARROW_DEPTH,
         steps: 1,
@@ -103,7 +103,7 @@ export function Craft3D(flightLog, canvas, propColors) {
   }
 
   function buildCraft() {
-    let path = new THREE.Path(),
+    const path = new THREE.Path(),
       ARM_WIDTH_RADIANS = 0.15,
       //How much wider is the motor mount than the arm
       MOTOR_MOUNT_WIDTH_RATIO = 2.0,
@@ -114,7 +114,7 @@ export function Craft3D(flightLog, canvas, propColors) {
       ARM_WIDTH = 2 * Math.sin(ARM_WIDTH_RADIANS) * HUB_RADIUS;
 
     for (let i = 0; i < numMotors; i++) {
-      let armStart = (i / numMotors) * Math.PI * 2 - ARM_WIDTH_RADIANS,
+      const armStart = (i / numMotors) * Math.PI * 2 - ARM_WIDTH_RADIANS,
         armEnd = armStart + ARM_WIDTH_RADIANS * 2;
 
       if (i === 0) {
@@ -161,7 +161,7 @@ export function Craft3D(flightLog, canvas, propColors) {
 
       // Draw one half of the arm:
       for (let j = 0; j < armPoints.length; j++) {
-        let point = armPoints[j];
+        const point = armPoints[j];
         path.lineTo(
           point.length * armVectorX - point.width * crossArmX,
           point.length * armVectorY - point.width * crossArmY,
@@ -170,7 +170,7 @@ export function Craft3D(flightLog, canvas, propColors) {
 
       // And flip the points to draw the other half:
       for (let j = armPoints.length - 1; j >= 0; j--) {
-        let point = armPoints[j];
+        const point = armPoints[j];
         path.lineTo(
           point.length * armVectorX + point.width * crossArmX,
           point.length * armVectorY + point.width * crossArmY,
@@ -180,7 +180,7 @@ export function Craft3D(flightLog, canvas, propColors) {
       path.lineTo(Math.cos(armEnd) * HUB_RADIUS, Math.sin(armEnd) * HUB_RADIUS);
     }
 
-    let shape = path.toShapes(true, false),
+    const shape = path.toShapes(true, false),
       extrudeSettings = {
         amount: CRAFT_DEPTH,
         steps: 1,
@@ -232,7 +232,7 @@ export function Craft3D(flightLog, canvas, propColors) {
   }
 
   for (let i = 0; i < numMotors; i++) {
-    let propShell = new THREE.Mesh(
+    const propShell = new THREE.Mesh(
       propGeometry[propGeometry.length - 1],
       propShellMaterial,
     );
@@ -284,7 +284,7 @@ export function Craft3D(flightLog, canvas, propColors) {
     for (let i = 0; i < numMotors; i++) {
       if (props[i]) propShells[i].remove(props[i]);
 
-      let throttlePos = Math.min(
+      const throttlePos = Math.min(
           Math.max(
             frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]] -
               sysInfo.motorOutput[0],

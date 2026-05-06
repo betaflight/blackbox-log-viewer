@@ -35,7 +35,7 @@ export function FIFOCache(initialCapacity) {
    */
   this.recycle = function () {
     if (queue.length > this.capacity) {
-      let key = queue.shift(),
+      const key = queue.shift(),
         result = items[key];
 
       delete items[key];
@@ -68,7 +68,7 @@ export function FIFOCache(initialCapacity) {
    * expired or had never been stored.
    */
   this.get = function (key) {
-    let item = items[key];
+    const item = items[key];
 
     if (item) {
       removeFromQueue(key);

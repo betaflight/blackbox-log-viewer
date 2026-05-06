@@ -90,10 +90,10 @@ export function FlightLogGrapher(
   };
 
   function extend(base, top) {
-    let target = {};
+    const target = {};
 
     [base, top].forEach(function (obj) {
-      for (let prop in obj) {
+      for (const prop in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, prop)) {
           target[prop] = obj[prop];
         }
@@ -199,36 +199,36 @@ export function FlightLogGrapher(
         matches;
 
       if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
-        let motorIndex = matches[1];
+        const motorIndex = matches[1];
 
         idents.motorFields[motorIndex] = fieldIndex;
         idents.motorColors[motorIndex] =
           lineColors[motorGraphColorIndex++ % lineColors.length];
       } else if ((matches = fieldName.match(/^rcCommand\[(\d+)]$/))) {
-        let rcCommandIndex = matches[1];
+        const rcCommandIndex = matches[1];
 
         if (rcCommandIndex >= 0 && rcCommandIndex < 4) {
           idents.rcCommandFields[rcCommandIndex] = fieldIndex;
         }
       } else if ((matches = fieldName.match(/^axisPID\[(\d+)]$/))) {
-        let axisIndex = matches[1];
+        const axisIndex = matches[1];
 
         idents.axisPIDSum[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^axis(.)\[(\d+)]$/))) {
-        let axisIndex = matches[2];
+        const axisIndex = matches[2];
 
         idents.axisPIDFields[matches[1]] = axisIndex;
         idents.hasPIDs = true;
       } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
-        let axisIndex = matches[1];
+        const axisIndex = matches[1];
 
         idents.gyroFields[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^accSmooth\[(\d+)]$/))) {
-        let axisIndex = matches[1];
+        const axisIndex = matches[1];
 
         idents.accFields[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^servo\[(\d+)]$/))) {
-        let servoIndex = matches[1];
+        const servoIndex = matches[1];
 
         idents.numServos++;
         idents.servoFields[servoIndex] = fieldIndex;
@@ -348,7 +348,7 @@ export function FlightLogGrapher(
       chunkIndex < chunks.length;
       chunkIndex++
     ) {
-      let chunk = chunks[chunkIndex];
+      const chunk = chunks[chunkIndex];
 
       for (; frameIndex < chunk.frames.length; frameIndex++) {
         let fieldValue = chunk.frames[frameIndex][fieldIndex],
@@ -422,7 +422,7 @@ export function FlightLogGrapher(
     if (highlight) {
       // Draw semi-transparent stroke with wider line to simulate glow
       // Decided not to use canvasContext.shadowBlur for performance reasons
-      let lineWidthTemp = canvasContext.lineWidth;
+      const lineWidthTemp = canvasContext.lineWidth;
       canvasContext.lineWidth = 1.5 * canvasContext.lineWidth + 3;
       canvasContext.globalAlpha = 0.5;
       canvasContext.stroke();
@@ -448,7 +448,7 @@ export function FlightLogGrapher(
 
   //Draw an background for the line for a graph (at the origin and spanning the window)
   function drawAxisBackground(plotHeight) {
-    let axisGradient = canvasContext.createLinearGradient(
+    const axisGradient = canvasContext.createLinearGradient(
       0,
       -plotHeight / 2,
       0,
@@ -465,7 +465,7 @@ export function FlightLogGrapher(
 
   //Draw a grid
   function drawGrid(curve, plotHeight) {
-    let settings = curve.getCurve(),
+    const settings = curve.getCurve(),
       GRID_LINES = 10,
       min = -settings.inputRange - settings.offset,
       max = settings.inputRange - settings.offset,
@@ -479,7 +479,7 @@ export function FlightLogGrapher(
 
     // horizontal lines
     for (let y = 1; y < GRID_LINES; y++) {
-      let yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
+      const yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
       if (yValue != 0 && Math.abs(yValue < plotHeight / 2)) {
         canvasContext.moveTo(0, yValue);
         canvasContext.lineTo(canvas.width, yValue);
@@ -491,7 +491,7 @@ export function FlightLogGrapher(
       i < windowEndTime;
       i += 100000
     ) {
-      let x = timeToCanvasX(i);
+      const x = timeToCanvasX(i);
       canvasContext.moveTo(x, yScale);
       canvasContext.lineTo(x, -yScale);
     }
@@ -526,12 +526,12 @@ export function FlightLogGrapher(
     canvasContext.stroke();
 
     if (label) {
-      let margin = 8,
+      const margin = 8,
         labelWidth = canvasContext.measureText(label).width + 2 * margin;
 
       align = align || "left";
       canvasContext.textAlign = align;
-      let labelDirection = align == "left" ? 1 : -1;
+      const labelDirection = align == "left" ? 1 : -1;
 
       canvasContext.lineWidth = 1;
       canvasContext.beginPath();
@@ -576,7 +576,7 @@ export function FlightLogGrapher(
   }
 
   function drawEvent(event, sequenceNum) {
-    let x = timeToCanvasX(event.time),
+    const x = timeToCanvasX(event.time),
       labelY = (sequenceNum + 1) * (drawingParams.fontSizeEventLabel + 10);
 
     switch (event.event) {
@@ -682,7 +682,7 @@ export function FlightLogGrapher(
       sequenceNum = 0;
 
     for (let i = 0; i < chunks.length; i++) {
-      let events = chunks[i].events;
+      const events = chunks[i].events;
 
       for (let j = 0; j < events.length; j++) {
         if (events[j].time > windowEndTime) {
@@ -704,8 +704,8 @@ export function FlightLogGrapher(
 
     // Add custom markers
 
-    let markerEvent = controller.getMarker();
-    let bookmarkEvents = controller.getBookmarks();
+    const markerEvent = controller.getMarker();
+    const bookmarkEvents = controller.getBookmarks();
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
       canvasContext.fillStyle = ThemeColors.getGraphText();
       canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;
@@ -732,7 +732,7 @@ export function FlightLogGrapher(
           );
         }
 
-        let markerFrequency =
+        const markerFrequency =
           (windowCenterTime - markerEvent.time).toFixed(0) != 0
             ? `${(1000000 / (windowCenterTime - markerEvent.time)).toFixed(
                 0,
@@ -785,7 +785,7 @@ export function FlightLogGrapher(
       (inTime !== false && inTime >= windowStartTime) ||
       (outTime !== false && outTime < windowEndTime)
     ) {
-      let inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
+      const inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
         outMarkerX = outTime === false ? false : timeToCanvasX(outTime);
 
       canvasContext.fillStyle = "rgba(0,0,0,0.8)";
@@ -800,7 +800,7 @@ export function FlightLogGrapher(
       }
 
       if (outTime !== false && outTime < windowEndTime) {
-        let outMarkerXClipped = Math.max(outMarkerX, 0);
+        const outMarkerXClipped = Math.max(outMarkerX, 0);
         canvasContext.fillRect(
           outMarkerXClipped,
           0,
@@ -842,7 +842,7 @@ export function FlightLogGrapher(
   }
 
   function computeDrawingParameters() {
-    let fontSizeBase = Math.max(8, canvas.height / 60),
+    const fontSizeBase = Math.max(8, canvas.height / 60),
       newParams = {
         fontSizePIDTableLabel: fontSizeBase * 3.4,
         fontSizeAxisLabel: fontSizeBase * 0.9,
@@ -859,10 +859,10 @@ export function FlightLogGrapher(
     canvas.width = width;
     canvas.height = height;
 
-    let sticksHeight =
+    const sticksHeight =
       (canvas.height * parseInt(options.sticks.size)) / 2 / 100.0;
     // The total width available to draw both sticks in:
-    let sticksWidth = (canvas.width * parseInt(options.sticks.size)) / 100.0;
+    const sticksWidth = (canvas.width * parseInt(options.sticks.size)) / 100.0;
 
     if (sticks) {
       sticks.resize(sticksWidth, sticksHeight);
@@ -880,7 +880,7 @@ export function FlightLogGrapher(
       0,
     )}px`;
 
-    let craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
+    const craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
 
     if (craft2D) {
       craft2D.resize(craftSize, craftSize);
@@ -951,7 +951,7 @@ export function FlightLogGrapher(
 
       // Plot graphs
       for (i = 0; i < graphs.length; i++) {
-        let graph = graphs[i];
+        const graph = graphs[i];
 
         canvasContext.save();
         {
@@ -971,7 +971,7 @@ export function FlightLogGrapher(
             if (graphConfig.isGraphFieldHidden(i, j)) {
               continue;
             }
-            let field = graph.fields[j];
+            const field = graph.fields[j];
             plotField(
               chunks,
               startFrameIndex,
@@ -996,7 +996,7 @@ export function FlightLogGrapher(
 
       //Draw a bar highlighting the current time if we are drawing any graphs
       if (options.drawVerticalBar && graphs.length) {
-        let centerX = canvas.width / 2;
+        const centerX = canvas.width / 2;
 
         canvasContext.strokeStyle = "rgba(255, 64, 64, 0.2)";
         canvasContext.lineWidth = 11;
@@ -1024,7 +1024,7 @@ export function FlightLogGrapher(
       }
 
       // Draw details at the current time
-      let centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);
+      const centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);
 
       if (centerFrame) {
         if (options.drawSticks) {
@@ -1051,8 +1051,8 @@ export function FlightLogGrapher(
       if (options.drawAnalyser && graphConfig.selectedFieldName) {
         try {
           // If we do not select a graph/field, then the analyser is hidden
-          let graph = graphs[graphConfig.selectedGraphIndex];
-          let field = graph.fields[graphConfig.selectedFieldIndex];
+          const graph = graphs[graphConfig.selectedGraphIndex];
+          const field = graph.fields[graphConfig.selectedFieldIndex];
           analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
         } catch (err) {
           console.log(`Cannot plot analyser ${err}`);
@@ -1089,7 +1089,7 @@ export function FlightLogGrapher(
       heightSum += graph.height ? graph.height : 1.0;
 
       for (let j = 0; j < graphs[i].fields.length; j++) {
-        let field = graphs[i].fields[j];
+        const field = graphs[i].fields[j];
 
         field.index = flightLog.getMainFieldIndexByName(field.name);
 

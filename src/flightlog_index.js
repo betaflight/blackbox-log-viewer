@@ -37,7 +37,7 @@ export function FlightLogIndex(logData) {
   }
 
   function buildIntraframeDirectories() {
-    let parser = new FlightLogParser(logData, that);
+    const parser = new FlightLogParser(logData, that);
 
     intraframeDirectories = [];
 
@@ -160,7 +160,7 @@ export function FlightLogIndex(logData) {
                     throttleTotal = 0;
                     maxMotor = 0;
                     minMotor = 2000;
-                    for (let mofo of motorFields) {
+                    for (const mofo of motorFields) {
                       maxMotor = Math.max(frame[mofo], maxMotor);
                       minMotor = Math.min(frame[mofo], minMotor);
                       throttleTotal += frame[mofo];
@@ -173,7 +173,7 @@ export function FlightLogIndex(logData) {
                   }
                   if (maxRCFields.length) {
                     rcTotal = 0;
-                    for (let rcfo of maxRCFields) {
+                    for (const rcfo of maxRCFields) {
                       rcTotal += Math.max(rcTotal, Math.abs(frame[rcfo]));
                     }
 

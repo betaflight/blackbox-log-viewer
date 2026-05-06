@@ -3,15 +3,15 @@ import { useSettingsStore } from "./stores/settings.js";
 export function Craft2D(flightLog, canvas, propColors) {
   const { userSettings } = useSettingsStore();
 
-  let ARM_THICKNESS_MULTIPLIER = 0.18,
+  const ARM_THICKNESS_MULTIPLIER = 0.18,
     ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER = 1.1,
     CENTRAL_HUB_SIZE_MULTIPLIER = 0.3;
 
-  let canvasContext = canvas.getContext("2d");
+  const canvasContext = canvas.getContext("2d");
 
-  let craftParameters = {};
+  const craftParameters = {};
 
-  let customMix = userSettings.customMix ?? null;
+  const customMix = userSettings.customMix ?? null;
 
   let numMotors;
   if (!customMix) {
@@ -156,7 +156,7 @@ export function Craft2D(flightLog, canvas, propColors) {
   }
 
   this.render = function (frame, frameFieldIndexes) {
-    let sysConfig = flightLog.getSysConfig();
+    const sysConfig = flightLog.getSysConfig();
 
     canvasContext.save();
 
@@ -204,7 +204,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     canvasContext.fill();
 
     for (let i = 0; i < numMotors; i++) {
-      let motorValue = frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]];
+      const motorValue = frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]];
 
       canvasContext.save();
       {
