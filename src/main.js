@@ -2285,7 +2285,7 @@ function BlackboxLogViewer() {
       graphStore.hasMap = hasMap;
       html.classList.toggle("has-map", hasMap);
       prefs.set("hasMap", hasMap);
-      if (flightLog.hasGpsData()) {
+      if (flightLog?.hasGpsData()) {
         mapGrapher.initialize();
       }
     };
@@ -2338,7 +2338,7 @@ function BlackboxLogViewer() {
         if (hasVideo) {
           setVideoTime(newTime / 1000000 + videoOffset);
         } else {
-          newTime += flightLog.getMinTime();
+          newTime += flightLog?.getMinTime() ?? 0;
           setCurrentBlackboxTime(newTime);
         }
         invalidateGraph();
@@ -2368,7 +2368,7 @@ function BlackboxLogViewer() {
     get: () => activeGraphConfig,
   });
   this.newGraphConfig = function (newConfig, redrawChart) {
-    newGraphConfig(newConfig, redrawChart);
+    newGraphConfig(newConfig, !redrawChart);
   };
   this.exportCsv = function () {
     setGraphState(GRAPH_STATE_PAUSED);

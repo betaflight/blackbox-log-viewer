@@ -5,13 +5,26 @@ import { PrefStorage } from "../pref_storage.js";
 
 const prefs = new PrefStorage();
 
+function deepMerge(target, source) {
+  for (const key of Object.keys(source)) {
+    const sv = source[key];
+    if (sv && typeof sv === "object" && !Array.isArray(sv) && target[key] && typeof target[key] === "object") {
+      Object.assign(target[key], sv);
+    } else {
+      target[key] = sv;
+    }
+  }
+}
+
 export const useSettingsStore = defineStore("settings", () => {
-  const userSettings = reactive({ ...defaultUserSettings });
+  const userSettings = reactive(structuredClone(defaultUserSettings));
 
   function load() {
     prefs.get("userSettings", (item) => {
       if (item) {
-        Object.assign(userSettings, defaultUserSettings, item);
+        const merged = structuredClone(defaultUserSettings);
+        deepMerge(merged, item);
+        Object.assign(userSettings, merged);
       }
     });
   }
