@@ -693,9 +693,8 @@ function BlackboxLogViewer() {
     reader.onload = function (e) {
       const bytes = e.target.result;
 
-      const fileContents = String.fromCharCode.apply(
-        null,
-        new Uint8Array(bytes, 0, 100),
+      const fileContents = String.fromCharCode(
+        ...new Uint8Array(bytes, 0, 100),
       );
 
       if (fileContents.match(/# dump|# diff/i)) {

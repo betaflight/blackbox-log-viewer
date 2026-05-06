@@ -24,7 +24,7 @@ export function uint32ToFloat(value) {
 }
 
 export function asciiArrayToString(arr) {
-  return String.fromCharCode.apply(null, arr);
+  return String.fromCharCode(...arr);
 }
 
 export function asciiStringToByteArray(s) {
@@ -271,18 +271,12 @@ export function validate(value, defaultValue) {
   return value != null ? value : defaultValue;
 }
 
-export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-  if (typeof stroke == "undefined") {
-    stroke = true;
-  }
-  if (typeof radius === "undefined") {
-    radius = 5;
-  }
+export function roundRect(ctx, x, y, width, height, radius = 5, fill, stroke = true) {
   if (typeof radius === "number") {
     radius = { tl: radius, tr: radius, br: radius, bl: radius };
   } else {
     const defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
-    for (const side in defaultRadius) {
+    for (const side of Object.keys(defaultRadius)) {
       radius[side] = radius[side] || defaultRadius[side];
     }
   }

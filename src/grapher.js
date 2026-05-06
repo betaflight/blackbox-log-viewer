@@ -84,17 +84,7 @@ export function FlightLogGrapher(
   };
 
   function extend(base, top) {
-    const target = {};
-
-    [base, top].forEach(function (obj) {
-      for (const prop in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-          target[prop] = obj[prop];
-        }
-      }
-    });
-
-    return target;
+    return Object.assign({}, base, top);
   }
 
   function onMouseMove(e) {

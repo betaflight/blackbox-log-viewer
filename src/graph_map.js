@@ -162,9 +162,9 @@ export function MapGrapher() {
       flightLog.getMaxTime(),
     );
 
+    let frameCount = 0;
     for (const chunk of chunks) {
-      for (const fi in chunk.frames) {
-        const frame = chunk.frames[fi];
+      for (const frame of chunk.frames) {
         const coordinates = this.getCoordinatesFromFrame(
           frame,
           latIndexAtFrame,
@@ -174,6 +174,7 @@ export function MapGrapher() {
 
         // if there are no coordinates the frame is skipped
         if (!coordinates) {
+          frameCount++;
           continue;
         }
 
@@ -184,9 +185,10 @@ export function MapGrapher() {
         minAlt = coordinates.alt < minAlt ? coordinates.alt : minAlt;
 
         // 1/4 of the dots is enough to draw the line
-        if (fi % 4 === 0) {
+        if (frameCount % 4 === 0) {
           latlngs.push(coordinates);
         }
+        frameCount++;
       }
     }
     return { latlngs, maxAlt, minAlt };

@@ -628,9 +628,9 @@ export function FlightLog(logData) {
 
     maxSmoothing = 0;
 
-    for (const fieldIndex in newSmoothing) {
-      if (newSmoothing[fieldIndex] > maxSmoothing) {
-        maxSmoothing = newSmoothing[fieldIndex];
+    for (const value of Object.values(newSmoothing)) {
+      if (value > maxSmoothing) {
+        maxSmoothing = value;
       }
     }
   };
@@ -1169,8 +1169,7 @@ export function FlightLog(logData) {
     }
 
     if (!allDone) {
-      for (const fieldIndex in fieldSmoothing) {
-        const radius = fieldSmoothing[fieldIndex];
+      for (const [fieldIndex, radius] of Object.entries(fieldSmoothing)) {
         //The position we're currently computing the smoothed value for:
         let centerChunkIndex, centerFrameIndex;
 

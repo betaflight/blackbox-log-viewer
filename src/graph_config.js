@@ -238,13 +238,13 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     }
   };
 
-  const getMinMaxForFields = function (/* fieldName1, fieldName2, ... */) {
+  const getMinMaxForFields = function (...fieldNames) {
     // helper to make a curve scale based on the combined min/max of one or more fields
     let min = Number.MAX_VALUE,
       max = -Number.MAX_VALUE;
 
-    for (const argument of arguments) {
-      const mm = flightLog.getMinMaxForFieldDuringAllTime(argument);
+    for (const fieldName of fieldNames) {
+      const mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
       min = Math.min(mm.min, min);
       max = Math.max(mm.max, max);
     }
@@ -256,8 +256,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     return { min: -500, max: 500 };
   };
 
-  const getCurveForMinMaxFields = function (/* fieldName1, fieldName2, ... */) {
-    const mm = getMinMaxForFields.apply(null, arguments);
+  const getCurveForMinMaxFields = function (...fieldNames) {
+    const mm = getMinMaxForFields(...fieldNames);
     // added convertation min max values from log file units to friendly chart
     const mmChartUnits = {
       min: FlightLogFieldPresenter.ConvertFieldValue(
@@ -280,8 +280,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
   };
 
   const getCurveForMinMaxFieldsZeroOffset =
-    function (/* fieldName1, fieldName2, ... */) {
-      const mm = getMinMaxForFields.apply(null, arguments);
+    function (...fieldNames) {
+      const mm = getMinMaxForFields(...fieldNames);
       // added convertation min max values from log file units to friendly chart
       const mmChartUnits = {
         min: FlightLogFieldPresenter.ConvertFieldValue(

@@ -274,10 +274,8 @@ function work(
 }
 
 export function FFTComplex(n, inverse) {
-  if (arguments.length < 2) {
-    throw new RangeError(
-      `You didn't pass enough arguments, passed \`${  arguments.length  }'`,
-    );
+  if (n === undefined || inverse === undefined) {
+    throw new RangeError("FFTComplex requires both `n` and `inverse` arguments");
   }
 
   n = ~~n;
