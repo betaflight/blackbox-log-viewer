@@ -1,4 +1,5 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+import { useSettingsStore } from "./stores/settings.js";
 
 function createElement(html) {
   const template = document.createElement("template");
@@ -38,6 +39,7 @@ export function GraphLegend(
   onExpandGraph,
   onNewGraphConfig,
 ) {
+  const { userSettings } = useSettingsStore();
   let that = this;
 
   const targetEl =

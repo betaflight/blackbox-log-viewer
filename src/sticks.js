@@ -2,8 +2,10 @@ import { FlightLogParser } from "./flightlog_parser";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { ExpoCurve } from "./expo";
 import { roundRect } from "./tools";
+import { useSettingsStore } from "./stores/settings.js";
 
 export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
+  const { userSettings } = useSettingsStore();
   let // inefficient; copied from grapher.js. Font could be a global?
 
     DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -25,12 +27,6 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
   let that = this,
     windowCenterTime,
     canvasContext = canvas.getContext("2d"),
-    defaultSettings = {
-      drawSticks: true,
-      stickTrails: false,
-      stickInvertYaw: false,
-      stickUnits: false,
-    },
     sysConfig = flightLog.getSysConfig(),
     pitchStickCurve = new ExpoCurve(
       0,
@@ -39,9 +35,6 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       1.0,
       10,
     );
-
-  // Use defaults for any options not provided
-  globalThis.userSettings = { ...defaultSettings, ...userSettings };
 
   this.resize = function (width, height) {
     // Resize canvas if size changed

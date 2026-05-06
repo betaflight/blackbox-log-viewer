@@ -626,7 +626,6 @@ function BlackboxLogViewer() {
     // Add flightLog to map
     html.classList.toggle("has-gps", flightLog.hasGpsData());
     if (flightLog.hasGpsData()) {
-      mapGrapher.setUserSettings(userSettings);
       mapGrapher.setFlightLog(flightLog);
     }
   }
@@ -1514,9 +1513,8 @@ function BlackboxLogViewer() {
       }
       invalidateGraph();
     }
-    // userSettings is now managed by settingsStore (loaded from prefs on creation)
+    // userSettings is the reactive object from settingsStore — no global bridge needed
     userSettings = settingsStore.userSettings;
-    globalThis.userSettings = userSettings;
 
     document
       .querySelector(".open-graph-configuration-dialog")
@@ -2334,7 +2332,7 @@ function BlackboxLogViewer() {
       html.classList.toggle("has-map", hasMap);
       prefs.set("hasMap", hasMap);
       if (flightLog.hasGpsData()) {
-        mapGrapher.initialize(userSettings);
+        mapGrapher.initialize();
       }
     };
     this.toggleAnalyserFullscreen = function () {
@@ -2481,20 +2479,15 @@ function BlackboxLogViewer() {
   };
   this.saveUserSettings = function (newSettings) {
     settingsStore.saveAll(newSettings);
-    userSettings = settingsStore.userSettings;
-    globalThis.userSettings = userSettings;
 
     if (newSettings.darkMode !== undefined) {
       DarkTheme.setMode(newSettings.darkMode);
     }
 
     if (graph != null) {
-      graph.refreshOptions(newSettings);
+      graph.refreshOptions(userSettings);
       graph.refreshLogo();
       graph.initializeCraftModel();
-      if (flightLog.hasGpsData()) {
-        mapGrapher.setUserSettings(newSettings);
-      }
       updateCanvasSize();
     }
   };

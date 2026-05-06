@@ -1,4 +1,7 @@
+import { useSettingsStore } from "./stores/settings.js";
+
 export function MapGrapher() {
+  const { userSettings } = useSettingsStore();
   let myMap,
     currentLogStartDateTime,
     currentTime,
@@ -239,10 +242,6 @@ export function MapGrapher() {
     } catch {
       // Frame coordinates unavailable — skip position update
     }
-  };
-
-  this.setUserSettings = function (newUserSettings) {
-    globalThis.userSettings = newUserSettings;
   };
 
   this.redrawAll = function () {

@@ -2,6 +2,7 @@ import { FILTER_TYPE } from "./flightlog_fielddefs";
 import { constrain } from "./tools";
 import { NUM_VS_BINS } from "./graph_spectrum_calc";
 import { ImportedCurves } from "./graph_imported_curves";
+import { useSettingsStore } from "./stores/settings.js";
 
 const BLUR_FILTER_PIXEL = 1,
   DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -466,6 +467,7 @@ GraphSpectrumPlot._drawLegend = function (
   HEIGHT,
   importedCurves,
 ) {
+  const { userSettings } = useSettingsStore();
   const left = parseFloat(userSettings?.analyser_legend?.left);
   const top = parseFloat(userSettings?.analyser_legend?.top);
   const width = parseFloat(userSettings?.analyser_legend?.width);

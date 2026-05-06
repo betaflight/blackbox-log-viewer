@@ -7,6 +7,7 @@ import {
   FFT_CALC_STEPS,
 } from "./flightlog_fielddefs";
 import { formatTime } from "./tools";
+import { useSettingsStore } from "./stores/settings.js";
 
 export function FlightLogFieldPresenter() {
   // this is intentional
@@ -1621,6 +1622,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
   value,
   currentFlightMode,
 ) {
+  const { userSettings } = useSettingsStore();
   if (value === undefined) {
     return "";
   }
@@ -2417,6 +2419,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
   toFriendly,
   value,
 ) {
+  const { userSettings } = useSettingsStore();
   if (value === undefined) {
     return 0;
   }

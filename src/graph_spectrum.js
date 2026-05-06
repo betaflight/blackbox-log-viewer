@@ -7,8 +7,10 @@ import {
 } from "./graph_spectrum_plot";
 import { PrefStorage } from "./pref_storage";
 import { SpectrumExporter } from "./spectrum-exporter";
+import { useSettingsStore } from "./stores/settings.js";
 
 export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
+  const { userSettings } = useSettingsStore();
   const ANALYSER_LARGE_LEFT_MARGIN = 10,
     ANALYSER_LARGE_TOP_MARGIN = 10,
     ANALYSER_LARGE_HEIGHT_MARGIN = 20,

@@ -1,4 +1,5 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+import { useSettingsStore } from "./stores/settings.js";
 
 const FIELD_THROTTLE_NAME = ["rcCommands[3]"],
   FIELD_RPM_NAMES = [
@@ -109,6 +110,7 @@ GraphSpectrumCalc.getNearPower2Value = function (size) {
 };
 
 GraphSpectrumCalc.dataLoadFrequency = function () {
+  const { userSettings } = useSettingsStore();
   const flightSamples = this._getFlightSamplesFreq();
 
   if (userSettings.analyserHanning) {
@@ -163,6 +165,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function (
   minValue = Infinity,
   maxValue = -Infinity,
 ) {
+  const { userSettings } = useSettingsStore();
   const flightSamples = this._getFlightSamplesFreqVsX(
     vsFieldNames,
     minValue,
@@ -749,6 +752,7 @@ GraphSpectrumCalc._psd = function (
   overlapCount,
   scaling = "density",
 ) {
+  const { userSettings } = useSettingsStore();
   // Compute FFT for samples segments
   const fftOutput = this._fft_segmented(
     samples,
@@ -849,6 +853,7 @@ GraphSpectrumCalc._fft_segmented = function (
   pointsPerSegment,
   overlapCount,
 ) {
+  const { userSettings } = useSettingsStore();
   const samplesCount = samples.length;
   const output = [];
 

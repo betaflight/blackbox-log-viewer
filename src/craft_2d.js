@@ -1,4 +1,8 @@
+import { useSettingsStore } from "./stores/settings.js";
+
 export function Craft2D(flightLog, canvas, propColors) {
+  const { userSettings } = useSettingsStore();
+
   let ARM_THICKNESS_MULTIPLIER = 0.18,
     ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER = 1.1,
     CENTRAL_HUB_SIZE_MULTIPLIER = 0.3,
@@ -8,13 +12,7 @@ export function Craft2D(flightLog, canvas, propColors) {
 
   let craftParameters = {};
 
-  let customMix;
-
-  if (userSettings != null) {
-    customMix = userSettings.customMix;
-  } else {
-    customMix = null;
-  }
+  let customMix = userSettings.customMix ?? null;
 
   let numMotors;
   if (!customMix) {

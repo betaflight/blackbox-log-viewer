@@ -1,4 +1,5 @@
 import { FlightLogGrapher } from "./grapher";
+import { useSettingsStore } from "./stores/settings.js";
 
 /**
  * Render a video of the given log using the given videoOptions (user video settings) and logParameters.
@@ -28,6 +29,8 @@ export function FlightLogVideoRenderer(
   videoOptions,
   events,
 ) {
+  const { userSettings } = useSettingsStore();
+
   let WORK_CHUNK_SIZE_FOCUSED = 8,
     WORK_CHUNK_SIZE_UNFOCUSED = 32,
     videoWriter,
