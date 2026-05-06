@@ -17,6 +17,16 @@
         </span>
         <span v-else class="opacity-50">No workspace</span>
       </UButton>
+
+      <template #ws-trailing="{ item }">
+        <UIcon v-if="item.wsActive" name="i-lucide-check" class="size-4 text-green-500" />
+        <UIcon
+          name="i-lucide-save"
+          class="size-4 opacity-40 hover:opacity-100 cursor-pointer"
+          title="Save current graph setup to this workspace"
+          @click.stop.prevent="emit('save-workspace', item.wsId, item.wsTitle)"
+        />
+      </template>
     </UDropdownMenu>
   </div>
 </template>
@@ -40,32 +50,24 @@ const activeEntry = computed(() => {
 
 const workspaceItems = computed(() => {
   const configs = workspaceStore.workspaceGraphConfigs;
-  const switchItems = [];
-  const saveItems = [];
+  const wsItems = [];
 
   for (let index = 1; index < 11; index++) {
     const id = index % 10;
     const entry = configs?.[id];
     const isActive = id === workspaceStore.activeWorkspace;
 
-    switchItems.push({
+    wsItems.push({
+      slot: "ws",
       label: entry ? `${id}  ${entry.title}` : `${id}  <empty>`,
-      icon: isActive ? "i-lucide-check" : undefined,
       disabled: !entry,
-      kbds: [`${id}`],
+      wsId: id,
+      wsActive: isActive,
+      wsTitle: entry?.title || "Unnamed",
       onSelect() {
         if (entry) {
           emit("switch-workspace", id);
         }
-      },
-    });
-
-    saveItems.push({
-      label: `Save to ${id}`,
-      icon: "i-lucide-save",
-      kbds: ["shift", `${id}`],
-      onSelect() {
-        emit("save-workspace", id, entry?.title || "Unnamed");
       },
     });
   }
@@ -87,6 +89,6 @@ const workspaceItems = computed(() => {
     },
   ];
 
-  return [switchItems, saveItems, presetItems];
+  return [wsItems, presetItems];
 });
 </script>
