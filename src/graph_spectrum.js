@@ -78,10 +78,10 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       } else {
         return {
           height:
-            (canvas.height * Number.parseInt(userSettings.analyser.size)) / 100.0,
-          width: (canvas.width * Number.parseInt(userSettings.analyser.size)) / 100.0,
-          left: (canvas.width * Number.parseInt(userSettings.analyser.left)) / 100.0,
-          top: (canvas.height * Number.parseInt(userSettings.analyser.top)) / 100.0,
+            (canvas.height * Number.parseInt(userSettings.analyser.size)) / 100,
+          width: (canvas.width * Number.parseInt(userSettings.analyser.size)) / 100,
+          left: (canvas.width * Number.parseInt(userSettings.analyser.left)) / 100,
+          top: (canvas.height * Number.parseInt(userSettings.analyser.top)) / 100,
         };
       }
     };

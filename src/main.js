@@ -2509,4 +2509,4 @@ document.addEventListener("click", function (e) {
   }
 });
 
-new BlackboxLogViewer();
+const _app = new BlackboxLogViewer(); // NOSONAR — constructor registers itself in appStore.controller
