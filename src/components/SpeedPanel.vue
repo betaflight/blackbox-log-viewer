@@ -30,12 +30,12 @@ const playbackStore = usePlaybackStore();
 // Left half  (0–100)  → 10%–100%
 // Right half (100–200) → 100%–300%
 function posToRate(pos) {
-  if (pos <= 100) return Math.round(10 + pos * 0.9);
+  if (pos <= 100) { return Math.round(10 + pos * 0.9); }
   return Math.round(100 + (pos - 100) * 2);
 }
 
 function rateToPos(rate) {
-  if (rate <= 100) return Math.round((rate - 10) / 0.9);
+  if (rate <= 100) { return Math.round((rate - 10) / 0.9); }
   return Math.round(100 + (rate - 100) / 2);
 }
 

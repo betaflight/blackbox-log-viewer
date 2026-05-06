@@ -30,12 +30,12 @@ const graphStore = useGraphStore();
 // Left half  (0–100)  → 1%–100%
 // Right half (100–200) → 100%–1000%
 function posToZoom(pos) {
-  if (pos <= 100) return Math.round(1 + pos * 0.99);
+  if (pos <= 100) { return Math.round(1 + pos * 0.99); }
   return Math.round(100 + (pos - 100) * 9);
 }
 
 function zoomToPos(zoom) {
-  if (zoom <= 100) return Math.round((zoom - 1) / 0.99);
+  if (zoom <= 100) { return Math.round((zoom - 1) / 0.99); }
   return Math.round(100 + (zoom - 100) / 9);
 }
 
