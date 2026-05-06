@@ -362,7 +362,7 @@ function onLogoChange(e) {
 }
 
 function onSave() {
-  const raw = structuredClone(local.value);
+  const raw = JSON.parse(JSON.stringify(toRaw(local.value))); // NOSONAR — structuredClone fails on Vue reactive proxies
   emit("save", raw);
   open.value = false;
 }
