@@ -48,114 +48,54 @@
     </div>
 
     <div class="overflow-y-auto flex-1 p-4 font-mono text-xs">
-      <!-- Main 6-column grid -->
+      <!-- Pane columns: one pane per group, sortable for reordering -->
       <div
-        class="grid gap-4"
-        :class="cols ? '' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'"
-        :style="cols ? { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` } : {}"
+        ref="gridEl"
+        class="gap-4"
+        :class="cols ? '' : 'columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6'"
+        :style="cols ? { columns: cols } : {}"
       >
-        <!-- Column 1: PIDs -->
-        <div v-show="!hiddenGroups.has('PID Settings')" class="flex flex-col gap-4">
-          <UiBox title="PID Settings" collapsible>
-            <PidTable :rows="mainPids" :showDMax="showDMax" />
-          </UiBox>
+        <div
+          v-for="group in visiblePanes"
+          :key="group"
+          :data-group="group"
+          class="break-inside-avoid mb-4"
+        >
+            <UiBox :title="group" collapsible>
+              <template #title>
+                <UIcon name="i-lucide-grip-horizontal" class="drag-handle size-3 cursor-grab active:cursor-grabbing opacity-40 hover:opacity-100 ml-1" />
+              </template>
 
-          <UiBox v-if="showBaroPids" title="Baro" collapsible>
-            <PidTable :rows="baroPids" :showDMax="false" srOnly />
-          </UiBox>
+              <!-- PID Settings: multi-table layout -->
+              <template v-if="group === 'PID Settings'">
+                <PidTable :rows="mainPids" :showDMax="showDMax" />
+                <template v-if="showBaroPids">
+                  <div class="text-[11px] font-semibold text-dimmed mt-2 mb-0.5">Baro</div>
+                  <PidTable :rows="baroPids" :showDMax="false" srOnly />
+                </template>
+                <template v-if="showMagPids">
+                  <div class="text-[11px] font-semibold text-dimmed mt-2 mb-0.5">Mag</div>
+                  <PidTable :rows="magPids" :showDMax="false" srOnly />
+                </template>
+                <template v-if="showGpsPids">
+                  <div class="text-[11px] font-semibold text-dimmed mt-2 mb-0.5">GPS</div>
+                  <PidTable :rows="gpsPids" :showDMax="false" srOnly />
+                </template>
+              </template>
 
-          <UiBox v-if="showMagPids" title="Mag" collapsible>
-            <PidTable :rows="magPids" :showDMax="false" srOnly />
-          </UiBox>
+              <!-- Features / Disabled Fields -->
+              <FeatureTable v-else-if="group === 'Features'" :data="featuresList" />
+              <FeatureTable v-else-if="group === 'Disabled Fields'" :data="disabledFieldsList" />
 
-          <UiBox v-if="showGpsPids" title="GPS" collapsible>
-            <PidTable :rows="gpsPids" :showDMax="false" srOnly />
-          </UiBox>
-
-          <UiBox v-if="pidSliderParams.length > 0 && !hiddenGroups.has('PID Sliders')" title="PID Sliders" collapsible>
-            <ParamTable :params="pidSliderParams" />
-          </UiBox>
-
-          <UiBox v-if="feedforwardParams.length > 0 && !hiddenGroups.has('Feedforward')" title="Feedforward" collapsible>
-            <ParamTable :params="feedforwardParams" />
-          </UiBox>
-        </div>
-
-        <!-- Column 2: Rates -->
-        <div v-show="!hiddenGroups.has('Rates')" class="flex flex-col gap-4">
-          <UiBox title="Rates" collapsible>
-            <ParamTable :params="rateParams" />
-          </UiBox>
-
-          <UiBox v-if="dMaxParams.length > 0 && !hiddenGroups.has('D Max')" title="D Max" collapsible>
-            <ParamTable :params="dMaxParams" />
-          </UiBox>
-
-          <UiBox v-if="rateLimitParams.length > 0 && !hiddenGroups.has('Rate Limits')" title="Rate Limits" collapsible>
-            <ParamTable :params="rateLimitParams" />
-          </UiBox>
-
-          <UiBox v-if="antiGravityParams.length > 0 && !hiddenGroups.has('Anti Gravity')" title="Anti Gravity" collapsible>
-            <ParamTable :params="antiGravityParams" />
-          </UiBox>
-
-          <UiBox v-if="otherParams.length > 0 && !hiddenGroups.has('Other')" title="Other" collapsible>
-            <ParamTable :params="otherParams" />
-          </UiBox>
-        </div>
-
-        <!-- Column 3: Parameters -->
-        <div v-show="!hiddenGroups.has('Parameters')" class="flex flex-col gap-4">
-          <UiBox title="Parameters" collapsible>
-            <ParamTable :params="generalParams" />
-          </UiBox>
-        </div>
-
-        <!-- Column 4: Motor / ESC -->
-        <div v-show="!hiddenGroups.has('Motor / ESC')" class="flex flex-col gap-4">
-          <UiBox title="Motor / ESC" collapsible>
-            <ParamTable :params="motorParams" />
-          </UiBox>
-        </div>
-
-        <!-- Column 5: Gyro Filters -->
-        <div v-show="!hiddenGroups.has('Gyro Filters')" class="flex flex-col gap-4">
-          <UiBox title="Gyro Filters" collapsible>
-            <ParamTable :params="gyroFilterParams" />
-          </UiBox>
-
-          <UiBox v-if="dynNotchParams.length > 0 && !hiddenGroups.has('Dynamic Notch')" title="Dynamic Notch" collapsible>
-            <ParamTable :params="dynNotchParams" />
-          </UiBox>
-
-          <UiBox v-if="rpmFilterParams.length > 0 && !hiddenGroups.has('RPM Filter')" title="RPM Filter" collapsible>
-            <ParamTable :params="rpmFilterParams" />
-          </UiBox>
-        </div>
-
-        <!-- Column 6: D-Term Filters -->
-        <div v-show="!hiddenGroups.has('D-Term Filters')" class="flex flex-col gap-4">
-          <UiBox title="D-Term Filters" collapsible>
-            <ParamTable :params="dtermFilterParams" />
-          </UiBox>
-
-          <UiBox v-if="rcSmoothingParams.length > 0 && !hiddenGroups.has('RC Smoothing')" title="RC Smoothing" collapsible>
-            <ParamTable :params="rcSmoothingParams" />
-          </UiBox>
+              <!-- Default: ParamTable -->
+              <ParamTable v-else :params="groupParamMap[group]" />
+            </UiBox>
         </div>
       </div>
 
-      <!-- Full-width sections below the grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mt-4">
-        <UiBox v-if="featuresList.length > 0 && !hiddenGroups.has('Features')" title="Features" collapsible>
-          <FeatureTable :data="featuresList" />
-        </UiBox>
-
-        <UiBox v-if="disabledFieldsList.length > 0 && !hiddenGroups.has('Disabled Fields')" title="Disabled Fields" collapsible>
-          <FeatureTable :data="disabledFieldsList" />
-        </UiBox>
-
-        <UiBox title="All Headers" collapsible collapsed class="sm:col-span-2 md:col-span-3 xl:col-span-6">
+      <!-- All Headers (full-width below panes) -->
+      <div class="mt-4">
+        <UiBox title="All Headers" collapsible collapsed>
           <template #actions>
             <div class="flex items-center gap-2">
               <UInput
@@ -259,7 +199,8 @@
 
 <script setup>
 import semver from "semver";
-import { computed, ref } from "vue";
+import Sortable from "sortablejs";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import UiBox from "./UiBox.vue";
 import ParamTable from "./ParamTable.vue";
 import PidTable from "./PidTable.vue";
@@ -1063,6 +1004,134 @@ function saveHiddenPrefs() {
 }
 loadHiddenPrefs();
 
+// Group order for display
+const GROUP_ORDER = [
+  "PID Settings", "PID Sliders", "Feedforward", "Rates", "D Max", "Rate Limits",
+  "Parameters", "Motor / ESC", "Anti Gravity",
+  "Gyro Filters", "Dynamic Notch", "RPM Filter",
+  "D-Term Filters", "RC Smoothing",
+  "Features", "Disabled Fields", "Other",
+];
+
+// --- Pane ordering and drag-and-drop ---
+
+const DEFAULT_PANE_ORDER = [...GROUP_ORDER];
+
+const paneOrder = ref([...DEFAULT_PANE_ORDER]);
+
+function loadPaneOrder() {
+  try {
+    const saved = localStorage.getItem("bbv-pane-order");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const order = parsed.filter((id) => DEFAULT_PANE_ORDER.includes(id));
+      for (const id of DEFAULT_PANE_ORDER) {
+        if (!order.includes(id)) {
+          order.push(id);
+        }
+      }
+      paneOrder.value = order;
+    }
+  } catch {
+    // ignore
+  }
+}
+function savePaneOrder() {
+  try {
+    localStorage.setItem("bbv-pane-order", JSON.stringify(paneOrder.value));
+  } catch {
+    // ignore
+  }
+}
+loadPaneOrder();
+
+const groupParamMap = computed(() => ({
+  "PID Sliders": pidSliderParams.value,
+  "Feedforward": feedforwardParams.value,
+  "Rates": rateParams.value,
+  "D Max": dMaxParams.value,
+  "Rate Limits": rateLimitParams.value,
+  "Parameters": generalParams.value,
+  "Motor / ESC": motorParams.value,
+  "Anti Gravity": antiGravityParams.value,
+  "Gyro Filters": gyroFilterParams.value,
+  "Dynamic Notch": dynNotchParams.value,
+  "RPM Filter": rpmFilterParams.value,
+  "D-Term Filters": dtermFilterParams.value,
+  "RC Smoothing": rcSmoothingParams.value,
+  "Other": otherParams.value,
+}));
+
+function paneHasData(group) {
+  if (group === "PID Settings") { return true; }
+  if (group === "Features") { return featuresList.value.length > 0; }
+  if (group === "Disabled Fields") { return disabledFieldsList.value.length > 0; }
+  const params = groupParamMap.value[group];
+  return params && params.length > 0;
+}
+
+const visiblePanes = computed(() =>
+  paneOrder.value.filter((g) => !hiddenGroups.value.has(g) && paneHasData(g)),
+);
+
+// --- Sortable.js drag-and-drop ---
+const gridEl = ref(null);
+let sortable = null;
+
+watch(gridEl, (el) => {
+  if (sortable) { sortable.destroy(); sortable = null; }
+  if (!el) { return; }
+  sortable = Sortable.create(el, {
+    handle: ".drag-handle",
+    ghostClass: "opacity-30",
+    animation: 0,
+    onStart() {
+      // Freeze all pane positions to prevent CSS columns reflow during drag
+      const children = Array.from(el.children);
+      const containerRect = el.getBoundingClientRect();
+      const rects = children.map((c) => c.getBoundingClientRect());
+      el.style.columns = "auto";
+      el.style.position = "relative";
+      el.style.height = `${containerRect.height}px`;
+      for (let i = 0; i < children.length; i++) {
+        const c = children[i];
+        const r = rects[i];
+        c.style.position = "absolute";
+        c.style.left = `${r.left - containerRect.left}px`;
+        c.style.top = `${r.top - containerRect.top}px`;
+        c.style.width = `${r.width}px`;
+        c.style.margin = "0";
+      }
+    },
+    onEnd() {
+      // Unfreeze — clear inline styles, restore CSS columns layout
+      for (const c of el.children) {
+        c.style.position = "";
+        c.style.left = "";
+        c.style.top = "";
+        c.style.width = "";
+        c.style.margin = "";
+      }
+      el.style.columns = "";
+      el.style.position = "";
+      el.style.height = "";
+      // Read reordered visible groups from DOM (Sortable already moved elements)
+      const newVisible = Array.from(el.children)
+        .map((c) => c.dataset.group)
+        .filter(Boolean);
+      // Rebuild full order: reordered visible + hidden groups preserved
+      const visibleSet = new Set(newVisible);
+      const hidden = paneOrder.value.filter((g) => !visibleSet.has(g));
+      paneOrder.value = [...newVisible, ...hidden];
+      savePaneOrder();
+    },
+  });
+});
+
+onBeforeUnmount(() => {
+  if (sortable) { sortable.destroy(); }
+});
+
 function toggleGroupVisibility(group) {
   const s = hiddenGroups.value;
   if (s.has(group)) {
@@ -1181,15 +1250,6 @@ const HEADER_SKIP_KEYS = new Set([
   "flightControllerIdentifier",
   "flightControllerVersion",
 ]);
-
-// Group order for display
-const GROUP_ORDER = [
-  "PID Settings", "PID Sliders", "Feedforward", "Rates", "D Max", "Rate Limits",
-  "Parameters", "Motor / ESC", "Anti Gravity",
-  "Gyro Filters", "Dynamic Notch", "RPM Filter",
-  "D-Term Filters", "RC Smoothing",
-  "Features", "Disabled Fields", "Other",
-];
 
 const groupedHeaders = computed(() => {
   const s = sc.value;

@@ -28,6 +28,7 @@
     "Leaflet.MultiOptionsPolyline": "github:hgoebl/Leaflet.MultiOptionsPolyline",
     "pinia": "^3.0.4",
     "semver": "^7.7.4",
+    "sortablejs": "^1.15.7",
     "throttle-debounce": "^5.0.0",
     "vue": "^3.5.33",
     "vue-router": "^4.6.4",
