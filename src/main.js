@@ -74,9 +74,7 @@ function BlackboxLogViewer() {
   const currentOffsetCache = { log: null, index: null, video: null, offset: null };
   // JSON array of graph configurations for New Workspaces feature
   let lastGraphConfig = null; // Undo feature - go back to last configuration.
-  let workspaceGraphConfigs = []; // Workspaces
-  let activeWorkspace = 1; // Active Workspace
-  let bookmarkTimes = []; // Empty array for bookmarks (times)
+  // workspaceGraphConfigs, activeWorkspace, workspaceStore.bookmarkTimes live in workspaceStore
   // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
   const activeGraphConfig = new GraphConfig();
   const fieldPresenter = FlightLogFieldPresenter;
@@ -132,10 +130,6 @@ function BlackboxLogViewer() {
     // Playback
     playbackStore.graphState = graphState;
 
-    // Workspace
-    workspaceStore.activeWorkspace = activeWorkspace;
-    workspaceStore.workspaceGraphConfigs = workspaceGraphConfigs || [];
-    workspaceStore.bookmarkTimes = [...bookmarkTimes];
   }
 
   function blackboxTimeFromVideoTime() {
@@ -870,12 +864,12 @@ function BlackboxLogViewer() {
     // get bookmark events
     const bookmarks = [];
     try {
-      if (bookmarkTimes != null) {
+      if (workspaceStore.bookmarkTimes != null) {
         for (let i = 0; i <= 9; i++) {
-          if (bookmarkTimes[i] != null) {
+          if (workspaceStore.bookmarkTimes[i] != null) {
             bookmarks[i] = {
-              state: bookmarkTimes[i] !== 0,
-              time: bookmarkTimes[i],
+              state: workspaceStore.bookmarkTimes[i] !== 0,
+              time: workspaceStore.bookmarkTimes[i],
             };
           } else bookmarks[i] = null;
         }
@@ -887,7 +881,7 @@ function BlackboxLogViewer() {
   };
 
   this.getBookmarkTimes = function () {
-    return bookmarkTimes;
+    return workspaceStore.bookmarkTimes;
   };
 
   this.refreshGraph = function () {
@@ -906,15 +900,15 @@ function BlackboxLogViewer() {
   function saveWorkspaces(file) {
     let data; // Data to save
 
-    if (!workspaceGraphConfigs) {
+    if (!workspaceStore.workspaceGraphConfigs) {
       return null;
     } // No workspaces to save
     if (!file) {
       file = "workspaces.json";
     } // No filename to save to, make one up
 
-    if (typeof workspaceGraphConfigs === "object") {
-      data = JSON.stringify(workspaceGraphConfigs, undefined, 4);
+    if (typeof workspaceStore.workspaceGraphConfigs === "object") {
+      data = JSON.stringify(workspaceStore.workspaceGraphConfigs, undefined, 4);
     }
 
     triggerDownload(new Blob([data], { type: "text/json" }), file);
@@ -957,8 +951,8 @@ function BlackboxLogViewer() {
         globalThis.alert("Old Workspace format. Upgrading...");
         tmp = upgradeWorkspaceFormat(tmp);
       }
-      workspaceGraphConfigs = tmp;
-      onSwitchWorkspace(workspaceGraphConfigs, 1);
+      workspaceStore.workspaceGraphConfigs = tmp;
+      onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, 1);
       globalThis.alert("Workspaces Loaded");
     };
 
@@ -1031,8 +1025,6 @@ function BlackboxLogViewer() {
   function onSwitchWorkspace(newWorkspaces, newActiveId) {
     prefs.set("activeWorkspace", newActiveId);
     prefs.set("workspaceGraphConfigs", newWorkspaces);
-    workspaceGraphConfigs = newWorkspaces;
-    activeWorkspace = newActiveId;
     workspaceStore.workspaceGraphConfigs = newWorkspaces || [];
     workspaceStore.activeWorkspace = newActiveId;
     if (
@@ -1047,11 +1039,11 @@ function BlackboxLogViewer() {
 
   // Save current config
   function onSaveWorkspace(id, title) {
-    workspaceGraphConfigs[id] = {
+    workspaceStore.workspaceGraphConfigs[id] = {
       title: title,
       graphConfig: graphConfig,
     };
-    onSwitchWorkspace(workspaceGraphConfigs, id);
+    onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
   }
 
   activeGraphConfig.addListener(function () {
@@ -1074,21 +1066,21 @@ function BlackboxLogViewer() {
     // initial load of the configuration defaults if we have them
     prefs.get("workspaceGraphConfigs", function (item) {
       if (item) {
-        workspaceGraphConfigs = upgradeWorkspaceFormat(item);
+        workspaceStore.workspaceGraphConfigs = upgradeWorkspaceFormat(item);
       } else {
-        workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
+        workspaceStore.workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
       }
     });
 
     prefs.get("activeWorkspace", function (id) {
       if (id) {
-        activeWorkspace = id;
+        workspaceStore.activeWorkspace = id;
       } else {
-        activeWorkspace = 1;
+        workspaceStore.activeWorkspace = 1;
       }
     });
 
-    onSwitchWorkspace(workspaceGraphConfigs, activeWorkspace);
+    onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, workspaceStore.activeWorkspace);
 
     prefs.get("log-legend-hidden", function (item) {
       if (item) {
@@ -1258,8 +1250,8 @@ function BlackboxLogViewer() {
 
     // Status bar interactions wired via Vue StatusBar bridge
     this.gotoBookmark = function (index) {
-      if (bookmarkTimes?.[index] != null) {
-        setCurrentBlackboxTime(bookmarkTimes[index]);
+      if (workspaceStore.bookmarkTimes?.[index] != null) {
+        setCurrentBlackboxTime(workspaceStore.bookmarkTimes[index]);
         invalidateGraph();
       }
     };
@@ -1582,11 +1574,11 @@ function BlackboxLogViewer() {
 
     function handleWorkspaceKey(id, shiftKey) {
       if (!shiftKey) {
-        if (workspaceGraphConfigs[id] != null) {
-          onSwitchWorkspace(workspaceGraphConfigs, id);
+        if (workspaceStore.workspaceGraphConfigs[id] != null) {
+          onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
         }
-      } else if (workspaceGraphConfigs[id]) {
-        onSaveWorkspace(id, workspaceGraphConfigs[id].title);
+      } else if (workspaceStore.workspaceGraphConfigs[id]) {
+        onSaveWorkspace(id, workspaceStore.workspaceGraphConfigs[id].title);
       } else {
         onSaveWorkspace(id, "Unnamed");
       }
@@ -1594,14 +1586,14 @@ function BlackboxLogViewer() {
 
     function handleBookmarkSave(id) {
       if (id === 0) {
-        bookmarkTimes = [];
-      } else if (bookmarkTimes == null) {
-        bookmarkTimes = [];
-        bookmarkTimes[id] = currentBlackboxTime;
-      } else if (bookmarkTimes[id] == null) {
-        bookmarkTimes[id] = currentBlackboxTime;
+        workspaceStore.bookmarkTimes = [];
+      } else if (workspaceStore.bookmarkTimes == null) {
+        workspaceStore.bookmarkTimes = [];
+        workspaceStore.bookmarkTimes[id] = currentBlackboxTime;
+      } else if (workspaceStore.bookmarkTimes[id] == null) {
+        workspaceStore.bookmarkTimes[id] = currentBlackboxTime;
       } else {
-        bookmarkTimes[id] = null;
+        workspaceStore.bookmarkTimes[id] = null;
       }
       invalidateGraph();
     }
@@ -1612,8 +1604,8 @@ function BlackboxLogViewer() {
         handleWorkspaceKey(id, e.shiftKey);
       } else if (e.shiftKey) {
         handleBookmarkSave(id);
-      } else if (bookmarkTimes[id] != null) {
-        setCurrentBlackboxTime(bookmarkTimes[id]);
+      } else if (workspaceStore.bookmarkTimes[id] != null) {
+        setCurrentBlackboxTime(workspaceStore.bookmarkTimes[id]);
         invalidateGraph();
       }
     }
@@ -1715,8 +1707,8 @@ function BlackboxLogViewer() {
           makeScreenshot();
         } else if (e.shiftKey) {
           onSaveWorkspace(
-            activeWorkspace,
-            workspaceGraphConfigs[activeWorkspace].title,
+            workspaceStore.activeWorkspace,
+            workspaceStore.workspaceGraphConfigs[workspaceStore.activeWorkspace].title,
           );
         }
       } catch {
@@ -2061,8 +2053,8 @@ function BlackboxLogViewer() {
       }
     };
     this.switchWorkspace = function (id) {
-      if (workspaceGraphConfigs[id] != null) {
-        onSwitchWorkspace(workspaceGraphConfigs, id);
+      if (workspaceStore.workspaceGraphConfigs[id] != null) {
+        onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
       }
     };
     this.saveWorkspace = function (id, title) {
