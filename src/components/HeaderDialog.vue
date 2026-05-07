@@ -986,8 +986,8 @@ const disabledFieldsList = computed(() => {
 // --- All Headers ---
 
 const headerFieldColumns = [
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "value", header: "Value" },
+  { accessorKey: "name", header: "Name", meta: { class: { td: "whitespace-nowrap" } } },
+  { accessorKey: "value", header: "Value", meta: { class: { td: "w-full" } } },
   { accessorKey: "toggle", header: "" },
 ];
 
