@@ -62,8 +62,6 @@ function BlackboxLogViewer() {
   let graphState = GRAPH_STATE_PAUSED;
   let currentBlackboxTime = 0;
   let lastRenderTime = false;
-  let flightLog;
-  let flightLogDataArray;
   let graph = null;
   const prefs = new PrefStorage();
   let _configuration = null; // is their an associated dump file ?
@@ -78,7 +76,7 @@ function BlackboxLogViewer() {
   // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
   const activeGraphConfig = new GraphConfig();
   const fieldPresenter = FlightLogFieldPresenter;
-  let hasLog = false;
+  // hasLog lives in logStore.hasLog
   // hasMarker lives in graphStore.hasMarker
   // hasAnalyser, hasMap, hasAnalyserFullscreen live in graphStore
   // hasAnalyserSticks constant false, set in graphStore
@@ -116,11 +114,8 @@ function BlackboxLogViewer() {
 
   function syncToStores() {
     // Log
-    logStore.flightLog = flightLog ?? null;
-    logStore.flightLogDataArray = flightLogDataArray ?? null;
     logStore.currentBlackboxTime = currentBlackboxTime;
-    logStore.hasLog = hasLog;
-    logStore.hasGps = !!flightLog?.hasGpsData?.();
+    logStore.hasGps = !!logStore.flightLog?.hasGpsData?.();
 
     // Graph
     graphStore.hasCraft = !!userSettings.drawCraft;
@@ -133,11 +128,11 @@ function BlackboxLogViewer() {
   }
 
   function blackboxTimeFromVideoTime() {
-    return (video.currentTime - playbackStore.videoOffset) * 1000000 + flightLog.getMinTime();
+    return (video.currentTime - playbackStore.videoOffset) * 1000000 + logStore.flightLog.getMinTime();
   }
 
   function syncLogToVideo() {
-    if (hasLog) {
+    if (logStore.hasLog) {
       currentBlackboxTime = blackboxTimeFromVideoTime();
     }
   }
@@ -173,28 +168,28 @@ function BlackboxLogViewer() {
   }
 
   function updateValuesChart() {
-    const frame = flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
-      fieldNames = flightLog.getMainFieldNames();
+    const frame = logStore.flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
+      fieldNames = logStore.flightLog.getMainFieldNames();
 
     if (frame) {
       const currentFlightMode =
-        frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+        frame[logStore.flightLog.getMainFieldIndexByName("flightModeFlags")];
 
       if (graphStore.hasTableOverlay) {
-        const debugMode = flightLog.getSysConfig().debug_mode;
+        const debugMode = logStore.flightLog.getSysConfig().debug_mode;
         const values = [];
 
         for (let i = 0; i < fieldNames.length; i++) {
           values.push({
             name: fieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
             raw: atMost2DecPlaces(frame[i]),
-            decoded: fieldPresenter.decodeFieldToFriendly(flightLog, fieldNames[i], frame[i], currentFlightMode),
+            decoded: fieldPresenter.decodeFieldToFriendly(logStore.flightLog, fieldNames[i], frame[i], currentFlightMode),
           });
         }
         logStore.fieldValues = values;
 
         const statRows = [];
-        const stats = SimpleStats(flightLog).calculate();
+        const stats = SimpleStats(logStore.flightLog).calculate();
         for (const field of Object.keys(stats)) {
           const stat = stats[field];
           if (stat === undefined) {
@@ -202,9 +197,9 @@ function BlackboxLogViewer() {
           }
           statRows.push({
             name: fieldPresenter.fieldNameToFriendly(stat.name, debugMode),
-            min: `${FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.min)} (${atMost2DecPlaces(stat.min)})`,
-            max: `${FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.max)} (${atMost2DecPlaces(stat.max)})`,
-            mean: `${FlightLogFieldPresenter.decodeFieldToFriendly(flightLog, stat.name, stat.mean)} (${atMost2DecPlaces(stat.mean)})`,
+            min: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.min)} (${atMost2DecPlaces(stat.min)})`,
+            max: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.max)} (${atMost2DecPlaces(stat.max)})`,
+            mean: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.mean)} (${atMost2DecPlaces(stat.mean)})`,
           });
         }
         logStore.fieldStats = statRows;
@@ -221,7 +216,7 @@ function BlackboxLogViewer() {
 
       // update time field
       const graphTimeText = formatTime(
-        (currentBlackboxTime - flightLog.getMinTime()) / 1000,
+        (currentBlackboxTime - logStore.flightLog.getMinTime()) / 1000,
         true,
       );
       appStore.graphTimeDisplay = graphTimeText;
@@ -235,7 +230,7 @@ function BlackboxLogViewer() {
 
       // Update the Legend Values
       if (graphStore.legendVisible) {
-        updateLegendValues(flightLog, frame);
+        updateLegendValues(logStore.flightLog, frame);
       }
     }
   }
@@ -265,8 +260,8 @@ function BlackboxLogViewer() {
 
       currentBlackboxTime += delta;
 
-      if (currentBlackboxTime > flightLog.getMaxTime()) {
-        currentBlackboxTime = flightLog.getMaxTime();
+      if (currentBlackboxTime > logStore.flightLog.getMaxTime()) {
+        currentBlackboxTime = logStore.flightLog.getMaxTime();
         setGraphState(GRAPH_STATE_PAUSED);
       }
     }
@@ -276,7 +271,7 @@ function BlackboxLogViewer() {
     seekBar.setCurrentTime(currentBlackboxTime);
     seekBar.setWindow(graph.getWindowWidthTime());
 
-    if (flightLog.hasGpsData()) {
+    if (logStore.flightLog.hasGpsData()) {
       mapGrapher.setCurrentTime(currentBlackboxTime);
     }
 
@@ -311,7 +306,7 @@ function BlackboxLogViewer() {
     if (graph) {
       graph.resize(width, height);
       seekBar.resize(canvas.offsetWidth, 50);
-      if (flightLog.hasGpsData()) {
+      if (logStore.flightLog.hasGpsData()) {
         mapGrapher.resize(width, height);
       }
 
@@ -321,8 +316,8 @@ function BlackboxLogViewer() {
 
   function setSeekBarMode(mode) {
     graphStore.seekBarMode = mode;
-    if (flightLog) {
-      const activity = flightLog.getActivitySummary();
+    if (logStore.flightLog) {
+      const activity = logStore.flightLog.getActivitySummary();
       seekBar.setActivity(activity.times, activity[mode], activity.hasEvent);
       seekBar.repaint();
     }
@@ -331,23 +326,23 @@ function BlackboxLogViewer() {
   function renderLogFileInfo(file) {
     appStore.logFilename = file.name;
 
-    const logCount = flightLog.getLogCount();
+    const logCount = logStore.flightLog.getLogCount();
     const entries = [];
     for (let index = 0; index < logCount; index++) {
-      const error = flightLog.getLogError(index);
+      const error = logStore.flightLog.getLogError(index);
       let logLabel;
       if (error) {
         logLabel = error;
       } else {
         logLabel = `${formatTime(
-          flightLog.getMinTime(index) / 1000,
+          logStore.flightLog.getMinTime(index) / 1000,
           false,
         )} - ${formatTime(
-          flightLog.getMaxTime(index) / 1000,
+          logStore.flightLog.getMaxTime(index) / 1000,
           false,
         )} [${formatTime(
           Math.ceil(
-            (flightLog.getMaxTime(index) - flightLog.getMinTime(index)) / 1000,
+            (logStore.flightLog.getMaxTime(index) - logStore.flightLog.getMinTime(index)) / 1000,
           ),
           false,
         )}]`;
@@ -365,18 +360,18 @@ function BlackboxLogViewer() {
    * Update the metadata displays to show information about the currently selected log index.
    */
   function renderSelectedLogInfo() {
-    logStore.activeLogIndex = flightLog.getLogIndex();
+    logStore.activeLogIndex = logStore.flightLog.getLogIndex();
 
-    if (flightLog.getNumCellsEstimate()) {
-      appStore.statusCells = `${flightLog.getNumCellsEstimate()}S (${Number(
-        flightLog.getReferenceVoltageMillivolts() / 1000,
+    if (logStore.flightLog.getNumCellsEstimate()) {
+      appStore.statusCells = `${logStore.flightLog.getNumCellsEstimate()}S (${Number(
+        logStore.flightLog.getReferenceVoltageMillivolts() / 1000,
       ).toFixed(2)}V)`;
     } else {
       appStore.statusCells = "";
     }
 
     // Add log version information to status bar
-    const sysConfig = flightLog.getSysConfig();
+    const sysConfig = logStore.flightLog.getSysConfig();
 
     const versionText =
       (sysConfig["Craft name"] != null && sysConfig["Craft name"].length
@@ -404,16 +399,16 @@ function BlackboxLogViewer() {
     appStore.statusLograte = lograteText;
 
     seekBar.setTimeRange(
-      flightLog.getMinTime(),
-      flightLog.getMaxTime(),
+      logStore.flightLog.getMinTime(),
+      logStore.flightLog.getMaxTime(),
       currentBlackboxTime,
     );
     seekBar.setActivityRange(
-      flightLog.getSysConfig().motorOutput[0],
-      flightLog.getSysConfig().motorOutput[1],
+      logStore.flightLog.getSysConfig().motorOutput[0],
+      logStore.flightLog.getSysConfig().motorOutput[1],
     );
 
-    const activity = flightLog.getActivitySummary();
+    const activity = logStore.flightLog.getActivitySummary();
 
     seekBar.setActivity(
       activity.times,
@@ -423,8 +418,8 @@ function BlackboxLogViewer() {
     seekBar.repaint();
 
     // Add flightLog to map
-    if (flightLog.hasGpsData()) {
-      mapGrapher.setFlightLog(flightLog);
+    if (logStore.flightLog.hasGpsData()) {
+      mapGrapher.setFlightLog(logStore.flightLog);
     }
   }
 
@@ -453,7 +448,7 @@ function BlackboxLogViewer() {
   function setCurrentBlackboxTime(newTime) {
     if (logStore.hasVideo) {
       video.currentTime =
-        (newTime - flightLog.getMinTime()) / 1000000 + playbackStore.videoOffset;
+        (newTime - logStore.flightLog.getMinTime()) / 1000000 + playbackStore.videoOffset;
 
       syncLogToVideo();
     } else {
@@ -551,8 +546,8 @@ function BlackboxLogViewer() {
 
     try {
       if (logIndex === null) {
-        for (let i = 0; i < flightLog.getLogCount(); i++) {
-          if (flightLog.openLog(i)) {
+        for (let i = 0; i < logStore.flightLog.getLogCount(); i++) {
+          if (logStore.flightLog.openLog(i)) {
             success = true;
             currentOffsetCache.index = i;
             break;
@@ -563,7 +558,7 @@ function BlackboxLogViewer() {
           throw "No logs in this file could be parsed successfully";
         }
       } else {
-        flightLog.openLog(logIndex);
+        logStore.flightLog.openLog(logIndex);
         currentOffsetCache.index = logIndex;
       }
     } catch (e) {
@@ -577,20 +572,20 @@ function BlackboxLogViewer() {
     }
 
     if (
-      flightLog.getSysConfig().looptime != null &&
-      flightLog.getSysConfig().frameIntervalPNum != null &&
-      flightLog.getSysConfig().frameIntervalPDenom != null
+      logStore.flightLog.getSysConfig().looptime != null &&
+      logStore.flightLog.getSysConfig().frameIntervalPNum != null &&
+      logStore.flightLog.getSysConfig().frameIntervalPDenom != null
     ) {
       userSettings.analyserSampleRate =
         1000000 /
-        ((flightLog.getSysConfig().looptime *
-          validate(flightLog.getSysConfig().pid_process_denom, 1) *
-          flightLog.getSysConfig().frameIntervalPDenom) /
-          flightLog.getSysConfig().frameIntervalPNum);
+        ((logStore.flightLog.getSysConfig().looptime *
+          validate(logStore.flightLog.getSysConfig().pid_process_denom, 1) *
+          logStore.flightLog.getSysConfig().frameIntervalPDenom) /
+          logStore.flightLog.getSysConfig().frameIntervalPNum);
     }
 
     graph = new FlightLogGrapher(
-      flightLog,
+      logStore.flightLog,
       activeGraphConfig,
       canvas,
       stickCanvas,
@@ -602,7 +597,7 @@ function BlackboxLogViewer() {
     setVideoInTime(false);
     setVideoOutTime(false);
 
-    activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+    activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
 
     graph.onSeek = function (offset) {
       //Seek faster
@@ -620,7 +615,7 @@ function BlackboxLogViewer() {
       syncLogToVideo();
     } else {
       // Start at beginning:
-      currentBlackboxTime = flightLog.getMinTime();
+      currentBlackboxTime = logStore.flightLog.getMinTime();
     }
 
     renderSelectedLogInfo();
@@ -694,10 +689,10 @@ function BlackboxLogViewer() {
         return;
       }
 
-      flightLogDataArray = new Uint8Array(bytes);
+      logStore.flightLogDataArray = new Uint8Array(bytes);
 
       try {
-        flightLog = new FlightLog(flightLogDataArray);
+        logStore.flightLog = new FlightLog(logStore.flightLogDataArray);
       } catch (err) {
         alert(
           `Sorry, an error occurred while trying to open this log:\n\n${err}`,
@@ -706,7 +701,7 @@ function BlackboxLogViewer() {
       }
 
       if (!graphConfig) {
-        graphConfig = GraphConfig.getExampleGraphConfigs(flightLog, [
+        graphConfig = GraphConfig.getExampleGraphConfigs(logStore.flightLog, [
           "Motors",
           "Gyros",
         ]);
@@ -717,7 +712,6 @@ function BlackboxLogViewer() {
       currentOffsetCache.log = file.name; // store the name of the loaded log file
       currentOffsetCache.index = null; // and clear the index
 
-      hasLog = true;
       logStore.hasLog = true;
 
       setTimeout(function () {
@@ -785,17 +779,17 @@ function BlackboxLogViewer() {
     }));
   }
 
-  function updateLegendValues(flightLog, frame) {
+  function updateLegendValues(log, frame) {
     try {
-      const currentFlightMode = frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+      const currentFlightMode = frame[log.getMainFieldIndexByName("flightModeFlags")];
       const graphs = activeGraphConfig.getGraphs();
       const vals = {};
       for (const graph of graphs) {
         for (const field of graph.fields) {
-          let value = frame[flightLog.getMainFieldIndexByName(field.name)];
+          let value = frame[log.getMainFieldIndexByName(field.name)];
           if (userSettings.legendUnits) {
             value = FlightLogFieldPresenter.decodeFieldToFriendly(
-              flightLog, field.name, value, currentFlightMode,
+              log, field.name, value, currentFlightMode,
             );
           } else if (value % 1 !== 0) {
             value = value.toFixed(2);
@@ -983,7 +977,7 @@ function BlackboxLogViewer() {
       file,
       performance.now(),
     );
-    CsvExporter(flightLog, options).dump(onSuccess);
+    CsvExporter(logStore.flightLog, options).dump(onSuccess);
   }
 
   function exportSpectrumToCsv(options = {}) {
@@ -1009,14 +1003,14 @@ function BlackboxLogViewer() {
       file,
       performance.now(),
     );
-    GpxExporter(flightLog).dump(onSuccess);
+    GpxExporter(logStore.flightLog).dump(onSuccess);
   }
 
   function newGraphConfig(newConfig, noRedraw) {
     lastGraphConfig = graphConfig; // Remember the last configuration.
     graphConfig = newConfig;
     activeGraphConfig.setRedrawChart(noRedraw ? false : true);
-    activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+    activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
 
     prefs.set("graphConfig", graphConfig);
   }
@@ -1028,7 +1022,7 @@ function BlackboxLogViewer() {
     workspaceStore.workspaceGraphConfigs = newWorkspaces || [];
     workspaceStore.activeWorkspace = newActiveId;
     if (
-      flightLog &&
+      logStore.flightLog &&
       newWorkspaces[newActiveId] &&
       newWorkspaces[newActiveId].graphConfig
     ) {
@@ -1107,7 +1101,7 @@ function BlackboxLogViewer() {
         } // Assume 60Hz video
         setVideoTime(video.currentTime - scrollTime / 1000000);
       } else {
-        const currentFrame = flightLog.getCurrentFrameAtTime(
+        const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
           logStore.hasVideo ? video.currentTime : currentBlackboxTime,
         );
         if (currentFrame && currentFrame.previous && slow) {
@@ -1137,7 +1131,7 @@ function BlackboxLogViewer() {
         } // Assume 60Hz video
         setVideoTime(video.currentTime + scrollTime / 1000000);
       } else {
-        const currentFrame = flightLog.getCurrentFrameAtTime(
+        const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
           logStore.hasVideo ? video.currentTime : currentBlackboxTime,
         );
         if (currentFrame && currentFrame.next && slow) {
@@ -1154,12 +1148,12 @@ function BlackboxLogViewer() {
       setGraphState(GRAPH_STATE_PAUSED);
     };
     logJumpStart = function () {
-      setCurrentBlackboxTime(flightLog.getMinTime());
+      setCurrentBlackboxTime(logStore.flightLog.getMinTime());
       setGraphState(GRAPH_STATE_PAUSED);
     };
 
     logJumpEnd = function () {
-      setCurrentBlackboxTime(flightLog.getMaxTime());
+      setCurrentBlackboxTime(logStore.flightLog.getMaxTime());
       setGraphState(GRAPH_STATE_PAUSED);
     };
 
@@ -1184,7 +1178,7 @@ function BlackboxLogViewer() {
     };
 
     const logSmartSync = function () {
-      if (graphStore.hasMarker && logStore.hasVideo && hasLog) {
+      if (graphStore.hasMarker && logStore.hasVideo && logStore.hasLog) {
         try {
           setVideoOffset(
             playbackStore.videoOffset + (currentBlackboxTime - graphStore.markerTime) / 1000000,
@@ -1942,7 +1936,7 @@ function BlackboxLogViewer() {
     this.toggleMap = function () {
       graphStore.hasMap = !graphStore.hasMap;
       prefs.set("hasMap", graphStore.hasMap);
-      if (flightLog?.hasGpsData()) {
+      if (logStore.flightLog?.hasGpsData()) {
         mapGrapher.initialize();
       }
     };
@@ -2037,7 +2031,7 @@ function BlackboxLogViewer() {
         if (logStore.hasVideo) {
           setVideoTime(newTime / 1000000 + playbackStore.videoOffset);
         } else {
-          newTime += flightLog?.getMinTime() ?? 0;
+          newTime += logStore.flightLog?.getMinTime() ?? 0;
           setCurrentBlackboxTime(newTime);
         }
         invalidateGraph();
