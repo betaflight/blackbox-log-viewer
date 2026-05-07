@@ -281,9 +281,9 @@ export function FFTComplex(n, inverse) {
   n = Math.trunc(n);
   inverse = !!inverse;
 
-  if (n < 1) {
+  if (!Number.isFinite(n) || n < 1) {
     throw new RangeError(
-      `n is outside range, should be positive integer, was \`${  n  }'`,
+      `n is outside range, should be a finite positive integer, was \`${n}'`,
     );
   }
 
