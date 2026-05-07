@@ -61,7 +61,7 @@
           :data-group="group"
           class="break-inside-avoid mb-4"
         >
-            <UiBox :title="group" collapsible>
+            <UiBox :title="group">
               <template #title>
                 <UIcon name="i-lucide-grip-horizontal" class="drag-handle size-3 cursor-grab active:cursor-grabbing opacity-40 hover:opacity-100 ml-1" />
               </template>
