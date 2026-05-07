@@ -182,19 +182,19 @@ const highlightFi = ref(null);
 function onFieldHover(gi, fi) {
   highlightGi.value = gi;
   highlightFi.value = fi;
-  appStore.controller?.legendHighlight?.(gi, fi);
+  graphStore.highlightLegendField(gi, fi);
 }
 
 function onFieldLeave() {
   highlightGi.value = null;
   highlightFi.value = null;
-  appStore.controller?.legendHighlight?.(null, null);
+  graphStore.highlightLegendField(null, null);
 }
 
 // --- Field click → analyser selection ---
 function onFieldClick(e, gi, fi, field) {
   if (e.button !== 0 || e.altKey) { return; }
-  appStore.controller?.legendSelect?.(gi, fi, field.friendlyName, e.ctrlKey);
+  graphStore.selectLegendField(gi, fi, field.friendlyName, e.ctrlKey);
   e.preventDefault();
 }
 
@@ -202,27 +202,27 @@ function onFieldClick(e, gi, fi, field) {
 function onGraphClick(e, gi) {
   if (e.button !== 0) { return; }
   if (e.altKey) {
-    appStore.controller?.legendExpand?.(gi);
+    graphStore.expandGraphConfig?.(gi);
   } else {
-    appStore.controller?.legendZoom?.(gi);
+    graphStore.zoomGraphConfig?.(gi);
   }
   e.preventDefault();
 }
 
 // --- Visibility toggle ---
 function onToggleVisibility(gi, fi) {
-  appStore.controller?.legendToggleField?.(gi, fi);
+  graphStore.toggleLegendField(gi, fi);
 }
 
 // --- Show/Hide ---
 function showLegend() {
   graphStore.legendVisible = true;
-  appStore.controller?.legendVisibilityChange?.(false);
+  graphStore.legendVisibilityChange(false);
 }
 
 function hideLegend() {
   graphStore.legendVisible = false;
-  appStore.controller?.legendVisibilityChange?.(true);
+  graphStore.legendVisibilityChange(true);
 }
 
 // --- Drag & drop for graph reorder ---
@@ -258,7 +258,7 @@ function setupDragContainer(el) {
     e.preventDefault();
     const newOrder = Array.from(el.querySelectorAll(".graph-legend"))
       .map((div) => Number.parseInt(div.dataset.index));
-    appStore.controller?.legendReorder?.(newOrder);
+    graphStore.reorderGraphs?.(newOrder);
   });
 }
 
@@ -284,13 +284,13 @@ watch(legendContainer, (el) => {
 
 // --- Pen reset (middle-click) and field wheel adjustments ---
 function onResetPen(gi, fi) {
-  appStore.controller?.legendResetPen?.(gi, fi);
+  graphStore.resetPen?.(gi, fi);
 }
 
 function onFieldWheel(e, gi, fi) {
   if (e.shiftKey || e.altKey || e.ctrlKey) {
     const delta = e.deltaY < 0 ? 1 : -1;
-    appStore.controller?.legendFieldWheel?.(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
+    graphStore.fieldWheel?.(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
   }
 }
 

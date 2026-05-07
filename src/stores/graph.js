@@ -52,8 +52,65 @@ export const useGraphStore = defineStore("graph", () => {
   const markerTime = ref(0);
   const seekBarMode = ref("avgThrottle");
 
-  // Registered by main.js — queues a graph render frame
+  // Callbacks registered by main.js
   const invalidateGraph = shallowRef(null);
+  const updateCanvasSize = shallowRef(null);
+  const zoomGraphConfig = shallowRef(null);
+  const expandGraphConfig = shallowRef(null);
+  const reorderGraphs = shallowRef(null);
+  const resetPen = shallowRef(null);
+  const fieldWheel = shallowRef(null);
+
+  // --- Legend actions ---
+
+  function buildLegendGraphs() {
+    const graphs = activeGraphConfig.value?.getGraphs() ?? [];
+    legendGraphs.value = graphs.map((g, gi) => ({
+      label: g.label,
+      fields: g.fields.map((f, fi) => ({
+        name: f.name,
+        friendlyName: f.friendlyName,
+        color: f.color,
+        hidden: activeGraphConfig.value.isGraphFieldHidden(gi, fi),
+      })),
+    }));
+  }
+
+  function highlightLegendField(gi, fi) {
+    if (!activeGraphConfig.value) return;
+    activeGraphConfig.value.highlightGraphIndex = gi;
+    activeGraphConfig.value.highlightFieldIndex = fi;
+    invalidateGraph.value?.();
+  }
+
+  function selectLegendField(gi, fi, fieldName, ctrlKey) {
+    if (!activeGraphConfig.value) return;
+    const toggleAnalizer = activeGraphConfig.value.selectedFieldName === fieldName;
+    const lockAnalyserHide = ctrlKey || graph.value?.hasMultiSpectrumAnalyser();
+    if (toggleAnalizer) {
+      hasAnalyser.value = lockAnalyserHide ? true : !hasAnalyser.value;
+    } else {
+      activeGraphConfig.value.selectedFieldName = fieldName;
+      activeGraphConfig.value.selectedGraphIndex = gi;
+      activeGraphConfig.value.selectedFieldIndex = fi;
+      hasAnalyser.value = true;
+    }
+    graph.value?.setDrawAnalyser(hasAnalyser.value, ctrlKey);
+    prefs.set("hasAnalyser", hasAnalyser.value);
+    invalidateGraph.value?.();
+  }
+
+  function toggleLegendField(gi, fi) {
+    if (!activeGraphConfig.value) return;
+    activeGraphConfig.value.toggleGraphField(gi, fi);
+    buildLegendGraphs();
+    invalidateGraph.value?.();
+  }
+
+  function legendVisibilityChange(hidden) {
+    prefs.set("log-legend-hidden", hidden);
+    updateCanvasSize.value?.();
+  }
 
   function toggleAnalyser() {
     if (activeGraphConfig.value?.selectedFieldName != null) {
@@ -137,6 +194,17 @@ export const useGraphStore = defineStore("graph", () => {
     markerTime,
     seekBarMode,
     invalidateGraph,
+    updateCanvasSize,
+    zoomGraphConfig,
+    expandGraphConfig,
+    reorderGraphs,
+    resetPen,
+    fieldWheel,
+    buildLegendGraphs,
+    highlightLegendField,
+    selectLegendField,
+    toggleLegendField,
+    legendVisibilityChange,
     toggleAnalyser,
     toggleAnalyserFullscreen,
     toggleMap,

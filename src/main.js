@@ -284,6 +284,7 @@ function BlackboxLogViewer() {
     }
   }
   graphStore.invalidateGraph = invalidateGraph;
+  graphStore.updateCanvasSize = updateCanvasSize;
 
   function updateCanvasSize() {
     const width = canvas.clientWidth,
@@ -750,18 +751,7 @@ function BlackboxLogViewer() {
     alert(errorMessage);
   }
 
-  function buildLegendGraphs() {
-    const graphs = graphStore.activeGraphConfig.getGraphs();
-    graphStore.legendGraphs = graphs.map((g, gi) => ({
-      label: g.label,
-      fields: g.fields.map((f, fi) => ({
-        name: f.name,
-        friendlyName: f.friendlyName,
-        color: f.color,
-        hidden: graphStore.activeGraphConfig.isGraphFieldHidden(gi, fi),
-      })),
-    }));
-  }
+  // buildLegendGraphs moved to graphStore
 
   function updateLegendValues(log, frame) {
     try {
@@ -788,42 +778,8 @@ function BlackboxLogViewer() {
     }
   }
 
-  function onLegendVisbilityChange(hidden) {
-    prefs.set("log-legend-hidden", hidden);
-    updateCanvasSize();
-  }
-
-  function onLegendSelectionChange(gi, fi, fieldName, ctrlKey) {
-    const toggleAnalizer = graphStore.activeGraphConfig.selectedFieldName === fieldName;
-    const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
-    if (toggleAnalizer) {
-      if (lockAnalyserHide) {
-        graphStore.hasAnalyser = true;
-      } else {
-        graphStore.hasAnalyser = !graphStore.hasAnalyser;
-      }
-    } else {
-      graphStore.activeGraphConfig.selectedFieldName = fieldName;
-      graphStore.activeGraphConfig.selectedGraphIndex = gi;
-      graphStore.activeGraphConfig.selectedFieldIndex = fi;
-      graphStore.hasAnalyser = true;
-    }
-    graph.setDrawAnalyser(graphStore.hasAnalyser, ctrlKey);
-    prefs.set("hasAnalyser", graphStore.hasAnalyser);
-    invalidateGraph();
-  }
-
-  function onLegendHighlightChange(gi, fi) {
-    graphStore.activeGraphConfig.highlightGraphIndex = gi;
-    graphStore.activeGraphConfig.highlightFieldIndex = fi;
-    invalidateGraph();
-  }
-
-  function onLegendToggleField(gi, fi) {
-    graphStore.activeGraphConfig.toggleGraphField(gi, fi);
-    buildLegendGraphs();
-    invalidateGraph();
-  }
+  // onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange,
+  // onLegendToggleField moved to graphStore actions
 
   function setMarker(state) {
     graphStore.hasMarker = state;
@@ -1025,7 +981,7 @@ function BlackboxLogViewer() {
   }
 
   graphStore.activeGraphConfig.addListener(function () {
-    buildLegendGraphs();
+    graphStore.buildLegendGraphs();
     invalidateGraph();
   });
 
@@ -1039,7 +995,7 @@ function BlackboxLogViewer() {
     // Version information
     appStore.statusViewerVersion = `v${__APP_VERSION__}`;
 
-    buildLegendGraphs();
+    graphStore.buildLegendGraphs();
 
     // initial load of the configuration defaults if we have them
     prefs.get("workspaceGraphConfigs", function (item) {
@@ -1872,35 +1828,21 @@ function BlackboxLogViewer() {
       }
     });
 
-    this.legendHighlight = function (gi, fi) {
-      onLegendHighlightChange(gi, fi);
-    };
-    this.legendSelect = function (gi, fi, fieldName, ctrlKey) {
-      onLegendSelectionChange(gi, fi, fieldName, ctrlKey);
-    };
-    this.legendZoom = function (gi) {
-      zoomGraphConfig(gi);
-    };
-    this.legendExpand = function (gi) {
-      expandGraphConfig(gi);
-    };
-    this.legendToggleField = function (gi, fi) {
-      onLegendToggleField(gi, fi);
-    };
-    this.legendReorder = function (newOrder) {
+    // Legend actions: highlight, select, toggleField, legendVisibilityChange moved to graphStore
+    // Legend callbacks: closure-dependent methods registered on graphStore
+    graphStore.zoomGraphConfig = (gi) => zoomGraphConfig(gi);
+    graphStore.expandGraphConfig = (gi) => expandGraphConfig(gi);
+    graphStore.reorderGraphs = (newOrder) => {
       const oldGraphs = graphConfig;
       const newGraphs = newOrder.map((i) => oldGraphs[i]);
       newGraphConfig(newGraphs);
     };
-    this.legendVisibilityChange = function (hidden) {
-      onLegendVisbilityChange(hidden);
-    };
-    this.legendResetPen = function (gi, fi) {
+    graphStore.resetPen = (gi, fi) => {
       const graphs = graphStore.activeGraphConfig.getGraphs();
       const msg = restorePenDefaults(graphs, String(gi), fi == null ? null : String(fi));
       applyPenChange(msg);
     };
-    this.legendFieldWheel = function (gi, fi, delta, shiftKey, altKey, ctrlKey) {
+    graphStore.fieldWheel = (gi, fi, delta, shiftKey, altKey, ctrlKey) => {
       const graphs = graphStore.activeGraphConfig.getGraphs();
       const g = String(gi);
       const f = String(fi);
