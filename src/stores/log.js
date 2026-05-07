@@ -22,7 +22,10 @@ export const useLogStore = defineStore("log", () => {
   const currentBlackboxTime = ref(0);
   const hasLog = ref(false);
   const hasVideo = ref(false);
-  const hasGps = ref(false);
+  const hasGps = computed(() => {
+    void activeLogIndex.value; // re-evaluate when log index changes
+    return !!flightLog.value?.hasGpsData?.();
+  });
   const videoURL = ref(null);
 
   // Field values table data (updated by updateValuesChart in main.js)

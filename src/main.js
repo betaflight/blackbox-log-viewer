@@ -111,12 +111,6 @@ function BlackboxLogViewer() {
   const settingsStore = useSettingsStore(pinia);
   graphStore.activeGraphConfig = new GraphConfig();
 
-  function syncToStores() {
-    logStore.hasGps = !!logStore.flightLog?.hasGpsData?.();
-    graphStore.hasCraft = !!userSettings.drawCraft;
-    graphStore.hasSticks = !!userSettings.drawSticks;
-  }
-
   function blackboxTimeFromVideoTime() {
     return (video.currentTime - playbackStore.videoOffset) * 1000000 + logStore.flightLog.getMinTime();
   }
@@ -282,7 +276,6 @@ function BlackboxLogViewer() {
   }
 
   function invalidateGraph() {
-    syncToStores();
     if (!animationFrameIsQueued) {
       animationFrameIsQueued = true;
       requestAnimationFrame(animationLoop);
@@ -431,7 +424,6 @@ function BlackboxLogViewer() {
         break;
     }
 
-    syncToStores();
     invalidateGraph();
   }
 
@@ -613,7 +605,6 @@ function BlackboxLogViewer() {
 
     setGraphState(GRAPH_STATE_PAUSED);
     setGraphZoom(graphStore.graphZoom, true);
-    syncToStores();
   }
 
   function loadFiles(files) {
@@ -1877,12 +1868,10 @@ function BlackboxLogViewer() {
     };
     this.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
-      graphStore.hasCraft = userSettings.drawCraft;
       saveOneUserSetting("drawCraft", userSettings.drawCraft);
     };
     this.toggleSticks = function () {
       userSettings.drawSticks = !userSettings.drawSticks;
-      graphStore.hasSticks = userSettings.drawSticks;
       graph.setDrawSticks(userSettings.drawSticks);
       saveOneUserSetting("drawSticks", userSettings.drawSticks);
       invalidateGraph();

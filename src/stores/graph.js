@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { ref, shallowRef } from "vue";
+import { ref, shallowRef, computed } from "vue";
+import { useSettingsStore } from "./settings.js";
 
 export const GRAPH_MIN_ZOOM = 1;
 export const GRAPH_MAX_ZOOM = 1000;
@@ -16,8 +17,9 @@ export const useGraphStore = defineStore("graph", () => {
   const hasAnalyser = ref(false);
   const hasAnalyserFullscreen = ref(false);
   const hasAnalyserSticks = ref(false);
-  const hasCraft = ref(false);
-  const hasSticks = ref(false);
+  const settingsStore = useSettingsStore();
+  const hasCraft = computed(() => !!settingsStore.userSettings.drawCraft);
+  const hasSticks = computed(() => !!settingsStore.userSettings.drawSticks);
   const hasMap = ref(false);
   const hasMarker = ref(false);
   const hasConfig = ref(false);
