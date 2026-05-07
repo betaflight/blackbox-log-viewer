@@ -169,7 +169,8 @@ import { useSettingsStore } from "../stores/settings.js";
 const graphStore = useGraphStore();
 const appStore = useAppStore();
 const logStore = useLogStore();
-const { userSettings } = useSettingsStore();
+const settingsStore = useSettingsStore();
+const { userSettings } = settingsStore;
 const legendContainer = ref(null);
 
 const legendValues = computed(() => graphStore.legendValues);
@@ -295,15 +296,15 @@ function onFieldWheel(e, gi, fi) {
 
 // --- Override toggles ---
 function toggleExpo() {
-  appStore.controller?.toggleExpo?.();
+  settingsStore.saveSetting("graphExpoOverride", !userSettings.graphExpoOverride);
 }
 
 function toggleSmoothing() {
-  appStore.controller?.toggleSmoothing?.();
+  settingsStore.saveSetting("graphSmoothOverride", !userSettings.graphSmoothOverride);
 }
 
 function toggleGrid() {
-  appStore.controller?.toggleGrid?.();
+  settingsStore.saveSetting("graphGridOverride", !userSettings.graphGridOverride);
 }
 
 function openGraphConfig() {

@@ -225,23 +225,27 @@ function onNewWindow() {
 
 function onViewConfig() {
   appStore.headerDialogOpen = false;
-  getController()?.closeOverlays?.();
+  graphStore.hasTableOverlay = false;
+  graphStore.hasConfigOverlay = false;
 }
 
 function onToggleHeader() {
   if (!appStore.headerDialogOpen) {
-    getController()?.closeOverlays?.();
+    graphStore.hasTableOverlay = false;
+    graphStore.hasConfigOverlay = false;
   }
   appStore.headerDialogOpen = !appStore.headerDialogOpen;
 }
 
 function onToggleTable() {
   appStore.headerDialogOpen = false;
-  getController()?.toggleTable?.();
+  graphStore.hasTableOverlay = !graphStore.hasTableOverlay;
+  graphStore.hasConfigOverlay = false;
+  graphStore.invalidateGraph?.();
 }
 
 function onToggleVideo() {
-  getController()?.toggleVideo?.();
+  appStore.viewVideo = !appStore.viewVideo;
 }
 
 function onToggleCraft() {

@@ -44,6 +44,9 @@ export const useGraphStore = defineStore("graph", () => {
   const markerTime = ref(0);
   const seekBarMode = ref("avgThrottle");
 
+  // Registered by main.js — queues a graph render frame
+  const invalidateGraph = shallowRef(null);
+
   function setGraphZoom(zoom) {
     graphZoom.value = Math.max(GRAPH_MIN_ZOOM, Math.min(GRAPH_MAX_ZOOM, zoom));
   }
@@ -85,6 +88,7 @@ export const useGraphStore = defineStore("graph", () => {
     isFullscreen,
     markerTime,
     seekBarMode,
+    invalidateGraph,
     setGraphZoom,
     quickZoomToggle,
   };

@@ -34,6 +34,7 @@ import { usePlaybackStore, GRAPH_STATE_PAUSED, GRAPH_STATE_PLAY, PLAYBACK_MIN_RA
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
+import { watch } from "vue";
 
 
 // TODO: Figure out if we can open the same file in a new window
@@ -281,6 +282,7 @@ function BlackboxLogViewer() {
       requestAnimationFrame(animationLoop);
     }
   }
+  graphStore.invalidateGraph = invalidateGraph;
 
   function updateCanvasSize() {
     const width = canvas.clientWidth,
@@ -1478,12 +1480,20 @@ function BlackboxLogViewer() {
     }
 
     function toggleOverrideStatus(userSetting) {
-      userSettings[userSetting] = !userSettings[userSetting];
-      saveOneUserSetting(userSetting, userSettings[userSetting]);
-      graph.refreshOptions(userSettings);
-      graph.refreshGraphConfig();
-      invalidateGraph();
+      settingsStore.saveSetting(userSetting, !userSettings[userSetting]);
     }
+
+    // Watch override settings and refresh graph when they change
+    watch(
+      () => [userSettings.graphSmoothOverride, userSettings.graphExpoOverride, userSettings.graphGridOverride],
+      () => {
+        if (graph) {
+          graph.refreshOptions(userSettings);
+          graph.refreshGraphConfig();
+          invalidateGraph();
+        }
+      },
+    );
 
     // Middle-click pen reset wired via Vue LegendPanel
 
@@ -1863,9 +1873,6 @@ function BlackboxLogViewer() {
     });
 
     // View toggle bridges
-    this.toggleVideo = function () {
-      appStore.viewVideo = !appStore.viewVideo;
-    };
     this.toggleCraft = function () {
       userSettings.drawCraft = !userSettings.drawCraft;
       saveOneUserSetting("drawCraft", userSettings.drawCraft);
@@ -1875,18 +1882,6 @@ function BlackboxLogViewer() {
       graph.setDrawSticks(userSettings.drawSticks);
       saveOneUserSetting("drawSticks", userSettings.drawSticks);
       invalidateGraph();
-    };
-    this.toggleTable = function () {
-      showValueTable();
-      showConfigFile(false);
-    };
-    this.viewConfig = function () {
-      showValueTable(false);
-      showConfigFile();
-    };
-    this.closeOverlays = function () {
-      showValueTable(false);
-      showConfigFile(false);
     };
     this.toggleAnalyser = function () {
       if (graphStore.activeGraphConfig.selectedFieldName != null) {
@@ -1926,15 +1921,6 @@ function BlackboxLogViewer() {
       }
       graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       invalidateGraph();
-    };
-    this.toggleSmoothing = function () {
-      toggleOverrideStatus("graphSmoothOverride");
-    };
-    this.toggleExpo = function () {
-      toggleOverrideStatus("graphExpoOverride");
-    };
-    this.toggleGrid = function () {
-      toggleOverrideStatus("graphGridOverride");
     };
     this.legendHighlight = function (gi, fi) {
       onLegendHighlightChange(gi, fi);
