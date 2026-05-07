@@ -72,16 +72,19 @@
               class="graph-legend-field-name"
               @click="onFieldClick($event, gi, fi, field)"
             >{{ field.friendlyName }}</span>
-            <span
-              class="graph-legend-field-visibility"
+            <button
+              type="button"
+              class="graph-legend-field-visibility bg-transparent border-0 p-0 cursor-pointer"
               :class="field.hidden ? 'legend-eye-closed' : 'legend-eye-open'"
+              :aria-label="field.hidden ? `Show ${field.friendlyName}` : `Hide ${field.friendlyName}`"
+              :aria-pressed="!field.hidden"
               @click.prevent="onToggleVisibility(gi, fi)"
             >
               <UIcon
                 :name="field.hidden ? 'i-lucide-eye-off' : 'i-lucide-eye'"
                 class="size-3.5"
               />
-            </span>
+            </button>
             <span
               class="graph-legend-field-value"
               @click="onFieldClick($event, gi, fi, field)"
