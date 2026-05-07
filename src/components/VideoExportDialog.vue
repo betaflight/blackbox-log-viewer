@@ -18,17 +18,17 @@
 
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium">Framerate</span>
-            <USelect v-model="frameRate" :items="frameRateOptions" class="w-40" />
+            <USelect v-model="frameRate" :items="frameRateOptions" :ui="{ content: 'z-[300]' }" class="w-40" />
           </div>
 
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium">Resolution</span>
-            <USelect v-model="resolution" :items="resolutionOptions" class="w-40" />
+            <USelect v-model="resolution" :items="resolutionOptions" :ui="{ content: 'z-[300]' }" class="w-40" />
           </div>
 
           <div v-if="hasFlightVideo" class="flex items-center justify-between">
             <span class="text-sm font-medium">Dim flight video</span>
-            <USelect v-model="videoDim" :items="videoDimOptions" class="w-40" />
+            <USelect v-model="videoDim" :items="videoDimOptions" :ui="{ content: 'z-[300]' }" class="w-40" />
           </div>
 
           <div class="flex items-center justify-between">

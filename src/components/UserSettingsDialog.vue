@@ -19,6 +19,7 @@
               <USelect
                 v-model="local.mixerConfiguration"
                 :items="mixerOptions"
+                :ui="{ content: 'z-[300]' }"
                 size="sm"
                 class="flex-1"
               />
@@ -52,6 +53,7 @@
               <USelect
                 v-model="local.stickMode"
                 :items="stickModeOptions"
+                :ui="{ content: 'z-[300]' }"
                 size="sm"
                 class="min-w-24"
               />
@@ -77,6 +79,7 @@
               <USelect
                 v-model="local.speedUnits"
                 :items="speedOptions"
+                :ui="{ content: 'z-[300]' }"
                 size="sm"
                 class="min-w-24"
               />
@@ -85,6 +88,7 @@
               <USelect
                 v-model="local.altitudeUnits"
                 :items="altitudeOptions"
+                :ui="{ content: 'z-[300]' }"
                 size="sm"
                 class="min-w-24"
               />
@@ -93,6 +97,7 @@
               <USelect
                 v-model="local.darkMode"
                 :items="darkModeOptions"
+                :ui="{ content: 'z-[300]' }"
                 size="sm"
                 class="min-w-40"
               />
