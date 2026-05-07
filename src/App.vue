@@ -359,9 +359,9 @@ function onDragOver(e) {
 }
 function onDrop(e) {
   e.preventDefault();
-  const item = e.dataTransfer.items[0];
-  const entry = item.webkitGetAsEntry();
-  if (entry.isFile) {
+  const item = e.dataTransfer.items?.[0];
+  const entry = item?.webkitGetAsEntry?.();
+  if (entry?.isFile) {
     getController()?.loadFiles([e.dataTransfer.files[0]]);
   }
 }
