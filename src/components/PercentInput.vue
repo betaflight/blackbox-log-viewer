@@ -10,7 +10,7 @@
       size="xs"
       orientation="vertical"
       :ui="{ root: 'w-16' }"
-      @update:model-value="$emit('update:modelValue', `${$event}%`)"
+      @update:model-value="$emit('update:modelValue', `${$event ?? 0}%`)"
     />
     <span class="text-xs text-dimmed">%</span>
   </div>
