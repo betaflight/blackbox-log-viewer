@@ -352,19 +352,15 @@ FFTComplex.prototype.process = function (
 
   const type = t === "real" ? t : "complex";
 
-  if (outputStride < 1) {
+  if (!Number.isFinite(outputStride) || outputStride < 1) {
     throw new RangeError(
-      `outputStride is outside range, should be positive integer, was \`${ 
-        outputStride 
-        }'`,
+      `outputStride must be a finite positive integer, got: ${outputStride}`,
     );
   }
 
-  if (inputStride < 1) {
+  if (!Number.isFinite(inputStride) || inputStride < 1) {
     throw new RangeError(
-      `inputStride is outside range, should be positive integer, was \`${ 
-        inputStride 
-        }'`,
+      `inputStride must be a finite positive integer, got: ${inputStride}`,
     );
   }
 
