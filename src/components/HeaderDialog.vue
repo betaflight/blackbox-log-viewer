@@ -1198,7 +1198,7 @@ const EXPLICIT_GROUPS = {
   levelPID: "PID Settings", altPID: "PID Settings", velPID: "PID Settings",
   magPID: "PID Settings", posPID: "PID Settings", posrPID: "PID Settings",
   navrPID: "PID Settings",
-  rates_type: "Rates", rates: "Rates", rate_limits: "Rates",
+  rates_type: "Rates", rates: "Rates", rate_limits: "Rate Limits",
   rc_rates: "Rates", rc_expo: "Rates", rcYawRate: "Rates", rcYawExpo: "Rates",
   d_max: "D Max", d_max_gain: "D Max", d_max_advance: "D Max",
   features: "Features", fields_disabled_mask: "Disabled Fields",
