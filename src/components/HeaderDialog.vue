@@ -1105,7 +1105,7 @@ watch(gridEl, (el) => {
         c.style.width = "";
         c.style.margin = "";
       }
-      el.style.columns = "";
+      el.style.columns = cols.value == null ? "" : String(cols.value);
       el.style.position = "";
       el.style.height = "";
       // Read reordered visible groups from DOM (Sortable already moved elements)
