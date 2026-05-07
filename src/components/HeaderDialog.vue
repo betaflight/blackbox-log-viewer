@@ -132,65 +132,66 @@
             </div>
           </template>
           <div class="text-xs text-dimmed mb-1">{{ totalHeaderCount }} headers in {{ groupedHeaders.length }} groups</div>
-          <table class="w-full text-xs">
-            <template v-for="group in groupedHeaders" :key="group.name">
-              <!-- Group header -->
-              <tr
-                class="border-b border-default bg-elevated cursor-pointer select-none"
-                @click="toggleGroupExpand(group.name)"
-              >
-                <td class="py-1 px-1 w-5">
-                  <UIcon
-                    :name="expandedHeaderGroups.has(group.name) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
-                    class="size-3.5 text-dimmed"
-                  />
-                </td>
-                <td class="py-1 px-1 font-semibold text-highlighted" colspan="2">
-                  {{ group.name }}
-                  <span class="text-dimmed font-normal ml-1">({{ group.fields.length }})</span>
-                </td>
-                <td class="py-1 px-1 w-6 text-center" @click.stop>
-                  <button
-                    :title="hiddenGroups.has(group.name) ? `Show ${group.name}` : `Hide ${group.name}`"
-                    class="opacity-60 hover:opacity-100"
-                    @click="toggleGroupVisibility(group.name)"
-                  >
-                    <UIcon
-                      :name="hiddenGroups.has(group.name) ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                      class="size-3.5"
-                      :class="hiddenGroups.has(group.name) ? 'text-dimmed' : 'text-highlighted'"
-                    />
-                  </button>
-                </td>
-              </tr>
-              <!-- Field rows -->
-              <template v-if="expandedHeaderGroups.has(group.name)">
-                <tr
-                  v-for="field in group.fields"
-                  :key="field.name"
-                  class="border-b border-default"
-                  :class="hiddenFields.has(field.name) ? 'opacity-40' : ''"
-                >
-                  <td class="py-0.5 px-1"></td>
-                  <td class="py-0.5 px-1 text-dimmed whitespace-nowrap">{{ field.name }}</td>
-                  <td class="py-0.5 px-1 font-medium">{{ field.value }}</td>
-                  <td class="py-0.5 px-1 w-6 text-center">
-                    <button
-                      :title="hiddenFields.has(field.name) ? `Show ${field.name}` : `Hide ${field.name}`"
-                      class="opacity-40 hover:opacity-100"
-                      @click="toggleFieldVisibility(field.name)"
-                    >
-                      <UIcon
-                        :name="hiddenFields.has(field.name) ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                        class="size-3"
-                        :class="hiddenFields.has(field.name) ? 'text-dimmed' : 'text-highlighted'"
-                      />
-                    </button>
-                  </td>
-                </tr>
+          <div v-for="group in groupedHeaders" :key="group.name">
+            <!-- Group header -->
+            <div
+              class="flex items-center gap-1 py-1 px-1 bg-elevated border-b border-default cursor-pointer select-none text-xs"
+              @click="toggleGroupExpand(group.name)"
+            >
+              <UIcon
+                :name="expandedHeaderGroups.has(group.name) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+                class="size-3.5 text-dimmed"
+              />
+              <span class="font-semibold text-highlighted flex-1">
+                {{ group.name }}
+                <span class="text-dimmed font-normal ml-1">({{ group.fields.length }})</span>
+              </span>
+              <UButton
+                variant="ghost"
+                color="neutral"
+                size="2xs"
+                :icon="hiddenGroups.has(group.name) ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :title="hiddenGroups.has(group.name) ? `Show ${group.name}` : `Hide ${group.name}`"
+                @click.stop="toggleGroupVisibility(group.name)"
+              />
+            </div>
+            <!-- Field rows -->
+            <UTable
+              v-if="expandedHeaderGroups.has(group.name)"
+              :data="group.fields"
+              :columns="headerFieldColumns"
+              :ui="{
+                thead: 'sr-only',
+                base: 'w-full',
+                td: 'py-0.5 px-1 text-xs',
+                tr: 'border-b border-default',
+              }"
+            >
+              <template #name-cell="{ row }">
+                <span
+                  class="text-dimmed whitespace-nowrap"
+                  :class="{ 'opacity-40': hiddenFields.has(row.original.name) }"
+                >{{ row.original.name }}</span>
               </template>
-            </template>
-          </table>
+              <template #value-cell="{ row }">
+                <span
+                  class="font-medium"
+                  :class="{ 'opacity-40': hiddenFields.has(row.original.name) }"
+                >{{ row.original.value }}</span>
+              </template>
+              <template #toggle-cell="{ row }">
+                <UButton
+                  variant="ghost"
+                  color="neutral"
+                  size="2xs"
+                  :icon="hiddenFields.has(row.original.name) ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  :title="hiddenFields.has(row.original.name) ? `Show ${row.original.name}` : `Hide ${row.original.name}`"
+                  :class="{ 'opacity-40': !hiddenFields.has(row.original.name) }"
+                  @click="toggleFieldVisibility(row.original.name)"
+                />
+              </template>
+            </UTable>
+          </div>
         </UiBox>
       </div>
     </div>
@@ -975,6 +976,12 @@ const disabledFieldsList = computed(() => {
 });
 
 // --- All Headers ---
+
+const headerFieldColumns = [
+  { accessorKey: "name", header: "Name" },
+  { accessorKey: "value", header: "Value" },
+  { accessorKey: "toggle", header: "" },
+];
 
 const headerSearch = ref("");
 const headerSortAlpha = ref(false);
