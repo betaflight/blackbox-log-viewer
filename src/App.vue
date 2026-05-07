@@ -249,19 +249,19 @@ function onToggleVideo() {
 }
 
 function onToggleCraft() {
-  getController()?.toggleCraft?.();
+  settingsStore.saveSetting("drawCraft", !settingsStore.userSettings.drawCraft);
 }
 
 function onToggleSticks() {
-  getController()?.toggleSticks?.();
+  settingsStore.saveSetting("drawSticks", !settingsStore.userSettings.drawSticks);
 }
 
 function onToggleAnalyser() {
-  getController()?.toggleAnalyser?.();
+  graphStore.toggleAnalyser();
 }
 
 function onToggleMap() {
-  getController()?.toggleMap?.();
+  graphStore.toggleMap();
 }
 
 function onRateChange(rate) {

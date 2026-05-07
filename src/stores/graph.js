@@ -1,12 +1,20 @@
 import { defineStore } from "pinia";
 import { ref, shallowRef, computed } from "vue";
 import { useSettingsStore } from "./settings.js";
+import { useLogStore } from "./log.js";
+import { PrefStorage } from "../pref_storage.js";
 
 export const GRAPH_MIN_ZOOM = 1;
 export const GRAPH_MAX_ZOOM = 1000;
 export const GRAPH_DEFAULT_ZOOM = 100;
 
 export const useGraphStore = defineStore("graph", () => {
+  const prefs = new PrefStorage();
+
+  // Renderer instances — registered by main.js after creation
+  const graph = shallowRef(null);
+  const mapGrapher = shallowRef(null);
+
   const graphConfig = ref(null);
   const activeGraphConfig = shallowRef(null);
   const lastGraphConfig = ref(null);
@@ -47,6 +55,44 @@ export const useGraphStore = defineStore("graph", () => {
   // Registered by main.js — queues a graph render frame
   const invalidateGraph = shallowRef(null);
 
+  function toggleAnalyser() {
+    if (activeGraphConfig.value?.selectedFieldName != null) {
+      hasAnalyser.value = !hasAnalyser.value;
+    } else {
+      const graphs = activeGraphConfig.value?.getGraphs() ?? [];
+      if (graphs.length === 0 || graphs[0].fields.length === 0) {
+        hasAnalyser.value = false;
+      } else {
+        activeGraphConfig.value.selectedFieldName = graphs[0].fields[0].friendlyName;
+        activeGraphConfig.value.selectedGraphIndex = 0;
+        activeGraphConfig.value.selectedFieldIndex = 0;
+        hasAnalyser.value = true;
+      }
+    }
+    if (!hasAnalyser.value) {
+      hasAnalyserFullscreen.value = false;
+      graph.value?.setAnalyser(false);
+    }
+    graph.value?.setDrawAnalyser(hasAnalyser.value);
+    prefs.set("hasAnalyser", hasAnalyser.value);
+    invalidateGraph.value?.();
+  }
+
+  function toggleAnalyserFullscreen() {
+    hasAnalyserFullscreen.value = hasAnalyser.value ? !hasAnalyserFullscreen.value : false;
+    graph.value?.setAnalyser(hasAnalyserFullscreen.value);
+    invalidateGraph.value?.();
+  }
+
+  function toggleMap() {
+    hasMap.value = !hasMap.value;
+    prefs.set("hasMap", hasMap.value);
+    const logStore = useLogStore();
+    if (logStore.flightLog?.hasGpsData()) {
+      mapGrapher.value?.initialize();
+    }
+  }
+
   function setGraphZoom(zoom) {
     graphZoom.value = Math.max(GRAPH_MIN_ZOOM, Math.min(GRAPH_MAX_ZOOM, zoom));
   }
@@ -61,6 +107,8 @@ export const useGraphStore = defineStore("graph", () => {
   }
 
   return {
+    graph,
+    mapGrapher,
     graphConfig,
     activeGraphConfig,
     lastGraphConfig,
@@ -89,6 +137,9 @@ export const useGraphStore = defineStore("graph", () => {
     markerTime,
     seekBarMode,
     invalidateGraph,
+    toggleAnalyser,
+    toggleAnalyserFullscreen,
+    toggleMap,
     setGraphZoom,
     quickZoomToggle,
   };

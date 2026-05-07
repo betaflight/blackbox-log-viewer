@@ -111,6 +111,7 @@ function BlackboxLogViewer() {
   const appStore = useAppStore(pinia);
   const settingsStore = useSettingsStore(pinia);
   graphStore.activeGraphConfig = new GraphConfig();
+  graphStore.mapGrapher = mapGrapher;
 
   function blackboxTimeFromVideoTime() {
     return (video.currentTime - playbackStore.videoOffset) * 1000000 + logStore.flightLog.getMinTime();
@@ -576,6 +577,7 @@ function BlackboxLogViewer() {
       analyserCanvas,
       userSettings,
     );
+    graphStore.graph = graph;
 
     setVideoInTime(false);
     setVideoOutTime(false);
@@ -1475,10 +1477,6 @@ function BlackboxLogViewer() {
       return false; // nothing was changed
     }
 
-    function saveOneUserSetting(name, value) {
-      settingsStore.saveSetting(name, value);
-    }
-
     function toggleOverrideStatus(userSetting) {
       settingsStore.saveSetting(userSetting, !userSettings[userSetting]);
     }
@@ -1490,6 +1488,17 @@ function BlackboxLogViewer() {
         if (graph) {
           graph.refreshOptions(userSettings);
           graph.refreshGraphConfig();
+          invalidateGraph();
+        }
+      },
+    );
+
+    // Watch drawSticks and update graph renderer
+    watch(
+      () => userSettings.drawSticks,
+      (val) => {
+        if (graph) {
+          graph.setDrawSticks(val);
           invalidateGraph();
         }
       },
@@ -1596,19 +1605,10 @@ function BlackboxLogViewer() {
 
     function handleAnalyserKey(shifted) {
       if (!shifted) {
-        graphStore.hasAnalyser =
-          graphStore.activeGraphConfig.selectedFieldName == null ? false : !graphStore.hasAnalyser;
-        if (!graphStore.hasAnalyser) {
-          graphStore.hasAnalyserFullscreen = false;
-          graph.setAnalyser(false);
-        }
-        graph.setDrawAnalyser(graphStore.hasAnalyser);
-        prefs.set("hasAnalyser", graphStore.hasAnalyser);
+        graphStore.toggleAnalyser();
       } else {
-        graphStore.hasAnalyserFullscreen = graphStore.hasAnalyser ? !graphStore.hasAnalyserFullscreen : false;
-        graph.setAnalyser(graphStore.hasAnalyserFullscreen);
+        graphStore.toggleAnalyserFullscreen();
       }
-      invalidateGraph();
     }
 
     function handleKeyVideoIn(e, shifted) {
@@ -1872,56 +1872,6 @@ function BlackboxLogViewer() {
       }
     });
 
-    // View toggle bridges
-    this.toggleCraft = function () {
-      userSettings.drawCraft = !userSettings.drawCraft;
-      saveOneUserSetting("drawCraft", userSettings.drawCraft);
-    };
-    this.toggleSticks = function () {
-      userSettings.drawSticks = !userSettings.drawSticks;
-      graph.setDrawSticks(userSettings.drawSticks);
-      saveOneUserSetting("drawSticks", userSettings.drawSticks);
-      invalidateGraph();
-    };
-    this.toggleAnalyser = function () {
-      if (graphStore.activeGraphConfig.selectedFieldName != null) {
-        graphStore.hasAnalyser = !graphStore.hasAnalyser;
-      } else {
-        const graphs = graphStore.activeGraphConfig.getGraphs();
-        if (graphs.length === 0 || graphs[0].fields.length === 0) {
-          graphStore.hasAnalyser = false;
-        } else {
-          graphStore.activeGraphConfig.selectedFieldName =
-            graphs[0].fields[0].friendlyName;
-          graphStore.activeGraphConfig.selectedGraphIndex = 0;
-          graphStore.activeGraphConfig.selectedFieldIndex = 0;
-          graphStore.hasAnalyser = true;
-        }
-      }
-      if (!graphStore.hasAnalyser) {
-        graphStore.hasAnalyserFullscreen = false;
-        graph.setAnalyser(false);
-      }
-      graph.setDrawAnalyser(graphStore.hasAnalyser);
-      prefs.set("hasAnalyser", graphStore.hasAnalyser);
-      invalidateGraph();
-    };
-    this.toggleMap = function () {
-      graphStore.hasMap = !graphStore.hasMap;
-      prefs.set("hasMap", graphStore.hasMap);
-      if (logStore.flightLog?.hasGpsData()) {
-        mapGrapher.initialize();
-      }
-    };
-    this.toggleAnalyserFullscreen = function () {
-      if (graphStore.hasAnalyser) {
-        graphStore.hasAnalyserFullscreen = !graphStore.hasAnalyserFullscreen;
-      } else {
-        graphStore.hasAnalyserFullscreen = false;
-      }
-      graph.setAnalyser(graphStore.hasAnalyserFullscreen);
-      invalidateGraph();
-    };
     this.legendHighlight = function (gi, fi) {
       onLegendHighlightChange(gi, fi);
     };

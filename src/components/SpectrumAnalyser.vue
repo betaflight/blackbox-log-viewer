@@ -239,6 +239,6 @@ function onImportChange(e) {
 }
 
 function toggleFullscreen() {
-  appStore.controller?.toggleAnalyserFullscreen?.();
+  graphStore.toggleAnalyserFullscreen();
 }
 </script>
