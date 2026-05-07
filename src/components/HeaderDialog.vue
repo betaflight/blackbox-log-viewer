@@ -878,7 +878,8 @@ const featuresList = computed(() => {
       name: f.name,
       description: f.description,
       enabled: !!(value & (1 << f.bit)),
-    }));
+    }))
+    .filter((f) => f.enabled);
 });
 
 // --- Disabled Fields ---
@@ -929,11 +930,13 @@ const disabledFieldsList = computed(() => {
     ];
   }
 
-  return fields.map((name, i) => ({
-    name,
-    description: "",
-    enabled: !!(value & (1 << i)),
-  }));
+  return fields
+    .map((name, i) => ({
+      name,
+      description: "",
+      enabled: !!(value & (1 << i)),
+    }))
+    .filter((f) => f.enabled);
 });
 
 // --- Unknown Headers ---
