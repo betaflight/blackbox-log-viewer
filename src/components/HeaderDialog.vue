@@ -243,6 +243,14 @@ const props = defineProps({
 // --- Helpers ---
 
 const sc = computed(() => props.sysConfig || {});
+const filteredSc = computed(() => {
+  if (hiddenFields.value.size === 0) return sc.value;
+  const result = { ...sc.value };
+  for (const key of hiddenFields.value) {
+    delete result[key];
+  }
+  return result;
+});
 const fwType = computed(() => sc.value.firmwareType);
 const fwVer = computed(() => sc.value.firmwareVersion || "0.0.0");
 const isBF = computed(() => fwType.value === FIRMWARE_TYPE_BETAFLIGHT);
@@ -368,24 +376,24 @@ function pidRow(label, data) {
 }
 
 const mainPids = computed(() => [
-  pidRow("Roll", sc.value.rollPID),
-  pidRow("Pitch", sc.value.pitchPID),
-  pidRow("Yaw", sc.value.yawPID),
-  pidRow("Level", sc.value.levelPID),
-]);
+  pidRow("Roll", filteredSc.value.rollPID),
+  pidRow("Pitch", filteredSc.value.pitchPID),
+  pidRow("Yaw", filteredSc.value.yawPID),
+  pidRow("Level", filteredSc.value.levelPID),
+].filter((r) => !r.missing));
 
 const baroPids = computed(() => [
-  pidRow("ALT", sc.value.altPID),
-  pidRow("VEL", sc.value.velPID),
-]);
+  pidRow("ALT", filteredSc.value.altPID),
+  pidRow("VEL", filteredSc.value.velPID),
+].filter((r) => !r.missing));
 
-const magPids = computed(() => [pidRow("MAG", sc.value.magPID)]);
+const magPids = computed(() => [pidRow("MAG", filteredSc.value.magPID)].filter((r) => !r.missing));
 
 const gpsPids = computed(() => [
-  pidRow("POS", sc.value.posPID),
-  pidRow("POSR", sc.value.posrPID),
-  pidRow("NAVR", sc.value.navrPID),
-]);
+  pidRow("POS", filteredSc.value.posPID),
+  pidRow("POSR", filteredSc.value.posrPID),
+  pidRow("NAVR", filteredSc.value.navrPID),
+].filter((r) => !r.missing));
 
 // --- PID Sliders ---
 
@@ -393,7 +401,7 @@ const pidSliderParams = computed(() => {
   if (!isBF.value || !gte("4.3.0")) {
     return [];
   }
-  const s = sc.value;
+  const s = filteredSc.value;
   return [
     param("Status", selectVal(s.simplified_pids_mode, SIMPLIFIED_PIDS_MODE)),
     param("PI gain", fmtVal(s.simplified_pi_gain, 0)),
@@ -410,7 +418,7 @@ const pidSliderParams = computed(() => {
 // --- Feedforward ---
 
 const feedforwardParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   const result = [param("Transition", fmtVal(s.ff_transition, 2))];
   if (isBF.value && gte("4.3.0")) {
     result.push(
@@ -431,7 +439,7 @@ function rateValue(rates, index, rMul, rDec) {
 }
 
 const rateParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   const isI = isINAV.value;
   const rMul = isI ? 10 : 1;
   const rDec = isI ? 0 : 2;
@@ -455,7 +463,7 @@ const dMaxParams = computed(() => {
   if (!isBF.value || !gte("4.0.0")) {
     return [];
   }
-  const s = sc.value;
+  const s = filteredSc.value;
   return [
     param("Roll", fmtVal(s.d_max?.[0], 0)),
     param("Pitch", fmtVal(s.d_max?.[1], 0)),
@@ -471,7 +479,7 @@ const rateLimitParams = computed(() => {
   if (!isBF.value || !gte("4.0.0")) {
     return [];
   }
-  const s = sc.value;
+  const s = filteredSc.value;
   return [
     param("Roll", fmtVal(s.rate_limits?.[0], 0)),
     param("Pitch", fmtVal(s.rate_limits?.[1], 0)),
@@ -482,7 +490,7 @@ const rateLimitParams = computed(() => {
 // --- General Parameters ---
 
 const generalParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   const vDec = isBF.value && gte("4.0.0") ? 2 : 1;
   const result = [
     param("Loop Time", fmtVal(s.looptime, 0)),
@@ -531,7 +539,7 @@ const generalParams = computed(() => {
 // --- Gyro Filters ---
 
 const gyroFilterParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   const lpfList = isBF.value && gte("3.4.0") ? GYRO_HARDWARE_LPF : GYRO_LPF;
   const result = [
     param("Hardware LPF", selectVal(s.gyro_lpf, lpfList)),
@@ -593,7 +601,7 @@ const gyroFilterParams = computed(() => {
 // --- D-Term Filters ---
 
 const dtermFilterParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   const result = [
     param("Filter Type", selectVal(s.dterm_filter_type, FILTER_TYPE)),
     param("LPF Hz", fmtVal(s.dterm_lpf_hz, 0)),
@@ -639,7 +647,7 @@ const dynNotchParams = computed(() => {
   if (!isBF.value || !gte("4.1.0")) {
     return [];
   }
-  const s = sc.value;
+  const s = filteredSc.value;
   const countLabel = gte("4.3.0") ? "Count" : "Width %";
   const countVal = gte("4.3.0") ? s.dyn_notch_count : s.dyn_notch_width_percent;
   return [
@@ -653,7 +661,7 @@ const dynNotchParams = computed(() => {
 // --- RPM Filter ---
 
 const rpmFilterParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   if (s.gyro_rpm_notch_harmonics == null) {
     return [];
   }
@@ -742,7 +750,7 @@ const rcSmoothingParams = computed(() => {
   if (!isBF.value) {
     return [];
   }
-  const s = sc.value;
+  const s = filteredSc.value;
   let result;
 
   if (gte("4.3.0")) {
@@ -772,7 +780,7 @@ const rcSmoothingParams = computed(() => {
 // --- Motor / ESC ---
 
 const motorParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   return [
     param("Unsynced Fast PWM", selectVal(s.unsynced_fast_pwm, MOTOR_SYNC)),
     param("Fast PWM Protocol", selectVal(s.fast_pwm_protocol, FAST_PROTOCOL)),
@@ -803,7 +811,7 @@ const motorParams = computed(() => {
 // --- Anti Gravity ---
 
 const antiGravityParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   if (s.anti_gravity_mode == null && s.anti_gravity_gain == null) {
     return [];
   }
@@ -820,7 +828,7 @@ const antiGravityParams = computed(() => {
 // --- Other ---
 
 const otherParams = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   const result = [
     param("Acc Hardware", selectVal(s.acc_hardware, ACC_HARDWARE)),
     param("Baro Hardware", selectVal(s.baro_hardware, BARO_HARDWARE)),
@@ -840,7 +848,7 @@ const otherParams = computed(() => {
 // --- Features ---
 
 const featuresList = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   if (s.features == null) {
     return [];
   }
@@ -921,7 +929,7 @@ const featuresList = computed(() => {
 // --- Disabled Fields ---
 
 const disabledFieldsList = computed(() => {
-  const s = sc.value;
+  const s = filteredSc.value;
   if (!isBF.value || !gte("4.3.0") || s.fields_disabled_mask == null) {
     return [];
   }
@@ -1070,7 +1078,7 @@ const groupParamMap = computed(() => ({
 }));
 
 function paneHasData(group) {
-  if (group === "PID Settings") { return true; }
+  if (group === "PID Settings") { return mainPids.value.length > 0; }
   if (group === "Features") { return featuresList.value.length > 0; }
   if (group === "Disabled Fields") { return disabledFieldsList.value.length > 0; }
   const params = groupParamMap.value[group];
