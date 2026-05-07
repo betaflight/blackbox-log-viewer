@@ -3,23 +3,27 @@
     class="relative border-2 rounded-lg"
     :class="[highlight ? typeClass.box : 'border-neutral-500/30', title ? 'mt-3' : '']"
   >
-    <div
-      v-if="title"
-      :class="[
-        'flex gap-2 items-center absolute top-0 left-4 translate-y-[-50%] p-1 px-3 rounded-full text-black text-[13px] font-semibold',
-        typeClass.pill,
-        collapsible ? 'cursor-pointer select-none' : '',
-      ]"
-      @click="collapsible && toggle()"
-    >
-      <UIcon
-        v-if="collapsible"
-        :name="expanded ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
-        class="size-3.5"
-      />
-      {{ title }}
-      <slot name="title" />
-      <HelpIcon v-if="help" :text="help" />
+    <div v-if="title" class="flex items-center absolute top-0 left-4 right-4 translate-y-[-50%]">
+      <div
+        :class="[
+          'flex gap-2 items-center p-1 px-3 rounded-full text-black text-[13px] font-semibold',
+          typeClass.pill,
+          collapsible ? 'cursor-pointer select-none' : '',
+        ]"
+        @click="collapsible && toggle()"
+      >
+        <UIcon
+          v-if="collapsible"
+          :name="expanded ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+          class="size-3.5"
+        />
+        {{ title }}
+        <slot name="title" />
+        <HelpIcon v-if="help" :text="help" />
+      </div>
+      <div v-if="$slots.actions && expanded" class="ml-auto" @click.stop>
+        <slot name="actions" />
+      </div>
     </div>
     <div v-show="expanded" :class="`flex flex-col p-3 gap-2 ${title ? 'pt-6' : ''}`">
       <slot />

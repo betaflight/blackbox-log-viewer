@@ -155,8 +155,28 @@
           <FeatureTable :data="disabledFieldsList" />
         </UiBox>
 
-        <UiBox v-if="unknownHeaders.length > 0" title="Unknown Headers" collapsible collapsed>
-          <ParamTable :params="unknownHeaders" />
+        <UiBox title="All Headers" collapsible collapsed class="sm:col-span-2 md:col-span-3 xl:col-span-6">
+          <template #actions>
+            <div class="flex items-center gap-2">
+              <UInput
+                v-model="headerSearch"
+                icon="i-lucide-search"
+                size="xs"
+                placeholder="Filter..."
+                class="w-36"
+              />
+              <UButton
+                :icon="headerSortAlpha ? 'i-lucide-arrow-down-a-z' : 'i-lucide-list'"
+                size="xs"
+                :variant="headerSortAlpha ? 'solid' : 'ghost'"
+                :color="headerSortAlpha ? 'primary' : 'neutral'"
+                title="Sort alphabetically"
+                @click="headerSortAlpha = !headerSortAlpha"
+              />
+            </div>
+          </template>
+          <div class="text-xs text-dimmed mb-1">{{ filteredHeaders.length }} of {{ allHeaders.length }} headers</div>
+          <ParamTable :params="filteredHeaders" />
         </UiBox>
       </div>
     </div>
@@ -939,13 +959,78 @@ const disabledFieldsList = computed(() => {
     .filter((f) => f.enabled);
 });
 
-// --- Unknown Headers ---
+// --- All Headers ---
 
-const unknownHeaders = computed(() => {
-  const uh = sc.value.unknownHeaders;
-  if (!uh || !Array.isArray(uh) || uh.length === 0) {
-    return [];
+const headerSearch = ref("");
+const headerSortAlpha = ref(false);
+
+function formatHeaderValue(val) {
+  if (val == null) {
+    return null;
   }
-  return uh.map((h) => param(h.name, h.value));
+  if (Array.isArray(val)) {
+    if (val.every((v) => v == null)) {
+      return null;
+    }
+    return val.map((v) => (v == null ? "-" : String(v))).join(", ");
+  }
+  return String(val);
+}
+
+const HEADER_SKIP_KEYS = new Set([
+  "unknownHeaders",
+  "firmwareType",
+  "Craft_name",
+  "firmware",
+  "firmwareVersion",
+  "boardIdentifier",
+  "flightControllerIdentifier",
+  "flightControllerVersion",
+]);
+
+const allHeaders = computed(() => {
+  const s = sc.value;
+  const entries = [];
+
+  // sysConfig fields
+  for (const key of Object.keys(s)) {
+    if (HEADER_SKIP_KEYS.has(key)) {
+      continue;
+    }
+    const formatted = formatHeaderValue(s[key]);
+    if (formatted == null) {
+      continue;
+    }
+    entries.push({ name: key, value: formatted });
+  }
+
+  // unknown headers (not in sysConfig schema)
+  const uh = s.unknownHeaders;
+  if (Array.isArray(uh)) {
+    for (const h of uh) {
+      entries.push({ name: h.name, value: String(h.value) });
+    }
+  }
+
+  return entries;
+});
+
+const filteredHeaders = computed(() => {
+  let list = allHeaders.value;
+
+  const q = headerSearch.value.trim().toLowerCase();
+  if (q) {
+    list = list.filter(
+      (h) =>
+        h.name.toLowerCase().includes(q) ||
+        h.value.toLowerCase().includes(q),
+    );
+  }
+
+  if (headerSortAlpha.value) {
+    list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  return list;
 });
 </script>
