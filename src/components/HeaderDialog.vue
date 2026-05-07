@@ -66,22 +66,8 @@
                 <UIcon name="i-lucide-grip-horizontal" class="drag-handle size-3 cursor-grab active:cursor-grabbing opacity-40 hover:opacity-100 ml-1" />
               </template>
 
-              <!-- PID Settings: multi-table layout -->
-              <template v-if="group === 'PID Settings'">
-                <PidTable :rows="mainPids" :showDMax="showDMax" />
-                <template v-if="showBaroPids">
-                  <div class="text-[11px] font-semibold text-dimmed mt-2 mb-0.5">Baro</div>
-                  <PidTable :rows="baroPids" :showDMax="false" srOnly />
-                </template>
-                <template v-if="showMagPids">
-                  <div class="text-[11px] font-semibold text-dimmed mt-2 mb-0.5">Mag</div>
-                  <PidTable :rows="magPids" :showDMax="false" srOnly />
-                </template>
-                <template v-if="showGpsPids">
-                  <div class="text-[11px] font-semibold text-dimmed mt-2 mb-0.5">GPS</div>
-                  <PidTable :rows="gpsPids" :showDMax="false" srOnly />
-                </template>
-              </template>
+              <!-- PID Settings: single merged table -->
+              <PidTable v-if="group === 'PID Settings'" :rows="allPids" :showDMax="showDMax" />
 
               <!-- Features / Disabled Fields -->
               <FeatureTable v-else-if="group === 'Features'" :data="featuresList" />
@@ -348,9 +334,12 @@ const boardInfo = computed(() =>
 // --- PID Tables ---
 
 const showDMax = computed(() => isBF.value && gte("4.0.0"));
-const showBaroPids = computed(() => lt("3.4.0"));
-const showMagPids = computed(() => lt("3.4.0"));
-const showGpsPids = computed(() => lt("3.4.0"));
+const allPids = computed(() => [
+  ...mainPids.value,
+  ...baroPids.value,
+  ...magPids.value,
+  ...gpsPids.value,
+]);
 
 function pidRow(label, data) {
   if (!data) {
@@ -1078,7 +1067,7 @@ const groupParamMap = computed(() => ({
 }));
 
 function paneHasData(group) {
-  if (group === "PID Settings") { return mainPids.value.length > 0; }
+  if (group === "PID Settings") { return allPids.value.length > 0; }
   if (group === "Features") { return featuresList.value.length > 0; }
   if (group === "Disabled Fields") { return disabledFieldsList.value.length > 0; }
   const params = groupParamMap.value[group];
