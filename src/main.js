@@ -68,8 +68,6 @@ function BlackboxLogViewer() {
   const prefs = new PrefStorage();
   let _configuration = null; // is their an associated dump file ?
   const configurationDefaults = new ConfigurationDefaults(prefs); // configuration defaults
-  // User's video render config:
-  let videoConfig = {};
   // JSON graph configuration:
   let graphConfig = null;
   let offsetCache = []; // Storage for the offset cache (last 20 files)
@@ -82,7 +80,6 @@ function BlackboxLogViewer() {
   // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
   const activeGraphConfig = new GraphConfig();
   const fieldPresenter = FlightLogFieldPresenter;
-  let hasVideo = false;
   let hasLog = false;
   // hasMarker lives in graphStore.hasMarker
   // hasAnalyser, hasMap, hasAnalyserFullscreen live in graphStore
@@ -95,11 +92,9 @@ function BlackboxLogViewer() {
   const analyserCanvas = document.getElementById("analyserCanvas");
   const stickCanvas = document.getElementById("stickCanvas");
   const craftCanvas = document.getElementById("craftCanvas");
-  let videoURL = false;
-  let videoOffset = 0;
-  let videoExportInTime = null;
-  let videoExportOutTime = null;
   // markerTime lives in graphStore.markerTime
+  // hasVideo, videoURL live in logStore
+  // videoOffset, videoExportInTime, videoExportOutTime, videoConfig live in playbackStore
   let userSettings;
   const seekBarCanvas = document.getElementById("seekbarCanvas");
   const seekBar = new SeekBar(seekBarCanvas);
@@ -127,9 +122,7 @@ function BlackboxLogViewer() {
     logStore.flightLogDataArray = flightLogDataArray ?? null;
     logStore.currentBlackboxTime = currentBlackboxTime;
     logStore.hasLog = hasLog;
-    logStore.hasVideo = hasVideo;
     logStore.hasGps = !!flightLog?.hasGpsData?.();
-    logStore.videoURL = videoURL;
 
     // Graph
     graphStore.hasCraft = !!userSettings.drawCraft;
@@ -138,10 +131,6 @@ function BlackboxLogViewer() {
 
     // Playback
     playbackStore.graphState = graphState;
-    playbackStore.videoOffset = videoOffset;
-    playbackStore.videoExportInTime = videoExportInTime;
-    playbackStore.videoExportOutTime = videoExportOutTime;
-    playbackStore.videoConfig = videoConfig;
 
     // Workspace
     workspaceStore.activeWorkspace = activeWorkspace;
@@ -150,7 +139,7 @@ function BlackboxLogViewer() {
   }
 
   function blackboxTimeFromVideoTime() {
-    return (video.currentTime - videoOffset) * 1000000 + flightLog.getMinTime();
+    return (video.currentTime - playbackStore.videoOffset) * 1000000 + flightLog.getMinTime();
   }
 
   function syncLogToVideo() {
@@ -161,17 +150,15 @@ function BlackboxLogViewer() {
 
   function setVideoOffset(offset, withRefresh) {
     // optionally prevent the graph refresh until later
-    videoOffset = offset;
+    playbackStore.videoOffset = offset;
 
     /*
      * Round to 2 dec places for display and put a plus at the start for positive values to emphasize the fact it's
      * an offset
      */
-    const videoOffsetDisplay =
-      (videoOffset >= 0 ? "+" : "") + videoOffset.toFixed(3);
-    appStore.videoOffsetDisplay = videoOffsetDisplay;
+    appStore.videoOffsetDisplay =
+      (offset >= 0 ? "+" : "") + offset.toFixed(3);
 
-    playbackStore.videoOffset = videoOffset;
     if (withRefresh) {
       invalidateGraph();
     }
@@ -269,7 +256,7 @@ function BlackboxLogViewer() {
       return;
     }
 
-    if (hasVideo) {
+    if (logStore.hasVideo) {
       currentBlackboxTime = blackboxTimeFromVideoTime();
     } else if (graphState === GRAPH_STATE_PLAY) {
       let delta;
@@ -454,12 +441,12 @@ function BlackboxLogViewer() {
 
     switch (newState) {
       case GRAPH_STATE_PLAY:
-        if (hasVideo) {
+        if (logStore.hasVideo) {
           video.play();
         }
         break;
       case GRAPH_STATE_PAUSED:
-        if (hasVideo) {
+        if (logStore.hasVideo) {
           video.pause();
         }
         break;
@@ -470,9 +457,9 @@ function BlackboxLogViewer() {
   }
 
   function setCurrentBlackboxTime(newTime) {
-    if (hasVideo) {
+    if (logStore.hasVideo) {
       video.currentTime =
-        (newTime - flightLog.getMinTime()) / 1000000 + videoOffset;
+        (newTime - flightLog.getMinTime()) / 1000000 + playbackStore.videoOffset;
 
       syncLogToVideo();
     } else {
@@ -490,27 +477,27 @@ function BlackboxLogViewer() {
   }
 
   function setVideoInTime(inTime) {
-    videoExportInTime = inTime;
+    playbackStore.videoExportInTime = inTime;
 
     if (seekBar) {
-      seekBar.setInTime(videoExportInTime);
+      seekBar.setInTime(playbackStore.videoExportInTime);
     }
 
     if (graph) {
-      graph.setInTime(videoExportInTime);
+      graph.setInTime(playbackStore.videoExportInTime);
       invalidateGraph();
     }
   }
 
   function setVideoOutTime(outTime) {
-    videoExportOutTime = outTime;
+    playbackStore.videoExportOutTime = outTime;
 
     if (seekBar) {
-      seekBar.setOutTime(videoExportOutTime);
+      seekBar.setOutTime(playbackStore.videoExportOutTime);
     }
 
     if (graph) {
-      graph.setOutTime(videoExportOutTime);
+      graph.setOutTime(playbackStore.videoExportOutTime);
       invalidateGraph();
     }
   }
@@ -627,7 +614,7 @@ function BlackboxLogViewer() {
       //Seek faster
       offset *= 2;
 
-      if (hasVideo) {
+      if (logStore.hasVideo) {
         setVideoTime(video.currentTime + offset / 1000000);
       } else {
         setCurrentBlackboxTime(currentBlackboxTime + offset);
@@ -635,7 +622,7 @@ function BlackboxLogViewer() {
       invalidateGraph();
     };
 
-    if (hasVideo) {
+    if (logStore.hasVideo) {
       syncLogToVideo();
     } else {
       // Start at beginning:
@@ -755,9 +742,9 @@ function BlackboxLogViewer() {
 
   function loadVideo(file) {
     currentOffsetCache.video = file.name; // store the name of the loaded video
-    if (videoURL) {
-      URL.revokeObjectURL(videoURL);
-      videoURL = false;
+    if (logStore.videoURL) {
+      URL.revokeObjectURL(logStore.videoURL);
+      logStore.videoURL = null;
     }
 
     if (!URL.createObjectURL) {
@@ -768,18 +755,17 @@ function BlackboxLogViewer() {
       return;
     }
 
-    videoURL = URL.createObjectURL(file);
+    logStore.videoURL = URL.createObjectURL(file);
     video.volume = 1.0;
-    video.src = videoURL;
+    video.src = logStore.videoURL;
 
     // Reapply the last playbackStore.playbackRate to the new video
     setPlaybackRate(playbackStore.playbackRate, true);
   }
 
   function videoLoaded(_e) {
-    hasVideo = true;
+    logStore.hasVideo = true;
 
-    syncToStores();
     setGraphState(GRAPH_STATE_PAUSED);
     invalidateGraph();
   }
@@ -1123,14 +1109,14 @@ function BlackboxLogViewer() {
         scrollTime =
           fast === 0 ? scrollTime : graph.getWindowWidthTime() * fast;
       }
-      if (hasVideo) {
+      if (logStore.hasVideo) {
         if (slow) {
           scrollTime = (1 / 60) * 1000000;
         } // Assume 60Hz video
         setVideoTime(video.currentTime - scrollTime / 1000000);
       } else {
         const currentFrame = flightLog.getCurrentFrameAtTime(
-          hasVideo ? video.currentTime : currentBlackboxTime,
+          logStore.hasVideo ? video.currentTime : currentBlackboxTime,
         );
         if (currentFrame && currentFrame.previous && slow) {
           setCurrentBlackboxTime(
@@ -1153,14 +1139,14 @@ function BlackboxLogViewer() {
         scrollTime =
           fast === 0 ? scrollTime : graph.getWindowWidthTime() * fast;
       }
-      if (hasVideo) {
+      if (logStore.hasVideo) {
         if (slow) {
           scrollTime = (1 / 60) * 1000000;
         } // Assume 60Hz video
         setVideoTime(video.currentTime + scrollTime / 1000000);
       } else {
         const currentFrame = flightLog.getCurrentFrameAtTime(
-          hasVideo ? video.currentTime : currentBlackboxTime,
+          logStore.hasVideo ? video.currentTime : currentBlackboxTime,
         );
         if (currentFrame && currentFrame.next && slow) {
           setCurrentBlackboxTime(
@@ -1198,18 +1184,18 @@ function BlackboxLogViewer() {
     };
 
     const logSyncBack = function () {
-      setVideoOffset(videoOffset - 1 / 15, true);
+      setVideoOffset(playbackStore.videoOffset - 1 / 15, true);
     };
 
     const logSyncForward = function () {
-      setVideoOffset(videoOffset + 1 / 15, true);
+      setVideoOffset(playbackStore.videoOffset + 1 / 15, true);
     };
 
     const logSmartSync = function () {
-      if (graphStore.hasMarker && hasVideo && hasLog) {
+      if (graphStore.hasMarker && logStore.hasVideo && hasLog) {
         try {
           setVideoOffset(
-            videoOffset + (currentBlackboxTime - graphStore.markerTime) / 1000000,
+            playbackStore.videoOffset + (currentBlackboxTime - graphStore.markerTime) / 1000000,
             true,
           );
         } catch {
@@ -1652,7 +1638,7 @@ function BlackboxLogViewer() {
     function handleKeyVideoIn(e, shifted) {
       if (!shifted) {
         setVideoInTime(
-          videoExportInTime === currentBlackboxTime
+          playbackStore.videoExportInTime === currentBlackboxTime
             ? null
             : currentBlackboxTime,
         );
@@ -1663,7 +1649,7 @@ function BlackboxLogViewer() {
     function handleKeyVideoOut(e, shifted) {
       if (!shifted) {
         setVideoOutTime(
-          videoExportOutTime === currentBlackboxTime
+          playbackStore.videoExportOutTime === currentBlackboxTime
             ? null
             : currentBlackboxTime,
         );
@@ -1886,9 +1872,9 @@ function BlackboxLogViewer() {
 
     prefs.get("videoConfig", function (item) {
       if (item) {
-        videoConfig = item;
+        playbackStore.videoConfig = item;
       } else {
-        videoConfig = {
+        playbackStore.videoConfig = {
           width: 1280,
           height: 720,
           frameRate: 30,
@@ -2056,8 +2042,8 @@ function BlackboxLogViewer() {
     this.setGraphTime = function (timeStr) {
       let newTime = stringTimetoMsec(timeStr);
       if (!isNaN(newTime)) {
-        if (hasVideo) {
-          setVideoTime(newTime / 1000000 + videoOffset);
+        if (logStore.hasVideo) {
+          setVideoTime(newTime / 1000000 + playbackStore.videoOffset);
         } else {
           newTime += flightLog?.getMinTime() ?? 0;
           setCurrentBlackboxTime(newTime);
@@ -2114,17 +2100,17 @@ function BlackboxLogViewer() {
   this.getVideoExportParams = function () {
     return {
       graphConfig: activeGraphConfig,
-      inTime: videoExportInTime,
-      outTime: videoExportOutTime,
-      flightVideo: hasVideo && appStore.viewVideo ? video.cloneNode() : false,
-      flightVideoOffset: videoOffset,
+      inTime: playbackStore.videoExportInTime,
+      outTime: playbackStore.videoExportOutTime,
+      flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,
+      flightVideoOffset: playbackStore.videoOffset,
       hasCraft: userSettings.drawCraft,
       hasAnalyser: graphStore.hasAnalyser,
       hasSticks: userSettings.drawSticks,
     };
   };
   this.saveVideoConfig = function (newConfig) {
-    videoConfig = newConfig;
+    playbackStore.videoConfig = newConfig;
     prefs.set("videoConfig", newConfig);
   };
   // Playback
