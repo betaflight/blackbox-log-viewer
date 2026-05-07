@@ -19,6 +19,11 @@ export function Configuration(file) {
       graphStore.configLines = e.target.result.split("\n");
       graphStore.configFileName = file.name;
     };
+    reader.onerror = reader.onabort = function () {
+      const graphStore = useGraphStore();
+      graphStore.configLines = [];
+      graphStore.configFileName = "";
+    };
 
     reader.readAsText(file);
   }
@@ -53,6 +58,9 @@ export function ConfigurationDefaults(prefs) {
     reader.onload = function (e) {
       fileLinesArray = e.target.result.split("\n");
       prefs.set("configurationDefaults", fileLinesArray);
+    };
+    reader.onerror = reader.onabort = function () {
+      fileLinesArray = null;
     };
 
     reader.readAsText(file);
