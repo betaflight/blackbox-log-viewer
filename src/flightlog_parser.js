@@ -528,10 +528,197 @@ export function FlightLogParser(logData) {
     }
   }
 
+  // Sets of field names for dispatch-based header parsing (avoids large switch statement)
+
+  // Fields parsed as simple parseInt and stored directly in sysConfig
+  const PARSE_INT_FIELDS = new Set([
+    "rcRate", "thrMid", "thrExpo", "tpa_rate", "tpa_mode", "tpa_breakpoint",
+    "airmode_activate_throttle", "serialrx_provider", "looptime",
+    "gyro_sync_denom", "pid_process_denom", "pidController", "yaw_p_limit",
+    "dterm_average_count", "rollPitchItermResetRate", "yawItermResetRate",
+    "rollPitchItermIgnoreRate", "yawItermIgnoreRate", "dterm_differentiator",
+    "deltaMethod", "dynamic_dterm_threshold", "dynamic_pterm",
+    "iterm_reset_offset", "deadband", "yaw_deadband", "gyro_lpf",
+    "gyro_hardware_lpf", "gyro_32khz_hardware_lpf", "acc_lpf_hz",
+    "acc_hardware", "baro_hardware", "mag_hardware", "gyro_cal_on_first_arm",
+    "vbat_pid_compensation", "rc_smoothing", "rc_smoothing_type",
+    "rc_smoothing_debug_axis", "rc_smoothing_rx_average",
+    "rc_smoothing_rx_smoothed", "rc_smoothing_mode",
+    "rc_smoothing_auto_factor_setpoint", "rc_smoothing_auto_factor_throttle",
+    "rc_smoothing_feedforward_hz", "rc_smoothing_setpoint_hz",
+    "rc_smoothing_throttle_hz", "superExpoYawMode", "features", "dynamic_pid",
+    "rc_interpolation", "rc_interpolation_channels",
+    "rc_interpolation_interval", "unsynced_fast_pwm", "fast_pwm_protocol",
+    "motor_pwm_rate", "vbatscale", "vbatref", "acc_1G", "dterm_filter_type",
+    "dterm_filter2_type", "pidAtMinThrottle", "pidSumLimit",
+    "pidSumLimitYaw", "anti_gravity_threshold", "itermWindupPointPercent",
+    "ptermSRateWeight", "setpointRelaxRatio", "ff_transition", "ff_averaging",
+    "ff_smooth_factor", "ff_jitter_factor", "ff_boost", "ff_max_rate_limit",
+    "dtermSetpointWeight", "gyro_soft_type", "gyro_soft2_type", "debug_mode",
+    "anti_gravity_mode", "anti_gravity_gain", "anti_gravity_p_gain",
+    "anti_gravity_cutoff_hz", "abs_control_gain", "use_integrated_yaw",
+    "d_max_gain", "d_max_advance", "dshot_bidir",
+    "gyro_rpm_notch_harmonics", "gyro_rpm_notch_q", "gyro_rpm_notch_min",
+    "rpm_filter_fade_range_hz", "rpm_notch_lpf", "dterm_rpm_notch_harmonics",
+    "dterm_rpm_notch_q", "dterm_rpm_notch_min", "iterm_relax",
+    "iterm_relax_type", "iterm_relax_cutoff", "dyn_notch_range",
+    "dyn_notch_width_percent", "dyn_notch_q", "dyn_notch_count",
+    "dyn_notch_min_hz", "dyn_notch_max_hz", "rates_type",
+    "vbat_sag_compensation", "fields_disabled_mask", "motor_pwm_protocol",
+    "gyro_to_use", "gyro_enabled_bitmask", "dynamic_idle_min_rpm",
+    "dyn_idle_p_gain", "dyn_idle_i_gain", "dyn_idle_d_gain",
+    "dyn_idle_start_increase", "dyn_idle_max_increase",
+    "simplified_pids_mode", "simplified_pi_gain", "simplified_i_gain",
+    "simplified_d_gain", "simplified_dmax_gain", "simplified_d_max_gain",
+    "simplified_feedforward_gain", "simplified_pitch_d_gain",
+    "simplified_pitch_pi_gain", "simplified_master_multiplier",
+    "simplified_dterm_filter", "simplified_dterm_filter_multiplier",
+    "simplified_gyro_filter", "simplified_gyro_filter_multiplier",
+    "motor_output_limit", "throttle_limit_type", "throttle_limit_percent",
+    "throttle_boost", "throttle_boost_cutoff", "motor_poles",
+    "blackbox_high_resolution",
+    // Legacy firmware log headers
+    "dterm_cut_hz", "acc_cut_hz",
+  ]);
+
+  // Fields parsed as CSV and stored directly in sysConfig
+  const CSV_FIELDS = new Set([
+    "rates", "rate_limits", "rollPID", "pitchPID", "yawPID", "altPID",
+    "posPID", "posrPID", "navrPID", "levelPID", "velPID", "motorOutput",
+    "rc_smoothing_cutoffs", "rc_smoothing_active_cutoffs",
+    "rc_smoothing_active_cutoffs_ff_sp_thr", "gyro_lowpass_dyn_hz",
+    "gyro_lowpass_dyn_expo", "dterm_lpf_dyn_expo", "thrust_linear",
+    "tpa_low_rate", "tpa_low_breakpoint", "tpa_low_always", "mixer_type",
+    "chirp_lag_freq_hz", "chirp_lead_freq_hz", "chirp_amplitude_roll",
+    "chirp_amplitude_pitch", "chirp_amplitude_yaw",
+    "chirp_frequency_start_deci_hz", "chirp_frequency_end_deci_hz",
+    "chirp_time_seconds", "dterm_lpf_dyn_hz",
+  ]);
+
+  // Fields where parseInt value is divided by 100 on older firmware, raw on newer
+  const VERSION_CONDITIONAL_INT_FIELDS = new Set([
+    "yaw_lpf_hz", "gyro_lowpass_hz", "gyro_lowpass2_hz", "dterm_notch_hz",
+    "dterm_notch_cutoff", "dterm_lpf_hz", "dterm_lpf2_hz",
+  ]);
+
+  // Fields where value is CSV on newer firmware, parseInt/100 on older
+  const VERSION_CONDITIONAL_CSV_FIELDS = new Set([
+    "gyro_notch_hz", "gyro_notch_cutoff",
+  ]);
+
+  // Fields stored as raw string values
+  const STRING_FIELDS = new Set([
+    "Product", "Blackbox version", "Firmware date", "Board information",
+    "Craft name", "Log start datetime",
+  ]);
+
+  // Fields where parseInt value is divided by 1000 on newer firmware
+  const ACCEL_LIMIT_FIELDS = new Set([
+    "yawRateAccelLimit", "rateAccelLimit",
+  ]);
+
+  // Fields where parseInt value is divided by 100
+  const DIVIDE_100_FIELDS = new Set([
+    "motor_idle", "digitalIdleOffset",
+  ]);
+
+  /**
+   * Check if firmware meets the 3.0.1/2.0.0 version threshold for filter fields
+   */
+  const isModernFilterFirmware = () =>
+    (this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "3.0.1")) ||
+    (this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "2.0.0"));
+
+  /**
+   * Parse "Firmware revision" header value and set firmware type/version in sysConfig
+   */
+  const parseFirmwareRevision = (fieldValue) => {
+    // Extract the firmware revision in case of Betaflight/Raceflight/Cleanflight 2.x/Other
+    const fwMatches = /((?:Beta|Race|Clean|Base|Butter)flight)\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
+    if (fwMatches != null) {
+      if (fwMatches[1] === "Betaflight") {
+        this.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
+      }
+
+      this.sysConfig.firmware = `${Number.parseInt(fwMatches[2], 10)}.${Number.parseInt(fwMatches[3], 10)}`;
+      this.sysConfig.firmwarePatch =
+        fwMatches[4] ? Number.parseInt(fwMatches[4], 10) : "0";
+      this.sysConfig.firmwareVersion = `${this.sysConfig.firmware}.${this.sysConfig.firmwarePatch}`;
+      return;
+    }
+
+    // Try to detect INAV
+    const inavMatches = /(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
+    if (inavMatches != null) {
+      this.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
+      this.sysConfig.firmware = Number.parseFloat(`${inavMatches[2]}.${inavMatches[3]}`);
+      this.sysConfig.firmwarePatch =
+        inavMatches[4] ? Number.parseInt(inavMatches[4], 10) : "";
+      return;
+    }
+
+    // Legacy firmware versions
+    this.sysConfig.firmwareVersion = "0.0.0";
+    this.sysConfig.firmware = 0;
+    this.sysConfig.firmwarePatch = 0;
+  };
+
+  /**
+   * Parse "Field X ..." header and update frameDefs
+   */
+  const parseFieldDefinition = (fieldName, fieldValue) => {
+    const matches = fieldName.match(/^Field (.) (.+)$/);
+    if (!matches) {
+      return false;
+    }
+
+    const frameName = matches[1];
+    const frameInfo = matches[2];
+
+    if (!this.frameDefs[frameName]) {
+      this.frameDefs[frameName] = {
+        name: [],
+        nameToIndex: {},
+        count: 0,
+        signed: [],
+        predictor: [],
+        encoding: [],
+      };
+    }
+
+    const frameDef = this.frameDefs[frameName];
+
+    const frameInfoHandlers = {
+      predictor: () => { frameDef.predictor = parseCommaSeparatedString(fieldValue); },
+      encoding: () => { frameDef.encoding = parseCommaSeparatedString(fieldValue); },
+      name: () => {
+        frameDef.name = translateLegacyFieldNames(fieldValue.split(","));
+        frameDef.count = frameDef.name.length;
+        frameDef.nameToIndex = mapFieldNamesToIndex(frameDef.name);
+        /*
+         * We could survive with the `signed` header just being filled with zeros, so if it is absent
+         * then resize it to length.
+         */
+        frameDef.signed.length = frameDef.count;
+      },
+      signed: () => { frameDef.signed = parseCommaSeparatedString(fieldValue); },
+    };
+
+    const handler = frameInfoHandlers[frameInfo];
+    if (handler) {
+      handler();
+    } else {
+      console.log(`Saw unsupported field header "${fieldName}"`);
+    }
+
+    return true;
+  };
+
   const parseHeaderLine = () => {
     const COLON = ":".codePointAt(0);
     let separatorPos = false;
-    let matches;
 
     if (stream.peekChar() !== " ") {
       return;
@@ -569,11 +756,59 @@ export function FlightLogParser(logData) {
       stream.data.subarray(separatorPos + 1, lineEnd),
     );
 
+    // Dispatch to Set-based lookups first (covers the majority of fields)
+    if (PARSE_INT_FIELDS.has(fieldName)) {
+      this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10);
+      return;
+    }
+
+    if (CSV_FIELDS.has(fieldName)) {
+      this.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
+      return;
+    }
+
+    if (VERSION_CONDITIONAL_INT_FIELDS.has(fieldName)) {
+      this.sysConfig[fieldName] = isModernFilterFirmware()
+        ? Number.parseInt(fieldValue, 10)
+        : Number.parseInt(fieldValue, 10) / 100;
+      return;
+    }
+
+    if (VERSION_CONDITIONAL_CSV_FIELDS.has(fieldName)) {
+      this.sysConfig[fieldName] = isModernFilterFirmware()
+        ? parseCommaSeparatedString(fieldValue)
+        : Number.parseInt(fieldValue, 10) / 100;
+      return;
+    }
+
+    if (ACCEL_LIMIT_FIELDS.has(fieldName)) {
+      const isBfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
+        semver.gte(this.sysConfig.firmwareVersion, "3.1.0");
+      const isCfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
+        semver.gte(this.sysConfig.firmwareVersion, "2.0.0");
+      this.sysConfig[fieldName] = (isBfModern || isCfModern)
+        ? Number.parseInt(fieldValue, 10) / 1000
+        : Number.parseInt(fieldValue, 10);
+      return;
+    }
+
+    if (DIVIDE_100_FIELDS.has(fieldName)) {
+      this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10) / 100;
+      return;
+    }
+
+    if (STRING_FIELDS.has(fieldName)) {
+      this.sysConfig[fieldName] = fieldValue;
+      return;
+    }
+
+    // Remaining cases with unique logic
     switch (fieldName) {
       case "I interval":
-        this.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
-        if (this.sysConfig.frameIntervalI < 1)
+        this.sysConfig.frameIntervalI = Number.parseInt(fieldValue, 10);
+        if (this.sysConfig.frameIntervalI < 1) {
           this.sysConfig.frameIntervalI = 1;
+        }
         break;
       case "P interval": {
         const slashIdx = fieldValue.indexOf("/");
@@ -588,294 +823,52 @@ export function FlightLogParser(logData) {
       }
       case "P denom":
       case "P ratio":
-        // Don't do nothing with this, because is the same than frameIntervalI/frameIntervalPDenom so we don't need it
         break;
       case "Data version":
-        dataVersion = parseInt(fieldValue, 10);
+        dataVersion = Number.parseInt(fieldValue, 10);
         break;
       case "Firmware type":
-        switch (fieldValue) {
-          case "Cleanflight":
-            this.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
-            break;
-          default:
-            this.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
-        }
+        this.sysConfig.firmwareType = fieldValue === "Cleanflight"
+          ? FIRMWARE_TYPE_CLEANFLIGHT
+          : FIRMWARE_TYPE_BASEFLIGHT;
         break;
-
-      // Betaflight Log Header Parameters
       case "minthrottle":
-        this.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        this.sysConfig.motorOutput[0] = this.sysConfig[fieldName]; // by default, set the minMotorOutput to match minThrottle
+        this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10);
+        this.sysConfig.motorOutput[0] = this.sysConfig[fieldName];
         break;
       case "maxthrottle":
-        this.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        this.sysConfig.motorOutput[1] = this.sysConfig[fieldName]; // by default, set the maxMotorOutput to match maxThrottle
-        break;
-      case "rcRate":
-      case "thrMid":
-      case "thrExpo":
-      case "tpa_rate":
-      case "tpa_mode":
-      case "tpa_breakpoint":
-      case "airmode_activate_throttle":
-      case "serialrx_provider":
-      case "looptime":
-      case "gyro_sync_denom":
-      case "pid_process_denom":
-      case "pidController":
-      case "yaw_p_limit":
-      case "dterm_average_count":
-      case "rollPitchItermResetRate":
-      case "yawItermResetRate":
-      case "rollPitchItermIgnoreRate":
-      case "yawItermIgnoreRate":
-      case "dterm_differentiator":
-      case "deltaMethod":
-      case "dynamic_dterm_threshold":
-      case "dynamic_pterm":
-      case "iterm_reset_offset":
-      case "deadband":
-      case "yaw_deadband":
-      case "gyro_lpf":
-      case "gyro_hardware_lpf":
-      case "gyro_32khz_hardware_lpf":
-      case "acc_lpf_hz":
-      case "acc_hardware":
-      case "baro_hardware":
-      case "mag_hardware":
-      case "gyro_cal_on_first_arm":
-      case "vbat_pid_compensation":
-      case "rc_smoothing":
-      case "rc_smoothing_type":
-      case "rc_smoothing_debug_axis":
-      case "rc_smoothing_rx_average":
-      case "rc_smoothing_rx_smoothed":
-      case "rc_smoothing_mode": // 4.3 rc smoothing stuff
-      case "rc_smoothing_auto_factor_setpoint":
-      case "rc_smoothing_auto_factor_throttle":
-      case "rc_smoothing_feedforward_hz":
-      case "rc_smoothing_setpoint_hz":
-      case "rc_smoothing_throttle_hz":
-      case "superExpoYawMode":
-      case "features":
-      case "dynamic_pid":
-      case "rc_interpolation":
-      case "rc_interpolation_channels":
-      case "rc_interpolation_interval":
-      case "unsynced_fast_pwm":
-      case "fast_pwm_protocol":
-      case "motor_pwm_rate":
-      case "vbatscale":
-      case "vbatref":
-      case "acc_1G":
-      case "dterm_filter_type":
-      case "dterm_filter2_type":
-      case "pidAtMinThrottle":
-      case "pidSumLimit":
-      case "pidSumLimitYaw":
-      case "anti_gravity_threshold":
-      case "itermWindupPointPercent":
-      case "ptermSRateWeight":
-      case "setpointRelaxRatio":
-      case "ff_transition":
-      case "ff_averaging":
-      case "ff_smooth_factor":
-      case "ff_jitter_factor":
-      case "ff_boost":
-      case "ff_max_rate_limit":
-      case "dtermSetpointWeight":
-      case "gyro_soft_type":
-      case "gyro_soft2_type":
-      case "debug_mode":
-      case "anti_gravity_mode":
-      case "anti_gravity_gain":
-      case "anti_gravity_p_gain":
-      case "anti_gravity_cutoff_hz":
-      case "abs_control_gain":
-      case "use_integrated_yaw":
-      case "d_max_gain":
-      case "d_max_advance":
-      case "dshot_bidir":
-      case "gyro_rpm_notch_harmonics":
-      case "gyro_rpm_notch_q":
-      case "gyro_rpm_notch_min":
-      case "rpm_filter_fade_range_hz":
-      case "rpm_notch_lpf":
-      case "dterm_rpm_notch_harmonics":
-      case "dterm_rpm_notch_q":
-      case "dterm_rpm_notch_min":
-      case "iterm_relax":
-      case "iterm_relax_type":
-      case "iterm_relax_cutoff":
-      case "dyn_notch_range":
-      case "dyn_notch_width_percent":
-      case "dyn_notch_q":
-      case "dyn_notch_count":
-      case "dyn_notch_min_hz":
-      case "dyn_notch_max_hz":
-      case "rates_type":
-      case "vbat_sag_compensation":
-      case "fields_disabled_mask":
-      case "motor_pwm_protocol":
-      case "gyro_to_use":
-      case "gyro_enabled_bitmask":
-      case "dynamic_idle_min_rpm":
-      case "dyn_idle_p_gain":
-      case "dyn_idle_i_gain":
-      case "dyn_idle_d_gain":
-      case "dyn_idle_start_increase":
-      case "dyn_idle_max_increase":
-      case "simplified_pids_mode":
-      case "simplified_pi_gain":
-      case "simplified_i_gain":
-      case "simplified_d_gain":
-      case "simplified_dmax_gain":
-      case "simplified_d_max_gain":
-      case "simplified_feedforward_gain":
-      case "simplified_pitch_d_gain":
-      case "simplified_pitch_pi_gain":
-      case "simplified_master_multiplier":
-      case "simplified_dterm_filter":
-      case "simplified_dterm_filter_multiplier":
-      case "simplified_gyro_filter":
-      case "simplified_gyro_filter_multiplier":
-      case "motor_output_limit":
-      case "throttle_limit_type":
-      case "throttle_limit_percent":
-      case "throttle_boost":
-      case "throttle_boost_cutoff":
-      case "motor_poles":
-      case "blackbox_high_resolution":
-        this.sysConfig[fieldName] = parseInt(fieldValue, 10);
+        this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10);
+        this.sysConfig.motorOutput[1] = this.sysConfig[fieldName];
         break;
       case "rc_expo":
       case "rc_rates":
         if (stringHasComma(fieldValue)) {
           this.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
         } else {
-          this.sysConfig[fieldName][0] = parseInt(fieldValue, 10);
-          this.sysConfig[fieldName][1] = parseInt(fieldValue, 10);
+          this.sysConfig[fieldName][0] = Number.parseInt(fieldValue, 10);
+          this.sysConfig[fieldName][1] = Number.parseInt(fieldValue, 10);
         }
         break;
       case "rcYawExpo":
-        this.sysConfig["rc_expo"][2] = parseInt(fieldValue, 10);
+        this.sysConfig["rc_expo"][2] = Number.parseInt(fieldValue, 10);
         break;
       case "rcYawRate":
-        this.sysConfig["rc_rates"][2] = parseInt(fieldValue, 10);
+        this.sysConfig["rc_rates"][2] = Number.parseInt(fieldValue, 10);
         break;
-
-      case "yawRateAccelLimit":
-      case "rateAccelLimit":
-        if (
-          (this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
-            semver.gte(this.sysConfig.firmwareVersion, "3.1.0")) ||
-          (this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
-            semver.gte(this.sysConfig.firmwareVersion, "2.0.0"))
-        ) {
-          this.sysConfig[fieldName] = parseInt(fieldValue, 10) / 1000;
-        } else {
-          this.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        }
-        break;
-
-      case "yaw_lpf_hz":
-      case "gyro_lowpass_hz":
-      case "gyro_lowpass2_hz":
-      case "dterm_notch_hz":
-      case "dterm_notch_cutoff":
-      case "dterm_lpf_hz":
-      case "dterm_lpf2_hz":
-        if (
-          (this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
-            semver.gte(this.sysConfig.firmwareVersion, "3.0.1")) ||
-          (this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
-            semver.gte(this.sysConfig.firmwareVersion, "2.0.0"))
-        ) {
-          this.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        } else {
-          this.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
-        }
-        break;
-
-      case "gyro_notch_hz":
-      case "gyro_notch_cutoff":
-        if (
-          (this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
-            semver.gte(this.sysConfig.firmwareVersion, "3.0.1")) ||
-          (this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
-            semver.gte(this.sysConfig.firmwareVersion, "2.0.0"))
-        ) {
-          this.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-        } else {
-          this.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
-        }
-        break;
-
-      case "motor_idle":
-      case "digitalIdleOffset":
-        this.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
-        break;
-
-      /**  Legacy firmware log headers **/
-      case "dterm_cut_hz":
-      case "acc_cut_hz":
-        this.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        break;
-      /** End of legacy firmware log headers **/
-
       case "superExpoFactor":
         if (stringHasComma(fieldValue)) {
           const expoParams = parseCommaSeparatedString(fieldValue);
           this.sysConfig.superExpoFactor = expoParams[0];
           this.sysConfig.superExpoFactorYaw = expoParams[1];
         } else {
-          this.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
+          this.sysConfig.superExpoFactor = Number.parseInt(fieldValue, 10);
         }
         break;
-
-      /* CSV packed values */
-
-      case "rates":
-      case "rate_limits":
-      case "rollPID":
-      case "pitchPID":
-      case "yawPID":
-      case "altPID":
-      case "posPID":
-      case "posrPID":
-      case "navrPID":
-      case "levelPID":
-      case "velPID":
-      case "motorOutput":
-      case "rc_smoothing_cutoffs":
-      case "rc_smoothing_active_cutoffs":
-      case "rc_smoothing_active_cutoffs_ff_sp_thr":
-      case "gyro_lowpass_dyn_hz":
-      case "gyro_lowpass_dyn_expo":
-      case "dterm_lpf_dyn_expo":
-      case "thrust_linear":
-      case "tpa_low_rate":
-      case "tpa_low_breakpoint":
-      case "tpa_low_always":
-      case "mixer_type":
-      case "chirp_lag_freq_hz":
-      case "chirp_lead_freq_hz":
-      case "chirp_amplitude_roll":
-      case "chirp_amplitude_pitch":
-      case "chirp_amplitude_yaw":
-      case "chirp_frequency_start_deci_hz":
-      case "chirp_frequency_end_deci_hz":
-      case "chirp_time_seconds":
-      case "dterm_lpf_dyn_hz":
-        this.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-        break;
       case "magPID":
-        this.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3); //[parseInt(fieldValue, 10), null, null];
+        this.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3);
         break;
       case "d_min":
       case "d_max": {
-        // Add D MAX values as Derivative numbers to PID array
         const dMaxValues = parseCommaSeparatedString(fieldValue);
         this.sysConfig["rollPID"].push(dMaxValues[0]);
         this.sysConfig["pitchPID"].push(dMaxValues[1]);
@@ -883,16 +876,12 @@ export function FlightLogParser(logData) {
         break;
       }
       case "ff_weight": {
-        // Add feedforward values to the PID array
         const ffValues = parseCommaSeparatedString(fieldValue);
         this.sysConfig["rollPID"].push(ffValues[0]);
         this.sysConfig["pitchPID"].push(ffValues[1]);
         this.sysConfig["yawPID"].push(ffValues[2]);
         break;
       }
-
-      /* End of CSV packed values */
-
       case "vbatcellvoltage": {
         const vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
         this.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
@@ -919,102 +908,18 @@ export function FlightLogParser(logData) {
           this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT
         ) {
           this.sysConfig.gyroScale =
-            this.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
+            this.sysConfig.gyroScale * (Math.PI / 180) * 0.000001;
         }
         break;
-      case "Firmware revision": {
-        //TODO Unify this somehow...
-
-        // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
-        const matches = /((?:Beta|Race|Clean|Base|Butter)flight)\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
-        if (matches != null) {
-          // Detecting Betaflight requires looking at the revision string
-          if (matches[1] === "Betaflight") {
-            this.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
-          }
-
-          this.sysConfig.firmware = `${Number.parseInt(matches[2], 10)}.${Number.parseInt(matches[3], 10)}`;
-          this.sysConfig.firmwarePatch =
-            matches[4] ? Number.parseInt(matches[4], 10) : "0";
-          this.sysConfig.firmwareVersion = `${this.sysConfig.firmware}.${this.sysConfig.firmwarePatch}`;
-        } else {
-          /*
-           * Try to detect INAV
-           */
-          const matches = /(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
-          if (matches != null) {
-            this.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
-            this.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
-            this.sysConfig.firmwarePatch =
-              matches[4] ? Number.parseInt(matches[4], 10) : "";
-          } else {
-            // Legacy firmware versions
-            this.sysConfig.firmwareVersion = "0.0.0";
-            this.sysConfig.firmware = 0;
-            this.sysConfig.firmwarePatch = 0;
-          }
-        }
-        this.sysConfig[fieldName] = fieldValue;
-
-        break;
-      }
-      case "Product":
-      case "Blackbox version":
-      case "Firmware date":
-      case "Board information":
-      case "Craft name":
-      case "Log start datetime":
-        // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
-        // Just Add them anyway
+      case "Firmware revision":
+        parseFirmwareRevision(fieldValue);
         this.sysConfig[fieldName] = fieldValue;
         break;
       case "DeviceUID":
         this.sysConfig.deviceUID = fieldValue;
         break;
       default:
-        if ((matches = fieldName.match(/^Field (.) (.+)$/))) {
-          const frameName = matches[1];
-          const frameInfo = matches[2];
-
-          if (!this.frameDefs[frameName]) {
-            this.frameDefs[frameName] = {
-              name: [],
-              nameToIndex: {},
-              count: 0,
-              signed: [],
-              predictor: [],
-              encoding: [],
-            };
-          }
-
-          const frameDef = this.frameDefs[frameName];
-
-          switch (frameInfo) {
-            case "predictor":
-              frameDef.predictor = parseCommaSeparatedString(fieldValue);
-              break;
-            case "encoding":
-              frameDef.encoding = parseCommaSeparatedString(fieldValue);
-              break;
-            case "name":
-              frameDef.name = translateLegacyFieldNames(fieldValue.split(","));
-              frameDef.count = frameDef.name.length;
-
-              frameDef.nameToIndex = mapFieldNamesToIndex(frameDef.name);
-
-              /*
-               * We could survive with the `signed` header just being filled with zeros, so if it is absent
-               * then resize it to length.
-               */
-              frameDef.signed.length = frameDef.count;
-              break;
-            case "signed":
-              frameDef.signed = parseCommaSeparatedString(fieldValue);
-              break;
-            default:
-              console.log(`Saw unsupported field header "${fieldName}"`);
-          }
-        } else {
+        if (!parseFieldDefinition(fieldName, fieldValue)) {
           console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
           if (this.sysConfig.unknownHeaders === null) {
             this.sysConfig.unknownHeaders = [];
@@ -1022,7 +927,7 @@ export function FlightLogParser(logData) {
           this.sysConfig.unknownHeaders.push({
             name: fieldName,
             value: fieldValue,
-          }); // Save the unknown headers
+          });
         }
         break;
     }
@@ -1099,7 +1004,7 @@ export function FlightLogParser(logData) {
       invalidateMainStream();
     }
 
-    if (this.onFrameReady)
+    if (this.onFrameReady) {
       this.onFrameReady(
         mainStreamIsValid,
         mainHistory[0],
@@ -1107,6 +1012,7 @@ export function FlightLogParser(logData) {
         frameStart,
         frameEnd - frameStart,
       );
+    }
 
     // Rotate history buffers
 
@@ -1358,7 +1264,7 @@ export function FlightLogParser(logData) {
 
     //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
 
-    if (this.onFrameReady)
+    if (this.onFrameReady) {
       this.onFrameReady(
         mainStreamIsValid,
         mainHistory[0],
@@ -1366,6 +1272,7 @@ export function FlightLogParser(logData) {
         frameStart,
         frameEnd - frameStart,
       );
+    }
 
     if (mainStreamIsValid) {
       // Rotate history buffers
@@ -1446,8 +1353,7 @@ export function FlightLogParser(logData) {
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD:
         if (
-          !this.frameDefs.H ||
-          this.frameDefs.H.nameToIndex["GPS_home[0]"] === undefined
+          this.frameDefs.H?.nameToIndex["GPS_home[0]"] === undefined
         ) {
           throw "Attempted to base prediction on GPS home position without GPS home frame definition";
         }
@@ -1456,8 +1362,7 @@ export function FlightLogParser(logData) {
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1:
         if (
-          !this.frameDefs.H ||
-          this.frameDefs.H.nameToIndex["GPS_home[1]"] === undefined
+          this.frameDefs.H?.nameToIndex["GPS_home[1]"] === undefined
         ) {
           throw "Attempted to base prediction on GPS home position without GPS home frame definition";
         }

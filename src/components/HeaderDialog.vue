@@ -1271,11 +1271,13 @@ function buildGroupMap(s) {
       continue;
     }
     const group = getHeaderGroup(key);
-    (groups[group] ??= []).push({ name: key, value: formatted, group });
+    if (!groups[group]) { groups[group] = []; }
+    groups[group].push({ name: key, value: formatted, group });
   }
   if (Array.isArray(s.unknownHeaders)) {
+    if (!groups["Parameters"]) { groups["Parameters"] = []; }
     for (const h of s.unknownHeaders) {
-      (groups["Parameters"] ??= []).push({ name: h.name, value: String(h.value), group: "Parameters" });
+      groups["Parameters"].push({ name: h.name, value: String(h.value), group: "Parameters" });
     }
   }
   return groups;

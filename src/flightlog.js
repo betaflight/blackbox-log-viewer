@@ -263,69 +263,47 @@ export function FlightLog(logData) {
     } else return false;
   };
 
+  const addComputedFieldNames = (disabled) => {
+    // Heading: ATTITUDE enabled (quaternion available) OR both GYRO and ACC enabled (IMU estimation)
+    const hasQuaternion = fieldNames.includes("imuQuaternion[0]");
+    const hasGyroAndAcc = fieldNames.includes("gyroADC[0]") && fieldNames.includes("accSmooth[0]");
+    if (hasQuaternion || hasGyroAndAcc) {
+      fieldNames.push("heading[0]", "heading[1]", "heading[2]");
+    }
+
+    if (!disabled.PID) {
+      fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
+    }
+    if (!disabled.SETPOINT) {
+      fieldNames.push("rcCommands[0]", "rcCommands[1]", "rcCommands[2]", "rcCommands[3]");
+    }
+    if (!disabled.GYRO && !disabled.SETPOINT) {
+      fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]");
+    }
+    if (!disabled.GPS) {
+      if (fieldNames.includes("GPS_coord[0]")) {
+        fieldNames.push("gpsCartesianCoords[0]", "gpsCartesianCoords[1]", "gpsCartesianCoords[2]", "gpsDistance", "gpsHomeAzimuth");
+      }
+      if (fieldNames.includes("GPS_velned[0]")) {
+        fieldNames.push("gpsTrajectoryTiltAngle");
+      }
+    }
+  };
+
   const buildFieldNames = () => {
     // Make an independent copy
     fieldNames = parser.frameDefs.I.name.slice(0);
 
-    // Add names of slow fields which we'll merge into the main stream
+    // Merge slow fields into main stream
     if (parser.frameDefs.S) {
-      for (const name of parser.frameDefs.S.name) {
-        fieldNames.push(name);
-      }
+      fieldNames.push(...parser.frameDefs.S.name);
     }
-    // Add names of gps fields which we'll merge into the main stream
+    // Merge GPS fields (skip duplicate time)
     if (parser.frameDefs.G) {
-      for (const name of parser.frameDefs.G.name) {
-        if (name !== "time") {
-          // remove duplicate time field
-          fieldNames.push(name);
-        }
-      }
+      fieldNames.push(...parser.frameDefs.G.name.filter((n) => n !== "time"));
     }
 
-    // Add names for our ADDITIONAL_COMPUTED_FIELDS
-    // Add heading fields when: ATTITUDE enabled (added 2025.12 / quaternion available) OR both GYRO and ACC enabled (IMU estimation available)
-    if (
-      fieldNames.includes("imuQuaternion[0]") ||
-      (fieldNames.includes("gyroADC[0]") && fieldNames.includes("accSmooth[0]"))
-    ) {
-      fieldNames.push("heading[0]", "heading[1]", "heading[2]");
-    }
-
-    if (!this.isFieldDisabled().PID) {
-      fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
-    }
-
-    if (!this.isFieldDisabled().SETPOINT) {
-      fieldNames.push(
-        "rcCommands[0]",
-        "rcCommands[1]",
-        "rcCommands[2]",
-        "rcCommands[3]",
-      ); // Custom calculated scaled rccommand
-    }
-
-    if (!this.isFieldDisabled().GYRO && !this.isFieldDisabled().SETPOINT) {
-      fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
-    }
-
-    if (!this.isFieldDisabled().GPS) {
-      if (fieldNames.includes("GPS_coord[0]")) {
-        // GPS coords in cartesian system
-        fieldNames.push(
-          "gpsCartesianCoords[0]",
-          "gpsCartesianCoords[1]",
-          "gpsCartesianCoords[2]",
-          "gpsDistance",
-          "gpsHomeAzimuth",
-        );
-      }
-
-      if (fieldNames.includes("GPS_velned[0]")) {
-        // GPS trajectory tilt angle
-        fieldNames.push("gpsTrajectoryTiltAngle");
-      }
-    }
+    addComputedFieldNames(this.isFieldDisabled());
 
     fieldNameToIndex = {};
     for (let i = 0; i < fieldNames.length; i++) {
@@ -648,6 +626,240 @@ export function FlightLog(logData) {
   };
 
   /**
+   * Compute attitude (roll, pitch, heading) from IMU quaternion or gyro+acc fallback.
+   * Writes 3 fields to destFrame starting at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computeAttitude = (
+    srcFrame,
+    destFrame,
+    fieldIndex,
+    imuQuaternion,
+    gyroADC,
+    accSmooth,
+    magADC,
+    chunkIMU,
+    sysConfig,
+  ) => {
+    if (imuQuaternion) {
+      const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
+      const q = {
+        x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
+        y: srcFrame[imuQuaternion[1]] / scaleFromFixedInt16,
+        z: srcFrame[imuQuaternion[2]] / scaleFromFixedInt16,
+        w: 1.0,
+      };
+
+      let m = q.x ** 2 + q.y ** 2 + q.z ** 2;
+      if (m < 1.0) {
+        q.w = Math.sqrt(1.0 - m);
+      } else {
+        m = Math.sqrt(m);
+        q.x /= m;
+        q.y /= m;
+        q.z /= m;
+        q.w = 0;
+      }
+      const xx = q.x ** 2,
+        xy = q.x * q.y,
+        xz = q.x * q.z,
+        wx = q.w * q.x,
+        yy = q.y ** 2,
+        yz = q.y * q.z,
+        wy = q.w * q.y,
+        zz = q.z ** 2,
+        wz = q.w * q.z;
+      const roll = Math.atan2(+2 * (wx + yz), +1 - 2 * (xx + yy));
+      const pitch = 0.5 * Math.PI - Math.acos(+2 * (wy - xz));
+      let heading = -Math.atan2(+2 * (wz + xy), +1 - 2 * (yy + zz));
+      if (heading < 0) {
+        heading += 2 * Math.PI;
+      }
+
+      destFrame[fieldIndex++] = roll;
+      destFrame[fieldIndex++] = pitch;
+      destFrame[fieldIndex++] = heading;
+    } else if (gyroADC && accSmooth) {
+      const attitude = chunkIMU.updateEstimatedAttitude(
+        [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
+        [
+          srcFrame[accSmooth[0]],
+          srcFrame[accSmooth[1]],
+          srcFrame[accSmooth[2]],
+        ],
+        srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
+        sysConfig.acc_1G,
+        sysConfig.gyroScale,
+        magADC,
+      );
+      destFrame[fieldIndex++] = attitude.roll;
+      destFrame[fieldIndex++] = attitude.pitch;
+      destFrame[fieldIndex++] = attitude.heading;
+    }
+    return fieldIndex;
+  };
+
+  /**
+   * Compute PID sums (P+I+D+F+S) for each axis, constrained by pidSumLimit.
+   * Writes 3 fields to destFrame starting at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computePidSums = (
+    srcFrame,
+    destFrame,
+    fieldIndex,
+    axisPID,
+    sysConfig,
+  ) => {
+    for (let axis = 0; axis < 3; axis++) {
+      let pidSum =
+        (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
+        (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
+        (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0) +
+        (axisPID[axis][3] !== undefined ? srcFrame[axisPID[axis][3]] : 0) +
+        (axisPID[axis][4] !== undefined ? srcFrame[axisPID[axis][4]] : 0);
+
+      const pidLimit =
+        axis < AXIS.YAW ? sysConfig.pidSumLimit : sysConfig.pidSumLimitYaw;
+      if (pidLimit != null && pidLimit > 0) {
+        pidSum = constrain(pidSum, -pidLimit, pidLimit);
+      }
+
+      destFrame[fieldIndex++] = pidSum;
+    }
+    return fieldIndex;
+  };
+
+  /**
+   * Compute scaled RC commands (setpoint in deg/s, throttle in %).
+   * For BF 4.0+ copies real setpoint fields; for older versions calculates from rcCommand.
+   * Writes 4 fields to destFrame starting at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computeScaledRcCommands = (
+    srcFrame,
+    destFrame,
+    fieldIndex,
+    setpoint,
+    rcCommand,
+    currentFlightMode,
+    sysConfig,
+  ) => {
+    if (
+      sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
+      semver.gte(sysConfig.firmwareVersion, "4.0.0")
+    ) {
+      for (let axis = 0; axis <= AXIS.YAW; axis++) {
+        destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
+      }
+      destFrame[fieldIndex++] = srcFrame[setpoint[AXIS.YAW + 1]] / 10;
+    } else {
+      for (let axis = 0; axis <= AXIS.YAW; axis++) {
+        destFrame[fieldIndex++] =
+          rcCommand[axis] !== undefined
+            ? this.rcCommandRawToDegreesPerSecond(
+                srcFrame[rcCommand[axis]],
+                axis,
+                currentFlightMode,
+              )
+            : 0;
+      }
+      destFrame[fieldIndex++] =
+        rcCommand[AXIS.YAW + 1] !== undefined
+          ? this.rcCommandRawToThrottle(srcFrame[rcCommand[AXIS.YAW + 1]])
+          : 0;
+    }
+    return fieldIndex;
+  };
+
+  /**
+   * Compute PID error (setpoint - gyro) for each axis.
+   * Writes 3 fields to destFrame starting at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computePidErrors = (
+    srcFrame,
+    destFrame,
+    fieldIndex,
+    fieldIndexRcCommands,
+    gyroADC,
+  ) => {
+    for (let axis = 0; axis < 3; axis++) {
+      const gyroADCdegrees =
+        gyroADC[axis] !== undefined
+          ? this.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]])
+          : 0;
+      destFrame[fieldIndex++] =
+        destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
+    }
+    return fieldIndex;
+  };
+
+  /**
+   * Compute GPS cartesian coordinates, distance to home, and azimuth.
+   * Writes 5 fields to destFrame starting at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computeGpsFields = (
+    srcFrame,
+    destFrame,
+    fieldIndex,
+    gpsCoord,
+    numSatIndex,
+  ) => {
+    const numSat = numSatIndex ? srcFrame[numSatIndex] : 0;
+    if (numSat > 4) {
+      const gpsCartesianCoords = gpsTransform.WGS_BS(
+        srcFrame[gpsCoord[0]] / 10000000,
+        srcFrame[gpsCoord[1]] / 10000000,
+        srcFrame[gpsCoord[2]] / 10,
+      );
+      destFrame[fieldIndex++] = gpsCartesianCoords.x;
+      destFrame[fieldIndex++] = gpsCartesianCoords.y;
+      destFrame[fieldIndex++] = gpsCartesianCoords.z;
+      destFrame[fieldIndex++] = Math.sqrt(
+        gpsCartesianCoords.x * gpsCartesianCoords.x +
+          gpsCartesianCoords.z * gpsCartesianCoords.z,
+      );
+
+      let homeAzimuth =
+        (Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) * 180) /
+        Math.PI;
+      if (homeAzimuth < 0) {
+        homeAzimuth += 360;
+      }
+      destFrame[fieldIndex++] = homeAzimuth;
+    } else {
+      destFrame[fieldIndex++] = 0;
+      destFrame[fieldIndex++] = 0;
+      destFrame[fieldIndex++] = 0;
+      destFrame[fieldIndex++] = 0;
+      destFrame[fieldIndex++] = 0;
+    }
+    return fieldIndex;
+  };
+
+  /**
+   * Compute trajectory tilt angle from NED GPS velocity.
+   * Writes 1 field to destFrame at fieldIndex.
+   * Returns updated fieldIndex.
+   */
+  const computeTrajectoryTilt = (srcFrame, destFrame, fieldIndex, gpsVelNED) => {
+    const Vn = srcFrame[gpsVelNED[0]],
+      Ve = srcFrame[gpsVelNED[1]],
+      Vd = srcFrame[gpsVelNED[2]];
+    const velocity = Math.hypot(Vn, Ve, Vd);
+    const minVelo = 5; // 5cm/s limit to prevent division by zero and miss tiny noise values
+    let trajectoryTiltAngle = 0;
+    if (velocity > minVelo) {
+      const angleSin = Math.max(-1, Math.min(1, Vd / velocity));
+      trajectoryTiltAngle = (-Math.asin(angleSin) * 180) / Math.PI; // [degree], if velo is up then >0
+    }
+    destFrame[fieldIndex++] = trajectoryTiltAngle;
+    return fieldIndex;
+  };
+
+  /**
    * Use the data in sourceChunks to compute additional fields (like IMU attitude) and add those into the
    * resultChunks.
    *
@@ -781,6 +993,8 @@ export function FlightLog(logData) {
       sourceChunkIndex++;
     }
 
+    const disabledFields = this.isFieldDisabled();
+
     for (
       ;
       destChunkIndex < destChunks.length;
@@ -798,206 +1012,70 @@ export function FlightLog(logData) {
           const destFrame = destChunk.frames[i];
           let fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
-          if (imuQuaternion) {
-            const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
-            const q = {
-              x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
-              y: srcFrame[imuQuaternion[1]] / scaleFromFixedInt16,
-              z: srcFrame[imuQuaternion[2]] / scaleFromFixedInt16,
-              w: 1.0,
-            };
+          fieldIndex = computeAttitude(
+            srcFrame,
+            destFrame,
+            fieldIndex,
+            imuQuaternion,
+            gyroADC,
+            accSmooth,
+            magADC,
+            chunkIMU,
+            sysConfig,
+          );
 
-            let m = q.x ** 2 + q.y ** 2 + q.z ** 2;
-            if (m < 1.0) {
-              // reconstruct .w of unit quaternion
-              q.w = Math.sqrt(1.0 - m);
-            } else {
-              // normalize [0,x,y,z]
-              m = Math.sqrt(m);
-              q.x /= m;
-              q.y /= m;
-              q.z /= m;
-              q.w = 0;
-            }
-            const xx = q.x ** 2,
-              xy = q.x * q.y,
-              xz = q.x * q.z,
-              wx = q.w * q.x,
-              yy = q.y ** 2,
-              yz = q.y * q.z,
-              wy = q.w * q.y,
-              zz = q.z ** 2,
-              wz = q.w * q.z;
-            const roll = Math.atan2(+2 * (wx + yz), +1 - 2 * (xx + yy));
-            const pitch = 0.5 * Math.PI - Math.acos(+2 * (wy - xz));
-            let heading = -Math.atan2(+2 * (wz + xy), +1 - 2 * (yy + zz));
-            if (heading < 0) {
-              heading += 2 * Math.PI;
-            }
-
-            destFrame[fieldIndex++] = roll;
-            destFrame[fieldIndex++] = pitch;
-            destFrame[fieldIndex++] = heading;
-          } else if (gyroADC && accSmooth) {
-            const attitude = chunkIMU.updateEstimatedAttitude(
-              [
-                srcFrame[gyroADC[0]],
-                srcFrame[gyroADC[1]],
-                srcFrame[gyroADC[2]],
-              ],
-              [
-                srcFrame[accSmooth[0]],
-                srcFrame[accSmooth[1]],
-                srcFrame[accSmooth[2]],
-              ],
-              srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-              sysConfig.acc_1G,
-              sysConfig.gyroScale,
-              magADC,
+          if (!disabledFields.PID) {
+            fieldIndex = computePidSums(
+              srcFrame,
+              destFrame,
+              fieldIndex,
+              axisPID,
+              sysConfig,
             );
-            destFrame[fieldIndex++] = attitude.roll;
-            destFrame[fieldIndex++] = attitude.pitch;
-            destFrame[fieldIndex++] = attitude.heading;
           }
 
-          // Add the Feedforward PID sum (P+I+D+F)
-          if (!this.isFieldDisabled().PID) {
-            for (let axis = 0; axis < 3; axis++) {
-              let pidSum =
-                (axisPID[axis][0] !== undefined
-                  ? srcFrame[axisPID[axis][0]]
-                  : 0) +
-                (axisPID[axis][1] !== undefined
-                  ? srcFrame[axisPID[axis][1]]
-                  : 0) +
-                (axisPID[axis][2] !== undefined
-                  ? srcFrame[axisPID[axis][2]]
-                  : 0) +
-                (axisPID[axis][3] !== undefined
-                  ? srcFrame[axisPID[axis][3]]
-                  : 0) +
-                (axisPID[axis][4] !== undefined
-                  ? srcFrame[axisPID[axis][4]]
-                  : 0);
-
-              // Limit the PID sum by the limits defined in the header
-              const pidLimit =
-                axis < AXIS.YAW
-                  ? sysConfig.pidSumLimit
-                  : sysConfig.pidSumLimitYaw;
-              if (pidLimit != null && pidLimit > 0) {
-                pidSum = constrain(pidSum, -pidLimit, pidLimit);
-              }
-
-              // Assign value
-              destFrame[fieldIndex++] = pidSum;
-            }
-          }
-
-          // Check the current flightmode (we need to know this so that we can correctly calculate the rates)
           const currentFlightMode = srcFrame[flightModeFlagsIndex];
-
-          // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
           const fieldIndexRcCommands = fieldIndex;
 
-          if (!this.isFieldDisabled().SETPOINT) {
-            // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
-            if (
-              sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
-              semver.gte(sysConfig.firmwareVersion, "4.0.0")
-            ) {
-              // Roll, pitch and yaw
-              for (let axis = 0; axis <= AXIS.YAW; axis++) {
-                destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
-              }
-              // Throttle
-              destFrame[fieldIndex++] = srcFrame[setpoint[AXIS.YAW + 1]] / 10;
-
-              // Versions earlier to 4.0 we must calculate the expected setpoint
-            } else {
-              // Roll, pitch and yaw
-              for (let axis = 0; axis <= AXIS.YAW; axis++) {
-                destFrame[fieldIndex++] =
-                  rcCommand[axis] !== undefined
-                    ? this.rcCommandRawToDegreesPerSecond(
-                        srcFrame[rcCommand[axis]],
-                        axis,
-                        currentFlightMode,
-                      )
-                    : 0;
-              }
-              // Throttle
-              destFrame[fieldIndex++] =
-                rcCommand[AXIS.YAW + 1] !== undefined
-                  ? this.rcCommandRawToThrottle(
-                      srcFrame[rcCommand[AXIS.YAW + 1]],
-                    )
-                  : 0;
-            }
+          if (!disabledFields.SETPOINT) {
+            fieldIndex = computeScaledRcCommands(
+              srcFrame,
+              destFrame,
+              fieldIndex,
+              setpoint,
+              rcCommand,
+              currentFlightMode,
+              sysConfig,
+            );
           }
 
-          // Calculate the PID Error
-          if (
-            !this.isFieldDisabled().GYRO &&
-            !this.isFieldDisabled().SETPOINT
-          ) {
-            for (let axis = 0; axis < 3; axis++) {
-              const gyroADCdegrees =
-                gyroADC[axis] !== undefined
-                  ? this.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]])
-                  : 0;
-              destFrame[fieldIndex++] =
-                destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
-            }
+          if (!disabledFields.GYRO && !disabledFields.SETPOINT) {
+            fieldIndex = computePidErrors(
+              srcFrame,
+              destFrame,
+              fieldIndex,
+              fieldIndexRcCommands,
+              gyroADC,
+            );
           }
 
-          // Calculate cartesian coords, azimuth and trajectory tilt angle by GPS
           if (gpsTransform && gpsCoord) {
-            const numSat = numSatIndex ? srcFrame[numSatIndex] : 0;
-            if (numSat > 4) {
-              const gpsCartesianCoords = gpsTransform.WGS_BS(
-                srcFrame[gpsCoord[0]] / 10000000,
-                srcFrame[gpsCoord[1]] / 10000000,
-                srcFrame[gpsCoord[2]] / 10,
-              );
-              destFrame[fieldIndex++] = gpsCartesianCoords.x;
-              destFrame[fieldIndex++] = gpsCartesianCoords.y;
-              destFrame[fieldIndex++] = gpsCartesianCoords.z;
-              destFrame[fieldIndex++] = Math.sqrt(
-                gpsCartesianCoords.x * gpsCartesianCoords.x +
-                  gpsCartesianCoords.z * gpsCartesianCoords.z,
-              );
-
-              let homeAzimuth =
-                (Math.atan2(-gpsCartesianCoords.z, -gpsCartesianCoords.x) *
-                  180) /
-                Math.PI;
-              if (homeAzimuth < 0) {
-                homeAzimuth += 360;
-              }
-              destFrame[fieldIndex++] = homeAzimuth;
-            } else {
-              destFrame[fieldIndex++] = 0;
-              destFrame[fieldIndex++] = 0;
-              destFrame[fieldIndex++] = 0;
-              destFrame[fieldIndex++] = 0;
-              destFrame[fieldIndex++] = 0;
-            }
+            fieldIndex = computeGpsFields(
+              srcFrame,
+              destFrame,
+              fieldIndex,
+              gpsCoord,
+              numSatIndex,
+            );
           }
 
-          // Calculate trajectory tilt angle by NED GPS velocity
           if (gpsVelNED) {
-            const Vn = srcFrame[gpsVelNED[0]],
-              Ve = srcFrame[gpsVelNED[1]],
-              Vd = srcFrame[gpsVelNED[2]];
-            const velocity = Math.hypot(Vn, Ve, Vd);
-            const minVelo = 5; // 5cm/s limit to prevent division by zero and miss tiny noise values
-            let trajectoryTiltAngle = 0;
-            if (velocity > minVelo) {
-              const angleSin = Math.max(-1, Math.min(1, Vd / velocity));
-              trajectoryTiltAngle = (-Math.asin(angleSin) * 180) / Math.PI; // [degree], if velo is up then >0
-            }
-            destFrame[fieldIndex++] = trajectoryTiltAngle;
+            fieldIndex = computeTrajectoryTilt(
+              srcFrame,
+              destFrame,
+              fieldIndex,
+              gpsVelNED,
+            );
           }
 
           // Remove empty fields at the end
