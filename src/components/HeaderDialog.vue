@@ -295,10 +295,11 @@ function formatParams(title, params) {
 
 function copyToClipboard() {
   const sections = [
-    formatParams("PID Settings", mainPids.value.map((r) => {
+    formatParams("PID Settings", allPids.value.map((r) => {
       const dMax = showDMax.value ? ` DMax=${r.dMax}` : "";
       return { name: r.label, value: `P=${r.p} I=${r.i} D=${r.d}${dMax} FF=${r.f}` };
     })),
+    formatParams("PID Controller", pidControllerParams.value),
     formatParams("Rates", rateParams.value),
     formatParams("Parameters", generalParams.value),
     formatParams("Motor / ESC", motorParams.value),
@@ -446,20 +447,54 @@ const rateParams = computed(() => {
   ].filter((p) => !p.missing);
 });
 
-// --- D Max ---
+// --- PID Controller ---
 
-const dMaxParams = computed(() => {
-  if (!isBF.value || !gte("4.0.0")) {
-    return [];
-  }
+const pidControllerParams = computed(() => {
   const s = filteredSc.value;
-  return [
-    param("Roll", fmtVal(s.d_max?.[0], 0)),
-    param("Pitch", fmtVal(s.d_max?.[1], 0)),
-    param("Yaw", fmtVal(s.d_max?.[2], 0)),
-    param("Gain", fmtVal(s.d_max_gain, 0)),
-    param("Advance", fmtVal(s.d_max_advance, 0)),
-  ].filter((p) => !p.missing);
+  const result = [];
+
+  // D Max
+  if (isBF.value && gte("4.0.0")) {
+    result.push(
+      param("D Max Roll", fmtVal(s.d_max?.[0], 0)),
+      param("D Max Pitch", fmtVal(s.d_max?.[1], 0)),
+      param("D Max Yaw", fmtVal(s.d_max?.[2], 0)),
+      param("D Max Gain", fmtVal(s.d_max_gain, 0)),
+      param("D Max Advance", fmtVal(s.d_max_advance, 0)),
+    );
+  }
+
+  // Anti Gravity
+  const gainDec = isBF.value && gte("3.1.0") && lte("4.3.9") ? 3 : 0;
+  result.push(
+    param("AG Mode", selectVal(s.anti_gravity_mode, ANTI_GRAVITY_MODE)),
+    param("AG Gain", fmtVal(s.anti_gravity_gain, gainDec)),
+    param("AG Threshold", fmtVal(s.anti_gravity_threshold, 0)),
+    param("AG P Gain", fmtVal(s.anti_gravity_p_gain, 0)),
+    param("AG Cutoff Hz", fmtVal(s.anti_gravity_cutoff_hz, 0)),
+  );
+
+  // TPA
+  result.push(
+    param("TPA Rate", fmtVal(s.tpa_rate, 2)),
+    param("TPA Breakpoint", fmtVal(s.tpa_breakpoint, 0)),
+  );
+
+  // PID limits & modifiers
+  result.push(
+    param("Thrust Linear", fmtVal(s.thrust_linear, 0)),
+    param("PID Sum Limit", fmtVal(s.pidSumLimit, 0)),
+    param("PID Sum Limit Yaw", fmtVal(s.pidSumLimitYaw, 0)),
+    param("Vbat Sag Comp", fmtVal(s.vbat_sag_compensation, 0)),
+    param("I-Term Relax", selectVal(s.iterm_relax, ITERM_RELAX)),
+    param("I-Term Relax Type", selectVal(s.iterm_relax_type, ITERM_RELAX_TYPE)),
+    param("I-Term Relax Cutoff", fmtVal(s.iterm_relax_cutoff, 0)),
+    param("Abs Control Gain", fmtVal(s.abs_control_gain, 0)),
+    param("PID At Min Throttle", selectVal(s.pidAtMinThrottle, OFF_ON)),
+    param("Use Integrated Yaw", selectVal(s.use_integrated_yaw, OFF_ON)),
+  );
+
+  return result.filter((p) => !p.missing);
 });
 
 // --- Rate Limits ---
@@ -476,7 +511,7 @@ const rateLimitParams = computed(() => {
   ].filter((p) => !p.missing);
 });
 
-// --- General Parameters ---
+// --- Parameters (merged General + Other) ---
 
 const generalParams = computed(() => {
   const s = filteredSc.value;
@@ -488,8 +523,6 @@ const generalParams = computed(() => {
     param("Debug Mode", selectVal(s.debug_mode, DEBUG_MODE)),
     param("Deadband", fmtVal(s.deadband, 0)),
     param("Yaw Deadband", fmtVal(s.yaw_deadband, 0)),
-    param("TPA Rate", fmtVal(s.tpa_rate, 2)),
-    param("TPA Breakpoint", fmtVal(s.tpa_breakpoint, 0)),
     param("Vbat Scale", fmtVal(s.vbatscale, 0)),
     param("Vbat Ref", fmtVal(s.vbatref, 0)),
     param("Vbat Min Cell", fmtVal(s.vbatmincellvoltage, vDec)),
@@ -499,14 +532,6 @@ const generalParams = computed(() => {
     param("Max Throttle", fmtVal(s.maxthrottle, 0)),
     param("THR Mid", fmtVal(s.thrMid, 2)),
     param("THR Expo", fmtVal(s.thrExpo, 2)),
-    param("Thrust Linear", fmtVal(s.thrust_linear, 0)),
-    param("PID Sum Limit", fmtVal(s.pidSumLimit, 0)),
-    param("PID Sum Limit Yaw", fmtVal(s.pidSumLimitYaw, 0)),
-    param("Vbat Sag Comp", fmtVal(s.vbat_sag_compensation, 0)),
-    param("I-Term Relax", selectVal(s.iterm_relax, ITERM_RELAX)),
-    param("I-Term Relax Type", selectVal(s.iterm_relax_type, ITERM_RELAX_TYPE)),
-    param("I-Term Relax Cutoff", fmtVal(s.iterm_relax_cutoff, 0)),
-    param("Abs Control Gain", fmtVal(s.abs_control_gain, 0)),
     param(
       "Yaw Rate Accel Limit",
       isBF.value && gte("3.1.0")
@@ -520,8 +545,19 @@ const generalParams = computed(() => {
         : fmtVal(s.rateAccelLimit, 1),
     ),
     param("Setpoint Relax Ratio", fmtVal(s.setpointRelaxRatio, 2)),
-    param("Use Integrated Yaw", selectVal(s.use_integrated_yaw, OFF_ON)),
+    // Hardware (was "Other")
+    param("Acc Hardware", selectVal(s.acc_hardware, ACC_HARDWARE)),
+    param("Baro Hardware", selectVal(s.baro_hardware, BARO_HARDWARE)),
+    param("Mag Hardware", selectVal(s.mag_hardware, MAG_HARDWARE)),
+    param("Current Offset", fmtVal(s.currentMeterOffset, 0)),
+    param("Current Scale", fmtVal(s.currentMeterScale, 0)),
   ];
+  // Gyro selection
+  if (isBF.value && gte("2025.12.0")) {
+    result.push(param("Gyro Bitmask", bitmaskVal(s.gyro_enabled_bitmask, 8)));
+  } else if (isBF.value && gte("4.3.0")) {
+    result.push(param("Gyro To Use", selectVal(s.gyro_to_use, GYRO_TO_USE)));
+  }
   return result.filter((p) => !p.missing);
 });
 
@@ -578,8 +614,9 @@ const gyroFilterParams = computed(() => {
     );
   }
 
-  // Acc LPF
+  // Yaw + Acc LPF
   result.push(
+    param("Yaw LPF Hz", fmtVal(s.yaw_lpf_hz, 0)),
     param("Acc LPF Hz", fmtVal(s.acc_lpf_hz, 2)),
     param("Acc Cut Hz", fmtVal(s.acc_cut_hz, 2)),
   );
@@ -599,7 +636,6 @@ const dtermFilterParams = computed(() => {
     param("Notch Hz", fmtVal(s.dterm_notch_hz, 0)),
     param("Notch Cutoff", fmtVal(s.dterm_notch_cutoff, 0)),
     param("Cut Hz", fmtVal(s.dterm_cut_hz, 2)),
-    param("Yaw LPF Hz", fmtVal(s.yaw_lpf_hz, 0)),
   ];
 
   // Dynamic D-term LPF
@@ -659,6 +695,7 @@ const rpmFilterParams = computed(() => {
     param("Q", fmtVal(s.gyro_rpm_notch_q, 0)),
     param("Min Hz", fmtVal(s.gyro_rpm_notch_min, 0)),
     param("Fade Range Hz", fmtVal(s.rpm_filter_fade_range_hz, 0)),
+    param("Weights", s.rpm_filter_weights ? String(s.rpm_filter_weights) : null),
     param("Notch LPF", fmtVal(s.rpm_notch_lpf, 0)),
     param("D-Term Harmonics", fmtVal(s.dterm_rpm_notch_harmonics, 0)),
     param("D-Term Q", fmtVal(s.dterm_rpm_notch_q, 0)),
@@ -761,6 +798,7 @@ const rcSmoothingParams = computed(() => {
       "Debug Axis",
       selectVal(s.rc_smoothing_debug_axis, RC_SMOOTHING_DEBUG_AXIS),
     ),
+    param("Serial Rx", selectVal(s.serialrx_provider, SERIALRX_PROVIDER)),
   );
 
   return result.filter((p) => !p.missing);
@@ -792,47 +830,9 @@ const motorParams = computed(() => {
     param("Dyn Idle P", fmtVal(s.dyn_idle_p_gain, 0)),
     param("Dyn Idle I", fmtVal(s.dyn_idle_i_gain, 0)),
     param("Dyn Idle D", fmtVal(s.dyn_idle_d_gain, 0)),
-    param("Serial Rx", selectVal(s.serialrx_provider, SERIALRX_PROVIDER)),
-    param("PID At Min Throttle", selectVal(s.pidAtMinThrottle, OFF_ON)),
   ].filter((p) => !p.missing);
 });
 
-// --- Anti Gravity ---
-
-const antiGravityParams = computed(() => {
-  const s = filteredSc.value;
-  if (s.anti_gravity_mode == null && s.anti_gravity_gain == null) {
-    return [];
-  }
-  const gainDec = isBF.value && gte("3.1.0") && lte("4.3.9") ? 3 : 0;
-  return [
-    param("Mode", selectVal(s.anti_gravity_mode, ANTI_GRAVITY_MODE)),
-    param("Gain", fmtVal(s.anti_gravity_gain, gainDec)),
-    param("Threshold", fmtVal(s.anti_gravity_threshold, 0)),
-    param("P Gain", fmtVal(s.anti_gravity_p_gain, 0)),
-    param("Cutoff Hz", fmtVal(s.anti_gravity_cutoff_hz, 0)),
-  ].filter((p) => !p.missing);
-});
-
-// --- Other ---
-
-const otherParams = computed(() => {
-  const s = filteredSc.value;
-  const result = [
-    param("Acc Hardware", selectVal(s.acc_hardware, ACC_HARDWARE)),
-    param("Baro Hardware", selectVal(s.baro_hardware, BARO_HARDWARE)),
-    param("Mag Hardware", selectVal(s.mag_hardware, MAG_HARDWARE)),
-    param("Current Offset", fmtVal(s.currentMeterOffset, 0)),
-    param("Current Scale", fmtVal(s.currentMeterScale, 0)),
-  ];
-  // Gyro selection
-  if (isBF.value && gte("2025.12.0")) {
-    result.push(param("Gyro Bitmask", bitmaskVal(s.gyro_enabled_bitmask, 8)));
-  } else if (isBF.value && gte("4.3.0")) {
-    result.push(param("Gyro To Use", selectVal(s.gyro_to_use, GYRO_TO_USE)));
-  }
-  return result.filter((p) => !p.missing);
-});
 
 // --- Features ---
 
@@ -1010,11 +1010,11 @@ loadHiddenPrefs();
 
 // Group order for display
 const GROUP_ORDER = [
-  "PID Settings", "PID Sliders", "Feedforward", "Rates", "D Max", "Rate Limits",
-  "Parameters", "Motor / ESC", "Anti Gravity",
+  "PID Settings", "PID Sliders", "PID Controller", "Feedforward", "Rates", "Rate Limits",
+  "Parameters", "Motor / ESC",
   "Gyro Filters", "Dynamic Notch", "RPM Filter",
   "D-Term Filters", "RC Smoothing",
-  "Features", "Disabled Fields", "Other",
+  "Features", "Disabled Fields",
 ];
 
 // --- Pane ordering and drag-and-drop ---
@@ -1051,19 +1051,17 @@ loadPaneOrder();
 
 const groupParamMap = computed(() => ({
   "PID Sliders": pidSliderParams.value,
+  "PID Controller": pidControllerParams.value,
   "Feedforward": feedforwardParams.value,
   "Rates": rateParams.value,
-  "D Max": dMaxParams.value,
   "Rate Limits": rateLimitParams.value,
   "Parameters": generalParams.value,
   "Motor / ESC": motorParams.value,
-  "Anti Gravity": antiGravityParams.value,
   "Gyro Filters": gyroFilterParams.value,
   "Dynamic Notch": dynNotchParams.value,
   "RPM Filter": rpmFilterParams.value,
   "D-Term Filters": dtermFilterParams.value,
   "RC Smoothing": rcSmoothingParams.value,
-  "Other": otherParams.value,
 }));
 
 function paneHasData(group) {
@@ -1189,46 +1187,50 @@ const EXPLICIT_GROUPS = {
   navrPID: "PID Settings",
   rates_type: "Rates", rates: "Rates", rate_limits: "Rate Limits",
   rc_rates: "Rates", rc_expo: "Rates", rcYawRate: "Rates", rcYawExpo: "Rates",
-  d_max: "D Max", d_max_gain: "D Max", d_max_advance: "D Max",
+  d_max: "PID Controller", d_max_gain: "PID Controller", d_max_advance: "PID Controller",
+  tpa_rate: "PID Controller", tpa_breakpoint: "PID Controller",
+  thrust_linear: "PID Controller",
+  pidSumLimit: "PID Controller", pidSumLimitYaw: "PID Controller",
+  vbat_sag_compensation: "PID Controller", vbat_pid_compensation: "PID Controller",
+  iterm_relax: "PID Controller", iterm_relax_type: "PID Controller", iterm_relax_cutoff: "PID Controller",
+  abs_control_gain: "PID Controller", use_integrated_yaw: "PID Controller",
+  pidAtMinThrottle: "PID Controller",
   features: "Features", fields_disabled_mask: "Disabled Fields",
   looptime: "Parameters", gyro_sync_denom: "Parameters", pid_process_denom: "Parameters",
   debug_mode: "Parameters", deadband: "Parameters", yaw_deadband: "Parameters",
-  tpa_rate: "Parameters", tpa_breakpoint: "Parameters",
   vbatscale: "Parameters", vbatref: "Parameters",
   vbatmincellvoltage: "Parameters", vbatmaxcellvoltage: "Parameters",
-  vbatwarningcellvoltage: "Parameters", vbat_sag_compensation: "Parameters",
-  vbat_pid_compensation: "Parameters",
+  vbatwarningcellvoltage: "Parameters",
   minthrottle: "Parameters", maxthrottle: "Parameters",
   thrMid: "Parameters", thrExpo: "Parameters",
-  pidSumLimit: "Parameters", pidSumLimitYaw: "Parameters",
-  iterm_relax: "Parameters", iterm_relax_type: "Parameters", iterm_relax_cutoff: "Parameters",
-  abs_control_gain: "Parameters", yawRateAccelLimit: "Parameters", rateAccelLimit: "Parameters",
-  setpointRelaxRatio: "Parameters", use_integrated_yaw: "Parameters",
+  yawRateAccelLimit: "Parameters", rateAccelLimit: "Parameters",
+  setpointRelaxRatio: "Parameters",
   pidController: "Parameters", yaw_p_limit: "Parameters",
   rollPitchItermResetRate: "Parameters", yawItermResetRate: "Parameters",
   itermThrottleGain: "Parameters", ptermSetpointWeight: "Parameters",
   dtermSetpointWeight: "Parameters", H_sensitivity: "Parameters",
   iterm_reset_offset: "Parameters", airmode_activate_throttle: "Parameters",
-  acc_hardware: "Other", baro_hardware: "Other", mag_hardware: "Other",
-  currentMeter: "Other", currentMeterOffset: "Other", currentMeterScale: "Other",
-  gyro_to_use: "Other", gyro_enabled_bitmask: "Other",
+  acc_hardware: "Parameters", baro_hardware: "Parameters", mag_hardware: "Parameters",
+  currentMeter: "Parameters", currentMeterOffset: "Parameters", currentMeterScale: "Parameters",
+  gyro_to_use: "Parameters", gyro_enabled_bitmask: "Parameters",
+  serialrx_provider: "RC Smoothing",
+  yaw_lpf_hz: "Gyro Filters",
 };
 
 function getHeaderGroup(key) {
   if (EXPLICIT_GROUPS[key]) { return EXPLICIT_GROUPS[key]; }
   if (key.startsWith("simplified_")) { return "PID Sliders"; }
   if (key.startsWith("ff_")) { return "Feedforward"; }
-  if (key.startsWith("anti_gravity_")) { return "Anti Gravity"; }
+  if (key.startsWith("anti_gravity_")) { return "PID Controller"; }
+  if (key.startsWith("tpa_low_")) { return "PID Controller"; }
   if (key.startsWith("gyro_rpm_") || key.startsWith("rpm_") || key.startsWith("dterm_rpm_")) { return "RPM Filter"; }
   if (key.startsWith("dyn_notch_")) { return "Dynamic Notch"; }
   if (key.startsWith("gyro_")) { return "Gyro Filters"; }
   if (key.startsWith("dterm_")) { return "D-Term Filters"; }
   if (key.startsWith("rc_smoothing_") || key.startsWith("rc_interpolation")) { return "RC Smoothing"; }
   if (key.startsWith("motor") || key.startsWith("throttle") || key.startsWith("dshot") || key.startsWith("dyn_idle_") || key.startsWith("dynamic_idle")) { return "Motor / ESC"; }
-  if (key.startsWith("unsynced_") || key.startsWith("fast_pwm_") || key === "digitalIdleOffset" || key === "motor_idle" || key === "motor_pwm_rate" || key === "serialrx_provider" || key === "pidAtMinThrottle") { return "Motor / ESC"; }
-  if (key.startsWith("tpa_low_")) { return "Parameters"; }
-  if (key.startsWith("chirp_")) { return "Other"; }
-  return "Other";
+  if (key.startsWith("unsynced_") || key.startsWith("fast_pwm_") || key === "digitalIdleOffset" || key === "motor_idle" || key === "motor_pwm_rate") { return "Motor / ESC"; }
+  return "Parameters";
 }
 
 function formatHeaderValue(val) {
@@ -1279,10 +1281,10 @@ const groupedHeaders = computed(() => {
   const uh = s.unknownHeaders;
   if (Array.isArray(uh)) {
     for (const h of uh) {
-      if (!groups["Other"]) {
-        groups["Other"] = [];
+      if (!groups["Parameters"]) {
+        groups["Parameters"] = [];
       }
-      groups["Other"].push({ name: h.name, value: String(h.value), group: "Other" });
+      groups["Parameters"].push({ name: h.name, value: String(h.value), group: "Parameters" });
     }
   }
 
