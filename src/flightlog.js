@@ -47,7 +47,6 @@ function verifyChunkIndexes(_chunks) {
  */
 export function FlightLog(logData) {
   const ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/;
-  const that = this;
   let logIndex = 0;
   const logIndexes = new FlightLogIndex(logData);
   const parser = new FlightLogParser(logData);
@@ -264,7 +263,7 @@ export function FlightLog(logData) {
     } else return false;
   };
 
-  function buildFieldNames() {
+  const buildFieldNames = () => {
     // Make an independent copy
     fieldNames = parser.frameDefs.I.name.slice(0);
 
@@ -293,11 +292,11 @@ export function FlightLog(logData) {
       fieldNames.push("heading[0]", "heading[1]", "heading[2]");
     }
 
-    if (!that.isFieldDisabled().PID) {
+    if (!this.isFieldDisabled().PID) {
       fieldNames.push("axisSum[0]", "axisSum[1]", "axisSum[2]");
     }
 
-    if (!that.isFieldDisabled().SETPOINT) {
+    if (!this.isFieldDisabled().SETPOINT) {
       fieldNames.push(
         "rcCommands[0]",
         "rcCommands[1]",
@@ -306,11 +305,11 @@ export function FlightLog(logData) {
       ); // Custom calculated scaled rccommand
     }
 
-    if (!that.isFieldDisabled().GYRO && !that.isFieldDisabled().SETPOINT) {
+    if (!this.isFieldDisabled().GYRO && !this.isFieldDisabled().SETPOINT) {
       fieldNames.push("axisError[0]", "axisError[1]", "axisError[2]"); // Custom calculated error field
     }
 
-    if (!that.isFieldDisabled().GPS) {
+    if (!this.isFieldDisabled().GPS) {
       if (fieldNames.includes("GPS_coord[0]")) {
         // GPS coords in cartesian system
         fieldNames.push(
@@ -332,29 +331,29 @@ export function FlightLog(logData) {
     for (let i = 0; i < fieldNames.length; i++) {
       fieldNameToIndex[fieldNames[i]] = i;
     }
-  }
+  };
 
-  function estimateNumMotors() {
+  const estimateNumMotors = () => {
     let count = 0;
 
     for (let j = 0; j < MAX_MOTOR_NUMBER; j++) {
-      if (that.getMainFieldIndexByName(`motor[${j}]`) !== undefined) {
+      if (this.getMainFieldIndexByName(`motor[${j}]`) !== undefined) {
         count++;
       }
     }
 
     numMotors = count;
-  }
+  };
 
-  function estimateNumCells() {
-    const sysConfig = that.getSysConfig();
+  const estimateNumCells = () => {
+    const sysConfig = this.getSysConfig();
     let i;
 
     let refVoltage;
     if (firmwareGreaterOrEqual(sysConfig, "3.1.0", "2.0.0")) {
       refVoltage = sysConfig.vbatref;
     } else {
-      refVoltage = that.vbatADCToMillivolts(sysConfig.vbatref) / 100;
+      refVoltage = this.vbatADCToMillivolts(sysConfig.vbatref) / 100;
     }
 
     //Are we even logging VBAT?
@@ -367,7 +366,7 @@ export function FlightLog(logData) {
 
       numCells = i;
     }
-  }
+  };
 
   this.getNumCellsEstimate = function () {
     return numCells;
@@ -654,7 +653,7 @@ export function FlightLog(logData) {
    *
    * sourceChunks and destChunks can be the same array.
    */
-  function injectComputedFields(sourceChunks, destChunks) {
+  const injectComputedFields = (sourceChunks, destChunks) => {
     let gyroADC = [
       fieldNameToIndex["gyroADC[0]"],
       fieldNameToIndex["gyroADC[1]"],
@@ -729,7 +728,7 @@ export function FlightLog(logData) {
     let sourceChunkIndex;
     let destChunkIndex;
 
-    const sysConfig = that.getSysConfig();
+    const sysConfig = this.getSysConfig();
 
     if (destChunks.length === 0) {
       return;
@@ -862,7 +861,7 @@ export function FlightLog(logData) {
           }
 
           // Add the Feedforward PID sum (P+I+D+F)
-          if (!that.isFieldDisabled().PID) {
+          if (!this.isFieldDisabled().PID) {
             for (let axis = 0; axis < 3; axis++) {
               let pidSum =
                 (axisPID[axis][0] !== undefined
@@ -901,7 +900,7 @@ export function FlightLog(logData) {
           // Calculate the Scaled rcCommand (setpoint) (in deg/s, % for throttle)
           const fieldIndexRcCommands = fieldIndex;
 
-          if (!that.isFieldDisabled().SETPOINT) {
+          if (!this.isFieldDisabled().SETPOINT) {
             // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
             if (
               sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
@@ -920,7 +919,7 @@ export function FlightLog(logData) {
               for (let axis = 0; axis <= AXIS.YAW; axis++) {
                 destFrame[fieldIndex++] =
                   rcCommand[axis] !== undefined
-                    ? that.rcCommandRawToDegreesPerSecond(
+                    ? this.rcCommandRawToDegreesPerSecond(
                         srcFrame[rcCommand[axis]],
                         axis,
                         currentFlightMode,
@@ -930,7 +929,7 @@ export function FlightLog(logData) {
               // Throttle
               destFrame[fieldIndex++] =
                 rcCommand[AXIS.YAW + 1] !== undefined
-                  ? that.rcCommandRawToThrottle(
+                  ? this.rcCommandRawToThrottle(
                       srcFrame[rcCommand[AXIS.YAW + 1]],
                     )
                   : 0;
@@ -939,13 +938,13 @@ export function FlightLog(logData) {
 
           // Calculate the PID Error
           if (
-            !that.isFieldDisabled().GYRO &&
-            !that.isFieldDisabled().SETPOINT
+            !this.isFieldDisabled().GYRO &&
+            !this.isFieldDisabled().SETPOINT
           ) {
             for (let axis = 0; axis < 3; axis++) {
               const gyroADCdegrees =
                 gyroADC[axis] !== undefined
-                  ? that.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]])
+                  ? this.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]])
                   : 0;
               destFrame[fieldIndex++] =
                 destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
@@ -1006,7 +1005,7 @@ export function FlightLog(logData) {
         }
       }
     }
-  }
+  };
 
   /**
    * Add timestamps to events that getChunksInRange was unable to compute, because at the time it had trailing
@@ -1595,19 +1594,17 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
   } else {
     // earlier version of betaflight
 
-    const that = this;
-
-    const calculateExpoPlus = function (value, axis) {
+    const calculateExpoPlus = (value, axis) => {
       let propFactor;
       let superExpoFactor;
 
-      if (axis === AXIS.YAW && !that.getSysConfig().superExpoYawMode) {
+      if (axis === AXIS.YAW && !this.getSysConfig().superExpoYawMode) {
         propFactor = 1.0;
       } else {
         superExpoFactor =
           axis === AXIS.YAW
-            ? that.getSysConfig().superExpoFactorYaw
-            : that.getSysConfig().superExpoFactor;
+            ? this.getSysConfig().superExpoFactorYaw
+            : this.getSysConfig().superExpoFactor;
         propFactor =
           1.0 - (superExpoFactor / 100.0) * (Math.abs(value) / 500.0);
       }

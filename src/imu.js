@@ -155,7 +155,7 @@ export function IMU(copyFrom) {
       ),
     };
 
-    //TODO magnetometer heading disabled — only EstN heading used
+    //Magnetometer heading disabled — only EstN heading used
     rotateVector(this.EstN, deltaGyroAngle);
     normalizeVector(this.EstN, this.EstN);
     attitude.heading = calculateHeading(

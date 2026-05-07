@@ -75,8 +75,6 @@ export function FlightLogGrapher(
     craft2D = null,
     analyser = null /* define a new spectrum analyser */,
     watermarkLogo /* Watermark feature */;
-  const that = this;
-
   this.onSeek = null;
 
   this.getAnalyser = function () {
@@ -87,30 +85,30 @@ export function FlightLogGrapher(
     return { ...base, ...top };
   }
 
-  function onMouseMove(e) {
+  const onMouseMove = (e) => {
     e.preventDefault();
 
-    if (that.onSeek) {
+    if (this.onSeek) {
       //Reverse the seek direction so that it looks like you're dragging the data with the mouse
-      that.onSeek(((lastMouseX - e.pageX) / canvas.width) * windowWidthMicros);
+      this.onSeek(((lastMouseX - e.pageX) / canvas.width) * windowWidthMicros);
     }
 
     lastMouseX = e.pageX;
-  }
+  };
 
-  function onTouchMove(e) {
+  const onTouchMove = (e) => {
     e.preventDefault();
 
-    if (that.onSeek) {
+    if (this.onSeek) {
       //Reverse the seek direction so that it looks like you're dragging the data
-      that.onSeek(
+      this.onSeek(
         ((lastMouseX - e.originalEvent.touches[0].pageX) / canvas.width) *
           windowWidthMicros,
       );
     }
 
     lastMouseX = e.originalEvent.touches[0].pageX;
-  }
+  };
 
   function onMouseDown(e) {
     if (e.which === 1) {

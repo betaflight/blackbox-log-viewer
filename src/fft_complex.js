@@ -220,17 +220,9 @@ function butterfly(output, outputOffset, outputStride, fStride, state, m, p) {
   }
 }
 
-function work(
-  output,
-  outputOffset,
-  outputStride,
-  f,
-  fOffset,
-  fStride,
-  inputStride,
-  factors,
-  state,
-) {
+function work(out, inp, inputStride, factors, state) {
+  const { data: output, offset: outputOffset, stride: outputStride } = out;
+  const { data: f, offset: fOffset, stride: fStride } = inp;
   const p = factors.shift();
   const m = factors.shift();
 
@@ -244,12 +236,8 @@ function work(
   } else {
     for (let i = 0; i < p; i++) {
       work(
-        output,
-        outputOffset + outputStride * i * m,
-        outputStride,
-        f,
-        fOffset + i * fStride * inputStride,
-        fStride * p,
+        { data: output, offset: outputOffset + outputStride * i * m, stride: outputStride },
+        { data: f, offset: fOffset + i * fStride * inputStride, stride: fStride * p },
         inputStride,
         factors.slice(),
         state,
@@ -372,24 +360,16 @@ FFTComplex.prototype.process = function (
     }
 
     work(
-      output,
-      outputOffset,
-      outputStride,
-      this.state.scratch,
-      0,
-      1,
+      { data: output, offset: outputOffset, stride: outputStride },
+      { data: this.state.scratch, offset: 0, stride: 1 },
       1,
       this.state.factors.slice(),
       this.state,
     );
   } else if (input === output) {
     work(
-      this.state.scratch,
-      0,
-      1,
-      input,
-      inputOffset,
-      1,
+      { data: this.state.scratch, offset: 0, stride: 1 },
+      { data: input, offset: inputOffset, stride: 1 },
       inputStride,
       this.state.factors.slice(),
       this.state,
@@ -403,12 +383,8 @@ FFTComplex.prototype.process = function (
     }
   } else {
     work(
-      output,
-      outputOffset,
-      outputStride,
-      input,
-      inputOffset,
-      1,
+      { data: output, offset: outputOffset, stride: outputStride },
+      { data: input, offset: inputOffset, stride: 1 },
       inputStride,
       this.state.factors.slice(),
       this.state,

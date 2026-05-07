@@ -54,7 +54,7 @@ export function LapTimer() {
     ctx.strokeStyle = fgColor;
 
     //Fill in background
-    roundRect(ctx, 0, 0, width, lineHeight * (rows - 0.5), 7, true, true); // draw the bounding box with border
+    roundRect(ctx, { x: 0, y: 0, width, height: lineHeight * (rows - 0.5), radius: 7 }); // draw the bounding box with border
 
     // Add Title, and current values
     let currentRow = 1;

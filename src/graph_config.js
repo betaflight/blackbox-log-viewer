@@ -310,7 +310,11 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
   const gyroScaleMargin = 1.2; // Give a 20% margin for gyro graphs
   const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
   try {
-    if (fieldName.match(/^motor\[/)) {
+    if (
+      fieldName.match(/^motor\[/) ||
+      fieldName === "rcCommands[3]" || // Throttle scaled
+      fieldName.match(/^rssi.*/)
+    ) {
       return {
         power: 1,
         MinMax: {
@@ -329,29 +333,12 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         "eRPM[6]",
         "eRPM[7]",
       );
-    } else if (fieldName.match(/^servo\[/)) {
-      return {
-        power: 1,
-        MinMax: {
-          min: 1000,
-          max: 2000,
-        },
-      };
     } else if (fieldName.match(/^accSmooth\[/)) {
       return {
         power: 1,
         MinMax: {
           min: -16,
           max: 16,
-        },
-      };
-    } else if (fieldName === "rcCommands[3]") {
-      // Throttle scaled
-      return {
-        power: 1 /* Make this 1 to scale linearly */,
-        MinMax: {
-          min: 0,
-          max: 100,
         },
       };
     } else if (
@@ -367,7 +354,10 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: maxDegreesSecond(gyroScaleMargin),
         },
       };
-    } else if (fieldName.match(/^axis.+\[/)) {
+    } else if (
+      fieldName.match(/^axis.+\[/) ||
+      fieldName === "GPS_speed"
+    ) {
       return {
         power: 1,
         MinMax: {
@@ -375,8 +365,10 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 100,
         },
       };
-    } else if (fieldName === "rcCommand[3]") {
-      // Throttle
+    } else if (
+      fieldName.match(/^servo\[/) ||
+      fieldName.match(/^rcCommand\[/)
+    ) {
       return {
         power: 1,
         MinMax: {
@@ -384,15 +376,11 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 2000,
         },
       };
-    } else if (fieldName.match(/^rcCommand\[/)) {
-      return {
-        power: 1,
-        MinMax: {
-          min: 1000,
-          max: 2000,
-        },
-      };
-    } else if (fieldName === "heading[2]") {
+    } else if (
+      fieldName === "heading[2]" ||
+      fieldName === "GPS_ground_course" ||
+      fieldName === "gpsHomeAzimuth"
+    ) {
       return {
         power: 1,
         MinMax: {
@@ -416,44 +404,12 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: 400,
         },
       };
-    } else if (fieldName.match(/^rssi.*/)) {
-      return {
-        power: 1,
-        MinMax: {
-          min: 0,
-          max: 100,
-        },
-      };
-    } else if (fieldName === "GPS_ground_course") {
-      return {
-        power: 1,
-        MinMax: {
-          min: 0,
-          max: 360,
-        },
-      };
     } else if (fieldName === "GPS_numSat") {
       return {
         power: 1,
         MinMax: {
           min: 0,
           max: 40,
-        },
-      };
-    } else if (fieldName === "GPS_speed") {
-      return {
-        power: 1,
-        MinMax: {
-          min: -100,
-          max: 100,
-        },
-      };
-    } else if (fieldName === "gpsHomeAzimuth") {
-      return {
-        power: 1,
-        MinMax: {
-          min: 0,
-          max: 360,
         },
       };
     } else if (fieldName.match(/^GPS_velned\[/)) {

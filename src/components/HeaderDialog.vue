@@ -453,22 +453,18 @@ const rateParams = computed(() => {
 
 const pidControllerParams = computed(() => {
   const s = filteredSc.value;
-  const result = [];
+  const gainDec = isBF.value && gte("3.1.0") && lte("4.3.9") ? 3 : 0;
 
-  // D Max
-  if (isBF.value && gte("4.0.0")) {
-    result.push(
+  return [
+    // D Max (BF 4.0+)
+    ...(isBF.value && gte("4.0.0") ? [
       param("D Max Roll", fmtVal(s.d_max?.[0], 0)),
       param("D Max Pitch", fmtVal(s.d_max?.[1], 0)),
       param("D Max Yaw", fmtVal(s.d_max?.[2], 0)),
       param("D Max Gain", fmtVal(s.d_max_gain, 0)),
       param("D Max Advance", fmtVal(s.d_max_advance, 0)),
-    );
-  }
-
-  // Anti Gravity, TPA, PID limits & modifiers
-  const gainDec = isBF.value && gte("3.1.0") && lte("4.3.9") ? 3 : 0;
-  result.push(
+    ] : []),
+    // Anti Gravity, TPA, PID limits & modifiers
     param("AG Mode", selectVal(s.anti_gravity_mode, ANTI_GRAVITY_MODE)),
     param("AG Gain", fmtVal(s.anti_gravity_gain, gainDec)),
     param("AG Threshold", fmtVal(s.anti_gravity_threshold, 0)),
@@ -486,9 +482,7 @@ const pidControllerParams = computed(() => {
     param("Abs Control Gain", fmtVal(s.abs_control_gain, 0)),
     param("PID At Min Throttle", selectVal(s.pidAtMinThrottle, OFF_ON)),
     param("Use Integrated Yaw", selectVal(s.use_integrated_yaw, OFF_ON)),
-  );
-
-  return result.filter((p) => !p.missing);
+  ].filter((p) => !p.missing);
 });
 
 // --- Rate Limits ---
@@ -1209,21 +1203,36 @@ const EXPLICIT_GROUPS = {
   gyro_to_use: "Parameters", gyro_enabled_bitmask: "Parameters",
   serialrx_provider: "RC Smoothing",
   yaw_lpf_hz: "Gyro Filters",
+  digitalIdleOffset: "Motor / ESC",
 };
+
+const PREFIX_GROUPS = [
+  ["simplified_", "PID Sliders"],
+  ["ff_", "Feedforward"],
+  ["anti_gravity_", "PID Controller"],
+  ["tpa_low_", "PID Controller"],
+  ["gyro_rpm_", "RPM Filter"],
+  ["rpm_", "RPM Filter"],
+  ["dterm_rpm_", "RPM Filter"],
+  ["dyn_notch_", "Dynamic Notch"],
+  ["gyro_", "Gyro Filters"],
+  ["dterm_", "D-Term Filters"],
+  ["rc_smoothing_", "RC Smoothing"],
+  ["rc_interpolation", "RC Smoothing"],
+  ["motor", "Motor / ESC"],
+  ["throttle", "Motor / ESC"],
+  ["dshot", "Motor / ESC"],
+  ["dyn_idle_", "Motor / ESC"],
+  ["dynamic_idle", "Motor / ESC"],
+  ["unsynced_", "Motor / ESC"],
+  ["fast_pwm_", "Motor / ESC"],
+];
 
 function getHeaderGroup(key) {
   if (EXPLICIT_GROUPS[key]) { return EXPLICIT_GROUPS[key]; }
-  if (key.startsWith("simplified_")) { return "PID Sliders"; }
-  if (key.startsWith("ff_")) { return "Feedforward"; }
-  if (key.startsWith("anti_gravity_")) { return "PID Controller"; }
-  if (key.startsWith("tpa_low_")) { return "PID Controller"; }
-  if (key.startsWith("gyro_rpm_") || key.startsWith("rpm_") || key.startsWith("dterm_rpm_")) { return "RPM Filter"; }
-  if (key.startsWith("dyn_notch_")) { return "Dynamic Notch"; }
-  if (key.startsWith("gyro_")) { return "Gyro Filters"; }
-  if (key.startsWith("dterm_")) { return "D-Term Filters"; }
-  if (key.startsWith("rc_smoothing_") || key.startsWith("rc_interpolation")) { return "RC Smoothing"; }
-  if (key.startsWith("motor") || key.startsWith("throttle") || key.startsWith("dshot") || key.startsWith("dyn_idle_") || key.startsWith("dynamic_idle")) { return "Motor / ESC"; }
-  if (key.startsWith("unsynced_") || key.startsWith("fast_pwm_") || key === "digitalIdleOffset" || key === "motor_idle" || key === "motor_pwm_rate") { return "Motor / ESC"; }
+  for (const [prefix, group] of PREFIX_GROUPS) {
+    if (key.startsWith(prefix)) { return group; }
+  }
   return "Parameters";
 }
 

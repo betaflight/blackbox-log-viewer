@@ -147,16 +147,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     for (let i = 0; i < 2; i++) {
       //Fill in background
       canvasContext.fillStyle = stickAreaColor;
-      roundRect(
-        canvasContext,
-        -radi,
-        -radi,
-        radi * 2,
-        radi * 2,
-        10,
-        true,
-        false,
-      );
+      roundRect(canvasContext, { x: -radi, y: -radi, width: radi * 2, height: radi * 2, radius: 10, stroke: false });
 
       //Draw crosshair
       canvasContext.beginPath();
