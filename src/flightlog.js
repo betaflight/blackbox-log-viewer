@@ -634,12 +634,7 @@ export function FlightLog(logData) {
     srcFrame,
     destFrame,
     fieldIndex,
-    imuQuaternion,
-    gyroADC,
-    accSmooth,
-    magADC,
-    chunkIMU,
-    sysConfig,
+    { imuQuaternion, gyroADC, accSmooth, magADC, chunkIMU, sysConfig },
   ) => {
     if (imuQuaternion) {
       const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
@@ -700,6 +695,14 @@ export function FlightLog(logData) {
   };
 
   /**
+   * Read a single PID component value from the source frame, returning 0 if the field is absent.
+   */
+  const readPidComponent = (srcFrame, components, index) => {
+    if (components[index] === undefined) { return 0; }
+    return srcFrame[components[index]];
+  };
+
+  /**
    * Compute PID sums (P+I+D+F+S) for each axis, constrained by pidSumLimit.
    * Writes 3 fields to destFrame starting at fieldIndex.
    * Returns updated fieldIndex.
@@ -712,12 +715,10 @@ export function FlightLog(logData) {
     sysConfig,
   ) => {
     for (let axis = 0; axis < 3; axis++) {
-      let pidSum =
-        (axisPID[axis][0] !== undefined ? srcFrame[axisPID[axis][0]] : 0) +
-        (axisPID[axis][1] !== undefined ? srcFrame[axisPID[axis][1]] : 0) +
-        (axisPID[axis][2] !== undefined ? srcFrame[axisPID[axis][2]] : 0) +
-        (axisPID[axis][3] !== undefined ? srcFrame[axisPID[axis][3]] : 0) +
-        (axisPID[axis][4] !== undefined ? srcFrame[axisPID[axis][4]] : 0);
+      let pidSum = 0;
+      for (let n = 0; n < 5; n++) {
+        pidSum += readPidComponent(srcFrame, axisPID[axis], n);
+      }
 
       const pidLimit =
         axis < AXIS.YAW ? sysConfig.pidSumLimit : sysConfig.pidSumLimitYaw;
@@ -860,226 +861,114 @@ export function FlightLog(logData) {
   };
 
   /**
+   * Resolve field indices from fieldNameToIndex for computed field injection.
+   * Sets arrays to false when the primary field is absent.
+   */
+  const resolveFieldIndices = () => {
+    let gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
+    let accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
+    let magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
+    let imuQuaternion = [fieldNameToIndex["imuQuaternion[0]"], fieldNameToIndex["imuQuaternion[1]"], fieldNameToIndex["imuQuaternion[2]"]];
+    let rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]];
+    let setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]];
+    let gpsCoord = [fieldNameToIndex["GPS_coord[0]"], fieldNameToIndex["GPS_coord[1]"], fieldNameToIndex["GPS_altitude"]];
+    let gpsVelNED = [fieldNameToIndex["GPS_velned[0]"], fieldNameToIndex["GPS_velned[1]"], fieldNameToIndex["GPS_velned[2]"]];
+    let axisPID = [
+      [fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"], fieldNameToIndex["axisF[0]"], fieldNameToIndex["axisS[0]"]],
+      [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"], fieldNameToIndex["axisS[1]"]],
+      [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"], fieldNameToIndex["axisS[2]"]],
+    ];
+
+    if (!magADC[0]) { magADC = false; }
+    if (!gyroADC[0]) { gyroADC = false; }
+    if (!accSmooth[0]) { accSmooth = false; }
+    if (!imuQuaternion[0]) { imuQuaternion = false; }
+    if (!rcCommand[0]) { rcCommand = false; }
+    if (!setpoint[0]) { setpoint = false; }
+    if (!axisPID[0]) { axisPID = false; }
+    if (!gpsCoord[0]) { gpsCoord = false; }
+    if (!gpsVelNED[0]) { gpsVelNED = false; }
+
+    return {
+      gyroADC, accSmooth, magADC, imuQuaternion, rcCommand, setpoint,
+      gpsCoord, gpsVelNED, axisPID,
+      numSatIndex: fieldNameToIndex["GPS_numSat"],
+      flightModeFlagsIndex: fieldNameToIndex["flightModeFlags"],
+      sysConfig: this.getSysConfig(),
+      disabledFields: this.isFieldDisabled(),
+    };
+  };
+
+  /**
+   * Compute all additional fields for a single frame.
+   */
+  const computeFrameFields = (srcFrame, destFrame, chunkIMU, ctx) => {
+    let fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
+
+    fieldIndex = computeAttitude(srcFrame, destFrame, fieldIndex, {
+      imuQuaternion: ctx.imuQuaternion,
+      gyroADC: ctx.gyroADC,
+      accSmooth: ctx.accSmooth,
+      magADC: ctx.magADC,
+      chunkIMU,
+      sysConfig: ctx.sysConfig,
+    });
+
+    if (!ctx.disabledFields.PID) {
+      fieldIndex = computePidSums(srcFrame, destFrame, fieldIndex, ctx.axisPID, ctx.sysConfig);
+    }
+
+    const currentFlightMode = srcFrame[ctx.flightModeFlagsIndex];
+    const fieldIndexRcCommands = fieldIndex;
+
+    if (!ctx.disabledFields.SETPOINT) {
+      fieldIndex = computeScaledRcCommands(srcFrame, destFrame, fieldIndex, ctx.setpoint, ctx.rcCommand, currentFlightMode, ctx.sysConfig);
+    }
+
+    if (!ctx.disabledFields.GYRO && !ctx.disabledFields.SETPOINT) {
+      fieldIndex = computePidErrors(srcFrame, destFrame, fieldIndex, fieldIndexRcCommands, ctx.gyroADC);
+    }
+
+    if (gpsTransform && ctx.gpsCoord) {
+      fieldIndex = computeGpsFields(srcFrame, destFrame, fieldIndex, ctx.gpsCoord, ctx.numSatIndex);
+    }
+
+    if (ctx.gpsVelNED) {
+      fieldIndex = computeTrajectoryTilt(srcFrame, destFrame, fieldIndex, ctx.gpsVelNED);
+    }
+
+    destFrame.splice(fieldIndex);
+  };
+
+  /**
    * Use the data in sourceChunks to compute additional fields (like IMU attitude) and add those into the
    * resultChunks.
    *
    * sourceChunks and destChunks can be the same array.
    */
   const injectComputedFields = (sourceChunks, destChunks) => {
-    let gyroADC = [
-      fieldNameToIndex["gyroADC[0]"],
-      fieldNameToIndex["gyroADC[1]"],
-      fieldNameToIndex["gyroADC[2]"],
-    ];
-    let accSmooth = [
-      fieldNameToIndex["accSmooth[0]"],
-      fieldNameToIndex["accSmooth[1]"],
-      fieldNameToIndex["accSmooth[2]"],
-    ];
-    let magADC = [
-      fieldNameToIndex["magADC[0]"],
-      fieldNameToIndex["magADC[1]"],
-      fieldNameToIndex["magADC[2]"],
-    ];
-    let imuQuaternion = [
-      fieldNameToIndex["imuQuaternion[0]"],
-      fieldNameToIndex["imuQuaternion[1]"],
-      fieldNameToIndex["imuQuaternion[2]"],
-    ];
-    let rcCommand = [
-      fieldNameToIndex["rcCommand[0]"],
-      fieldNameToIndex["rcCommand[1]"],
-      fieldNameToIndex["rcCommand[2]"],
-      fieldNameToIndex["rcCommand[3]"],
-    ];
-    let setpoint = [
-      fieldNameToIndex["setpoint[0]"],
-      fieldNameToIndex["setpoint[1]"],
-      fieldNameToIndex["setpoint[2]"],
-      fieldNameToIndex["setpoint[3]"],
-    ];
-    let gpsCoord = [
-      fieldNameToIndex["GPS_coord[0]"],
-      fieldNameToIndex["GPS_coord[1]"],
-      fieldNameToIndex["GPS_altitude"],
-    ];
-    let gpsVelNED = [
-      fieldNameToIndex["GPS_velned[0]"],
-      fieldNameToIndex["GPS_velned[1]"],
-      fieldNameToIndex["GPS_velned[2]"],
-    ];
+    if (destChunks.length === 0) { return; }
 
-    const flightModeFlagsIndex = fieldNameToIndex["flightModeFlags"]; // This points to the flightmode data
+    const ctx = resolveFieldIndices();
 
-    let axisPID = [
-      [
-        fieldNameToIndex["axisP[0]"],
-        fieldNameToIndex["axisI[0]"],
-        fieldNameToIndex["axisD[0]"],
-        fieldNameToIndex["axisF[0]"],
-        fieldNameToIndex["axisS[0]"],
-      ],
-      [
-        fieldNameToIndex["axisP[1]"],
-        fieldNameToIndex["axisI[1]"],
-        fieldNameToIndex["axisD[1]"],
-        fieldNameToIndex["axisF[1]"],
-        fieldNameToIndex["axisS[1]"],
-      ],
-      [
-        fieldNameToIndex["axisP[2]"],
-        fieldNameToIndex["axisI[2]"],
-        fieldNameToIndex["axisD[2]"],
-        fieldNameToIndex["axisF[2]"],
-        fieldNameToIndex["axisS[2]"],
-      ],
-    ];
-
-    const numSatIndex = fieldNameToIndex["GPS_numSat"];
-
-    let sourceChunkIndex;
-    let destChunkIndex;
-
-    const sysConfig = this.getSysConfig();
-
-    if (destChunks.length === 0) {
-      return;
-    }
-
-    // Do we have mag fields? If not mark that data as absent
-    if (!magADC[0]) {
-      magADC = false;
-    }
-
-    if (!gyroADC[0]) {
-      gyroADC = false;
-    }
-
-    if (!accSmooth[0]) {
-      accSmooth = false;
-    }
-
-    if (!imuQuaternion[0]) {
-      imuQuaternion = false;
-    }
-
-    if (!rcCommand[0]) {
-      rcCommand = false;
-    }
-
-    if (!setpoint[0]) {
-      setpoint = false;
-    }
-
-    if (!axisPID[0]) {
-      axisPID = false;
-    }
-
-    if (!gpsCoord[0]) {
-      gpsCoord = false;
-    }
-
-    if (!gpsVelNED[0]) {
-      gpsVelNED = false;
-    }
-
-    sourceChunkIndex = 0;
-    destChunkIndex = 0;
+    let sourceChunkIndex = 0;
+    let destChunkIndex = 0;
 
     // Skip leading source chunks that don't appear in the destination
-    while (
-      sourceChunks[sourceChunkIndex].index < destChunks[destChunkIndex].index
-    ) {
+    while (sourceChunks[sourceChunkIndex].index < destChunks[destChunkIndex].index) {
       sourceChunkIndex++;
     }
 
-    const disabledFields = this.isFieldDisabled();
-
-    for (
-      ;
-      destChunkIndex < destChunks.length;
-      sourceChunkIndex++, destChunkIndex++
-    ) {
-      const destChunk = destChunks[destChunkIndex],
-        sourceChunk = sourceChunks[sourceChunkIndex];
+    for (; destChunkIndex < destChunks.length; sourceChunkIndex++, destChunkIndex++) {
+      const destChunk = destChunks[destChunkIndex];
+      const sourceChunk = sourceChunks[sourceChunkIndex];
 
       if (!destChunk.hasAdditionalFields) {
         destChunk.hasAdditionalFields = true;
         const chunkIMU = new IMU(sourceChunk.initialIMU);
 
         for (let i = 0; i < sourceChunk.frames.length; i++) {
-          const srcFrame = sourceChunk.frames[i];
-          const destFrame = destChunk.frames[i];
-          let fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
-
-          fieldIndex = computeAttitude(
-            srcFrame,
-            destFrame,
-            fieldIndex,
-            imuQuaternion,
-            gyroADC,
-            accSmooth,
-            magADC,
-            chunkIMU,
-            sysConfig,
-          );
-
-          if (!disabledFields.PID) {
-            fieldIndex = computePidSums(
-              srcFrame,
-              destFrame,
-              fieldIndex,
-              axisPID,
-              sysConfig,
-            );
-          }
-
-          const currentFlightMode = srcFrame[flightModeFlagsIndex];
-          const fieldIndexRcCommands = fieldIndex;
-
-          if (!disabledFields.SETPOINT) {
-            fieldIndex = computeScaledRcCommands(
-              srcFrame,
-              destFrame,
-              fieldIndex,
-              setpoint,
-              rcCommand,
-              currentFlightMode,
-              sysConfig,
-            );
-          }
-
-          if (!disabledFields.GYRO && !disabledFields.SETPOINT) {
-            fieldIndex = computePidErrors(
-              srcFrame,
-              destFrame,
-              fieldIndex,
-              fieldIndexRcCommands,
-              gyroADC,
-            );
-          }
-
-          if (gpsTransform && gpsCoord) {
-            fieldIndex = computeGpsFields(
-              srcFrame,
-              destFrame,
-              fieldIndex,
-              gpsCoord,
-              numSatIndex,
-            );
-          }
-
-          if (gpsVelNED) {
-            fieldIndex = computeTrajectoryTilt(
-              srcFrame,
-              destFrame,
-              fieldIndex,
-              gpsVelNED,
-            );
-          }
-
-          // Remove empty fields at the end
-          destFrame.splice(fieldIndex);
+          computeFrameFields(sourceChunk.frames[i], destChunk.frames[i], chunkIMU, ctx);
         }
       }
     }

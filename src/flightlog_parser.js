@@ -716,6 +716,139 @@ export function FlightLogParser(logData) {
     return true;
   };
 
+  // Unified dispatch map for all header fields (replaces Set lookups + switch)
+  const parseIntHandler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10); };
+  const csvHandler = (fn, fv) => { this.sysConfig[fn] = parseCommaSeparatedString(fv); };
+  const versionCondIntHandler = (fn, fv) => {
+    this.sysConfig[fn] = isModernFilterFirmware()
+      ? Number.parseInt(fv, 10)
+      : Number.parseInt(fv, 10) / 100;
+  };
+  const versionCondCsvHandler = (fn, fv) => {
+    this.sysConfig[fn] = isModernFilterFirmware()
+      ? parseCommaSeparatedString(fv)
+      : Number.parseInt(fv, 10) / 100;
+  };
+  const accelLimitHandler = (fn, fv) => {
+    const isBfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "3.1.0");
+    const isCfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "2.0.0");
+    this.sysConfig[fn] = (isBfModern || isCfModern)
+      ? Number.parseInt(fv, 10) / 1000
+      : Number.parseInt(fv, 10);
+  };
+  const divide100Handler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10) / 100; };
+  const stringHandler = (fn, fv) => { this.sysConfig[fn] = fv; };
+  const rcExpoRateHandler = (fn, fv) => {
+    if (stringHasComma(fv)) {
+      this.sysConfig[fn] = parseCommaSeparatedString(fv);
+    } else {
+      this.sysConfig[fn][0] = Number.parseInt(fv, 10);
+      this.sysConfig[fn][1] = Number.parseInt(fv, 10);
+    }
+  };
+  const pidArrayPushHandler = (_fn, fv) => {
+    const values = parseCommaSeparatedString(fv);
+    this.sysConfig["rollPID"].push(values[0]);
+    this.sysConfig["pitchPID"].push(values[1]);
+    this.sysConfig["yawPID"].push(values[2]);
+  };
+  const currentMeterHandler = (_fn, fv) => {
+    const params = parseCommaSeparatedString(fv);
+    this.sysConfig.currentMeterOffset = params[0];
+    this.sysConfig.currentMeterScale = params[1];
+  };
+  const gyroScaleHandler = (_fn, fv) => {
+    this.sysConfig.gyroScale = hexToFloat(fv);
+    /* Legacy firmware uses a gyroScale that'll give radians per microsecond as output, whereas modern firmware produces degrees
+     * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
+     * match the legacy format so we can use a consistent IMU for all firmware types: */
+    if (
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV ||
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT ||
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT
+    ) {
+      this.sysConfig.gyroScale *= (Math.PI / 180) * 0.000001;
+    }
+  };
+  const noopHandler = () => {};
+
+  const HEADER_HANDLERS = {};
+  for (const field of PARSE_INT_FIELDS) { HEADER_HANDLERS[field] = parseIntHandler; }
+  for (const field of CSV_FIELDS) { HEADER_HANDLERS[field] = csvHandler; }
+  for (const field of VERSION_CONDITIONAL_INT_FIELDS) { HEADER_HANDLERS[field] = versionCondIntHandler; }
+  for (const field of VERSION_CONDITIONAL_CSV_FIELDS) { HEADER_HANDLERS[field] = versionCondCsvHandler; }
+  for (const field of ACCEL_LIMIT_FIELDS) { HEADER_HANDLERS[field] = accelLimitHandler; }
+  for (const field of DIVIDE_100_FIELDS) { HEADER_HANDLERS[field] = divide100Handler; }
+  for (const field of STRING_FIELDS) { HEADER_HANDLERS[field] = stringHandler; }
+
+  // Individual handlers with unique logic
+  HEADER_HANDLERS["I interval"] = (_fn, fv) => {
+    this.sysConfig.frameIntervalI = Number.parseInt(fv, 10);
+    if (this.sysConfig.frameIntervalI < 1) {
+      this.sysConfig.frameIntervalI = 1;
+    }
+  };
+  HEADER_HANDLERS["P interval"] = (_fn, fv) => {
+    const slashIdx = fv.indexOf("/");
+    if (slashIdx === -1) {
+      this.sysConfig.frameIntervalPNum = 1;
+      this.sysConfig.frameIntervalPDenom = Number.parseInt(fv, 10);
+    } else {
+      this.sysConfig.frameIntervalPNum = Number.parseInt(fv.substring(0, slashIdx), 10);
+      this.sysConfig.frameIntervalPDenom = Number.parseInt(fv.substring(slashIdx + 1), 10);
+    }
+  };
+  HEADER_HANDLERS["P denom"] = noopHandler;
+  HEADER_HANDLERS["P ratio"] = noopHandler;
+  HEADER_HANDLERS["Data version"] = (_fn, fv) => { dataVersion = Number.parseInt(fv, 10); };
+  HEADER_HANDLERS["Firmware type"] = (_fn, fv) => {
+    this.sysConfig.firmwareType = fv === "Cleanflight"
+      ? FIRMWARE_TYPE_CLEANFLIGHT
+      : FIRMWARE_TYPE_BASEFLIGHT;
+  };
+  HEADER_HANDLERS["minthrottle"] = (fn, fv) => {
+    this.sysConfig[fn] = Number.parseInt(fv, 10);
+    this.sysConfig.motorOutput[0] = this.sysConfig[fn];
+  };
+  HEADER_HANDLERS["maxthrottle"] = (fn, fv) => {
+    this.sysConfig[fn] = Number.parseInt(fv, 10);
+    this.sysConfig.motorOutput[1] = this.sysConfig[fn];
+  };
+  HEADER_HANDLERS["rc_expo"] = rcExpoRateHandler;
+  HEADER_HANDLERS["rc_rates"] = rcExpoRateHandler;
+  HEADER_HANDLERS["rcYawExpo"] = (_fn, fv) => { this.sysConfig["rc_expo"][2] = Number.parseInt(fv, 10); };
+  HEADER_HANDLERS["rcYawRate"] = (_fn, fv) => { this.sysConfig["rc_rates"][2] = Number.parseInt(fv, 10); };
+  HEADER_HANDLERS["superExpoFactor"] = (_fn, fv) => {
+    if (stringHasComma(fv)) {
+      const expoParams = parseCommaSeparatedString(fv);
+      this.sysConfig.superExpoFactor = expoParams[0];
+      this.sysConfig.superExpoFactorYaw = expoParams[1];
+    } else {
+      this.sysConfig.superExpoFactor = Number.parseInt(fv, 10);
+    }
+  };
+  HEADER_HANDLERS["magPID"] = (_fn, fv) => { this.sysConfig.magPID = parseCommaSeparatedString(fv, 3); };
+  HEADER_HANDLERS["d_min"] = pidArrayPushHandler;
+  HEADER_HANDLERS["d_max"] = pidArrayPushHandler;
+  HEADER_HANDLERS["ff_weight"] = pidArrayPushHandler;
+  HEADER_HANDLERS["vbatcellvoltage"] = (_fn, fv) => {
+    const params = parseCommaSeparatedString(fv);
+    this.sysConfig.vbatmincellvoltage = params[0];
+    this.sysConfig.vbatwarningcellvoltage = params[1];
+    this.sysConfig.vbatmaxcellvoltage = params[2];
+  };
+  HEADER_HANDLERS["currentMeter"] = currentMeterHandler;
+  HEADER_HANDLERS["currentSensor"] = currentMeterHandler;
+  HEADER_HANDLERS["gyro.scale"] = gyroScaleHandler;
+  HEADER_HANDLERS["gyro_scale"] = gyroScaleHandler;
+  HEADER_HANDLERS["Firmware revision"] = (fn, fv) => {
+    parseFirmwareRevision(fv);
+    this.sysConfig[fn] = fv;
+  };
+  HEADER_HANDLERS["DeviceUID"] = (_fn, fv) => { this.sysConfig.deviceUID = fv; };
+
   const parseHeaderLine = () => {
     const COLON = ":".codePointAt(0);
     let separatorPos = false;
@@ -734,11 +867,13 @@ export function FlightLogParser(logData) {
       stream.pos < lineStart + 1024 && stream.pos < stream.end;
       stream.pos++
     ) {
-      if (separatorPos === false && stream.data[stream.pos] === COLON)
+      if (separatorPos === false && stream.data[stream.pos] === COLON) {
         separatorPos = stream.pos;
+      }
 
-      if (stream.data[stream.pos] === NEWLINE || stream.data[stream.pos] === 0)
+      if (stream.data[stream.pos] === NEWLINE || stream.data[stream.pos] === 0) {
         break;
+      }
     }
 
     if (stream.data[stream.pos] !== NEWLINE || separatorPos === false) {
@@ -747,8 +882,6 @@ export function FlightLogParser(logData) {
 
     const lineEnd = stream.pos;
 
-    // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
-    // In this way is easier to maintain the code
     const fieldName = translateFieldName(
       asciiArrayToString(stream.data.subarray(lineStart, separatorPos)),
     );
@@ -756,180 +889,16 @@ export function FlightLogParser(logData) {
       stream.data.subarray(separatorPos + 1, lineEnd),
     );
 
-    // Dispatch to Set-based lookups first (covers the majority of fields)
-    if (PARSE_INT_FIELDS.has(fieldName)) {
-      this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10);
-      return;
-    }
-
-    if (CSV_FIELDS.has(fieldName)) {
-      this.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-      return;
-    }
-
-    if (VERSION_CONDITIONAL_INT_FIELDS.has(fieldName)) {
-      this.sysConfig[fieldName] = isModernFilterFirmware()
-        ? Number.parseInt(fieldValue, 10)
-        : Number.parseInt(fieldValue, 10) / 100;
-      return;
-    }
-
-    if (VERSION_CONDITIONAL_CSV_FIELDS.has(fieldName)) {
-      this.sysConfig[fieldName] = isModernFilterFirmware()
-        ? parseCommaSeparatedString(fieldValue)
-        : Number.parseInt(fieldValue, 10) / 100;
-      return;
-    }
-
-    if (ACCEL_LIMIT_FIELDS.has(fieldName)) {
-      const isBfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
-        semver.gte(this.sysConfig.firmwareVersion, "3.1.0");
-      const isCfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
-        semver.gte(this.sysConfig.firmwareVersion, "2.0.0");
-      this.sysConfig[fieldName] = (isBfModern || isCfModern)
-        ? Number.parseInt(fieldValue, 10) / 1000
-        : Number.parseInt(fieldValue, 10);
-      return;
-    }
-
-    if (DIVIDE_100_FIELDS.has(fieldName)) {
-      this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10) / 100;
-      return;
-    }
-
-    if (STRING_FIELDS.has(fieldName)) {
-      this.sysConfig[fieldName] = fieldValue;
-      return;
-    }
-
-    // Remaining cases with unique logic
-    switch (fieldName) {
-      case "I interval":
-        this.sysConfig.frameIntervalI = Number.parseInt(fieldValue, 10);
-        if (this.sysConfig.frameIntervalI < 1) {
-          this.sysConfig.frameIntervalI = 1;
-        }
-        break;
-      case "P interval": {
-        const slashIdx = fieldValue.indexOf("/");
-        if (slashIdx === -1) {
-          this.sysConfig.frameIntervalPNum = 1;
-          this.sysConfig.frameIntervalPDenom = Number.parseInt(fieldValue, 10);
-        } else {
-          this.sysConfig.frameIntervalPNum = Number.parseInt(fieldValue.substring(0, slashIdx), 10);
-          this.sysConfig.frameIntervalPDenom = Number.parseInt(fieldValue.substring(slashIdx + 1), 10);
-        }
-        break;
-      }
-      case "P denom":
-      case "P ratio":
-        break;
-      case "Data version":
-        dataVersion = Number.parseInt(fieldValue, 10);
-        break;
-      case "Firmware type":
-        this.sysConfig.firmwareType = fieldValue === "Cleanflight"
-          ? FIRMWARE_TYPE_CLEANFLIGHT
-          : FIRMWARE_TYPE_BASEFLIGHT;
-        break;
-      case "minthrottle":
-        this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10);
-        this.sysConfig.motorOutput[0] = this.sysConfig[fieldName];
-        break;
-      case "maxthrottle":
-        this.sysConfig[fieldName] = Number.parseInt(fieldValue, 10);
-        this.sysConfig.motorOutput[1] = this.sysConfig[fieldName];
-        break;
-      case "rc_expo":
-      case "rc_rates":
-        if (stringHasComma(fieldValue)) {
-          this.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-        } else {
-          this.sysConfig[fieldName][0] = Number.parseInt(fieldValue, 10);
-          this.sysConfig[fieldName][1] = Number.parseInt(fieldValue, 10);
-        }
-        break;
-      case "rcYawExpo":
-        this.sysConfig["rc_expo"][2] = Number.parseInt(fieldValue, 10);
-        break;
-      case "rcYawRate":
-        this.sysConfig["rc_rates"][2] = Number.parseInt(fieldValue, 10);
-        break;
-      case "superExpoFactor":
-        if (stringHasComma(fieldValue)) {
-          const expoParams = parseCommaSeparatedString(fieldValue);
-          this.sysConfig.superExpoFactor = expoParams[0];
-          this.sysConfig.superExpoFactorYaw = expoParams[1];
-        } else {
-          this.sysConfig.superExpoFactor = Number.parseInt(fieldValue, 10);
-        }
-        break;
-      case "magPID":
-        this.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3);
-        break;
-      case "d_min":
-      case "d_max": {
-        const dMaxValues = parseCommaSeparatedString(fieldValue);
-        this.sysConfig["rollPID"].push(dMaxValues[0]);
-        this.sysConfig["pitchPID"].push(dMaxValues[1]);
-        this.sysConfig["yawPID"].push(dMaxValues[2]);
-        break;
-      }
-      case "ff_weight": {
-        const ffValues = parseCommaSeparatedString(fieldValue);
-        this.sysConfig["rollPID"].push(ffValues[0]);
-        this.sysConfig["pitchPID"].push(ffValues[1]);
-        this.sysConfig["yawPID"].push(ffValues[2]);
-        break;
-      }
-      case "vbatcellvoltage": {
-        const vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
-        this.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
-        this.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
-        this.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
-        break;
-      }
-      case "currentMeter":
-      case "currentSensor": {
-        const currentMeterParams = parseCommaSeparatedString(fieldValue);
-        this.sysConfig.currentMeterOffset = currentMeterParams[0];
-        this.sysConfig.currentMeterScale = currentMeterParams[1];
-        break;
-      }
-      case "gyro.scale":
-      case "gyro_scale":
-        this.sysConfig.gyroScale = hexToFloat(fieldValue);
-        /* Legacy firmware uses a gyroScale that'll give radians per microsecond as output, whereas modern firmware produces degrees
-         * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
-         * match the legacy format so we can use a consistent IMU for all firmware types: */
-        if (
-          this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV ||
-          this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT ||
-          this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT
-        ) {
-          this.sysConfig.gyroScale =
-            this.sysConfig.gyroScale * (Math.PI / 180) * 0.000001;
-        }
-        break;
-      case "Firmware revision":
-        parseFirmwareRevision(fieldValue);
-        this.sysConfig[fieldName] = fieldValue;
-        break;
-      case "DeviceUID":
-        this.sysConfig.deviceUID = fieldValue;
-        break;
-      default:
-        if (!parseFieldDefinition(fieldName, fieldValue)) {
-          console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
-          if (this.sysConfig.unknownHeaders === null) {
-            this.sysConfig.unknownHeaders = [];
-          }
-          this.sysConfig.unknownHeaders.push({
-            name: fieldName,
-            value: fieldValue,
-          });
-        }
-        break;
+    const handler = HEADER_HANDLERS[fieldName];
+    if (handler) {
+      handler(fieldName, fieldValue);
+    } else if (!parseFieldDefinition(fieldName, fieldValue)) {
+      console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
+      this.sysConfig.unknownHeaders ??= [];
+      this.sysConfig.unknownHeaders.push({
+        name: fieldName,
+        value: fieldValue,
+      });
     }
   };
 
