@@ -55,7 +55,7 @@
         :style="cols ? { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` } : {}"
       >
         <!-- Column 1: PIDs -->
-        <div class="flex flex-col gap-4">
+        <div v-show="!hiddenGroups.has('PID Settings')" class="flex flex-col gap-4">
           <UiBox title="PID Settings" collapsible>
             <PidTable :rows="mainPids" :showDMax="showDMax" />
           </UiBox>
@@ -72,74 +72,74 @@
             <PidTable :rows="gpsPids" :showDMax="false" srOnly />
           </UiBox>
 
-          <UiBox v-if="pidSliderParams.length > 0" title="PID Sliders" collapsible>
+          <UiBox v-if="pidSliderParams.length > 0 && !hiddenGroups.has('PID Sliders')" title="PID Sliders" collapsible>
             <ParamTable :params="pidSliderParams" />
           </UiBox>
 
-          <UiBox v-if="feedforwardParams.length > 0" title="Feedforward" collapsible>
+          <UiBox v-if="feedforwardParams.length > 0 && !hiddenGroups.has('Feedforward')" title="Feedforward" collapsible>
             <ParamTable :params="feedforwardParams" />
           </UiBox>
         </div>
 
         <!-- Column 2: Rates -->
-        <div class="flex flex-col gap-4">
+        <div v-show="!hiddenGroups.has('Rates')" class="flex flex-col gap-4">
           <UiBox title="Rates" collapsible>
             <ParamTable :params="rateParams" />
           </UiBox>
 
-          <UiBox v-if="dMaxParams.length > 0" title="D Max" collapsible>
+          <UiBox v-if="dMaxParams.length > 0 && !hiddenGroups.has('D Max')" title="D Max" collapsible>
             <ParamTable :params="dMaxParams" />
           </UiBox>
 
-          <UiBox v-if="rateLimitParams.length > 0" title="Rate Limits" collapsible>
+          <UiBox v-if="rateLimitParams.length > 0 && !hiddenGroups.has('Rate Limits')" title="Rate Limits" collapsible>
             <ParamTable :params="rateLimitParams" />
           </UiBox>
 
-          <UiBox v-if="antiGravityParams.length > 0" title="Anti Gravity" collapsible>
+          <UiBox v-if="antiGravityParams.length > 0 && !hiddenGroups.has('Anti Gravity')" title="Anti Gravity" collapsible>
             <ParamTable :params="antiGravityParams" />
           </UiBox>
 
-          <UiBox v-if="otherParams.length > 0" title="Other" collapsible>
+          <UiBox v-if="otherParams.length > 0 && !hiddenGroups.has('Other')" title="Other" collapsible>
             <ParamTable :params="otherParams" />
           </UiBox>
         </div>
 
         <!-- Column 3: Parameters -->
-        <div class="flex flex-col gap-4">
+        <div v-show="!hiddenGroups.has('Parameters')" class="flex flex-col gap-4">
           <UiBox title="Parameters" collapsible>
             <ParamTable :params="generalParams" />
           </UiBox>
         </div>
 
         <!-- Column 4: Motor / ESC -->
-        <div class="flex flex-col gap-4">
+        <div v-show="!hiddenGroups.has('Motor / ESC')" class="flex flex-col gap-4">
           <UiBox title="Motor / ESC" collapsible>
             <ParamTable :params="motorParams" />
           </UiBox>
         </div>
 
         <!-- Column 5: Gyro Filters -->
-        <div class="flex flex-col gap-4">
+        <div v-show="!hiddenGroups.has('Gyro Filters')" class="flex flex-col gap-4">
           <UiBox title="Gyro Filters" collapsible>
             <ParamTable :params="gyroFilterParams" />
           </UiBox>
 
-          <UiBox v-if="dynNotchParams.length > 0" title="Dynamic Notch" collapsible>
+          <UiBox v-if="dynNotchParams.length > 0 && !hiddenGroups.has('Dynamic Notch')" title="Dynamic Notch" collapsible>
             <ParamTable :params="dynNotchParams" />
           </UiBox>
 
-          <UiBox v-if="rpmFilterParams.length > 0" title="RPM Filter" collapsible>
+          <UiBox v-if="rpmFilterParams.length > 0 && !hiddenGroups.has('RPM Filter')" title="RPM Filter" collapsible>
             <ParamTable :params="rpmFilterParams" />
           </UiBox>
         </div>
 
         <!-- Column 6: D-Term Filters -->
-        <div class="flex flex-col gap-4">
+        <div v-show="!hiddenGroups.has('D-Term Filters')" class="flex flex-col gap-4">
           <UiBox title="D-Term Filters" collapsible>
             <ParamTable :params="dtermFilterParams" />
           </UiBox>
 
-          <UiBox v-if="rcSmoothingParams.length > 0" title="RC Smoothing" collapsible>
+          <UiBox v-if="rcSmoothingParams.length > 0 && !hiddenGroups.has('RC Smoothing')" title="RC Smoothing" collapsible>
             <ParamTable :params="rcSmoothingParams" />
           </UiBox>
         </div>
@@ -147,11 +147,11 @@
 
       <!-- Full-width sections below the grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mt-4">
-        <UiBox v-if="featuresList.length > 0" title="Features" collapsible>
+        <UiBox v-if="featuresList.length > 0 && !hiddenGroups.has('Features')" title="Features" collapsible>
           <FeatureTable :data="featuresList" />
         </UiBox>
 
-        <UiBox v-if="disabledFieldsList.length > 0" title="Disabled Fields" collapsible>
+        <UiBox v-if="disabledFieldsList.length > 0 && !hiddenGroups.has('Disabled Fields')" title="Disabled Fields" collapsible>
           <FeatureTable :data="disabledFieldsList" />
         </UiBox>
 
@@ -170,13 +170,87 @@
                 size="xs"
                 :variant="headerSortAlpha ? 'solid' : 'ghost'"
                 :color="headerSortAlpha ? 'primary' : 'neutral'"
-                title="Sort alphabetically"
+                title="Sort fields alphabetically"
                 @click="headerSortAlpha = !headerSortAlpha"
+              />
+              <UButton
+                :icon="headerSortGroups ? 'i-lucide-arrow-down-a-z' : 'i-lucide-arrow-up-down'"
+                size="xs"
+                :variant="headerSortGroups ? 'solid' : 'ghost'"
+                :color="headerSortGroups ? 'primary' : 'neutral'"
+                title="Sort groups alphabetically"
+                @click="headerSortGroups = !headerSortGroups"
+              />
+              <UButton
+                :icon="allGroupsExpanded ? 'i-lucide-fold-vertical' : 'i-lucide-unfold-vertical'"
+                size="xs"
+                :variant="allGroupsExpanded ? 'solid' : 'ghost'"
+                :color="allGroupsExpanded ? 'primary' : 'neutral'"
+                :title="allGroupsExpanded ? 'Collapse all groups' : 'Expand all groups'"
+                @click="toggleAllGroups"
               />
             </div>
           </template>
-          <div class="text-xs text-dimmed mb-1">{{ filteredHeaders.length }} of {{ allHeaders.length }} headers</div>
-          <ParamTable :params="filteredHeaders" />
+          <div class="text-xs text-dimmed mb-1">{{ totalHeaderCount }} headers in {{ groupedHeaders.length }} groups</div>
+          <table class="w-full text-xs">
+            <template v-for="group in groupedHeaders" :key="group.name">
+              <!-- Group header -->
+              <tr
+                class="border-b border-default bg-elevated cursor-pointer select-none"
+                @click="toggleGroupExpand(group.name)"
+              >
+                <td class="py-1 px-1 w-5">
+                  <UIcon
+                    :name="expandedHeaderGroups.has(group.name) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+                    class="size-3.5 text-dimmed"
+                  />
+                </td>
+                <td class="py-1 px-1 font-semibold text-highlighted" colspan="2">
+                  {{ group.name }}
+                  <span class="text-dimmed font-normal ml-1">({{ group.fields.length }})</span>
+                </td>
+                <td class="py-1 px-1 w-6 text-center" @click.stop>
+                  <button
+                    :title="hiddenGroups.has(group.name) ? `Show ${group.name}` : `Hide ${group.name}`"
+                    class="opacity-60 hover:opacity-100"
+                    @click="toggleGroupVisibility(group.name)"
+                  >
+                    <UIcon
+                      :name="hiddenGroups.has(group.name) ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                      class="size-3.5"
+                      :class="hiddenGroups.has(group.name) ? 'text-dimmed' : 'text-highlighted'"
+                    />
+                  </button>
+                </td>
+              </tr>
+              <!-- Field rows -->
+              <template v-if="expandedHeaderGroups.has(group.name)">
+                <tr
+                  v-for="field in group.fields"
+                  :key="field.name"
+                  class="border-b border-default"
+                  :class="hiddenFields.has(field.name) ? 'opacity-40' : ''"
+                >
+                  <td class="py-0.5 px-1"></td>
+                  <td class="py-0.5 px-1 text-dimmed whitespace-nowrap">{{ field.name }}</td>
+                  <td class="py-0.5 px-1 font-medium">{{ field.value }}</td>
+                  <td class="py-0.5 px-1 w-6 text-center">
+                    <button
+                      :title="hiddenFields.has(field.name) ? `Show ${field.name}` : `Hide ${field.name}`"
+                      class="opacity-40 hover:opacity-100"
+                      @click="toggleFieldVisibility(field.name)"
+                    >
+                      <UIcon
+                        :name="hiddenFields.has(field.name) ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                        class="size-3"
+                        :class="hiddenFields.has(field.name) ? 'text-dimmed' : 'text-highlighted'"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </template>
+          </table>
         </UiBox>
       </div>
     </div>
@@ -963,6 +1037,126 @@ const disabledFieldsList = computed(() => {
 
 const headerSearch = ref("");
 const headerSortAlpha = ref(false);
+const headerSortGroups = ref(false);
+const expandedHeaderGroups = ref(new Set());
+const hiddenGroups = ref(new Set());
+const hiddenFields = ref(new Set());
+
+// Persist hidden groups/fields
+function loadHiddenPrefs() {
+  try {
+    const g = localStorage.getItem("bbv-hidden-groups");
+    const f = localStorage.getItem("bbv-hidden-fields");
+    if (g) { hiddenGroups.value = new Set(JSON.parse(g)); }
+    if (f) { hiddenFields.value = new Set(JSON.parse(f)); }
+  } catch {
+    // ignore
+  }
+}
+function saveHiddenPrefs() {
+  try {
+    localStorage.setItem("bbv-hidden-groups", JSON.stringify([...hiddenGroups.value]));
+    localStorage.setItem("bbv-hidden-fields", JSON.stringify([...hiddenFields.value]));
+  } catch {
+    // ignore
+  }
+}
+loadHiddenPrefs();
+
+function toggleGroupVisibility(group) {
+  const s = hiddenGroups.value;
+  if (s.has(group)) {
+    s.delete(group);
+  } else {
+    s.add(group);
+  }
+  hiddenGroups.value = new Set(s);
+  saveHiddenPrefs();
+}
+
+function toggleFieldVisibility(key) {
+  const s = hiddenFields.value;
+  if (s.has(key)) {
+    s.delete(key);
+  } else {
+    s.add(key);
+  }
+  hiddenFields.value = new Set(s);
+  saveHiddenPrefs();
+}
+
+function toggleGroupExpand(group) {
+  const s = expandedHeaderGroups.value;
+  if (s.has(group)) {
+    s.delete(group);
+  } else {
+    s.add(group);
+  }
+  expandedHeaderGroups.value = new Set(s);
+}
+
+const allGroupsExpanded = computed(() => {
+  const groups = groupedHeaders.value;
+  return groups.length > 0 && groups.every((g) => expandedHeaderGroups.value.has(g.name));
+});
+
+function toggleAllGroups() {
+  if (allGroupsExpanded.value) {
+    expandedHeaderGroups.value = new Set();
+  } else {
+    expandedHeaderGroups.value = new Set(groupedHeaders.value.map((g) => g.name));
+  }
+}
+
+// Group assignment by sysConfig key
+const EXPLICIT_GROUPS = {
+  rollPID: "PID Settings", pitchPID: "PID Settings", yawPID: "PID Settings",
+  levelPID: "PID Settings", altPID: "PID Settings", velPID: "PID Settings",
+  magPID: "PID Settings", posPID: "PID Settings", posrPID: "PID Settings",
+  navrPID: "PID Settings",
+  rates_type: "Rates", rates: "Rates", rate_limits: "Rates",
+  rc_rates: "Rates", rc_expo: "Rates", rcYawRate: "Rates", rcYawExpo: "Rates",
+  d_max: "D Max", d_max_gain: "D Max", d_max_advance: "D Max",
+  features: "Features", fields_disabled_mask: "Disabled Fields",
+  looptime: "Parameters", gyro_sync_denom: "Parameters", pid_process_denom: "Parameters",
+  debug_mode: "Parameters", deadband: "Parameters", yaw_deadband: "Parameters",
+  tpa_rate: "Parameters", tpa_breakpoint: "Parameters",
+  vbatscale: "Parameters", vbatref: "Parameters",
+  vbatmincellvoltage: "Parameters", vbatmaxcellvoltage: "Parameters",
+  vbatwarningcellvoltage: "Parameters", vbat_sag_compensation: "Parameters",
+  vbat_pid_compensation: "Parameters",
+  minthrottle: "Parameters", maxthrottle: "Parameters",
+  thrMid: "Parameters", thrExpo: "Parameters",
+  pidSumLimit: "Parameters", pidSumLimitYaw: "Parameters",
+  iterm_relax: "Parameters", iterm_relax_type: "Parameters", iterm_relax_cutoff: "Parameters",
+  abs_control_gain: "Parameters", yawRateAccelLimit: "Parameters", rateAccelLimit: "Parameters",
+  setpointRelaxRatio: "Parameters", use_integrated_yaw: "Parameters",
+  pidController: "Parameters", yaw_p_limit: "Parameters",
+  rollPitchItermResetRate: "Parameters", yawItermResetRate: "Parameters",
+  itermThrottleGain: "Parameters", ptermSetpointWeight: "Parameters",
+  dtermSetpointWeight: "Parameters", H_sensitivity: "Parameters",
+  iterm_reset_offset: "Parameters", airmode_activate_throttle: "Parameters",
+  acc_hardware: "Other", baro_hardware: "Other", mag_hardware: "Other",
+  currentMeter: "Other", currentMeterOffset: "Other", currentMeterScale: "Other",
+  gyro_to_use: "Other", gyro_enabled_bitmask: "Other",
+};
+
+function getHeaderGroup(key) {
+  if (EXPLICIT_GROUPS[key]) { return EXPLICIT_GROUPS[key]; }
+  if (key.startsWith("simplified_")) { return "PID Sliders"; }
+  if (key.startsWith("ff_")) { return "Feedforward"; }
+  if (key.startsWith("anti_gravity_")) { return "Anti Gravity"; }
+  if (key.startsWith("gyro_rpm_") || key.startsWith("rpm_") || key.startsWith("dterm_rpm_")) { return "RPM Filter"; }
+  if (key.startsWith("dyn_notch_")) { return "Dynamic Notch"; }
+  if (key.startsWith("gyro_")) { return "Gyro Filters"; }
+  if (key.startsWith("dterm_")) { return "D-Term Filters"; }
+  if (key.startsWith("rc_smoothing_") || key.startsWith("rc_interpolation")) { return "RC Smoothing"; }
+  if (key.startsWith("motor") || key.startsWith("throttle") || key.startsWith("dshot") || key.startsWith("dyn_idle_") || key.startsWith("dynamic_idle")) { return "Motor / ESC"; }
+  if (key.startsWith("unsynced_") || key.startsWith("fast_pwm_") || key === "digitalIdleOffset" || key === "motor_idle" || key === "motor_pwm_rate" || key === "serialrx_provider" || key === "pidAtMinThrottle") { return "Motor / ESC"; }
+  if (key.startsWith("tpa_low_")) { return "Parameters"; }
+  if (key.startsWith("chirp_")) { return "Other"; }
+  return "Other";
+}
 
 function formatHeaderValue(val) {
   if (val == null) {
@@ -988,9 +1182,18 @@ const HEADER_SKIP_KEYS = new Set([
   "flightControllerVersion",
 ]);
 
-const allHeaders = computed(() => {
+// Group order for display
+const GROUP_ORDER = [
+  "PID Settings", "PID Sliders", "Feedforward", "Rates", "D Max", "Rate Limits",
+  "Parameters", "Motor / ESC", "Anti Gravity",
+  "Gyro Filters", "Dynamic Notch", "RPM Filter",
+  "D-Term Filters", "RC Smoothing",
+  "Features", "Disabled Fields", "Other",
+];
+
+const groupedHeaders = computed(() => {
   const s = sc.value;
-  const entries = [];
+  const groups = {};
 
   // sysConfig fields
   for (const key of Object.keys(s)) {
@@ -1001,36 +1204,70 @@ const allHeaders = computed(() => {
     if (formatted == null) {
       continue;
     }
-    entries.push({ name: key, value: formatted });
+    const group = getHeaderGroup(key);
+    if (!groups[group]) {
+      groups[group] = [];
+    }
+    groups[group].push({ name: key, value: formatted, group });
   }
 
-  // unknown headers (not in sysConfig schema)
+  // unknown headers
   const uh = s.unknownHeaders;
   if (Array.isArray(uh)) {
     for (const h of uh) {
-      entries.push({ name: h.name, value: String(h.value) });
+      if (!groups["Other"]) {
+        groups["Other"] = [];
+      }
+      groups["Other"].push({ name: h.name, value: String(h.value), group: "Other" });
     }
   }
 
-  return entries;
-});
-
-const filteredHeaders = computed(() => {
-  let list = allHeaders.value;
-
+  // Build ordered group array
   const q = headerSearch.value.trim().toLowerCase();
-  if (q) {
-    list = list.filter(
-      (h) =>
-        h.name.toLowerCase().includes(q) ||
-        h.value.toLowerCase().includes(q),
-    );
+  const result = [];
+  for (const name of GROUP_ORDER) {
+    let fields = groups[name];
+    if (!fields) {
+      continue;
+    }
+    if (q) {
+      fields = fields.filter(
+        (f) => f.name.toLowerCase().includes(q) || f.value.toLowerCase().includes(q),
+      );
+      if (fields.length === 0) {
+        continue;
+      }
+    }
+    if (headerSortAlpha.value) {
+      fields = [...fields].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    result.push({ name, fields });
   }
-
-  if (headerSortAlpha.value) {
-    list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+  // Any groups not in GROUP_ORDER
+  for (const name of Object.keys(groups)) {
+    if (!GROUP_ORDER.includes(name)) {
+      let fields = groups[name];
+      if (q) {
+        fields = fields.filter(
+          (f) => f.name.toLowerCase().includes(q) || f.value.toLowerCase().includes(q),
+        );
+        if (fields.length === 0) {
+          continue;
+        }
+      }
+      if (headerSortAlpha.value) {
+        fields = [...fields].sort((a, b) => a.name.localeCompare(b.name));
+      }
+      result.push({ name, fields });
+    }
   }
-
-  return list;
+  if (headerSortGroups.value) {
+    result.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return result;
 });
+
+const totalHeaderCount = computed(() =>
+  groupedHeaders.value.reduce((sum, g) => sum + g.fields.length, 0),
+);
 </script>
