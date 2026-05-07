@@ -786,40 +786,9 @@ function BlackboxLogViewer() {
   }
 
 
-  this.getMarker = function () {
-    // get marker field
-    return {
-      state: graphStore.hasMarker,
-      time: graphStore.markerTime,
-    };
-  };
+  // getMarker, getBookmarks, getBookmarkTimes — grapher.js reads stores directly
 
-  this.getBookmarks = function () {
-    // get bookmark events
-    const bookmarks = [];
-    try {
-      if (workspaceStore.bookmarkTimes != null) {
-        for (let i = 0; i <= 9; i++) {
-          if (workspaceStore.bookmarkTimes[i] != null) {
-            bookmarks[i] = {
-              state: workspaceStore.bookmarkTimes[i] !== 0,
-              time: workspaceStore.bookmarkTimes[i],
-            };
-          } else bookmarks[i] = null;
-        }
-      }
-      return bookmarks;
-    } catch {
-      return null;
-    }
-  };
-
-  this.getBookmarkTimes = function () {
-    return workspaceStore.bookmarkTimes;
-  };
-
-  this.refreshGraph = function () {
-    // Called when the theme changes to refresh canvas colors
+  appStore.refreshGraph = () => {
     if (graph !== null) {
       ThemeColors.clearCache();
       graph.refreshTheme();
@@ -1182,34 +1151,18 @@ function BlackboxLogViewer() {
 
     // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
 
-    // Status bar interactions wired via Vue StatusBar bridge
-    this.gotoBookmark = function (index) {
+    // Workspace/navigation callbacks registered on stores
+    workspaceStore.gotoBookmark = (index) => {
       if (workspaceStore.bookmarkTimes?.[index] != null) {
         setCurrentBlackboxTime(workspaceStore.bookmarkTimes[index]);
         invalidateGraph();
       }
     };
-    this.gotoMarker = function () {
-      setCurrentBlackboxTime(graphStore.markerTime);
-      invalidateGraph();
-    };
-    this.showConfigFile = function () {
-      showConfigFile(true);
-    };
 
-    // Spectrum actions wired via Vue SpectrumAnalyser
-    this.spectrumExport = function () {
-      exportSpectrumToCsv();
-    };
-    this.spectrumImport = function (files) {
-      graph.getAnalyser()?.importSpectrumFromCSV(files);
-    };
-    this.spectrumClear = function () {
-      graph.getAnalyser()?.removeImportedSpectrums();
-    };
-    this.getAnalyser = function () {
-      return graph?.getAnalyser();
-    };
+    // Spectrum callbacks registered on graphStore
+    graphStore.spectrumExport = () => exportSpectrumToCsv();
+    graphStore.spectrumImport = (files) => graph.getAnalyser()?.importSpectrumFromCSV(files);
+    graphStore.spectrumClear = () => graph.getAnalyser()?.removeImportedSpectrums();
 
     // GPX export wired via Vue AppToolbar
 
@@ -1857,31 +1810,18 @@ function BlackboxLogViewer() {
       }
       applyPenChange(msg);
     };
-    this.setPlaybackRate = function (rate) {
-      setPlaybackRate(rate, false);
-    };
-    this.setGraphZoom = function (zoom) {
-      setGraphZoom(zoom, false);
-    };
-    this.logSyncHere = function () {
-      logSyncHere();
-    };
-    this.logSyncBack = function () {
-      logSyncBack();
-    };
-    this.logSyncForward = function () {
-      logSyncForward();
-    };
-    this.logSmartSync = function () {
-      logSmartSync();
-    };
-    this.setVideoOffsetValue = function (val) {
+    // Video sync callbacks registered on playbackStore
+    playbackStore.logSyncHere = () => logSyncHere();
+    playbackStore.logSyncBack = () => logSyncBack();
+    playbackStore.logSyncForward = () => logSyncForward();
+    playbackStore.logSmartSync = () => logSmartSync();
+    playbackStore.setVideoOffsetValue = (val) => {
       const offset = Number.parseFloat(val);
       if (!Number.isNaN(offset)) {
         setVideoOffset(offset, true);
       }
     };
-    this.setGraphTime = function (timeStr) {
+    playbackStore.setGraphTime = (timeStr) => {
       let newTime = stringTimetoMsec(timeStr);
       if (!isNaN(newTime)) {
         if (logStore.hasVideo) {
@@ -1893,24 +1833,20 @@ function BlackboxLogViewer() {
         invalidateGraph();
       }
     };
-    this.setSeekBarMode = function (mode) {
-      setSeekBarMode(mode);
-    };
-    this.selectLogIndex = function (index) {
+    graphStore.setSeekBarMode = (mode) => setSeekBarMode(mode);
+    graphStore.selectLogIndex = (index) => {
       selectLog(Number.parseInt(index, 10));
       if (graph) {
         graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       }
     };
-    this.switchWorkspace = function (id) {
+    workspaceStore.switchWorkspace = (id) => {
       if (workspaceStore.workspaceGraphConfigs[id] != null) {
         onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
       }
     };
-    this.saveWorkspace = function (id, title) {
-      onSaveWorkspace(id, title);
-    };
-    this.applyDefaultWorkspace = function (index) {
+    workspaceStore.saveWorkspace = (id, title) => onSaveWorkspace(id, title);
+    workspaceStore.applyDefaultWorkspace = (index) => {
       const presets = [null, structuredClone(ctzsnoozeWorkspace), structuredClone(supaflyWorkspace)];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
@@ -1918,79 +1854,42 @@ function BlackboxLogViewer() {
     };
   }
 
-  // Bridge API — expose key functions for Vue components during migration
-  this.loadFiles = loadFiles;
-  this.invalidateGraph = invalidateGraph;
-  this.newGraphConfig = function (newConfig, redrawChart) {
-    newGraphConfig(newConfig, !redrawChart);
-  };
-  this.exportCsv = function () {
+  // Callbacks registered on stores — replaces this.* controller bridge
+  appStore.loadFiles = loadFiles;
+  appStore.newGraphConfig = (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart);
+  appStore.exportCsv = () => {
     setGraphState(GRAPH_STATE_PAUSED);
     exportCsv();
   };
-  this.exportGpx = function () {
+  appStore.exportGpx = () => {
     setGraphState(GRAPH_STATE_PAUSED);
     exportGpx();
   };
-  this.exportWorkspaces = function () {
+  appStore.exportWorkspaces = () => {
     setGraphState(GRAPH_STATE_PAUSED);
     saveWorkspaces();
   };
-  this.pauseForExport = function () {
-    setGraphState(GRAPH_STATE_PAUSED);
-  };
-  this.getVideoExportParams = function () {
-    return {
-      graphConfig: graphStore.activeGraphConfig,
-      inTime: playbackStore.videoExportInTime,
-      outTime: playbackStore.videoExportOutTime,
-      flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,
-      flightVideoOffset: playbackStore.videoOffset,
-      hasCraft: userSettings.drawCraft,
-      hasAnalyser: graphStore.hasAnalyser,
-      hasSticks: userSettings.drawSticks,
-    };
-  };
-  this.saveVideoConfig = function (newConfig) {
+  appStore.pauseForExport = () => setGraphState(GRAPH_STATE_PAUSED);
+  appStore.getVideoExportParams = () => ({
+    graphConfig: graphStore.activeGraphConfig,
+    inTime: playbackStore.videoExportInTime,
+    outTime: playbackStore.videoExportOutTime,
+    flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,
+    flightVideoOffset: playbackStore.videoOffset,
+    hasCraft: userSettings.drawCraft,
+    hasAnalyser: graphStore.hasAnalyser,
+    hasSticks: userSettings.drawSticks,
+  });
+  appStore.saveVideoConfig = (newConfig) => {
     playbackStore.videoConfig = newConfig;
     prefs.set("videoConfig", newConfig);
   };
-  // Playback
-  this.logPlayPause = function () {
-    logPlayPause();
-  };
-  this.logJumpBack = function () {
-    logJumpBack(null);
-  };
-  this.logJumpForward = function () {
-    logJumpForward(null);
-  };
-  this.logJumpStart = function () {
-    logJumpStart();
-  };
-  this.logJumpEnd = function () {
-    logJumpEnd();
-  };
-  this.videoJumpStart = function () {
-    setVideoTime(0);
-    setGraphState(GRAPH_STATE_PAUSED);
-  };
-  this.videoJumpEnd = function () {
-    if (video.duration) {
-      setVideoTime(video.duration);
-      setGraphState(GRAPH_STATE_PAUSED);
-    }
-  };
-  this.openNewWindow = function () {
-    createNewBlackboxWindow();
-  };
-  this.saveUserSettings = function (newSettings) {
+  appStore.openNewWindow = () => createNewBlackboxWindow();
+  appStore.saveUserSettings = (newSettings) => {
     settingsStore.saveAll(newSettings);
-
     if (newSettings.darkMode !== undefined) {
       DarkTheme.setMode(newSettings.darkMode);
     }
-
     if (graph != null) {
       graph.refreshOptions(userSettings);
       graph.refreshLogo();
@@ -1998,8 +1897,26 @@ function BlackboxLogViewer() {
       updateCanvasSize();
     }
   };
+  graphStore.applyGraphZoom = (zoom) => setGraphZoom(zoom, false);
+  playbackStore.applyPlaybackRate = (rate) => setPlaybackRate(rate, false);
+  // Playback callbacks registered on playbackStore
+  playbackStore.logPlayPause = () => logPlayPause();
+  playbackStore.logJumpBack = () => logJumpBack(null);
+  playbackStore.logJumpForward = () => logJumpForward(null);
+  playbackStore.logJumpStart = () => logJumpStart();
+  playbackStore.logJumpEnd = () => logJumpEnd();
+  playbackStore.videoJumpStart = () => {
+    setVideoTime(0);
+    setGraphState(GRAPH_STATE_PAUSED);
+  };
+  playbackStore.videoJumpEnd = () => {
+    if (video.duration) {
+      setVideoTime(video.duration);
+      setGraphState(GRAPH_STATE_PAUSED);
+    }
+  };
 
-  // Register this controller in the store — replaces globalThis.blackboxLogViewer
+  // Register this controller in the store — will be removed when all consumers migrate
   appStore.controller = this;
 }
 

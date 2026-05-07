@@ -90,12 +90,10 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { useAppStore } from "../stores/app.js";
 import { useGraphStore } from "../stores/graph.js";
 import { useSettingsStore } from "../stores/settings.js";
 import { SPECTRUM_TYPE } from "../graph_spectrum_plot";
 
-const appStore = useAppStore();
 const graphStore = useGraphStore();
 const { userSettings } = useSettingsStore();
 
@@ -131,7 +129,7 @@ const lowLevelPSD = ref(userSettings.psdHeatmapMin ?? -40);
 const segmentLength = ref(9);
 
 function getAnalyser() {
-  return appStore.controller?.getAnalyser?.();
+  return graphStore.graph?.getAnalyser?.();
 }
 
 // --- Watchers: push changes to analyser ---
@@ -227,14 +225,14 @@ function resetSegmentLength() { segmentLength.value = 9; getAnalyser()?.resetSeg
 // --- Spectrum actions ---
 const spectrumMenuItems = [
   [
-    { label: "Export CSV", icon: "i-lucide-download", onSelect: () => appStore.controller?.spectrumExport() },
+    { label: "Export CSV", icon: "i-lucide-download", onSelect: () => graphStore.spectrumExport?.() },
     { label: "Import CSV", icon: "i-lucide-upload", onSelect: () => importInput.value?.click() },
-    { label: "Clear imported", icon: "i-lucide-trash-2", onSelect: () => appStore.controller?.spectrumClear() },
+    { label: "Clear imported", icon: "i-lucide-trash-2", onSelect: () => graphStore.spectrumClear?.() },
   ],
 ];
 
 function onImportChange(e) {
-  appStore.controller?.spectrumImport(e.target.files);
+  graphStore.spectrumImport?.(e.target.files);
   e.target.value = "";
 }
 

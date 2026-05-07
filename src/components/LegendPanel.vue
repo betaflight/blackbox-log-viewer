@@ -312,6 +312,6 @@ function openGraphConfig() {
 }
 
 function onLogIndexChange(val) {
-  appStore.controller?.selectLogIndex?.(val);
+  graphStore.selectLogIndex?.(val);
 }
 </script>

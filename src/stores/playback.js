@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, shallowRef, computed } from "vue";
 
 export const GRAPH_STATE_PAUSED = 0;
 export const GRAPH_STATE_PLAY = 1;
@@ -19,20 +19,21 @@ export const usePlaybackStore = defineStore("playback", () => {
   const isPlaying = computed(() => graphState.value === GRAPH_STATE_PLAY);
   const isPaused = computed(() => graphState.value === GRAPH_STATE_PAUSED);
 
-  function play() {
-    graphState.value = GRAPH_STATE_PLAY;
-  }
-
-  function pause() {
-    graphState.value = GRAPH_STATE_PAUSED;
-  }
-
-  function togglePlayPause() {
-    graphState.value =
-      graphState.value === GRAPH_STATE_PLAY
-        ? GRAPH_STATE_PAUSED
-        : GRAPH_STATE_PLAY;
-  }
+  // Callbacks registered by main.js (need video element + renderer closures)
+  const logPlayPause = shallowRef(null);
+  const logJumpBack = shallowRef(null);
+  const logJumpForward = shallowRef(null);
+  const logJumpStart = shallowRef(null);
+  const logJumpEnd = shallowRef(null);
+  const videoJumpStart = shallowRef(null);
+  const videoJumpEnd = shallowRef(null);
+  const logSyncHere = shallowRef(null);
+  const logSyncBack = shallowRef(null);
+  const logSyncForward = shallowRef(null);
+  const logSmartSync = shallowRef(null);
+  const setVideoOffsetValue = shallowRef(null);
+  const setGraphTime = shallowRef(null);
+  const applyPlaybackRate = shallowRef(null);
 
   function setPlaybackRate(rate) {
     playbackRate.value = Math.max(
@@ -54,9 +55,20 @@ export const usePlaybackStore = defineStore("playback", () => {
     videoConfig,
     isPlaying,
     isPaused,
-    play,
-    pause,
-    togglePlayPause,
+    logPlayPause,
+    logJumpBack,
+    logJumpForward,
+    logJumpStart,
+    logJumpEnd,
+    videoJumpStart,
+    videoJumpEnd,
+    logSyncHere,
+    logSyncBack,
+    logSyncForward,
+    logSmartSync,
+    setVideoOffsetValue,
+    setGraphTime,
+    applyPlaybackRate,
     setPlaybackRate,
     setVideoOffset,
   };

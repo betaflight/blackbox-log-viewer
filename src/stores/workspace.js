@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 
 export const useWorkspaceStore = defineStore("workspace", () => {
   const workspaceGraphConfigs = ref([]);
@@ -15,6 +15,12 @@ export const useWorkspaceStore = defineStore("workspace", () => {
   }
 
   const showDefaultMenu = ref(false);
+
+  // Callbacks registered by main.js
+  const switchWorkspace = shallowRef(null);
+  const saveWorkspace = shallowRef(null);
+  const applyDefaultWorkspace = shallowRef(null);
+  const gotoBookmark = shallowRef(null);
 
   /** Get title for a workspace slot (1-9, 0) */
   function getTitle(id) {
@@ -34,6 +40,10 @@ export const useWorkspaceStore = defineStore("workspace", () => {
     setActiveWorkspace,
     setWorkspaceGraphConfigs,
     showDefaultMenu,
+    switchWorkspace,
+    saveWorkspace,
+    applyDefaultWorkspace,
+    gotoBookmark,
     getTitle,
     hasWorkspace,
   };

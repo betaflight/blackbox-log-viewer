@@ -112,7 +112,7 @@ export const DarkTheme = {
     this.apply();
 
     // Notify the application that theme has changed so canvas can redraw
-    useAppStore().controller?.refreshGraph?.();
+    useAppStore().refreshGraph?.();
 
     if (typeof callback === "function") {
       callback();

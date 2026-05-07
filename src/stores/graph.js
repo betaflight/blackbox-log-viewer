@@ -60,6 +60,12 @@ export const useGraphStore = defineStore("graph", () => {
   const reorderGraphs = shallowRef(null);
   const resetPen = shallowRef(null);
   const fieldWheel = shallowRef(null);
+  const spectrumExport = shallowRef(null);
+  const spectrumImport = shallowRef(null);
+  const spectrumClear = shallowRef(null);
+  const applyGraphZoom = shallowRef(null);
+  const selectLogIndex = shallowRef(null);
+  const setSeekBarMode = shallowRef(null);
 
   // --- Legend actions ---
 
@@ -200,6 +206,12 @@ export const useGraphStore = defineStore("graph", () => {
     reorderGraphs,
     resetPen,
     fieldWheel,
+    spectrumExport,
+    spectrumImport,
+    spectrumClear,
+    applyGraphZoom,
+    selectLogIndex,
+    setSeekBarMode,
     buildLegendGraphs,
     highlightLegendField,
     selectLegendField,

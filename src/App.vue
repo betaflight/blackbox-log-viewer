@@ -125,6 +125,7 @@ import { useAppStore } from "./stores/app.js";
 import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useSettingsStore } from "./stores/settings.js";
+import { useWorkspaceStore } from "./stores/workspace.js";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -151,6 +152,7 @@ const appStore = useAppStore();
 const logStore = useLogStore();
 const playbackStore = usePlaybackStore();
 const settingsStore = useSettingsStore();
+const workspaceStore = useWorkspaceStore();
 
 // Centralized CSS class binding — replaces 27 imperative html.classList calls in main.js
 watchEffect(() => {
@@ -184,12 +186,8 @@ const sysConfig = computed(() => logStore.flightLog?.getSysConfig?.() ?? null);
 // Video export params — built at dialog open time from store state
 const videoExportParams = ref(null);
 
-function getController() {
-  return appStore.controller;
-}
-
 function onFilesSelected(files) {
-  getController()?.loadFiles(files);
+  appStore.loadFiles?.(files);
 }
 
 function onOpenSettings() {
@@ -201,26 +199,25 @@ function onOpenKeys() {
 }
 
 function onExportCsv() {
-  getController()?.exportCsv?.();
+  appStore.exportCsv?.();
 }
 
 function onExportGpx() {
-  getController()?.exportGpx?.();
+  appStore.exportGpx?.();
 }
 
 function onExportVideo() {
-  const ctrl = getController();
-  ctrl?.pauseForExport?.();
-  videoExportParams.value = ctrl?.getVideoExportParams?.() ?? null;
+  appStore.pauseForExport?.();
+  videoExportParams.value = appStore.getVideoExportParams?.() ?? null;
   appStore.videoExportDialogOpen = true;
 }
 
 function onExportWorkspaces() {
-  getController()?.exportWorkspaces?.();
+  appStore.exportWorkspaces?.();
 }
 
 function onNewWindow() {
-  getController()?.openNewWindow?.();
+  appStore.openNewWindow?.();
 }
 
 function onViewConfig() {
@@ -265,95 +262,95 @@ function onToggleMap() {
 }
 
 function onRateChange(rate) {
-  getController()?.setPlaybackRate?.(rate);
+  playbackStore.applyPlaybackRate?.(rate);
 }
 
 function onZoomChange(zoom) {
-  getController()?.setGraphZoom?.(zoom);
+  graphStore.applyGraphZoom?.(zoom);
 }
 
 function onSyncBack() {
-  getController()?.logSyncBack?.();
+  playbackStore.logSyncBack?.();
 }
 
 function onSyncForward() {
-  getController()?.logSyncForward?.();
+  playbackStore.logSyncForward?.();
 }
 
 function onSyncHere() {
-  getController()?.logSyncHere?.();
+  playbackStore.logSyncHere?.();
 }
 
 function onSmartSync() {
-  getController()?.logSmartSync?.();
+  playbackStore.logSmartSync?.();
 }
 
 function onOffsetChange(val) {
-  getController()?.setVideoOffsetValue?.(val);
+  playbackStore.setVideoOffsetValue?.(val);
 }
 
 function onTimeChange(timeStr) {
-  getController()?.setGraphTime?.(timeStr);
+  playbackStore.setGraphTime?.(timeStr);
 }
 
 function onPlayPause() {
-  getController()?.logPlayPause?.();
+  playbackStore.logPlayPause?.();
 }
 
 function onJumpStart() {
-  getController()?.logJumpStart?.();
+  playbackStore.logJumpStart?.();
 }
 
 function onJumpEnd() {
-  getController()?.logJumpEnd?.();
+  playbackStore.logJumpEnd?.();
 }
 
 function onStepBack() {
-  getController()?.logJumpBack?.();
+  playbackStore.logJumpBack?.();
 }
 
 function onStepForward() {
-  getController()?.logJumpForward?.();
+  playbackStore.logJumpForward?.();
 }
 
 function onVideoJumpStart() {
-  getController()?.videoJumpStart?.();
+  playbackStore.videoJumpStart?.();
 }
 
 function onVideoJumpEnd() {
-  getController()?.videoJumpEnd?.();
+  playbackStore.videoJumpEnd?.();
 }
 
 function onSaveSettings(newSettings) {
-  getController()?.saveUserSettings?.(newSettings);
+  appStore.saveUserSettings?.(newSettings);
 }
 
 function onGraphConfigSave(newConfig) {
-  getController()?.newGraphConfig?.(newConfig, true);
+  appStore.newGraphConfig?.(newConfig, true);
 }
 
 function onGraphConfigUpdate(newConfig) {
-  getController()?.newGraphConfig?.(newConfig, false);
+  appStore.newGraphConfig?.(newConfig, false);
 }
 
 function onSaveVideoConfig(cfg) {
-  getController()?.saveVideoConfig?.(cfg);
+  appStore.saveVideoConfig?.(cfg);
 }
 
 function onSwitchWorkspace(id) {
-  getController()?.switchWorkspace?.(id);
+  workspaceStore.switchWorkspace?.(id);
 }
 
 function onSaveWorkspace(id, title) {
-  getController()?.saveWorkspace?.(id, title);
+  workspaceStore.saveWorkspace?.(id, title);
 }
 
 function onApplyDefaultWorkspace(index) {
-  getController()?.applyDefaultWorkspace?.(index);
+  workspaceStore.applyDefaultWorkspace?.(index);
 }
 
 function onGotoBookmark(index) {
-  getController()?.gotoBookmark?.(index + 1);
+  workspaceStore.gotoBookmark?.(index + 1);
 }
 
 // Drag-and-drop file loading (window-level)
@@ -366,7 +363,7 @@ function onDrop(e) {
   const item = e.dataTransfer.items?.[0];
   const entry = item?.webkitGetAsEntry?.();
   if (entry?.isFile) {
-    getController()?.loadFiles([e.dataTransfer.files[0]]);
+    appStore.loadFiles?.([e.dataTransfer.files[0]]);
   }
 }
 onMounted(() => {

@@ -13,10 +13,8 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import { useAppStore } from "../stores/app.js";
 import { useGraphStore } from "../stores/graph.js";
 
-const appStore = useAppStore();
 const graphStore = useGraphStore();
 
 const seekbarOptions = [
@@ -28,6 +26,6 @@ const seekbarOptions = [
 const seekbarType = ref(graphStore.seekBarMode || "avgThrottle");
 
 watch(seekbarType, (val) => {
-  appStore.controller?.setSeekBarMode?.(val);
+  graphStore.setSeekBarMode?.(val);
 });
 </script>

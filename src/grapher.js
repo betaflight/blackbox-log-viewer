@@ -13,7 +13,8 @@ import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
 import { ExpoCurve } from "./expo";
 import { leftPad, formatTime } from "./tools";
-import { useAppStore } from "./stores/app.js";
+import { useGraphStore } from "./stores/graph.js";
+import { useWorkspaceStore } from "./stores/workspace.js";
 import { ThemeColors } from "./theme_colors";
 
 export function FlightLogGrapher(
@@ -25,7 +26,8 @@ export function FlightLogGrapher(
   analyserCanvas,
   options,
 ) {
-  const { controller } = useAppStore();
+  const graphStore = useGraphStore();
+  const workspaceStore = useWorkspaceStore();
 
   const DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif";
   let drawingParams = {
@@ -256,7 +258,7 @@ export function FlightLogGrapher(
     lapTimer.refresh(
       windowCenterTime,
       3600 * 1000000 /*a long time*/,
-      controller.getBookmarkTimes(),
+      workspaceStore.bookmarkTimes,
     );
     lapTimer.drawCanvas(canvas, options);
   }
@@ -681,8 +683,10 @@ export function FlightLogGrapher(
 
     // Add custom markers
 
-    const markerEvent = controller.getMarker();
-    const bookmarkEvents = controller.getBookmarks();
+    const markerEvent = { state: graphStore.hasMarker, time: graphStore.markerTime };
+    const bookmarkEvents = workspaceStore.bookmarkTimes?.map((t) =>
+      t != null ? { state: t !== 0, time: t } : null,
+    ) ?? null;
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
       canvasContext.fillStyle = ThemeColors.getGraphText();
       canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;

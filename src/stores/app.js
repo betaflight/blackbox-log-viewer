@@ -30,6 +30,19 @@ export const useAppStore = defineStore("app", () => {
   // Legacy controller reference (BlackboxLogViewer instance)
   const controller = shallowRef(null);
 
+  // Callbacks registered by main.js (closure-dependent operations)
+  const loadFiles = shallowRef(null);
+  const newGraphConfig = shallowRef(null);
+  const exportCsv = shallowRef(null);
+  const exportGpx = shallowRef(null);
+  const exportWorkspaces = shallowRef(null);
+  const openNewWindow = shallowRef(null);
+  const pauseForExport = shallowRef(null);
+  const getVideoExportParams = shallowRef(null);
+  const saveVideoConfig = shallowRef(null);
+  const saveUserSettings = shallowRef(null);
+  const refreshGraph = shallowRef(null);
+
   function setLegendHidden(hidden) {
     legendHidden.value = hidden;
   }
@@ -58,6 +71,17 @@ export const useAppStore = defineStore("app", () => {
     settingsDialogOpen,
     keysDialogOpen,
     controller,
+    loadFiles,
+    newGraphConfig,
+    exportCsv,
+    exportGpx,
+    exportWorkspaces,
+    openNewWindow,
+    pauseForExport,
+    getVideoExportParams,
+    saveVideoConfig,
+    saveUserSettings,
+    refreshGraph,
     setLegendHidden,
     setViewVideo,
   };
