@@ -1,13 +1,15 @@
 <template>
   <!-- Reopen button when legend is hidden -->
-  <span
+  <button
     v-show="!graphStore.legendVisible"
-    class="absolute right-2.5 top-2 z-5 cursor-pointer opacity-60 hover:opacity-100 transition-opacity text-[var(--text-secondary)]"
+    type="button"
+    class="absolute right-2.5 top-2 z-5 cursor-pointer opacity-60 hover:opacity-100 transition-opacity text-[var(--text-secondary)] bg-transparent border-0 p-0"
     title="Show the legend"
+    aria-label="Show the legend"
     @click="showLegend"
   >
     <UIcon name="i-lucide-settings" class="size-4" />
-  </span>
+  </button>
 
   <!-- Legend sidebar -->
   <div v-show="graphStore.legendVisible" class="log-graph-config">
