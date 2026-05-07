@@ -59,8 +59,6 @@ function BlackboxLogViewer() {
 
   const SMALL_JUMP_TIME = 100 * 1000;
 
-  let graphState = GRAPH_STATE_PAUSED;
-  let currentBlackboxTime = 0;
   let lastRenderTime = false;
   let graph = null;
   const prefs = new PrefStorage();
@@ -114,16 +112,9 @@ function BlackboxLogViewer() {
   graphStore.activeGraphConfig = new GraphConfig();
 
   function syncToStores() {
-    // Log
-    logStore.currentBlackboxTime = currentBlackboxTime;
     logStore.hasGps = !!logStore.flightLog?.hasGpsData?.();
-
-    // Graph
     graphStore.hasCraft = !!userSettings.drawCraft;
     graphStore.hasSticks = !!userSettings.drawSticks;
-    // Playback
-    playbackStore.graphState = graphState;
-
   }
 
   function blackboxTimeFromVideoTime() {
@@ -132,7 +123,7 @@ function BlackboxLogViewer() {
 
   function syncLogToVideo() {
     if (logStore.hasLog) {
-      currentBlackboxTime = blackboxTimeFromVideoTime();
+      logStore.currentBlackboxTime = blackboxTimeFromVideoTime();
     }
   }
 
@@ -167,7 +158,7 @@ function BlackboxLogViewer() {
   }
 
   function updateValuesChart() {
-    const frame = logStore.flightLog.getSmoothedFrameAtTime(currentBlackboxTime),
+    const frame = logStore.flightLog.getSmoothedFrameAtTime(logStore.currentBlackboxTime),
       fieldNames = logStore.flightLog.getMainFieldNames();
 
     if (frame) {
@@ -215,15 +206,15 @@ function BlackboxLogViewer() {
 
       // update time field
       const graphTimeText = formatTime(
-        (currentBlackboxTime - logStore.flightLog.getMinTime()) / 1000,
+        (logStore.currentBlackboxTime - logStore.flightLog.getMinTime()) / 1000,
         true,
       );
       appStore.graphTimeDisplay = graphTimeText;
       if (graphStore.hasMarker) {
         const markerText = `Marker Offset ${formatTime(
-          (currentBlackboxTime - graphStore.markerTime) / 1000,
+          (logStore.currentBlackboxTime - graphStore.markerTime) / 1000,
           true,
-        )}ms ${(1000000 / (currentBlackboxTime - graphStore.markerTime)).toFixed(0)}Hz`;
+        )}ms ${(1000000 / (logStore.currentBlackboxTime - graphStore.markerTime)).toFixed(0)}Hz`;
         appStore.statusMarkerOffset = markerText;
       }
 
@@ -245,8 +236,8 @@ function BlackboxLogViewer() {
     }
 
     if (logStore.hasVideo) {
-      currentBlackboxTime = blackboxTimeFromVideoTime();
-    } else if (graphState === GRAPH_STATE_PLAY) {
+      logStore.currentBlackboxTime = blackboxTimeFromVideoTime();
+    } else if (playbackStore.graphState === GRAPH_STATE_PLAY) {
       let delta;
 
       if (lastRenderTime === false) {
@@ -257,26 +248,26 @@ function BlackboxLogViewer() {
         );
       }
 
-      currentBlackboxTime += delta;
+      logStore.currentBlackboxTime += delta;
 
-      if (currentBlackboxTime > logStore.flightLog.getMaxTime()) {
-        currentBlackboxTime = logStore.flightLog.getMaxTime();
+      if (logStore.currentBlackboxTime > logStore.flightLog.getMaxTime()) {
+        logStore.currentBlackboxTime = logStore.flightLog.getMaxTime();
         setGraphState(GRAPH_STATE_PAUSED);
       }
     }
 
-    graph.render(currentBlackboxTime);
+    graph.render(logStore.currentBlackboxTime);
 
-    seekBar.setCurrentTime(currentBlackboxTime);
+    seekBar.setCurrentTime(logStore.currentBlackboxTime);
     seekBar.setWindow(graph.getWindowWidthTime());
 
     if (logStore.flightLog.hasGpsData()) {
-      mapGrapher.setCurrentTime(currentBlackboxTime);
+      mapGrapher.setCurrentTime(logStore.currentBlackboxTime);
     }
 
     updateValuesChartRateLimited();
 
-    if (graphState === GRAPH_STATE_PLAY) {
+    if (playbackStore.graphState === GRAPH_STATE_PLAY) {
       lastRenderTime = now;
 
       seekBarRepaintRateLimited();
@@ -400,7 +391,7 @@ function BlackboxLogViewer() {
     seekBar.setTimeRange(
       logStore.flightLog.getMinTime(),
       logStore.flightLog.getMaxTime(),
-      currentBlackboxTime,
+      logStore.currentBlackboxTime,
     );
     seekBar.setActivityRange(
       logStore.flightLog.getSysConfig().motorOutput[0],
@@ -423,7 +414,7 @@ function BlackboxLogViewer() {
   }
 
   function setGraphState(newState) {
-    graphState = newState;
+    playbackStore.graphState = newState;
 
     lastRenderTime = false;
 
@@ -451,10 +442,9 @@ function BlackboxLogViewer() {
 
       syncLogToVideo();
     } else {
-      currentBlackboxTime = newTime;
+      logStore.currentBlackboxTime = newTime;
     }
 
-    logStore.currentBlackboxTime = currentBlackboxTime;
     invalidateGraph();
   }
 
@@ -605,7 +595,7 @@ function BlackboxLogViewer() {
       if (logStore.hasVideo) {
         setVideoTime(video.currentTime + offset / 1000000);
       } else {
-        setCurrentBlackboxTime(currentBlackboxTime + offset);
+        setCurrentBlackboxTime(logStore.currentBlackboxTime + offset);
       }
       invalidateGraph();
     };
@@ -614,7 +604,7 @@ function BlackboxLogViewer() {
       syncLogToVideo();
     } else {
       // Start at beginning:
-      currentBlackboxTime = logStore.flightLog.getMinTime();
+      logStore.currentBlackboxTime = logStore.flightLog.getMinTime();
     }
 
     renderSelectedLogInfo();
@@ -1101,7 +1091,7 @@ function BlackboxLogViewer() {
         setVideoTime(video.currentTime - scrollTime / 1000000);
       } else {
         const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
-          logStore.hasVideo ? video.currentTime : currentBlackboxTime,
+          logStore.hasVideo ? video.currentTime : logStore.currentBlackboxTime,
         );
         if (currentFrame && currentFrame.previous && slow) {
           setCurrentBlackboxTime(
@@ -1110,7 +1100,7 @@ function BlackboxLogViewer() {
             ],
           );
         } else {
-          setCurrentBlackboxTime(currentBlackboxTime - scrollTime);
+          setCurrentBlackboxTime(logStore.currentBlackboxTime - scrollTime);
         }
       }
 
@@ -1131,7 +1121,7 @@ function BlackboxLogViewer() {
         setVideoTime(video.currentTime + scrollTime / 1000000);
       } else {
         const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
-          logStore.hasVideo ? video.currentTime : currentBlackboxTime,
+          logStore.hasVideo ? video.currentTime : logStore.currentBlackboxTime,
         );
         if (currentFrame && currentFrame.next && slow) {
           setCurrentBlackboxTime(
@@ -1140,7 +1130,7 @@ function BlackboxLogViewer() {
             ],
           );
         } else {
-          setCurrentBlackboxTime(currentBlackboxTime + scrollTime);
+          setCurrentBlackboxTime(logStore.currentBlackboxTime + scrollTime);
         }
       }
 
@@ -1157,7 +1147,7 @@ function BlackboxLogViewer() {
     };
 
     logPlayPause = function () {
-      if (graphState === GRAPH_STATE_PAUSED) {
+      if (playbackStore.graphState === GRAPH_STATE_PAUSED) {
         setGraphState(GRAPH_STATE_PLAY);
       } else {
         setGraphState(GRAPH_STATE_PAUSED);
@@ -1180,7 +1170,7 @@ function BlackboxLogViewer() {
       if (graphStore.hasMarker && logStore.hasVideo && logStore.hasLog) {
         try {
           setVideoOffset(
-            playbackStore.videoOffset + (currentBlackboxTime - graphStore.markerTime) / 1000000,
+            playbackStore.videoOffset + (logStore.currentBlackboxTime - graphStore.markerTime) / 1000000,
             true,
           );
         } catch {
@@ -1582,9 +1572,9 @@ function BlackboxLogViewer() {
         workspaceStore.bookmarkTimes = [];
       } else if (workspaceStore.bookmarkTimes == null) {
         workspaceStore.bookmarkTimes = [];
-        workspaceStore.bookmarkTimes[id] = currentBlackboxTime;
+        workspaceStore.bookmarkTimes[id] = logStore.currentBlackboxTime;
       } else if (workspaceStore.bookmarkTimes[id] == null) {
-        workspaceStore.bookmarkTimes[id] = currentBlackboxTime;
+        workspaceStore.bookmarkTimes[id] = logStore.currentBlackboxTime;
       } else {
         workspaceStore.bookmarkTimes[id] = null;
       }
@@ -1623,9 +1613,9 @@ function BlackboxLogViewer() {
     function handleKeyVideoIn(e, shifted) {
       if (!shifted) {
         setVideoInTime(
-          playbackStore.videoExportInTime === currentBlackboxTime
+          playbackStore.videoExportInTime === logStore.currentBlackboxTime
             ? null
-            : currentBlackboxTime,
+            : logStore.currentBlackboxTime,
         );
       }
       e.preventDefault();
@@ -1634,9 +1624,9 @@ function BlackboxLogViewer() {
     function handleKeyVideoOut(e, shifted) {
       if (!shifted) {
         setVideoOutTime(
-          playbackStore.videoExportOutTime === currentBlackboxTime
+          playbackStore.videoExportOutTime === logStore.currentBlackboxTime
             ? null
-            : currentBlackboxTime,
+            : logStore.currentBlackboxTime,
         );
       }
       e.preventDefault();
@@ -1646,7 +1636,7 @@ function BlackboxLogViewer() {
       if (e.altKey) {
         logSmartSync();
       } else {
-        graphStore.markerTime = currentBlackboxTime;
+        graphStore.markerTime = logStore.currentBlackboxTime;
         setMarker(!graphStore.hasMarker);
         appStore.statusMarkerOffset = graphStore.hasMarker
           ? `Marker Offset ${formatTime(0)}ms`
