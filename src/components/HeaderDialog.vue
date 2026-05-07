@@ -230,7 +230,9 @@ const props = defineProps({
 
 const sc = computed(() => props.sysConfig || {});
 const filteredSc = computed(() => {
-  if (hiddenFields.value.size === 0) return sc.value;
+  if (hiddenFields.value.size === 0) {
+    return sc.value;
+  }
   const result = { ...sc.value };
   for (const key of hiddenFields.value) {
     delete result[key];
@@ -464,7 +466,7 @@ const pidControllerParams = computed(() => {
     );
   }
 
-  // Anti Gravity
+  // Anti Gravity, TPA, PID limits & modifiers
   const gainDec = isBF.value && gte("3.1.0") && lte("4.3.9") ? 3 : 0;
   result.push(
     param("AG Mode", selectVal(s.anti_gravity_mode, ANTI_GRAVITY_MODE)),
@@ -472,16 +474,8 @@ const pidControllerParams = computed(() => {
     param("AG Threshold", fmtVal(s.anti_gravity_threshold, 0)),
     param("AG P Gain", fmtVal(s.anti_gravity_p_gain, 0)),
     param("AG Cutoff Hz", fmtVal(s.anti_gravity_cutoff_hz, 0)),
-  );
-
-  // TPA
-  result.push(
     param("TPA Rate", fmtVal(s.tpa_rate, 2)),
     param("TPA Breakpoint", fmtVal(s.tpa_breakpoint, 0)),
-  );
-
-  // PID limits & modifiers
-  result.push(
     param("Thrust Linear", fmtVal(s.thrust_linear, 0)),
     param("PID Sum Limit", fmtVal(s.pidSumLimit, 0)),
     param("PID Sum Limit Yaw", fmtVal(s.pidSumLimitYaw, 0)),
@@ -1257,11 +1251,8 @@ const HEADER_SKIP_KEYS = new Set([
   "flightControllerVersion",
 ]);
 
-const groupedHeaders = computed(() => {
-  const s = sc.value;
+function buildGroupMap(s) {
   const groups = {};
-
-  // sysConfig fields
   for (const key of Object.keys(s)) {
     if (HEADER_SKIP_KEYS.has(key)) {
       continue;
@@ -1271,62 +1262,47 @@ const groupedHeaders = computed(() => {
       continue;
     }
     const group = getHeaderGroup(key);
-    if (!groups[group]) {
-      groups[group] = [];
-    }
-    groups[group].push({ name: key, value: formatted, group });
+    (groups[group] ??= []).push({ name: key, value: formatted, group });
   }
-
-  // unknown headers
-  const uh = s.unknownHeaders;
-  if (Array.isArray(uh)) {
-    for (const h of uh) {
-      if (!groups["Parameters"]) {
-        groups["Parameters"] = [];
-      }
-      groups["Parameters"].push({ name: h.name, value: String(h.value), group: "Parameters" });
+  if (Array.isArray(s.unknownHeaders)) {
+    for (const h of s.unknownHeaders) {
+      (groups["Parameters"] ??= []).push({ name: h.name, value: String(h.value), group: "Parameters" });
     }
   }
+  return groups;
+}
 
-  // Build ordered group array
+function filterAndSort(fields, query, sortAlpha) {
+  let result = fields;
+  if (query) {
+    result = result.filter(
+      (f) => f.name.toLowerCase().includes(query) || f.value.toLowerCase().includes(query),
+    );
+  }
+  if (sortAlpha && result.length > 0) {
+    result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return result;
+}
+
+const groupedHeaders = computed(() => {
+  const groups = buildGroupMap(sc.value);
   const q = headerSearch.value.trim().toLowerCase();
   const result = [];
+
+  // Groups in defined order
   for (const name of GROUP_ORDER) {
-    let fields = groups[name];
-    if (!fields) {
-      continue;
-    }
-    if (q) {
-      fields = fields.filter(
-        (f) => f.name.toLowerCase().includes(q) || f.value.toLowerCase().includes(q),
-      );
-      if (fields.length === 0) {
-        continue;
-      }
-    }
-    if (headerSortAlpha.value) {
-      fields = [...fields].sort((a, b) => a.name.localeCompare(b.name));
-    }
-    result.push({ name, fields });
+    if (!groups[name]) { continue; }
+    const fields = filterAndSort(groups[name], q, headerSortAlpha.value);
+    if (fields.length > 0) { result.push({ name, fields }); }
   }
   // Any groups not in GROUP_ORDER
   for (const name of Object.keys(groups)) {
-    if (!GROUP_ORDER.includes(name)) {
-      let fields = groups[name];
-      if (q) {
-        fields = fields.filter(
-          (f) => f.name.toLowerCase().includes(q) || f.value.toLowerCase().includes(q),
-        );
-        if (fields.length === 0) {
-          continue;
-        }
-      }
-      if (headerSortAlpha.value) {
-        fields = [...fields].sort((a, b) => a.name.localeCompare(b.name));
-      }
-      result.push({ name, fields });
-    }
+    if (GROUP_ORDER.includes(name)) { continue; }
+    const fields = filterAndSort(groups[name], q, headerSortAlpha.value);
+    if (fields.length > 0) { result.push({ name, fields }); }
   }
+
   if (headerSortGroups.value) {
     result.sort((a, b) => a.name.localeCompare(b.name));
   }
