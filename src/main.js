@@ -74,7 +74,7 @@ function BlackboxLogViewer() {
   let lastGraphConfig = null; // Undo feature - go back to last configuration.
   // workspaceGraphConfigs, activeWorkspace, workspaceStore.bookmarkTimes live in workspaceStore
   // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
-  const activeGraphConfig = new GraphConfig();
+  // activeGraphConfig lives in graphStore.activeGraphConfig (initialized after store creation)
   const fieldPresenter = FlightLogFieldPresenter;
   // hasLog lives in logStore.hasLog
   // hasMarker lives in graphStore.hasMarker
@@ -111,6 +111,7 @@ function BlackboxLogViewer() {
   const workspaceStore = useWorkspaceStore(pinia);
   const appStore = useAppStore(pinia);
   const settingsStore = useSettingsStore(pinia);
+  graphStore.activeGraphConfig = new GraphConfig();
 
   function syncToStores() {
     // Log
@@ -120,8 +121,6 @@ function BlackboxLogViewer() {
     // Graph
     graphStore.hasCraft = !!userSettings.drawCraft;
     graphStore.hasSticks = !!userSettings.drawSticks;
-    graphStore.activeGraphConfig = activeGraphConfig;
-
     // Playback
     playbackStore.graphState = graphState;
 
@@ -586,7 +585,7 @@ function BlackboxLogViewer() {
 
     graph = new FlightLogGrapher(
       logStore.flightLog,
-      activeGraphConfig,
+      graphStore.activeGraphConfig,
       canvas,
       stickCanvas,
       craftCanvas,
@@ -597,7 +596,7 @@ function BlackboxLogViewer() {
     setVideoInTime(false);
     setVideoOutTime(false);
 
-    activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
+    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
 
     graph.onSeek = function (offset) {
       //Seek faster
@@ -767,14 +766,14 @@ function BlackboxLogViewer() {
   }
 
   function buildLegendGraphs() {
-    const graphs = activeGraphConfig.getGraphs();
+    const graphs = graphStore.activeGraphConfig.getGraphs();
     graphStore.legendGraphs = graphs.map((g, gi) => ({
       label: g.label,
       fields: g.fields.map((f, fi) => ({
         name: f.name,
         friendlyName: f.friendlyName,
         color: f.color,
-        hidden: activeGraphConfig.isGraphFieldHidden(gi, fi),
+        hidden: graphStore.activeGraphConfig.isGraphFieldHidden(gi, fi),
       })),
     }));
   }
@@ -782,7 +781,7 @@ function BlackboxLogViewer() {
   function updateLegendValues(log, frame) {
     try {
       const currentFlightMode = frame[log.getMainFieldIndexByName("flightModeFlags")];
-      const graphs = activeGraphConfig.getGraphs();
+      const graphs = graphStore.activeGraphConfig.getGraphs();
       const vals = {};
       for (const graph of graphs) {
         for (const field of graph.fields) {
@@ -810,7 +809,7 @@ function BlackboxLogViewer() {
   }
 
   function onLegendSelectionChange(gi, fi, fieldName, ctrlKey) {
-    const toggleAnalizer = activeGraphConfig.selectedFieldName === fieldName;
+    const toggleAnalizer = graphStore.activeGraphConfig.selectedFieldName === fieldName;
     const lockAnalyserHide = ctrlKey || graph.hasMultiSpectrumAnalyser();
     if (toggleAnalizer) {
       if (lockAnalyserHide) {
@@ -819,9 +818,9 @@ function BlackboxLogViewer() {
         graphStore.hasAnalyser = !graphStore.hasAnalyser;
       }
     } else {
-      activeGraphConfig.selectedFieldName = fieldName;
-      activeGraphConfig.selectedGraphIndex = gi;
-      activeGraphConfig.selectedFieldIndex = fi;
+      graphStore.activeGraphConfig.selectedFieldName = fieldName;
+      graphStore.activeGraphConfig.selectedGraphIndex = gi;
+      graphStore.activeGraphConfig.selectedFieldIndex = fi;
       graphStore.hasAnalyser = true;
     }
     graph.setDrawAnalyser(graphStore.hasAnalyser, ctrlKey);
@@ -830,13 +829,13 @@ function BlackboxLogViewer() {
   }
 
   function onLegendHighlightChange(gi, fi) {
-    activeGraphConfig.highlightGraphIndex = gi;
-    activeGraphConfig.highlightFieldIndex = fi;
+    graphStore.activeGraphConfig.highlightGraphIndex = gi;
+    graphStore.activeGraphConfig.highlightFieldIndex = fi;
     invalidateGraph();
   }
 
   function onLegendToggleField(gi, fi) {
-    activeGraphConfig.toggleGraphField(gi, fi);
+    graphStore.activeGraphConfig.toggleGraphField(gi, fi);
     buildLegendGraphs();
     invalidateGraph();
   }
@@ -1009,8 +1008,8 @@ function BlackboxLogViewer() {
   function newGraphConfig(newConfig, noRedraw) {
     lastGraphConfig = graphConfig; // Remember the last configuration.
     graphConfig = newConfig;
-    activeGraphConfig.setRedrawChart(noRedraw ? false : true);
-    activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
+    graphStore.activeGraphConfig.setRedrawChart(noRedraw ? false : true);
+    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
 
     prefs.set("graphConfig", graphConfig);
   }
@@ -1040,7 +1039,7 @@ function BlackboxLogViewer() {
     onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
   }
 
-  activeGraphConfig.addListener(function () {
+  graphStore.activeGraphConfig.addListener(function () {
     buildLegendGraphs();
     invalidateGraph();
   });
@@ -1607,7 +1606,7 @@ function BlackboxLogViewer() {
     function handleAnalyserKey(shifted) {
       if (!shifted) {
         graphStore.hasAnalyser =
-          activeGraphConfig.selectedFieldName == null ? false : !graphStore.hasAnalyser;
+          graphStore.activeGraphConfig.selectedFieldName == null ? false : !graphStore.hasAnalyser;
         if (!graphStore.hasAnalyser) {
           graphStore.hasAnalyserFullscreen = false;
           graph.setAnalyser(false);
@@ -1911,17 +1910,17 @@ function BlackboxLogViewer() {
       showConfigFile(false);
     };
     this.toggleAnalyser = function () {
-      if (activeGraphConfig.selectedFieldName != null) {
+      if (graphStore.activeGraphConfig.selectedFieldName != null) {
         graphStore.hasAnalyser = !graphStore.hasAnalyser;
       } else {
-        const graphs = activeGraphConfig.getGraphs();
+        const graphs = graphStore.activeGraphConfig.getGraphs();
         if (graphs.length === 0 || graphs[0].fields.length === 0) {
           graphStore.hasAnalyser = false;
         } else {
-          activeGraphConfig.selectedFieldName =
+          graphStore.activeGraphConfig.selectedFieldName =
             graphs[0].fields[0].friendlyName;
-          activeGraphConfig.selectedGraphIndex = 0;
-          activeGraphConfig.selectedFieldIndex = 0;
+          graphStore.activeGraphConfig.selectedGraphIndex = 0;
+          graphStore.activeGraphConfig.selectedFieldIndex = 0;
           graphStore.hasAnalyser = true;
         }
       }
@@ -1982,12 +1981,12 @@ function BlackboxLogViewer() {
       onLegendVisbilityChange(hidden);
     };
     this.legendResetPen = function (gi, fi) {
-      const graphs = activeGraphConfig.getGraphs();
+      const graphs = graphStore.activeGraphConfig.getGraphs();
       const msg = restorePenDefaults(graphs, String(gi), fi == null ? null : String(fi));
       applyPenChange(msg);
     };
     this.legendFieldWheel = function (gi, fi, delta, shiftKey, altKey, ctrlKey) {
-      const graphs = activeGraphConfig.getGraphs();
+      const graphs = graphStore.activeGraphConfig.getGraphs();
       const g = String(gi);
       const f = String(fi);
       const increase = delta >= 0;
@@ -2085,7 +2084,7 @@ function BlackboxLogViewer() {
   };
   this.getVideoExportParams = function () {
     return {
-      graphConfig: activeGraphConfig,
+      graphConfig: graphStore.activeGraphConfig,
       inTime: playbackStore.videoExportInTime,
       outTime: playbackStore.videoExportOutTime,
       flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,

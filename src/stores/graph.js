@@ -7,7 +7,7 @@ export const GRAPH_DEFAULT_ZOOM = 100;
 
 export const useGraphStore = defineStore("graph", () => {
   const graphConfig = ref(null);
-  const activeGraphConfig = ref(null);
+  const activeGraphConfig = shallowRef(null);
   const lastGraphConfig = ref(null);
   const graphZoom = ref(GRAPH_DEFAULT_ZOOM);
   const lastGraphZoom = ref(GRAPH_DEFAULT_ZOOM);
