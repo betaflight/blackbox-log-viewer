@@ -301,8 +301,11 @@ function copyToClipboard() {
       const dMax = showDMax.value ? ` DMax=${r.dMax}` : "";
       return { name: r.label, value: `P=${r.p} I=${r.i} D=${r.d}${dMax} FF=${r.f}` };
     })),
+    formatParams("PID Sliders", pidSliderParams.value),
     formatParams("PID Controller", pidControllerParams.value),
+    formatParams("Feedforward", feedforwardParams.value),
     formatParams("Rates", rateParams.value),
+    formatParams("Rate Limits", rateLimitParams.value),
     formatParams("Parameters", generalParams.value),
     formatParams("Motor / ESC", motorParams.value),
     formatParams("Gyro Filters", gyroFilterParams.value),
