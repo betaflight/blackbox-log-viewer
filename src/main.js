@@ -1,6 +1,5 @@
 import "./vendor.js";
 
-import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
@@ -9,10 +8,7 @@ import { SeekBar } from "./seekbar.js";
 import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
 import supaflyWorkspace from "./ws_supafly.json";
 import { FlightLog } from "./flightlog.js";
-import { FlightLogParser } from "./flightlog_parser.js";
 import {
-  formatTime,
-  stringLoopTime,
   stringTimetoMsec,
   validate,
   mouseNotification,
@@ -21,15 +17,17 @@ import { restorePenDefaults, changePenSmoothing, changePenZoom, changePenExpo } 
 import { createKeydownHandler } from "./keyboard_handler.js";
 import { upgradeWorkspaceFormat, saveWorkspaces, loadWorkspaces } from "./workspace_io.js";
 import { exportCsv, exportGpx, exportSpectrumToCsv } from "./export_utils.js";
-import { updateValuesChart } from "./values_display.js";
+import { syncLogToVideo, setVideoOffset, setVideoTime, setVideoInTime, setVideoOutTime, loadVideo, reportVideoError } from "./video_handler.js";
+import { renderLogFileInfo, renderSelectedLogInfo, setSeekBarMode } from "./log_lifecycle.js";
+import { invalidateGraph, updateCanvasSize, setGraphState, setCurrentBlackboxTime, setPlaybackRate, setGraphZoom, showConfigFile, showValueTable, logJumpBack, logJumpForward, logJumpStart, logJumpEnd, logPlayPause, setMarker, logSyncHere, logSyncBack, logSyncForward, logSmartSync, videoLoaded } from "./playback_controls.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
 import { DarkTheme } from "./dark_theme.js";
 import { ThemeColors } from "./theme_colors.js";
 import pinia from "./pinia_instance.js";
 import { useLogStore } from "./stores/log.js";
-import { useGraphStore, GRAPH_MIN_ZOOM, GRAPH_MAX_ZOOM } from "./stores/graph.js";
-import { usePlaybackStore, GRAPH_STATE_PAUSED, GRAPH_STATE_PLAY, PLAYBACK_MIN_RATE, PLAYBACK_MAX_RATE } from "./stores/playback.js";
+import { useGraphStore } from "./stores/graph.js";
+import { usePlaybackStore, GRAPH_STATE_PAUSED } from "./stores/playback.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
@@ -57,9 +55,6 @@ function BlackboxLogViewer() {
     );
   }
 
-  const SMALL_JUMP_TIME = 100 * 1000;
-
-  let lastRenderTime = false;
   let graph = null;
   const prefs = new PrefStorage();
   let _configuration = null; // is their an associated dump file ?
@@ -88,9 +83,7 @@ function BlackboxLogViewer() {
   let userSettings;
   const seekBarCanvas = document.getElementById("seekbarCanvas");
   const seekBar = new SeekBar(seekBarCanvas);
-  const seekBarRepaintRateLimited = throttle(200, seekBar.repaint.bind(seekBar));
   // seekBarMode lives in graphStore.seekBarMode
-  let animationFrameIsQueued = false;
   // playbackRate lives in playbackStore.playbackRate
   // graphZoom, lastGraphZoom live in graphStore
   const mapGrapher = new MapGrapher();
@@ -111,334 +104,9 @@ function BlackboxLogViewer() {
   graphStore.canvasRefs = { canvas, analyserCanvas, stickCanvas, craftCanvas };
   playbackStore.videoElement = video;
 
-  function blackboxTimeFromVideoTime() {
-    return (video.currentTime - playbackStore.videoOffset) * 1000000 + logStore.flightLog.getMinTime();
-  }
 
-  function syncLogToVideo() {
-    if (logStore.hasLog) {
-      logStore.currentBlackboxTime = blackboxTimeFromVideoTime();
-    }
-  }
-
-  function setVideoOffset(offset, withRefresh) {
-    // optionally prevent the graph refresh until later
-    playbackStore.videoOffset = offset;
-
-    /*
-     * Round to 2 dec places for display and put a plus at the start for positive values to emphasize the fact it's
-     * an offset
-     */
-    appStore.videoOffsetDisplay =
-      (offset >= 0 ? "+" : "") + offset.toFixed(3);
-
-    if (withRefresh) {
-      invalidateGraph();
-    }
-  }
-
-  const updateValuesChartRateLimited = throttle(250, () =>
-    updateValuesChart(logStore, graphStore, appStore, userSettings),
-  );
-
-  function animationLoop() {
-    const now = Date.now();
-
-    if (!graph) {
-      animationFrameIsQueued = false;
-      return;
-    }
-
-    if (logStore.hasVideo) {
-      logStore.currentBlackboxTime = blackboxTimeFromVideoTime();
-    } else if (playbackStore.graphState === GRAPH_STATE_PLAY) {
-      let delta;
-
-      if (lastRenderTime === false) {
-        delta = 0;
-      } else {
-        delta = Math.floor(
-          ((now - lastRenderTime) * 1000 * playbackStore.playbackRate) / 100,
-        );
-      }
-
-      logStore.currentBlackboxTime += delta;
-
-      if (logStore.currentBlackboxTime > logStore.flightLog.getMaxTime()) {
-        logStore.currentBlackboxTime = logStore.flightLog.getMaxTime();
-        setGraphState(GRAPH_STATE_PAUSED);
-      }
-    }
-
-    graph.render(logStore.currentBlackboxTime);
-
-    seekBar.setCurrentTime(logStore.currentBlackboxTime);
-    seekBar.setWindow(graph.getWindowWidthTime());
-
-    if (logStore.flightLog.hasGpsData()) {
-      mapGrapher.setCurrentTime(logStore.currentBlackboxTime);
-    }
-
-    updateValuesChartRateLimited();
-
-    if (playbackStore.graphState === GRAPH_STATE_PLAY) {
-      lastRenderTime = now;
-
-      seekBarRepaintRateLimited();
-
-      animationFrameIsQueued = true;
-      requestAnimationFrame(animationLoop);
-    } else {
-      seekBar.repaint();
-
-      animationFrameIsQueued = false;
-    }
-  }
-
-  function invalidateGraph() {
-    if (!animationFrameIsQueued) {
-      animationFrameIsQueued = true;
-      requestAnimationFrame(animationLoop);
-    }
-  }
   graphStore.invalidateGraph = invalidateGraph;
   graphStore.updateCanvasSize = updateCanvasSize;
-
-  function updateCanvasSize() {
-    const width = canvas.clientWidth,
-      height = canvas.clientHeight;
-
-    if (graph) {
-      graph.resize(width, height);
-      seekBar.resize(canvas.offsetWidth, 50);
-      if (logStore.flightLog.hasGpsData()) {
-        mapGrapher.resize(width, height);
-      }
-
-      invalidateGraph();
-    }
-  }
-
-  function setSeekBarMode(mode) {
-    graphStore.seekBarMode = mode;
-    if (logStore.flightLog) {
-      const activity = logStore.flightLog.getActivitySummary();
-      seekBar.setActivity(activity.times, activity[mode], activity.hasEvent);
-      seekBar.repaint();
-    }
-  }
-
-  function renderLogFileInfo(file) {
-    appStore.logFilename = file.name;
-
-    const logCount = logStore.flightLog.getLogCount();
-    const entries = [];
-    for (let index = 0; index < logCount; index++) {
-      const error = logStore.flightLog.getLogError(index);
-      let logLabel;
-      if (error) {
-        logLabel = error;
-      } else {
-        logLabel = `${formatTime(
-          logStore.flightLog.getMinTime(index) / 1000,
-          false,
-        )} - ${formatTime(
-          logStore.flightLog.getMaxTime(index) / 1000,
-          false,
-        )} [${formatTime(
-          Math.ceil(
-            (logStore.flightLog.getMaxTime(index) - logStore.flightLog.getMinTime(index)) / 1000,
-          ),
-          false,
-        )}]`;
-      }
-      const label = logCount > 1
-        ? `${index + 1}/${logCount}: ${logLabel}`
-        : logLabel;
-      entries.push({ label, value: index, disabled: !!error });
-    }
-    logStore.logIndexEntries = entries;
-    logStore.activeLogIndex = 0;
-  }
-
-  /**
-   * Update the metadata displays to show information about the currently selected log index.
-   */
-  function renderSelectedLogInfo() {
-    logStore.activeLogIndex = logStore.flightLog.getLogIndex();
-
-    if (logStore.flightLog.getNumCellsEstimate()) {
-      appStore.statusCells = `${logStore.flightLog.getNumCellsEstimate()}S (${Number(
-        logStore.flightLog.getReferenceVoltageMillivolts() / 1000,
-      ).toFixed(2)}V)`;
-    } else {
-      appStore.statusCells = "";
-    }
-
-    // Add log version information to status bar
-    const sysConfig = logStore.flightLog.getSysConfig();
-
-    const versionText =
-      (sysConfig["Craft name"] != null && sysConfig["Craft name"].length
-        ? `${sysConfig["Craft name"]} : `
-        : "") +
-      (sysConfig["Firmware revision"] != null
-        ? `${sysConfig["Firmware revision"]}`
-        : "") +
-      (sysConfig.deviceUID == null ? "" : ` (${sysConfig.deviceUID})`);
-    appStore.statusVersion = versionText;
-
-    const looptimeText = stringLoopTime(
-      sysConfig.looptime,
-      sysConfig.pid_process_denom,
-      sysConfig.unsynced_fast_pwm,
-      sysConfig.motor_pwm_rate,
-    );
-    appStore.statusLooptime = looptimeText;
-
-    const lograteText =
-      sysConfig["frameIntervalPDenom"] != null &&
-      sysConfig["frameIntervalPNum"] != null
-        ? `Sample Rate : ${sysConfig["frameIntervalPNum"]}/${sysConfig["frameIntervalPDenom"]}`
-        : "";
-    appStore.statusLograte = lograteText;
-
-    seekBar.setTimeRange(
-      logStore.flightLog.getMinTime(),
-      logStore.flightLog.getMaxTime(),
-      logStore.currentBlackboxTime,
-    );
-    seekBar.setActivityRange(
-      logStore.flightLog.getSysConfig().motorOutput[0],
-      logStore.flightLog.getSysConfig().motorOutput[1],
-    );
-
-    const activity = logStore.flightLog.getActivitySummary();
-
-    seekBar.setActivity(
-      activity.times,
-      activity[graphStore.seekBarMode],
-      activity.hasEvent,
-    );
-    seekBar.repaint();
-
-    // Add flightLog to map
-    if (logStore.flightLog.hasGpsData()) {
-      mapGrapher.setFlightLog(logStore.flightLog);
-    }
-  }
-
-  function setGraphState(newState) {
-    playbackStore.graphState = newState;
-
-    lastRenderTime = false;
-
-    switch (newState) {
-      case GRAPH_STATE_PLAY:
-        if (logStore.hasVideo) {
-          video.play();
-        }
-        break;
-      case GRAPH_STATE_PAUSED:
-        if (logStore.hasVideo) {
-          video.pause();
-        }
-        break;
-    }
-
-    invalidateGraph();
-  }
-
-  function setCurrentBlackboxTime(newTime) {
-    if (logStore.hasVideo) {
-      video.currentTime =
-        (newTime - logStore.flightLog.getMinTime()) / 1000000 + playbackStore.videoOffset;
-
-      syncLogToVideo();
-    } else {
-      logStore.currentBlackboxTime = newTime;
-    }
-
-    invalidateGraph();
-  }
-
-  function setVideoTime(newTime) {
-    video.currentTime = newTime;
-
-    syncLogToVideo();
-  }
-
-  function setVideoInTime(inTime) {
-    playbackStore.videoExportInTime = inTime;
-
-    if (seekBar) {
-      seekBar.setInTime(playbackStore.videoExportInTime);
-    }
-
-    if (graph) {
-      graph.setInTime(playbackStore.videoExportInTime);
-      invalidateGraph();
-    }
-  }
-
-  function setVideoOutTime(outTime) {
-    playbackStore.videoExportOutTime = outTime;
-
-    if (seekBar) {
-      seekBar.setOutTime(playbackStore.videoExportOutTime);
-    }
-
-    if (graph) {
-      graph.setOutTime(playbackStore.videoExportOutTime);
-      invalidateGraph();
-    }
-  }
-
-  function setPlaybackRate(rate, _updateUi) {
-    if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
-      playbackStore.playbackRate = rate;
-
-      if (video) {
-        video.playbackRate = rate / 100;
-      }
-    }
-  }
-
-  function setGraphZoom(zoom, _updateUi) {
-    if (zoom == null) {
-      // go back to last zoom value
-      zoom = graphStore.lastGraphZoom;
-    }
-    if (zoom >= GRAPH_MIN_ZOOM && zoom <= GRAPH_MAX_ZOOM) {
-      graphStore.lastGraphZoom = graphStore.graphZoom;
-      graphStore.graphZoom = zoom;
-
-      if (graph) {
-        graph.setGraphZoom(zoom / 100);
-        invalidateGraph();
-      }
-    }
-
-  }
-
-  function showConfigFile(state) {
-    if (graphStore.hasConfig) {
-      if (state == null) {
-        graphStore.hasConfigOverlay = !graphStore.hasConfigOverlay;
-      } else {
-        graphStore.hasConfigOverlay = !!state;
-      }
-    }
-  }
-
-  function showValueTable(state) {
-    if (state == null) {
-      graphStore.hasTableOverlay = !graphStore.hasTableOverlay;
-    } else {
-      graphStore.hasTableOverlay = !!state;
-    }
-    updateValuesChart();
-  }
 
   /**
    * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
@@ -631,51 +299,8 @@ function BlackboxLogViewer() {
     reader.readAsArrayBuffer(file);
   }
 
-  function loadVideo(file) {
-    playbackStore.currentOffsetCache.video = file.name; // store the name of the loaded video
-    if (logStore.videoURL) {
-      URL.revokeObjectURL(logStore.videoURL);
-      logStore.videoURL = null;
-    }
-
-    if (!URL.createObjectURL) {
-      alert(
-        "Sorry, your web browser doesn't support showing videos from your local computer.",
-      );
-      playbackStore.currentOffsetCache.video = null; // clear the associated video name
-      return;
-    }
-
-    logStore.videoURL = URL.createObjectURL(file);
-    video.volume = 1.0;
-    video.src = logStore.videoURL;
-
-    // Reapply the last playbackStore.playbackRate to the new video
-    setPlaybackRate(playbackStore.playbackRate, true);
-  }
-
-  function videoLoaded(_e) {
-    logStore.hasVideo = true;
-
-    setGraphState(GRAPH_STATE_PAUSED);
-    invalidateGraph();
-  }
-
-  function reportVideoError(e) {
-    let errorMessage = "Error while loading the video.";
-    if (e.currentTarget.error.code) {
-      errorMessage += ` ERROR (${e.currentTarget.error.code}): ${e.currentTarget.error.message}`;
-    }
-    alert(errorMessage);
-  }
-
   // buildLegendGraphs, onLegendVisbilityChange, onLegendSelectionChange,
   // onLegendHighlightChange, onLegendToggleField moved to graphStore actions
-
-  function setMarker(state) {
-    graphStore.hasMarker = state;
-  }
-
 
   // getMarker, getBookmarks, getBookmarkTimes — grapher.js reads stores directly
 
@@ -731,8 +356,6 @@ function BlackboxLogViewer() {
     invalidateGraph();
   });
 
-  let logJumpBack, logJumpForward, logJumpStart, logJumpEnd, logPlayPause;
-
   // Initialize on DOM ready (modules are deferred, DOM is ready)
   {
     // Initialize dark theme
@@ -774,112 +397,7 @@ function BlackboxLogViewer() {
     graphStore.hasAnalyser = false;
 
     // File open and new window wired via Vue AppToolbar
-
-    logJumpBack = function (fast, slow) {
-      let scrollTime = SMALL_JUMP_TIME;
-      if (fast != null) {
-        scrollTime =
-          fast === 0 ? scrollTime : graph.getWindowWidthTime() * fast;
-      }
-      if (logStore.hasVideo) {
-        if (slow) {
-          scrollTime = (1 / 60) * 1000000;
-        } // Assume 60Hz video
-        setVideoTime(video.currentTime - scrollTime / 1000000);
-      } else {
-        const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
-          logStore.hasVideo ? video.currentTime : logStore.currentBlackboxTime,
-        );
-        if (currentFrame && currentFrame.previous && slow) {
-          setCurrentBlackboxTime(
-            currentFrame.previous[
-              FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
-            ],
-          );
-        } else {
-          setCurrentBlackboxTime(logStore.currentBlackboxTime - scrollTime);
-        }
-      }
-
-      setGraphState(GRAPH_STATE_PAUSED);
-    };
-    // Playback buttons wired via Vue PlaybackControls bridge
-
-    logJumpForward = function (fast, slow) {
-      let scrollTime = SMALL_JUMP_TIME;
-      if (fast != null) {
-        scrollTime =
-          fast === 0 ? scrollTime : graph.getWindowWidthTime() * fast;
-      }
-      if (logStore.hasVideo) {
-        if (slow) {
-          scrollTime = (1 / 60) * 1000000;
-        } // Assume 60Hz video
-        setVideoTime(video.currentTime + scrollTime / 1000000);
-      } else {
-        const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
-          logStore.hasVideo ? video.currentTime : logStore.currentBlackboxTime,
-        );
-        if (currentFrame && currentFrame.next && slow) {
-          setCurrentBlackboxTime(
-            currentFrame.next[
-              FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
-            ],
-          );
-        } else {
-          setCurrentBlackboxTime(logStore.currentBlackboxTime + scrollTime);
-        }
-      }
-
-      setGraphState(GRAPH_STATE_PAUSED);
-    };
-    logJumpStart = function () {
-      setCurrentBlackboxTime(logStore.flightLog.getMinTime());
-      setGraphState(GRAPH_STATE_PAUSED);
-    };
-
-    logJumpEnd = function () {
-      setCurrentBlackboxTime(logStore.flightLog.getMaxTime());
-      setGraphState(GRAPH_STATE_PAUSED);
-    };
-
-    logPlayPause = function () {
-      if (playbackStore.graphState === GRAPH_STATE_PAUSED) {
-        setGraphState(GRAPH_STATE_PLAY);
-      } else {
-        setGraphState(GRAPH_STATE_PAUSED);
-      }
-    };
-
-    const logSyncHere = function () {
-      setVideoOffset(video.currentTime, true);
-    };
-
-    const logSyncBack = function () {
-      setVideoOffset(playbackStore.videoOffset - 1 / 15, true);
-    };
-
-    const logSyncForward = function () {
-      setVideoOffset(playbackStore.videoOffset + 1 / 15, true);
-    };
-
-    const logSmartSync = function () {
-      if (graphStore.hasMarker && logStore.hasVideo && logStore.hasLog) {
-        try {
-          setVideoOffset(
-            playbackStore.videoOffset + (logStore.currentBlackboxTime - graphStore.markerTime) / 1000000,
-            true,
-          );
-        } catch {
-          console.log("Failed to set video offset");
-        }
-      }
-      setMarker(!graphStore.hasMarker);
-      invalidateGraph();
-    };
-    // Sync controls wired via Vue SyncPanel bridge
-
-    // Time input wired via Vue TimePanel bridge
+    // Playback/sync controls wired via playback_controls.js
 
     function expandGraphConfig(index) {
       // Put each of the fields into a separate graph
@@ -1124,10 +642,10 @@ function BlackboxLogViewer() {
       applyPenChange(msg);
     };
     // Video sync callbacks registered on playbackStore
-    playbackStore.logSyncHere = () => logSyncHere();
-    playbackStore.logSyncBack = () => logSyncBack();
-    playbackStore.logSyncForward = () => logSyncForward();
-    playbackStore.logSmartSync = () => logSmartSync();
+    playbackStore.logSyncHere = logSyncHere;
+    playbackStore.logSyncBack = logSyncBack;
+    playbackStore.logSyncForward = logSyncForward;
+    playbackStore.logSmartSync = logSmartSync;
     playbackStore.setVideoOffsetValue = (val) => {
       const offset = Number.parseFloat(val);
       if (!Number.isNaN(offset)) {
@@ -1146,7 +664,7 @@ function BlackboxLogViewer() {
         invalidateGraph();
       }
     };
-    graphStore.setSeekBarMode = (mode) => setSeekBarMode(mode);
+    graphStore.setSeekBarMode = setSeekBarMode;
     graphStore.selectLogIndex = (index) => {
       selectLog(Number.parseInt(index, 10));
       if (graph) {
@@ -1210,14 +728,14 @@ function BlackboxLogViewer() {
       updateCanvasSize();
     }
   };
-  graphStore.applyGraphZoom = (zoom) => setGraphZoom(zoom, false);
-  playbackStore.applyPlaybackRate = (rate) => setPlaybackRate(rate, false);
+  graphStore.applyGraphZoom = setGraphZoom;
+  playbackStore.applyPlaybackRate = setPlaybackRate;
   // Playback callbacks registered on playbackStore
-  playbackStore.logPlayPause = () => logPlayPause();
+  playbackStore.logPlayPause = logPlayPause;
   playbackStore.logJumpBack = () => logJumpBack(null);
   playbackStore.logJumpForward = () => logJumpForward(null);
-  playbackStore.logJumpStart = () => logJumpStart();
-  playbackStore.logJumpEnd = () => logJumpEnd();
+  playbackStore.logJumpStart = logJumpStart;
+  playbackStore.logJumpEnd = logJumpEnd;
   playbackStore.videoJumpStart = () => {
     setVideoTime(0);
     setGraphState(GRAPH_STATE_PAUSED);
