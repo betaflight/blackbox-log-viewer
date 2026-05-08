@@ -16,6 +16,13 @@ export const usePlaybackStore = defineStore("playback", () => {
   const videoExportOutTime = ref(null);
   const videoConfig = ref({ width: 1280, height: 720, frameRate: 30, videoDim: 0.4 });
 
+  // Video DOM element — registered by main.js
+  const videoElement = shallowRef(null);
+
+  // Offset cache for auto-syncing video to log
+  const offsetCache = shallowRef([]);
+  const currentOffsetCache = shallowRef({ log: null, index: null, video: null, offset: null });
+
   const isPlaying = computed(() => graphState.value === GRAPH_STATE_PLAY);
   const isPaused = computed(() => graphState.value === GRAPH_STATE_PAUSED);
 
@@ -53,6 +60,9 @@ export const usePlaybackStore = defineStore("playback", () => {
     videoExportInTime,
     videoExportOutTime,
     videoConfig,
+    videoElement,
+    offsetCache,
+    currentOffsetCache,
     isPlaying,
     isPaused,
     logPlayPause,

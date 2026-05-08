@@ -14,6 +14,10 @@ export const useGraphStore = defineStore("graph", () => {
   // Renderer instances — registered by main.js after creation
   const graph = shallowRef(null);
   const mapGrapher = shallowRef(null);
+  const seekBar = shallowRef(null);
+
+  // Canvas DOM refs — registered by main.js
+  const canvasRefs = shallowRef(null);
 
   const graphConfig = ref(null);
   const activeGraphConfig = shallowRef(null);
@@ -172,6 +176,8 @@ export const useGraphStore = defineStore("graph", () => {
   return {
     graph,
     mapGrapher,
+    seekBar,
+    canvasRefs,
     graphConfig,
     activeGraphConfig,
     lastGraphConfig,

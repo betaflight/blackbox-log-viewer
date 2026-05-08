@@ -65,11 +65,8 @@ function BlackboxLogViewer() {
   let _configuration = null; // is their an associated dump file ?
   const configurationDefaults = new ConfigurationDefaults(prefs); // configuration defaults
   // JSON graph configuration:
-  let graphConfig = null;
-  let offsetCache = []; // Storage for the offset cache (last 20 files)
-  const currentOffsetCache = { log: null, index: null, video: null, offset: null };
-  // JSON array of graph configurations for New Workspaces feature
-  let lastGraphConfig = null; // Undo feature - go back to last configuration.
+  // graphConfig and lastGraphConfig live in graphStore
+  // offsetCache and currentOffsetCache live in playbackStore
   // workspaceGraphConfigs, activeWorkspace, workspaceStore.bookmarkTimes live in workspaceStore
   // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
   // activeGraphConfig lives in graphStore.activeGraphConfig (initialized after store creation)
@@ -110,6 +107,9 @@ function BlackboxLogViewer() {
   const settingsStore = useSettingsStore(pinia);
   graphStore.activeGraphConfig = new GraphConfig();
   graphStore.mapGrapher = mapGrapher;
+  graphStore.seekBar = seekBar;
+  graphStore.canvasRefs = { canvas, analyserCanvas, stickCanvas, craftCanvas };
+  playbackStore.videoElement = video;
 
   function blackboxTimeFromVideoTime() {
     return (video.currentTime - playbackStore.videoOffset) * 1000000 + logStore.flightLog.getMinTime();
@@ -452,7 +452,7 @@ function BlackboxLogViewer() {
         for (let i = 0; i < logStore.flightLog.getLogCount(); i++) {
           if (logStore.flightLog.openLog(i)) {
             success = true;
-            currentOffsetCache.index = i;
+            playbackStore.currentOffsetCache.index = i;
             break;
           }
         }
@@ -462,11 +462,11 @@ function BlackboxLogViewer() {
         }
       } else {
         logStore.flightLog.openLog(logIndex);
-        currentOffsetCache.index = logIndex;
+        playbackStore.currentOffsetCache.index = logIndex;
       }
     } catch (e) {
       alert(`Error opening log: ${e}`);
-      currentOffsetCache.index = null;
+      playbackStore.currentOffsetCache.index = null;
       return;
     }
 
@@ -501,7 +501,7 @@ function BlackboxLogViewer() {
     setVideoInTime(false);
     setVideoOutTime(false);
 
-    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
+    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
     graph.onSeek = function (offset) {
       //Seek faster
@@ -552,11 +552,11 @@ function BlackboxLogViewer() {
     }
 
     // finally, see if there is an offsetCache value already, and auto set the offset
-    for (const cahesOffset of offsetCache) {
+    for (const cahesOffset of playbackStore.offsetCache) {
       if (
-        currentOffsetCache.log === cahesOffset.log &&
-        currentOffsetCache.index === cahesOffset.index &&
-        currentOffsetCache.video === cahesOffset.video
+        playbackStore.currentOffsetCache.log === cahesOffset.log &&
+        playbackStore.currentOffsetCache.index === cahesOffset.index &&
+        playbackStore.currentOffsetCache.video === cahesOffset.video
       ) {
         setVideoOffset(cahesOffset.offset, true);
       }
@@ -603,8 +603,8 @@ function BlackboxLogViewer() {
         return;
       }
 
-      if (!graphConfig) {
-        graphConfig = GraphConfig.getExampleGraphConfigs(logStore.flightLog, [
+      if (!graphStore.graphConfig) {
+        graphStore.graphConfig = GraphConfig.getExampleGraphConfigs(logStore.flightLog, [
           "Motors",
           "Gyros",
         ]);
@@ -612,8 +612,8 @@ function BlackboxLogViewer() {
 
       renderLogFileInfo(file);
       graphStore.seekBarMode = "avgThrottle";
-      currentOffsetCache.log = file.name; // store the name of the loaded log file
-      currentOffsetCache.index = null; // and clear the index
+      playbackStore.currentOffsetCache.log = file.name; // store the name of the loaded log file
+      playbackStore.currentOffsetCache.index = null; // and clear the index
 
       logStore.hasLog = true;
 
@@ -632,7 +632,7 @@ function BlackboxLogViewer() {
   }
 
   function loadVideo(file) {
-    currentOffsetCache.video = file.name; // store the name of the loaded video
+    playbackStore.currentOffsetCache.video = file.name; // store the name of the loaded video
     if (logStore.videoURL) {
       URL.revokeObjectURL(logStore.videoURL);
       logStore.videoURL = null;
@@ -642,7 +642,7 @@ function BlackboxLogViewer() {
       alert(
         "Sorry, your web browser doesn't support showing videos from your local computer.",
       );
-      currentOffsetCache.video = null; // clear the associated video name
+      playbackStore.currentOffsetCache.video = null; // clear the associated video name
       return;
     }
 
@@ -693,12 +693,12 @@ function BlackboxLogViewer() {
 
 
   function newGraphConfig(newConfig, noRedraw) {
-    lastGraphConfig = graphConfig; // Remember the last configuration.
-    graphConfig = newConfig;
+    graphStore.lastGraphConfig = graphStore.graphConfig; // Remember the last configuration.
+    graphStore.graphConfig = newConfig;
     graphStore.activeGraphConfig.setRedrawChart(noRedraw ? false : true);
-    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphConfig);
+    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
-    prefs.set("graphConfig", graphConfig);
+    prefs.set("graphConfig", graphStore.graphConfig);
   }
 
   // Store to local cache and update Workspace Selector control
@@ -721,7 +721,7 @@ function BlackboxLogViewer() {
   function onSaveWorkspace(id, title) {
     workspaceStore.workspaceGraphConfigs[id] = {
       title: title,
-      graphConfig: graphConfig,
+      graphConfig: graphStore.graphConfig,
     };
     onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
   }
@@ -886,7 +886,7 @@ function BlackboxLogViewer() {
 
       const expandedGraphConfig = [];
 
-      for (const field of graphConfig[index].fields) {
+      for (const field of graphStore.graphConfig[index].fields) {
         // Loop through each of the fields
         const singleGraph = { fields: [], label: "", height: 1 };
         singleGraph.fields.push(field);
@@ -901,19 +901,19 @@ function BlackboxLogViewer() {
     function zoomGraphConfig(index) {
       // Put each of the fields onto one graph and clear the others
 
-      if (graphConfig.length === 1) {
+      if (graphStore.graphConfig.length === 1) {
         // if there is only one graph, then return to previous configuration
-        if (lastGraphConfig != null) {
-          newGraphConfig(lastGraphConfig);
+        if (graphStore.lastGraphConfig != null) {
+          newGraphConfig(graphStore.lastGraphConfig);
         }
       } else {
         const expandedGraphConfig = [];
         const singleGraph = { fields: [], label: "", height: 1 };
 
-        for (const field of graphConfig[index].fields) {
+        for (const field of graphStore.graphConfig[index].fields) {
           // Loop through each of the fields
           singleGraph.fields.push(field);
-          singleGraph.label = graphConfig[index].label;
+          singleGraph.label = graphStore.graphConfig[index].label;
         }
         expandedGraphConfig.push(singleGraph);
 
@@ -1043,7 +1043,7 @@ function BlackboxLogViewer() {
       setCurrentBlackboxTime, showValueTable, showConfigFile, newGraphConfig,
       toggleOverrideStatus, invalidateGraph, makeScreenshot,
       onSwitchWorkspace, onSaveWorkspace,
-      lastGraphConfig: () => lastGraphConfig,
+      lastGraphConfig: () => graphStore.lastGraphConfig,
     }));
 
     video.addEventListener("loadedmetadata", updateCanvasSize);
@@ -1083,14 +1083,14 @@ function BlackboxLogViewer() {
 
     prefs.get("graphConfig", function (item) {
       if (item) {
-        graphConfig = GraphConfig.load(item);
+        graphStore.graphConfig = GraphConfig.load(item);
       }
     });
 
     // Get the offsetCache buffer
     prefs.get("offsetCache", function (item) {
       if (item) {
-        offsetCache = item;
+        playbackStore.offsetCache = item;
       }
     });
 
@@ -1099,7 +1099,7 @@ function BlackboxLogViewer() {
     graphStore.zoomGraphConfig = (gi) => zoomGraphConfig(gi);
     graphStore.expandGraphConfig = (gi) => expandGraphConfig(gi);
     graphStore.reorderGraphs = (newOrder) => {
-      const oldGraphs = graphConfig;
+      const oldGraphs = graphStore.graphConfig;
       const newGraphs = newOrder.map((i) => oldGraphs[i]);
       newGraphConfig(newGraphs);
     };
