@@ -1916,8 +1916,6 @@ function BlackboxLogViewer() {
     }
   };
 
-  // Register this controller in the store — will be removed when all consumers migrate
-  appStore.controller = this;
 }
 
-const _app = new BlackboxLogViewer(); // NOSONAR — constructor registers itself in appStore.controller
+new BlackboxLogViewer(); // NOSONAR — constructor registers callbacks on Pinia stores

@@ -27,9 +27,6 @@ export const useAppStore = defineStore("app", () => {
   const settingsDialogOpen = ref(false);
   const keysDialogOpen = ref(false);
 
-  // Legacy controller reference (BlackboxLogViewer instance)
-  const controller = shallowRef(null);
-
   // Callbacks registered by main.js (closure-dependent operations)
   const loadFiles = shallowRef(null);
   const newGraphConfig = shallowRef(null);
@@ -70,7 +67,6 @@ export const useAppStore = defineStore("app", () => {
     videoExportDialogOpen,
     settingsDialogOpen,
     keysDialogOpen,
-    controller,
     loadFiles,
     newGraphConfig,
     exportCsv,
