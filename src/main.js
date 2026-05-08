@@ -3,26 +3,25 @@ import "./vendor.js";
 import { throttle } from "throttle-debounce";
 import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
-import { SimpleStats } from "./simple-stats.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
 import { SeekBar } from "./seekbar.js";
-import { GpxExporter } from "./gpx-exporter.js";
-import { CsvExporter } from "./csv-exporter.js";
 import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
 import supaflyWorkspace from "./ws_supafly.json";
 import { FlightLog } from "./flightlog.js";
 import { FlightLogParser } from "./flightlog_parser.js";
-import { FlightLogFieldPresenter } from "./flightlog_fields_presenter.js";
 import {
   formatTime,
   stringLoopTime,
   stringTimetoMsec,
-  constrain,
   validate,
   mouseNotification,
-  triggerDownload,
 } from "./tools.js";
+import { restorePenDefaults, changePenSmoothing, changePenZoom, changePenExpo } from "./pen_adjustment.js";
+import { createKeydownHandler } from "./keyboard_handler.js";
+import { upgradeWorkspaceFormat, saveWorkspaces, loadWorkspaces } from "./workspace_io.js";
+import { exportCsv, exportGpx, exportSpectrumToCsv } from "./export_utils.js";
+import { updateValuesChart } from "./values_display.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
 import { DarkTheme } from "./dark_theme.js";
@@ -74,7 +73,6 @@ function BlackboxLogViewer() {
   // workspaceGraphConfigs, activeWorkspace, workspaceStore.bookmarkTimes live in workspaceStore
   // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
   // activeGraphConfig lives in graphStore.activeGraphConfig (initialized after store creation)
-  const fieldPresenter = FlightLogFieldPresenter;
   // hasLog lives in logStore.hasLog
   // hasMarker lives in graphStore.hasMarker
   // hasAnalyser, hasMap, hasAnalyserFullscreen live in graphStore
@@ -139,89 +137,9 @@ function BlackboxLogViewer() {
     }
   }
 
-  function isInteger(value) {
-    return Math.trunc(value) === value;
-  }
-
-  function atMost2DecPlaces(value) {
-    if (isInteger(value)) return value; //it's an integer already
-
-    if (value === null) {
-      return "(absent)";
-    }
-
-    return value.toFixed(2);
-  }
-
-  function updateValuesChart() {
-    const frame = logStore.flightLog.getSmoothedFrameAtTime(logStore.currentBlackboxTime),
-      fieldNames = logStore.flightLog.getMainFieldNames();
-
-    if (frame) {
-      const currentFlightMode =
-        frame[logStore.flightLog.getMainFieldIndexByName("flightModeFlags")];
-
-      if (graphStore.hasTableOverlay) {
-        const debugMode = logStore.flightLog.getSysConfig().debug_mode;
-        const values = [];
-
-        for (let i = 0; i < fieldNames.length; i++) {
-          values.push({
-            name: fieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
-            raw: atMost2DecPlaces(frame[i]),
-            decoded: fieldPresenter.decodeFieldToFriendly(logStore.flightLog, fieldNames[i], frame[i], currentFlightMode),
-          });
-        }
-        logStore.fieldValues = values;
-
-        const statRows = [];
-        const stats = SimpleStats(logStore.flightLog).calculate();
-        for (const field of Object.keys(stats)) {
-          const stat = stats[field];
-          if (stat === undefined) {
-            continue;
-          }
-          statRows.push({
-            name: fieldPresenter.fieldNameToFriendly(stat.name, debugMode),
-            min: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.min)} (${atMost2DecPlaces(stat.min)})`,
-            max: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.max)} (${atMost2DecPlaces(stat.max)})`,
-            mean: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.mean)} (${atMost2DecPlaces(stat.mean)})`,
-          });
-        }
-        logStore.fieldStats = statRows;
-      }
-
-      // Update flight mode flags on status bar
-      const flightModeText = fieldPresenter.decodeFieldToFriendly(
-        null,
-        "flightModeFlags",
-        currentFlightMode,
-        null,
-      );
-      appStore.statusFlightMode = flightModeText;
-
-      // update time field
-      const graphTimeText = formatTime(
-        (logStore.currentBlackboxTime - logStore.flightLog.getMinTime()) / 1000,
-        true,
-      );
-      appStore.graphTimeDisplay = graphTimeText;
-      if (graphStore.hasMarker) {
-        const markerText = `Marker Offset ${formatTime(
-          (logStore.currentBlackboxTime - graphStore.markerTime) / 1000,
-          true,
-        )}ms ${(1000000 / (logStore.currentBlackboxTime - graphStore.markerTime)).toFixed(0)}Hz`;
-        appStore.statusMarkerOffset = markerText;
-      }
-
-      // Update the Legend Values
-      if (graphStore.legendVisible) {
-        updateLegendValues(logStore.flightLog, frame);
-      }
-    }
-  }
-
-  const updateValuesChartRateLimited = throttle(250, updateValuesChart);
+  const updateValuesChartRateLimited = throttle(250, () =>
+    updateValuesChart(logStore, graphStore, appStore, userSettings),
+  );
 
   function animationLoop() {
     const now = Date.now();
@@ -629,7 +547,7 @@ function BlackboxLogViewer() {
       } else if (isVideo) {
         loadVideo(file);
       } else if (isWorkspaces) {
-        loadWorkspaces(file);
+        loadWorkspaces(file, workspaceStore, onSwitchWorkspace);
       }
     }
 
@@ -751,35 +669,8 @@ function BlackboxLogViewer() {
     alert(errorMessage);
   }
 
-  // buildLegendGraphs moved to graphStore
-
-  function updateLegendValues(log, frame) {
-    try {
-      const currentFlightMode = frame[log.getMainFieldIndexByName("flightModeFlags")];
-      const graphs = graphStore.activeGraphConfig.getGraphs();
-      const vals = {};
-      for (const graph of graphs) {
-        for (const field of graph.fields) {
-          let value = frame[log.getMainFieldIndexByName(field.name)];
-          if (userSettings.legendUnits) {
-            value = FlightLogFieldPresenter.decodeFieldToFriendly(
-              log, field.name, value, currentFlightMode,
-            );
-          } else if (value % 1 !== 0) {
-            value = value.toFixed(2);
-          }
-          const settings = `Z100 E${(field.curve.power * 100).toFixed(0)} S${(field.smoothing / 100).toFixed(0)}`;
-          vals[field.name] = { value: value ?? "", settings };
-        }
-      }
-      graphStore.legendValues = vals;
-    } catch {
-      console.log("Cannot update legend with values");
-    }
-  }
-
-  // onLegendVisbilityChange, onLegendSelectionChange, onLegendHighlightChange,
-  // onLegendToggleField moved to graphStore actions
+  // buildLegendGraphs, onLegendVisbilityChange, onLegendSelectionChange,
+  // onLegendHighlightChange, onLegendToggleField moved to graphStore actions
 
   function setMarker(state) {
     graphStore.hasMarker = state;
@@ -799,121 +690,7 @@ function BlackboxLogViewer() {
     }
   };
 
-  // Workspace save/restore to/from file.
-  function saveWorkspaces(file) {
-    let data; // Data to save
 
-    if (!workspaceStore.workspaceGraphConfigs) {
-      return null;
-    } // No workspaces to save
-    if (!file) {
-      file = "workspaces.json";
-    } // No filename to save to, make one up
-
-    if (typeof workspaceStore.workspaceGraphConfigs === "object") {
-      data = JSON.stringify(workspaceStore.workspaceGraphConfigs, undefined, 4);
-    }
-
-    triggerDownload(new Blob([data], { type: "text/json" }), file);
-  }
-
-  function upgradeWorkspaceFormat(oldFormat) {
-    // Check if upgrade is needed
-    if (!oldFormat.graphConfig) {
-      return oldFormat;
-    }
-
-    const newFormat = [];
-
-    oldFormat.graphConfig.forEach((element, id) => {
-      if (element) {
-        let title = "Unnamed";
-        if (element.length > 0) {
-          title = element[0].label;
-        }
-
-        newFormat[id] = {
-          title: title,
-          graphConfig: element,
-        };
-      } else {
-        newFormat[id] = null;
-      }
-    });
-
-    return newFormat;
-  }
-
-  function loadWorkspaces(file) {
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      const data = e.target.result;
-      let tmp = JSON.parse(data);
-      if (tmp.graphConfig) {
-        globalThis.alert("Old Workspace format. Upgrading...");
-        tmp = upgradeWorkspaceFormat(tmp);
-      }
-      workspaceStore.workspaceGraphConfigs = tmp;
-      onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, 1);
-      globalThis.alert("Workspaces Loaded");
-    };
-
-    reader.readAsText(file);
-  }
-
-  function createExportCallback(fileExtension, fileType, file, startTime) {
-    const callback = function (data) {
-      console.debug(
-        `${fileExtension.toUpperCase()} export finished in ${
-          (performance.now() - startTime) / 1000
-        } secs`,
-      );
-      if (!data) {
-        console.debug("Empty data, nothing to save");
-        return;
-      }
-      const filename = file || `${appStore.logFilename}.${fileExtension}`;
-      triggerDownload(new Blob([data], { type: fileType }), filename);
-    };
-    return callback;
-  }
-
-  function exportCsv(file, options = {}) {
-    const onSuccess = createExportCallback(
-      "csv",
-      "text/csv",
-      file,
-      performance.now(),
-    );
-    CsvExporter(logStore.flightLog, options).dump(onSuccess);
-  }
-
-  function exportSpectrumToCsv(options = {}) {
-    const fileName = graph.getAnalyser().getExportedFileName();
-    if (fileName == null) {
-      console.warn("The export is not supported for this spectrum type");
-      return;
-    }
-
-    const onSuccess = createExportCallback(
-      "csv",
-      "text/csv",
-      fileName,
-      performance.now(),
-    );
-    graph.getAnalyser().exportSpectrumToCSV(onSuccess, options);
-  }
-
-  function exportGpx(file) {
-    const onSuccess = createExportCallback(
-      "gpx",
-      "GPX File",
-      file,
-      performance.now(),
-    );
-    GpxExporter(logStore.flightLog).dump(onSuccess);
-  }
 
   function newGraphConfig(newConfig, noRedraw) {
     lastGraphConfig = graphConfig; // Remember the last configuration.
@@ -1160,7 +937,7 @@ function BlackboxLogViewer() {
     };
 
     // Spectrum callbacks registered on graphStore
-    graphStore.spectrumExport = () => exportSpectrumToCsv();
+    graphStore.spectrumExport = () => exportSpectrumToCsv(graph.getAnalyser(), appStore.logFilename);
     graphStore.spectrumImport = (files) => graph.getAnalyser()?.importSpectrumFromCSV(files);
     graphStore.spectrumClear = () => graph.getAnalyser()?.removeImportedSpectrums();
 
@@ -1169,222 +946,6 @@ function BlackboxLogViewer() {
     window.addEventListener("resize", function () {
       updateCanvasSize();
     });
-
-    function savePenDefaults(graphConfig, graph, field) {
-      /**
-       * graphConfig is the current graph configuration
-       * group is the set of pens to change, null means individual pen within group
-       * field is the actual pen to change, null means all pens within group
-       */
-
-      if (graph == null && field == null) {
-        return false;
-      } // no pen specified, just exit
-
-      if (graph != null && field == null) {
-        const gi = Number.parseInt(graph, 10);
-        // save ALL pens within group
-        for (const configField of graphConfig[gi].fields) {
-          if (configField.default == null) {
-            configField.default = [];
-            configField.default.smoothing = configField.smoothing;
-            configField.default.power = configField.curve.power;
-          }
-        }
-        return "<h4>Stored defaults for all pens</h4>";
-      }
-      if (graph != null && field != null) {
-        const gi = Number.parseInt(graph, 10);
-        const fi = Number.parseInt(field, 10);
-        // restore single pen
-        if (graphConfig[gi].fields[fi].default == null) {
-          graphConfig[gi].fields[fi].default = [];
-          graphConfig[gi].fields[fi].default.smoothing =
-            graphConfig[gi].fields[fi].smoothing;
-          graphConfig[gi].fields[fi].default.power =
-            graphConfig[gi].fields[fi].curve.power;
-          return "<h4>Stored defaults for single pen</h4>";
-        }
-      }
-      return false; // nothing was changed
-    }
-
-    function restorePenDefaults(graphConfig, graph, field) {
-      /**
-       * graphConfig is the current graph configuration
-       * group is the set of pens to change, null means individual pen within group
-       * field is the actual pen to change, null means all pens within group
-       */
-
-      if (graph == null && field == null) {
-        return false;
-      } // no pen specified, just exit
-
-      if (graph != null && field == null) {
-        const gi = Number.parseInt(graph, 10);
-        // restore ALL pens within group
-        for (const configField of graphConfig[gi].fields) {
-          if (configField.default != null) {
-            configField.smoothing = configField.default.smoothing;
-            configField.curve.power = configField.default.power;
-          } else {
-            return false;
-          }
-        }
-        return "<h4>Restored defaults for all pens</h4>";
-      }
-      if (graph != null && field != null) {
-        const gi = Number.parseInt(graph, 10);
-        const fi = Number.parseInt(field, 10);
-        // restore single pen
-        if (graphConfig[gi].fields[fi].default == null) {
-          return false; // no defaults stored
-        }
-        graphConfig[gi].fields[fi].smoothing =
-          graphConfig[gi].fields[fi].default.smoothing;
-        graphConfig[gi].fields[fi].curve.power =
-          graphConfig[gi].fields[fi].default.power;
-        return "<h4>Restored defaults for single pen</h4>";
-      }
-      return false; // nothing was changed
-    }
-
-    function changePenSmoothing(graphConfig, graph, field, delta) {
-      /**
-       * graphConfig is the current graph configuration
-       * group is the set of pens to change, null means individual pen within group
-       * field is the actual pen to change, null means all pens within group
-       * delta is the direction false is down, true is up
-       */
-
-      const range = { min: 0, max: 10000 }; // actually in milliseconds!
-      const scroll = 1000; // actually in milliseconds
-
-      if (graph == null && field == null) {
-        return false;
-      } // no pen specified, just exit
-
-      savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
-
-      let changedValue = "<h4>Smoothing</h4>";
-      if (graph != null && field == null) {
-        const gi = Number.parseInt(graph, 10);
-        // change ALL pens within group
-        for (const configField of graphConfig[gi].fields) {
-          configField.smoothing += delta ? -scroll : +scroll;
-          configField.smoothing = constrain(
-            configField.smoothing,
-            range.min,
-            range.max,
-          );
-          changedValue += `${configField.friendlyName} ${(configField.smoothing / 100).toFixed(2)}%\n`;
-        }
-        return changedValue;
-      }
-      if (graph != null && field != null) {
-        const gi = Number.parseInt(graph, 10);
-        const fi = Number.parseInt(field, 10);
-        // change single pen
-        graphConfig[gi].fields[fi].smoothing += delta ? -scroll : +scroll;
-        graphConfig[gi].fields[fi].smoothing = constrain(
-          graphConfig[gi].fields[fi].smoothing,
-          range.min,
-          range.max,
-        );
-        return `${changedValue + graphConfig[gi].fields[fi].friendlyName} ${(graphConfig[gi].fields[fi].smoothing / 100).toFixed(2)}%\n`;
-      }
-      return false; // nothing was changed
-    }
-
-    function changePenZoom(graphConfig, graph, field, delta) {
-      /**
-       * graphConfig is the current graph configuration
-       * group is the set of pens to change, null means individual pen within group
-       * field is the actual pen to change, null means all pens within group
-       * delta is the direction false is down, true is up
-       */
-
-      if (graph == null && field == null) {
-        return false;
-      } // no pen specified, just exit
-
-      savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
-      const zoomScaleOut = 1.05,
-        zoomScaleIn = 1.0 / zoomScaleOut;
-      let changedValue = "<h4></h4>";
-      if (graph != null && field == null) {
-        const gi = Number.parseInt(graph, 10);
-        // change ALL pens within group
-        changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
-        for (const configField of graphConfig[gi].fields) {
-          configField.curve.MinMax.min *= delta ? zoomScaleOut : zoomScaleIn;
-          configField.curve.MinMax.max *= delta ? zoomScaleOut : zoomScaleIn;
-          changedValue += `${configField.friendlyName}\n`;
-        }
-        return changedValue;
-      }
-      if (graph != null && field != null) {
-        const gi = Number.parseInt(graph, 10);
-        // change single pen
-        graphConfig[gi].fields[field].curve.MinMax.min *= delta
-          ? zoomScaleOut
-          : zoomScaleIn;
-        graphConfig[gi].fields[field].curve.MinMax.max *= delta
-          ? zoomScaleOut
-          : zoomScaleIn;
-        changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
-        changedValue += `${graphConfig[gi].fields[field].friendlyName}\n`;
-        return changedValue;
-      }
-      return false; // nothing was changed
-    }
-
-    function changePenExpo(graphConfig, graph, field, delta) {
-      /**
-       * graphConfig is the current graph configuration
-       * group is the set of pens to change, null means individual pen within group
-       * field is the actual pen to change, null means all pens within group
-       * delta is the direction false is down, true is up
-       */
-
-      const range = { min: 0.05, max: 1.0 }; // 1.0 is actually 100 percent linear!
-      const scroll = 0.05;
-
-      if (graph == null && field == null) {
-        return false;
-      } // no pen specified, just exit
-
-      savePenDefaults(graphConfig, graph, field); // only updates defaults if they are not already set
-
-      let changedValue = "<h4>Expo</h4>";
-      if (graph != null && field == null) {
-        const gi = Number.parseInt(graph, 10);
-        // change ALL pens within group
-        for (const configField of graphConfig[gi].fields) {
-          configField.curve.power += delta ? -scroll : +scroll;
-          configField.curve.power = constrain(
-            configField.curve.power,
-            range.min,
-            range.max,
-          );
-          changedValue += `${configField.friendlyName} ${(configField.curve.power * 100).toFixed(2)}%\n`;
-        }
-        return changedValue;
-      }
-      if (graph != null && field != null) {
-        const gi = Number.parseInt(graph, 10);
-        const fi = Number.parseInt(field, 10);
-        // change single pen
-        graphConfig[gi].fields[fi].curve.power += delta ? -scroll : +scroll;
-        graphConfig[gi].fields[fi].curve.power = constrain(
-          graphConfig[gi].fields[fi].curve.power,
-          range.min,
-          range.max,
-        );
-        return `${changedValue + graphConfig[gi].fields[fi].friendlyName} ${(graphConfig[gi].fields[fi].curve.power * 100).toFixed(2)}%\n`;
-      }
-      return false; // nothing was changed
-    }
 
     function toggleOverrideStatus(userSetting) {
       settingsStore.saveSetting(userSetting, !userSettings[userSetting]);
@@ -1474,264 +1035,16 @@ function BlackboxLogViewer() {
       { passive: false },
     );
 
-    function handleWorkspaceKey(id, shiftKey) {
-      if (!shiftKey) {
-        if (workspaceStore.workspaceGraphConfigs[id] != null) {
-          onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
-        }
-      } else if (workspaceStore.workspaceGraphConfigs[id]) {
-        onSaveWorkspace(id, workspaceStore.workspaceGraphConfigs[id].title);
-      } else {
-        onSaveWorkspace(id, "Unnamed");
-      }
-    }
-
-    function handleBookmarkSave(id) {
-      if (id === 0) {
-        workspaceStore.bookmarkTimes = [];
-      } else if (workspaceStore.bookmarkTimes == null) {
-        workspaceStore.bookmarkTimes = [];
-        workspaceStore.bookmarkTimes[id] = logStore.currentBlackboxTime;
-      } else if (workspaceStore.bookmarkTimes[id] == null) {
-        workspaceStore.bookmarkTimes[id] = logStore.currentBlackboxTime;
-      } else {
-        workspaceStore.bookmarkTimes[id] = null;
-      }
-      invalidateGraph();
-    }
-
-    function handleDigitKey(e) {
-      const id = Number.parseInt(e.code.slice(5), 10);
-      if (!e.altKey) {
-        handleWorkspaceKey(id, e.shiftKey);
-      } else if (e.shiftKey) {
-        handleBookmarkSave(id);
-      } else if (workspaceStore.bookmarkTimes[id] != null) {
-        setCurrentBlackboxTime(workspaceStore.bookmarkTimes[id]);
-        invalidateGraph();
-      }
-    }
-
-    function handleAnalyserKey(shifted) {
-      if (!shifted) {
-        graphStore.toggleAnalyser();
-      } else {
-        graphStore.toggleAnalyserFullscreen();
-      }
-    }
-
-    function handleKeyVideoIn(e, shifted) {
-      if (!shifted) {
-        setVideoInTime(
-          playbackStore.videoExportInTime === logStore.currentBlackboxTime
-            ? null
-            : logStore.currentBlackboxTime,
-        );
-      }
-      e.preventDefault();
-    }
-
-    function handleKeyVideoOut(e, shifted) {
-      if (!shifted) {
-        setVideoOutTime(
-          playbackStore.videoExportOutTime === logStore.currentBlackboxTime
-            ? null
-            : logStore.currentBlackboxTime,
-        );
-      }
-      e.preventDefault();
-    }
-
-    function handleKeyMarker(e) {
-      if (e.altKey) {
-        logSmartSync();
-      } else {
-        graphStore.markerTime = logStore.currentBlackboxTime;
-        setMarker(!graphStore.hasMarker);
-        appStore.statusMarkerOffset = graphStore.hasMarker
-          ? `Marker Offset ${formatTime(0)}ms`
-          : "";
-        invalidateGraph();
-      }
-      e.preventDefault();
-    }
-
-    function handleKeyConfig(e, shifted) {
-      if (!shifted) {
-        appStore.headerDialogOpen = false;
-        showValueTable(false);
-        showConfigFile();
-        e.preventDefault();
-      }
-    }
-
-    function handleKeyTable(e, shifted) {
-      if (!shifted) {
-        appStore.headerDialogOpen = false;
-        showValueTable();
-        showConfigFile(false);
-        invalidateGraph();
-        e.preventDefault();
-      }
-    }
-
-    function handleKeyZoom(e) {
-      try {
-        if (e.ctrlKey) {
-          if (lastGraphConfig != null) {
-            newGraphConfig(lastGraphConfig);
-          }
-        } else if (graphStore.graphZoom === GRAPH_MIN_ZOOM) {
-          setGraphZoom(null, true);
-        } else {
-          setGraphZoom(GRAPH_MIN_ZOOM, true);
-        }
-      } catch {
-        // Intentionally ignored — zoom toggle gracefully degrades when graph state is incomplete
-      }
-      e.preventDefault();
-    }
-
-    function handleKeySave(e, shifted) {
-      try {
-        if (!shifted) {
-          toggleOverrideStatus("graphSmoothOverride");
-        } else if (e.altKey) {
-          makeScreenshot();
-        } else if (e.shiftKey) {
-          onSaveWorkspace(
-            workspaceStore.activeWorkspace,
-            workspaceStore.workspaceGraphConfigs[workspaceStore.activeWorkspace].title,
-          );
-        }
-      } catch {
-        // Intentionally ignored — smoothing/screenshot/save gracefully degrades when graph state is incomplete
-      }
-      e.preventDefault();
-    }
-
-    function handleKeyOverride(settingKey, e, shifted) {
-      try {
-        if (!shifted) {
-          toggleOverrideStatus(settingKey);
-        }
-      } catch {
-        // Intentionally ignored — override gracefully degrades when graph state is incomplete
-      }
-      e.preventDefault();
-    }
-
-    const letterKeyHandlers = {
-      KeyI: handleKeyVideoIn,
-      KeyO: handleKeyVideoOut,
-      KeyM: handleKeyMarker,
-      KeyC: handleKeyConfig,
-      KeyA(e, shifted) {
-        handleAnalyserKey(shifted);
-        if (!shifted) {
-          e.preventDefault();
-        }
-      },
-      KeyH(e, shifted) {
-        if (!shifted) {
-          if (!appStore.headerDialogOpen) {
-            showValueTable(false);
-            showConfigFile(false);
-          }
-          appStore.headerDialogOpen =
-            !appStore.headerDialogOpen;
-          e.preventDefault();
-        }
-      },
-      KeyT: handleKeyTable,
-      KeyW(e) {
-        if (e.shiftKey) {
-          workspaceStore.showDefaultMenu = true;
-        }
-      },
-      KeyZ: handleKeyZoom,
-      KeyS: handleKeySave,
-      KeyX(e, shifted) {
-        handleKeyOverride("graphExpoOverride", e, shifted);
-      },
-      KeyG(e, shifted) {
-        handleKeyOverride("graphGridOverride", e, shifted);
-      },
-    };
-
-    function handleLetterKey(e, shifted) {
-      const handler = letterKeyHandlers[e.code];
-      if (!handler) {
-        return false;
-      }
-      handler(e, shifted);
-      return true;
-    }
-
-    function handleNavigationKey(e) {
-      switch (e.code) {
-        case "Space":
-          logPlayPause();
-          break;
-        case "ArrowLeft":
-          if (e.shiftKey) {
-            setGraphZoom(graphStore.graphZoom - 10 - (e.altKey ? 15 : 0), true);
-          } else {
-            logJumpBack(null, e.altKey);
-          }
-          break;
-        case "ArrowRight":
-          if (e.shiftKey) {
-            setGraphZoom(graphStore.graphZoom + 10 + (e.altKey ? 15 : 0), true);
-          } else {
-            logJumpForward(null, e.altKey);
-          }
-          break;
-        case "PageUp":
-          logJumpBack(0.25);
-          break;
-        case "PageDown":
-          logJumpForward(0.25);
-          break;
-        case "Home":
-          logJumpStart();
-          break;
-        case "End":
-          logJumpEnd();
-          break;
-        default:
-          return false;
-      }
-      e.preventDefault();
-      return true;
-    }
-
-    document.addEventListener("keydown", function (e) {
-      const shifted = e.altKey || e.shiftKey || e.ctrlKey || e.metaKey;
-      if (
-        e.key === "Enter" &&
-        e.target.type === "text" &&
-        !e.target.closest(".modal")
-      ) {
-        e.target.blur();
-      }
-      // keyboard controls are disabled on modal dialog boxes and text entry fields
-      if (graph && e.target.type !== "text" && !e.target.closest(".modal")) {
-        if (e.code.startsWith("Digit")) {
-          try {
-            handleDigitKey(e);
-          } catch {
-            // Intentionally ignored — workspace feature gracefully degrades when graph state is incomplete
-          }
-          e.preventDefault();
-          return;
-        }
-        if (handleLetterKey(e, shifted)) {
-          return;
-        }
-        handleNavigationKey(e);
-      }
-    });
+    document.addEventListener("keydown", createKeydownHandler({
+      hasGraph: () => graph != null,
+      graphStore, logStore, playbackStore, workspaceStore, appStore,
+      logPlayPause, logJumpBack, logJumpForward, logJumpStart, logJumpEnd,
+      logSmartSync, setGraphZoom, setVideoInTime, setVideoOutTime, setMarker,
+      setCurrentBlackboxTime, showValueTable, showConfigFile, newGraphConfig,
+      toggleOverrideStatus, invalidateGraph, makeScreenshot,
+      onSwitchWorkspace, onSaveWorkspace,
+      lastGraphConfig: () => lastGraphConfig,
+    }));
 
     video.addEventListener("loadedmetadata", updateCanvasSize);
     video.addEventListener("error", reportVideoError);
@@ -1859,15 +1172,15 @@ function BlackboxLogViewer() {
   appStore.newGraphConfig = (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart);
   appStore.exportCsv = () => {
     setGraphState(GRAPH_STATE_PAUSED);
-    exportCsv();
+    exportCsv(logStore.flightLog, appStore.logFilename);
   };
   appStore.exportGpx = () => {
     setGraphState(GRAPH_STATE_PAUSED);
-    exportGpx();
+    exportGpx(logStore.flightLog, appStore.logFilename);
   };
   appStore.exportWorkspaces = () => {
     setGraphState(GRAPH_STATE_PAUSED);
-    saveWorkspaces();
+    saveWorkspaces(workspaceStore.workspaceGraphConfigs);
   };
   appStore.pauseForExport = () => setGraphState(GRAPH_STATE_PAUSED);
   appStore.getVideoExportParams = () => ({
