@@ -223,7 +223,7 @@ export function logJumpBack(fast, slow) {
     const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
       logStore.currentBlackboxTime,
     );
-    if (currentFrame && currentFrame.previous && slow) {
+    if (currentFrame?.previous && slow) {
       setCurrentBlackboxTime(
         currentFrame.previous[
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
@@ -256,7 +256,7 @@ export function logJumpForward(fast, slow) {
     const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
       logStore.currentBlackboxTime,
     );
-    if (currentFrame && currentFrame.next && slow) {
+    if (currentFrame?.next && slow) {
       setCurrentBlackboxTime(
         currentFrame.next[
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME

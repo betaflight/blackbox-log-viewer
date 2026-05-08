@@ -7,7 +7,9 @@ function isInteger(value) {
 }
 
 function atMost2DecPlaces(value) {
-  if (isInteger(value)) return value;
+  if (isInteger(value)) {
+    return value;
+  }
 
   if (value === null) {
     return "(absent)";
@@ -42,66 +44,64 @@ export function updateLegendValues(log, frame, graphStore, userSettings) {
 }
 
 export function updateValuesChart(logStore, graphStore, appStore, userSettings) {
-  const frame = logStore.flightLog.getSmoothedFrameAtTime(logStore.currentBlackboxTime),
-    fieldNames = logStore.flightLog.getMainFieldNames();
+  const frame = logStore.flightLog.getSmoothedFrameAtTime(logStore.currentBlackboxTime);
+  if (!frame) {
+    return;
+  }
 
-  if (frame) {
-    const currentFlightMode =
-      frame[logStore.flightLog.getMainFieldIndexByName("flightModeFlags")];
+  const fieldNames = logStore.flightLog.getMainFieldNames();
+  const currentFlightMode =
+    frame[logStore.flightLog.getMainFieldIndexByName("flightModeFlags")];
 
-    if (graphStore.hasTableOverlay) {
-      const debugMode = logStore.flightLog.getSysConfig().debug_mode;
-      const values = [];
+  if (graphStore.hasTableOverlay) {
+    const debugMode = logStore.flightLog.getSysConfig().debug_mode;
+    const values = [];
 
-      for (let i = 0; i < fieldNames.length; i++) {
-        values.push({
-          name: FlightLogFieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
-          raw: atMost2DecPlaces(frame[i]),
-          decoded: FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, fieldNames[i], frame[i], currentFlightMode),
-        });
-      }
-      logStore.fieldValues = values;
-
-      const statRows = [];
-      const stats = SimpleStats(logStore.flightLog).calculate();
-      for (const field of Object.keys(stats)) {
-        const stat = stats[field];
-        if (stat === undefined) {
-          continue;
-        }
-        statRows.push({
-          name: FlightLogFieldPresenter.fieldNameToFriendly(stat.name, debugMode),
-          min: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.min)} (${atMost2DecPlaces(stat.min)})`,
-          max: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.max)} (${atMost2DecPlaces(stat.max)})`,
-          mean: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.mean)} (${atMost2DecPlaces(stat.mean)})`,
-        });
-      }
-      logStore.fieldStats = statRows;
+    for (let i = 0; i < fieldNames.length; i++) {
+      values.push({
+        name: FlightLogFieldPresenter.fieldNameToFriendly(fieldNames[i], debugMode),
+        raw: atMost2DecPlaces(frame[i]),
+        decoded: FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, fieldNames[i], frame[i], currentFlightMode),
+      });
     }
+    logStore.fieldValues = values;
 
-    const flightModeText = FlightLogFieldPresenter.decodeFieldToFriendly(
-      null,
-      "flightModeFlags",
-      currentFlightMode,
-      null,
-    );
-    appStore.statusFlightMode = flightModeText;
+    const statRows = [];
+    const stats = SimpleStats(logStore.flightLog).calculate();
+    for (const field of Object.keys(stats)) {
+      const stat = stats[field];
+      if (stat === undefined) {
+        continue;
+      }
+      statRows.push({
+        name: FlightLogFieldPresenter.fieldNameToFriendly(stat.name, debugMode),
+        min: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.min)} (${atMost2DecPlaces(stat.min)})`,
+        max: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.max)} (${atMost2DecPlaces(stat.max)})`,
+        mean: `${FlightLogFieldPresenter.decodeFieldToFriendly(logStore.flightLog, stat.name, stat.mean)} (${atMost2DecPlaces(stat.mean)})`,
+      });
+    }
+    logStore.fieldStats = statRows;
+  }
 
-    const graphTimeText = formatTime(
-      (logStore.currentBlackboxTime - logStore.flightLog.getMinTime()) / 1000,
+  appStore.statusFlightMode = FlightLogFieldPresenter.decodeFieldToFriendly(
+    null,
+    "flightModeFlags",
+    currentFlightMode,
+    null,
+  );
+
+  appStore.graphTimeDisplay = formatTime(
+    (logStore.currentBlackboxTime - logStore.flightLog.getMinTime()) / 1000,
+    true,
+  );
+  if (graphStore.hasMarker) {
+    appStore.statusMarkerOffset = `Marker Offset ${formatTime(
+      (logStore.currentBlackboxTime - graphStore.markerTime) / 1000,
       true,
-    );
-    appStore.graphTimeDisplay = graphTimeText;
-    if (graphStore.hasMarker) {
-      const markerText = `Marker Offset ${formatTime(
-        (logStore.currentBlackboxTime - graphStore.markerTime) / 1000,
-        true,
-      )}ms ${(1000000 / (logStore.currentBlackboxTime - graphStore.markerTime)).toFixed(0)}Hz`;
-      appStore.statusMarkerOffset = markerText;
-    }
+    )}ms ${(1000000 / (logStore.currentBlackboxTime - graphStore.markerTime)).toFixed(0)}Hz`;
+  }
 
-    if (graphStore.legendVisible) {
-      updateLegendValues(logStore.flightLog, frame, graphStore, userSettings);
-    }
+  if (graphStore.legendVisible) {
+    updateLegendValues(logStore.flightLog, frame, graphStore, userSettings);
   }
 }

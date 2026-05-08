@@ -41,10 +41,7 @@ export function saveWorkspaces(workspaceGraphConfigs, file) {
 }
 
 export function loadWorkspaces(file, workspaceStore, onSwitchWorkspace) {
-  const reader = new FileReader();
-
-  reader.onload = function (e) {
-    const data = e.target.result;
+  file.text().then((data) => {
     let tmp = JSON.parse(data);
     if (tmp.graphConfig) {
       globalThis.alert("Old Workspace format. Upgrading...");
@@ -53,7 +50,5 @@ export function loadWorkspaces(file, workspaceStore, onSwitchWorkspace) {
     workspaceStore.workspaceGraphConfigs = tmp;
     onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, 1);
     globalThis.alert("Workspaces Loaded");
-  };
-
-  reader.readAsText(file);
+  });
 }

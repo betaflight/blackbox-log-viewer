@@ -23,8 +23,8 @@ export const useLogStore = defineStore("log", () => {
   const hasLog = ref(false);
   const hasVideo = ref(false);
   const hasGps = computed(() => {
-    void activeLogIndex.value; // re-evaluate when log index changes
-    return !!flightLog.value?.hasGpsData?.();
+    // activeLogIndex dependency ensures re-evaluation when log index changes
+    return activeLogIndex.value >= 0 && !!flightLog.value?.hasGpsData?.();
   });
   const videoURL = ref(null);
 

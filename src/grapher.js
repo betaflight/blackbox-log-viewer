@@ -685,7 +685,7 @@ export function FlightLogGrapher(
 
     const markerEvent = { state: graphStore.hasMarker, time: graphStore.markerTime };
     const bookmarkEvents = workspaceStore.bookmarkTimes?.map((t) =>
-      t != null ? { state: t !== 0, time: t } : null,
+      t == null ? null : { state: t !== 0, time: t },
     ) ?? null;
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
       canvasContext.fillStyle = ThemeColors.getGraphText();

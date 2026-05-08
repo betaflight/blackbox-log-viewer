@@ -293,7 +293,7 @@ function BlackboxLogViewer() {
   function newGraphConfig(newConfig, noRedraw) {
     graphStore.lastGraphConfig = graphStore.graphConfig; // Remember the last configuration.
     graphStore.graphConfig = newConfig;
-    graphStore.activeGraphConfig.setRedrawChart(noRedraw ? false : true);
+    graphStore.activeGraphConfig.setRedrawChart(!noRedraw);
     graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
     prefs.set("graphConfig", graphStore.graphConfig);
@@ -584,7 +584,7 @@ function BlackboxLogViewer() {
       const g = String(gi);
       const f = String(fi);
       const increase = delta >= 0;
-      let msg = false;
+      let msg = null;
       if (shiftKey) {
         msg = changePenZoom(graphs, g, f, increase);
       } else if (altKey) {

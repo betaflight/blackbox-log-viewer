@@ -58,12 +58,12 @@ export function renderSelectedLogInfo() {
   const sysConfig = logStore.flightLog.getSysConfig();
 
   const versionText =
-    (sysConfig["Craft name"] != null && sysConfig["Craft name"].length
+    (sysConfig["Craft name"]?.length
       ? `${sysConfig["Craft name"]} : `
       : "") +
-    (sysConfig["Firmware revision"] != null
-      ? `${sysConfig["Firmware revision"]}`
-      : "") +
+    (sysConfig["Firmware revision"] == null
+      ? ""
+      : `${sysConfig["Firmware revision"]}`) +
     (sysConfig.deviceUID == null ? "" : ` (${sysConfig.deviceUID})`);
   appStore.statusVersion = versionText;
 

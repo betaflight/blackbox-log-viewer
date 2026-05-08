@@ -2,7 +2,7 @@ import { constrain } from "./tools.js";
 
 export function savePenDefaults(graphs, group, field) {
   if (group == null && field == null) {
-    return false;
+    return null;
   }
 
   if (group != null && field == null) {
@@ -26,23 +26,22 @@ export function savePenDefaults(graphs, group, field) {
       return "<h4>Stored defaults for single pen</h4>";
     }
   }
-  return false;
+  return null;
 }
 
 export function restorePenDefaults(graphs, group, field) {
   if (group == null && field == null) {
-    return false;
+    return null;
   }
 
   if (group != null && field == null) {
     const gi = Number.parseInt(group, 10);
     for (const configField of graphs[gi].fields) {
-      if (configField.default != null) {
-        configField.smoothing = configField.default.smoothing;
-        configField.curve.power = configField.default.power;
-      } else {
-        return false;
+      if (configField.default == null) {
+        return null;
       }
+      configField.smoothing = configField.default.smoothing;
+      configField.curve.power = configField.default.power;
     }
     return "<h4>Restored defaults for all pens</h4>";
   }
@@ -50,13 +49,13 @@ export function restorePenDefaults(graphs, group, field) {
     const gi = Number.parseInt(group, 10);
     const fi = Number.parseInt(field, 10);
     if (graphs[gi].fields[fi].default == null) {
-      return false;
+      return null;
     }
     graphs[gi].fields[fi].smoothing = graphs[gi].fields[fi].default.smoothing;
     graphs[gi].fields[fi].curve.power = graphs[gi].fields[fi].default.power;
     return "<h4>Restored defaults for single pen</h4>";
   }
-  return false;
+  return null;
 }
 
 export function changePenSmoothing(graphs, group, field, delta) {
@@ -64,7 +63,7 @@ export function changePenSmoothing(graphs, group, field, delta) {
   const scroll = 1000;
 
   if (group == null && field == null) {
-    return false;
+    return null;
   }
 
   savePenDefaults(graphs, group, field);
@@ -86,45 +85,44 @@ export function changePenSmoothing(graphs, group, field, delta) {
     graphs[gi].fields[fi].smoothing = constrain(graphs[gi].fields[fi].smoothing, range.min, range.max);
     return `${changedValue + graphs[gi].fields[fi].friendlyName} ${(graphs[gi].fields[fi].smoothing / 100).toFixed(2)}%\n`;
   }
-  return false;
+  return null;
 }
 
 export function changePenZoom(graphs, group, field, delta) {
   if (group == null && field == null) {
-    return false;
+    return null;
   }
 
   savePenDefaults(graphs, group, field);
-  const zoomScaleOut = 1.05,
-    zoomScaleIn = 1.0 / zoomScaleOut;
-  let changedValue = "<h4></h4>";
+  const zoomScaleOut = 1.05;
+  const scale = delta ? zoomScaleOut : 1 / zoomScaleOut;
+  const direction = delta ? "Zoom out:\n" : "Zoom in:\n";
+
   if (group != null && field == null) {
     const gi = Number.parseInt(group, 10);
-    changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
+    let changedValue = `<h4></h4>${direction}`;
     for (const configField of graphs[gi].fields) {
-      configField.curve.MinMax.min *= delta ? zoomScaleOut : zoomScaleIn;
-      configField.curve.MinMax.max *= delta ? zoomScaleOut : zoomScaleIn;
+      configField.curve.MinMax.min *= scale;
+      configField.curve.MinMax.max *= scale;
       changedValue += `${configField.friendlyName}\n`;
     }
     return changedValue;
   }
   if (group != null && field != null) {
     const gi = Number.parseInt(group, 10);
-    graphs[gi].fields[field].curve.MinMax.min *= delta ? zoomScaleOut : zoomScaleIn;
-    graphs[gi].fields[field].curve.MinMax.max *= delta ? zoomScaleOut : zoomScaleIn;
-    changedValue += delta ? "Zoom out:\n" : "Zoom in:\n";
-    changedValue += `${graphs[gi].fields[field].friendlyName}\n`;
-    return changedValue;
+    graphs[gi].fields[field].curve.MinMax.min *= scale;
+    graphs[gi].fields[field].curve.MinMax.max *= scale;
+    return `<h4></h4>${direction}${graphs[gi].fields[field].friendlyName}\n`;
   }
-  return false;
+  return null;
 }
 
 export function changePenExpo(graphs, group, field, delta) {
-  const range = { min: 0.05, max: 1.0 };
+  const range = { min: 0.05, max: 1 };
   const scroll = 0.05;
 
   if (group == null && field == null) {
-    return false;
+    return null;
   }
 
   savePenDefaults(graphs, group, field);
@@ -146,5 +144,5 @@ export function changePenExpo(graphs, group, field, delta) {
     graphs[gi].fields[fi].curve.power = constrain(graphs[gi].fields[fi].curve.power, range.min, range.max);
     return `${changedValue + graphs[gi].fields[fi].friendlyName} ${(graphs[gi].fields[fi].curve.power * 100).toFixed(2)}%\n`;
   }
-  return false;
+  return null;
 }

@@ -87,14 +87,18 @@ export const useGraphStore = defineStore("graph", () => {
   }
 
   function highlightLegendField(gi, fi) {
-    if (!activeGraphConfig.value) return;
+    if (!activeGraphConfig.value) {
+      return;
+    }
     activeGraphConfig.value.highlightGraphIndex = gi;
     activeGraphConfig.value.highlightFieldIndex = fi;
     invalidateGraph.value?.();
   }
 
   function selectLegendField(gi, fi, fieldName, ctrlKey) {
-    if (!activeGraphConfig.value) return;
+    if (!activeGraphConfig.value) {
+      return;
+    }
     const toggleAnalizer = activeGraphConfig.value.selectedFieldName === fieldName;
     const lockAnalyserHide = ctrlKey || graph.value?.hasMultiSpectrumAnalyser();
     if (toggleAnalizer) {
@@ -111,7 +115,9 @@ export const useGraphStore = defineStore("graph", () => {
   }
 
   function toggleLegendField(gi, fi) {
-    if (!activeGraphConfig.value) return;
+    if (!activeGraphConfig.value) {
+      return;
+    }
     activeGraphConfig.value.toggleGraphField(gi, fi);
     buildLegendGraphs();
     invalidateGraph.value?.();
@@ -123,9 +129,7 @@ export const useGraphStore = defineStore("graph", () => {
   }
 
   function toggleAnalyser() {
-    if (activeGraphConfig.value?.selectedFieldName != null) {
-      hasAnalyser.value = !hasAnalyser.value;
-    } else {
+    if (activeGraphConfig.value?.selectedFieldName == null) {
       const graphs = activeGraphConfig.value?.getGraphs() ?? [];
       if (graphs.length === 0 || graphs[0].fields.length === 0) {
         hasAnalyser.value = false;
@@ -135,6 +139,8 @@ export const useGraphStore = defineStore("graph", () => {
         activeGraphConfig.value.selectedFieldIndex = 0;
         hasAnalyser.value = true;
       }
+    } else {
+      hasAnalyser.value = !hasAnalyser.value;
     }
     if (!hasAnalyser.value) {
       hasAnalyserFullscreen.value = false;

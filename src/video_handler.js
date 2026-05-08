@@ -83,7 +83,7 @@ export function loadVideo(file) {
 
   logStore.videoURL = URL.createObjectURL(file);
   const video = playbackStore.videoElement;
-  video.volume = 1.0;
+  video.volume = 1;
   video.src = logStore.videoURL;
   video.playbackRate = playbackStore.playbackRate / 100;
 }

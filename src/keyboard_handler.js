@@ -81,10 +81,10 @@ export function createKeydownHandler(ctx) {
   }
 
   function handleAnalyserKey(shifted) {
-    if (!shifted) {
-      graphStore.toggleAnalyser();
-    } else {
+    if (shifted) {
       graphStore.toggleAnalyserFullscreen();
+    } else {
+      graphStore.toggleAnalyser();
     }
   }
 
