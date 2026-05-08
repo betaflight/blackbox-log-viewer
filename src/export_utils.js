@@ -24,7 +24,7 @@ export function exportCsv(flightLog, logFilename, file, options = {}) {
 }
 
 export function exportGpx(flightLog, logFilename, file) {
-  const onSuccess = createExportCallback("gpx", "GPX File", file, performance.now(), logFilename);
+  const onSuccess = createExportCallback("gpx", "application/gpx+xml", file, performance.now(), logFilename);
   GpxExporter(flightLog).dump(onSuccess);
 }
 

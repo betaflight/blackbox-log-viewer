@@ -569,8 +569,17 @@ export function FlightLog(logData) {
         parser.resetDataState();
 
         //Prime the parser with the previous state we get from the flightlog index, so it can base deltas off that data
-        if (iframeDirectory.initialGPSHome) {
-          parser.setGPSHomeHistory(iframeDirectory.initialGPSHome[chunkIndex]);
+        gpsTransform = null;
+        const initialGPSHome = iframeDirectory.initialGPSHome?.[chunkIndex];
+        if (initialGPSHome) {
+          parser.setGPSHomeHistory(initialGPSHome);
+          const homeAltitude = initialGPSHome.length > 2 ? initialGPSHome[2] / 10 : 0;
+          gpsTransform = new GPS_transform(
+            initialGPSHome[0] / 10000000,
+            initialGPSHome[1] / 10000000,
+            homeAltitude,
+            0,
+          );
         }
 
         parser.parseLogData(false, chunkStartOffset, chunkEndOffset);

@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { computed } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 
 const graphStore = useGraphStore();
@@ -23,9 +23,8 @@ const seekbarOptions = [
   { label: "Maximum motor differential", value: "maxMotorDiff" },
 ];
 
-const seekbarType = ref(graphStore.seekBarMode || "avgThrottle");
-
-watch(seekbarType, (val) => {
-  graphStore.setSeekBarMode?.(val);
+const seekbarType = computed({
+  get: () => graphStore.seekBarMode || "avgThrottle",
+  set: (val) => graphStore.setSeekBarMode?.(val),
 });
 </script>

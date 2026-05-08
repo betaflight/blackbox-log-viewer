@@ -637,10 +637,16 @@ export function FlightLogParser(logData) {
   const parseFirmwareRevision = (fieldValue) => {
     // Extract the firmware revision in case of Betaflight/Raceflight/Cleanflight 2.x/Other
     const fwMatches = /((?:Beta|Race|Clean|Base|Butter)flight)\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
+    const FIRMWARE_NAME_MAP = {
+      betaflight: FIRMWARE_TYPE_BETAFLIGHT,
+      raceflight: FIRMWARE_TYPE_BETAFLIGHT,
+      butterflight: FIRMWARE_TYPE_BETAFLIGHT,
+      cleanflight: FIRMWARE_TYPE_CLEANFLIGHT,
+      baseflight: FIRMWARE_TYPE_BASEFLIGHT,
+    };
+
     if (fwMatches != null) {
-      if (fwMatches[1] === "Betaflight") {
-        this.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
-      }
+      this.sysConfig.firmwareType = FIRMWARE_NAME_MAP[fwMatches[1].toLowerCase()] ?? FIRMWARE_TYPE_BETAFLIGHT;
 
       this.sysConfig.firmware = `${Number.parseInt(fwMatches[2], 10)}.${Number.parseInt(fwMatches[3], 10)}`;
       this.sysConfig.firmwarePatch =
@@ -653,9 +659,10 @@ export function FlightLogParser(logData) {
     const inavMatches = /(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
     if (inavMatches != null) {
       this.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
-      this.sysConfig.firmware = Number.parseFloat(`${inavMatches[2]}.${inavMatches[3]}`);
+      this.sysConfig.firmware = `${Number.parseInt(inavMatches[2], 10)}.${Number.parseInt(inavMatches[3], 10)}`;
       this.sysConfig.firmwarePatch =
-        inavMatches[4] ? Number.parseInt(inavMatches[4], 10) : "";
+        inavMatches[4] ? Number.parseInt(inavMatches[4], 10) : "0";
+      this.sysConfig.firmwareVersion = `${this.sysConfig.firmware}.${this.sysConfig.firmwarePatch}`;
       return;
     }
 
@@ -1296,7 +1303,7 @@ export function FlightLogParser(logData) {
         value += 1500;
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
-        if (this.frameDefs.I.nameToIndex["motor[0]"] < 0) {
+        if (this.frameDefs.I.nameToIndex["motor[0]"] === undefined) {
           throw "Attempted to base I-field prediction on motor0 before it was read";
         }
         value += current[this.frameDefs.I.nameToIndex["motor[0]"]];
