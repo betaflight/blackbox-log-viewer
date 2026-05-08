@@ -34,7 +34,6 @@ import { useSettingsStore } from "./stores/settings.js";
 import { watch } from "vue";
 
 
-// TODO: Figure out if we can open the same file in a new window
 function createNewBlackboxWindow(_fileToOpen) {
   globalThis.open(globalThis.location.href, "_blank").focus();
 }
@@ -57,35 +56,15 @@ function BlackboxLogViewer() {
 
   let graph = null;
   const prefs = new PrefStorage();
-  let _configuration = null; // is their an associated dump file ?
-  const configurationDefaults = new ConfigurationDefaults(prefs); // configuration defaults
-  // JSON graph configuration:
-  // graphConfig and lastGraphConfig live in graphStore
-  // offsetCache and currentOffsetCache live in playbackStore
-  // workspaceGraphConfigs, activeWorkspace, workspaceStore.bookmarkTimes live in workspaceStore
-  // Graph configuration which is currently in use, customised based on the current flight log from graphConfig
-  // activeGraphConfig lives in graphStore.activeGraphConfig (initialized after store creation)
-  // hasLog lives in logStore.hasLog
-  // hasMarker lives in graphStore.hasMarker
-  // hasAnalyser, hasMap, hasAnalyserFullscreen live in graphStore
-  // hasAnalyserSticks constant false, set in graphStore
-  // viewVideo lives in appStore.viewVideo
-  // hasTableOverlay, hasConfig, hasConfigOverlay live in graphStore
-  // isFullscreen lives in graphStore.isFullscreen
+  const configurationDefaults = new ConfigurationDefaults(prefs);
   const video = document.getElementById("logVideo");
   const canvas = document.getElementById("graphCanvas");
   const analyserCanvas = document.getElementById("analyserCanvas");
   const stickCanvas = document.getElementById("stickCanvas");
   const craftCanvas = document.getElementById("craftCanvas");
-  // markerTime lives in graphStore.markerTime
-  // hasVideo, videoURL live in logStore
-  // videoOffset, videoExportInTime, videoExportOutTime, videoConfig live in playbackStore
   let userSettings;
   const seekBarCanvas = document.getElementById("seekbarCanvas");
   const seekBar = new SeekBar(seekBarCanvas);
-  // seekBarMode lives in graphStore.seekBarMode
-  // playbackRate lives in playbackStore.playbackRate
-  // graphZoom, lastGraphZoom live in graphStore
   const mapGrapher = new MapGrapher();
 
   // --- Pinia store sync ---
@@ -250,11 +229,10 @@ function BlackboxLogViewer() {
           if (file.name.match(/default/i)) {
             configurationDefaults.loadFile(file);
           } else {
-            _configuration = new Configuration(file);
+            new Configuration(file); // NOSONAR — side effect: sets graphStore.configLines
             graphStore.hasConfig = true;
           }
         } catch {
-          _configuration = null;
           graphStore.hasConfig = false;
         }
         return;
@@ -298,11 +276,6 @@ function BlackboxLogViewer() {
 
     reader.readAsArrayBuffer(file);
   }
-
-  // buildLegendGraphs, onLegendVisbilityChange, onLegendSelectionChange,
-  // onLegendHighlightChange, onLegendToggleField moved to graphStore actions
-
-  // getMarker, getBookmarks, getBookmarkTimes — grapher.js reads stores directly
 
   appStore.refreshGraph = () => {
     if (graph !== null) {
@@ -396,9 +369,6 @@ function BlackboxLogViewer() {
     // Reset the analyser window on application startup.
     graphStore.hasAnalyser = false;
 
-    // File open and new window wired via Vue AppToolbar
-    // Playback/sync controls wired via playback_controls.js
-
     function expandGraphConfig(index) {
       // Put each of the fields into a separate graph
 
@@ -439,14 +409,7 @@ function BlackboxLogViewer() {
       }
       invalidateGraph();
     }
-    // userSettings is the reactive object from settingsStore — no global bridge needed
     userSettings = settingsStore.userSettings;
-
-    // Graph configuration dialog wired via Vue LegendPanel "Graph setup" button
-
-    // Header, keys, settings dialogs wired via Vue AppToolbar/ViewControls
-
-    // Workspace/navigation callbacks registered on stores
     workspaceStore.gotoBookmark = (index) => {
       if (workspaceStore.bookmarkTimes?.[index] != null) {
         setCurrentBlackboxTime(workspaceStore.bookmarkTimes[index]);
@@ -458,8 +421,6 @@ function BlackboxLogViewer() {
     graphStore.spectrumExport = () => exportSpectrumToCsv(graph.getAnalyser(), appStore.logFilename);
     graphStore.spectrumImport = (files) => graph.getAnalyser()?.importSpectrumFromCSV(files);
     graphStore.spectrumClear = () => graph.getAnalyser()?.removeImportedSpectrums();
-
-    // GPX export wired via Vue AppToolbar
 
     window.addEventListener("resize", function () {
       updateCanvasSize();
@@ -491,8 +452,6 @@ function BlackboxLogViewer() {
         }
       },
     );
-
-    // Middle-click pen reset wired via Vue LegendPanel
 
     function handleGraphCanvasWheel(e, delta) {
       const zoomStep = 10 + (e.altKey ? 15 : 0);
@@ -568,11 +527,7 @@ function BlackboxLogViewer() {
     video.addEventListener("error", reportVideoError);
     video.addEventListener("loadeddata", videoLoaded);
 
-    // Speed/Zoom sliders and navbar toggle wired via Vue
-
     seekBar.onSeek = setCurrentBlackboxTime;
-
-    // Drag-and-drop wired via App.vue
 
     if ("launchQueue" in globalThis) {
       launchQueue.setConsumer(async (launchParams) => {
@@ -612,8 +567,6 @@ function BlackboxLogViewer() {
       }
     });
 
-    // Legend actions: highlight, select, toggleField, legendVisibilityChange moved to graphStore
-    // Legend callbacks: closure-dependent methods registered on graphStore
     graphStore.zoomGraphConfig = (gi) => zoomGraphConfig(gi);
     graphStore.expandGraphConfig = (gi) => expandGraphConfig(gi);
     graphStore.reorderGraphs = (newOrder) => {
@@ -641,7 +594,6 @@ function BlackboxLogViewer() {
       }
       applyPenChange(msg);
     };
-    // Video sync callbacks registered on playbackStore
     playbackStore.logSyncHere = logSyncHere;
     playbackStore.logSyncBack = logSyncBack;
     playbackStore.logSyncForward = logSyncForward;
@@ -685,7 +637,6 @@ function BlackboxLogViewer() {
     };
   }
 
-  // Callbacks registered on stores — replaces this.* controller bridge
   appStore.loadFiles = loadFiles;
   appStore.newGraphConfig = (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart);
   appStore.exportCsv = () => {
@@ -730,7 +681,6 @@ function BlackboxLogViewer() {
   };
   graphStore.applyGraphZoom = setGraphZoom;
   playbackStore.applyPlaybackRate = setPlaybackRate;
-  // Playback callbacks registered on playbackStore
   playbackStore.logPlayPause = logPlayPause;
   playbackStore.logJumpBack = () => logJumpBack(null);
   playbackStore.logJumpForward = () => logJumpForward(null);
