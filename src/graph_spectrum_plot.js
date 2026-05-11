@@ -2,6 +2,7 @@ import { FILTER_TYPE } from "./flightlog_fielddefs";
 import { constrain } from "./tools";
 import { NUM_VS_BINS } from "./graph_spectrum_calc";
 import { ImportedCurves } from "./graph_imported_curves";
+import { useSettingsStore } from "./stores/settings.js";
 
 const BLUR_FILTER_PIXEL = 1,
   DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
@@ -34,7 +35,7 @@ export const SPECTRUM_OVERDRAW_TYPE = {
   AUTO: 5,
 };
 
-export const GraphSpectrumPlot = globalThis.GraphSpectrumPlot || {
+export const GraphSpectrumPlot = {
   _isFullScreen: false,
   _cachedCanvas: null,
   _cachedDataCanvas: null,
@@ -348,7 +349,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
   const dbStep = 10;
   const minY = Math.floor(minimum / dbStep) * dbStep;
   let maxY = (Math.floor(maximum / dbStep) + 1) * dbStep;
-  if (minY == maxY) {
+  if (minY === maxY) {
     maxY = minY + 1; // prevent divide by zero
   }
   //Store vsRange for _drawMousePosition
@@ -466,6 +467,7 @@ GraphSpectrumPlot._drawLegend = function (
   HEIGHT,
   importedCurves,
 ) {
+  const { userSettings } = useSettingsStore();
   const left = parseFloat(userSettings?.analyser_legend?.left);
   const top = parseFloat(userSettings?.analyser_legend?.top);
   const width = parseFloat(userSettings?.analyser_legend?.width);
@@ -847,7 +849,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.GYRO_FILTERS ||
     (this._overdrawType === SPECTRUM_OVERDRAW_TYPE.AUTO &&
-      this._fftData.fieldName.toLowerCase().indexOf("gyro") !== -1)
+      this._fftData.fieldName.toLowerCase().includes("gyro"))
   ) {
     // Dynamic gyro lpf
     if (
@@ -975,7 +977,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
     this._overdrawType === SPECTRUM_OVERDRAW_TYPE.YAW_FILTERS ||
     (this._overdrawType === SPECTRUM_OVERDRAW_TYPE.AUTO &&
-      this._fftData.fieldName.toLowerCase().indexOf("yaw") !== -1)
+      this._fftData.fieldName.toLowerCase().includes("yaw"))
   ) {
     if (this._sysConfig.yaw_lpf_hz != null && this._sysConfig.yaw_lpf_hz > 0) {
       this._drawLowpassFilter(
@@ -997,7 +999,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
       this._overdrawType === SPECTRUM_OVERDRAW_TYPE.ALL_FILTERS ||
       this._overdrawType === SPECTRUM_OVERDRAW_TYPE.DTERM_FILTERS ||
       (this._overdrawType === SPECTRUM_OVERDRAW_TYPE.AUTO &&
-        this._fftData.fieldName.toLowerCase().indexOf("pid d") !== -1)
+        this._fftData.fieldName.toLowerCase().includes("pid d"))
     ) {
       // Dynamic dterm lpf
       if (
@@ -1099,7 +1101,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
       }
     }
     offset++; // make some space!
-  } catch (e) {
+  } catch {
     console.warn("Notch filter fieldName missing");
   }
 
@@ -1115,7 +1117,6 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
       "rgba(255,0,0,0.50)",
       3,
     );
-    offset++;
   }
 
   this._drawRateWarning(canvasCtx);
@@ -1397,10 +1398,10 @@ GraphSpectrumPlot._drawInterestFrequency = function (
   stroke,
   lineWidth,
 ) {
-  let interestLabel = "";
+  let interestLabel;
   if (
     this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
-    label != ""
+    label !== ""
   ) {
     const psdValue = this.getPSDbyFreq(frequency);
     interestLabel = `${label}: (${frequency.toFixed(0)}Hz, ${psdValue.toFixed(0)}dBm/Hz)`;
@@ -1633,7 +1634,7 @@ GraphSpectrumPlot._drawMousePosition = function (
   mouseX = Math.max(mouseX, marginLeft);
   mouseY = Math.min(mouseY, HEIGHT);
 
-  let mouseFrequency = 0;
+  let mouseFrequency;
 
   if (
     this._spectrumType === SPECTRUM_TYPE.FREQUENCY ||
@@ -1686,7 +1687,7 @@ GraphSpectrumPlot._drawMousePosition = function (
 
       if (
         this._spectrumType === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY &&
-        this._importedPSD.curvesCount() == 0
+        this._importedPSD.curvesCount() === 0
       ) {
         // single PSD spectrum
         const currentPSD = this.getPSDbyFreq(mouseFrequency);
@@ -1722,10 +1723,9 @@ GraphSpectrumPlot._drawMousePosition = function (
         this._spectrumType === SPECTRUM_TYPE.PSD_VS_THROTTLE ||
         this._spectrumType === SPECTRUM_TYPE.PSD_VS_RPM
       ) {
-        const label =
-          Math.round(
+        const label = `${Math.round(
             this.getValueFromMatrixFFT(mouseFrequency, vsArgValue),
-          ).toString() + "dBm/Hz";
+          )}dBm/Hz`;
         this._drawAxisLabel(canvasCtx, label, mouseX - 30, mouseY - 4, "left");
       }
     }
@@ -1834,7 +1834,7 @@ GraphSpectrumPlot.setLogRateWarningInfo = function (logRateInfo) {
 };
 
 GraphSpectrumPlot._drawRateWarning = function (canvasCtx) {
-  if (this._logRateWarning != undefined) {
+  if (this._logRateWarning !== undefined) {
     canvasCtx.save();
 
     canvasCtx.font = `${

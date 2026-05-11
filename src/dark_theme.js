@@ -8,9 +8,11 @@
  * - AUTO (2): Follow system preference via prefers-color-scheme
  *
  * The theme preference is stored via PrefStorage and persists across sessions.
- * When the theme changes, the dark-theme class is toggled on the body element,
- * triggering CSS variable overrides and causing canvas elements to redraw.
+ * When the theme changes, appStore.darkThemeEnabled is set, and App.vue's
+ * watchEffect toggles the .dark class on the root element for CSS variable overrides.
  */
+
+import { useAppStore } from "./stores/app.js";
 
 export const DarkTheme = {
   // Preference key name
@@ -110,7 +112,7 @@ export const DarkTheme = {
     this.apply();
 
     // Notify the application that theme has changed so canvas can redraw
-    globalThis.blackboxLogViewer?.refreshGraph?.();
+    useAppStore().refreshGraph?.();
 
     if (typeof callback === "function") {
       callback();
@@ -131,19 +133,16 @@ export const DarkTheme = {
   },
 
   /**
-   * Apply dark theme
+   * Apply the resolved theme state to the store (classes applied by App.vue watchEffect)
    */
   applyDark: function () {
-    document.body.classList.add("dark-theme");
     this.enabled = true;
+    useAppStore().darkThemeEnabled = true;
   },
 
-  /**
-   * Apply light theme (remove dark theme)
-   */
   applyNormal: function () {
-    document.body.classList.remove("dark-theme");
     this.enabled = false;
+    useAppStore().darkThemeEnabled = false;
   },
 
   /**

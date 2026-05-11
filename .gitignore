@@ -15,3 +15,12 @@ release/
 # artefacts for Visual Studio Code
 /.vscode/
 npm-debug.log*
+
+# Nuxt UI auto-generated
+auto-imports.d.ts
+components.d.ts
+
+# Internal docs
+CLAUDE.md
+plan.md
+issues.md

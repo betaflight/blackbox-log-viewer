@@ -1,28 +1,34 @@
+import semver from "semver";
+import {
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
+} from "./flightlog_fielddefs";
+
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
 export function hexToFloat(string) {
-  let arr = new Uint32Array(1);
+  const arr = new Uint32Array(1);
   arr[0] = parseInt(string, 16);
 
-  let floatArr = new Float32Array(arr.buffer);
+  const floatArr = new Float32Array(arr.buffer);
 
   return floatArr[0];
 }
 
 export function uint32ToFloat(value) {
-  let arr = new Uint32Array(1);
+  const arr = new Uint32Array(1);
   arr[0] = value;
 
-  let floatArr = new Float32Array(arr.buffer);
+  const floatArr = new Float32Array(arr.buffer);
 
   return floatArr[0];
 }
 
 export function asciiArrayToString(arr) {
-  return String.fromCharCode.apply(null, arr);
+  return String.fromCodePoint(...arr);
 }
 
 export function asciiStringToByteArray(s) {
-  let bytes = [];
+  const bytes = [];
 
   for (let i = 0; i < s.length; i++) bytes.push(s.charCodeAt(i));
 
@@ -98,9 +104,9 @@ export function parseCommaSeparatedString(string, length) {
    * returns              if the string does not contain a comma, then the first integer/float/string is returned
    *                      else an Array is returned containing all the values up to the length (if specified)
    ***/
-  let parts = string.split(","),
-    result,
-    value;
+  const parts = string.split(",");
+  let result;
+  let value;
 
   length = length || parts.length; // we can force a length if we like
 
@@ -122,34 +128,6 @@ export function parseCommaSeparatedString(string, length) {
       }
     }
     return result;
-  }
-}
-
-/**
- * Browser Zoom Facilities
- **/
-let zoomLevels = [
-  0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5, 1.75, 2.0, 2.5,
-  3.0, 4.0, 5.0,
-];
-
-export function zoomIn() {
-  let currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
-  for (let i = 0; i < zoomLevels.length; i++) {
-    if (zoomLevels[i] > currentZoom) {
-      document.body.style.zoom = zoomLevels[i];
-      return;
-    }
-  }
-}
-
-export function zoomOut() {
-  let currentZoom = document.body.style.zoom || 1.0; //parseInt(documentElem.css("zoom"));
-  for (let i = zoomLevels.length - 1; i > 0; i--) {
-    if (zoomLevels[i] < currentZoom) {
-      document.body.style.zoom = zoomLevels[i];
-      return;
-    }
   }
 }
 
@@ -211,17 +189,15 @@ export function leftPad(string, pad, minLength) {
 
 export function formatTime(msec, displayMsec) {
   // modify function to allow negative times.
-  let ms, secs, mins, hours;
+  let ms = Math.round(Math.abs(msec));
 
-  ms = Math.round(Math.abs(msec));
-
-  secs = Math.floor(ms / 1000);
+  let secs = Math.floor(ms / 1000);
   ms %= 1000;
 
-  mins = Math.floor(secs / 60);
+  let mins = Math.floor(secs / 60);
   secs %= 60;
 
-  hours = Math.floor(mins / 60);
+  const hours = Math.floor(mins / 60);
   mins %= 60;
 
   return `${
@@ -248,7 +224,7 @@ export function stringLoopTime(
       )}kHz`;
       if (unsynced_fast_pwm != null) {
         returnString +=
-          unsynced_fast_pwm == 0
+          unsynced_fast_pwm === 0
             ? "/SYNCED"
             : motor_pwm_rate != null
               ? `/${parseFloat((motor_pwm_rate / 1000).toFixed(3))}kHz`
@@ -262,11 +238,11 @@ export function stringLoopTime(
 
 export function stringTimetoMsec(input) {
   try {
-    let matches = input.match(/([-])?([0-9]+)(\D)*([0-9]+)*\D*([0-9]+)*/);
+    const matches = input.match(/(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/);
 
     if (matches.length > 2) {
       // there is a placeholder - either : or .
-      if (matches[3] == ":") {
+      if (matches[3] === ":") {
         // time has been entered MM:SS.SSS
         return (
           (matches[1] ? -1 : 1) *
@@ -282,7 +258,7 @@ export function stringTimetoMsec(input) {
         );
       }
     } else return (matches[1] ? -1 : 1) * (matches[2] * 1000000);
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
@@ -295,18 +271,12 @@ export function validate(value, defaultValue) {
   return value != null ? value : defaultValue;
 }
 
-export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-  if (typeof stroke == "undefined") {
-    stroke = true;
-  }
-  if (typeof radius === "undefined") {
-    radius = 5;
-  }
+export function roundRect(ctx, { x, y, width, height, radius = 5, fill = true, stroke = true }) {
   if (typeof radius === "number") {
     radius = { tl: radius, tr: radius, br: radius, bl: radius };
   } else {
-    let defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
-    for (let side in defaultRadius) {
+    const defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
+    for (const side of Object.keys(defaultRadius)) {
       radius[side] = radius[side] || defaultRadius[side];
     }
   }
@@ -334,104 +304,92 @@ export function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
   }
 }
 
-export var mouseNotification = {
+function getOrCreateNotifElem(parentElem, messageClass, message, timeout) {
+  let notifElem = document.getElementById("mouse-notification");
+  if (notifElem) {
+    clearTimeout(timeout);
+    notifElem.className = messageClass;
+    notifElem.innerHTML = message;
+  } else {
+    notifElem = document.createElement("div");
+    notifElem.className = messageClass;
+    notifElem.id = "mouse-notification";
+    notifElem.innerHTML = message;
+    parentElem.appendChild(notifElem);
+  }
+  return notifElem;
+}
+
+function computeAlignedLeft(align, targetWidth, popupWidth, margin) {
+  if (align.includes("right")) {
+    return targetWidth - (popupWidth + margin);
+  }
+  if (align.includes("center")) {
+    return targetWidth / 2 - (popupWidth + margin) / 2;
+  }
+  return margin;
+}
+
+function computeAlignedTop(align, targetHeight, popupHeight, margin) {
+  if (align.includes("bottom")) {
+    return targetHeight - (popupHeight + margin);
+  }
+  if (align.includes("middle")) {
+    return targetHeight / 2 - (popupHeight + margin) / 2;
+  }
+  return margin;
+}
+
+export const mouseNotification = {
   enabled: true,
-  elem: $(".mouseNotification"),
+  elem: null,
   timeout: null,
   show: function (target, x, y, message, delay, messageClass, align, margin) {
-    /**
-         target 			is the target element that triggered the mouse notification
-         x,y				are the mouse coordinates (if required)
-         message 		is the text to display (supports html encoding)
-         delay 			is how long the message will remain before auto clearing
-         messageClass 	is the css class that should be used to draw the box, null for default
-         align 			is the position to put the popup to, null means at the mouse position, 'top-left' etc,
-         margin 			is the margin from the mouse cursor or border, null for default 10px
-
-         the index.html should have an entry <div class="mouseNotification"></div>
-         and the .css should have two definitions...
-
-         .mouseNotification {
-                position: absolute;
-                margin 0 auto;
-                white-space: pre-wrap;
-            }
-
-         .mouseNotification-box {
-                padding: 4px;
-                color: black;
-                background-color: #EAEAEA;
-                border: 2px solid white;
-                border-radius: 3px;
-            }
-
-         **/
-
     if (!this.enabled) return false;
 
-    this.elem = this.elem || $(".mouseNotification");
+    if (!this.elem) {
+      this.elem = document.getElementById("mouseNotification");
+    }
 
     messageClass = messageClass || "mouseNotification-box";
     margin = margin || 10;
 
-    let mouseNotificationElem = $("#mouse-notification");
-    if (mouseNotificationElem.length != 0) {
-      clearTimeout(this.timeout);
-      mouseNotificationElem.replaceWith(
-        `<div class="${messageClass}" id="mouse-notification">${message}</div>`,
-      );
-    } else {
-      this.elem.append(
-        `<div class="${messageClass}" id="mouse-notification">${message}</div>`,
-      );
-    }
+    getOrCreateNotifElem(this.elem, messageClass, message, this.timeout);
     this.timeout = setTimeout(function () {
-      $("#mouse-notification").remove();
+      document.getElementById("mouse-notification")?.remove();
     }, delay || 1000);
 
-    let popupRect = $(this.elem).get(0).getBoundingClientRect(); // get the popup metrics
-    let targetRect = $(target).get(0).getBoundingClientRect();
+    let popupRect = this.elem.getBoundingClientRect();
+    const targetEl =
+      target instanceof Element ? target : document.querySelector(target);
+    const targetRect = targetEl.getBoundingClientRect();
 
-    let left = 0,
-      top = 0;
-
-    // reposition the notification;
+    // reposition the notification
     if (align != null) {
-      // default is at the mouse position
-      if (align.indexOf("right") !== -1) {
-        left = targetRect.width - (popupRect.width + margin);
-      } else if (align.indexOf("center") !== -1) {
-        left = targetRect.width / 2 - (popupRect.width + margin) / 2;
-      } else {
-        // default left
-        left = margin;
-      }
-      if (align.indexOf("bottom") !== -1) {
-        top = targetRect.height - (popupRect.height + margin);
-      } else if (align.indexOf("middle") !== -1) {
-        top = targetRect.height / 2 - (popupRect.height + margin) / 2;
-      } else {
-        // default top
-        top = margin;
-      }
-      this.elem.css("left", left);
-      this.elem.css("top", top);
+      const left = computeAlignedLeft(
+        align,
+        targetRect.width,
+        popupRect.width,
+        margin,
+      );
+      const top = computeAlignedTop(
+        align,
+        targetRect.height,
+        popupRect.height,
+        margin,
+      );
+      this.elem.style.left = `${left}px`;
+      this.elem.style.top = `${top}px`;
     } else {
-      // default is at the mouse position
-      this.elem.css("left", (x || 0) - targetRect.left + margin);
-      this.elem.css("top", (y || 0) - targetRect.top + margin);
+      this.elem.style.left = `${(x || 0) - targetRect.left + margin}px`;
+      this.elem.style.top = `${(y || 0) - targetRect.top + margin}px`;
     }
 
     // now re-position the box if it goes out of the target element
-    popupRect = $(this.elem).get(0).getBoundingClientRect(); // now get them again now that we have positioned it.
+    popupRect = this.elem.getBoundingClientRect();
     if (popupRect.right > targetRect.right - margin) {
-      this.elem.css("left", targetRect.right - popupRect.width - margin);
+      this.elem.style.left = `${targetRect.right - popupRect.width - margin}px`;
     }
-    /* // disable the overflow to the bottom as single elements will overflow.
-         if (popupRect.bottom > (targetRect.bottom - margin)) {
-         this.elem.css('top', targetRect.bottom - popupRect.height - margin);
-         }
-         */
 
     return true;
   },
@@ -450,34 +408,16 @@ export function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
    ***/
   if (cf_version === undefined) {
     return (
-      sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+      sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
       semver.gte(sysConfig.firmwareVersion, bf_version)
     );
   } else {
     return (
-      (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
+      (sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
         semver.gte(sysConfig.firmwareVersion, bf_version)) ||
-      (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
+      (sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
         semver.gte(sysConfig.firmwareVersion, cf_version))
     );
-  }
-}
-
-export function getManifestVersion(manifest) {
-  try {
-    if (!manifest) {
-      manifest = chrome.runtime.getManifest();
-    }
-
-    let version = manifest.version_name;
-    if (!version) {
-      version = manifest.version;
-    }
-
-    return version;
-  } catch (error) {
-    console.log("manifest does not exist, probably not running nw.js");
-    return "-";
   }
 }
 
@@ -485,16 +425,10 @@ export function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function isChromium() {
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
-  if (!navigator.userAgentData) {
-    console.log(navigator.userAgent);
-    return false;
-  }
-
-  console.log(navigator.userAgentData);
-  // https://learn.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-guidance
-  return navigator.userAgentData.brands.some((brand) => {
-    return brand.brand == "Chromium";
-  });
+export function triggerDownload(blob, filename) {
+  const a = document.createElement("a");
+  a.download = filename;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
 }

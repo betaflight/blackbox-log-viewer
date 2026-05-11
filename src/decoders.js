@@ -166,15 +166,11 @@ ArrayDataStream.prototype.readTag2_3SVariable = function (values) {
 };
 
 ArrayDataStream.prototype.readTag8_4S16_v1 = function (values) {
-  let selector,
-    combinedChar,
-    char1,
-    char2,
-    i,
-    FIELD_ZERO = 0,
+  const FIELD_ZERO = 0,
     FIELD_4BIT = 1,
     FIELD_8BIT = 2,
     FIELD_16BIT = 3;
+  let selector, combinedChar, char1, char2, i;
 
   selector = this.readByte();
 
@@ -210,16 +206,11 @@ ArrayDataStream.prototype.readTag8_4S16_v1 = function (values) {
 };
 
 ArrayDataStream.prototype.readTag8_4S16_v2 = function (values) {
-  let selector,
-    i,
-    char1,
-    char2,
-    buffer,
-    nibbleIndex,
-    FIELD_ZERO = 0,
+  const FIELD_ZERO = 0,
     FIELD_4BIT = 1,
     FIELD_8BIT = 2,
     FIELD_16BIT = 3;
+  let selector, i, char1, char2, buffer, nibbleIndex;
 
   selector = this.readByte();
 
@@ -282,7 +273,7 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function (values) {
 ArrayDataStream.prototype.readTag8_8SVB = function (values, valueCount) {
   let i, header;
 
-  if (valueCount == 1) {
+  if (valueCount === 1) {
     values[0] = this.readSignedVB();
   } else {
     header = this.readByte();

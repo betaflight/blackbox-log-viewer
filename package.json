@@ -4,6 +4,7 @@
   "displayName": "Betaflight - Blackbox Explorer",
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
   "version": "2026.6.0",
+  "type": "module",
   "main": "index.html",
   "default_locale": "en",
   "scripts": {
@@ -21,27 +22,32 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
-    "bootstrap": "~3.4.1",
     "html2canvas": "^1.0.0-rc.5",
-    "jquery": "^3.7.1",
-    "jquery-ui": "^1.13.2",
     "leaflet": "^1.9.3",
     "leaflet-marker-rotation": "^0.4.0",
     "Leaflet.MultiOptionsPolyline": "github:hgoebl/Leaflet.MultiOptionsPolyline",
-    "lodash": "^4.18.1",
-    "throttle-debounce": "^5.0.0"
+    "pinia": "^3.0.4",
+    "semver": "^7.7.4",
+    "sortablejs": "^1.15.7",
+    "throttle-debounce": "^5.0.0",
+    "vue": "^3.5.33",
+    "vue-router": "^4.6.4",
+    "webm-writer": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@iconify-json/lucide": "^1.2.105",
+    "@nuxt/ui": "^4.7.1",
+    "@vitejs/plugin-vue": "^6.0.6",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",
     "prettier": "^3.8.3",
+    "tailwindcss": "^4.2.4",
     "vite": "^7.3.2",
     "vite-plugin-pwa": "^1.0.3"
   },
   "overrides": {
-    "lodash.template": "^4.5.0",
     "@rollup/plugin-terser": "^1.0.0"
   },
   "engines": {

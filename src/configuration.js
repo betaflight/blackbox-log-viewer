@@ -1,129 +1,47 @@
 /**
  * Configuration
  *
- * Handle loading and display of configuration file
- *
+ * Handle loading of configuration dump/diff files.
+ * Parsed lines are pushed to graphStore for Vue rendering.
  */
 
-export function Configuration(file, configurationDefaults, showConfigFile) {
-  // Private Variables
-  let that = this; // generic pointer back to this function
-  let fileData; // configuration file information
-  let fileLinesArray; // Store the contents of the file globally
+import { useGraphStore } from "./stores/graph.js";
 
-  function renderFileContentList(configurationList, filter) {
-    let li;
-
-    // Clear the contents of the list
-    $("li", configurationList).remove();
-
-    for (let i = 0; i < fileLinesArray.length; i++) {
-      if (!filter || filter.length < 1) {
-        //Everything
-        // li = $('<li class="configuration-row' + ((configurationDefaults.isDefault(fileLinesArray[i]))?(''):(' configuration-changed')) +'">' + fileLinesArray[i] + '</li>');
-
-        li = $(
-          `<li class="configuration-row"${
-            fileLinesArray[i].length == 0
-              ? ' style="background-color: white; height: 10px;"'
-              : ""
-          }>${fileLinesArray[i].length == 0 ? "&nbsp" : fileLinesArray[i]}</li>`,
-        ); // Removed default syntax highlighting
-        configurationList.append(li);
-      } else {
-        try {
-          let regFilter = new RegExp(`(.*)(${filter})(.*)`, "i");
-          let highLight = fileLinesArray[i].match(regFilter);
-          if (highLight != null) {
-            // don't include blank lines
-            li = $(
-              `<li class="configuration-row">${highLight[1]}<b>${highLight[2]}</b>${highLight[3]}</li>`,
-            ); // Removed default syntax highlighting
-            configurationList.append(li);
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-    }
-  }
-
-  function renderFileContents(filter) {
-    let configurationElem = ".configuration-file", // point to the actual element in index.html
-      configurationDiv = $(
-        `<div class="configuration-file">` +
-          `<div class="configuration-header">` +
-          `<h4>${file.name}<span class="configuration-close glyphicon glyphicon-remove"></span>` +
-          `</h4>` +
-          `<input type="text" class="form-control configuration-filter" placeholder="Enter filter" size="5"/>` +
-          `</div>` +
-          `<div><ul class="list-unstyled configuration-list"></ul></div>` +
-          `</div>`,
-      ),
-      configurationTitle = $("h3", configurationDiv),
-      li;
-
-    // now replace the element in the index.html with the loaded file information
-    $(configurationElem).replaceWith(configurationDiv);
-
-    let configurationList = $(".configuration-list");
-    renderFileContentList(configurationList, null);
-
-    //configurationTitle.text(file.name);
-    $("#status-bar .configuration-file-name").text(file.name);
-
-    // now replace the element in the index.html with the loaded file information
-    $(configurationElem).replaceWith(configurationDiv);
-
-    // Add close icon
-    $(".configuration-close").click(function () {
-      if (showConfigFile) showConfigFile(false); // hide the config file
-    });
-  }
+export function Configuration(file) {
+  let fileData;
 
   function loadFile(file) {
-    let reader = new FileReader();
-    fileData = file; // Store the data locally;
+    fileData = file;
+    const reader = new FileReader();
 
     reader.onload = function (e) {
-      let data = e.target.result; // all the data
-
-      fileLinesArray = data.split("\n"); // separated into lines
-
-      renderFileContents();
-
-      // Add user configurable file filter
-      $(".configuration-filter").keyup(function () {
-        let newFilter = $(".configuration-filter").val();
-
-        let configurationList = $(".configuration-list");
-        renderFileContentList(configurationList, newFilter);
-      });
+      const graphStore = useGraphStore();
+      graphStore.configLines = e.target.result.split("\n");
+      graphStore.configFileName = file.name;
+    };
+    reader.onerror = reader.onabort = function () {
+      const graphStore = useGraphStore();
+      graphStore.configLines = [];
+      graphStore.configFileName = "";
     };
 
     reader.readAsText(file);
   }
 
-  // Public variables and functions
   this.getFile = function () {
     return fileData;
   };
 
-  loadFile(file); // configuration file loaded
-
-  // Add filter
+  loadFile(file);
 }
 
 export function ConfigurationDefaults(prefs) {
   // Special configuration file that handles default values only
 
-  // Private Variables
-  let that = this; // generic pointer back to this function
-  let fileData; // configuration file information
-  let fileLinesArray = null; // Store the contents of the file globally
+  let fileData;
+  let fileLinesArray = null;
 
   function loadFileFromCache() {
-    // Get the file from the cache if it exists
     prefs.get("configurationDefaults", function (item) {
       if (item) {
         fileLinesArray = item;
@@ -134,20 +52,20 @@ export function ConfigurationDefaults(prefs) {
   }
 
   this.loadFile = function (file) {
-    let reader = new FileReader();
-    fileData = file; // Store the data locally;
+    const reader = new FileReader();
+    fileData = file;
 
     reader.onload = function (e) {
-      let data = e.target.result; // all the data
-      fileLinesArray = data.split("\n"); // separated into lines
-
-      prefs.set("configurationDefaults", fileLinesArray); // and store it to the cache
+      fileLinesArray = e.target.result.split("\n");
+      prefs.set("configurationDefaults", fileLinesArray);
+    };
+    reader.onerror = reader.onabort = function () {
+      fileLinesArray = null;
     };
 
     reader.readAsText(file);
   };
 
-  // Public variables and functions
   this.getFile = function () {
     return fileData;
   };
@@ -157,20 +75,21 @@ export function ConfigurationDefaults(prefs) {
   };
 
   this.hasDefaults = function () {
-    return fileLinesArray != null; // is there a default file array
+    return fileLinesArray !== null;
   };
 
   this.isDefault = function (line) {
-    // Returns the default line equivalent
-
-    if (!fileLinesArray) return true; // by default, lines are the same if there is no default file loaded
-
-    for (let i = 0; i < fileLinesArray.length; i++) {
-      if (line != fileLinesArray[i]) continue; // not the same line, keep looking
-      return true; // line is same as default
+    if (!fileLinesArray) {
+      return true;
     }
-    return false; // line not the same as default or not found
+    for (let i = 0; i < fileLinesArray.length; i++) {
+      if (line !== fileLinesArray[i]) {
+        continue;
+      }
+      return true;
+    }
+    return false;
   };
 
-  loadFileFromCache(); // configuration file loaded
+  loadFileFromCache();
 }

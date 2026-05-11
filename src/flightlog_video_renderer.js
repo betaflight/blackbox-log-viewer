@@ -1,4 +1,7 @@
+import WebMWriter from "webm-writer";
 import { FlightLogGrapher } from "./grapher";
+import { triggerDownload } from "./tools.js";
+import { useSettingsStore } from "./stores/settings.js";
 
 /**
  * Render a video of the given log using the given videoOptions (user video settings) and logParameters.
@@ -28,32 +31,22 @@ export function FlightLogVideoRenderer(
   videoOptions,
   events,
 ) {
-  let WORK_CHUNK_SIZE_FOCUSED = 8,
-    WORK_CHUNK_SIZE_UNFOCUSED = 32,
-    videoWriter,
-    canvas = document.createElement("canvas"),
-    stickCanvas = document.createElement("canvas"),
-    craftCanvas = document.createElement("canvas"),
-    analyserCanvas = document.createElement("canvas"),
-    stickCanvasLeft,
-    stickCanvasTop,
-    hasStick,
-    craftCanvasLeft,
-    craftCanvasTop,
-    hasCraft,
-    analyserCanvasLeft,
-    analyserCanvasTop,
-    hasAnalyser,
-    canvasContext = canvas.getContext("2d"),
-    frameCount,
-    frameDuration /* Duration of a frame in Blackbox's microsecond time units */,
-    frameTime,
-    frameIndex,
-    cancel = false,
-    workChunkSize = WORK_CHUNK_SIZE_FOCUSED,
-    hidden,
-    visibilityChange,
-    graph;
+  const { userSettings } = useSettingsStore();
+
+  const WORK_CHUNK_SIZE_FOCUSED = 8;
+  const WORK_CHUNK_SIZE_UNFOCUSED = 32;
+  let videoWriter;
+  const canvas = document.createElement("canvas");
+  const stickCanvas = document.createElement("canvas");
+  const craftCanvas = document.createElement("canvas");
+  const analyserCanvas = document.createElement("canvas");
+  const canvasContext = canvas.getContext("2d");
+  let frameTime;
+  let frameIndex;
+  let cancel = false;
+  let workChunkSize = WORK_CHUNK_SIZE_FOCUSED;
+  let hidden;
+  let visibilityChange;
 
   // From https://developer.mozilla.org/en-US/docs/Web/Guide/User_experience/Using_the_Page_Visibility_API
   if (typeof document.hidden !== "undefined") {
@@ -99,58 +92,6 @@ export function FlightLogVideoRenderer(
     }
   }
 
-  function supportsFileWriter() {
-    return !!(chrome && chrome.fileSystem);
-  }
-
-  /**
-   * Returns a Promise that resolves to a FileWriter for the file the user chose, or fails if the user cancels/
-   * something else bad happens.
-   */
-  function openFileForWrite(suggestedName, onComplete) {
-    return new Promise(function (resolve, reject) {
-      chrome.fileSystem.chooseEntry(
-        {
-          type: "saveFile",
-          suggestedName: suggestedName,
-          accepts: [{ extensions: ["webm"], description: "WebM video" }],
-        },
-        function (fileEntry) {
-          let error = chrome.runtime.lastError;
-
-          if (error) {
-            if (error.message == "User cancelled") {
-              reject(null);
-            } else {
-              reject(error.message);
-            }
-          } else {
-            fileEntry.createWriter(
-              function (fileWriter) {
-                fileWriter.onerror = function (e) {
-                  console.error(e);
-                };
-
-                fileWriter.onwriteend = function () {
-                  fileWriter.onwriteend = null;
-
-                  resolve(fileWriter);
-                };
-
-                // If the file already existed then we need to truncate it to avoid doing a partial rewrite
-                fileWriter.truncate(0);
-              },
-              function (e) {
-                // File is not readable or does not exist!
-                reject(e);
-              },
-            );
-          }
-        },
-      );
-    });
-  }
-
   function notifyCompletion(success, frameCount) {
     removeVisibilityHandler();
 
@@ -162,7 +103,7 @@ export function FlightLogVideoRenderer(
   function finishRender() {
     videoWriter.complete().then(function (webM) {
       if (webM) {
-        globalThis.saveAs(webM, "video.webm");
+        triggerDownload(webM, "video.webm");
       }
 
       notifyCompletion(true, frameIndex);
@@ -177,14 +118,14 @@ export function FlightLogVideoRenderer(
      * I'd dearly like to run the rendering process in a Web Worker, but workers can't use Canvas because
      * it happens to be a DOM element (and Workers aren't allowed access to the DOM). Stupid!
      */
-    let framesToRender = Math.min(workChunkSize, frameCount - frameIndex);
+    const framesToRender = Math.min(workChunkSize, frameCount - frameIndex);
 
     if (cancel) {
       notifyCompletion(false);
       return;
     }
 
-    let completeChunk = function () {
+    const completeChunk = function () {
         if (events && events.onProgress) {
           events.onProgress(frameIndex, frameCount);
         }
@@ -198,13 +139,13 @@ export function FlightLogVideoRenderer(
       renderFrame = function () {
         graph.render(frameTime);
 
-        if (logParameters.hasSticks && parseInt(userSettings.sticks.size) > 0)
+        if (logParameters.hasSticks && Number.parseInt(userSettings.sticks.size, 10) > 0)
           canvasContext.drawImage(stickCanvas, stickCanvasLeft, stickCanvasTop);
-        if (logParameters.hasCraft && parseInt(userSettings.craft.size) > 0)
+        if (logParameters.hasCraft && Number.parseInt(userSettings.craft.size, 10) > 0)
           canvasContext.drawImage(craftCanvas, craftCanvasLeft, craftCanvasTop);
         if (
           logParameters.hasAnalyser &&
-          parseInt(userSettings.analyser.size) > 0
+          Number.parseInt(userSettings.analyser.size, 10) > 0
         )
           canvasContext.drawImage(
             analyserCanvas,
@@ -219,8 +160,8 @@ export function FlightLogVideoRenderer(
       };
 
     if (logParameters.flightVideo) {
-      let renderFrames = function (frameCount) {
-        if (frameCount == 0) {
+      const renderFrames = function (frameCount) {
+        if (frameCount === 0) {
           completeChunk();
           return;
         }
@@ -280,27 +221,10 @@ export function FlightLogVideoRenderer(
 
     installVisibilityHandler();
 
-    let webMOptions = {
+    videoWriter = new WebMWriter({
       frameRate: videoOptions.frameRate,
-    };
-
-    if (supportsFileWriter()) {
-      openFileForWrite("video.webm").then(
-        function (fileWriter) {
-          webMOptions.fileWriter = fileWriter;
-
-          videoWriter = new WebMWriter(webMOptions);
-          renderChunk();
-        },
-        function (error) {
-          console.error(error);
-          notifyCompletion(false);
-        },
-      );
-    } else {
-      videoWriter = new WebMWriter(webMOptions);
-      renderChunk();
-    }
+    });
+    renderChunk();
   };
 
   /**
@@ -311,11 +235,11 @@ export function FlightLogVideoRenderer(
   };
 
   /**
-   * Returns true if the video can be saved directly to disk (bypassing memory caching). If so, the user
-   * will be prompted for a filename when the start() method is called.
+   * Returns true if the video can be saved directly to disk (bypassing memory caching).
+   * Chrome Apps fileSystem API is removed — always returns false in PWA mode.
    */
   this.willWriteDirectToDisk = function () {
-    return supportsFileWriter();
+    return false;
   };
 
   canvas.width = videoOptions.width;
@@ -326,13 +250,9 @@ export function FlightLogVideoRenderer(
     delete logParameters.flightVideo;
   }
 
-  let options = $.extend({}, userSettings || {}, {
-    eraseBackground: !logParameters.flightVideo,
-    drawEvents: false,
-    fillBackground: !logParameters.flightVideo,
-  });
+  const options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
 
-  graph = new FlightLogGrapher(
+  const graph = new FlightLogGrapher(
     flightLog,
     logParameters.graphConfig,
     canvas,
@@ -342,14 +262,14 @@ export function FlightLogVideoRenderer(
     options,
   );
 
-  stickCanvasLeft = parseInt($(stickCanvas).css("left"), 10);
-  stickCanvasTop = parseInt($(stickCanvas).css("top"), 10);
+  const stickCanvasLeft = Number.parseInt(stickCanvas.style.left, 10) || 0;
+  const stickCanvasTop = Number.parseInt(stickCanvas.style.top, 10) || 0;
 
-  craftCanvasLeft = parseInt($(craftCanvas).css("left"), 10);
-  craftCanvasTop = parseInt($(craftCanvas).css("top"), 10);
+  const craftCanvasLeft = Number.parseInt(craftCanvas.style.left, 10) || 0;
+  const craftCanvasTop = Number.parseInt(craftCanvas.style.top, 10) || 0;
 
-  analyserCanvasLeft = parseInt($(analyserCanvas).css("left"), 10);
-  analyserCanvasTop = parseInt($(analyserCanvas).css("top"), 10);
+  const analyserCanvasLeft = Number.parseInt(analyserCanvas.style.left, 10) || 0;
+  const analyserCanvasTop = Number.parseInt(analyserCanvas.style.top, 10) || 0;
 
   if (!("inTime" in logParameters) || logParameters.inTime === false) {
     logParameters.inTime = flightLog.getMinTime();
@@ -359,10 +279,10 @@ export function FlightLogVideoRenderer(
     logParameters.outTime = flightLog.getMaxTime();
   }
 
-  frameDuration = 1000000 / videoOptions.frameRate;
+  const frameDuration = 1000000 / videoOptions.frameRate;
 
   // If the in -> out time is not an exact number of frames, we'll round the end time of the video to make it so:
-  frameCount = Math.round(
+  const frameCount = Math.round(
     (logParameters.outTime - logParameters.inTime) / frameDuration,
   );
 
@@ -375,12 +295,12 @@ export function FlightLogVideoRenderer(
  * Is video rendering supported on this web browser? We require the ability to encode canvases to WebP.
  */
 FlightLogVideoRenderer.isSupported = function () {
-  let canvas = document.createElement("canvas");
+  const canvas = document.createElement("canvas");
 
   canvas.width = 16;
   canvas.height = 16;
 
-  let encoded = canvas.toDataURL("image/webp", { quality: 0.9 });
+  const encoded = canvas.toDataURL("image/webp", { quality: 0.9 });
 
   return encoded && encoded.match(/^data:image\/webp;/);
 };

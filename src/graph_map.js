@@ -1,4 +1,7 @@
+import { useSettingsStore } from "./stores/settings.js";
+
 export function MapGrapher() {
+  const { userSettings } = useSettingsStore();
   let myMap,
     currentLogStartDateTime,
     currentTime,
@@ -105,7 +108,7 @@ export function MapGrapher() {
     flightLog = newFlightLog;
 
     const newLogStartDateTime = flightLog.getSysConfig()["Log start datetime"];
-    if (currentLogStartDateTime != newLogStartDateTime) {
+    if (currentLogStartDateTime !== newLogStartDateTime) {
       this.reset();
       currentLogStartDateTime = newLogStartDateTime;
     }
@@ -118,7 +121,7 @@ export function MapGrapher() {
     }
 
     this.setFlightLogIndexs();
-    let { latlngs, maxAlt, minAlt } = this.getPolylinesData();
+    const { latlngs, maxAlt, minAlt } = this.getPolylinesData();
 
     const hasGpsData = latlngs.length > 0;
 
@@ -138,7 +141,7 @@ export function MapGrapher() {
       console.debug("FlightLog has no gps data.");
     }
 
-    $("#mapContainer").toggleClass("no-gps-data", !hasGpsData);
+    document.getElementById("mapContainer")?.classList.toggle("no-gps-data", !hasGpsData);
   };
 
   this.setFlightLogIndexs = function () {
@@ -150,7 +153,7 @@ export function MapGrapher() {
   };
 
   this.getPolylinesData = function () {
-    let latlngs = [];
+    const latlngs = [];
     let maxAlt = Number.MIN_VALUE;
     let minAlt = Number.MAX_VALUE;
 
@@ -159,9 +162,9 @@ export function MapGrapher() {
       flightLog.getMaxTime(),
     );
 
+    let frameCount = 0;
     for (const chunk of chunks) {
-      for (const fi in chunk.frames) {
-        const frame = chunk.frames[fi];
+      for (const frame of chunk.frames) {
         const coordinates = this.getCoordinatesFromFrame(
           frame,
           latIndexAtFrame,
@@ -171,6 +174,7 @@ export function MapGrapher() {
 
         // if there are no coordinates the frame is skipped
         if (!coordinates) {
+          frameCount++;
           continue;
         }
 
@@ -181,9 +185,10 @@ export function MapGrapher() {
         minAlt = coordinates.alt < minAlt ? coordinates.alt : minAlt;
 
         // 1/4 of the dots is enough to draw the line
-        if (fi % 4 == 0) {
+        if (frameCount % 4 === 0) {
           latlngs.push(coordinates);
         }
+        frameCount++;
       }
     }
     return { latlngs, maxAlt, minAlt };
@@ -196,7 +201,7 @@ export function MapGrapher() {
 
     const thresholdIncrement = delta / divider;
 
-    let altThresholds = [];
+    const altThresholds = [];
     let threshold = minAlt;
     for (let i = 0; i < divider; i++) {
       //amount of colors - min and max that are set
@@ -236,11 +241,9 @@ export function MapGrapher() {
         frame.current,
         groundCourseIndexAtFrame,
       );
-    } catch (e) {}
-  };
-
-  this.setUserSettings = function (newUserSettings) {
-    globalThis.userSettings = newUserSettings;
+    } catch {
+      // Frame coordinates unavailable — skip position update
+    }
   };
 
   this.redrawAll = function () {
@@ -256,7 +259,7 @@ export function MapGrapher() {
   this.redrawFlightTrail = function () {
     // If flightLog has changed redraw flight trail
     const currentLogIndex = flightLog.getLogIndex();
-    if (previousLogIndex != currentLogIndex) {
+    if (previousLogIndex !== currentLogIndex) {
       this.clearMap(previousLogIndex);
       if (trailLayers.has(currentLogIndex)) {
         const polyline = userSettings.mapTrailAltitudeColored
@@ -366,12 +369,20 @@ export function MapGrapher() {
       return;
     }
     const containerstyle = {
-      height: (height * parseInt(userSettings.map.size)) / 100.0,
-      width: (width * parseInt(userSettings.map.size)) / 100.0,
-      left: (width * parseInt(userSettings.map.left)) / 100.0,
-      top: (height * parseInt(userSettings.map.top)) / 100.0,
+      height: (height * Number.parseInt(userSettings.map.size, 10)) / 100,
+      width: (width * Number.parseInt(userSettings.map.size, 10)) / 100,
+      left: (width * Number.parseInt(userSettings.map.left, 10)) / 100,
+      top: (height * Number.parseInt(userSettings.map.top, 10)) / 100,
     };
-    $("#mapContainer").css(containerstyle);
+    const mapEl = document.getElementById("mapContainer");
+    if (mapEl) {
+      Object.assign(mapEl.style, {
+        height: `${containerstyle.height}px`,
+        width: `${containerstyle.width}px`,
+        left: `${containerstyle.left}px`,
+        top: `${containerstyle.top}px`,
+      });
+    }
   };
 
   this.getCoordinatesFromFrame = function (
@@ -399,7 +410,7 @@ export function MapGrapher() {
 
   this.getGroundCourseFromFrame = function (frame, groundCourseIndex) {
     const gc = frame[groundCourseIndex];
-    return typeof gc == "number" ? gc / grounCourseDivider : 0;
+    return typeof gc === "number" ? gc / grounCourseDivider : 0;
   };
 
   this.getHomeCoordinatesFromFlightLog = function (flightLog) {

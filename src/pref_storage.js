@@ -4,11 +4,11 @@
  * Supply keyPrefix if you want it automatically prepended to key names.
  */
 export function PrefStorage(keyPrefix) {
-  let LOCALSTORAGE = 0,
-    CHROME_STORAGE_LOCAL = 1,
-    MEMORY = 2,
-    mode,
-    memoryStorage = {};
+  const LOCALSTORAGE = 0;
+  const CHROME_STORAGE_LOCAL = 1;
+  const MEMORY = 2;
+  let mode;
+  const memoryStorage = {};
 
   /**
    * Fetch the value with the given name, calling the onGet handler (possibly asynchronously) with the retrieved
@@ -18,17 +18,20 @@ export function PrefStorage(keyPrefix) {
     name = keyPrefix + name;
 
     switch (mode) {
-      case LOCALSTORAGE:
-        var parsed = null;
+      case LOCALSTORAGE: {
+        let parsed = null;
 
         if (globalThis.localStorage) {
           try {
             parsed = JSON.parse(globalThis.localStorage[name]);
-          } catch (e) {}
+          } catch {
+            // Invalid JSON in storage — return null
+          }
         }
 
         onGet(parsed);
         break;
+      }
       case CHROME_STORAGE_LOCAL:
         chrome.storage.local.get(name, function (data) {
           onGet(data[name]);
@@ -57,13 +60,14 @@ export function PrefStorage(keyPrefix) {
           }
         }
         break;
-      case CHROME_STORAGE_LOCAL:
-        var data = {};
+      case CHROME_STORAGE_LOCAL: {
+        const data = {};
 
         data[name] = value;
 
         chrome.storage.local.set(data);
         break;
+      }
       case MEMORY:
         memoryStorage[name] = value;
         break;

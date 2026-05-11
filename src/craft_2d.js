@@ -1,20 +1,17 @@
+import { useSettingsStore } from "./stores/settings.js";
+
 export function Craft2D(flightLog, canvas, propColors) {
-  let ARM_THICKNESS_MULTIPLIER = 0.18,
+  const { userSettings } = useSettingsStore();
+
+  const ARM_THICKNESS_MULTIPLIER = 0.18,
     ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER = 1.1,
-    CENTRAL_HUB_SIZE_MULTIPLIER = 0.3,
-    MOTOR_LABEL_SPACING = 10;
+    CENTRAL_HUB_SIZE_MULTIPLIER = 0.3;
 
-  let canvasContext = canvas.getContext("2d");
+  const canvasContext = canvas.getContext("2d");
 
-  let craftParameters = {};
+  const craftParameters = {};
 
-  let customMix;
-
-  if (userSettings != null) {
-    customMix = userSettings.customMix;
-  } else {
-    customMix = null;
-  }
+  const customMix = userSettings.customMix ?? null;
 
   let numMotors;
   if (!customMix) {
@@ -23,10 +20,10 @@ export function Craft2D(flightLog, canvas, propColors) {
     numMotors = customMix.motorOrder.length;
   }
 
-  let shadeColors = [],
-    craftColor = "rgb(76,76,76)",
-    armLength,
-    bladeRadius;
+  const shadeColors = [];
+  const craftColor = "rgb(76,76,76)";
+  let armLength;
+  let bladeRadius;
 
   let motorOrder, yawOffset;
 
@@ -51,7 +48,7 @@ export function Craft2D(flightLog, canvas, propColors) {
         break;
       default:
         motorOrder = new Array(numMotors);
-        for (var i = 0; i < numMotors; i++) {
+        for (let i = 0; i < numMotors; i++) {
           motorOrder[i] = i;
         }
         yawOffset = 0;
@@ -148,7 +145,7 @@ export function Craft2D(flightLog, canvas, propColors) {
           craftParameters.motors.push({
             x: Math.cos((i / numMotors) * Math.PI * 2),
             y: Math.sin((i / numMotors) * Math.PI * 2),
-            direction: Math.pow(-1, i),
+            direction: (-1) ** i,
             color: propColors[i],
           });
         }
@@ -159,8 +156,7 @@ export function Craft2D(flightLog, canvas, propColors) {
   }
 
   this.render = function (frame, frameFieldIndexes) {
-    let motorIndex,
-      sysConfig = flightLog.getSysConfig();
+    const sysConfig = flightLog.getSysConfig();
 
     canvasContext.save();
 
@@ -177,7 +173,7 @@ export function Craft2D(flightLog, canvas, propColors) {
 
     canvasContext.beginPath();
 
-    for (i = 0; i < numMotors; i++) {
+    for (let i = 0; i < numMotors; i++) {
       canvasContext.moveTo(0, 0);
 
       canvasContext.lineTo(
@@ -207,8 +203,8 @@ export function Craft2D(flightLog, canvas, propColors) {
     canvasContext.fillStyle = craftColor;
     canvasContext.fill();
 
-    for (i = 0; i < numMotors; i++) {
-      let motorValue = frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]];
+    for (let i = 0; i < numMotors; i++) {
+      const motorValue = frame[frameFieldIndexes[`motor[${motorOrder[i]}]`]];
 
       canvasContext.save();
       {
@@ -263,14 +259,14 @@ export function Craft2D(flightLog, canvas, propColors) {
     canvasContext.restore();
   };
 
-  for (var i = 0; i < propColors.length; i++) {
-    shadeColors.push(makeColorHalfStrength(propColors[i]));
+  for (const propColor of propColors) {
+    shadeColors.push(makeColorHalfStrength(propColor));
   }
 
   decide2DCraftParameters();
 
   this.resize = function (width, height) {
-    if (canvas.width != width || canvas.height != height) {
+    if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
     }

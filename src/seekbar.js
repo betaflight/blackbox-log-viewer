@@ -28,37 +28,37 @@ function getCursorStyleWindow() {
 }
 
 export function SeekBar(canvas) {
-  let that = this,
-    //Times:
-    min,
-    max,
-    current,
-    currentWindow = 0,
-    //Activity to display on bar:
-    activityStrength,
-    activityTime,
-    //Whether a special event exists at the given time:
-    hasEvent,
-    //Expect to be plotting PWM-like data by default:
-    activityMin = 1000,
-    activityMax = 2000,
-    canvasContext = canvas.getContext("2d"),
-    background = document.createElement("canvas"),
-    backgroundContext = background.getContext("2d"),
-    inTime = false,
-    outTime = false,
-    backgroundValid = false,
-    dirtyRegion = false,
-    //Current time cursor:
-    CURSOR_WIDTH = 1,
-    // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
-    BAR_INSET = CURSOR_WIDTH;
+  const that = this;
+  //Times:
+  let min;
+  let max;
+  let current;
+  let currentWindow = 0;
+  //Activity to display on bar:
+  let activityStrength;
+  let activityTime;
+  //Whether a special event exists at the given time:
+  let hasEvent;
+  //Expect to be plotting PWM-like data by default:
+  let activityMin = 1000;
+  let activityMax = 2000;
+  const canvasContext = canvas.getContext("2d");
+  const background = document.createElement("canvas");
+  const backgroundContext = background.getContext("2d");
+  let inTime = false;
+  let outTime = false;
+  let backgroundValid = false;
+  let dirtyRegion = false;
+  //Current time cursor:
+  let CURSOR_WIDTH = 1;
+  // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
+  let BAR_INSET = CURSOR_WIDTH;
 
   this.onSeek = false;
 
   function seekToDOMPixel(x) {
-    let bounding = canvas.getBoundingClientRect(),
-      time;
+    const bounding = canvas.getBoundingClientRect();
+    let time;
 
     // Compensate for canvas being stretched on the page
     x = (x / (bounding.right - bounding.left)) * canvas.width;
@@ -80,59 +80,68 @@ export function SeekBar(canvas) {
     backgroundValid = false;
   }
 
-  function onMouseMove(e) {
-    if (e.which == 1) seekToDOMPixel(e.pageX - $(canvas).offset().left);
+  function getCanvasOffsetLeft() {
+    return canvas.getBoundingClientRect().left + window.scrollX;
   }
 
-  $(canvas).mousedown(function (e) {
+  let cancelMouseDrag = null;
+  let cancelTouchDrag = null;
+
+  function onMouseMove(e) {
+    if (e.button === 0) { seekToDOMPixel(e.pageX - getCanvasOffsetLeft()); }
+  }
+
+  function onMouseDown(e) {
     e.preventDefault();
 
-    if (e.which == 1) {
-      //Left mouse button only for seeking
-      seekToDOMPixel(e.pageX - $(this).offset().left);
+    if (e.button === 0) {
+      seekToDOMPixel(e.pageX - getCanvasOffsetLeft());
+      document.body.addEventListener("mousemove", onMouseMove);
 
-      //"capture" the mouse so we can drag outside the boundaries of the seek bar
-      $("body").on("mousemove", onMouseMove);
-
-      //Release the capture when the mouse is released
-      $("body").one("mouseup", function () {
-        $("body").off("mousemove", onMouseMove);
-      });
+      function onMouseUp() {
+        document.body.removeEventListener("mousemove", onMouseMove);
+        document.body.removeEventListener("mouseup", onMouseUp);
+        cancelMouseDrag = null;
+      }
+      cancelMouseDrag = onMouseUp;
+      document.body.addEventListener("mouseup", onMouseUp);
     }
-  });
+  }
+
+  canvas.addEventListener("mousedown", onMouseDown);
 
   function onTouchMove(e) {
-    if (e.which == 0)
-      seekToDOMPixel(
-        e.originalEvent.touches[0].pageX - $(canvas).offset().left,
-      );
+    seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
   }
 
   function onTouchStart(e) {
     e.preventDefault();
 
-    if (e.which == 0) {
-      //touch only for seeking
-      seekToDOMPixel(e.originalEvent.touches[0].pageX - $(this).offset().left);
+    seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
+    document.body.addEventListener("touchmove", onTouchMove);
 
-      //"capture" so we can drag outside the boundaries of the seek bar
-      $("body").on("touchmove", onTouchMove);
-
-      //Release the capture when touch ends
-      $("body").one("touchend", function () {
-        $("body").off("touchmove", onTouchMove);
-      });
+    function onTouchEnd() {
+      document.body.removeEventListener("touchmove", onTouchMove);
+      document.body.removeEventListener("touchend", onTouchEnd);
+      document.body.removeEventListener("touchcancel", onTouchEnd);
+      cancelTouchDrag = null;
     }
+    cancelTouchDrag = onTouchEnd;
+    document.body.addEventListener("touchend", onTouchEnd);
+    document.body.addEventListener("touchcancel", onTouchEnd);
   }
 
-  $(canvas).on("touchstart", onTouchStart);
+  canvas.addEventListener("touchstart", onTouchStart);
 
   this.destroy = function () {
-    $(canvas).off("touchstart", onTouchStart);
+    canvas.removeEventListener("mousedown", onMouseDown);
+    canvas.removeEventListener("touchstart", onTouchStart);
+    if (cancelMouseDrag) { cancelMouseDrag(); }
+    if (cancelTouchDrag) { cancelTouchDrag(); }
   };
 
   this.resize = function (width, height) {
-    let ratio = globalThis.devicePixelRatio ? globalThis.devicePixelRatio : 1;
+    const ratio = globalThis.devicePixelRatio ? globalThis.devicePixelRatio : 1;
 
     canvas.width = width * ratio;
     canvas.height = height * ratio;
@@ -270,7 +279,7 @@ export function SeekBar(canvas) {
         }
 
         if (outTime !== false) {
-          let barStartX = (outTime - min) / pixelTimeStep + BAR_INSET;
+          const barStartX = (outTime - min) / pixelTimeStep + BAR_INSET;
 
           backgroundContext.fillRect(
             barStartX,
@@ -286,7 +295,9 @@ export function SeekBar(canvas) {
   }
 
   this.repaint = function () {
-    if (canvas.width == 0 || canvas.height == 0) return;
+    if (canvas.width === 0 || canvas.height === 0) {
+      return;
+    }
 
     if (!backgroundValid) {
       dirtyRegion = false;
@@ -309,11 +320,11 @@ export function SeekBar(canvas) {
     }
 
     //Draw cursor
-    let pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2),
-      cursorX = (current - min) / pixelTimeStep + BAR_INSET,
-      cursorWidth = 0;
+    const pixelTimeStep = (max - min) / (canvas.width - BAR_INSET * 2);
+    const cursorX = (current - min) / pixelTimeStep + BAR_INSET;
+    let cursorWidth = 0;
 
-    if (currentWindow != 0) {
+    if (currentWindow !== 0) {
       cursorWidth = currentWindow / 2 / pixelTimeStep;
     }
 

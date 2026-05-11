@@ -1,6 +1,6 @@
 import { signExtend16Bit, signExtend8Bit } from "./tools";
 
-let EOF = -1;
+const EOF = -1;
 
 /*
  * Take an array of unsigned byte data and present it as a stream with various methods
@@ -46,7 +46,7 @@ ArrayDataStream.prototype.readS8 = function () {
   return signExtend8Bit(this.readByte());
 };
 
-ArrayDataStream.prototype.unreadChar = function (c) {
+ArrayDataStream.prototype.unreadChar = function (_c) {
   this.pos--;
 };
 
@@ -73,7 +73,7 @@ ArrayDataStream.prototype.readUnsignedVB = function () {
   for (i = 0; i < 5; i++) {
     b = this.readByte();
 
-    if (b == EOF) return 0;
+    if (b === EOF) return 0;
 
     result = result | ((b & ~0x80) << shift);
 
@@ -94,15 +94,15 @@ ArrayDataStream.prototype.readUnsignedVB = function () {
 };
 
 ArrayDataStream.prototype.readSignedVB = function () {
-  let unsigned = this.readUnsignedVB();
+  const unsigned = this.readUnsignedVB();
 
   // Apply ZigZag decoding to recover the signed value
   return (unsigned >>> 1) ^ -(unsigned & 1);
 };
 
 ArrayDataStream.prototype.readString = function (length) {
-  let chars = new Array(length),
-    i;
+  const chars = new Array(length);
+  let i;
 
   for (i = 0; i < length; i++) {
     chars[i] = this.readChar();
@@ -112,21 +112,21 @@ ArrayDataStream.prototype.readString = function (length) {
 };
 
 ArrayDataStream.prototype.readS16 = function () {
-  let b1 = this.readByte(),
+  const b1 = this.readByte(),
     b2 = this.readByte();
 
   return signExtend16Bit(b1 | (b2 << 8));
 };
 
 ArrayDataStream.prototype.readU16 = function () {
-  let b1 = this.readByte(),
+  const b1 = this.readByte(),
     b2 = this.readByte();
 
   return b1 | (b2 << 8);
 };
 
 ArrayDataStream.prototype.readU32 = function () {
-  let b1 = this.readByte(),
+  const b1 = this.readByte(),
     b2 = this.readByte(),
     b3 = this.readByte(),
     b4 = this.readByte();
@@ -146,10 +146,10 @@ ArrayDataStream.prototype.nextOffsetOf = function (needle) {
   let i, j;
 
   for (i = this.pos; i <= this.end - needle.length; i++) {
-    if (this.data[i] == needle[0]) {
-      for (j = 1; j < needle.length && this.data[i + j] == needle[j]; j++);
+    if (this.data[i] === needle[0]) {
+      for (j = 1; j < needle.length && this.data[i + j] === needle[j]; j++);
 
-      if (j == needle.length) return i;
+      if (j === needle.length) return i;
     }
   }
 

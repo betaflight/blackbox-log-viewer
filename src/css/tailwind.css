@@ -1,0 +1,32 @@
+/**
+ * Tailwind CSS + Nuxt UI theme
+ * Matches Betaflight Configurator color system
+ */
+
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  --color-primary-50: #fffeea;
+  --color-primary-100: #fffac5;
+  --color-primary-200: #fff685;
+  --color-primary-300: #ffea46;
+  --color-primary-400: #ffc526;
+  --color-primary-500: #ffbb00;
+  --color-primary-600: #e29000;
+  --color-primary-700: #bb6502;
+  --color-primary-800: #984e08;
+  --color-primary-900: #7c400b;
+  --color-primary-950: #482100;
+
+  --color-neutral-850: oklch(23.5% 0 0);
+}
+
+:root, :host {
+  --ui-primary: var(--color-primary-500);
+  --ui-radius: 0.35rem;
+}
+
+.dark {
+  --ui-primary: var(--color-primary-400);
+}

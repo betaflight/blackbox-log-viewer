@@ -3,6 +3,9 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import globals from "globals";
 
 export default [
+  {
+    ignores: ["src/vendor/", "dist/", "public/", "test/"],
+  },
   js.configs.recommended,
   eslintConfigPrettier,
   {
@@ -12,27 +15,36 @@ export default [
       sourceType: "module",
       globals: {
         ...globals.browser,
-        ...globals.jquery,
+        THREE: "readonly", // vendored three.min.js (r70, loaded via <script>)
+        L: "readonly", // Leaflet (loaded via <script>)
+        chrome: "readonly", // Chrome/Electron extension APIs (pref_storage.js)
+        __APP_VERSION__: "readonly", // Vite define
       },
     },
     rules: {
-      "no-var": "warn",
-      "no-unused-vars": "warn",
-      "no-undef": "warn",
-      "no-redeclare": "warn",
-      "no-prototype-builtins": "warn",
-      "no-empty": "warn",
-      "no-inner-declarations": "warn",
-      "no-fallthrough": "warn",
-      "no-useless-escape": "warn",
-      "no-constant-condition": "warn",
-      "no-unreachable": "warn",
-      "no-duplicate-case": "warn",
-      "no-dupe-keys": "warn",
-      "no-irregular-whitespace": "warn",
-      "no-case-declarations": "warn",
-      "prefer-template": "warn",
-      "comma-dangle": ["warn", "always-multiline"],
+      "no-var": "error",
+      "no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "no-undef": "error",
+      "no-redeclare": "error",
+      "no-prototype-builtins": "error",
+      "no-empty": "error",
+      "no-inner-declarations": "error",
+      "no-fallthrough": "error",
+      "no-useless-escape": "error",
+      "no-constant-condition": "error",
+      "no-unreachable": "error",
+      "no-duplicate-case": "error",
+      "no-dupe-keys": "error",
+      "no-irregular-whitespace": "error",
+      "no-case-declarations": "error",
+      eqeqeq: ["error", "smart"],
+      "prefer-const": "error",
+      "prefer-template": "error",
+      radix: "error",
+      "comma-dangle": ["error", "always-multiline"],
       semi: ["error", "always"],
     },
   },

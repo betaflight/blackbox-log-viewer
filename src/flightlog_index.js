@@ -6,15 +6,14 @@ import "./decoders";
 
 export function FlightLogIndex(logData) {
   //Private:
-  let that = this,
-    logBeginOffsets = false,
-    logCount = false,
-    intraframeDirectories = false;
+  const that = this;
+  let logBeginOffsets = false;
+  let intraframeDirectories = false;
 
   function buildLogOffsetsIndex() {
-    let stream = new ArrayDataStream(logData),
-      i,
-      logStart;
+    const stream = new ArrayDataStream(logData);
+    let i;
+    let logStart;
 
     logBeginOffsets = [];
 
@@ -23,7 +22,7 @@ export function FlightLogIndex(logData) {
         FlightLogParser.prototype.FLIGHT_LOG_START_MARKER,
       );
 
-      if (logStart == -1) {
+      if (logStart === -1) {
         //No more logs found in the file
         logBeginOffsets.push(stream.end);
         break;
@@ -38,41 +37,36 @@ export function FlightLogIndex(logData) {
   }
 
   function buildIntraframeDirectories() {
-    let parser = new FlightLogParser(logData, that);
+    const parser = new FlightLogParser(logData, that);
 
     intraframeDirectories = [];
 
     for (let i = 0; i < that.getLogCount(); i++) {
-      var intraIndex = {
-          times: [],
-          offsets: [],
-          avgThrottle: [],
-          maxRC: [],
-          maxMotorDiff: [],
-          initialIMU: [],
-          initialSlow: [],
-          initialGPSHome: [],
-          initialGPS: [],
-          hasEvent: [],
-          minTime: false,
-          maxTime: false,
-          unLoggedTime: 0,
-        },
-        imu = new IMU(),
-        gyroADC,
-        accSmooth,
-        magADC,
-        iframeCount = 0,
-        motorFields = [],
-        maxRCFields = [],
-        matches,
-        throttleTotal,
-        rcTotal,
-        maxMotor,
-        minMotor,
-        eventInThisChunk = null,
-        parsedHeader,
-        sawEndMarker = false;
+      const intraIndex = {
+        times: [],
+        offsets: [],
+        avgThrottle: [],
+        maxRC: [],
+        maxMotorDiff: [],
+        initialIMU: [],
+        initialSlow: [],
+        initialGPSHome: [],
+        initialGPS: [],
+        hasEvent: [],
+        minTime: false,
+        maxTime: false,
+        unLoggedTime: 0,
+      };
+      const imu = new IMU();
+      let iframeCount = 0;
+      const motorFields = [];
+      const maxRCFields = [];
+      let throttleTotal;
+      let rcTotal;
+      let maxMotor;
+      let minMotor;
+      let parsedHeader;
+      let sawEndMarker = false;
 
       try {
         parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
@@ -86,26 +80,26 @@ export function FlightLogIndex(logData) {
 
       // Only attempt to parse the log if the header wasn't corrupt
       if (parsedHeader) {
-        var sysConfig = parser.sysConfig,
-          mainFrameDef = parser.frameDefs.I,
-          gyroADC = [
-            mainFrameDef.nameToIndex["gyroADC[0]"],
-            mainFrameDef.nameToIndex["gyroADC[1]"],
-            mainFrameDef.nameToIndex["gyroADC[2]"],
-          ],
-          accSmooth = [
-            mainFrameDef.nameToIndex["accSmooth[0]"],
-            mainFrameDef.nameToIndex["accSmooth[1]"],
-            mainFrameDef.nameToIndex["accSmooth[2]"],
-          ],
-          magADC = [
-            mainFrameDef.nameToIndex["magADC[0]"],
-            mainFrameDef.nameToIndex["magADC[1]"],
-            mainFrameDef.nameToIndex["magADC[2]"],
-          ],
-          lastSlow = [],
-          lastGPSHome = [],
-          lastGPS = [];
+        const sysConfig = parser.sysConfig;
+        const mainFrameDef = parser.frameDefs.I;
+        const gyroADC = [
+          mainFrameDef.nameToIndex["gyroADC[0]"],
+          mainFrameDef.nameToIndex["gyroADC[1]"],
+          mainFrameDef.nameToIndex["gyroADC[2]"],
+        ];
+        const accSmooth = [
+          mainFrameDef.nameToIndex["accSmooth[0]"],
+          mainFrameDef.nameToIndex["accSmooth[1]"],
+          mainFrameDef.nameToIndex["accSmooth[2]"],
+        ];
+        let magADC = [
+          mainFrameDef.nameToIndex["magADC[0]"],
+          mainFrameDef.nameToIndex["magADC[1]"],
+          mainFrameDef.nameToIndex["magADC[2]"],
+        ];
+        let lastSlow = [];
+        let lastGPSHome = [];
+        let lastGPS = [];
 
         // Identify motor fields so they can be used to show the activity summary bar
         for (let j = 0; j < 8; j++) {
@@ -133,7 +127,7 @@ export function FlightLogIndex(logData) {
           frame,
           frameType,
           frameOffset,
-          frameSize,
+          _frameSize,
         ) {
           if (!frameValid) {
             return;
@@ -155,7 +149,7 @@ export function FlightLogIndex(logData) {
                 intraIndex.maxTime = frameTime;
               }
 
-              if (frameType == "I") {
+              if (frameType === "I") {
                 // Start a new chunk on every 4th I-frame
                 if (iframeCount % 4 === 0) {
                   // Log the beginning of the new chunk
@@ -166,7 +160,7 @@ export function FlightLogIndex(logData) {
                     throttleTotal = 0;
                     maxMotor = 0;
                     minMotor = 2000;
-                    for (let mofo of motorFields) {
+                    for (const mofo of motorFields) {
                       maxMotor = Math.max(frame[mofo], maxMotor);
                       minMotor = Math.min(frame[mofo], minMotor);
                       throttleTotal += frame[mofo];
@@ -179,7 +173,7 @@ export function FlightLogIndex(logData) {
                   }
                   if (maxRCFields.length) {
                     rcTotal = 0;
-                    for (let rcfo of maxRCFields) {
+                    for (const rcfo of maxRCFields) {
                       rcTotal += Math.max(rcTotal, Math.abs(frame[rcfo]));
                     }
 
@@ -223,11 +217,11 @@ export function FlightLogIndex(logData) {
                 intraIndex.hasEvent[intraIndex.times.length - 1] = true;
               }
 
-              if (frame.event == FlightLogEvent.LOG_END) {
+              if (frame.event === FlightLogEvent.LOG_END) {
                 sawEndMarker = true;
               }
 
-              if (frame.event == FlightLogEvent.LOGGING_RESUME) {
+              if (frame.event === FlightLogEvent.LOGGING_RESUME) {
                 if (frameTime) {
                   intraIndex.unLoggedTime += frame.data.currentTime - frameTime;
                 }
@@ -272,30 +266,29 @@ export function FlightLogIndex(logData) {
   }
 
   //Public:
-  this.loadFromJSON = function (json) {};
+  this.loadFromJSON = function (_json) {};
 
   this.saveToJSON = function () {
-    let intraframeDirectories = this.getIntraframeDirectories(),
-      i,
-      j,
-      resultIndexes = new Array(intraframeDirectories.length);
+    const intraframeDirectories = this.getIntraframeDirectories();
+    let i;
+    let j;
+    const resultIndexes = new Array(intraframeDirectories.length);
 
     for (i = 0; i < intraframeDirectories.length; i++) {
-      var lastTime,
-        lastLastTime,
-        lastOffset,
-        lastLastOffset,
-        lastThrottle,
-        sourceIndex = intraframeDirectories[i],
-        resultIndex = {
-          times: new Array(sourceIndex.times.length),
-          offsets: new Array(sourceIndex.offsets.length),
-          minTime: sourceIndex.minTime,
-          maxTime: sourceIndex.maxTime,
-          avgThrottle: new Array(sourceIndex.avgThrottle.length),
-          maxRC: new Array(sourceIndex.maxRC.length),
-          maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length),
-        };
+      let lastTime;
+      let lastLastTime;
+      let lastOffset;
+      let lastLastOffset;
+      const sourceIndex = intraframeDirectories[i];
+      const resultIndex = {
+        times: new Array(sourceIndex.times.length),
+        offsets: new Array(sourceIndex.offsets.length),
+        minTime: sourceIndex.minTime,
+        maxTime: sourceIndex.maxTime,
+        avgThrottle: new Array(sourceIndex.avgThrottle.length),
+        maxRC: new Array(sourceIndex.maxRC.length),
+        maxMotorDiff: new Array(sourceIndex.maxMotorDiff.length),
+      };
 
       if (sourceIndex.times.length > 0) {
         resultIndex.times[0] = sourceIndex.times[0];

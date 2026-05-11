@@ -1,5 +1,14 @@
+import semver from "semver";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-import { adjustFieldDefsList, FlightLogEvent } from "./flightlog_fielddefs";
+import {
+  adjustFieldDefsList,
+  FlightLogEvent,
+  FIRMWARE_TYPE_UNKNOWN,
+  FIRMWARE_TYPE_BASEFLIGHT,
+  FIRMWARE_TYPE_CLEANFLIGHT,
+  FIRMWARE_TYPE_BETAFLIGHT,
+  FIRMWARE_TYPE_INAV,
+} from "./flightlog_fielddefs";
 import { ArrayDataStream } from "./datastream";
 import "./decoders";
 import {
@@ -12,16 +21,9 @@ import {
   parseCommaSeparatedString,
 } from "./tools";
 
-globalThis.FIRMWARE_TYPE_UNKNOWN = 0;
-globalThis.FIRMWARE_TYPE_BASEFLIGHT = 1;
-globalThis.FIRMWARE_TYPE_CLEANFLIGHT = 2;
-globalThis.FIRMWARE_TYPE_BETAFLIGHT = 3;
-globalThis.FIRMWARE_TYPE_INAV = 4;
-
 export function FlightLogParser(logData) {
   //Private constants:
-  let FLIGHT_LOG_MAX_FIELDS = 128,
-    FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
+  const FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
     //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
     MAXIMUM_TIME_JUMP_BETWEEN_FRAMES = 10 * 1000000,
     //Likewise for iteration count
@@ -63,7 +65,6 @@ export function FlightLogParser(logData) {
     FLIGHT_LOG_FIELD_ENCODING_TAG8_4S16 = 8,
     FLIGHT_LOG_FIELD_ENCODING_NULL = 9, // Nothing is written to the file, take value to be zero
     FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE = 10,
-    FLIGHT_LOG_EVENT_LOG_END = 255,
     EOF = ArrayDataStream.prototype.EOF,
     NEWLINE = "\n".charCodeAt(0),
     INFLIGHT_ADJUSTMENT_FUNCTIONS = [
@@ -160,9 +161,8 @@ export function FlightLogParser(logData) {
     ];
 
   //Private variables:
-  let that = this,
-    dataVersion,
-    defaultSysConfig = {
+  let dataVersion;
+  const defaultSysConfig = {
       frameIntervalI: 32,
       frameIntervalPNum: 1,
       frameIntervalPDenom: 1,
@@ -180,12 +180,11 @@ export function FlightLogParser(logData) {
       currentMeterOffset: 0,
       currentMeterScale: 400,
       deviceUID: null,
-    },
-    // Blackbox log header parameter names.
-    // each name should exist in the blackbox log of the current firmware, or
-    // be an older name which is translated into a current name in the table below
-
-    defaultSysConfigExtension = {
+    };
+  // Blackbox log header parameter names.
+  // each name should exist in the blackbox log of the current firmware, or
+  // be an older name which is translated into a current name in the table below
+  const defaultSysConfigExtension = {
       abs_control_gain: null, // Absolute control gain
       anti_gravity_gain: null, // Anti gravity gain
       anti_gravity_p_gain: null, // Anti gravity P gain
@@ -256,7 +255,6 @@ export function FlightLogParser(logData) {
       mag_hardware: null, // Magnetometer Hardware type
       gyro_cal_on_first_arm: null, // Gyro Calibrate on first arm
       vbat_pid_compensation: null, // VBAT PID compensation
-      rate_limits: [null, null, null], // RC Rate limits
       rc_smoothing: null, // RC Control Smoothing
       rc_interpolation: null, // RC Control Interpolation type
       rc_interpolation_channels: null, // RC Control Interpotlation channels
@@ -355,12 +353,11 @@ export function FlightLogParser(logData) {
       chirp_frequency_end_deci_hz: null,
       chirp_time_seconds: null,
       unknownHeaders: [], // Unknown Extra Headers
-    },
-    // Translation of the field values name to the sysConfig var where it must be stored
-    // on the left are field names from the latest versions of blackbox.c
-    // on the right are older field names that must exist in the list above
-
-    translationValues = {
+    };
+  // Translation of the field values name to the sysConfig var where it must be stored
+  // on the left are field names from the latest versions of blackbox.c
+  // on the right are older field names that must exist in the list above
+  const translationValues = {
       acc_limit_yaw: "yawRateAccelLimit",
       accel_limit: "rateAccelLimit",
       acc_limit: "rateAccelLimit",
@@ -453,31 +450,26 @@ export function FlightLogParser(logData) {
       multi_gyro_combined: "dual_gyro_combined",
       multi_gyro_diff: "dual_gyro_diff",
       multi_gyro_scaled: "dual_gyro_scaled",
-    },
-    frameTypes,
-    // Blackbox state:
-    mainHistoryRing,
-    /* Points into blackboxHistoryRing to give us a circular buffer.
-     *
-     * 0 - space to decode new frames into, 1 - previous frame, 2 - previous previous frame
-     *
-     * Previous frame pointers are null when no valid history exists of that age.
-     */
-    mainHistory = [null, null, null],
-    mainStreamIsValid = false,
-    gpsHomeHistory = new Array(2), // 0 - space to decode new frames into, 1 - previous frame
-    gpsHomeIsValid = false,
-    //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
-    lastEvent,
-    lastGPS,
-    lastSlow,
-    // How many intentionally un-logged frames did we skip over before we decoded the current frame?
-    lastSkippedFrames,
-    // Details about the last main frame that was successfully parsed
-    lastMainFrameIteration,
-    lastMainFrameTime,
-    //The actual log data stream we're reading:
-    stream;
+    };
+  // frameTypes and stream are initialized at the end of the constructor (after function definitions)
+  // Blackbox state:
+  let mainHistoryRing;
+  /* Points into blackboxHistoryRing to give us a circular buffer.
+   *
+   * 0 - space to decode new frames into, 1 - previous frame, 2 - previous previous frame
+   *
+   * Previous frame pointers are null when no valid history exists of that age.
+   */
+  const mainHistory = [null, null, null];
+  let mainStreamIsValid = false;
+  let gpsHomeHistory = new Array(2); // 0 - space to decode new frames into, 1 - previous frame
+  let gpsHomeIsValid = false;
+  //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
+  let lastEvent, lastGPS, lastSlow;
+  // How many intentionally un-logged frames did we skip over before we decoded the current frame?
+  let lastSkippedFrames;
+  // Details about the last main frame that was successfully parsed
+  let lastMainFrameIteration, lastMainFrameTime;
 
   //Public fields:
 
@@ -487,11 +479,7 @@ export function FlightLogParser(logData) {
   this.frameDefs = {};
 
   // Lets add the custom extensions
-  let completeSysConfig = $.extend(
-    {},
-    defaultSysConfig,
-    defaultSysConfigExtension,
-  );
+  const completeSysConfig = { ...defaultSysConfig, ...defaultSysConfigExtension };
   this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
 
   /*
@@ -501,7 +489,7 @@ export function FlightLogParser(logData) {
   this.onFrameReady = null;
 
   function mapFieldNamesToIndex(fieldNames) {
-    let result = {};
+    const result = {};
 
     for (let i = 0; i < fieldNames.length; i++) {
       result[fieldNames[i]] = i;
@@ -515,7 +503,7 @@ export function FlightLogParser(logData) {
    */
   function translateLegacyFieldNames(names) {
     for (let i = 0; i < names.length; i++) {
-      var matches;
+      let matches;
 
       if ((matches = names[i].match(/^gyroData(.+)$/))) {
         names[i] = `gyroADC${matches[1]}`;
@@ -532,7 +520,7 @@ export function FlightLogParser(logData) {
    * returns The equivalent in the sysConfig object or the fieldName if not found
    */
   function translateFieldName(fieldName) {
-    let translation = translationValues[fieldName];
+    const translation = translationValues[fieldName];
     if (translation !== undefined) {
       return translation;
     } else {
@@ -540,528 +528,386 @@ export function FlightLogParser(logData) {
     }
   }
 
-  function parseHeaderLine() {
-    var COLON = ":".charCodeAt(0),
-      fieldName,
-      fieldValue,
-      lineStart,
-      lineEnd,
-      separatorPos = false,
-      matches,
-      i,
-      c;
+  // Sets of field names for dispatch-based header parsing (avoids large switch statement)
 
-    if (stream.peekChar() != " ") return;
+  // Fields parsed as simple parseInt and stored directly in sysConfig
+  const PARSE_INT_FIELDS = new Set([
+    "rcRate", "thrMid", "thrExpo", "tpa_rate", "tpa_mode", "tpa_breakpoint",
+    "airmode_activate_throttle", "serialrx_provider", "looptime",
+    "gyro_sync_denom", "pid_process_denom", "pidController", "yaw_p_limit",
+    "dterm_average_count", "rollPitchItermResetRate", "yawItermResetRate",
+    "rollPitchItermIgnoreRate", "yawItermIgnoreRate", "dterm_differentiator",
+    "deltaMethod", "dynamic_dterm_threshold", "dynamic_pterm",
+    "iterm_reset_offset", "deadband", "yaw_deadband", "gyro_lpf",
+    "gyro_hardware_lpf", "gyro_32khz_hardware_lpf", "acc_lpf_hz",
+    "acc_hardware", "baro_hardware", "mag_hardware", "gyro_cal_on_first_arm",
+    "vbat_pid_compensation", "rc_smoothing", "rc_smoothing_type",
+    "rc_smoothing_debug_axis", "rc_smoothing_rx_average",
+    "rc_smoothing_rx_smoothed", "rc_smoothing_mode",
+    "rc_smoothing_auto_factor_setpoint", "rc_smoothing_auto_factor_throttle",
+    "rc_smoothing_feedforward_hz", "rc_smoothing_setpoint_hz",
+    "rc_smoothing_throttle_hz", "superExpoYawMode", "features", "dynamic_pid",
+    "rc_interpolation", "rc_interpolation_channels",
+    "rc_interpolation_interval", "unsynced_fast_pwm", "fast_pwm_protocol",
+    "motor_pwm_rate", "vbatscale", "vbatref", "acc_1G", "dterm_filter_type",
+    "dterm_filter2_type", "pidAtMinThrottle", "pidSumLimit",
+    "pidSumLimitYaw", "anti_gravity_threshold", "itermWindupPointPercent",
+    "ptermSRateWeight", "setpointRelaxRatio", "ff_transition", "ff_averaging",
+    "ff_smooth_factor", "ff_jitter_factor", "ff_boost", "ff_max_rate_limit",
+    "dtermSetpointWeight", "gyro_soft_type", "gyro_soft2_type", "debug_mode",
+    "anti_gravity_mode", "anti_gravity_gain", "anti_gravity_p_gain",
+    "anti_gravity_cutoff_hz", "abs_control_gain", "use_integrated_yaw",
+    "d_max_gain", "d_max_advance", "dshot_bidir",
+    "gyro_rpm_notch_harmonics", "gyro_rpm_notch_q", "gyro_rpm_notch_min",
+    "rpm_filter_fade_range_hz", "rpm_notch_lpf", "dterm_rpm_notch_harmonics",
+    "dterm_rpm_notch_q", "dterm_rpm_notch_min", "iterm_relax",
+    "iterm_relax_type", "iterm_relax_cutoff", "dyn_notch_range",
+    "dyn_notch_width_percent", "dyn_notch_q", "dyn_notch_count",
+    "dyn_notch_min_hz", "dyn_notch_max_hz", "rates_type",
+    "vbat_sag_compensation", "fields_disabled_mask", "motor_pwm_protocol",
+    "gyro_to_use", "gyro_enabled_bitmask", "dynamic_idle_min_rpm",
+    "dyn_idle_p_gain", "dyn_idle_i_gain", "dyn_idle_d_gain",
+    "dyn_idle_start_increase", "dyn_idle_max_increase",
+    "simplified_pids_mode", "simplified_pi_gain", "simplified_i_gain",
+    "simplified_d_gain", "simplified_dmax_gain", "simplified_d_max_gain",
+    "simplified_feedforward_gain", "simplified_pitch_d_gain",
+    "simplified_pitch_pi_gain", "simplified_master_multiplier",
+    "simplified_dterm_filter", "simplified_dterm_filter_multiplier",
+    "simplified_gyro_filter", "simplified_gyro_filter_multiplier",
+    "motor_output_limit", "throttle_limit_type", "throttle_limit_percent",
+    "throttle_boost", "throttle_boost_cutoff", "motor_poles",
+    "blackbox_high_resolution",
+    // Legacy firmware log headers
+    "dterm_cut_hz", "acc_cut_hz",
+  ]);
+
+  // Fields parsed as CSV and stored directly in sysConfig
+  const CSV_FIELDS = new Set([
+    "rates", "rate_limits", "rollPID", "pitchPID", "yawPID", "altPID",
+    "posPID", "posrPID", "navrPID", "levelPID", "velPID", "motorOutput",
+    "rc_smoothing_cutoffs", "rc_smoothing_active_cutoffs",
+    "rc_smoothing_active_cutoffs_ff_sp_thr", "gyro_lowpass_dyn_hz",
+    "gyro_lowpass_dyn_expo", "dterm_lpf_dyn_expo", "thrust_linear",
+    "tpa_low_rate", "tpa_low_breakpoint", "tpa_low_always", "mixer_type",
+    "chirp_lag_freq_hz", "chirp_lead_freq_hz", "chirp_amplitude_roll",
+    "chirp_amplitude_pitch", "chirp_amplitude_yaw",
+    "chirp_frequency_start_deci_hz", "chirp_frequency_end_deci_hz",
+    "chirp_time_seconds", "dterm_lpf_dyn_hz",
+  ]);
+
+  // Fields where parseInt value is divided by 100 on older firmware, raw on newer
+  const VERSION_CONDITIONAL_INT_FIELDS = new Set([
+    "yaw_lpf_hz", "gyro_lowpass_hz", "gyro_lowpass2_hz", "dterm_notch_hz",
+    "dterm_notch_cutoff", "dterm_lpf_hz", "dterm_lpf2_hz",
+  ]);
+
+  // Fields where value is CSV on newer firmware, parseInt/100 on older
+  const VERSION_CONDITIONAL_CSV_FIELDS = new Set([
+    "gyro_notch_hz", "gyro_notch_cutoff",
+  ]);
+
+  // Fields stored as raw string values
+  const STRING_FIELDS = new Set([
+    "Product", "Blackbox version", "Firmware date", "Board information",
+    "Craft name", "Log start datetime",
+  ]);
+
+  // Fields where parseInt value is divided by 1000 on newer firmware
+  const ACCEL_LIMIT_FIELDS = new Set([
+    "yawRateAccelLimit", "rateAccelLimit",
+  ]);
+
+  // Fields where parseInt value is divided by 100
+  const DIVIDE_100_FIELDS = new Set([
+    "motor_idle", "digitalIdleOffset",
+  ]);
+
+  /**
+   * Check if firmware meets the 3.0.1/2.0.0 version threshold for filter fields
+   */
+  const isModernFilterFirmware = () =>
+    (this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "3.0.1")) ||
+    (this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "2.0.0"));
+
+  /**
+   * Parse "Firmware revision" header value and set firmware type/version in sysConfig
+   */
+  const parseFirmwareRevision = (fieldValue) => {
+    // Extract the firmware revision in case of Betaflight/Raceflight/Cleanflight 2.x/Other
+    const fwMatches = /((?:Beta|Race|Clean|Base|Butter)flight)\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
+    const FIRMWARE_NAME_MAP = {
+      betaflight: FIRMWARE_TYPE_BETAFLIGHT,
+      raceflight: FIRMWARE_TYPE_BETAFLIGHT,
+      butterflight: FIRMWARE_TYPE_BETAFLIGHT,
+      cleanflight: FIRMWARE_TYPE_CLEANFLIGHT,
+      baseflight: FIRMWARE_TYPE_BASEFLIGHT,
+    };
+
+    if (fwMatches != null) {
+      this.sysConfig.firmwareType = FIRMWARE_NAME_MAP[fwMatches[1].toLowerCase()] ?? FIRMWARE_TYPE_BETAFLIGHT;
+
+      this.sysConfig.firmware = `${Number.parseInt(fwMatches[2], 10)}.${Number.parseInt(fwMatches[3], 10)}`;
+      this.sysConfig.firmwarePatch =
+        fwMatches[4] ? Number.parseInt(fwMatches[4], 10) : "0";
+      this.sysConfig.firmwareVersion = `${this.sysConfig.firmware}.${this.sysConfig.firmwarePatch}`;
+      return;
+    }
+
+    // Try to detect INAV
+    const inavMatches = /(INAV).* (\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
+    if (inavMatches != null) {
+      this.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
+      this.sysConfig.firmware = `${Number.parseInt(inavMatches[2], 10)}.${Number.parseInt(inavMatches[3], 10)}`;
+      this.sysConfig.firmwarePatch =
+        inavMatches[4] ? Number.parseInt(inavMatches[4], 10) : "0";
+      this.sysConfig.firmwareVersion = `${this.sysConfig.firmware}.${this.sysConfig.firmwarePatch}`;
+      return;
+    }
+
+    // Legacy firmware versions
+    this.sysConfig.firmwareVersion = "0.0.0";
+    this.sysConfig.firmware = 0;
+    this.sysConfig.firmwarePatch = 0;
+  };
+
+  /**
+   * Parse "Field X ..." header and update frameDefs
+   */
+  const parseFieldDefinition = (fieldName, fieldValue) => {
+    const matches = fieldName.match(/^Field (.) (.+)$/);
+    if (!matches) {
+      return false;
+    }
+
+    const frameName = matches[1];
+    const frameInfo = matches[2];
+
+    if (!this.frameDefs[frameName]) {
+      this.frameDefs[frameName] = {
+        name: [],
+        nameToIndex: {},
+        count: 0,
+        signed: [],
+        predictor: [],
+        encoding: [],
+      };
+    }
+
+    const frameDef = this.frameDefs[frameName];
+
+    const frameInfoHandlers = {
+      predictor: () => { frameDef.predictor = parseCommaSeparatedString(fieldValue); },
+      encoding: () => { frameDef.encoding = parseCommaSeparatedString(fieldValue); },
+      name: () => {
+        frameDef.name = translateLegacyFieldNames(fieldValue.split(","));
+        frameDef.count = frameDef.name.length;
+        frameDef.nameToIndex = mapFieldNamesToIndex(frameDef.name);
+        /*
+         * We could survive with the `signed` header just being filled with zeros, so if it is absent
+         * then resize it to length.
+         */
+        frameDef.signed.length = frameDef.count;
+      },
+      signed: () => { frameDef.signed = parseCommaSeparatedString(fieldValue); },
+    };
+
+    const handler = frameInfoHandlers[frameInfo];
+    if (handler) {
+      handler();
+    } else {
+      console.log(`Saw unsupported field header "${fieldName}"`);
+    }
+
+    return true;
+  };
+
+  // Unified dispatch map for all header fields (replaces Set lookups + switch)
+  const parseIntHandler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10); };
+  const csvHandler = (fn, fv) => { this.sysConfig[fn] = parseCommaSeparatedString(fv); };
+  const versionCondIntHandler = (fn, fv) => {
+    this.sysConfig[fn] = isModernFilterFirmware()
+      ? Number.parseInt(fv, 10)
+      : Number.parseInt(fv, 10) / 100;
+  };
+  const versionCondCsvHandler = (fn, fv) => {
+    this.sysConfig[fn] = isModernFilterFirmware()
+      ? parseCommaSeparatedString(fv)
+      : Number.parseInt(fv, 10) / 100;
+  };
+  const accelLimitHandler = (fn, fv) => {
+    const isBfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "3.1.0");
+    const isCfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
+      semver.gte(this.sysConfig.firmwareVersion, "2.0.0");
+    this.sysConfig[fn] = (isBfModern || isCfModern)
+      ? Number.parseInt(fv, 10) / 1000
+      : Number.parseInt(fv, 10);
+  };
+  const divide100Handler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10) / 100; };
+  const stringHandler = (fn, fv) => { this.sysConfig[fn] = fv; };
+  const rcExpoRateHandler = (fn, fv) => {
+    if (stringHasComma(fv)) {
+      this.sysConfig[fn] = parseCommaSeparatedString(fv);
+    } else {
+      this.sysConfig[fn][0] = Number.parseInt(fv, 10);
+      this.sysConfig[fn][1] = Number.parseInt(fv, 10);
+    }
+  };
+  const pidArrayPushHandler = (_fn, fv) => {
+    const values = parseCommaSeparatedString(fv);
+    this.sysConfig["rollPID"].push(values[0]);
+    this.sysConfig["pitchPID"].push(values[1]);
+    this.sysConfig["yawPID"].push(values[2]);
+  };
+  const currentMeterHandler = (_fn, fv) => {
+    const params = parseCommaSeparatedString(fv);
+    this.sysConfig.currentMeterOffset = params[0];
+    this.sysConfig.currentMeterScale = params[1];
+  };
+  const gyroScaleHandler = (_fn, fv) => {
+    this.sysConfig.gyroScale = hexToFloat(fv);
+    /* Legacy firmware uses a gyroScale that'll give radians per microsecond as output, whereas modern firmware produces degrees
+     * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
+     * match the legacy format so we can use a consistent IMU for all firmware types: */
+    if (
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV ||
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT ||
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT
+    ) {
+      this.sysConfig.gyroScale *= (Math.PI / 180) * 0.000001;
+    }
+  };
+  const noopHandler = () => {};
+
+  const HEADER_HANDLERS = {};
+  for (const field of PARSE_INT_FIELDS) { HEADER_HANDLERS[field] = parseIntHandler; }
+  for (const field of CSV_FIELDS) { HEADER_HANDLERS[field] = csvHandler; }
+  for (const field of VERSION_CONDITIONAL_INT_FIELDS) { HEADER_HANDLERS[field] = versionCondIntHandler; }
+  for (const field of VERSION_CONDITIONAL_CSV_FIELDS) { HEADER_HANDLERS[field] = versionCondCsvHandler; }
+  for (const field of ACCEL_LIMIT_FIELDS) { HEADER_HANDLERS[field] = accelLimitHandler; }
+  for (const field of DIVIDE_100_FIELDS) { HEADER_HANDLERS[field] = divide100Handler; }
+  for (const field of STRING_FIELDS) { HEADER_HANDLERS[field] = stringHandler; }
+
+  // Individual handlers with unique logic
+  HEADER_HANDLERS["I interval"] = (_fn, fv) => {
+    this.sysConfig.frameIntervalI = Number.parseInt(fv, 10);
+    if (this.sysConfig.frameIntervalI < 1) {
+      this.sysConfig.frameIntervalI = 1;
+    }
+  };
+  HEADER_HANDLERS["P interval"] = (_fn, fv) => {
+    const slashIdx = fv.indexOf("/");
+    if (slashIdx === -1) {
+      this.sysConfig.frameIntervalPNum = 1;
+      this.sysConfig.frameIntervalPDenom = Number.parseInt(fv, 10);
+    } else {
+      this.sysConfig.frameIntervalPNum = Number.parseInt(fv.substring(0, slashIdx), 10);
+      this.sysConfig.frameIntervalPDenom = Number.parseInt(fv.substring(slashIdx + 1), 10);
+    }
+  };
+  HEADER_HANDLERS["P denom"] = noopHandler;
+  HEADER_HANDLERS["P ratio"] = noopHandler;
+  HEADER_HANDLERS["Data version"] = (_fn, fv) => { dataVersion = Number.parseInt(fv, 10); };
+  HEADER_HANDLERS["Firmware type"] = (_fn, fv) => {
+    this.sysConfig.firmwareType = fv === "Cleanflight"
+      ? FIRMWARE_TYPE_CLEANFLIGHT
+      : FIRMWARE_TYPE_BASEFLIGHT;
+  };
+  HEADER_HANDLERS["minthrottle"] = (fn, fv) => {
+    this.sysConfig[fn] = Number.parseInt(fv, 10);
+    this.sysConfig.motorOutput[0] = this.sysConfig[fn];
+  };
+  HEADER_HANDLERS["maxthrottle"] = (fn, fv) => {
+    this.sysConfig[fn] = Number.parseInt(fv, 10);
+    this.sysConfig.motorOutput[1] = this.sysConfig[fn];
+  };
+  HEADER_HANDLERS["rc_expo"] = rcExpoRateHandler;
+  HEADER_HANDLERS["rc_rates"] = rcExpoRateHandler;
+  HEADER_HANDLERS["rcYawExpo"] = (_fn, fv) => { this.sysConfig["rc_expo"][2] = Number.parseInt(fv, 10); };
+  HEADER_HANDLERS["rcYawRate"] = (_fn, fv) => { this.sysConfig["rc_rates"][2] = Number.parseInt(fv, 10); };
+  HEADER_HANDLERS["superExpoFactor"] = (_fn, fv) => {
+    if (stringHasComma(fv)) {
+      const expoParams = parseCommaSeparatedString(fv);
+      this.sysConfig.superExpoFactor = expoParams[0];
+      this.sysConfig.superExpoFactorYaw = expoParams[1];
+    } else {
+      this.sysConfig.superExpoFactor = Number.parseInt(fv, 10);
+    }
+  };
+  HEADER_HANDLERS["magPID"] = (_fn, fv) => { this.sysConfig.magPID = parseCommaSeparatedString(fv, 3); };
+  HEADER_HANDLERS["d_min"] = pidArrayPushHandler;
+  HEADER_HANDLERS["d_max"] = pidArrayPushHandler;
+  HEADER_HANDLERS["ff_weight"] = pidArrayPushHandler;
+  HEADER_HANDLERS["vbatcellvoltage"] = (_fn, fv) => {
+    const params = parseCommaSeparatedString(fv);
+    this.sysConfig.vbatmincellvoltage = params[0];
+    this.sysConfig.vbatwarningcellvoltage = params[1];
+    this.sysConfig.vbatmaxcellvoltage = params[2];
+  };
+  HEADER_HANDLERS["currentMeter"] = currentMeterHandler;
+  HEADER_HANDLERS["currentSensor"] = currentMeterHandler;
+  HEADER_HANDLERS["gyro.scale"] = gyroScaleHandler;
+  HEADER_HANDLERS["gyro_scale"] = gyroScaleHandler;
+  HEADER_HANDLERS["Firmware revision"] = (fn, fv) => {
+    parseFirmwareRevision(fv);
+    this.sysConfig[fn] = fv;
+  };
+  HEADER_HANDLERS["DeviceUID"] = (_fn, fv) => { this.sysConfig.deviceUID = fv; };
+
+  const parseHeaderLine = () => {
+    const COLON = ":".codePointAt(0);
+    let separatorPos = false;
+
+    if (stream.peekChar() !== " ") {
+      return;
+    }
 
     //Skip the leading space
     stream.readChar();
 
-    lineStart = stream.pos;
+    const lineStart = stream.pos;
 
     for (
       ;
       stream.pos < lineStart + 1024 && stream.pos < stream.end;
       stream.pos++
     ) {
-      if (separatorPos === false && stream.data[stream.pos] == COLON)
+      if (separatorPos === false && stream.data[stream.pos] === COLON) {
         separatorPos = stream.pos;
+      }
 
-      if (stream.data[stream.pos] == NEWLINE || stream.data[stream.pos] === 0)
+      if (stream.data[stream.pos] === NEWLINE || stream.data[stream.pos] === 0) {
         break;
+      }
     }
 
-    if (stream.data[stream.pos] != NEWLINE || separatorPos === false) return;
+    if (stream.data[stream.pos] !== NEWLINE || separatorPos === false) {
+      return;
+    }
 
-    lineEnd = stream.pos;
+    const lineEnd = stream.pos;
 
-    fieldName = asciiArrayToString(
-      stream.data.subarray(lineStart, separatorPos),
+    const fieldName = translateFieldName(
+      asciiArrayToString(stream.data.subarray(lineStart, separatorPos)),
     );
-    fieldValue = asciiArrayToString(
+    const fieldValue = asciiArrayToString(
       stream.data.subarray(separatorPos + 1, lineEnd),
     );
 
-    // Translate the fieldName to the sysConfig parameter name. The fieldName has been changing between versions
-    // In this way is easier to maintain the code
-    fieldName = translateFieldName(fieldName);
-
-    switch (fieldName) {
-      case "I interval":
-        that.sysConfig.frameIntervalI = parseInt(fieldValue, 10);
-        if (that.sysConfig.frameIntervalI < 1)
-          that.sysConfig.frameIntervalI = 1;
-        break;
-      case "P interval":
-        matches = fieldValue.match(/(\d+)\/(\d+)/);
-
-        if (matches) {
-          that.sysConfig.frameIntervalPNum = parseInt(matches[1], 10);
-          that.sysConfig.frameIntervalPDenom = parseInt(matches[2], 10);
-        } else {
-          that.sysConfig.frameIntervalPNum = 1;
-          that.sysConfig.frameIntervalPDenom = parseInt(fieldValue, 10);
-        }
-        break;
-      case "P denom":
-      case "P ratio":
-        // Don't do nothing with this, because is the same than frameIntervalI/frameIntervalPDenom so we don't need it
-        break;
-      case "Data version":
-        dataVersion = parseInt(fieldValue, 10);
-        break;
-      case "Firmware type":
-        switch (fieldValue) {
-          case "Cleanflight":
-            that.sysConfig.firmwareType = FIRMWARE_TYPE_CLEANFLIGHT;
-            $("html").removeClass("isBaseF");
-            $("html").addClass("isCF");
-            $("html").removeClass("isBF");
-            $("html").removeClass("isINAV");
-            break;
-          default:
-            that.sysConfig.firmwareType = FIRMWARE_TYPE_BASEFLIGHT;
-            $("html").addClass("isBaseF");
-            $("html").removeClass("isCF");
-            $("html").removeClass("isBF");
-            $("html").removeClass("isINAV");
-        }
-        break;
-
-      // Betaflight Log Header Parameters
-      case "minthrottle":
-        that.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        that.sysConfig.motorOutput[0] = that.sysConfig[fieldName]; // by default, set the minMotorOutput to match minThrottle
-        break;
-      case "maxthrottle":
-        that.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        that.sysConfig.motorOutput[1] = that.sysConfig[fieldName]; // by default, set the maxMotorOutput to match maxThrottle
-        break;
-      case "rcRate":
-      case "thrMid":
-      case "thrExpo":
-      case "tpa_rate":
-      case "tpa_mode":
-      case "tpa_breakpoint":
-      case "airmode_activate_throttle":
-      case "serialrx_provider":
-      case "looptime":
-      case "gyro_sync_denom":
-      case "pid_process_denom":
-      case "pidController":
-      case "yaw_p_limit":
-      case "dterm_average_count":
-      case "rollPitchItermResetRate":
-      case "yawItermResetRate":
-      case "rollPitchItermIgnoreRate":
-      case "yawItermIgnoreRate":
-      case "dterm_differentiator":
-      case "deltaMethod":
-      case "dynamic_dterm_threshold":
-      case "dynamic_pterm":
-      case "iterm_reset_offset":
-      case "deadband":
-      case "yaw_deadband":
-      case "gyro_lpf":
-      case "gyro_hardware_lpf":
-      case "gyro_32khz_hardware_lpf":
-      case "acc_lpf_hz":
-      case "acc_hardware":
-      case "baro_hardware":
-      case "mag_hardware":
-      case "gyro_cal_on_first_arm":
-      case "vbat_pid_compensation":
-      case "rc_smoothing":
-      case "rc_smoothing_type":
-      case "rc_smoothing_debug_axis":
-      case "rc_smoothing_rx_average":
-      case "rc_smoothing_rx_smoothed":
-      case "rc_smoothing_mode": // 4.3 rc smoothing stuff
-      case "rc_smoothing_auto_factor_setpoint":
-      case "rc_smoothing_auto_factor_throttle":
-      case "rc_smoothing_feedforward_hz":
-      case "rc_smoothing_setpoint_hz":
-      case "rc_smoothing_feedforward_hz":
-      case "rc_smoothing_throttle_hz":
-      case "superExpoYawMode":
-      case "features":
-      case "dynamic_pid":
-      case "rc_interpolation":
-      case "rc_interpolation_channels":
-      case "rc_interpolation_interval":
-      case "unsynced_fast_pwm":
-      case "fast_pwm_protocol":
-      case "motor_pwm_rate":
-      case "vbatscale":
-      case "vbatref":
-      case "acc_1G":
-      case "dterm_filter_type":
-      case "dterm_filter2_type":
-      case "pidAtMinThrottle":
-      case "pidSumLimit":
-      case "pidSumLimitYaw":
-      case "anti_gravity_threshold":
-      case "itermWindupPointPercent":
-      case "ptermSRateWeight":
-      case "setpointRelaxRatio":
-      case "ff_transition":
-      case "ff_averaging":
-      case "ff_smooth_factor":
-      case "ff_jitter_factor":
-      case "ff_boost":
-      case "ff_max_rate_limit":
-      case "dtermSetpointWeight":
-      case "gyro_soft_type":
-      case "gyro_soft2_type":
-      case "debug_mode":
-      case "anti_gravity_mode":
-      case "anti_gravity_gain":
-      case "anti_gravity_p_gain":
-      case "anti_gravity_cutoff_hz":
-      case "abs_control_gain":
-      case "use_integrated_yaw":
-      case "d_max_gain":
-      case "d_max_advance":
-      case "dshot_bidir":
-      case "gyro_rpm_notch_harmonics":
-      case "gyro_rpm_notch_q":
-      case "gyro_rpm_notch_min":
-      case "rpm_filter_fade_range_hz":
-      case "rpm_notch_lpf":
-      case "dterm_rpm_notch_harmonics":
-      case "dterm_rpm_notch_q":
-      case "dterm_rpm_notch_min":
-      case "iterm_relax":
-      case "iterm_relax_type":
-      case "iterm_relax_cutoff":
-      case "dyn_notch_range":
-      case "dyn_notch_width_percent":
-      case "dyn_notch_q":
-      case "dyn_notch_count":
-      case "dyn_notch_min_hz":
-      case "dyn_notch_max_hz":
-      case "rates_type":
-      case "vbat_sag_compensation":
-      case "fields_disabled_mask":
-      case "motor_pwm_protocol":
-      case "gyro_to_use":
-      case "gyro_enabled_bitmask":
-      case "dynamic_idle_min_rpm":
-      case "dyn_idle_p_gain":
-      case "dyn_idle_i_gain":
-      case "dyn_idle_d_gain":
-      case "dyn_idle_start_increase":
-      case "dyn_idle_max_increase":
-      case "simplified_pids_mode":
-      case "simplified_pi_gain":
-      case "simplified_i_gain":
-      case "simplified_d_gain":
-      case "simplified_dmax_gain":
-      case "simplified_d_max_gain":
-      case "simplified_feedforward_gain":
-      case "simplified_pitch_d_gain":
-      case "simplified_pitch_pi_gain":
-      case "simplified_master_multiplier":
-
-      case "simplified_dterm_filter":
-      case "simplified_dterm_filter_multiplier":
-      case "simplified_gyro_filter":
-      case "simplified_gyro_filter_multiplier":
-
-      case "motor_output_limit":
-      case "throttle_limit_type":
-      case "throttle_limit_percent":
-      case "throttle_boost":
-      case "throttle_boost_cutoff":
-
-      case "motor_poles":
-
-      case "blackbox_high_resolution":
-        that.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        break;
-      case "rc_expo":
-      case "rc_rates":
-        if (stringHasComma(fieldValue)) {
-          that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-        } else {
-          that.sysConfig[fieldName][0] = parseInt(fieldValue, 10);
-          that.sysConfig[fieldName][1] = parseInt(fieldValue, 10);
-        }
-        break;
-      case "rcYawExpo":
-        that.sysConfig["rc_expo"][2] = parseInt(fieldValue, 10);
-        break;
-      case "rcYawRate":
-        that.sysConfig["rc_rates"][2] = parseInt(fieldValue, 10);
-        break;
-
-      case "yawRateAccelLimit":
-      case "rateAccelLimit":
-        if (
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
-            semver.gte(that.sysConfig.firmwareVersion, "3.1.0")) ||
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
-            semver.gte(that.sysConfig.firmwareVersion, "2.0.0"))
-        ) {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 1000;
-        } else {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        }
-        break;
-
-      case "yaw_lpf_hz":
-      case "gyro_lowpass_hz":
-      case "gyro_lowpass2_hz":
-      case "dterm_notch_hz":
-      case "dterm_notch_cutoff":
-      case "dterm_lpf_hz":
-      case "dterm_lpf2_hz":
-        if (
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
-            semver.gte(that.sysConfig.firmwareVersion, "3.0.1")) ||
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
-            semver.gte(that.sysConfig.firmwareVersion, "2.0.0"))
-        ) {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        } else {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
-        }
-        break;
-
-      case "gyro_notch_hz":
-      case "gyro_notch_cutoff":
-        if (
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT &&
-            semver.gte(that.sysConfig.firmwareVersion, "3.0.1")) ||
-          (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT &&
-            semver.gte(that.sysConfig.firmwareVersion, "2.0.0"))
-        ) {
-          that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-        } else {
-          that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
-        }
-        break;
-
-      case "motor_idle":
-      case "digitalIdleOffset":
-        that.sysConfig[fieldName] = parseInt(fieldValue, 10) / 100;
-
-      /**  Legacy firmware log headers **/
-      case "dterm_cut_hz":
-      case "acc_cut_hz":
-        that.sysConfig[fieldName] = parseInt(fieldValue, 10);
-        break;
-      /** End of legacy firmware log headers **/
-
-      case "superExpoFactor":
-        if (stringHasComma(fieldValue)) {
-          let expoParams = parseCommaSeparatedString(fieldValue);
-          that.sysConfig.superExpoFactor = expoParams[0];
-          that.sysConfig.superExpoFactorYaw = expoParams[1];
-        } else {
-          that.sysConfig.superExpoFactor = parseInt(fieldValue, 10);
-        }
-        break;
-
-      /* CSV packed values */
-
-      case "rates":
-      case "rate_limits":
-      case "rollPID":
-      case "pitchPID":
-      case "yawPID":
-      case "altPID":
-      case "posPID":
-      case "posrPID":
-      case "navrPID":
-      case "levelPID":
-      case "velPID":
-      case "motorOutput":
-      case "rate_limits":
-      case "rc_smoothing_cutoffs":
-      case "rc_smoothing_active_cutoffs":
-      case "rc_smoothing_active_cutoffs_ff_sp_thr":
-      case "gyro_lowpass_dyn_hz":
-      case "gyro_lowpass_dyn_expo":
-      case "dterm_lpf_dyn_expo":
-      case "thrust_linear":
-      case "tpa_low_rate":
-      case "tpa_low_breakpoint":
-      case "tpa_low_always":
-      case "mixer_type":
-      case "chirp_lag_freq_hz":
-      case "chirp_lead_freq_hz":
-      case "chirp_amplitude_roll":
-      case "chirp_amplitude_pitch":
-      case "chirp_amplitude_yaw":
-      case "chirp_frequency_start_deci_hz":
-      case "chirp_frequency_end_deci_hz":
-      case "chirp_time_seconds":
-      case "dterm_lpf_dyn_hz":
-        that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
-        break;
-      case "magPID":
-        that.sysConfig.magPID = parseCommaSeparatedString(fieldValue, 3); //[parseInt(fieldValue, 10), null, null];
-        break;
-      case "d_min":
-      case "d_max":
-        // Add D MAX values as Derivative numbers to PID array
-        var dMaxValues = parseCommaSeparatedString(fieldValue);
-        that.sysConfig["rollPID"].push(dMaxValues[0]);
-        that.sysConfig["pitchPID"].push(dMaxValues[1]);
-        that.sysConfig["yawPID"].push(dMaxValues[2]);
-        break;
-      case "ff_weight":
-        // Add feedforward values to the PID array
-        var ffValues = parseCommaSeparatedString(fieldValue);
-        that.sysConfig["rollPID"].push(ffValues[0]);
-        that.sysConfig["pitchPID"].push(ffValues[1]);
-        that.sysConfig["yawPID"].push(ffValues[2]);
-        break;
-
-      /* End of CSV packed values */
-
-      case "vbatcellvoltage":
-        var vbatcellvoltageParams = parseCommaSeparatedString(fieldValue);
-        that.sysConfig.vbatmincellvoltage = vbatcellvoltageParams[0];
-        that.sysConfig.vbatwarningcellvoltage = vbatcellvoltageParams[1];
-        that.sysConfig.vbatmaxcellvoltage = vbatcellvoltageParams[2];
-        break;
-      case "currentMeter":
-      case "currentSensor":
-        var currentMeterParams = parseCommaSeparatedString(fieldValue);
-        that.sysConfig.currentMeterOffset = currentMeterParams[0];
-        that.sysConfig.currentMeterScale = currentMeterParams[1];
-        break;
-      case "gyro.scale":
-      case "gyro_scale":
-        that.sysConfig.gyroScale = hexToFloat(fieldValue);
-        /* Legacy firmware uses a gyroScale that'll give radians per microsecond as output, whereas modern firmware produces degrees
-         * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
-         * match the legacy format so we can use a consistent IMU for all firmware types: */
-        if (
-          that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
-          that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
-          that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT
-        ) {
-          that.sysConfig.gyroScale =
-            that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
-        }
-        break;
-      case "Firmware revision":
-        //TODO Unify this somehow...
-
-        // Extract the firmware revision in case of Betaflight/Raceflight/Cleanfligh 2.x/Other
-        var matches = fieldValue.match(/(.*flight).* (\d+)\.(\d+)(\.(\d+))*/i);
-        if (matches != null) {
-          // Detecting Betaflight requires looking at the revision string
-          if (matches[1] === "Betaflight") {
-            that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
-            $("html").removeClass("isBaseF");
-            $("html").removeClass("isCF");
-            $("html").addClass("isBF");
-            $("html").removeClass("isINAV");
-          }
-
-          that.sysConfig.firmware = `${parseInt(matches[2])}.${parseInt(matches[3])}`;
-          that.sysConfig.firmwarePatch =
-            matches[5] != null ? parseInt(matches[5]) : "0";
-          that.sysConfig.firmwareVersion = `${that.sysConfig.firmware}.${that.sysConfig.firmwarePatch}`;
-        } else {
-          /*
-           * Try to detect INAV
-           */
-          var matches = fieldValue.match(/(INAV).* (\d+)\.(\d+).(\d+)*/i);
-          if (matches != null) {
-            that.sysConfig.firmwareType = FIRMWARE_TYPE_INAV;
-            that.sysConfig.firmware = parseFloat(`${matches[2]}.${matches[3]}`);
-            that.sysConfig.firmwarePatch =
-              matches[5] != null ? parseInt(matches[5]) : "";
-            //added class definition as the isBF, isCF etc classes are only used for colors and
-            //a few images in the css.
-            $("html").removeClass("isBaseF");
-            $("html").removeClass("isCF");
-            $("html").removeClass("isBF");
-            $("html").addClass("isINAV");
-          } else {
-            // Legacy firmware versions
-            that.sysConfig.firmwareVersion = "0.0.0";
-            that.sysConfig.firmware = 0;
-            that.sysConfig.firmwarePatch = 0;
-          }
-        }
-        that.sysConfig[fieldName] = fieldValue;
-
-        break;
-      case "Product":
-      case "Blackbox version":
-      case "Firmware date":
-      case "Board information":
-      case "Craft name":
-      case "Log start datetime":
-        // These fields are not presently used for anything, ignore them here so we don't warn about unsupported headers
-        // Just Add them anyway
-        that.sysConfig[fieldName] = fieldValue;
-        break;
-      case "DeviceUID":
-        that.sysConfig.deviceUID = fieldValue;
-        break;
-      default:
-        if ((matches = fieldName.match(/^Field (.) (.+)$/))) {
-          let frameName = matches[1],
-            frameInfo = matches[2],
-            frameDef;
-
-          if (!that.frameDefs[frameName]) {
-            that.frameDefs[frameName] = {
-              name: [],
-              nameToIndex: {},
-              count: 0,
-              signed: [],
-              predictor: [],
-              encoding: [],
-            };
-          }
-
-          frameDef = that.frameDefs[frameName];
-
-          switch (frameInfo) {
-            case "predictor":
-              frameDef.predictor = parseCommaSeparatedString(fieldValue);
-              break;
-            case "encoding":
-              frameDef.encoding = parseCommaSeparatedString(fieldValue);
-              break;
-            case "name":
-              frameDef.name = translateLegacyFieldNames(fieldValue.split(","));
-              frameDef.count = frameDef.name.length;
-
-              frameDef.nameToIndex = mapFieldNamesToIndex(frameDef.name);
-
-              /*
-               * We could survive with the `signed` header just being filled with zeros, so if it is absent
-               * then resize it to length.
-               */
-              frameDef.signed.length = frameDef.count;
-              break;
-            case "signed":
-              frameDef.signed = parseCommaSeparatedString(fieldValue);
-              break;
-            default:
-              console.log(`Saw unsupported field header "${fieldName}"`);
-          }
-        } else {
-          console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
-          if (that.sysConfig.unknownHeaders === null) {
-            that.sysConfig.unknownHeaders = new Array();
-          }
-          that.sysConfig.unknownHeaders.push({
-            name: fieldName,
-            value: fieldValue,
-          }); // Save the unknown headers
-        }
-        break;
+    const handler = HEADER_HANDLERS[fieldName];
+    if (handler) {
+      handler(fieldName, fieldValue);
+    } else if (!parseFieldDefinition(fieldName, fieldValue)) {
+      console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
+      this.sysConfig.unknownHeaders ??= [];
+      this.sysConfig.unknownHeaders.push({
+        name: fieldName,
+        value: fieldValue,
+      });
     }
-  }
+  };
 
   function invalidateMainStream() {
     mainStreamIsValid = false;
@@ -1074,12 +920,10 @@ export function FlightLogParser(logData) {
   /**
    * Use data from the given frame to update field statistics for the given frame type.
    */
-  function updateFieldStatistics(frameType, frame) {
-    let i, fieldStats;
+  const updateFieldStatistics = (frameType, frame) => {
+    const fieldStats = this.stats.frame[frameType].field;
 
-    fieldStats = that.stats.frame[frameType].field;
-
-    for (i = 0; i < frame.length; i++) {
+    for (let i = 0; i < frame.length; i++) {
       if (!fieldStats[i]) {
         fieldStats[i] = {
           max: frame[i],
@@ -1090,13 +934,13 @@ export function FlightLogParser(logData) {
         fieldStats[i].min = Math.min(frame[i], fieldStats[i].min);
       }
     }
-  }
+  };
 
-  function completeIntraframe(frameType, frameStart, frameEnd, raw) {
+  const completeIntraframe = (frameType, frameStart, frameEnd, raw) => {
     let acceptFrame = true;
 
     // Do we have a previous frame to use as a reference to validate field values against?
-    if (!raw && lastMainFrameIteration != -1) {
+    if (!raw && lastMainFrameIteration !== -1) {
       /*
        * Check that iteration count and time didn't move backwards, and didn't move forward too much.
        */
@@ -1115,7 +959,7 @@ export function FlightLogParser(logData) {
     }
 
     if (acceptFrame) {
-      that.stats.intentionallyAbsentIterations +=
+      this.stats.intentionallyAbsentIterations +=
         countIntentionallySkippedFramesTo(
           mainHistory[0][
             FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
@@ -1136,14 +980,15 @@ export function FlightLogParser(logData) {
       invalidateMainStream();
     }
 
-    if (that.onFrameReady)
-      that.onFrameReady(
+    if (this.onFrameReady) {
+      this.onFrameReady(
         mainStreamIsValid,
         mainHistory[0],
         frameType,
         frameStart,
         frameEnd - frameStart,
       );
+    }
 
     // Rotate history buffers
 
@@ -1152,26 +997,26 @@ export function FlightLogParser(logData) {
     mainHistory[2] = mainHistory[0];
 
     // And advance the current frame into an empty space ready to be filled
-    if (mainHistory[0] == mainHistoryRing[0])
+    if (mainHistory[0] === mainHistoryRing[0])
       mainHistory[0] = mainHistoryRing[1];
-    else if (mainHistory[0] == mainHistoryRing[1])
+    else if (mainHistory[0] === mainHistoryRing[1])
       mainHistory[0] = mainHistoryRing[2];
     else mainHistory[0] = mainHistoryRing[0];
     return mainStreamIsValid;
-  }
+  };
 
   /**
    * Should a frame with the given index exist in this log (based on the user's selection of sampling rates)?
    */
-  function shouldHaveFrame(frameIndex) {
+  const shouldHaveFrame = (frameIndex) => {
     return (
-      ((frameIndex % that.sysConfig.frameIntervalI) +
-        that.sysConfig.frameIntervalPNum -
+      ((frameIndex % this.sysConfig.frameIntervalI) +
+        this.sysConfig.frameIntervalPNum -
         1) %
-        that.sysConfig.frameIntervalPDenom <
-      that.sysConfig.frameIntervalPNum
+        this.sysConfig.frameIntervalPDenom <
+      this.sysConfig.frameIntervalPNum
     );
-  }
+  };
 
   /**
    * Attempt to parse the frame of into the supplied `current` buffer using the encoding/predictor
@@ -1189,18 +1034,16 @@ export function FlightLogParser(logData) {
     skippedFrames,
     raw,
   ) {
-    let predictor = frameDef.predictor,
+    const predictor = frameDef.predictor,
       encoding = frameDef.encoding,
-      values = new Array(8),
-      i,
-      j,
-      groupCount;
+      values = new Array(8);
+    let i, j, groupCount;
 
     i = 0;
     while (i < frameDef.count) {
-      var value;
+      let value;
 
-      if (predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_INC) {
+      if (predictor[i] === FLIGHT_LOG_FIELD_PREDICTOR_INC) {
         current[i] = skippedFrames + 1;
 
         if (previous) current[i] += previous[i];
@@ -1233,7 +1076,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_TAG2_3S32:
             stream.readTag2_3S32(values);
 
@@ -1249,7 +1091,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE:
             stream.readTag2_3SVariable(values);
 
@@ -1265,11 +1106,13 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB:
             //How many fields are in this encoded group? Check the subsequent field encodings:
-            for (j = i + 1; j < i + 8 && j < frameDef.count; j++)
-              if (encoding[j] != FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) break;
+            for (j = i + 1; j < i + 8 && j < frameDef.count; j++) {
+              if (encoding[j] !== FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) {
+                break;
+              }
+            }
 
             groupCount = j - i;
 
@@ -1286,7 +1129,6 @@ export function FlightLogParser(logData) {
               );
 
             continue;
-            break;
           case FLIGHT_LOG_FIELD_ENCODING_NULL:
             //Nothing to read
             value = 0;
@@ -1310,20 +1152,20 @@ export function FlightLogParser(logData) {
     }
   }
 
-  function parseIntraframe(raw) {
-    let current = mainHistory[0],
+  const parseIntraframe = (raw) => {
+    const current = mainHistory[0],
       previous = mainHistory[1];
 
-    parseFrame(that.frameDefs.I, current, previous, null, 0, raw);
-  }
+    parseFrame(this.frameDefs.I, current, previous, null, 0, raw);
+  };
 
-  function completeGPSHomeFrame(frameType, frameStart, frameEnd, raw) {
+  const completeGPSHomeFrame = (frameType, frameStart, frameEnd, _raw) => {
     updateFieldStatistics(frameType, gpsHomeHistory[0]);
 
-    that.setGPSHomeHistory(gpsHomeHistory[0]);
+    this.setGPSHomeHistory(gpsHomeHistory[0]);
 
-    if (that.onFrameReady) {
-      that.onFrameReady(
+    if (this.onFrameReady) {
+      this.onFrameReady(
         true,
         gpsHomeHistory[0],
         frameType,
@@ -1333,15 +1175,15 @@ export function FlightLogParser(logData) {
     }
 
     return true;
-  }
+  };
 
-  function completeGPSFrame(frameType, frameStart, frameEnd, raw) {
+  const completeGPSFrame = (frameType, frameStart, frameEnd, _raw) => {
     if (gpsHomeIsValid) {
       updateFieldStatistics(frameType, lastGPS);
     }
 
-    if (that.onFrameReady) {
-      that.onFrameReady(
+    if (this.onFrameReady) {
+      this.onFrameReady(
         gpsHomeIsValid,
         lastGPS,
         frameType,
@@ -1351,13 +1193,13 @@ export function FlightLogParser(logData) {
     }
 
     return gpsHomeIsValid;
-  }
+  };
 
-  function completeSlowFrame(frameType, frameStart, frameEnd, raw) {
+  const completeSlowFrame = (frameType, frameStart, frameEnd, _raw) => {
     updateFieldStatistics(frameType, lastSlow);
 
-    if (that.onFrameReady) {
-      that.onFrameReady(
+    if (this.onFrameReady) {
+      this.onFrameReady(
         true,
         lastSlow,
         frameType,
@@ -1366,9 +1208,9 @@ export function FlightLogParser(logData) {
       );
     }
     return true;
-  }
+  };
 
-  function completeInterframe(frameType, frameStart, frameEnd, raw) {
+  const completeInterframe = (frameType, frameStart, frameEnd, raw) => {
     // Reject this frame if the time or iteration count jumped too far
     if (
       mainStreamIsValid &&
@@ -1391,21 +1233,22 @@ export function FlightLogParser(logData) {
       lastMainFrameTime =
         mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
 
-      that.stats.intentionallyAbsentIterations += lastSkippedFrames;
+      this.stats.intentionallyAbsentIterations += lastSkippedFrames;
 
       updateFieldStatistics(frameType, mainHistory[0]);
     }
 
     //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
 
-    if (that.onFrameReady)
-      that.onFrameReady(
+    if (this.onFrameReady) {
+      this.onFrameReady(
         mainStreamIsValid,
         mainHistory[0],
         frameType,
         frameStart,
         frameEnd - frameStart,
       );
+    }
 
     if (mainStreamIsValid) {
       // Rotate history buffers
@@ -1414,26 +1257,26 @@ export function FlightLogParser(logData) {
       mainHistory[1] = mainHistory[0];
 
       // And advance the current frame into an empty space ready to be filled
-      if (mainHistory[0] == mainHistoryRing[0])
+      if (mainHistory[0] === mainHistoryRing[0])
         mainHistory[0] = mainHistoryRing[1];
-      else if (mainHistory[0] == mainHistoryRing[1])
+      else if (mainHistory[0] === mainHistoryRing[1])
         mainHistory[0] = mainHistoryRing[2];
       else mainHistory[0] = mainHistoryRing[0];
     }
     return mainStreamIsValid;
-  }
+  };
 
   /**
    * Take the raw value for a a field, apply the prediction that is configured for it, and return it.
    */
-  function applyPrediction(
+  const applyPrediction = (
     fieldIndex,
     predictor,
     value,
     current,
     previous,
     previous2,
-  ) {
+  ) => {
     switch (predictor) {
       case FLIGHT_LOG_FIELD_PREDICTOR_0:
         // No correction to apply
@@ -1445,7 +1288,7 @@ export function FlightLogParser(logData) {
          * save space for positive values). So we need to convert those very large unsigned values into their
          * corresponding 32-bit signed values.
          */
-        value = Math.trunc(value) + that.sysConfig.minthrottle;
+        value = Math.trunc(value) + this.sysConfig.minthrottle;
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR:
         /*
@@ -1454,19 +1297,19 @@ export function FlightLogParser(logData) {
          * save space for positive values). So we need to convert those very large unsigned values into their
          * corresponding 32-bit signed values.
          */
-        value = Math.trunc(value) + Math.trunc(that.sysConfig.motorOutput[0]); // motorOutput[0] is the min motor output
+        value = Math.trunc(value) + Math.trunc(this.sysConfig.motorOutput[0]); // motorOutput[0] is the min motor output
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_1500:
         value += 1500;
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_MOTOR_0:
-        if (that.frameDefs.I.nameToIndex["motor[0]"] < 0) {
+        if (this.frameDefs.I.nameToIndex["motor[0]"] === undefined) {
           throw "Attempted to base I-field prediction on motor0 before it was read";
         }
-        value += current[that.frameDefs.I.nameToIndex["motor[0]"]];
+        value += current[this.frameDefs.I.nameToIndex["motor[0]"]];
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_VBATREF:
-        value += that.sysConfig.vbatref;
+        value += this.sysConfig.vbatref;
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_PREVIOUS:
         if (!previous) break;
@@ -1486,23 +1329,21 @@ export function FlightLogParser(logData) {
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD:
         if (
-          !that.frameDefs.H ||
-          that.frameDefs.H.nameToIndex["GPS_home[0]"] === undefined
+          this.frameDefs.H?.nameToIndex["GPS_home[0]"] === undefined
         ) {
           throw "Attempted to base prediction on GPS home position without GPS home frame definition";
         }
 
-        value += gpsHomeHistory[1][that.frameDefs.H.nameToIndex["GPS_home[0]"]];
+        value += gpsHomeHistory[1][this.frameDefs.H.nameToIndex["GPS_home[0]"]];
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1:
         if (
-          !that.frameDefs.H ||
-          that.frameDefs.H.nameToIndex["GPS_home[1]"] === undefined
+          this.frameDefs.H?.nameToIndex["GPS_home[1]"] === undefined
         ) {
           throw "Attempted to base prediction on GPS home position without GPS home frame definition";
         }
 
-        value += gpsHomeHistory[1][that.frameDefs.H.nameToIndex["GPS_home[1]"]];
+        value += gpsHomeHistory[1][this.frameDefs.H.nameToIndex["GPS_home[1]"]];
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_LAST_MAIN_FRAME_TIME:
         if (mainHistory[1])
@@ -1516,7 +1357,7 @@ export function FlightLogParser(logData) {
     }
 
     return value;
-  }
+  };
 
   /*
    * Based on the log sampling rate, work out how many frames would have been skipped after the last frame that was
@@ -1526,7 +1367,7 @@ export function FlightLogParser(logData) {
     let count = 0,
       frameIndex;
 
-    if (lastMainFrameIteration == -1) {
+    if (lastMainFrameIteration === -1) {
       // Haven't parsed a frame yet so there's no frames to skip
       return 0;
     } else {
@@ -1550,7 +1391,7 @@ export function FlightLogParser(logData) {
     let count = 0,
       frameIndex;
 
-    if (lastMainFrameIteration == -1) {
+    if (lastMainFrameIteration === -1) {
       // Haven't parsed a frame yet so there's no frames to skip
       return 0;
     } else {
@@ -1568,43 +1409,43 @@ export function FlightLogParser(logData) {
     return count;
   }
 
-  function parseInterframe(raw) {
-    let current = mainHistory[0],
+  const parseInterframe = (raw) => {
+    const current = mainHistory[0],
       previous = mainHistory[1],
       previous2 = mainHistory[2];
 
     lastSkippedFrames = countIntentionallySkippedFrames();
 
     parseFrame(
-      that.frameDefs.P,
+      this.frameDefs.P,
       current,
       previous,
       previous2,
       lastSkippedFrames,
       raw,
     );
-  }
+  };
 
-  function parseGPSFrame(raw) {
+  const parseGPSFrame = (raw) => {
     // Only parse a GPS frame if we have GPS header definitions
-    if (that.frameDefs.G) {
-      parseFrame(that.frameDefs.G, lastGPS, null, null, 0, raw);
+    if (this.frameDefs.G) {
+      parseFrame(this.frameDefs.G, lastGPS, null, null, 0, raw);
     }
-  }
+  };
 
-  function parseGPSHomeFrame(raw) {
-    if (that.frameDefs.H) {
-      parseFrame(that.frameDefs.H, gpsHomeHistory[0], null, null, 0, raw);
+  const parseGPSHomeFrame = (raw) => {
+    if (this.frameDefs.H) {
+      parseFrame(this.frameDefs.H, gpsHomeHistory[0], null, null, 0, raw);
     }
-  }
+  };
 
-  function parseSlowFrame(raw) {
-    if (that.frameDefs.S) {
-      parseFrame(that.frameDefs.S, lastSlow, null, null, 0, raw);
+  const parseSlowFrame = (raw) => {
+    if (this.frameDefs.S) {
+      parseFrame(this.frameDefs.S, lastSlow, null, null, 0, raw);
     }
-  }
+  };
 
-  function completeEventFrame(frameType, frameStart, frameEnd, raw) {
+  const completeEventFrame = (frameType, frameStart, frameEnd, _raw) => {
     if (lastEvent) {
       switch (lastEvent.event) {
         case FlightLogEvent.LOGGING_RESUME:
@@ -1617,8 +1458,8 @@ export function FlightLogParser(logData) {
           break;
       }
 
-      if (that.onFrameReady) {
-        that.onFrameReady(
+      if (this.onFrameReady) {
+        this.onFrameReady(
           true,
           lastEvent,
           frameType,
@@ -1631,10 +1472,34 @@ export function FlightLogParser(logData) {
     }
 
     return false;
+  };
+
+  const TWITCH_TEST_NAMES = {
+    1: "Response Time->",
+    2: "Half Setpoint Time->",
+    3: "Setpoint Time->",
+    4: "Negative Setpoint->",
+    5: "Initial Setpoint->",
+  };
+
+  function parseInflightAdjustment(data) {
+    const tmp = stream.readU8();
+    data.name = "Unknown";
+    data.func = tmp & 127;
+    data.value = tmp < 128 ? stream.readSignedVB() : uint32ToFloat(stream.readU32());
+    const descr = INFLIGHT_ADJUSTMENT_FUNCTIONS[data.func];
+    if (descr !== undefined) {
+      data.name = descr.name;
+      let scale = descr.scale ?? 1;
+      if (tmp >= 128 && descr.scalef !== undefined) {
+        scale = descr.scalef;
+      }
+      data.value = Math.round(data.value * scale * 10000) / 10000;
+    }
   }
 
-  function parseEventFrame(raw) {
-    let END_OF_LOG_MESSAGE = "End of log\0",
+  function parseEventFrame(_raw) {
+    const END_OF_LOG_MESSAGE = "End of log\0",
       eventType = stream.readByte();
 
     lastEvent = {
@@ -1654,10 +1519,10 @@ export function FlightLogParser(logData) {
       case FlightLogEvent.DISARM:
         lastEvent.data.reason = stream.readUnsignedVB();
         break;
-      case FlightLogEvent.AUTOTUNE_CYCLE_START:
+      case FlightLogEvent.AUTOTUNE_CYCLE_START: {
         lastEvent.data.phase = stream.readByte();
 
-        var cycleAndRising = stream.readByte();
+        const cycleAndRising = stream.readByte();
 
         lastEvent.data.cycle = cycleAndRising & 0x7f;
         lastEvent.data.rising = (cycleAndRising >> 7) & 0x01;
@@ -1666,6 +1531,7 @@ export function FlightLogParser(logData) {
         lastEvent.data.i = stream.readByte();
         lastEvent.data.d = stream.readByte();
         break;
+      }
       case FlightLogEvent.AUTOTUNE_CYCLE_RESULT:
         lastEvent.data.overshot = stream.readByte();
         lastEvent.data.p = stream.readByte();
@@ -1688,54 +1554,22 @@ export function FlightLogParser(logData) {
         lastEvent.data.newP = stream.readS16();
         break;
       case FlightLogEvent.INFLIGHT_ADJUSTMENT:
-        var tmp = stream.readU8();
-        lastEvent.data.name = "Unknown";
-        lastEvent.data.func = tmp & 127;
-        lastEvent.data.value =
-          tmp < 128 ? stream.readSignedVB() : uint32ToFloat(stream.readU32());
-        if (INFLIGHT_ADJUSTMENT_FUNCTIONS[lastEvent.data.func] !== undefined) {
-          let descr = INFLIGHT_ADJUSTMENT_FUNCTIONS[lastEvent.data.func];
-          lastEvent.data.name = descr.name;
-          let scale = 1;
-          if (descr.scale !== undefined) {
-            scale = descr.scale;
-          }
-          if (tmp >= 128 && descr.scalef !== undefined) {
-            scale = descr.scalef;
-          }
-          lastEvent.data.value =
-            Math.round(lastEvent.data.value * scale * 10000) / 10000;
-        }
+        parseInflightAdjustment(lastEvent.data);
         break;
-      case FlightLogEvent.TWITCH_TEST:
-        //lastEvent.data.stage = stream.readU8();
-        var tmp = stream.readU8();
-        switch (tmp) {
-          case 1:
-            lastEvent.data.name = "Response Time->";
-            break;
-          case 2:
-            lastEvent.data.name = "Half Setpoint Time->";
-            break;
-          case 3:
-            lastEvent.data.name = "Setpoint Time->";
-            break;
-          case 4:
-            lastEvent.data.name = "Negative Setpoint->";
-            break;
-          case 5:
-            lastEvent.data.name = "Initial Setpoint->";
-        }
+      case FlightLogEvent.TWITCH_TEST: {
+        const stage = stream.readU8();
+        lastEvent.data.name = TWITCH_TEST_NAMES[stage];
         lastEvent.data.value = uint32ToFloat(stream.readU32());
         break;
+      }
       case FlightLogEvent.LOGGING_RESUME:
         lastEvent.data.logIteration = stream.readUnsignedVB();
         lastEvent.data.currentTime = stream.readUnsignedVB();
         break;
-      case FlightLogEvent.LOG_END:
-        var endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
+      case FlightLogEvent.LOG_END: {
+        const endMessage = stream.readString(END_OF_LOG_MESSAGE.length);
 
-        if (endMessage == END_OF_LOG_MESSAGE) {
+        if (endMessage === END_OF_LOG_MESSAGE) {
           //Adjust the end of stream so we stop reading, this log is done
           stream.end = stream.pos;
         } else {
@@ -1746,6 +1580,7 @@ export function FlightLogParser(logData) {
           lastEvent = null;
         }
         break;
+      }
       default:
         lastEvent = null;
     }
@@ -1773,11 +1608,10 @@ export function FlightLogParser(logData) {
 
     //Reset system configuration to MW's defaults
     // Lets add the custom extensions
-    let completeSysConfig = $.extend(
-      {},
-      defaultSysConfig,
-      defaultSysConfigExtension,
-    );
+    const completeSysConfig = {
+      ...defaultSysConfig,
+      ...defaultSysConfigExtension,
+    };
     this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
 
     this.frameDefs = {};
@@ -1786,14 +1620,14 @@ export function FlightLogParser(logData) {
   };
 
   // Check that the given frame definition contains some fields and the right number of predictors & encodings to match
-  function isFrameDefComplete(frameDef) {
+  const isFrameDefComplete = (frameDef) => {
     return (
       frameDef &&
       frameDef.count > 0 &&
-      frameDef.encoding.length == frameDef.count &&
-      frameDef.predictor.length == frameDef.count
+      frameDef.encoding.length === frameDef.count &&
+      frameDef.predictor.length === frameDef.count
     );
-  }
+  };
 
   this.parseHeader = function (startOffset, endOffset) {
     this.resetAllState();
@@ -1805,7 +1639,7 @@ export function FlightLogParser(logData) {
     stream.eof = false;
 
     mainloop: while (true) {
-      let command = stream.readChar();
+      const command = stream.readChar();
 
       switch (command) {
         case "H":
@@ -1828,12 +1662,12 @@ export function FlightLogParser(logData) {
     }
 
     adjustFieldDefsList(
-      that.sysConfig.firmwareType,
-      that.sysConfig.firmwareVersion,
+      this.sysConfig.firmwareType,
+      this.sysConfig.firmwareVersion,
     );
     FlightLogFieldPresenter.adjustDebugDefsList(
-      that.sysConfig.firmwareType,
-      that.sysConfig.firmwareVersion,
+      this.sysConfig.firmwareType,
+      this.sysConfig.firmwareVersion,
     );
 
     if (!isFrameDefComplete(this.frameDefs.I)) {
@@ -1873,9 +1707,9 @@ export function FlightLogParser(logData) {
        */
       for (let i = 1; i < this.frameDefs.G.count; i++) {
         if (
-          this.frameDefs.G.predictor[i - 1] ==
+          this.frameDefs.G.predictor[i - 1] ===
             FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD &&
-          this.frameDefs.G.predictor[i] == FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD
+          this.frameDefs.G.predictor[i] === FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD
         ) {
           this.frameDefs.G.predictor[i] =
             FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD_1;
@@ -1900,7 +1734,7 @@ export function FlightLogParser(logData) {
    * (The data is stored in gpsHomeHistory[1])
    */
   this.setGPSHomeHistory = function (newGPSHome) {
-    if (newGPSHome.length == that.frameDefs.H.count) {
+    if (newGPSHome.length === this.frameDefs.H.count) {
       //Copy the decoded frame into the "last state" entry of gpsHomeHistory to publish it:
       for (let i = 0; i < newGPSHome.length; i++) {
         gpsHomeHistory[1][i] = newGPSHome[i];
@@ -1917,10 +1751,10 @@ export function FlightLogParser(logData) {
    * call resetDataState() first.
    */
   this.parseLogData = function (raw, startOffset, endOffset) {
-    let looksLikeFrameCompleted = false,
+    let looksLikeFrameCompleted,
       prematureEof = false,
       frameStart = 0,
-      frameType = null,
+      frameType,
       lastFrameType = null;
 
     invalidateMainStream();
@@ -1931,15 +1765,14 @@ export function FlightLogParser(logData) {
     stream.end = endOffset === undefined ? stream.end : endOffset;
     stream.eof = false;
     while (true) {
-      let command = stream.readChar();
+      const command = stream.readChar();
 
       if (lastFrameType) {
-        var lastFrameSize = stream.pos - frameStart,
-          frameTypeStats;
+        const lastFrameSize = stream.pos - frameStart;
 
         // Is this the beginning of a new frame?
         looksLikeFrameCompleted =
-          getFrameType(command) || (!prematureEof && command == EOF);
+          getFrameType(command) || (!prematureEof && command === EOF);
 
         if (!this.stats.frame[lastFrameType.marker]) {
           this.stats.frame[lastFrameType.marker] = {
@@ -1954,7 +1787,7 @@ export function FlightLogParser(logData) {
           };
         }
 
-        frameTypeStats = this.stats.frame[lastFrameType.marker];
+        const frameTypeStats = this.stats.frame[lastFrameType.marker];
         // If we see what looks like the beginning of a new frame, assume that the previous frame was valid:
         if (
           lastFrameSize <= FLIGHT_LOG_MAX_FRAME_LENGTH &&
@@ -1999,13 +1832,15 @@ export function FlightLogParser(logData) {
         }
       }
 
-      if (command == EOF) break;
+      if (command === EOF) {
+        break;
+      }
 
       frameStart = stream.pos - 1;
       frameType = getFrameType(command);
 
       // Reject the frame if it is one that we have no definitions for in the header
-      if (frameType && (command == "E" || that.frameDefs[command])) {
+      if (frameType && (command === "E" || this.frameDefs[command])) {
         lastFrameType = frameType;
         frameType.parse(raw);
 
@@ -2024,7 +1859,7 @@ export function FlightLogParser(logData) {
     return true;
   };
 
-  frameTypes = {
+  const frameTypes = {
     I: { marker: "I", parse: parseIntraframe, complete: completeIntraframe },
     P: { marker: "P", parse: parseInterframe, complete: completeInterframe },
     G: { marker: "G", parse: parseGPSFrame, complete: completeGPSFrame },
@@ -2037,7 +1872,7 @@ export function FlightLogParser(logData) {
     E: { marker: "E", parse: parseEventFrame, complete: completeEventFrame },
   };
 
-  stream = new ArrayDataStream(logData);
+  const stream = new ArrayDataStream(logData);
 }
 
 FlightLogParser.prototype.resetStats = function () {

@@ -1,7 +1,7 @@
 import { formatTime, roundRect } from "./tools";
 
 export function LapTimer() {
-  let lapTime = {
+  const lapTime = {
     current: null,
     last: null,
     best: null,
@@ -26,22 +26,22 @@ export function LapTimer() {
 
   this.drawCanvas = function (canvas, options) {
     // Draw the LapTimes using a canvas
-    let ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
-    let lineHeight = 14, //px
+    const lineHeight = 14, //px
       DEFAULT_FONT_FACE = "8pt Verdana, Arial, sans-serif",
       fgColor = "rgba(191,191,191,1.0)", // Text and highlights color
       bgColor = `rgba(76,76,76,${
-        parseInt(options.laptimer.transparency) / 100.0
+        parseInt(options.laptimer.transparency, 10) / 100.0
       })`, // background color
-      left = (canvas.width * parseInt(options.laptimer.left)) / 100.0,
-      top = (canvas.height * parseInt(options.laptimer.top)) / 100.0,
+      left = (canvas.width * parseInt(options.laptimer.left, 10)) / 100.0,
+      top = (canvas.height * parseInt(options.laptimer.top, 10)) / 100.0,
       margin = 4, // pixels
       rows = 5 + (lapTime.laps.length > 0 ? 1 + lapTime.laps.length : 0);
 
     ctx.save(); // Store the current canvas configuration
 
-    let firstColumnWidth = ctx.measureText("Current").width,
+    const firstColumnWidth = ctx.measureText("Current").width,
       secondColumn = ctx.measureText("XX:XX.XXX").width,
       width = margin + firstColumnWidth + margin + secondColumn + margin; // get the size of the box
 
@@ -54,7 +54,7 @@ export function LapTimer() {
     ctx.strokeStyle = fgColor;
 
     //Fill in background
-    roundRect(ctx, 0, 0, width, lineHeight * (rows - 0.5), 7, true, true); // draw the bounding box with border
+    roundRect(ctx, { x: 0, y: 0, width, height: lineHeight * (rows - 0.5), radius: 7 }); // draw the bounding box with border
 
     // Add Title, and current values
     let currentRow = 1;
@@ -127,13 +127,13 @@ export function LapTimer() {
 
     if (currentTime != null && bookmarkTimes != null)
       if (bookmarkTimes.length > 0) {
-        let bookmarkTimesSorted = bookmarkTimes.slice(0);
+        const bookmarkTimesSorted = bookmarkTimes.slice(0);
         bookmarkTimesSorted.push(maxTime); // add end time
         bookmarkTimesSorted.sort((a, b) => a - b); // sort on value (rather than default alphabetically)
 
         lapTime.laps = []; // Clear the array
 
-        for (var i = 0; i < bookmarkTimesSorted.length - 1; i++) {
+        for (let i = 0; i < bookmarkTimesSorted.length - 1; i++) {
           if (i > 0 && currentTime >= bookmarkTimesSorted[0]) {
             // Calculate all the laps so far
             lapTime.laps.push(
@@ -164,7 +164,7 @@ export function LapTimer() {
 
         if (lapTime.laps.length > 0 && currentTime > bookmarkTimesSorted[0]) {
           lapTime.best = maxTime;
-          for (var i = 0; i < lapTime.laps.length; i++) {
+          for (let i = 0; i < lapTime.laps.length; i++) {
             if (lapTime.laps[i] < lapTime.best) {
               lapTime.best = lapTime.laps[i];
             }

@@ -4,7 +4,8 @@
  * curve = 1.0 is a straight line mapping).
  */
 export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
-  let curve, inputScale, rawInputScale;
+  let curve, inputScale;
+  const rawInputScale = outputRange / inputRange;
 
   function lookupStraightLine(input) {
     return (input + offset) * inputScale;
@@ -32,12 +33,10 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
    * (e.g. the approximation will be too straight near the origin when power < 1.0, but a good fit far from the origin)
    */
   function lookupInterpolatedCurve(input) {
-    let valueInCurve, prevStepIndex;
-
     input += offset;
 
-    valueInCurve = Math.abs(input * inputScale);
-    prevStepIndex = Math.floor(valueInCurve);
+    const valueInCurve = Math.abs(input * inputScale);
+    let prevStepIndex = Math.floor(valueInCurve);
 
     /* If the input value lies beyond the stated input range, use the final
      * two points of the curve to extrapolate out (the "curve" out there is a straight line, though)
@@ -47,7 +46,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     }
 
     //Straight-line interpolation between the two curve points
-    let proportion = valueInCurve - prevStepIndex,
+    const proportion = valueInCurve - prevStepIndex,
       result =
         curve[prevStepIndex] +
         (curve[prevStepIndex + 1] - curve[prevStepIndex]) * proportion;
@@ -56,37 +55,25 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     return result;
   }
 
-  function lookupMathPow(input) {
-    input += offset;
-
-    let result = Math.pow(Math.abs(input) / inputRange, power) * outputRange;
-
-    if (input < 0) return -result;
-    return result;
-  }
-
-  rawInputScale = outputRange / inputRange;
-
   // If steps argument isn't supplied, use a reasonable default
   if (steps === undefined) {
     steps = 12;
   }
 
-  if (steps <= 2 || power == 1.0) {
+  if (steps <= 2 || power === 1) {
     //Curve is actually a straight line
     inputScale = outputRange / inputRange;
 
     this.lookup = lookupStraightLine;
   } else {
-    let stepSize = 1.0 / (steps - 1),
-      i;
+    const stepSize = 1 / (steps - 1);
 
     curve = new Array(steps);
 
     inputScale = (steps - 1) / inputRange;
 
-    for (i = 0; i < steps; i++) {
-      curve[i] = Math.pow(i * stepSize, power) * outputRange;
+    for (let i = 0; i < steps; i++) {
+      curve[i] = (i * stepSize) ** power * outputRange;
     }
 
     this.lookup = lookupInterpolatedCurve;

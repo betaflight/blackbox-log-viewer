@@ -1,5 +1,3 @@
-importScripts("/js/lodash.min.js");
-
 onmessage = function(event) {
 
   /**
@@ -17,9 +15,9 @@ onmessage = function(event) {
    * @returns {string}
    */
   function joinColumns(columns) {
-    return _(columns)
+    return columns
       .map(value =>
-        _.isNumber(value)
+        typeof value === "number"
         ? value
         : stringDelim + normalizeEmpty(value) + stringDelim)
       .join(opts.columnDelimiter);
@@ -32,9 +30,9 @@ onmessage = function(event) {
    * @returns {string}
    */
   function joinColumnValues(columns) {
-    return _(columns)
+    return columns
       .map(value =>
-        (_.isNumber(value) || _.value)
+        (typeof value === "number" || value)
         ? value
         : "NaN")
       .join(opts.columnDelimiter);
@@ -44,14 +42,13 @@ onmessage = function(event) {
     stringDelim = opts.quoteStrings
       ? opts.stringDelimiter
       : "",
-    mainFields = _([joinColumns(event.data.fieldNames)])
-      .concat(_(event.data.frames)
-        .flatten()
-        .map(row => joinColumnValues(row))
-        .value())
+    mainFields = [joinColumns(event.data.fieldNames)]
+      .concat(event.data.frames
+        .flat()
+        .map(row => joinColumnValues(row)))
       .join("\n"),
-    headers = _(event.data.sysConfig)
-      .map((value, key) => joinColumns([key, value]))
+    headers = Object.entries(event.data.sysConfig)
+      .map(([key, value]) => joinColumns([key, value]))
       .join("\n"),
     result = headers + "\n" + mainFields;
 

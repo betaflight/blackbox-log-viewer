@@ -13,6 +13,8 @@ import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
 import { ExpoCurve } from "./expo";
 import { leftPad, formatTime } from "./tools";
+import { useGraphStore } from "./stores/graph.js";
+import { useWorkspaceStore } from "./stores/workspace.js";
 import { ThemeColors } from "./theme_colors";
 
 export function FlightLogGrapher(
@@ -24,67 +26,57 @@ export function FlightLogGrapher(
   analyserCanvas,
   options,
 ) {
-  let PID_P = 0,
-    PID_I = 1,
-    PID_D = 2,
-    DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif",
-    drawingParams = {
-      fontSizePIDTableLabel: null,
-      fontSizeAxisLabel: null,
-      fontSizeFrameLabel: null,
-      fontSizeEventLabel: null,
+  const graphStore = useGraphStore();
+  const workspaceStore = useWorkspaceStore();
 
-      plotLineWidth: null,
-    },
-    // How far the center of the craft is from the top of the canvas, as a portion of height
-    // CRAFT_POSITION_Y_PROPORTION         =  parseInt(options.craft.top) / 100.0 ||0.2,
+  const DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif";
+  let drawingParams = {
+    fontSizePIDTableLabel: null,
+    fontSizeAxisLabel: null,
+    fontSizeFrameLabel: null,
+    fontSizeEventLabel: null,
 
-    lineColors = [
-      "#fb8072", // Red
-      "#8dd3c7", // Cyan
-      "#ffffb3", // Yellow
-      "#bebada", // Purple
-      "#80b1d3",
-      "#fdb462",
-      "#b3de69",
-      "#fccde5",
-      "#d9d9d9",
-      "#bc80bd",
-      "#ccebc5",
-      "#ffed6f",
-    ],
-    WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
+    plotLineWidth: null,
+  };
+  const lineColors = [
+    "#fb8072", // Red
+    "#8dd3c7", // Cyan
+    "#ffffb3", // Yellow
+    "#bebada", // Purple
+    "#80b1d3",
+    "#fdb462",
+    "#b3de69",
+    "#fccde5",
+    "#d9d9d9",
+    "#bc80bd",
+    "#ccebc5",
+    "#ffed6f",
+  ];
+  const WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
 
-  let windowStartTime,
-    windowCenterTime,
-    windowEndTime,
-    canvasContext = canvas.getContext("2d"),
-    defaultOptions = {
-      gapless: false,
-      craftType: "3D",
-      drawPidTable: true,
-      drawSticks: true,
-      drawTime: true,
-      drawAnalyser: true, // add an analyser option
-      analyserSampleRate: 2000 /*Hz*/, // the loop time for the log
-      eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
-    },
-    windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
+  let windowStartTime, windowCenterTime, windowEndTime;
+  const canvasContext = canvas.getContext("2d");
+  const defaultOptions = {
+    gapless: false,
+    craftType: "3D",
+    drawPidTable: true,
+    drawSticks: true,
+    drawTime: true,
+    drawAnalyser: true, // add an analyser option
+    analyserSampleRate: 2000 /*Hz*/, // the loop time for the log
+    eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
+  };
+  let windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
     idents,
-    sysConfig = flightLog.getSysConfig(),
     graphs = [],
     inTime = false,
     outTime = false,
     lastMouseX,
-    lastMouseY,
     sticks = null,
     craft3D = null,
     craft2D = null,
     analyser = null /* define a new spectrum analyser */,
-    watermarkLogo /* Watermark feature */,
-    lapTimer /* LapTimer feature */,
-    that = this;
-
+    watermarkLogo /* Watermark feature */;
   this.onSeek = null;
 
   this.getAnalyser = function () {
@@ -92,85 +84,72 @@ export function FlightLogGrapher(
   };
 
   function extend(base, top) {
-    let target = {};
-
-    [base, top].forEach(function (obj) {
-      for (let prop in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-          target[prop] = obj[prop];
-        }
-      }
-    });
-
-    return target;
+    return { ...base, ...top };
   }
 
-  function onMouseMove(e) {
+  const onMouseMove = (e) => {
     e.preventDefault();
 
-    if (that.onSeek) {
+    if (this.onSeek) {
       //Reverse the seek direction so that it looks like you're dragging the data with the mouse
-      that.onSeek(((lastMouseX - e.pageX) / canvas.width) * windowWidthMicros);
+      this.onSeek(((lastMouseX - e.pageX) / canvas.width) * windowWidthMicros);
     }
 
     lastMouseX = e.pageX;
-    lastMouseY = e.pageY;
-  }
+  };
 
-  function onTouchMove(e) {
+  const onTouchMove = (e) => {
     e.preventDefault();
 
-    if (that.onSeek) {
+    if (this.onSeek) {
       //Reverse the seek direction so that it looks like you're dragging the data
-      that.onSeek(
+      this.onSeek(
         ((lastMouseX - e.originalEvent.touches[0].pageX) / canvas.width) *
           windowWidthMicros,
       );
     }
 
     lastMouseX = e.originalEvent.touches[0].pageX;
-    lastMouseY = e.originalEvent.touches[0].pageY;
-  }
+  };
 
   function onMouseDown(e) {
-    if (e.which == 1) {
+    if (e.which === 1) {
       //Left mouse button only for seeking
       lastMouseX = e.pageX;
-      lastMouseY = e.pageY;
 
       //"capture" the mouse so we can drag outside the boundaries of canvas
-      $(document).on("mousemove", onMouseMove);
+      document.addEventListener("mousemove", onMouseMove);
 
-      //Release the capture when the mouse is released
-      $(document).one("mouseup", function () {
-        $(document).off("mousemove", onMouseMove);
-      });
+      function onMouseUp() {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+      document.addEventListener("mouseup", onMouseUp);
 
       e.preventDefault();
     }
   }
 
   function onTouchStart(e) {
-    if (e.which == 0) {
+    if (e.which === 0) {
       lastMouseX = e.originalEvent.touches[0].pageX;
-      lastMouseY = e.originalEvent.touches[0].pageY;
 
       //"capture" so we can drag outside the boundaries of canvas
-      $(document).on("touchmove", onTouchMove);
+      document.addEventListener("touchmove", onTouchMove);
 
-      //Release the capture when released
-      $(document).one("touchend", function () {
-        $(document).off("touchmove", onTouchMove);
-      });
+      function onTouchEnd() {
+        document.removeEventListener("touchmove", onTouchMove);
+        document.removeEventListener("touchend", onTouchEnd);
+      }
+      document.addEventListener("touchend", onTouchEnd);
 
       e.preventDefault();
     }
   }
 
   function identifyFields() {
-    let motorGraphColorIndex = 0,
-      fieldIndex,
-      fieldNames = flightLog.getMainFieldNames();
+    let motorGraphColorIndex = 0, fieldIndex;
+    const fieldNames = flightLog.getMainFieldNames();
 
     idents = {
       rcCommandFields: [],
@@ -199,40 +178,40 @@ export function FlightLogGrapher(
     };
 
     for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
-      var fieldName = fieldNames[fieldIndex],
-        matches;
+      const fieldName = fieldNames[fieldIndex];
+      let matches;
 
       if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
-        let motorIndex = matches[1];
+        const motorIndex = matches[1];
 
         idents.motorFields[motorIndex] = fieldIndex;
         idents.motorColors[motorIndex] =
           lineColors[motorGraphColorIndex++ % lineColors.length];
       } else if ((matches = fieldName.match(/^rcCommand\[(\d+)]$/))) {
-        let rcCommandIndex = matches[1];
+        const rcCommandIndex = matches[1];
 
         if (rcCommandIndex >= 0 && rcCommandIndex < 4) {
           idents.rcCommandFields[rcCommandIndex] = fieldIndex;
         }
       } else if ((matches = fieldName.match(/^axisPID\[(\d+)]$/))) {
-        var axisIndex = matches[1];
+        const axisIndex = matches[1];
 
         idents.axisPIDSum[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^axis(.)\[(\d+)]$/))) {
-        var axisIndex = matches[2];
+        const axisIndex = matches[2];
 
         idents.axisPIDFields[matches[1]] = axisIndex;
         idents.hasPIDs = true;
       } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
-        var axisIndex = matches[1];
+        const axisIndex = matches[1];
 
         idents.gyroFields[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^accSmooth\[(\d+)]$/))) {
-        var axisIndex = matches[1];
+        const axisIndex = matches[1];
 
         idents.accFields[axisIndex] = fieldIndex;
       } else if ((matches = fieldName.match(/^servo\[(\d+)]$/))) {
-        let servoIndex = matches[1];
+        const servoIndex = matches[1];
 
         idents.numServos++;
         idents.servoFields[servoIndex] = fieldIndex;
@@ -263,13 +242,13 @@ export function FlightLogGrapher(
 
   function drawWaterMark() {
     canvasContext.save();
-    canvasContext.globalAlpha = parseInt(options.watermark.transparency) / 100;
+    canvasContext.globalAlpha = Number.parseInt(options.watermark.transparency, 10) / 100;
     canvasContext.drawImage(
       watermarkLogo,
-      (parseInt(options.watermark.left) / 100) * canvas.width,
-      (parseInt(options.watermark.top) / 100) * canvas.height,
-      (parseInt(options.watermark.size) / 100) * watermarkLogo.width,
-      (parseInt(options.watermark.size) / 100) * watermarkLogo.height,
+      (Number.parseInt(options.watermark.left, 10) / 100) * canvas.width,
+      (Number.parseInt(options.watermark.top, 10) / 100) * canvas.height,
+      (Number.parseInt(options.watermark.size, 10) / 100) * watermarkLogo.width,
+      (Number.parseInt(options.watermark.size, 10) / 100) * watermarkLogo.height,
     );
     canvasContext.restore();
   }
@@ -279,7 +258,7 @@ export function FlightLogGrapher(
     lapTimer.refresh(
       windowCenterTime,
       3600 * 1000000 /*a long time*/,
-      blackboxLogViewer.getBookmarkTimes(),
+      workspaceStore.bookmarkTimes,
     );
     lapTimer.drawCanvas(canvas, options);
   }
@@ -326,16 +305,13 @@ export function FlightLogGrapher(
     lineWidth,
     highlight,
   ) {
-    let GAP_WARNING_BOX_RADIUS = 3,
-      chunkIndex,
-      frameIndex,
-      drawingLine = false,
+    const GAP_WARNING_BOX_RADIUS = 3;
+    let chunkIndex, frameIndex;
+    let drawingLine = false,
       notInBounds = -5, // when <0, then line is always drawn, (this allows us to paritially dash the line when the bounds is exceeded)
-      inGap = false,
-      lastX,
-      lastY,
-      yScale = -plotHeight,
-      xScale = canvas.width / windowWidthMicros;
+      inGap = false;
+    const yScale = -plotHeight;
+    const xScale = canvas.width / windowWidthMicros;
 
     //Draw points from this line until we leave the window
 
@@ -354,19 +330,17 @@ export function FlightLogGrapher(
       chunkIndex < chunks.length;
       chunkIndex++
     ) {
-      let chunk = chunks[chunkIndex];
+      const chunk = chunks[chunkIndex];
 
       for (; frameIndex < chunk.frames.length; frameIndex++) {
-        var fieldValue = chunk.frames[frameIndex][fieldIndex],
-          frameTime =
-            chunk.frames[frameIndex][
-              FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
-            ],
-          nextX,
-          nextY;
+        const fieldValue = chunk.frames[frameIndex][fieldIndex];
+        const frameTime =
+          chunk.frames[frameIndex][
+            FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
+          ];
 
-        nextY = curve.lookup(fieldValue) * yScale;
-        nextX = (frameTime - windowStartTime) * xScale;
+        let nextY = curve.lookup(fieldValue) * yScale;
+        const nextX = (frameTime - windowStartTime) * xScale;
 
         // clamp the Y to the range of the graph to prevent bleed into next graph if zoomed in (for example)
 
@@ -428,7 +402,7 @@ export function FlightLogGrapher(
     if (highlight) {
       // Draw semi-transparent stroke with wider line to simulate glow
       // Decided not to use canvasContext.shadowBlur for performance reasons
-      let lineWidthTemp = canvasContext.lineWidth;
+      const lineWidthTemp = canvasContext.lineWidth;
       canvasContext.lineWidth = 1.5 * canvasContext.lineWidth + 3;
       canvasContext.globalAlpha = 0.5;
       canvasContext.stroke();
@@ -454,7 +428,7 @@ export function FlightLogGrapher(
 
   //Draw an background for the line for a graph (at the origin and spanning the window)
   function drawAxisBackground(plotHeight) {
-    let axisGradient = canvasContext.createLinearGradient(
+    const axisGradient = canvasContext.createLinearGradient(
       0,
       -plotHeight / 2,
       0,
@@ -471,7 +445,7 @@ export function FlightLogGrapher(
 
   //Draw a grid
   function drawGrid(curve, plotHeight) {
-    let settings = curve.getCurve(),
+    const settings = curve.getCurve(),
       GRID_LINES = 10,
       min = -settings.inputRange - settings.offset,
       max = settings.inputRange - settings.offset,
@@ -485,8 +459,8 @@ export function FlightLogGrapher(
 
     // horizontal lines
     for (let y = 1; y < GRID_LINES; y++) {
-      let yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
-      if (yValue != 0 && Math.abs(yValue < plotHeight / 2)) {
+      const yValue = curve.lookup(GRID_INTERVAL * y + min) * yScale;
+      if (yValue !== 0 && Math.abs(yValue) < plotHeight / 2) {
         canvasContext.moveTo(0, yValue);
         canvasContext.lineTo(canvas.width, yValue);
       }
@@ -497,7 +471,7 @@ export function FlightLogGrapher(
       i < windowEndTime;
       i += 100000
     ) {
-      let x = timeToCanvasX(i);
+      const x = timeToCanvasX(i);
       canvasContext.moveTo(x, yScale);
       canvasContext.lineTo(x, -yScale);
     }
@@ -532,12 +506,12 @@ export function FlightLogGrapher(
     canvasContext.stroke();
 
     if (label) {
-      let margin = 8,
+      const margin = 8,
         labelWidth = canvasContext.measureText(label).width + 2 * margin;
 
       align = align || "left";
       canvasContext.textAlign = align;
-      let labelDirection = align == "left" ? 1 : -1;
+      const labelDirection = align === "left" ? 1 : -1;
 
       canvasContext.lineWidth = 1;
       canvasContext.beginPath();
@@ -582,7 +556,7 @@ export function FlightLogGrapher(
   }
 
   function drawEvent(event, sequenceNum) {
-    let x = timeToCanvasX(event.time),
+    const x = timeToCanvasX(event.time),
       labelY = (sequenceNum + 1) * (drawingParams.fontSizeEventLabel + 10);
 
     switch (event.event) {
@@ -679,23 +653,22 @@ export function FlightLogGrapher(
   }
 
   function drawEvents(chunks) {
-    let /*
-       * Also draw events that are a little left of the window, so that their labels don't suddenly
-       * disappear when they scroll out of view:
-       */
-      BEGIN_MARGIN_MICROSECONDS = 100000,
-      shouldSetFont = true,
-      sequenceNum = 0;
+    /*
+     * Also draw events that are a little left of the window, so that their labels don't suddenly
+     * disappear when they scroll out of view:
+     */
+    const BEGIN_MARGIN_MICROSECONDS = 100000;
+    let shouldSetFont = true, sequenceNum = 0;
 
-    for (var i = 0; i < chunks.length; i++) {
-      let events = chunks[i].events;
+    for (const chunk of chunks) {
+      const events = chunk.events;
 
-      for (let j = 0; j < events.length; j++) {
-        if (events[j].time > windowEndTime) {
+      for (const event of events) {
+        if (event.time > windowEndTime) {
           return;
         }
 
-        if (events[j].time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
+        if (event.time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS) {
           // Avoid setting the font if we don't draw any events
           if (shouldSetFont) {
             canvasContext.fillStyle = ThemeColors.getGraphText();
@@ -703,19 +676,20 @@ export function FlightLogGrapher(
             shouldSetFont = false;
           }
 
-          drawEvent(events[j], sequenceNum++);
+          drawEvent(event, sequenceNum++);
         }
       }
     }
 
     // Add custom markers
 
-    let markerEvent = blackboxLogViewer.getMarker();
-    let bookmarkEvents = blackboxLogViewer.getBookmarks();
+    const markerEvent = { state: graphStore.hasMarker, time: graphStore.markerTime };
+    const bookmarkEvents = workspaceStore.bookmarkTimes?.map((t) =>
+      t == null ? null : { state: t !== 0, time: t },
+    ) ?? null;
     if (shouldSetFont && (markerEvent != null || bookmarkEvents != null)) {
       canvasContext.fillStyle = ThemeColors.getGraphText();
       canvasContext.font = `${drawingParams.fontSizeEventLabel}pt ${DEFAULT_FONT_FACE}`;
-      shouldSetFont = false;
     }
 
     // Draw Marker Event Line
@@ -739,12 +713,11 @@ export function FlightLogGrapher(
           );
         }
 
-        let markerFrequency =
-          (windowCenterTime - markerEvent.time).toFixed(0) != 0
-            ? `${(1000000 / (windowCenterTime - markerEvent.time)).toFixed(
-                0,
-              )}Hz`
-            : "";
+        const timeDelta = windowCenterTime - markerEvent.time;
+        const markerFrequency =
+          timeDelta === 0
+            ? ""
+            : `${(1000000 / timeDelta).toFixed(0)}Hz`;
         drawEvent(
           {
             event: FlightLogEvent.CUSTOM_BLANK, // Blank doesnt show a vertical line
@@ -762,7 +735,7 @@ export function FlightLogGrapher(
 
     // Draw Bookmarks Event Line
     if (bookmarkEvents != null) {
-      for (var i = 0; i <= 9; i++) {
+      for (let i = 0; i <= 9; i++) {
         if (bookmarkEvents[i] != null) {
           if (bookmarkEvents[i].state)
             if (
@@ -792,7 +765,7 @@ export function FlightLogGrapher(
       (inTime !== false && inTime >= windowStartTime) ||
       (outTime !== false && outTime < windowEndTime)
     ) {
-      let inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
+      const inMarkerX = inTime === false ? false : timeToCanvasX(inTime),
         outMarkerX = outTime === false ? false : timeToCanvasX(outTime);
 
       canvasContext.fillStyle = "rgba(0,0,0,0.8)";
@@ -807,7 +780,7 @@ export function FlightLogGrapher(
       }
 
       if (outTime !== false && outTime < windowEndTime) {
-        let outMarkerXClipped = Math.max(outMarkerX, 0);
+        const outMarkerXClipped = Math.max(outMarkerX, 0);
         canvasContext.fillRect(
           outMarkerXClipped,
           0,
@@ -849,7 +822,7 @@ export function FlightLogGrapher(
   }
 
   function computeDrawingParameters() {
-    let fontSizeBase = Math.max(8, canvas.height / 60),
+    const fontSizeBase = Math.max(8, canvas.height / 60),
       newParams = {
         fontSizePIDTableLabel: fontSizeBase * 3.4,
         fontSizeAxisLabel: fontSizeBase * 0.9,
@@ -866,30 +839,28 @@ export function FlightLogGrapher(
     canvas.width = width;
     canvas.height = height;
 
-    let sticksHeight =
-      (canvas.height * parseInt(options.sticks.size)) / 2 / 100.0;
+    const sticksHeight =
+      (canvas.height * Number.parseInt(options.sticks.size, 10)) / 2 / 100;
     // The total width available to draw both sticks in:
-    let sticksWidth = (canvas.width * parseInt(options.sticks.size)) / 100.0;
+    const sticksWidth = (canvas.width * Number.parseInt(options.sticks.size, 10)) / 100;
 
     if (sticks) {
       sticks.resize(sticksWidth, sticksHeight);
     }
 
     // Recenter the craft canvas in the top left corner
-    $(stickCanvas).css({
-      left: `${Math.max(
-        (canvas.width * parseInt(options.sticks.left)) / 100.0 -
-          sticksWidth / 2,
-        0,
-      )}px`,
-      top: `${Math.max(
-        (canvas.height * parseInt(options.sticks.top)) / 100.0 -
-          sticksHeight / 2,
-        0,
-      )}px`,
-    });
+    stickCanvas.style.left = `${Math.max(
+      (canvas.width * Number.parseInt(options.sticks.left, 10)) / 100 -
+        sticksWidth / 2,
+      0,
+    )}px`;
+    stickCanvas.style.top = `${Math.max(
+      (canvas.height * Number.parseInt(options.sticks.top, 10)) / 100 -
+        sticksHeight / 2,
+      0,
+    )}px`;
 
-    let craftSize = canvas.height * (parseInt(options.craft.size) / 100.0);
+    const craftSize = canvas.height * (Number.parseInt(options.craft.size, 10) / 100);
 
     if (craft2D) {
       craft2D.resize(craftSize, craftSize);
@@ -898,16 +869,14 @@ export function FlightLogGrapher(
     }
 
     // Position the craft canvas according to options
-    $(craftCanvas).css({
-      left: `${Math.max(
-        (canvas.width * parseInt(options.craft.left)) / 100.0 - craftSize / 2,
-        0,
-      )}px`,
-      top: `${Math.max(
-        (canvas.height * parseInt(options.craft.top)) / 100.0 - craftSize / 2,
-        0,
-      )}px`,
-    });
+    craftCanvas.style.left = `${Math.max(
+      (canvas.width * Number.parseInt(options.craft.left, 10)) / 100 - craftSize / 2,
+      0,
+    )}px`;
+    craftCanvas.style.top = `${Math.max(
+      (canvas.height * Number.parseInt(options.craft.top, 10)) / 100 - craftSize / 2,
+      0,
+    )}px`;
 
     if (analyser != null) analyser.resize();
 
@@ -933,14 +902,11 @@ export function FlightLogGrapher(
       }
     }
 
-    let chunks = flightLog.getSmoothedChunksInTimeRange(
-        windowStartTime,
-        windowEndTime,
-      ),
-      startChunkIndex,
-      startFrameIndex,
-      i,
-      j;
+    const chunks = flightLog.getSmoothedChunksInTimeRange(
+      windowStartTime,
+      windowEndTime,
+    );
+    let startFrameIndex, i, j;
 
     if (chunks.length) {
       //Find the first sample that lies inside the window
@@ -963,7 +929,7 @@ export function FlightLogGrapher(
 
       // Plot graphs
       for (i = 0; i < graphs.length; i++) {
-        var graph = graphs[i];
+        const graph = graphs[i];
 
         canvasContext.save();
         {
@@ -983,7 +949,7 @@ export function FlightLogGrapher(
             if (graphConfig.isGraphFieldHidden(i, j)) {
               continue;
             }
-            var field = graph.fields[j];
+            const field = graph.fields[j];
             plotField(
               chunks,
               startFrameIndex,
@@ -994,8 +960,8 @@ export function FlightLogGrapher(
                 ? field.color
                 : GraphConfig.PALETTE[j % GraphConfig.PALETTE.length],
               field.lineWidth ? field.lineWidth : null,
-              graphConfig.highlightGraphIndex == i &&
-                graphConfig.highlightFieldIndex == j,
+              graphConfig.highlightGraphIndex === i &&
+                graphConfig.highlightFieldIndex === j,
             );
           }
 
@@ -1008,7 +974,7 @@ export function FlightLogGrapher(
 
       //Draw a bar highlighting the current time if we are drawing any graphs
       if (options.drawVerticalBar && graphs.length) {
-        let centerX = canvas.width / 2;
+        const centerX = canvas.width / 2;
 
         canvasContext.strokeStyle = "rgba(255, 64, 64, 0.2)";
         canvasContext.lineWidth = 11;
@@ -1036,7 +1002,7 @@ export function FlightLogGrapher(
       }
 
       // Draw details at the current time
-      let centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);
+      const centerFrame = flightLog.getSmoothedFrameAtTime(windowCenterTime);
 
       if (centerFrame) {
         if (options.drawSticks) {
@@ -1052,9 +1018,9 @@ export function FlightLogGrapher(
           );
         }
 
-        if (options.craftType == "3D") {
+        if (options.craftType === "3D") {
           craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
-        } else if (options.craftType == "2D") {
+        } else if (options.craftType === "2D") {
           craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
         }
       }
@@ -1063,8 +1029,8 @@ export function FlightLogGrapher(
       if (options.drawAnalyser && graphConfig.selectedFieldName) {
         try {
           // If we do not select a graph/field, then the analyser is hidden
-          var graph = graphs[graphConfig.selectedGraphIndex];
-          var field = graph.fields[graphConfig.selectedFieldIndex];
+          const graph = graphs[graphConfig.selectedGraphIndex];
+          const field = graph.fields[graphConfig.selectedFieldIndex];
           analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
         } catch (err) {
           console.log(`Cannot plot analyser ${err}`);
@@ -1086,14 +1052,10 @@ export function FlightLogGrapher(
   };
 
   this.refreshGraphConfig = function () {
-    let smoothing = {},
-      heightSum = 0,
-      allocatedHeight,
-      graphHeight,
-      i,
-      graph;
+    const smoothing = {};
+    let heightSum = 0, allocatedHeight, graphHeight, i, graph;
 
-    graphs = jQuery.extend(true, [], graphConfig.getGraphs());
+    graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs())); // NOSONAR — structuredClone fails on Vue reactive proxies
 
     for (i = 0; i < graphs.length; i++) {
       graph = graphs[i];
@@ -1101,7 +1063,7 @@ export function FlightLogGrapher(
       heightSum += graph.height ? graph.height : 1.0;
 
       for (let j = 0; j < graphs[i].fields.length; j++) {
-        let field = graphs[i].fields[j];
+        const field = graphs[i].fields[j];
 
         field.index = flightLog.getMainFieldIndexByName(field.name);
 
@@ -1163,15 +1125,15 @@ export function FlightLogGrapher(
 
   this.initializeCraftModel = function () {
     // Ensure craftType is a valid value
-    if (["2D", "3D"].indexOf(options.craftType) == -1) {
+    if (!["2D", "3D"].includes(options.craftType)) {
       options.craftType = defaultOptions.craftType;
     }
 
-    if (options.craftType == "3D") {
+    if (options.craftType === "3D") {
       if (craftCanvas) {
         try {
           craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
-        } catch (e) {
+        } catch {
           //WebGL not supported, fall back to 2D rendering
           options.craftType = "2D";
         }
@@ -1181,14 +1143,14 @@ export function FlightLogGrapher(
       }
     }
 
-    if (options.craftType == "2D") {
+    if (options.craftType === "2D") {
       craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
     }
   };
 
   this.destroy = function () {
-    $(canvas).off("mousedown", onMouseDown);
-    $(canvas).off("touchstart", onTouchStart);
+    canvas.removeEventListener("mousedown", onMouseDown);
+    canvas.removeEventListener("touchstart", onTouchStart);
   };
 
   this.refreshTheme = function () {
@@ -1271,7 +1233,7 @@ export function FlightLogGrapher(
 
   // Update user options
   this.refreshOptions = function (newSettings) {
-    options = $.extend(defaultOptions, newSettings || {});
+    options = { ...defaultOptions, ...newSettings };
   };
 
   this.refreshLogo = function () {
@@ -1302,16 +1264,19 @@ export function FlightLogGrapher(
   analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
 
   /* Create the Lap Timer object */
-  lapTimer = new LapTimer();
+  const lapTimer = new LapTimer();
 
   //Handle dragging events
-  $(canvas).on("mousedown", onMouseDown);
-  $(canvas).on("touchstart", onTouchStart);
+  canvas.addEventListener("mousedown", onMouseDown);
+  canvas.addEventListener("touchstart", onTouchStart);
 
   graphConfig.addListener(this.refreshGraphConfig);
   this.refreshGraphConfig();
 
-  $("html").toggleClass("has-grid-override", options["graphGridOverride"]);
+  document.documentElement.classList.toggle(
+    "has-grid-override",
+    options["graphGridOverride"],
+  );
 
   this.resize(canvas.width, canvas.height);
 }

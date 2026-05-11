@@ -1,3 +1,5 @@
+import semver from "semver";
+
 function makeReadOnly(x) {
   // Make read-only if browser supports it:
   if (Object.freeze) {
@@ -7,6 +9,13 @@ function makeReadOnly(x) {
   // Otherwise a no-op
   return x;
 }
+
+// Firmware type constants
+export const FIRMWARE_TYPE_UNKNOWN = 0;
+export const FIRMWARE_TYPE_BASEFLIGHT = 1;
+export const FIRMWARE_TYPE_CLEANFLIGHT = 2;
+export const FIRMWARE_TYPE_BETAFLIGHT = 3;
+export const FIRMWARE_TYPE_INAV = 4;
 
 // Some constants used at different places
 export const MAX_MOTOR_NUMBER = 8;

@@ -1,4 +1,6 @@
+import { FFTComplex } from "./fft_complex.js";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
+import { useSettingsStore } from "./stores/settings.js";
 
 const FIELD_THROTTLE_NAME = ["rcCommands[3]"],
   FIELD_RPM_NAMES = [
@@ -62,18 +64,10 @@ GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
     this._blackBoxRate = Math.round(this._actualeRate);
 
   if (this._BetaflightRate !== this._blackBoxRate) {
-    $(".actual-lograte").text(
-      this._actualeRate.toFixed(0) +
-        "/" +
-        this._BetaflightRate.toFixed(0) +
-        "Hz",
-    );
     return {
       actualRate: this._actualeRate,
       betaflightRate: this._BetaflightRate,
     };
-  } else {
-    $(".actual-lograte").text("");
   }
 
   return undefined;
@@ -102,10 +96,11 @@ GraphSpectrumCalc.setDataBuffer = function (fieldIndex, curve, fieldName) {
 };
 
 GraphSpectrumCalc.getNearPower2Value = function (size) {
-  return Math.pow(2, Math.ceil(Math.log2(size)));
+  return 2 ** Math.ceil(Math.log2(size));
 };
 
 GraphSpectrumCalc.dataLoadFrequency = function () {
+  const { userSettings } = useSettingsStore();
   const flightSamples = this._getFlightSamplesFreq();
 
   if (userSettings.analyserHanning) {
@@ -125,10 +120,10 @@ GraphSpectrumCalc.setPointsPerSegmentPSD = function (pointsCount) {
   this._pointsPerSegmentPSD = pointsCount;
 };
 
-GraphSpectrumCalc.dataLoadPSD = function (analyserZoomY) {
+GraphSpectrumCalc.dataLoadPSD = function (_analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
   const totalCount = flightSamples.count; // actual samples, not padded length
-  let pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);
+  const pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);
   // Non-overlapping when single full-segment; otherwise 75% overlap
   const overlapCount =
     pointsPerSegment === totalCount
@@ -160,6 +155,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function (
   minValue = Infinity,
   maxValue = -Infinity,
 ) {
+  const { userSettings } = useSettingsStore();
   const flightSamples = this._getFlightSamplesFreqVsX(
     vsFieldNames,
     minValue,
@@ -181,7 +177,7 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function (
     .fill(null)
     .map(() => new Float64Array(fftBufferSize * 2));
   const numberSamples = new Uint32Array(NUM_VS_BINS); // Number of samples in each vs value, used to average them later.
-  const fft = new FFT.complex(fftBufferSize, false);
+  const fft = new FFTComplex(fftBufferSize, false);
   const fftInput = new Float64Array(fftBufferSize);
   const fftOutput = new Float64Array(fftBufferSize * 2);
 
@@ -306,7 +302,7 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function (
     const psd = this._psd(fftInput, fftChunkLength, 0, "density"); // Using the one segment with all chunks fftChunkLength size, it will extended at power at 2 size inside _psd() - _fft_segmented()
     maxNoise = Math.max(psd.max, maxNoise);
     // The _psd() can extend fft data size. Set psdLength and create matrix by first using
-    if (matrixPsdOutput == undefined) {
+    if (matrixPsdOutput === undefined) {
       psdLength = psd.psdOutput.length;
       matrixPsdOutput = new Array(NUM_VS_BINS)
         .fill(null)
@@ -389,11 +385,11 @@ GraphSpectrumCalc.dataLoadPowerSpectralDensityVsRpm = function () {
 GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
   // Detect the axis
   let axisIndex;
-  if (this._dataBuffer.fieldName.indexOf("[roll]") >= 0) {
+  if (this._dataBuffer.fieldName.includes("[roll]")) {
     axisIndex = 0;
-  } else if (this._dataBuffer.fieldName.indexOf("[pitch]") >= 0) {
+  } else if (this._dataBuffer.fieldName.includes("[pitch]")) {
     axisIndex = 1;
-  } else if (this._dataBuffer.fieldName.indexOf("[yaw]") >= 0) {
+  } else if (this._dataBuffer.fieldName.includes("[yaw]")) {
     axisIndex = 2;
   }
 
@@ -445,19 +441,9 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
 };
 
 GraphSpectrumCalc._getFlightChunks = function () {
-  let logStart = 0;
-  if (this._analyserTimeRange.in) {
-    logStart = this._analyserTimeRange.in;
-  } else {
-    logStart = this._flightLog.getMinTime();
-  }
+  const logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
 
-  let logEnd = 0;
-  if (this._analyserTimeRange.out) {
-    logEnd = this._analyserTimeRange.out;
-  } else {
-    logEnd = this._flightLog.getMaxTime();
-  }
+  let logEnd = this._analyserTimeRange.out || this._flightLog.getMaxTime();
 
   // Limit size
   logEnd =
@@ -550,9 +536,9 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
           chunk.frames[frameIndex][this._dataBuffer.fieldIndex];
       }
       for (let i = 0; i < vsIndexes.length; i++) {
-        let vsFieldIx = vsIndexes[i];
+        const vsFieldIx = vsIndexes[i];
         let value = chunk.frames[frameIndex][vsFieldIx];
-        if (vsFieldNames == FIELD_RPM_NAMES) {
+        if (vsFieldNames === FIELD_RPM_NAMES) {
           const maxRPM = (MAX_RPM_HZ_VALUE * this._motorPoles) / 3.333;
           if (value > maxRPM) {
             value = maxRPM;
@@ -596,12 +582,12 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
   }
 
   // Use small top margin for RPM axis only. Because it has bad axis view for throttle
-  if (vsFieldNames == FIELD_RPM_NAMES) {
+  if (vsFieldNames === FIELD_RPM_NAMES) {
     maxValue += ((maxValue - minValue) * RPM_AXIS_TOP_MARGIN_PERCENT) / 100;
   }
 
   if (minValue > maxValue) {
-    if (minValue == Infinity) {
+    if (minValue === Infinity) {
       // this should never happen
       minValue = 0;
       maxValue = 100;
@@ -688,7 +674,7 @@ GraphSpectrumCalc._fft = function (samples, type) {
 
   const fftLength = samples.length;
   const fftOutput = new Float64Array(fftLength * 2);
-  const fft = new FFT.complex(fftLength, false);
+  const fft = new FFTComplex(fftLength, false);
 
   fft.simple(fftOutput, samples, type);
 
@@ -746,6 +732,7 @@ GraphSpectrumCalc._psd = function (
   overlapCount,
   scaling = "density",
 ) {
+  const { userSettings } = useSettingsStore();
   // Compute FFT for samples segments
   const fftOutput = this._fft_segmented(
     samples,
@@ -762,22 +749,22 @@ GraphSpectrumCalc._psd = function (
   if (userSettings.analyserHanning) {
     const window = Array(pointsPerSegment).fill(1);
     this._hanningWindow(window, pointsPerSegment);
-    if (scaling == "density") {
+    if (scaling === "density") {
       let skSum = 0;
       for (const value of window) {
         skSum += value ** 2;
       }
       scale = 1 / (this._blackBoxRate * skSum);
-    } else if (scaling == "spectrum") {
+    } else if (scaling === "spectrum") {
       let sum = 0;
       for (const value of window) {
         sum += value;
       }
       scale = 1 / sum ** 2;
     }
-  } else if (scaling == "density") {
+  } else if (scaling === "density") {
     scale = 1 / pointsPerSegment;
-  } else if (scaling == "spectrum") {
+  } else if (scaling === "spectrum") {
     scale = 1 / pointsPerSegment ** 2;
   }
 
@@ -802,9 +789,9 @@ GraphSpectrumCalc._psd = function (
     psdOutput[i] = 0.0;
     for (let j = 0; j < segmentsCount; j++) {
       let p = scale * fftOutput[j][i] ** 2;
-      if (i != 0) {
-        const even = dataCount % 2 == 0;
-        if (!even || (even && i != dataCount - 1)) {
+      if (i !== 0) {
+        const even = dataCount % 2 === 0;
+        if (!even || (even && i !== dataCount - 1)) {
           p *= 2;
         }
       }
@@ -846,6 +833,7 @@ GraphSpectrumCalc._fft_segmented = function (
   pointsPerSegment,
   overlapCount,
 ) {
+  const { userSettings } = useSettingsStore();
   const samplesCount = samples.length;
   const output = [];
 
@@ -861,15 +849,15 @@ GraphSpectrumCalc._fft_segmented = function (
     }
 
     let fftLength;
-    if (pointsPerSegment != samplesCount) {
-      fftLength = Math.floor(pointsPerSegment / 2);
-    } else {
+    if (pointsPerSegment === samplesCount) {
       // Extend the one segment input on power at 2 size
       const fftSize = this.getNearPower2Value(pointsPerSegment);
       const power2Input = new Float64Array(fftSize);
       power2Input.set(fftInput);
       fftInput = power2Input;
       fftLength = fftSize / 2;
+    } else {
+      fftLength = Math.floor(pointsPerSegment / 2);
     }
 
     const fftComplex = this._fft(fftInput);
