@@ -2043,7 +2043,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             return `${value.toFixed(0)} °/s`;
           case "debug[1]": // roll I-term relax factor
             return `${value.toFixed(0)} %`;
-          case "debug[3]": // roll absolute control axis error
+          case "debug[3]": // roll absolute control axis error (pre-2026.6; unused/zero in firmware >= 2026.6)
             return `${(value / 10).toFixed(1)} °`;
           default:
             return value.toFixed(0);
@@ -2809,7 +2809,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value; // °/s
           case "debug[1]": // roll I-term relax factor
             return value; // %
-          case "debug[3]": // roll absolute control axis error
+          case "debug[3]": // roll absolute control axis error (pre-2026.6; unused/zero in firmware >= 2026.6)
             return toFriendly ? value / 10 : value * 10; // °
           default:
             return value;
