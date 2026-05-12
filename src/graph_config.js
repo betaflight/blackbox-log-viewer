@@ -683,7 +683,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         case "ITERM_RELAX":
           switch (fieldName) {
             case "debug[2]": // roll I relaxed error
-            case "debug[3]": // roll absolute control axis error
+            case "debug[3]": // roll absolute control axis error (pre-2026.6; unused/zero in firmware >= 2026.6)
               return getCurveForMinMaxFieldsZeroOffset(fieldName);
             default:
               return getCurveForMinMaxFields(fieldName);

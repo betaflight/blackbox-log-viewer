@@ -482,7 +482,8 @@ const pidControllerParams = computed(() => {
     param("I-Term Relax", selectVal(s.iterm_relax, ITERM_RELAX)),
     param("I-Term Relax Type", selectVal(s.iterm_relax_type, ITERM_RELAX_TYPE)),
     param("I-Term Relax Cutoff", fmtVal(s.iterm_relax_cutoff, 0)),
-    param("Abs Control Gain", fmtVal(s.abs_control_gain, 0)),
+    // abs_control_gain removed in BF 2026.6
+    ...(isBF.value && lt("2026.6.0") ? [param("Abs Control Gain", fmtVal(s.abs_control_gain, 0))] : []),
     param("PID At Min Throttle", selectVal(s.pidAtMinThrottle, OFF_ON)),
     param("Use Integrated Yaw", selectVal(s.use_integrated_yaw, OFF_ON)),
   ].filter((p) => !p.missing);
