@@ -638,6 +638,7 @@ function BlackboxLogViewer() {
   }
 
   appStore.loadFiles = loadFiles;
+  // Note: internal newGraphConfig takes `noRedraw` (inverted). Callers pass `redrawChart` (true = redraw).
   appStore.newGraphConfig = (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart);
   appStore.exportCsv = () => {
     setGraphState(GRAPH_STATE_PAUSED);

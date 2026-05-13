@@ -330,7 +330,7 @@ function onGraphConfigSave(newConfig) {
 }
 
 function onGraphConfigUpdate(newConfig) {
-  appStore.newGraphConfig?.(newConfig, false);
+  appStore.newGraphConfig?.(newConfig, true);
 }
 
 function onSaveVideoConfig(cfg) {
