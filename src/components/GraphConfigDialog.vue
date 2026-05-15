@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-fit' }">
+  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-fit' }"  class="overflow-visible">
     <template #header>
       <div class="flex items-center justify-between w-full">
         <h4 class="font-semibold">Configure graphs</h4>
@@ -28,6 +28,7 @@
           />
         </div>
       </div>
+      <div id="menu-portal-container"></div>
     </template>
 
     <template #body>
@@ -159,38 +160,44 @@
                     @click="cycleColor(field)"
                   />
                 </div>
-                <UInputNumber
-                  :model-value="field.curve?.MinMax?.min ?? -500"
-                  :step="10"
-                  :format-options="noGrouping"
-                  size="xs"
-                  orientation="vertical"
-                  :ui="{ root: 'w-20' }"
-                  @update:model-value="
-                    setMin(field, $event);
-                    emitUpdate();
-                  "
-                  @dblclick="
-                    resetMin(field);
-                    emitUpdate();
-                  "
-                />
-                <UInputNumber
-                  :model-value="field.curve?.MinMax?.max ?? 500"
-                  :step="10"
-                  :format-options="noGrouping"
-                  size="xs"
-                  orientation="vertical"
-                  :ui="{ root: 'w-20' }"
-                  @update:model-value="
-                    setMax(field, $event);
-                    emitUpdate();
-                  "
-                  @dblclick="
-                    resetMax(field);
-                    emitUpdate();
-                  "
-                />
+                <UContextMenu :items="menuItems" :portal="false" :ui="{content: 'z-[9999] relative'}">
+                  <UInputNumber
+                    :model-value="field.curve?.MinMax?.min ?? -500"
+                    :step="10"
+                    :format-options="noGrouping"
+                    size="xs"
+                    orientation="vertical"
+                    :ui="{ root: 'w-20' }"
+                    @update:model-value="
+                      setMin(field, $event);
+                      emitUpdate();
+                    "
+                    @dblclick="
+                      resetMin(field);
+                      emitUpdate();
+                    "
+                    @contextmenu="(e) => onContextMenu(e, graph, field)"
+                  />
+                </UContextMenu>
+                <UContextMenu :items="menuItems" :portal="false" :ui="{content: 'z-[9999] relative'}">
+                  <UInputNumber
+                    :model-value="field.curve?.MinMax?.max ?? 500"
+                    :step="10"
+                    :format-options="noGrouping"
+                    size="xs"
+                    orientation="vertical"
+                    :ui="{ root: 'w-20' }"
+                    @update:model-value="
+                      setMax(field, $event);
+                      emitUpdate();
+                    "
+                    @dblclick="
+                      resetMax(field);
+                      emitUpdate();
+                    "
+                    @contextmenu="(e) => onContextMenu(e, graph, field)"
+                  />
+                </UContextMenu>
                 <UButton
                   variant="ghost"
                   color="error"
@@ -597,4 +604,118 @@ watch(open, (val) => {
     prevConfig.value = convertToConfig();
   }
 });
+
+const currentState = {
+  graph: null,
+  field: null,
+}
+
+function onContextMenu(event, graph, field) {
+  currentState.graph = graph;
+  currentState.field = field;
+}
+
+function setMinMaxToDefault() {
+  if (currentState.graph) {
+    for (const field of currentState.graph.fields) {
+      resetMin(field);
+      resetMax(field);
+    }
+  }
+}
+
+function setMinMaxLikeThis() {
+  if (currentState.graph && currentState.field) {
+    const min = currentState.field.curve.MinMax.min;
+    const max = currentState.field.curve.MinMax.max;
+    for (const field of currentState.graph.fields) {
+      setMin(field, min);
+      setMax(field, max);
+    }
+  }
+}
+
+function setMinMaxCentered() {
+  if (currentState.graph) {
+    for (const field of currentState.graph.fields) {
+      let min = field.curve.MinMax.min;
+      let max = field.curve.MinMax.max;
+      max = Math.max(Math.abs(min), Math.abs(max));
+      min = -max;
+      setMin(field, min);
+      setMax(field, max);
+    }
+  }
+}
+
+function setMinMaxOneScale() {
+  let max = -Number.MAX_VALUE,
+      min = Number.MAX_VALUE;
+  if (currentState.graph) {
+    for (const field of currentState.graph.fields) {
+      max = Math.max(max, Math.max(Math.abs(field.curve.MinMax.min), Math.abs(field.curve.MinMax.max)));
+    }
+    min = -max;
+
+    for (const field of currentState.graph.fields) {
+      setMin(field, min);
+      setMax(field, max);
+    }
+  }
+}
+
+const menuItems = [
+  {
+    label: 'Like this one',
+    onSelect() {
+      setMinMaxLikeThis();
+    }
+  },
+  {
+    label: 'Full range',
+    disabled: true,
+  },
+  {
+    label: 'One scale',
+    onSelect() {
+      setMinMaxOneScale();
+    }
+  },
+  {
+    label: 'Centered',
+    onSelect() {
+      setMinMaxCentered();
+    }
+  },
+  {
+    type: 'separator',
+  },
+  {
+    label: 'Zoom In',
+    disabled: true,
+  },
+  {
+    label: 'Zoom Out',
+    disabled: true,
+  },
+  {
+    type: 'separator',
+  },
+  {
+    label: 'Default',
+    onSelect() {
+      setMinMaxToDefault();
+    }
+  },
+  {
+    type: 'separator',
+  },
+  {
+    type: 'separator',
+  },
+  {
+    label: '\u25BCClose',
+  },
+]
+
 </script>
