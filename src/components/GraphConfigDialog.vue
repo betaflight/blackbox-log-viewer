@@ -621,6 +621,7 @@ function setMinMaxToDefault() {
       resetMin(field);
       resetMax(field);
     }
+    emitUpdate();
   }
 }
 
@@ -632,6 +633,7 @@ function setMinMaxLikeThis() {
       setMin(field, min);
       setMax(field, max);
     }
+    emitUpdate();
   }
 }
 
@@ -645,6 +647,7 @@ function setMinMaxCentered() {
       setMin(field, min);
       setMax(field, max);
     }
+    emitUpdate();
   }
 }
 
@@ -661,6 +664,7 @@ function setMinMaxOneScale() {
       setMin(field, min);
       setMax(field, max);
     }
+    emitUpdate();
   }
 }
 
