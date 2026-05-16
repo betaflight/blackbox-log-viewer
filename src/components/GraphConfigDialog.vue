@@ -608,7 +608,7 @@ watch(open, (val) => {
 const currentState = {
   graph: null,
   field: null,
-}
+};
 
 function onContextMenu(event, graph, field) {
   currentState.graph = graph;
@@ -652,8 +652,8 @@ function setMinMaxCentered() {
 }
 
 function setMinMaxOneScale() {
-  let max = -Number.MAX_VALUE,
-      min = Number.MAX_VALUE;
+  let max = -Number.MAX_VALUE;
+  let min;
   if (currentState.graph) {
     for (const field of currentState.graph.fields) {
       max = Math.max(max, Math.max(Math.abs(field.curve?.MinMax?.min), Math.abs(field.curve?.MinMax?.max)));
@@ -673,7 +673,7 @@ const menuItems = [
     label: 'Like this one',
     onSelect() {
       setMinMaxLikeThis();
-    }
+    },
   },
   {
     label: 'Full range',
@@ -683,13 +683,13 @@ const menuItems = [
     label: 'One scale',
     onSelect() {
       setMinMaxOneScale();
-    }
+    },
   },
   {
     label: 'Centered',
     onSelect() {
       setMinMaxCentered();
-    }
+    },
   },
   {
     type: 'separator',
@@ -709,7 +709,7 @@ const menuItems = [
     label: 'Default',
     onSelect() {
       setMinMaxToDefault();
-    }
+    },
   },
   {
     type: 'separator',
@@ -720,6 +720,6 @@ const menuItems = [
   {
     label: '\u25BCClose',
   },
-]
+];
 
 </script>
