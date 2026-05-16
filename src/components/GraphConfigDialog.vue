@@ -734,7 +734,7 @@ const menuItems = [
         [
           { label: 'Default', disabled: true },
         ],
-      ]
+      ],
     },
   ],
   [
