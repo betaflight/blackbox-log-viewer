@@ -657,22 +657,24 @@ function setMinMaxCentered() {
 
 function setMinMaxOneScale() {
   let max = -Number.MAX_VALUE;
-  let min;
+  let min = Number.MAX_VALUE;
 
   if (currentState.graph?.fields) {
     for (const field of currentState.graph.fields) {
       const mm = field?.curve?.MinMax;
       if (mm?.min !== undefined && mm?.max !== undefined) {
-        max = Math.max(max, Math.max(Math.abs(mm.min), Math.abs(mm.max)));
+        max = Math.max(max, mm.max);
+        min = Math.min(min, mm.min);
       }
     }
-    min = -max;
 
-    for (const field of currentState.graph.fields) {
-      setMin(field, min);
-      setMax(field, max);
+    if(min != Number.MAX_VALUE) {
+      for (const field of currentState.graph.fields) {
+        setMin(field, min);
+        setMax(field, max);
+      }
+      emitUpdate();
     }
-    emitUpdate();
   }
 }
 
