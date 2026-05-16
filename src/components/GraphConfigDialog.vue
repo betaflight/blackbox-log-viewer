@@ -610,11 +610,6 @@ const currentState = {
   field: null,
 };
 
-function onContextMenu(event, graph, field) {
-  currentState.graph = graph;
-  currentState.field = field;
-}
-
 function setMinMaxToDefault() {
   if (currentState.graph?.fields) {
     for (const field of currentState.graph.fields) {
@@ -739,11 +734,12 @@ const menuItems = [
       ],
     },
   ],
-  [
-    {
-      label: '\u25BCClose',
-    },
-  ],
 ];
+
+function onContextMenu(event, graph, field) {
+  currentState.graph = graph;
+  currentState.field = field;
+  menuItems[menuItems.length - 1][0].label = friendlyName(field?.name);
+}
 
 </script>
