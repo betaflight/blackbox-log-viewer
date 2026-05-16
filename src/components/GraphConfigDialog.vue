@@ -616,7 +616,7 @@ function onContextMenu(event, graph, field) {
 }
 
 function setMinMaxToDefault() {
-  if (currentState.graph) {
+  if (currentState.graph?.fields) {
     for (const field of currentState.graph.fields) {
       resetMin(field);
       resetMax(field);
@@ -626,9 +626,10 @@ function setMinMaxToDefault() {
 }
 
 function setMinMaxLikeThis() {
-  if (currentState.graph && currentState.field) {
-    const min = currentState.field.curve?.MinMax?.min;
-    const max = currentState.field.curve?.MinMax?.max;
+  const mm = currentState.field?.curve?.MinMax;
+  if (currentState.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
+    const min = mm.min;
+    const max = mm.max;
     for (const field of currentState.graph.fields) {
       setMin(field, min);
       setMax(field, max);
@@ -638,14 +639,17 @@ function setMinMaxLikeThis() {
 }
 
 function setMinMaxCentered() {
-  if (currentState.graph) {
+  if (currentState.graph?.fields) {
     for (const field of currentState.graph.fields) {
-      let min = field.curve?.MinMax?.min;
-      let max = field.curve?.MinMax?.max;
-      max = Math.max(Math.abs(min), Math.abs(max));
-      min = -max;
-      setMin(field, min);
-      setMax(field, max);
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        let min = mm.min;
+        let max = mm.max;
+        max = Math.max(Math.abs(min), Math.abs(max));
+        min = -max;
+        setMin(field, min);
+        setMax(field, max);
+      }
     }
     emitUpdate();
   }
@@ -654,9 +658,13 @@ function setMinMaxCentered() {
 function setMinMaxOneScale() {
   let max = -Number.MAX_VALUE;
   let min;
-  if (currentState.graph) {
+
+  if (currentState.graph?.fields) {
     for (const field of currentState.graph.fields) {
-      max = Math.max(max, Math.max(Math.abs(field.curve?.MinMax?.min), Math.abs(field.curve?.MinMax?.max)));
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        max = Math.max(max, Math.max(Math.abs(mm.min), Math.abs(mm.max)));
+      }
     }
     min = -max;
 
@@ -669,57 +677,71 @@ function setMinMaxOneScale() {
 }
 
 const menuItems = [
-  {
-    label: 'Like this one',
-    onSelect() {
-      setMinMaxLikeThis();
+  [
+    {
+      label: 'Like this one',
+      onSelect() {
+        setMinMaxLikeThis();
+      },
     },
-  },
-  {
-    label: 'Full range',
-    disabled: true,
-  },
-  {
-    label: 'One scale',
-    onSelect() {
-      setMinMaxOneScale();
+    {
+      label: 'Full range',
+      disabled: true,
     },
-  },
-  {
-    label: 'Centered',
-    onSelect() {
-      setMinMaxCentered();
+    {
+      label: 'One scale',
+      onSelect() {
+        setMinMaxOneScale();
+      },
     },
-  },
-  {
-    type: 'separator',
-  },
-  {
-    label: 'Zoom In',
-    disabled: true,
-  },
-  {
-    label: 'Zoom Out',
-    disabled: true,
-  },
-  {
-    type: 'separator',
-  },
-  {
-    label: 'Default',
-    onSelect() {
-      setMinMaxToDefault();
+    {
+      label: 'Centered',
+      onSelect() {
+        setMinMaxCentered();
+      },
     },
-  },
-  {
-    type: 'separator',
-  },
-  {
-    type: 'separator',
-  },
-  {
-    label: '\u25BCClose',
-  },
+  ],
+  [
+    {
+      label: 'Zoom In',
+      disabled: true,
+    },
+    {
+      label: 'Zoom Out',
+      disabled: true,
+    },
+  ],
+  [
+    {
+      label: 'Default',
+      onSelect() {
+        setMinMaxToDefault();
+      },
+    },
+  ],
+  [
+    {
+      label: 'current field menu',
+      children: [
+        [
+          { label: 'Full range', disabled: true },
+          { label: 'Centered', disabled: true },
+        ],
+        [
+          { label: 'Zoom In', disabled: true },
+          { label: 'Zoom Out', disabled: true },
+        ],
+        [
+          { label: 'Default', disabled: true },
+        ],
+      ]
+    },
+  ],
+  [
+    {
+      label: '\u25BCClose',
+    },
+  ],
 ];
 
 </script>
