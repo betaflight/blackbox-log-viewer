@@ -627,8 +627,8 @@ function setMinMaxToDefault() {
 
 function setMinMaxLikeThis() {
   if (currentState.graph && currentState.field) {
-    const min = currentState.field.curve.MinMax.min;
-    const max = currentState.field.curve.MinMax.max;
+    const min = currentState.field.curve?.MinMax?.min;
+    const max = currentState.field.curve?.MinMax?.max;
     for (const field of currentState.graph.fields) {
       setMin(field, min);
       setMax(field, max);
@@ -640,8 +640,8 @@ function setMinMaxLikeThis() {
 function setMinMaxCentered() {
   if (currentState.graph) {
     for (const field of currentState.graph.fields) {
-      let min = field.curve.MinMax.min;
-      let max = field.curve.MinMax.max;
+      let min = field.curve?.MinMax?.min;
+      let max = field.curve?.MinMax?.max;
       max = Math.max(Math.abs(min), Math.abs(max));
       min = -max;
       setMin(field, min);
@@ -656,7 +656,7 @@ function setMinMaxOneScale() {
       min = Number.MAX_VALUE;
   if (currentState.graph) {
     for (const field of currentState.graph.fields) {
-      max = Math.max(max, Math.max(Math.abs(field.curve.MinMax.min), Math.abs(field.curve.MinMax.max)));
+      max = Math.max(max, Math.max(Math.abs(field.curve?.MinMax?.min), Math.abs(field.curve?.MinMax?.max)));
     }
     min = -max;
 
