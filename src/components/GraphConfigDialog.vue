@@ -673,6 +673,19 @@ function setMinMaxOneScale() {
   }
 }
 
+function SetAllMinMaxToFullRangeDuringAllTime() {
+  if (currentState.graph?.fields && props.flightLog) {
+    for (const field of currentState.graph.fields) {
+      const mm = props.flightLog.getMinMaxForFieldDuringAllTime(field.name);
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        setMin(field, mm.min);
+        setMax(field, mm.max);
+      }
+    }
+    emitUpdate();
+  }
+}
+
 const menuItems = [
   [
     {
@@ -683,7 +696,9 @@ const menuItems = [
     },
     {
       label: 'Full range',
-      disabled: true,
+      onSelect() {
+        SetAllMinMaxToFullRangeDuringAllTime();
+      },
     },
     {
       label: 'One scale',
