@@ -708,6 +708,14 @@ function setMinMaxSelectedCentered() {
   }
 }
 
+function setMinMaxSelectedDefault() {
+  if (currentState.field) {
+    resetMin(currentState.field);
+    resetMax(currentState.field);
+    emitUpdate();
+  }
+}
+
 const menuItems = [
   [
     {
@@ -776,7 +784,12 @@ const menuItems = [
           { label: 'Zoom Out', disabled: true },
         ],
         [
-          { label: 'Default', disabled: true },
+          {
+            label: 'Default',
+            onSelect() {
+              setMinMaxSelectedDefault();
+            },
+          },
         ],
       ],
     },
