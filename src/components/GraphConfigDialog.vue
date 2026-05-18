@@ -673,6 +673,21 @@ function setMinMaxOneScale() {
   }
 }
 
+function setMinMaxZoom(zoom) {
+  if (currentState.graph?.fields) {
+    for (const field of currentState.graph.fields) {
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        const middle = (mm.min + mm.max) / 2;
+        const halfRange = (mm.max - mm.min) / 2;
+        setMin(field, middle - halfRange * zoom);
+        setMax(field, middle + halfRange * zoom);
+        emitUpdate();
+      }
+    }
+  }
+}
+
 function setMinMaxToFullRangeDuringAllTime() {
   if (currentState.graph?.fields && props.flightLog) {
     for (const field of currentState.graph.fields) {
@@ -716,6 +731,18 @@ function setMinMaxSelectedDefault() {
   }
 }
 
+function setMinMaxSelectedZoom(zoom) {
+  const mm = currentState.field?.curve?.MinMax;
+  if (mm?.min !== undefined && mm?.max !== undefined) {
+    const middle = (mm.min + mm.max) / 2;
+    const halfRange = (mm.max - mm.min) / 2;
+    setMin(currentState.field, middle - halfRange * zoom);
+    setMax(currentState.field, middle + halfRange * zoom);
+    emitUpdate();
+  }
+}
+
+const zoom = 1.1;
 const menuItems = [
   [
     {
@@ -746,11 +773,17 @@ const menuItems = [
   [
     {
       label: 'Zoom In',
-      disabled: true,
+      onSelect() {
+        if (zoom != 0) {
+          setMinMaxZoom(1 / zoom);
+        }
+      },
     },
     {
       label: 'Zoom Out',
-      disabled: true,
+      onSelect() {
+        setMinMaxZoom(zoom);
+      },
     },
   ],
   [
@@ -780,8 +813,18 @@ const menuItems = [
           },
         ],
         [
-          { label: 'Zoom In', disabled: true },
-          { label: 'Zoom Out', disabled: true },
+          {
+            label: 'Zoom In',
+            onSelect() {
+              setMinMaxSelectedZoom(1 / zoom);
+            },
+          },
+          {
+            label: 'Zoom Out',
+            onSelect() {
+              setMinMaxSelectedZoom(zoom);
+            },
+          },
         ],
         [
           {
