@@ -673,7 +673,7 @@ function setMinMaxOneScale() {
   }
 }
 
-function SetAllMinMaxToFullRangeDuringAllTime() {
+function setMinMaxToFullRangeDuringAllTime() {
   if (currentState.graph?.fields && props.flightLog) {
     for (const field of currentState.graph.fields) {
       const mm = props.flightLog.getMinMaxForFieldDuringAllTime(field.name);
@@ -683,6 +683,17 @@ function SetAllMinMaxToFullRangeDuringAllTime() {
       }
     }
     emitUpdate();
+  }
+}
+
+function setMinMaxSelectedToFullRangeDuringAllTime() {
+  if (currentState.field?.name && props.flightLog) {
+    const mm = props.flightLog.getMinMaxForFieldDuringAllTime(currentState.field?.name);
+    if (mm?.min !== undefined && mm?.max !== undefined) {
+      setMin(currentState.field, mm.min);
+      setMax(currentState.field, mm.max);
+      emitUpdate();
+    }
   }
 }
 
@@ -697,7 +708,7 @@ const menuItems = [
     {
       label: 'Full range',
       onSelect() {
-        SetAllMinMaxToFullRangeDuringAllTime();
+        setMinMaxToFullRangeDuringAllTime();
       },
     },
     {
@@ -736,8 +747,15 @@ const menuItems = [
       label: 'current field menu',
       children: [
         [
-          { label: 'Full range', disabled: true },
-          { label: 'Centered', disabled: true },
+          {
+            label: 'Full range',
+            onSelect() {
+              setMinMaxSelectedToFullRangeDuringAllTime();
+            },
+          },
+          {
+            label: 'Centered',
+          },
         ],
         [
           { label: 'Zoom In', disabled: true },
