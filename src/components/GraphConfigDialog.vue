@@ -160,7 +160,7 @@
                     @click="cycleColor(field)"
                   />
                 </div>
-                <UContextMenu :items="menuItems" :portal="false" :ui="{content: 'z-[9999] relative'}">
+                <UContextMenu :items="menuItems" portal="#menu-portal-container" :ui="{content: 'z-[9999] relative'}">
                   <UInputNumber
                     :model-value="field.curve?.MinMax?.min ?? -500"
                     :step="10"
@@ -179,7 +179,7 @@
                     @contextmenu="(e) => onContextMenu(e, graph, field)"
                   />
                 </UContextMenu>
-                <UContextMenu :items="menuItems" :portal="false" :ui="{content: 'z-[9999] relative'}">
+                <UContextMenu :items="menuItems" portal="#menu-portal-container" :ui="{content: 'z-[9999] relative'}">
                   <UInputNumber
                     :model-value="field.curve?.MinMax?.max ?? 500"
                     :step="10"
