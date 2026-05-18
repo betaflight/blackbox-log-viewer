@@ -443,12 +443,18 @@ function ensureCurveMinMax(field) {
 
 function setMin(field, val) {
   ensureCurveMinMax(field);
-  field.curve.MinMax.min = Number.parseFloat(val);
+  const num = Number.parseFloat(val);
+  if (Number.isFinite(num)) {
+    field.curve.MinMax.min = num;
+  }
 }
 
 function setMax(field, val) {
   ensureCurveMinMax(field);
-  field.curve.MinMax.max = Number.parseFloat(val);
+  const num = Number.parseFloat(val);
+  if (Number.isFinite(num)) {
+    field.curve.MinMax.max = num;
+  }
 }
 
 function resetMin(field) {
