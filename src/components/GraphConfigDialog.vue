@@ -688,9 +688,9 @@ function setMinMaxZoom(zoom) {
         const halfRange = (mm.max - mm.min) / 2;
         setMin(field, middle - halfRange * zoom);
         setMax(field, middle + halfRange * zoom);
-        emitUpdate();
       }
     }
+    emitUpdate();
   }
 }
 
