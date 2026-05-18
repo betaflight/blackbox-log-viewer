@@ -697,6 +697,17 @@ function setMinMaxSelectedToFullRangeDuringAllTime() {
   }
 }
 
+function setMinMaxSelectedCentered() {
+  const mm = currentState.field?.curve?.MinMax;
+  if (mm?.min !== undefined && mm?.max !== undefined) {
+    const max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
+    const min = -max;
+    setMin(currentState.field, min);
+    setMax(currentState.field, max);
+    emitUpdate();
+  }
+}
+
 const menuItems = [
   [
     {
@@ -755,6 +766,9 @@ const menuItems = [
           },
           {
             label: 'Centered',
+            onSelect() {
+              setMinMaxSelectedCentered();
+            },
           },
         ],
         [
