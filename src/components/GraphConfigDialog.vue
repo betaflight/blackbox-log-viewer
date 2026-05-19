@@ -779,7 +779,8 @@ const menuItems = [
   [
     {
       label: 'Zoom In',
-      onSelect() {
+      onSelect(e) {
+        e.preventDefault();
         if (zoom != 0) {
           setMinMaxZoom(1 / zoom);
         }
@@ -787,7 +788,8 @@ const menuItems = [
     },
     {
       label: 'Zoom Out',
-      onSelect() {
+      onSelect(e) {
+        e.preventDefault();
         setMinMaxZoom(zoom);
       },
     },
@@ -821,13 +823,17 @@ const menuItems = [
         [
           {
             label: 'Zoom In',
-            onSelect() {
-              setMinMaxSelectedZoom(1 / zoom);
+            onSelect(e) {
+              e.preventDefault();
+              if (zoom != 0) {
+                setMinMaxSelectedZoom(1 / zoom);
+              }
             },
           },
           {
             label: 'Zoom Out',
-            onSelect() {
+            onSelect(e) {
+              e.preventDefault();
               setMinMaxSelectedZoom(zoom);
             },
           },
