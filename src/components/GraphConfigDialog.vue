@@ -161,42 +161,40 @@
                   />
                 </div>
                 <UContextMenu :items="menuItems" portal="#menu-portal-container" :ui="{content: 'z-[9999] relative'}">
-                  <UInputNumber
-                    :model-value="field.curve?.MinMax?.min ?? -500"
-                    :step="10"
-                    :format-options="noGrouping"
-                    size="xs"
-                    orientation="vertical"
-                    :ui="{ root: 'w-20' }"
-                    @update:model-value="
-                      setMin(field, $event);
-                      emitUpdate();
-                    "
-                    @dblclick="
-                      resetMin(field);
-                      emitUpdate();
-                    "
-                    @contextmenu="(e) => onContextMenu(e, graph, field)"
-                  />
-                </UContextMenu>
-                <UContextMenu :items="menuItems" portal="#menu-portal-container" :ui="{content: 'z-[9999] relative'}">
-                  <UInputNumber
-                    :model-value="field.curve?.MinMax?.max ?? 500"
-                    :step="10"
-                    :format-options="noGrouping"
-                    size="xs"
-                    orientation="vertical"
-                    :ui="{ root: 'w-20' }"
-                    @update:model-value="
-                      setMax(field, $event);
-                      emitUpdate();
-                    "
-                    @dblclick="
-                      resetMax(field);
-                      emitUpdate();
-                    "
-                    @contextmenu="(e) => onContextMenu(e, graph, field)"
-                  />
+                  <div style="display: contents;" @contextmenu="(e) => onContextMenu(e, graph, field)">
+                    <UInputNumber
+                      :model-value="field.curve?.MinMax?.min ?? -500"
+                      :step="10"
+                      :format-options="noGrouping"
+                      size="xs"
+                      orientation="vertical"
+                      :ui="{ root: 'w-20' }"
+                      @update:model-value="
+                        setMin(field, $event);
+                        emitUpdate();
+                      "
+                      @dblclick="
+                        resetMin(field);
+                        emitUpdate();
+                      "
+                    />
+                    <UInputNumber
+                      :model-value="field.curve?.MinMax?.max ?? 500"
+                      :step="10"
+                      :format-options="noGrouping"
+                      size="xs"
+                      orientation="vertical"
+                      :ui="{ root: 'w-20' }"
+                      @update:model-value="
+                        setMax(field, $event);
+                        emitUpdate();
+                      "
+                      @dblclick="
+                        resetMax(field);
+                        emitUpdate();
+                      "
+                    />
+                  </div>
                 </UContextMenu>
                 <UButton
                   variant="ghost"
