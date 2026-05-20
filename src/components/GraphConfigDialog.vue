@@ -626,6 +626,14 @@ function setMinMaxToDefault() {
   }
 }
 
+function setMinMaxSelectedDefault() {
+  if (currentState.value.field) {
+    resetMin(currentState.value.field);
+    resetMax(currentState.value.field);
+    emitUpdate();
+  }
+}
+
 function setMinMaxLikeThis() {
   const mm = currentState.value.field?.curve?.MinMax;
   if (currentState.value.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
@@ -636,6 +644,29 @@ function setMinMaxLikeThis() {
       setMax(field, max);
     }
     emitUpdate();
+  }
+}
+
+function setMinMaxOneScale() {
+  let max = -Number.MAX_VALUE;
+  let min = Number.MAX_VALUE;
+
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        max = Math.max(max, mm.max);
+        min = Math.min(min, mm.min);
+      }
+    }
+
+    if (min !== Number.MAX_VALUE) {
+      for (const field of currentState.value.graph.fields) {
+        setMin(field, min);
+        setMax(field, max);
+      }
+      emitUpdate();
+    }
   }
 }
 
@@ -656,26 +687,14 @@ function setMinMaxCentered() {
   }
 }
 
-function setMinMaxOneScale() {
-  let max = -Number.MAX_VALUE;
-  let min = Number.MAX_VALUE;
-
-  if (currentState.value.graph?.fields) {
-    for (const field of currentState.value.graph.fields) {
-      const mm = field?.curve?.MinMax;
-      if (mm?.min !== undefined && mm?.max !== undefined) {
-        max = Math.max(max, mm.max);
-        min = Math.min(min, mm.min);
-      }
-    }
-
-    if(min != Number.MAX_VALUE) {
-      for (const field of currentState.value.graph.fields) {
-        setMin(field, min);
-        setMax(field, max);
-      }
-      emitUpdate();
-    }
+function setMinMaxSelectedCentered() {
+  const mm = currentState.value.field?.curve?.MinMax;
+  if (mm?.min !== undefined && mm?.max !== undefined) {
+    const max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
+    const min = -max;
+    setMin(currentState.value.field, min);
+    setMax(currentState.value.field, max);
+    emitUpdate();
   }
 }
 
@@ -690,6 +709,17 @@ function setMinMaxZoom(zoom) {
         setMax(field, middle + halfRange * zoom);
       }
     }
+    emitUpdate();
+  }
+}
+
+function setMinMaxSelectedZoom(zoom) {
+  const mm = currentState.value.field?.curve?.MinMax;
+  if (mm?.min !== undefined && mm?.max !== undefined) {
+    const middle = (mm.min + mm.max) / 2;
+    const halfRange = (mm.max - mm.min) / 2;
+    setMin(currentState.value.field, middle - halfRange * zoom);
+    setMax(currentState.value.field, middle + halfRange * zoom);
     emitUpdate();
   }
 }
@@ -715,36 +745,6 @@ function setMinMaxSelectedToFullRangeDuringAllTime() {
       setMax(currentState.value.field, mm.max);
       emitUpdate();
     }
-  }
-}
-
-function setMinMaxSelectedCentered() {
-  const mm = currentState.value.field?.curve?.MinMax;
-  if (mm?.min !== undefined && mm?.max !== undefined) {
-    const max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
-    const min = -max;
-    setMin(currentState.value.field, min);
-    setMax(currentState.value.field, max);
-    emitUpdate();
-  }
-}
-
-function setMinMaxSelectedDefault() {
-  if (currentState.value.field) {
-    resetMin(currentState.value.field);
-    resetMax(currentState.value.field);
-    emitUpdate();
-  }
-}
-
-function setMinMaxSelectedZoom(zoom) {
-  const mm = currentState.value.field?.curve?.MinMax;
-  if (mm?.min !== undefined && mm?.max !== undefined) {
-    const middle = (mm.min + mm.max) / 2;
-    const halfRange = (mm.max - mm.min) / 2;
-    setMin(currentState.value.field, middle - halfRange * zoom);
-    setMax(currentState.value.field, middle + halfRange * zoom);
-    emitUpdate();
   }
 }
 
@@ -823,9 +823,7 @@ const menuItems = ref([
             label: 'Zoom In',
             onSelect(e) {
               e.preventDefault();
-              if (zoom != 0) {
-                setMinMaxSelectedZoom(1 / zoom);
-              }
+              setMinMaxSelectedZoom(1 / zoom);
             },
           },
           {
