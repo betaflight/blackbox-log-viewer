@@ -611,14 +611,14 @@ watch(open, (val) => {
   }
 });
 
-const currentState = {
+const currentState = ref({
   graph: null,
   field: null,
-};
+});
 
 function setMinMaxToDefault() {
-  if (currentState.graph?.fields) {
-    for (const field of currentState.graph.fields) {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
       resetMin(field);
       resetMax(field);
     }
@@ -627,11 +627,11 @@ function setMinMaxToDefault() {
 }
 
 function setMinMaxLikeThis() {
-  const mm = currentState.field?.curve?.MinMax;
-  if (currentState.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
+  const mm = currentState.value.field?.curve?.MinMax;
+  if (currentState.value.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
     const min = mm.min;
     const max = mm.max;
-    for (const field of currentState.graph.fields) {
+    for (const field of currentState.value.graph.fields) {
       setMin(field, min);
       setMax(field, max);
     }
@@ -640,8 +640,8 @@ function setMinMaxLikeThis() {
 }
 
 function setMinMaxCentered() {
-  if (currentState.graph?.fields) {
-    for (const field of currentState.graph.fields) {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
       const mm = field?.curve?.MinMax;
       if (mm?.min !== undefined && mm?.max !== undefined) {
         let min = mm.min;
@@ -660,8 +660,8 @@ function setMinMaxOneScale() {
   let max = -Number.MAX_VALUE;
   let min = Number.MAX_VALUE;
 
-  if (currentState.graph?.fields) {
-    for (const field of currentState.graph.fields) {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
       const mm = field?.curve?.MinMax;
       if (mm?.min !== undefined && mm?.max !== undefined) {
         max = Math.max(max, mm.max);
@@ -670,7 +670,7 @@ function setMinMaxOneScale() {
     }
 
     if(min != Number.MAX_VALUE) {
-      for (const field of currentState.graph.fields) {
+      for (const field of currentState.value.graph.fields) {
         setMin(field, min);
         setMax(field, max);
       }
@@ -680,8 +680,8 @@ function setMinMaxOneScale() {
 }
 
 function setMinMaxZoom(zoom) {
-  if (currentState.graph?.fields) {
-    for (const field of currentState.graph.fields) {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
       const mm = field?.curve?.MinMax;
       if (mm?.min !== undefined && mm?.max !== undefined) {
         const middle = (mm.min + mm.max) / 2;
@@ -695,8 +695,8 @@ function setMinMaxZoom(zoom) {
 }
 
 function setMinMaxToFullRangeDuringAllTime() {
-  if (currentState.graph?.fields && props.flightLog) {
-    for (const field of currentState.graph.fields) {
+  if (currentState.value.graph?.fields && props.flightLog) {
+    for (const field of currentState.value.graph.fields) {
       const mm = props.flightLog.getMinMaxForFieldDuringAllTime(field.name);
       if (mm?.min !== undefined && mm?.max !== undefined) {
         setMin(field, mm.min);
@@ -708,48 +708,48 @@ function setMinMaxToFullRangeDuringAllTime() {
 }
 
 function setMinMaxSelectedToFullRangeDuringAllTime() {
-  if (currentState.field?.name && props.flightLog) {
-    const mm = props.flightLog.getMinMaxForFieldDuringAllTime(currentState.field?.name);
+  if (currentState.value.field?.name && props.flightLog) {
+    const mm = props.flightLog.getMinMaxForFieldDuringAllTime(currentState.value.field?.name);
     if (mm?.min !== undefined && mm?.max !== undefined) {
-      setMin(currentState.field, mm.min);
-      setMax(currentState.field, mm.max);
+      setMin(currentState.value.field, mm.min);
+      setMax(currentState.value.field, mm.max);
       emitUpdate();
     }
   }
 }
 
 function setMinMaxSelectedCentered() {
-  const mm = currentState.field?.curve?.MinMax;
+  const mm = currentState.value.field?.curve?.MinMax;
   if (mm?.min !== undefined && mm?.max !== undefined) {
     const max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
     const min = -max;
-    setMin(currentState.field, min);
-    setMax(currentState.field, max);
+    setMin(currentState.value.field, min);
+    setMax(currentState.value.field, max);
     emitUpdate();
   }
 }
 
 function setMinMaxSelectedDefault() {
-  if (currentState.field) {
-    resetMin(currentState.field);
-    resetMax(currentState.field);
+  if (currentState.value.field) {
+    resetMin(currentState.value.field);
+    resetMax(currentState.value.field);
     emitUpdate();
   }
 }
 
 function setMinMaxSelectedZoom(zoom) {
-  const mm = currentState.field?.curve?.MinMax;
+  const mm = currentState.value.field?.curve?.MinMax;
   if (mm?.min !== undefined && mm?.max !== undefined) {
     const middle = (mm.min + mm.max) / 2;
     const halfRange = (mm.max - mm.min) / 2;
-    setMin(currentState.field, middle - halfRange * zoom);
-    setMax(currentState.field, middle + halfRange * zoom);
+    setMin(currentState.value.field, middle - halfRange * zoom);
+    setMax(currentState.value.field, middle + halfRange * zoom);
     emitUpdate();
   }
 }
 
 const zoom = 1.1;
-const menuItems = [
+const menuItems = ref([
   [
     {
       label: 'Like this one',
@@ -781,9 +781,7 @@ const menuItems = [
       label: 'Zoom In',
       onSelect(e) {
         e.preventDefault();
-        if (zoom != 0) {
           setMinMaxZoom(1 / zoom);
-        }
       },
     },
     {
@@ -849,12 +847,12 @@ const menuItems = [
       ],
     },
   ],
-];
+]);
 
 function onContextMenu(event, graph, field) {
-  currentState.graph = graph;
-  currentState.field = field;
-  menuItems[menuItems.length - 1][0].label = friendlyName(field?.name) + " \u25B8";
+  currentState.value.graph = graph;
+  currentState.value.field = field;
+  menuItems.value[menuItems.value.length - 1][0].label = friendlyName(field?.name) + " \u25B8";
 }
 
 </script>
