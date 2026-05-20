@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-fit' }">
+  <UModal v-model:open="open" :ui="{ content: 'sm:max-w-fit' }"  class="overflow-visible">
     <template #header>
       <div class="flex items-center justify-between w-full">
         <h4 class="font-semibold">Configure graphs</h4>
@@ -28,6 +28,7 @@
           />
         </div>
       </div>
+      <div id="menu-portal-container"></div>
     </template>
 
     <template #body>
@@ -159,38 +160,42 @@
                     @click="cycleColor(field)"
                   />
                 </div>
-                <UInputNumber
-                  :model-value="field.curve?.MinMax?.min ?? -500"
-                  :step="10"
-                  :format-options="noGrouping"
-                  size="xs"
-                  orientation="vertical"
-                  :ui="{ root: 'w-20' }"
-                  @update:model-value="
-                    setMin(field, $event);
-                    emitUpdate();
-                  "
-                  @dblclick="
-                    resetMin(field);
-                    emitUpdate();
-                  "
-                />
-                <UInputNumber
-                  :model-value="field.curve?.MinMax?.max ?? 500"
-                  :step="10"
-                  :format-options="noGrouping"
-                  size="xs"
-                  orientation="vertical"
-                  :ui="{ root: 'w-20' }"
-                  @update:model-value="
-                    setMax(field, $event);
-                    emitUpdate();
-                  "
-                  @dblclick="
-                    resetMax(field);
-                    emitUpdate();
-                  "
-                />
+                <UContextMenu :items="menuItems" portal="#menu-portal-container" :ui="{content: 'z-[9999] relative'}">
+                  <div style="display: contents;" @contextmenu="(e) => onContextMenu(e, graph, field)">
+                    <UInputNumber
+                      :model-value="field.curve?.MinMax?.min ?? -500"
+                      :step="10"
+                      :format-options="noGrouping"
+                      size="xs"
+                      orientation="vertical"
+                      :ui="{ root: 'w-20' }"
+                      @update:model-value="
+                        setMin(field, $event);
+                        emitUpdate();
+                      "
+                      @dblclick="
+                        resetMin(field);
+                        emitUpdate();
+                      "
+                    />
+                    <UInputNumber
+                      :model-value="field.curve?.MinMax?.max ?? 500"
+                      :step="10"
+                      :format-options="noGrouping"
+                      size="xs"
+                      orientation="vertical"
+                      :ui="{ root: 'w-20' }"
+                      @update:model-value="
+                        setMax(field, $event);
+                        emitUpdate();
+                      "
+                      @dblclick="
+                        resetMax(field);
+                        emitUpdate();
+                      "
+                    />
+                  </div>
+                </UContextMenu>
                 <UButton
                   variant="ghost"
                   color="error"
@@ -436,12 +441,18 @@ function ensureCurveMinMax(field) {
 
 function setMin(field, val) {
   ensureCurveMinMax(field);
-  field.curve.MinMax.min = Number.parseFloat(val);
+  const num = Number.parseFloat(val);
+  if (Number.isFinite(num)) {
+    field.curve.MinMax.min = num;
+  }
 }
 
 function setMax(field, val) {
   ensureCurveMinMax(field);
-  field.curve.MinMax.max = Number.parseFloat(val);
+  const num = Number.parseFloat(val);
+  if (Number.isFinite(num)) {
+    field.curve.MinMax.max = num;
+  }
 }
 
 function resetMin(field) {
@@ -597,4 +608,247 @@ watch(open, (val) => {
     prevConfig.value = convertToConfig();
   }
 });
+
+const currentState = ref({
+  graph: null,
+  field: null,
+});
+
+function setMinMaxToDefault() {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
+      resetMin(field);
+      resetMax(field);
+    }
+    emitUpdate();
+  }
+}
+
+function setMinMaxSelectedDefault() {
+  if (currentState.value.field) {
+    resetMin(currentState.value.field);
+    resetMax(currentState.value.field);
+    emitUpdate();
+  }
+}
+
+function setMinMaxLikeThis() {
+  const mm = currentState.value.field?.curve?.MinMax;
+  if (currentState.value.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
+    const min = mm.min;
+    const max = mm.max;
+    for (const field of currentState.value.graph.fields) {
+      setMin(field, min);
+      setMax(field, max);
+    }
+    emitUpdate();
+  }
+}
+
+function setMinMaxOneScale() {
+  let max = -Number.MAX_VALUE;
+  let min = Number.MAX_VALUE;
+
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        max = Math.max(max, mm.max);
+        min = Math.min(min, mm.min);
+      }
+    }
+
+    if (min !== Number.MAX_VALUE) {
+      for (const field of currentState.value.graph.fields) {
+        setMin(field, min);
+        setMax(field, max);
+      }
+      emitUpdate();
+    }
+  }
+}
+
+function setMinMaxCentered() {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        let min = mm.min;
+        let max = mm.max;
+        max = Math.max(Math.abs(min), Math.abs(max));
+        min = -max;
+        setMin(field, min);
+        setMax(field, max);
+      }
+    }
+    emitUpdate();
+  }
+}
+
+function setMinMaxSelectedCentered() {
+  const mm = currentState.value.field?.curve?.MinMax;
+  if (mm?.min !== undefined && mm?.max !== undefined) {
+    const max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
+    const min = -max;
+    setMin(currentState.value.field, min);
+    setMax(currentState.value.field, max);
+    emitUpdate();
+  }
+}
+
+function setMinMaxZoom(zoom) {
+  if (currentState.value.graph?.fields) {
+    for (const field of currentState.value.graph.fields) {
+      const mm = field?.curve?.MinMax;
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        const middle = (mm.min + mm.max) / 2;
+        const halfRange = (mm.max - mm.min) / 2;
+        setMin(field, middle - halfRange * zoom);
+        setMax(field, middle + halfRange * zoom);
+      }
+    }
+    emitUpdate();
+  }
+}
+
+function setMinMaxSelectedZoom(zoom) {
+  const mm = currentState.value.field?.curve?.MinMax;
+  if (mm?.min !== undefined && mm?.max !== undefined) {
+    const middle = (mm.min + mm.max) / 2;
+    const halfRange = (mm.max - mm.min) / 2;
+    setMin(currentState.value.field, middle - halfRange * zoom);
+    setMax(currentState.value.field, middle + halfRange * zoom);
+    emitUpdate();
+  }
+}
+
+function setMinMaxToFullRangeDuringAllTime() {
+  if (currentState.value.graph?.fields && props.flightLog) {
+    for (const field of currentState.value.graph.fields) {
+      const mm = props.flightLog.getMinMaxForFieldDuringAllTime(field.name);
+      if (mm?.min !== undefined && mm?.max !== undefined) {
+        setMin(field, mm.min);
+        setMax(field, mm.max);
+      }
+    }
+    emitUpdate();
+  }
+}
+
+function setMinMaxSelectedToFullRangeDuringAllTime() {
+  if (currentState.value.field?.name && props.flightLog) {
+    const mm = props.flightLog.getMinMaxForFieldDuringAllTime(currentState.value.field?.name);
+    if (mm?.min !== undefined && mm?.max !== undefined) {
+      setMin(currentState.value.field, mm.min);
+      setMax(currentState.value.field, mm.max);
+      emitUpdate();
+    }
+  }
+}
+
+const zoom = 1.1;
+const menuItems = ref([
+  [
+    {
+      label: 'Like this one',
+      onSelect() {
+        setMinMaxLikeThis();
+      },
+    },
+    {
+      label: 'Full range',
+      onSelect() {
+        setMinMaxToFullRangeDuringAllTime();
+      },
+    },
+    {
+      label: 'One scale',
+      onSelect() {
+        setMinMaxOneScale();
+      },
+    },
+    {
+      label: 'Centered',
+      onSelect() {
+        setMinMaxCentered();
+      },
+    },
+  ],
+  [
+    {
+      label: 'Zoom In',
+      onSelect(e) {
+        e.preventDefault();
+          setMinMaxZoom(1 / zoom);
+      },
+    },
+    {
+      label: 'Zoom Out',
+      onSelect(e) {
+        e.preventDefault();
+        setMinMaxZoom(zoom);
+      },
+    },
+  ],
+  [
+    {
+      label: 'Default',
+      onSelect() {
+        setMinMaxToDefault();
+      },
+    },
+  ],
+  [
+    {
+      label: 'current field menu',
+      children: [
+        [
+          {
+            label: 'Full range',
+            onSelect() {
+              setMinMaxSelectedToFullRangeDuringAllTime();
+            },
+          },
+          {
+            label: 'Centered',
+            onSelect() {
+              setMinMaxSelectedCentered();
+            },
+          },
+        ],
+        [
+          {
+            label: 'Zoom In',
+            onSelect(e) {
+              e.preventDefault();
+              setMinMaxSelectedZoom(1 / zoom);
+            },
+          },
+          {
+            label: 'Zoom Out',
+            onSelect(e) {
+              e.preventDefault();
+              setMinMaxSelectedZoom(zoom);
+            },
+          },
+        ],
+        [
+          {
+            label: 'Default',
+            onSelect() {
+              setMinMaxSelectedDefault();
+            },
+          },
+        ],
+      ],
+    },
+  ],
+]);
+
+function onContextMenu(event, graph, field) {
+  currentState.value.graph = graph;
+  currentState.value.field = field;
+  menuItems.value[menuItems.value.length - 1][0].label = friendlyName(field?.name) + " \u25B8";
+}
+
 </script>
