@@ -612,6 +612,8 @@ watch(open, (val) => {
 const currentState = ref({
   graph: null,
   field: null,
+  isFieldChecked: null,
+  shiftKey: false,
 });
 
 function setMinMaxToDefault() {
@@ -747,7 +749,8 @@ function setMinMaxSelectedToFullRangeDuringAllTime() {
 }
 
 const zoom = 1.1;
-const menuItems = ref([
+
+const simpleMenuItems = computed(() => [
   [
     {
       label: 'Like this one',
@@ -800,7 +803,7 @@ const menuItems = ref([
   ],
   [
     {
-      label: 'current field menu',
+      label: friendlyName(currentState.value.field?.name ?? ""),
       children: [
         [
           {
@@ -845,10 +848,254 @@ const menuItems = ref([
   ],
 ]);
 
+function getFieldsCheckboxedSubmenu() {
+  return currentState.value.graph.fields.map((field, index) => ({
+    type: "checkbox",
+    label: friendlyName(field.name),
+    checked: currentState.value.isFieldChecked[index],
+    onUpdateChecked(state) {
+      currentState.value.isFieldChecked[index] = state;
+    },
+    onSelect(e) {
+      e.preventDefault();
+    },
+  }));
+}
+
+const extendedMenuItems = computed(() => [
+  [
+    {
+      label: 'Like this one',
+      children: [
+        [
+          {
+            type: "label",
+            label: "SET MIN-MAX VALUES",
+          },
+          {
+            type: "label",
+            label: "TO SELECTED CURVES",
+          },
+        ],
+        getFieldsCheckboxedSubmenu(),
+        [
+          {
+            label: "SET",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: 'Set full range',
+      children: [
+        [
+          {
+            type: "label",
+            label: "SELECT CURVES",
+          },
+        ],
+        getFieldsCheckboxedSubmenu(),
+        [
+          {
+            type: "label",
+            label: "SET FULL RANGE:",
+          },
+        ],
+        [
+          {
+            label: "At the all time",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+          {
+            label: "At the window time",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+          {
+            label: "At the markers time",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: 'One scale',
+      children: [
+        [
+          {
+            type: "label",
+            label: "SELECT CURVES",
+          },
+        ],
+        getFieldsCheckboxedSubmenu(),
+        [
+          {
+            label: "SET CURVES TO SAME SCALE",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: 'Centered',
+      children: [
+        [
+          {
+            type: "label",
+            label: "SELECT CURVES",
+          },
+        ],
+        getFieldsCheckboxedSubmenu(),
+        [
+          {
+            label: "SET CURVES TO ZERO OFFSET",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+        ],
+      ],
+    },
+  ],
+  [
+    {
+      label: 'Zoom',
+      children: [
+        [
+          {
+            type: "label",
+            label: "SELECT CURVES",
+          },
+        ],
+        getFieldsCheckboxedSubmenu(),
+        [
+          {
+            label: "ZOOM IN",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+          {
+            label: "ZOOM OUT",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+        ],
+      ],
+    },
+  ],
+  [
+    {
+      label: 'Default',
+      children: [
+        [
+          {
+            type: "label",
+            label: "SELECT CURVES",
+          },
+        ],
+        getFieldsCheckboxedSubmenu(),
+        [
+          {
+            label: "SET CURVES TO DEFAULT",
+            onSelect(e) {
+              e.preventDefault();
+            },
+          },
+        ],
+      ],
+    },
+  ],
+  [
+    {
+      label: friendlyName(currentState.value.field?.name ?? ""),
+      children: [
+        [
+          {
+            label: 'Full range',
+            children: [
+              [
+                {
+                  label: "At the all time",
+                  onSelect(e) {
+                    e.preventDefault();
+                  },
+                },
+                {
+                  label: "At the window time",
+                  onSelect(e) {
+                    e.preventDefault();
+                  },
+                },
+                {
+                  label: "At the markers time",
+                  onSelect(e) {
+                    e.preventDefault();
+                  },
+                },
+              ],
+            ],
+          },
+          {
+            label: 'Centered',
+            onSelect() {
+              setMinMaxSelectedCentered();
+            },
+          },
+        ],
+        [
+          {
+            label: 'Zoom In',
+            onSelect(e) {
+              e.preventDefault();
+              setMinMaxSelectedZoom(1 / zoom);
+            },
+          },
+          {
+            label: 'Zoom Out',
+            onSelect(e) {
+              e.preventDefault();
+              setMinMaxSelectedZoom(zoom);
+            },
+          },
+        ],
+        [
+          {
+            label: 'Default',
+            onSelect() {
+              setMinMaxSelectedDefault();
+            },
+          },
+        ],
+      ],
+    },
+  ],
+]);
+
+const menuItems = computed(() => {
+  if (currentState.value.shiftKey) {
+    return extendedMenuItems.value;
+  } else {
+    return simpleMenuItems.value;
+  }
+});
+
 function onContextMenu(event, graph, field) {
   currentState.value.graph = graph;
   currentState.value.field = field;
-  menuItems.value[menuItems.value.length - 1][0].label = friendlyName(field?.name);
+  currentState.value.shiftKey = event.shiftKey;
+  currentState.value.isFieldChecked = currentState.value.graph.fields.map(() => true);
 }
 
 </script>
