@@ -849,17 +849,22 @@ const simpleMenuItems = computed(() => [
 ]);
 
 function getFieldsCheckboxedSubmenu() {
-  return currentState.value.graph.fields.map((field, index) => ({
-    type: "checkbox",
-    label: friendlyName(field.name),
-    checked: currentState.value.isFieldChecked[index],
-    onUpdateChecked(state) {
-      currentState.value.isFieldChecked[index] = state;
-    },
-    onSelect(e) {
-      e.preventDefault();
-    },
-  }));
+  const fields = currentState.value.graph?.fields;
+  if (fields) {
+    return currentState.value.graph.fields.map((field, index) => ({
+      type: "checkbox",
+      label: friendlyName(field.name),
+      checked: currentState.value.isFieldChecked[index],
+      onUpdateChecked(state) {
+        currentState.value.isFieldChecked[index] = state;
+      },
+      onSelect(e) {
+        e.preventDefault();
+      },
+    }));
+  } else {
+    return [];
+  }
 }
 
 const extendedMenuItems = computed(() => [
