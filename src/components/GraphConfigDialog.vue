@@ -848,7 +848,7 @@ const menuItems = ref([
 function onContextMenu(event, graph, field) {
   currentState.value.graph = graph;
   currentState.value.field = field;
-  menuItems.value[menuItems.value.length - 1][0].label = friendlyName(field?.name) + " \u25B8";
+  menuItems.value[menuItems.value.length - 1][0].label = friendlyName(field?.name);
 }
 
 </script>
