@@ -864,7 +864,7 @@ const simpleMenuItems = computed(() => [
 
 function getFieldsCheckboxedSubmenu() {
   const fields = currentState.value.graph?.fields;
-  if (fields) {
+  if (fields && currentState.value.isFieldChecked) {
     return currentState.value.graph.fields.map((field, index) => ({
       type: "checkbox",
       label: friendlyName(field.name),
