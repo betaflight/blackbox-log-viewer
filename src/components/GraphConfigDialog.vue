@@ -616,11 +616,13 @@ const currentState = ref({
   shiftKey: false,
 });
 
-function setMinMaxToDefault() {
+function setMinMaxToDefault(setCheckedOnly) {
   if (currentState.value.graph?.fields) {
-    for (const field of currentState.value.graph.fields) {
-      resetMin(field);
-      resetMax(field);
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        resetMin(field);
+        resetMax(field);
+      }
     }
     emitUpdate();
   }
@@ -634,53 +636,61 @@ function setMinMaxSelectedDefault() {
   }
 }
 
-function setMinMaxLikeThis() {
+function setMinMaxLikeThis(setCheckedOnly) {
   const mm = currentState.value.field?.curve?.MinMax;
   if (currentState.value.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
     const min = mm.min;
     const max = mm.max;
-    for (const field of currentState.value.graph.fields) {
-      setMin(field, min);
-      setMax(field, max);
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        setMin(field, min);
+        setMax(field, max);
+      }
     }
     emitUpdate();
   }
 }
 
-function setMinMaxOneScale() {
+function setMinMaxOneScale(setCheckedOnly) {
   let max = -Number.MAX_VALUE;
   let min = Number.MAX_VALUE;
 
   if (currentState.value.graph?.fields) {
-    for (const field of currentState.value.graph.fields) {
-      const mm = field?.curve?.MinMax;
-      if (mm?.min !== undefined && mm?.max !== undefined) {
-        max = Math.max(max, mm.max);
-        min = Math.min(min, mm.min);
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        const mm = field?.curve?.MinMax;
+        if (mm?.min !== undefined && mm?.max !== undefined) {
+          max = Math.max(max, mm.max);
+          min = Math.min(min, mm.min);
+        }
       }
     }
 
     if (min !== Number.MAX_VALUE) {
-      for (const field of currentState.value.graph.fields) {
-        setMin(field, min);
-        setMax(field, max);
+      for (const [index, field] of currentState.value.graph.fields.entries()) {
+        if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+          setMin(field, min);
+          setMax(field, max);
+        }
       }
       emitUpdate();
     }
   }
 }
 
-function setMinMaxCentered() {
+function setMinMaxCentered(setCheckedOnly) {
   if (currentState.value.graph?.fields) {
-    for (const field of currentState.value.graph.fields) {
-      const mm = field?.curve?.MinMax;
-      if (mm?.min !== undefined && mm?.max !== undefined) {
-        let min = mm.min;
-        let max = mm.max;
-        max = Math.max(Math.abs(min), Math.abs(max));
-        min = -max;
-        setMin(field, min);
-        setMax(field, max);
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        const mm = field?.curve?.MinMax;
+        if (mm?.min !== undefined && mm?.max !== undefined) {
+          let min = mm.min;
+          let max = mm.max;
+          max = Math.max(Math.abs(min), Math.abs(max));
+          min = -max;
+          setMin(field, min);
+          setMax(field, max);
+        }
       }
     }
     emitUpdate();
@@ -698,15 +708,17 @@ function setMinMaxSelectedCentered() {
   }
 }
 
-function setMinMaxZoom(zoom) {
+function setMinMaxZoom(zoom, setCheckedOnly) {
   if (currentState.value.graph?.fields) {
-    for (const field of currentState.value.graph.fields) {
-      const mm = field?.curve?.MinMax;
-      if (mm?.min !== undefined && mm?.max !== undefined) {
-        const middle = (mm.min + mm.max) / 2;
-        const halfRange = (mm.max - mm.min) / 2;
-        setMin(field, middle - halfRange * zoom);
-        setMax(field, middle + halfRange * zoom);
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        const mm = field?.curve?.MinMax;
+        if (mm?.min !== undefined && mm?.max !== undefined) {
+          const middle = (mm.min + mm.max) / 2;
+          const halfRange = (mm.max - mm.min) / 2;
+          setMin(field, middle - halfRange * zoom);
+          setMax(field, middle + halfRange * zoom);
+        }
       }
     }
     emitUpdate();
@@ -724,13 +736,15 @@ function setMinMaxSelectedZoom(zoom) {
   }
 }
 
-function setMinMaxToFullRangeDuringAllTime() {
+function setMinMaxToFullRangeDuringAllTime(setCheckedOnly) {
   if (currentState.value.graph?.fields && props.flightLog) {
-    for (const field of currentState.value.graph.fields) {
-      const mm = props.flightLog.getMinMaxForFieldDuringAllTime(field.name);
-      if (mm?.min !== undefined && mm?.max !== undefined) {
-        setMin(field, mm.min);
-        setMax(field, mm.max);
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        const mm = props.flightLog.getMinMaxForFieldDuringAllTime(field.name);
+        if (mm?.min !== undefined && mm?.max !== undefined) {
+          setMin(field, mm.min);
+          setMax(field, mm.max);
+        }
       }
     }
     emitUpdate();
@@ -887,6 +901,7 @@ const extendedMenuItems = computed(() => [
           {
             label: "SET",
             onSelect(e) {
+              setMinMaxLikeThis(true);
               e.preventDefault();
             },
           },
@@ -913,17 +928,20 @@ const extendedMenuItems = computed(() => [
           {
             label: "At the all time",
             onSelect(e) {
+              setMinMaxToFullRangeDuringAllTime(true);
               e.preventDefault();
             },
           },
           {
             label: "At the window time",
+            disabled: true,
             onSelect(e) {
               e.preventDefault();
             },
           },
           {
             label: "At the markers time",
+            disabled: true,
             onSelect(e) {
               e.preventDefault();
             },
@@ -945,6 +963,7 @@ const extendedMenuItems = computed(() => [
           {
             label: "SET CURVES TO SAME SCALE",
             onSelect(e) {
+              setMinMaxOneScale(true);
               e.preventDefault();
             },
           },
@@ -965,6 +984,7 @@ const extendedMenuItems = computed(() => [
           {
             label: "SET CURVES TO ZERO OFFSET",
             onSelect(e) {
+              setMinMaxCentered(true);
               e.preventDefault();
             },
           },
@@ -987,12 +1007,14 @@ const extendedMenuItems = computed(() => [
           {
             label: "ZOOM IN",
             onSelect(e) {
+              setMinMaxSelectedZoom(1 / zoom, true);
               e.preventDefault();
             },
           },
           {
             label: "ZOOM OUT",
             onSelect(e) {
+              setMinMaxSelectedZoom(zoom, true);
               e.preventDefault();
             },
           },
@@ -1015,6 +1037,7 @@ const extendedMenuItems = computed(() => [
           {
             label: "SET CURVES TO DEFAULT",
             onSelect(e) {
+              setMinMaxToDefault(true);
               e.preventDefault();
             },
           },
@@ -1034,17 +1057,20 @@ const extendedMenuItems = computed(() => [
                 {
                   label: "At the all time",
                   onSelect(e) {
+                    setMinMaxSelectedToFullRangeDuringAllTime();
                     e.preventDefault();
                   },
                 },
                 {
                   label: "At the window time",
+                  disabled: true,
                   onSelect(e) {
                     e.preventDefault();
                   },
                 },
                 {
                   label: "At the markers time",
+                  disabled: true,
                   onSelect(e) {
                     e.preventDefault();
                   },
@@ -1100,7 +1126,9 @@ function onContextMenu(event, graph, field) {
   currentState.value.graph = graph;
   currentState.value.field = field;
   currentState.value.shiftKey = event.shiftKey;
-  currentState.value.isFieldChecked = currentState.value.graph.fields.map(() => true);
+  if (currentState.value.graph?.fields) {
+    currentState.value.isFieldChecked = currentState.value.graph.fields.map(() => true);
+  }
 }
 
 </script>
