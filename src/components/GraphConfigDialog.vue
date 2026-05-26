@@ -247,6 +247,7 @@ const open = defineModel("open", { type: Boolean, default: false });
 const props = defineProps({
   flightLog: { type: Object, default: null },
   graphConfig: { type: Object, default: null },
+  grapher: { type: Object, default: null },
 });
 
 const emit = defineEmits(["save", "update"]);
@@ -751,6 +752,36 @@ function setMinMaxToFullRangeDuringAllTime(setCheckedOnly) {
   }
 }
 
+function getMinMaxForFieldDuringWindowTimeInterval(setCheckedOnly) {
+  if (currentState.value.graph?.fields && props.flightLog && props.grapher) {
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        const mm = GraphConfig.getMinMaxForFieldDuringWindowTimeInterval(props.flightLog, props.grapher, field.name);
+        if (mm?.min !== undefined && mm?.max !== undefined) {
+          setMin(field, mm.min);
+          setMax(field, mm.max);
+        }
+      }
+    }
+    emitUpdate();
+  }
+}
+
+function getMinMaxForFieldDuringMarkedInterval(setCheckedOnly) {
+  if (currentState.value.graph?.fields && props.flightLog && props.grapher) {
+    for (const [index, field] of currentState.value.graph.fields.entries()) {
+      if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
+        const mm = GraphConfig.getMinMaxForFieldDuringMarkedInterval(props.flightLog, props.grapher, field.name);
+        if (mm?.min !== undefined && mm?.max !== undefined) {
+          setMin(field, mm.min);
+          setMax(field, mm.max);
+        }
+      }
+    }
+    emitUpdate();
+  }
+}
+
 function setMinMaxSelectedToFullRangeDuringAllTime() {
   if (currentState.value.field?.name && props.flightLog) {
     const mm = props.flightLog.getMinMaxForFieldDuringAllTime(currentState.value.field?.name);
@@ -934,15 +965,15 @@ const extendedMenuItems = computed(() => [
           },
           {
             label: "At the window time",
-            disabled: true,
             onSelect(e) {
+              getMinMaxForFieldDuringWindowTimeInterval(true);
               e.preventDefault();
             },
           },
           {
             label: "At the markers time",
-            disabled: true,
             onSelect(e) {
+              getMinMaxForFieldDuringMarkedInterval(true);
               e.preventDefault();
             },
           },
