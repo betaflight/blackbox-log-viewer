@@ -100,7 +100,7 @@
         v-model:open="appStore.graphConfigDialogOpen"
         :flightLog="logStore.flightLog"
         :graphConfig="graphStore.activeGraphConfig"
-        :grapher="graphStore.graph",
+        :grapher="graphStore.graph"
         @save="onGraphConfigSave"
         @update="onGraphConfigUpdate"
       />
