@@ -1038,14 +1038,14 @@ const extendedMenuItems = computed(() => [
           {
             label: "ZOOM IN",
             onSelect(e) {
-              setMinMaxSelectedZoom(1 / zoom, true);
+              setMinMaxZoom(1 / zoom, true);
               e.preventDefault();
             },
           },
           {
             label: "ZOOM OUT",
             onSelect(e) {
-              setMinMaxSelectedZoom(zoom, true);
+              setMinMaxZoom(zoom, true);
               e.preventDefault();
             },
           },
