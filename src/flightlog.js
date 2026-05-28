@@ -883,7 +883,7 @@ export function FlightLog(logData) {
   const computePlaneSasSum = (srcFrame, destFrame, fieldIndex, psasData) => {
     let psasRollSum = 0;
     for (const rollDataIndex of psasData[AXIS.ROLL]) {
-      if (rollDataIndex != undefined) {
+      if (rollDataIndex !== undefined) {
         psasRollSum += srcFrame[rollDataIndex];
       }
     }
@@ -891,7 +891,7 @@ export function FlightLog(logData) {
 
     let psasPitchSum = 0;
     for (const pitchDataIndex of psasData[AXIS.PITCH]) {
-      if (pitchDataIndex != undefined) {
+      if (pitchDataIndex !== undefined) {
         psasPitchSum += srcFrame[pitchDataIndex];
       }
     }
@@ -899,7 +899,7 @@ export function FlightLog(logData) {
 
     let psasYawSum = 0;
     for (const yawDataIndex of psasData[AXIS.YAW]) {
-      if (yawDataIndex != undefined) {
+      if (yawDataIndex !== undefined) {
         psasYawSum += srcFrame[yawDataIndex];
       }
     }
