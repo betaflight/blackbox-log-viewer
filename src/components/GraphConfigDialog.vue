@@ -179,8 +179,7 @@
                         emitUpdate();
                       "
                       @keydown="(e) => {
-                        if (e.ctrlKey && field.curve) {
-                          e.preventDefault();
+                        if (e.key === 'Control' && field.curve) {
                           field.curve.highPrecise = !field.curve.highPrecise;
                         }
                       }"
@@ -202,8 +201,7 @@
                         emitUpdate();
                       "
                       @keydown="(e) => {
-                        if (e.ctrlKey && field.curve) {
-                          e.preventDefault();
+                        if (e.key === 'Control' && field.curve) {
                           field.curve.highPrecise = !field.curve.highPrecise;
                         }
                       }"
@@ -636,7 +634,7 @@ function defineFieldsResolution() {
     for (const field of graph.fields) {
       const min = field?.curve?.MinMax?.min;
       const max = field?.curve?.MinMax?.max;
-      if (min && max) {
+      if (min != null && max != null) {
         field.curve.highPrecise = min % normalMinMaxStep !== 0 || max % normalMinMaxStep !== 0;
       }
     }
