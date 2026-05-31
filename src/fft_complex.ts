@@ -19,7 +19,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-function butterfly2(output, outputOffset, outputStride, fStride, state, m) {
+type FFTArray = Float64Array | number[];
+
+interface FFTState {
+  n: number;
+  inverse: boolean;
+  factors: number[];
+  twiddle: Float64Array;
+  scratch: Float64Array;
+}
+
+interface FFTBuffer {
+  data: FFTArray;
+  offset: number;
+  stride: number;
+}
+
+function butterfly2(
+  output: FFTArray,
+  outputOffset: number,
+  outputStride: number,
+  fStride: number,
+  state: FFTState,
+  m: number,
+): void {
   const t = state.twiddle;
 
   for (let i = 0; i < m; i++) {
@@ -46,7 +69,14 @@ function butterfly2(output, outputOffset, outputStride, fStride, state, m) {
   }
 }
 
-function butterfly3(output, outputOffset, outputStride, fStride, state, m) {
+function butterfly3(
+  output: FFTArray,
+  outputOffset: number,
+  outputStride: number,
+  fStride: number,
+  state: FFTState,
+  m: number,
+): void {
   const t = state.twiddle;
   const m1 = m,
     m2 = 2 * m;
@@ -99,7 +129,14 @@ function butterfly3(output, outputOffset, outputStride, fStride, state, m) {
   }
 }
 
-function butterfly4(output, outputOffset, outputStride, fStride, state, m) {
+function butterfly4(
+  output: FFTArray,
+  outputOffset: number,
+  outputStride: number,
+  fStride: number,
+  state: FFTState,
+  m: number,
+): void {
   const t = state.twiddle;
   const m1 = m,
     m2 = 2 * m,
@@ -177,7 +214,15 @@ function butterfly4(output, outputOffset, outputStride, fStride, state, m) {
   }
 }
 
-function butterfly(output, outputOffset, outputStride, fStride, state, m, p) {
+function butterfly(
+  output: FFTArray,
+  outputOffset: number,
+  outputStride: number,
+  fStride: number,
+  state: FFTState,
+  m: number,
+  p: number,
+): void {
   const t = state.twiddle,
     n = state.n,
     scratch = new Float64Array(2 * p);
@@ -220,11 +265,17 @@ function butterfly(output, outputOffset, outputStride, fStride, state, m, p) {
   }
 }
 
-function work(out, inp, inputStride, factors, state) {
+function work(
+  out: FFTBuffer,
+  inp: FFTBuffer,
+  inputStride: number,
+  factors: number[],
+  state: FFTState,
+): void {
   const { data: output, offset: outputOffset, stride: outputStride } = out;
   const { data: f, offset: fOffset, stride: fStride } = inp;
-  const p = factors.shift();
-  const m = factors.shift();
+  const p = factors.shift()!;
+  const m = factors.shift()!;
 
   if (m === 1) {
     for (let i = 0; i < p * m; i++) {
@@ -261,133 +312,139 @@ function work(out, inp, inputStride, factors, state) {
   }
 }
 
-export function FFTComplex(n, inverse) {
-  if (n === undefined || inverse === undefined) {
-    throw new RangeError("FFTComplex requires both `n` and `inverse` arguments");
-  }
+export class FFTComplex {
+  state: FFTState;
 
-  n = Math.trunc(n);
-  inverse = !!inverse;
-
-  if (!Number.isFinite(n) || n < 1) {
-    throw new RangeError(
-      `n is outside range, should be a finite positive integer, was \`${n}'`,
-    );
-  }
-
-  const state = {
-    n: n,
-    inverse: inverse,
-    factors: [],
-    twiddle: new Float64Array(2 * n),
-    scratch: new Float64Array(2 * n),
-  };
-
-  const t = state.twiddle,
-    theta = (2 * Math.PI) / n;
-
-  for (let i = 0; i < n; i++) {
-    const phase = inverse ? theta * i : -theta * i;
-    t[2 * i] = Math.cos(phase);
-    t[2 * i + 1] = Math.sin(phase);
-  }
-
-  let p = 4;
-  const v = Math.floor(Math.sqrt(n));
-
-  while (n > 1) {
-    while (n % p) {
-      switch (p) {
-        case 4:
-          p = 2;
-          break;
-        case 2:
-          p = 3;
-          break;
-        default:
-          p += 2;
-          break;
-      }
-
-      if (p > v) {
-        p = n;
-      }
+  constructor(n?: number, inverse?: boolean) {
+    if (n === undefined || inverse === undefined) {
+      throw new RangeError(
+        "FFTComplex requires both `n` and `inverse` arguments",
+      );
     }
 
-    n /= p;
+    n = Math.trunc(n);
+    inverse = !!inverse;
 
-    state.factors.push(p, n);
+    if (!Number.isFinite(n) || n < 1) {
+      throw new RangeError(
+        `n is outside range, should be a finite positive integer, was \`${n}'`,
+      );
+    }
+
+    const state: FFTState = {
+      n: n,
+      inverse: inverse,
+      factors: [],
+      twiddle: new Float64Array(2 * n),
+      scratch: new Float64Array(2 * n),
+    };
+
+    const t = state.twiddle,
+      theta = (2 * Math.PI) / n;
+
+    for (let i = 0; i < n; i++) {
+      const phase = inverse ? theta * i : -theta * i;
+      t[2 * i] = Math.cos(phase);
+      t[2 * i + 1] = Math.sin(phase);
+    }
+
+    let p = 4;
+    const v = Math.floor(Math.sqrt(n));
+
+    while (n > 1) {
+      while (n % p) {
+        switch (p) {
+          case 4:
+            p = 2;
+            break;
+          case 2:
+            p = 3;
+            break;
+          default:
+            p += 2;
+            break;
+        }
+
+        if (p > v) {
+          p = n;
+        }
+      }
+
+      n /= p;
+
+      state.factors.push(p, n);
+    }
+
+    this.state = state;
   }
 
-  this.state = state;
+  simple(output: FFTArray, input: FFTArray, t?: string): void {
+    this.process(output, 0, 1, input, 0, 1, t);
+  }
+
+  process(
+    output: FFTArray,
+    outputOffset: number,
+    outputStride: number,
+    input: FFTArray,
+    inputOffset: number,
+    inputStride: number,
+    t?: string,
+  ): void {
+    outputStride = Math.trunc(outputStride);
+    inputStride = Math.trunc(inputStride);
+
+    const type = t === "real" ? t : "complex";
+
+    if (!Number.isFinite(outputStride) || outputStride < 1) {
+      throw new RangeError(
+        `outputStride must be a finite positive integer, got: ${outputStride}`,
+      );
+    }
+
+    if (!Number.isFinite(inputStride) || inputStride < 1) {
+      throw new RangeError(
+        `inputStride must be a finite positive integer, got: ${inputStride}`,
+      );
+    }
+
+    if (type === "real") {
+      for (let i = 0; i < this.state.n; i++) {
+        const x0_r = input[inputOffset + inputStride * i];
+        this.state.scratch[2 * i] = x0_r;
+        this.state.scratch[2 * i + 1] = 0;
+      }
+
+      work(
+        { data: output, offset: outputOffset, stride: outputStride },
+        { data: this.state.scratch, offset: 0, stride: 1 },
+        1,
+        this.state.factors.slice(),
+        this.state,
+      );
+    } else if (input === output) {
+      work(
+        { data: this.state.scratch, offset: 0, stride: 1 },
+        { data: input, offset: inputOffset, stride: 1 },
+        inputStride,
+        this.state.factors.slice(),
+        this.state,
+      );
+
+      for (let i = 0; i < this.state.n; i++) {
+        const x0_r = this.state.scratch[2 * i],
+          x0_i = this.state.scratch[2 * i + 1];
+        output[2 * (outputOffset + outputStride * i)] = x0_r;
+        output[2 * (outputOffset + outputStride * i) + 1] = x0_i;
+      }
+    } else {
+      work(
+        { data: output, offset: outputOffset, stride: outputStride },
+        { data: input, offset: inputOffset, stride: 1 },
+        inputStride,
+        this.state.factors.slice(),
+        this.state,
+      );
+    }
+  }
 }
-
-FFTComplex.prototype.simple = function (output, input, t) {
-  this.process(output, 0, 1, input, 0, 1, t);
-};
-
-FFTComplex.prototype.process = function (
-  output,
-  outputOffset,
-  outputStride,
-  input,
-  inputOffset,
-  inputStride,
-  t,
-) {
-  outputStride = Math.trunc(outputStride);
-  inputStride = Math.trunc(inputStride);
-
-  const type = t === "real" ? t : "complex";
-
-  if (!Number.isFinite(outputStride) || outputStride < 1) {
-    throw new RangeError(
-      `outputStride must be a finite positive integer, got: ${outputStride}`,
-    );
-  }
-
-  if (!Number.isFinite(inputStride) || inputStride < 1) {
-    throw new RangeError(
-      `inputStride must be a finite positive integer, got: ${inputStride}`,
-    );
-  }
-
-  if (type === "real") {
-    for (let i = 0; i < this.state.n; i++) {
-      const x0_r = input[inputOffset + inputStride * i];
-      this.state.scratch[2 * i] = x0_r;
-      this.state.scratch[2 * i + 1] = 0;
-    }
-
-    work(
-      { data: output, offset: outputOffset, stride: outputStride },
-      { data: this.state.scratch, offset: 0, stride: 1 },
-      1,
-      this.state.factors.slice(),
-      this.state,
-    );
-  } else if (input === output) {
-    work(
-      { data: this.state.scratch, offset: 0, stride: 1 },
-      { data: input, offset: inputOffset, stride: 1 },
-      inputStride,
-      this.state.factors.slice(),
-      this.state,
-    );
-
-    for (let i = 0; i < this.state.n; i++) {
-      const x0_r = this.state.scratch[2 * i],
-        x0_i = this.state.scratch[2 * i + 1];
-      output[2 * (outputOffset + outputStride * i)] = x0_r;
-      output[2 * (outputOffset + outputStride * i) + 1] = x0_i;
-    }
-  } else {
-    work(
-      { data: output, offset: outputOffset, stride: outputStride },
-      { data: input, offset: inputOffset, stride: 1 },
-      inputStride,
-      this.state.factors.slice(),
-      this.state,
-    );
-  }
-};
