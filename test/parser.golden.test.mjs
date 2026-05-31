@@ -1,24 +1,36 @@
 // Golden-file characterization test for FlightLogParser.
 //
-// Parses a deterministic synthetic log and compares the observable output
+// Parses deterministic synthetic logs and compares the observable output
 // (sysConfig, frame definitions, stats, and every onFrameReady frame) against
-// a committed snapshot. This locks in current behavior so the upcoming
+// committed snapshots. This locks in current behavior so the upcoming
 // JS -> TS conversion of flightlog_parser can be proven byte-for-byte
 // equivalent.
 //
-// Run (bundled, because the parser is TypeScript with extensionless imports):
-//   npm run test:parser           # compare against the golden snapshot
-//   npm run test:parser -- --update   # regenerate the golden snapshot
+// Two fixtures:
+//   - simple:  header + I/P frames (predictors INC/PREVIOUS, VB encodings)
+//   - complex: adds GPS home/GPS (HOME_COORD predictor pair), slow + event
+//              frames, and TAG2_3S32 / TAG8_8SVB / NEG_14BIT encodings
 //
-// This module is bundled by esbuild and executed by node; see package.json.
+// Run (bundled, because the parser is TypeScript with extensionless imports):
+//   npm run test:parser                 # compare against the golden snapshots
+//   npm run test:parser -- --update     # regenerate the golden snapshots
 import { readFileSync, writeFileSync } from "node:fs";
 import { FlightLogParser } from "../src/flightlog_parser.js";
-import { buildSyntheticLog } from "./fixtures/synthetic_log.mjs";
+import { buildSyntheticLog, buildComplexLog } from "./fixtures/synthetic_log.mjs";
 
-const GOLDEN_PATH = "test/fixtures/parser.golden.json";
+const CASES = [
+  { name: "simple", build: buildSyntheticLog, golden: "test/fixtures/parser.golden.json" },
+  { name: "complex", build: buildComplexLog, golden: "test/fixtures/parser.golden.complex.json" },
+];
 
-function snapshot() {
-  const logData = buildSyntheticLog();
+function serializeFrame(frame) {
+  if (frame == null) return null;
+  if (Array.isArray(frame)) return Array.from(frame);
+  // Event frames pass the decoded event object rather than a numeric array.
+  return JSON.parse(JSON.stringify(frame));
+}
+
+function snapshot(logData) {
   const parser = new FlightLogParser(logData);
 
   const frames = [];
@@ -27,7 +39,7 @@ function snapshot() {
       valid,
       frameType,
       frameLength,
-      frame: frame ? Array.from(frame) : null,
+      frame: serializeFrame(frame),
     });
   };
 
@@ -77,6 +89,9 @@ function snapshot() {
     frameDefs: {
       I: frameDefSnapshot(parser.frameDefs.I),
       P: frameDefSnapshot(parser.frameDefs.P),
+      H: frameDefSnapshot(parser.frameDefs.H),
+      G: frameDefSnapshot(parser.frameDefs.G),
+      S: frameDefSnapshot(parser.frameDefs.S),
     },
     stats: {
       totalBytes: stats.totalBytes,
@@ -88,38 +103,44 @@ function snapshot() {
   };
 }
 
-const actual = `${JSON.stringify(snapshot(), null, 2)}\n`;
+const update = process.argv.includes("--update");
+let failures = 0;
 
-if (process.argv.includes("--update")) {
-  writeFileSync(GOLDEN_PATH, actual);
-  console.log(`Updated golden snapshot: ${GOLDEN_PATH}`);
-  process.exit(0);
-}
+for (const c of CASES) {
+  const actual = `${JSON.stringify(snapshot(c.build()), null, 2)}\n`;
 
-let expected;
-try {
-  expected = readFileSync(GOLDEN_PATH, "utf8");
-} catch {
-  console.error(
-    `Missing golden snapshot ${GOLDEN_PATH}. Run: npm run test:parser -- --update`,
-  );
-  process.exit(1);
-}
+  if (update) {
+    writeFileSync(c.golden, actual);
+    console.log(`updated ${c.name}: ${c.golden}`);
+    continue;
+  }
 
-if (actual === expected) {
-  console.log("ok   parser golden snapshot matches");
-  process.exit(0);
-}
+  let expected;
+  try {
+    expected = readFileSync(c.golden, "utf8");
+  } catch {
+    console.error(`Missing golden ${c.golden}. Run: npm run test:parser -- --update`);
+    failures++;
+    continue;
+  }
 
-// Report the first differing line to make regressions easy to locate.
-const a = actual.split("\n");
-const e = expected.split("\n");
-for (let i = 0; i < Math.max(a.length, e.length); i++) {
-  if (a[i] !== e[i]) {
-    console.error(`FAIL parser golden snapshot differs at line ${i + 1}:`);
-    console.error(`  expected: ${e[i] ?? "<eof>"}`);
-    console.error(`  actual:   ${a[i] ?? "<eof>"}`);
-    break;
+  if (actual === expected) {
+    console.log(`ok   ${c.name} golden snapshot matches`);
+    continue;
+  }
+
+  failures++;
+  const a = actual.split("\n");
+  const e = expected.split("\n");
+  for (let i = 0; i < Math.max(a.length, e.length); i++) {
+    if (a[i] !== e[i]) {
+      console.error(`FAIL ${c.name} differs at line ${i + 1}:`);
+      console.error(`  expected: ${e[i] ?? "<eof>"}`);
+      console.error(`  actual:   ${a[i] ?? "<eof>"}`);
+      break;
+    }
   }
 }
-process.exit(1);
+
+if (update) process.exit(0);
+process.exit(failures === 0 ? 0 : 1);

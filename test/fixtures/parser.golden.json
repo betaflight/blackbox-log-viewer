@@ -75,7 +75,10 @@
         "axisP[0]": 2,
         "motor[0]": 3
       }
-    }
+    },
+    "H": null,
+    "G": null,
+    "S": null
   },
   "stats": {
     "totalBytes": 22,

@@ -1,0 +1,461 @@
+{
+  "logByteLength": 884,
+  "sysConfig": {
+    "firmwareType": 3,
+    "firmwareVersion": "4.5.0",
+    "firmware": "4.5",
+    "firmwarePatch": 0,
+    "frameIntervalI": 1,
+    "frameIntervalPNum": 1,
+    "frameIntervalPDenom": 1
+  },
+  "frameDefs": {
+    "I": {
+      "name": [
+        "loopIteration",
+        "time",
+        "gyroADC[0]",
+        "gyroADC[1]",
+        "gyroADC[2]",
+        "motor[0]",
+        "motor[1]",
+        "motor[2]",
+        "debug[0]"
+      ],
+      "count": 9,
+      "signed": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "predictor": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "encoding": [
+        1,
+        1,
+        7,
+        7,
+        7,
+        6,
+        6,
+        6,
+        3
+      ],
+      "nameToIndex": {
+        "loopIteration": 0,
+        "time": 1,
+        "gyroADC[0]": 2,
+        "gyroADC[1]": 3,
+        "gyroADC[2]": 4,
+        "motor[0]": 5,
+        "motor[1]": 6,
+        "motor[2]": 7,
+        "debug[0]": 8
+      }
+    },
+    "P": {
+      "name": [
+        "loopIteration",
+        "time",
+        "gyroADC[0]",
+        "gyroADC[1]",
+        "gyroADC[2]",
+        "motor[0]",
+        "motor[1]",
+        "motor[2]",
+        "debug[0]"
+      ],
+      "count": 9,
+      "signed": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "predictor": [
+        6,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "encoding": [
+        9,
+        0,
+        7,
+        7,
+        7,
+        6,
+        6,
+        6,
+        3
+      ],
+      "nameToIndex": {
+        "loopIteration": 0,
+        "time": 1,
+        "gyroADC[0]": 2,
+        "gyroADC[1]": 3,
+        "gyroADC[2]": 4,
+        "motor[0]": 5,
+        "motor[1]": 6,
+        "motor[2]": 7,
+        "debug[0]": 8
+      }
+    },
+    "H": {
+      "name": [
+        "GPS_home[0]",
+        "GPS_home[1]"
+      ],
+      "count": 2,
+      "signed": [
+        1,
+        1
+      ],
+      "predictor": [
+        0,
+        0
+      ],
+      "encoding": [
+        0,
+        0
+      ],
+      "nameToIndex": {
+        "GPS_home[0]": 0,
+        "GPS_home[1]": 1
+      }
+    },
+    "G": {
+      "name": [
+        "time",
+        "GPS_coord[0]",
+        "GPS_coord[1]",
+        "GPS_numSat"
+      ],
+      "count": 4,
+      "signed": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "predictor": [
+        0,
+        7,
+        256,
+        0
+      ],
+      "encoding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "nameToIndex": {
+        "time": 0,
+        "GPS_coord[0]": 1,
+        "GPS_coord[1]": 2,
+        "GPS_numSat": 3
+      }
+    },
+    "S": {
+      "name": [
+        "flightModeFlags",
+        "stateFlags",
+        "failsafePhase"
+      ],
+      "count": 3,
+      "signed": [
+        0,
+        0,
+        0
+      ],
+      "predictor": [
+        0,
+        0,
+        0
+      ],
+      "encoding": [
+        1,
+        1,
+        1
+      ],
+      "nameToIndex": {
+        "flightModeFlags": 0,
+        "stateFlags": 1,
+        "failsafePhase": 2
+      }
+    }
+  },
+  "stats": {
+    "totalBytes": 54,
+    "totalCorruptFrames": 0,
+    "intentionallyAbsentIterations": 0,
+    "frame": {
+      "I": {
+        "bytes": 11,
+        "validCount": 1,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 0,
+            "min": 0
+          },
+          {
+            "max": 1000,
+            "min": 1000
+          },
+          {
+            "max": 1,
+            "min": 1
+          },
+          {
+            "max": 0,
+            "min": 0
+          },
+          {
+            "max": -1,
+            "min": -1
+          },
+          {
+            "max": 10,
+            "min": 10
+          },
+          {
+            "max": 20,
+            "min": 20
+          },
+          {
+            "max": 30,
+            "min": 30
+          },
+          {
+            "max": -5,
+            "min": -5
+          }
+        ]
+      },
+      "P": {
+        "bytes": 10,
+        "validCount": 1,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 1,
+            "min": 1
+          },
+          {
+            "max": 2000,
+            "min": 2000
+          },
+          {
+            "max": -2,
+            "min": -2
+          },
+          {
+            "max": 1,
+            "min": 1
+          },
+          {
+            "max": 0,
+            "min": 0
+          },
+          {
+            "max": 1,
+            "min": 1
+          },
+          {
+            "max": 2,
+            "min": 2
+          },
+          {
+            "max": 3,
+            "min": 3
+          },
+          {
+            "max": -3,
+            "min": -3
+          }
+        ]
+      },
+      "H": {
+        "bytes": 8,
+        "validCount": 1,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 123456,
+            "min": 123456
+          },
+          {
+            "max": 654321,
+            "min": 654321
+          }
+        ]
+      },
+      "G": {
+        "bytes": 7,
+        "validCount": 1,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 5000,
+            "min": 5000
+          },
+          {
+            "max": 123466,
+            "min": 123466
+          },
+          {
+            "max": 654341,
+            "min": 654341
+          },
+          {
+            "max": 8,
+            "min": 8
+          }
+        ]
+      },
+      "S": {
+        "bytes": 5,
+        "validCount": 1,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 2,
+            "min": 2
+          },
+          {
+            "max": 1,
+            "min": 1
+          },
+          {
+            "max": 0,
+            "min": 0
+          }
+        ]
+      },
+      "E": {
+        "bytes": 19,
+        "validCount": 2,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": []
+      }
+    }
+  },
+  "frames": [
+    {
+      "valid": true,
+      "frameType": "I",
+      "frameLength": 11,
+      "frame": [
+        0,
+        1000,
+        1,
+        0,
+        -1,
+        10,
+        20,
+        30,
+        -5
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "P",
+      "frameLength": 10,
+      "frame": [
+        1,
+        2000,
+        -2,
+        1,
+        0,
+        1,
+        2,
+        3,
+        -3
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "H",
+      "frameLength": 8,
+      "frame": [
+        123456,
+        654321
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "G",
+      "frameLength": 7,
+      "frame": [
+        5000,
+        123466,
+        654341,
+        8
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "S",
+      "frameLength": 5,
+      "frame": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "E",
+      "frameLength": 6,
+      "frame": {
+        "event": 0,
+        "data": {
+          "time": 123456
+        },
+        "time": 123456
+      }
+    },
+    {
+      "valid": true,
+      "frameType": "E",
+      "frameLength": 13,
+      "frame": {
+        "event": 255,
+        "data": {}
+      }
+    }
+  ]
+}
