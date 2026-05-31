@@ -290,7 +290,7 @@ export function useBlackboxViewer() {
     reader.readAsArrayBuffer(file);
   }
 
-  appStore.refreshGraph = () => {
+  const refreshGraph = () => {
     if (graph !== null) {
       ThemeColors.clearCache();
       graph.refreshTheme();
@@ -650,49 +650,6 @@ export function useBlackboxViewer() {
     };
   }
 
-  appStore.loadFiles = loadFiles;
-  // Note: internal newGraphConfig takes `noRedraw` (inverted). Callers pass `redrawChart` (true = redraw).
-  appStore.newGraphConfig = (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart);
-  appStore.exportCsv = () => {
-    setGraphState(GRAPH_STATE_PAUSED);
-    exportCsv(logStore.flightLog, appStore.logFilename);
-  };
-  appStore.exportGpx = () => {
-    setGraphState(GRAPH_STATE_PAUSED);
-    exportGpx(logStore.flightLog, appStore.logFilename);
-  };
-  appStore.exportWorkspaces = () => {
-    setGraphState(GRAPH_STATE_PAUSED);
-    saveWorkspaces(workspaceStore.workspaceGraphConfigs);
-  };
-  appStore.pauseForExport = () => setGraphState(GRAPH_STATE_PAUSED);
-  appStore.getVideoExportParams = () => ({
-    graphConfig: graphStore.activeGraphConfig,
-    inTime: playbackStore.videoExportInTime,
-    outTime: playbackStore.videoExportOutTime,
-    flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,
-    flightVideoOffset: playbackStore.videoOffset,
-    hasCraft: userSettings.drawCraft,
-    hasAnalyser: graphStore.hasAnalyser,
-    hasSticks: userSettings.drawSticks,
-  });
-  appStore.saveVideoConfig = (newConfig) => {
-    playbackStore.videoConfig = newConfig;
-    prefs.set("videoConfig", newConfig);
-  };
-  appStore.openNewWindow = () => createNewBlackboxWindow();
-  appStore.saveUserSettings = (newSettings) => {
-    settingsStore.saveAll(newSettings);
-    if (newSettings.darkMode !== undefined) {
-      DarkTheme.setMode(newSettings.darkMode);
-    }
-    if (graph != null) {
-      graph.refreshOptions(userSettings);
-      graph.refreshLogo();
-      graph.initializeCraftModel();
-      updateCanvasSize();
-    }
-  };
   graphStore.applyGraphZoom = setGraphZoom;
   playbackStore.applyPlaybackRate = setPlaybackRate;
   playbackStore.logPlayPause = logPlayPause;
@@ -715,6 +672,50 @@ export function useBlackboxViewer() {
     spectrumExport: (...args) => spectrumExport?.(...args),
     spectrumImport: (...args) => spectrumImport?.(...args),
     spectrumClear: (...args) => spectrumClear?.(...args),
+    refreshGraph,
+    loadFiles,
+    // Note: internal newGraphConfig takes `noRedraw` (inverted). Callers pass `redrawChart` (true = redraw).
+    newGraphConfig: (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart),
+    exportCsv: () => {
+      setGraphState(GRAPH_STATE_PAUSED);
+      exportCsv(logStore.flightLog, appStore.logFilename);
+    },
+    exportGpx: () => {
+      setGraphState(GRAPH_STATE_PAUSED);
+      exportGpx(logStore.flightLog, appStore.logFilename);
+    },
+    exportWorkspaces: () => {
+      setGraphState(GRAPH_STATE_PAUSED);
+      saveWorkspaces(workspaceStore.workspaceGraphConfigs);
+    },
+    pauseForExport: () => setGraphState(GRAPH_STATE_PAUSED),
+    getVideoExportParams: () => ({
+      graphConfig: graphStore.activeGraphConfig,
+      inTime: playbackStore.videoExportInTime,
+      outTime: playbackStore.videoExportOutTime,
+      flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,
+      flightVideoOffset: playbackStore.videoOffset,
+      hasCraft: userSettings.drawCraft,
+      hasAnalyser: graphStore.hasAnalyser,
+      hasSticks: userSettings.drawSticks,
+    }),
+    saveVideoConfig: (newConfig) => {
+      playbackStore.videoConfig = newConfig;
+      prefs.set("videoConfig", newConfig);
+    },
+    openNewWindow: () => createNewBlackboxWindow(),
+    saveUserSettings: (newSettings) => {
+      settingsStore.saveAll(newSettings);
+      if (newSettings.darkMode !== undefined) {
+        DarkTheme.setMode(newSettings.darkMode);
+      }
+      if (graph != null) {
+        graph.refreshOptions(userSettings);
+        graph.refreshLogo();
+        graph.initializeCraftModel();
+        updateCanvasSize();
+      }
+    },
   };
   return viewerInstance;
 }

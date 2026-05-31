@@ -123,6 +123,7 @@
 import { ref, computed, watchEffect, onMounted, onUnmounted } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
+import { useBlackboxViewer } from "./composables/use_blackbox_viewer.js";
 import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useSettingsStore } from "./stores/settings.js";
@@ -150,6 +151,7 @@ import SeekBarToolbar from "./components/SeekBarToolbar.vue";
 
 const graphStore = useGraphStore();
 const appStore = useAppStore();
+const viewer = useBlackboxViewer();
 const logStore = useLogStore();
 const playbackStore = usePlaybackStore();
 const settingsStore = useSettingsStore();
@@ -188,7 +190,7 @@ const sysConfig = computed(() => logStore.flightLog?.getSysConfig?.() ?? null);
 const videoExportParams = ref(null);
 
 function onFilesSelected(files) {
-  appStore.loadFiles?.(files);
+  viewer.loadFiles(files);
 }
 
 function onOpenSettings() {
@@ -200,25 +202,25 @@ function onOpenKeys() {
 }
 
 function onExportCsv() {
-  appStore.exportCsv?.();
+  viewer.exportCsv();
 }
 
 function onExportGpx() {
-  appStore.exportGpx?.();
+  viewer.exportGpx();
 }
 
 function onExportVideo() {
-  appStore.pauseForExport?.();
-  videoExportParams.value = appStore.getVideoExportParams?.() ?? null;
+  viewer.pauseForExport();
+  videoExportParams.value = viewer.getVideoExportParams() ?? null;
   appStore.videoExportDialogOpen = true;
 }
 
 function onExportWorkspaces() {
-  appStore.exportWorkspaces?.();
+  viewer.exportWorkspaces();
 }
 
 function onNewWindow() {
-  appStore.openNewWindow?.();
+  viewer.openNewWindow();
 }
 
 function onViewConfig() {
@@ -323,19 +325,19 @@ function onVideoJumpEnd() {
 }
 
 function onSaveSettings(newSettings) {
-  appStore.saveUserSettings?.(newSettings);
+  viewer.saveUserSettings(newSettings);
 }
 
 function onGraphConfigSave(newConfig) {
-  appStore.newGraphConfig?.(newConfig, true);
+  viewer.newGraphConfig(newConfig, true);
 }
 
 function onGraphConfigUpdate(newConfig) {
-  appStore.newGraphConfig?.(newConfig, true);
+  viewer.newGraphConfig(newConfig, true);
 }
 
 function onSaveVideoConfig(cfg) {
-  appStore.saveVideoConfig?.(cfg);
+  viewer.saveVideoConfig(cfg);
 }
 
 function onSwitchWorkspace(id) {
@@ -364,7 +366,7 @@ function onDrop(e) {
   const item = e.dataTransfer.items?.[0];
   const entry = item?.webkitGetAsEntry?.();
   if (entry?.isFile) {
-    appStore.loadFiles?.([e.dataTransfer.files[0]]);
+    viewer.loadFiles([e.dataTransfer.files[0]]);
   }
 }
 onMounted(() => {

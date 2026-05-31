@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, shallowRef } from "vue";
+import { ref } from "vue";
 
 export const useAppStore = defineStore("app", () => {
   const legendHidden = ref(false);
@@ -27,18 +27,7 @@ export const useAppStore = defineStore("app", () => {
   const settingsDialogOpen = ref(false);
   const keysDialogOpen = ref(false);
 
-  // Callbacks registered by main.js (closure-dependent operations)
-  const loadFiles = shallowRef(null);
-  const newGraphConfig = shallowRef(null);
-  const exportCsv = shallowRef(null);
-  const exportGpx = shallowRef(null);
-  const exportWorkspaces = shallowRef(null);
-  const openNewWindow = shallowRef(null);
-  const pauseForExport = shallowRef(null);
-  const getVideoExportParams = shallowRef(null);
-  const saveVideoConfig = shallowRef(null);
-  const saveUserSettings = shallowRef(null);
-  const refreshGraph = shallowRef(null);
+  // (Imperative operations moved to the useBlackboxViewer composable.)
 
   function setLegendHidden(hidden) {
     legendHidden.value = hidden;
@@ -67,17 +56,6 @@ export const useAppStore = defineStore("app", () => {
     videoExportDialogOpen,
     settingsDialogOpen,
     keysDialogOpen,
-    loadFiles,
-    newGraphConfig,
-    exportCsv,
-    exportGpx,
-    exportWorkspaces,
-    openNewWindow,
-    pauseForExport,
-    getVideoExportParams,
-    saveVideoConfig,
-    saveUserSettings,
-    refreshGraph,
     setLegendHidden,
     setViewVideo,
   };

@@ -13,6 +13,7 @@
  */
 
 import { useAppStore } from "./stores/app.js";
+import { useBlackboxViewer } from "./composables/use_blackbox_viewer.js";
 
 export const DarkTheme = {
   // Preference key name
@@ -112,7 +113,7 @@ export const DarkTheme = {
     this.apply();
 
     // Notify the application that theme has changed so canvas can redraw
-    useAppStore().refreshGraph?.();
+    useBlackboxViewer().refreshGraph();
 
     if (typeof callback === "function") {
       callback();
