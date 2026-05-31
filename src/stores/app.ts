@@ -29,11 +29,11 @@ export const useAppStore = defineStore("app", () => {
 
   // (Imperative operations moved to the useBlackboxViewer composable.)
 
-  function setLegendHidden(hidden) {
+  function setLegendHidden(hidden: boolean) {
     legendHidden.value = hidden;
   }
 
-  function setViewVideo(visible) {
+  function setViewVideo(visible: boolean) {
     viewVideo.value = visible;
   }
 

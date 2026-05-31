@@ -5,7 +5,8 @@ import { PrefStorage } from "../pref_storage.js";
 
 const prefs = new PrefStorage();
 
-function deepMerge(target, source) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   for (const key of Object.keys(source)) {
     const sv = source[key];
     if (sv && typeof sv === "object" && !Array.isArray(sv) && target[key] && typeof target[key] === "object") {
@@ -20,22 +21,22 @@ export const useSettingsStore = defineStore("settings", () => {
   const userSettings = reactive(structuredClone(defaultUserSettings));
 
   function load() {
-    prefs.get("userSettings", (item) => {
+    prefs.get("userSettings", (item: unknown) => {
       if (item) {
         const merged = structuredClone(defaultUserSettings);
-        deepMerge(merged, item);
+        deepMerge(merged, item as Record<string, unknown>);
         Object.assign(userSettings, merged);
       }
     });
   }
 
-  function saveAll(newSettings) {
+  function saveAll(newSettings: Record<string, unknown>) {
     Object.assign(userSettings, newSettings);
     prefs.set("userSettings", toRaw(userSettings));
   }
 
-  function saveSetting(key, value) {
-    userSettings[key] = value;
+  function saveSetting(key: string, value: unknown) {
+    (userSettings as Record<string, unknown>)[key] = value;
     prefs.set("userSettings", { ...toRaw(userSettings) });
   }
 

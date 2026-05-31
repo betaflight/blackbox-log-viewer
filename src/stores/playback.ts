@@ -8,34 +8,41 @@ export const PLAYBACK_MAX_RATE = 300;
 export const PLAYBACK_DEFAULT_RATE = 100;
 export const PLAYBACK_RATE_STEP = 5;
 
+interface OffsetEntry {
+  log: string | null;
+  index: number | null;
+  video: string | null;
+  offset: number | null;
+}
+
 export const usePlaybackStore = defineStore("playback", () => {
   const graphState = ref(GRAPH_STATE_PAUSED);
   const playbackRate = ref(PLAYBACK_DEFAULT_RATE);
   const videoOffset = ref(0);
-  const videoExportInTime = ref(null);
-  const videoExportOutTime = ref(null);
+  const videoExportInTime = ref<number | null>(null);
+  const videoExportOutTime = ref<number | null>(null);
   const videoConfig = ref({ width: 1280, height: 720, frameRate: 30, videoDim: 0.4 });
 
   // Video DOM element — registered by main.js
-  const videoElement = shallowRef(null);
+  const videoElement = shallowRef<HTMLVideoElement | null>(null);
 
   // Offset cache for auto-syncing video to log
-  const offsetCache = shallowRef([]);
-  const currentOffsetCache = shallowRef({ log: null, index: null, video: null, offset: null });
+  const offsetCache = shallowRef<OffsetEntry[]>([]);
+  const currentOffsetCache = shallowRef<OffsetEntry>({ log: null, index: null, video: null, offset: null });
 
   const isPlaying = computed(() => graphState.value === GRAPH_STATE_PLAY);
   const isPaused = computed(() => graphState.value === GRAPH_STATE_PAUSED);
 
   // Callbacks registered by main.js (need video element + renderer closures)
 
-  function setPlaybackRate(rate) {
+  function setPlaybackRate(rate: number) {
     playbackRate.value = Math.max(
       PLAYBACK_MIN_RATE,
       Math.min(PLAYBACK_MAX_RATE, rate),
     );
   }
 
-  function setVideoOffset(offset) {
+  function setVideoOffset(offset: number) {
     videoOffset.value = offset;
   }
 

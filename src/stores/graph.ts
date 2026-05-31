@@ -4,6 +4,11 @@ import { useSettingsStore } from "./settings.js";
 import { useLogStore } from "./log.js";
 import { PrefStorage } from "../pref_storage.js";
 
+// Renderer/config instances live in still-JS modules (grapher, graph_config);
+// typed loosely until those are converted.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
 export const GRAPH_MIN_ZOOM = 1;
 export const GRAPH_MAX_ZOOM = 1000;
 export const GRAPH_DEFAULT_ZOOM = 100;
@@ -12,16 +17,16 @@ export const useGraphStore = defineStore("graph", () => {
   const prefs = new PrefStorage();
 
   // Renderer instances — registered by main.js after creation
-  const graph = shallowRef(null);
-  const mapGrapher = shallowRef(null);
-  const seekBar = shallowRef(null);
+  const graph = shallowRef<Loose>(null);
+  const mapGrapher = shallowRef<Loose>(null);
+  const seekBar = shallowRef<Loose>(null);
 
   // Canvas DOM refs — registered by main.js
-  const canvasRefs = shallowRef(null);
+  const canvasRefs = shallowRef<Loose>(null);
 
-  const graphConfig = ref(null);
-  const activeGraphConfig = shallowRef(null);
-  const lastGraphConfig = ref(null);
+  const graphConfig = ref<Loose>(null);
+  const activeGraphConfig = shallowRef<Loose>(null);
+  const lastGraphConfig = ref<Loose>(null);
   const graphZoom = ref(GRAPH_DEFAULT_ZOOM);
   const lastGraphZoom = ref(GRAPH_DEFAULT_ZOOM);
 
@@ -37,14 +42,14 @@ export const useGraphStore = defineStore("graph", () => {
   const hasConfig = ref(false);
   const hasConfigOverlay = ref(false);
   const configFileName = ref("");
-  const configLines = shallowRef([]);
+  const configLines = shallowRef<string[]>([]);
 
   // Legend
   const legendVisible = ref(true);
   const legendTitle = ref("Legend");
-  const legendGraphs = shallowRef([]);
+  const legendGraphs = shallowRef<Loose[]>([]);
   // Each: { label, fields: [{ name, friendlyName, color, hidden }] }
-  const legendValues = shallowRef({});
+  const legendValues = shallowRef<Record<string, Loose>>({});
   // Map of fieldName → { value, settings }
 
   // Analyser
@@ -57,16 +62,16 @@ export const useGraphStore = defineStore("graph", () => {
   const seekBarMode = ref("avgThrottle");
 
   // Callbacks registered by main.js
-  const invalidateGraph = shallowRef(null);
-  const updateCanvasSize = shallowRef(null);
+  const invalidateGraph = shallowRef<(() => void) | null>(null);
+  const updateCanvasSize = shallowRef<(() => void) | null>(null);
 
   // --- Legend actions ---
 
   function buildLegendGraphs() {
-    const graphs = activeGraphConfig.value?.getGraphs() ?? [];
-    legendGraphs.value = graphs.map((g, gi) => ({
+    const graphs: Loose[] = activeGraphConfig.value?.getGraphs() ?? [];
+    legendGraphs.value = graphs.map((g: Loose, gi: number) => ({
       label: g.label,
-      fields: g.fields.map((f, fi) => ({
+      fields: g.fields.map((f: Loose, fi: number) => ({
         name: f.name,
         friendlyName: f.friendlyName,
         color: f.color,
@@ -75,7 +80,7 @@ export const useGraphStore = defineStore("graph", () => {
     }));
   }
 
-  function highlightLegendField(gi, fi) {
+  function highlightLegendField(gi: number, fi: number) {
     if (!activeGraphConfig.value) {
       return;
     }
@@ -84,7 +89,7 @@ export const useGraphStore = defineStore("graph", () => {
     invalidateGraph.value?.();
   }
 
-  function selectLegendField(gi, fi, fieldName, ctrlKey) {
+  function selectLegendField(gi: number, fi: number, fieldName: string, ctrlKey: boolean) {
     if (!activeGraphConfig.value) {
       return;
     }
@@ -103,7 +108,7 @@ export const useGraphStore = defineStore("graph", () => {
     invalidateGraph.value?.();
   }
 
-  function toggleLegendField(gi, fi) {
+  function toggleLegendField(gi: number, fi: number) {
     if (!activeGraphConfig.value) {
       return;
     }
@@ -112,14 +117,14 @@ export const useGraphStore = defineStore("graph", () => {
     invalidateGraph.value?.();
   }
 
-  function legendVisibilityChange(hidden) {
+  function legendVisibilityChange(hidden: boolean) {
     prefs.set("log-legend-hidden", hidden);
     updateCanvasSize.value?.();
   }
 
   function toggleAnalyser() {
     if (activeGraphConfig.value?.selectedFieldName == null) {
-      const graphs = activeGraphConfig.value?.getGraphs() ?? [];
+      const graphs: Loose[] = activeGraphConfig.value?.getGraphs() ?? [];
       if (graphs.length === 0 || graphs[0].fields.length === 0) {
         hasAnalyser.value = false;
       } else {
@@ -155,11 +160,11 @@ export const useGraphStore = defineStore("graph", () => {
     }
   }
 
-  function setGraphZoom(zoom) {
+  function setGraphZoom(zoom: number) {
     graphZoom.value = Math.max(GRAPH_MIN_ZOOM, Math.min(GRAPH_MAX_ZOOM, zoom));
   }
 
-  function quickZoomToggle(newZoom) {
+  function quickZoomToggle(newZoom: number) {
     if (graphZoom.value === newZoom) {
       setGraphZoom(lastGraphZoom.value);
     } else {

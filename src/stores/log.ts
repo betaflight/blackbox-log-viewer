@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, shallowRef, computed } from "vue";
+import type { FlightLog } from "../flightlog";
 import {
   FIRMWARE_TYPE_BASEFLIGHT,
   FIRMWARE_TYPE_CLEANFLIGHT,
@@ -7,7 +8,7 @@ import {
   FIRMWARE_TYPE_INAV,
 } from "../flightlog_fielddefs.js";
 
-const FIRMWARE_CLASS_MAP = {
+const FIRMWARE_CLASS_MAP: Record<number, string> = {
   [FIRMWARE_TYPE_BASEFLIGHT]: "isBaseF",
   [FIRMWARE_TYPE_CLEANFLIGHT]: "isCF",
   [FIRMWARE_TYPE_BETAFLIGHT]: "isBF",
@@ -17,8 +18,8 @@ const FIRMWARE_CLASS_MAP = {
 export const FIRMWARE_CLASSES = Object.values(FIRMWARE_CLASS_MAP);
 
 export const useLogStore = defineStore("log", () => {
-  const flightLog = ref(null);
-  const flightLogDataArray = ref(null);
+  const flightLog = ref<FlightLog | null>(null);
+  const flightLogDataArray = ref<Uint8Array | null>(null);
   const currentBlackboxTime = ref(0);
   const hasLog = ref(false);
   const hasVideo = ref(false);
@@ -26,14 +27,14 @@ export const useLogStore = defineStore("log", () => {
     // activeLogIndex dependency ensures re-evaluation when log index changes
     return activeLogIndex.value >= 0 && !!flightLog.value?.hasGpsData?.();
   });
-  const videoURL = ref(null);
+  const videoURL = ref<string | null>(null);
 
   // Field values table data (updated by updateValuesChart in main.js)
-  const fieldValues = shallowRef([]);
-  const fieldStats = shallowRef([]);
+  const fieldValues = shallowRef<unknown[]>([]);
+  const fieldStats = shallowRef<unknown[]>([]);
 
   // Log index picker (multiple logs in one file)
-  const logIndexEntries = shallowRef([]);
+  const logIndexEntries = shallowRef<Array<{ label: string; value: number; disabled?: boolean }>>([]);
   // Each: { label, value, disabled }
   const activeLogIndex = ref(0);
 
@@ -42,23 +43,23 @@ export const useLogStore = defineStore("log", () => {
 
   const firmwareClass = computed(() => {
     const type = flightLog.value?.getSysConfig?.()?.firmwareType;
-    return FIRMWARE_CLASS_MAP[type] ?? null;
+    return FIRMWARE_CLASS_MAP[type as number] ?? null;
   });
 
-  function setFlightLog(log) {
+  function setFlightLog(log: FlightLog | null) {
     flightLog.value = log;
     hasLog.value = !!log;
   }
 
-  function setFlightLogDataArray(dataArray) {
+  function setFlightLogDataArray(dataArray: Uint8Array | null) {
     flightLogDataArray.value = dataArray;
   }
 
-  function setCurrentBlackboxTime(time) {
+  function setCurrentBlackboxTime(time: number) {
     currentBlackboxTime.value = time;
   }
 
-  function setVideo(url) {
+  function setVideo(url: string | null) {
     videoURL.value = url;
     hasVideo.value = !!url;
   }

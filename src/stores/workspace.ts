@@ -1,16 +1,22 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-export const useWorkspaceStore = defineStore("workspace", () => {
-  const workspaceGraphConfigs = ref([]);
-  const activeWorkspace = ref(1);
-  const bookmarkTimes = ref([]);
+interface WorkspaceEntry {
+  title: string;
+  graphConfig: unknown;
+}
+type WorkspaceConfigs = Array<WorkspaceEntry | null>;
 
-  function setActiveWorkspace(id) {
+export const useWorkspaceStore = defineStore("workspace", () => {
+  const workspaceGraphConfigs = ref<WorkspaceConfigs>([]);
+  const activeWorkspace = ref(1);
+  const bookmarkTimes = ref<number[]>([]);
+
+  function setActiveWorkspace(id: number) {
     activeWorkspace.value = id;
   }
 
-  function setWorkspaceGraphConfigs(configs) {
+  function setWorkspaceGraphConfigs(configs: WorkspaceConfigs) {
     workspaceGraphConfigs.value = configs;
   }
 
@@ -19,13 +25,13 @@ export const useWorkspaceStore = defineStore("workspace", () => {
   // Callbacks registered by main.js
 
   /** Get title for a workspace slot (1-9, 0) */
-  function getTitle(id) {
+  function getTitle(id: number) {
     const entry = workspaceGraphConfigs.value[id];
     return entry ? entry.title : null;
   }
 
   /** Check if a workspace slot has data */
-  function hasWorkspace(id) {
+  function hasWorkspace(id: number) {
     return workspaceGraphConfigs.value[id] != null;
   }
 
