@@ -3,19 +3,37 @@ import { FlightLogEvent } from "./flightlog_fielddefs";
 import { IMU } from "./imu";
 import { ArrayDataStream } from "./datastream";
 import "./decoders";
+import type { IntraIndex } from "./flightlog_types";
 
-export function FlightLogIndex(logData) {
+export interface FlightLogIndex {
+  loadFromJSON(_json: unknown): void;
+  saveToJSON(): string;
+  getLogBeginOffset(index: number): number;
+  getLogCount(): number;
+  getIntraframeDirectories(): IntraIndex[];
+  getIntraframeDirectory(logIndex: number): IntraIndex;
+}
+
+// These deps are old-style constructor functions with a typed `this`, which TS
+// doesn't expose a construct signature for; cast to construct them.
+type Ctor<T, A extends unknown[]> = new (...args: A) => T;
+
+export function FlightLogIndex(
+  this: FlightLogIndex,
+  logData: Uint8Array | number[],
+) {
   //Private:
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const that = this;
-  let logBeginOffsets = false;
-  let intraframeDirectories = false;
+  let logBeginOffsets: number[] | false = false;
+  let intraframeDirectories: IntraIndex[] | false = false;
 
   function buildLogOffsetsIndex() {
     const stream = new ArrayDataStream(logData);
     let i;
     let logStart;
 
-    logBeginOffsets = [];
+    const offsets: number[] = (logBeginOffsets = []);
 
     for (i = 0; ; i++) {
       logStart = stream.nextOffsetOf(
@@ -24,11 +42,11 @@ export function FlightLogIndex(logData) {
 
       if (logStart === -1) {
         //No more logs found in the file
-        logBeginOffsets.push(stream.end);
+        offsets.push(stream.end);
         break;
       }
 
-      logBeginOffsets.push(logStart);
+      offsets.push(logStart);
 
       //Restart the search after this header
       stream.pos =
@@ -37,12 +55,15 @@ export function FlightLogIndex(logData) {
   }
 
   function buildIntraframeDirectories() {
-    const parser = new FlightLogParser(logData, that);
+    const parser = new (FlightLogParser as unknown as Ctor<
+      FlightLogParser,
+      [Uint8Array | number[], unknown?]
+    >)(logData, that);
 
-    intraframeDirectories = [];
+    const directories: IntraIndex[] = (intraframeDirectories = []);
 
     for (let i = 0; i < that.getLogCount(); i++) {
-      const intraIndex = {
+      const intraIndex: IntraIndex = {
         times: [],
         offsets: [],
         avgThrottle: [],
@@ -57,10 +78,10 @@ export function FlightLogIndex(logData) {
         maxTime: false,
         unLoggedTime: 0,
       };
-      const imu = new IMU();
+      const imu = new (IMU as unknown as Ctor<IMU, [IMU?]>)();
       let iframeCount = 0;
-      const motorFields = [];
-      const maxRCFields = [];
+      const motorFields: number[] = [];
+      const maxRCFields: number[] = [];
       let throttleTotal;
       let rcTotal;
       let maxMotor;
@@ -68,8 +89,10 @@ export function FlightLogIndex(logData) {
       let parsedHeader;
       let sawEndMarker = false;
 
+      const offsets = logBeginOffsets as number[];
+
       try {
-        parser.parseHeader(logBeginOffsets[i], logBeginOffsets[i + 1]);
+        parser.parseHeader(offsets[i], offsets[i + 1]);
         parsedHeader = true;
       } catch (e) {
         console.log(`Error parsing header of log #${i + 1}: ${e}`);
@@ -92,14 +115,14 @@ export function FlightLogIndex(logData) {
           mainFrameDef.nameToIndex["accSmooth[1]"],
           mainFrameDef.nameToIndex["accSmooth[2]"],
         ];
-        let magADC = [
+        let magADC: number[] | false = [
           mainFrameDef.nameToIndex["magADC[0]"],
           mainFrameDef.nameToIndex["magADC[1]"],
           mainFrameDef.nameToIndex["magADC[2]"],
         ];
-        let lastSlow = [];
-        let lastGPSHome = [];
-        let lastGPS = [];
+        let lastSlow: number[] = [];
+        let lastGPSHome: number[] = [];
+        let lastGPS: number[] = [];
 
         // Identify motor fields so they can be used to show the activity summary bar
         for (let j = 0; j < 8; j++) {
@@ -121,7 +144,7 @@ export function FlightLogIndex(logData) {
           magADC = false;
         }
 
-        let frameTime;
+        let frameTime: number | undefined;
         parser.onFrameReady = function (
           frameValid,
           frame,
@@ -139,21 +162,21 @@ export function FlightLogIndex(logData) {
               frameTime =
                 frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
               if (intraIndex.minTime === false) {
-                intraIndex.minTime = frameTime;
+                intraIndex.minTime = frameTime!;
               }
 
               if (
                 intraIndex.maxTime === false ||
-                frameTime > intraIndex.maxTime
+                frameTime! > intraIndex.maxTime
               ) {
-                intraIndex.maxTime = frameTime;
+                intraIndex.maxTime = frameTime!;
               }
 
               if (frameType === "I") {
                 // Start a new chunk on every 4th I-frame
                 if (iframeCount % 4 === 0) {
                   // Log the beginning of the new chunk
-                  intraIndex.times.push(frameTime);
+                  intraIndex.times.push(frameTime!);
                   intraIndex.offsets.push(frameOffset);
 
                   if (motorFields.length) {
@@ -184,9 +207,11 @@ export function FlightLogIndex(logData) {
                    * that came before, we have to record the initial state of various items which aren't
                    * logged anew every iteration.
                    */
-                  intraIndex.initialIMU.push(new IMU(imu));
-                  intraIndex.initialSlow.push(lastSlow);
-                  intraIndex.initialGPSHome.push(lastGPSHome);
+                  intraIndex.initialIMU.push(
+                    new (IMU as unknown as Ctor<IMU, [IMU?]>)(imu),
+                  );
+                  intraIndex.initialSlow!.push(lastSlow);
+                  intraIndex.initialGPSHome!.push(lastGPSHome);
                   intraIndex.initialGPS.push(lastGPS);
                 }
 
@@ -261,7 +286,7 @@ export function FlightLogIndex(logData) {
         }
       }
 
-      intraframeDirectories.push(intraIndex);
+      directories.push(intraIndex);
     }
   }
 
@@ -329,19 +354,19 @@ export function FlightLogIndex(logData) {
   this.getLogBeginOffset = function (index) {
     if (!logBeginOffsets) buildLogOffsetsIndex();
 
-    return logBeginOffsets[index];
+    return (logBeginOffsets as number[])[index];
   };
 
   this.getLogCount = function () {
     if (!logBeginOffsets) buildLogOffsetsIndex();
 
-    return logBeginOffsets.length - 1;
+    return (logBeginOffsets as number[]).length - 1;
   };
 
   this.getIntraframeDirectories = function () {
     if (!intraframeDirectories) buildIntraframeDirectories();
 
-    return intraframeDirectories;
+    return intraframeDirectories as IntraIndex[];
   };
 
   this.getIntraframeDirectory = function (logIndex) {

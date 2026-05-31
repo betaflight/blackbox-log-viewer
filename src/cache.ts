@@ -8,12 +8,25 @@
  *
  * Element age is determined by the time it was added or last get()'d from the cache.
  */
-export function FIFOCache(initialCapacity) {
-  //Private:
-  let queue = [],
-    items = {};
+export interface FIFOCache {
+  capacity: number;
+  // Values are heterogeneous (the cache is generic); kept loose like the original JS.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recycle(): any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  add(key: number, value: any): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get(key: number): any;
+  clear(): void;
+}
 
-  function removeFromQueue(key) {
+export function FIFOCache(this: FIFOCache, initialCapacity: number) {
+  //Private:
+  let queue: number[] = [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: Record<number, any> = {};
+
+  function removeFromQueue(key: number) {
     for (let i = 0; i < queue.length; i++) {
       if (queue[i] === key) {
         //Assume there's only one copy to remove:
@@ -35,7 +48,7 @@ export function FIFOCache(initialCapacity) {
    */
   this.recycle = function () {
     if (queue.length > this.capacity) {
-      const key = queue.shift(),
+      const key = queue.shift()!,
         result = items[key];
 
       delete items[key];
@@ -59,7 +72,7 @@ export function FIFOCache(initialCapacity) {
     items[key] = value;
 
     while (queue.length > this.capacity + 1) {
-      delete items[queue.shift()];
+      delete items[queue.shift()!];
     }
   };
 

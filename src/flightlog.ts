@@ -27,6 +27,8 @@ import type {
   FrameArray,
   FlightLogChunk,
   FlightLogEventData,
+  IntraIndex,
+  LogStats,
 } from "./flightlog_types";
 
 // Instance shape (old-style constructor function). Public methods are assigned
@@ -35,10 +37,10 @@ export interface FlightLog {
   parser: FlightLogParser;
   getMainFieldCount(): number;
   getMainFieldNames(): string[];
-  getLogError(logIndex?: number): string | false;
+  getLogError(logIndex: number): unknown;
   getStats(logIndex?: number): LogStats;
-  getMinTime(index?: number): number;
-  getMaxTime(index?: number): number;
+  getMinTime(index?: number): number | false;
+  getMaxTime(index?: number): number | false;
   getActualLoggedTime(index?: number): number;
   getSysConfig(): SysConfig;
   setSysConfig(newSysConfig: SysConfig): void;
@@ -90,7 +92,10 @@ type Frame = number[];
 // Field-index lists are an array of indices, or `false` when the source field
 // is absent. An explicit ComputeCtx (below) keeps `false` from widening.
 type FieldIndexList = number[] | false;
-type IMUInstance = InstanceType<typeof IMU>;
+type IMUInstance = IMU;
+// These deps are old-style constructor functions with a typed `this`, which TS
+// doesn't expose a construct signature for; cast to construct them.
+type Ctor<T, A extends unknown[]> = new (...args: A) => T;
 
 // Resolved field indices used to inject computed fields (see resolveFieldIndices).
 interface ComputeCtx {
@@ -109,28 +114,7 @@ interface ComputeCtx {
   disabledFields: Record<string, boolean>;
 }
 
-// Per-log stats originate from the still-JS flightlog_index; accessed both as
-// `.field[i]` (min/max) and `.frame[type].validCount`.
-interface LogStats {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-  field?: Array<{ min: number; max: number }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  frame: Record<string, any>;
-}
 
-// Per-log intraframe directory produced by FlightLogIndex (loosely typed — it
-// originates from the still-JS flightlog_index module).
-interface IframeDirectory {
-  offsets: number[];
-  times: number[];
-  stats: LogStats;
-  initialIMU: unknown[];
-  initialSlow: number[][];
-  initialGPS: number[][];
-  initialGPSHome?: number[][];
-  error?: string;
-}
 
 /*
  * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
@@ -157,24 +141,27 @@ function verifyChunkIndexes(_chunks: FlightLogChunk[]) {
 export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
   const ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/;
   let logIndex = 0;
-  const logIndexes = new FlightLogIndex(logData);
+  const logIndexes = new (FlightLogIndex as unknown as Ctor<
+    FlightLogIndex,
+    [Uint8Array | number[]]
+  >)(logData);
   // FlightLogParser is an old-style constructor function with a typed `this`,
   // which TS doesn't expose a construct signature for; cast to construct it.
   const parser = new (FlightLogParser as unknown as new (
     logData: Uint8Array | number[],
   ) => FlightLogParser)(logData);
-  let iframeDirectory: IframeDirectory;
+  let iframeDirectory: IntraIndex;
   // We cache these details so they don't have to be recomputed on every request:
   let numCells: number | false = false,
     numMotors: number | false = false;
   let fieldNames: string[] = [],
     fieldNameToIndex: Record<string, number> = {};
-  const chunkCache = new FIFOCache(2);
+  const chunkCache = new (FIFOCache as unknown as Ctor<FIFOCache, [number]>)(2);
   // Map from field indexes to smoothing window size in microseconds
   let fieldSmoothing: Record<number, number> = {},
     maxSmoothing = 0;
-  const smoothedCache = new FIFOCache(2);
-  let gpsTransform: InstanceType<typeof GPS_transform> | null = null;
+  const smoothedCache = new (FIFOCache as unknown as Ctor<FIFOCache, [number]>)(2);
+  let gpsTransform: GPS_transform | null = null;
 
   //Public fields:
   this.parser = parser;
@@ -205,9 +192,9 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
    */
   function getRawStats(logIndex?: number) {
     if (logIndex === undefined) {
-      return iframeDirectory.stats;
+      return iframeDirectory.stats!;
     } else {
-      return logIndexes.getIntraframeDirectory(logIndex).stats;
+      return logIndexes.getIntraframeDirectory(logIndex).stats!;
     }
   }
 
@@ -264,7 +251,11 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
   this.getActualLoggedTime = function (index) {
     index = index ?? logIndex;
     const directory = logIndexes.getIntraframeDirectory(index);
-    return directory.maxTime - directory.minTime - directory.unLoggedTime;
+    return (
+      (directory.maxTime as number) -
+      (directory.minTime as number) -
+      directory.unLoggedTime
+    );
   };
 
   /**
@@ -545,7 +536,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
         let mainFrameIndex = 0;
         const slowFrameLength = parser.frameDefs.S ? parser.frameDefs.S.count : 0;
         const lastSlow = parser.frameDefs.S
-          ? iframeDirectory.initialSlow[chunkIndex].slice(0)
+          ? iframeDirectory.initialSlow![chunkIndex].slice(0)
           : [];
         const lastGPSLength = parser.frameDefs.G ? parser.frameDefs.G.count - 1 : 0; // -1 since we exclude the time field
         const lastGPS = parser.frameDefs.G
@@ -655,12 +646,10 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
                 break;
               case "H": {
                 const homeAltitude = frame.length > 2 ? frame[2] / 10 : 0; // will work after BF firmware improvement
-                gpsTransform = new GPS_transform(
-                  frame[0] / 10000000,
-                  frame[1] / 10000000,
-                  homeAltitude,
-                  0.0,
-                );
+                gpsTransform = new (GPS_transform as unknown as Ctor<
+                  GPS_transform,
+                  [number, number, number, number]
+                >)(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0.0);
                 break;
               }
               case "G":
@@ -687,7 +676,10 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
         if (initialGPSHome) {
           parser.setGPSHomeHistory(initialGPSHome);
           const homeAltitude = initialGPSHome.length > 2 ? initialGPSHome[2] / 10 : 0;
-          gpsTransform = new GPS_transform(
+          gpsTransform = new (GPS_transform as unknown as Ctor<
+            GPS_transform,
+            [number, number, number, number]
+          >)(
             initialGPSHome[0] / 10000000,
             initialGPSHome[1] / 10000000,
             homeAltitude,
@@ -825,7 +817,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
       );
       destFrame[fieldIndex++] = attitude.roll;
       destFrame[fieldIndex++] = attitude.pitch;
-      destFrame[fieldIndex++] = (attitude as unknown as { heading: number }).heading;
+      destFrame[fieldIndex++] = attitude.heading;
     }
     return fieldIndex;
   };
@@ -1106,7 +1098,9 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
 
       if (!destChunk.hasAdditionalFields) {
         destChunk.hasAdditionalFields = true;
-        const chunkIMU = new IMU(sourceChunk.initialIMU);
+        const chunkIMU = new (IMU as unknown as Ctor<IMU, [IMU?]>)(
+          sourceChunk.initialIMU as IMU | undefined,
+        );
 
         for (let i = 0; i < sourceChunk.frames.length; i++) {
           computeFrameFields(sourceChunk.frames[i], destChunk.frames[i], chunkIMU, ctx);
@@ -1508,8 +1502,8 @@ export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
     } else {
       const mm = this.getMinMaxForFieldDuringTimeInterval(
         field_name,
-        this.getMinTime(),
-        this.getMaxTime(),
+        this.getMinTime() as number,
+        this.getMaxTime() as number,
       );
       if (mm !== undefined) {
         min = Math.min(mm.min, min);

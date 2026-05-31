@@ -2,7 +2,36 @@
  * This IMU code is used for attitude estimation, and is derived from legacy flight controller firmware.
  */
 
-export function IMU(copyFrom) {
+interface Vec {
+  X: number;
+  Y: number;
+  Z: number;
+}
+
+export interface Attitude {
+  roll: number;
+  pitch: number;
+  heading: number;
+}
+
+export interface IMU {
+  estimateGyro: Vec;
+  EstN: Vec;
+  estimateMag: Vec;
+  previousTime: number | false;
+  updateEstimatedAttitude(
+    gyroADC: number[],
+    accSmooth: number[],
+    currentTime: number,
+    acc_1G: number,
+    gyroScale: number,
+    _magADC?: unknown,
+  ): Attitude;
+  reset(): void;
+  copyStateFrom(that: IMU): void;
+}
+
+export function IMU(this: IMU, copyFrom?: IMU) {
   // Constants:
   const RAD = Math.PI / 180.0,
     ROLL = 0,
@@ -27,7 +56,7 @@ export function IMU(copyFrom) {
   //
   // **************************************************
 
-  function normalizeVector(src, dest) {
+  function normalizeVector(src: Vec, dest: Vec) {
     const length = Math.hypot(src.X, src.Y, src.Z);
 
     if (length !== 0) {
@@ -37,7 +66,7 @@ export function IMU(copyFrom) {
     }
   }
 
-  function rotateVector(v, delta) {
+  function rotateVector(v: Vec, delta: number[]) {
     // This does a  "proper" matrix rotation using gyro deltas without small-angle approximation
     const v_tmp = { X: v.X, Y: v.Y, Z: v.Z };
     const mat = [
@@ -74,7 +103,7 @@ export function IMU(copyFrom) {
   }
 
   // Use the craft's estimated roll/pitch to compensate for the roll/pitch of the magnetometer reading
-  function calculateHeading(vec, roll, pitch) {
+  function calculateHeading(vec: Vec, roll: number, pitch: number) {
     const cosineRoll = Math.cos(roll);
     const sineRoll = Math.sin(roll);
     const cosinePitch = Math.cos(pitch);
@@ -144,7 +173,7 @@ export function IMU(copyFrom) {
         INV_GYR_CMPF_FACTOR;
     }
 
-    const attitude = {
+    const attitude: Attitude = {
       roll: Math.atan2(this.estimateGyro.Y, this.estimateGyro.Z),
       pitch: Math.atan2(
         -this.estimateGyro.X,
@@ -153,7 +182,7 @@ export function IMU(copyFrom) {
             this.estimateGyro.Z * this.estimateGyro.Z,
         ),
       ),
-    };
+    } as Attitude;
 
     //Magnetometer heading disabled — only EstN heading used
     rotateVector(this.EstN, deltaGyroAngle);
@@ -174,7 +203,7 @@ export function IMU(copyFrom) {
   }
 }
 
-IMU.prototype.reset = function () {
+IMU.prototype.reset = function (this: IMU) {
   this.estimateGyro = { X: 0, Y: 0, Z: 0 };
   this.EstN = { X: 1, Y: 0, Z: 0 };
   this.estimateMag = { X: 0, Y: 0, Z: 0 };
@@ -182,7 +211,7 @@ IMU.prototype.reset = function () {
   this.previousTime = false;
 };
 
-IMU.prototype.copyStateFrom = function (that) {
+IMU.prototype.copyStateFrom = function (this: IMU, that: IMU) {
   this.estimateGyro = {
     X: that.estimateGyro.X,
     Y: that.estimateGyro.Y,

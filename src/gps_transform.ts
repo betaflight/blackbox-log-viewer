@@ -1,5 +1,23 @@
-export function GPS_transform(Lat0, Lon0, H0, Heading) {
-  function deg2rad(deg) {
+interface Vec3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface GPS_transform {
+  WGS_ECEF(Lat: number, Lon: number, H: number): Vec3;
+  ECEF_BS(pos: Vec3): Vec3;
+  WGS_BS(Lat: number, Lon: number, H: number): Vec3;
+}
+
+export function GPS_transform(
+  this: GPS_transform,
+  Lat0: number,
+  Lon0: number,
+  H0: number,
+  Heading: number,
+) {
+  function deg2rad(deg: number) {
     return (deg * Math.PI) / 180.0;
   }
 

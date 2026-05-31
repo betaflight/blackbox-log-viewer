@@ -73,6 +73,40 @@ export interface FlightLogEventData {
 export type FrameArray = number[];
 
 /**
+ * Per-log stats. Originates from the still-JS layers and is accessed both as
+ * `.field[i]` (min/max) and `.frame[type].validCount`, so it's kept loose.
+ */
+export interface LogStats {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  field?: Array<{ min: number; max: number }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  frame: Record<string, any>;
+}
+
+/**
+ * The intraframe directory FlightLogIndex builds per log, consumed by FlightLog
+ * for seeking and the activity summary.
+ */
+export interface IntraIndex {
+  times: number[];
+  offsets: number[];
+  avgThrottle: number[];
+  maxRC: number[];
+  maxMotorDiff: number[];
+  initialIMU: unknown[];
+  initialSlow?: number[][];
+  initialGPSHome?: number[][];
+  initialGPS: number[][];
+  hasEvent: boolean[];
+  minTime: number | false;
+  maxTime: number | false;
+  unLoggedTime: number;
+  error?: unknown;
+  stats?: LogStats;
+}
+
+/**
  * A cached block of decoded, time-aligned frames (with computed fields injected
  * on demand). Several fields are added/removed dynamically during processing.
  */
