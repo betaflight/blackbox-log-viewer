@@ -10,11 +10,25 @@ import {
   signExtend2Bit,
 } from "./tools.js";
 
+// Decoders for advanced formats, mixed into ArrayDataStream via the prototype.
+declare module "./datastream.js" {
+  interface ArrayDataStream {
+    readTag2_3S32(values: number[]): void;
+    readTag2_3SVariable(values: number[]): void;
+    readTag8_4S16_v1(values: number[]): void;
+    readTag8_4S16_v2(values: number[]): void;
+    readTag8_8SVB(values: number[], valueCount: number): void;
+  }
+}
+
 /**
  * Extend ArrayDataStream with decoders for advanced formats.
  */
-ArrayDataStream.prototype.readTag2_3S32 = function (values) {
-  let leadByte, byte1, byte2, byte3, byte4, i;
+ArrayDataStream.prototype.readTag2_3S32 = function (
+  this: ArrayDataStream,
+  values: number[],
+): void {
+  let leadByte: number, byte1: number, byte2: number, byte3: number, byte4: number, i: number;
 
   leadByte = this.readByte();
 
@@ -86,8 +100,18 @@ ArrayDataStream.prototype.readTag2_3S32 = function (values) {
   }
 };
 
-ArrayDataStream.prototype.readTag2_3SVariable = function (values) {
-  let leadByte, leadByte2, leadByte3, byte1, byte2, byte3, byte4, i;
+ArrayDataStream.prototype.readTag2_3SVariable = function (
+  this: ArrayDataStream,
+  values: number[],
+): void {
+  let leadByte: number,
+    leadByte2: number,
+    leadByte3: number,
+    byte1: number,
+    byte2: number,
+    byte3: number,
+    byte4: number,
+    i: number;
 
   leadByte = this.readByte();
 
@@ -165,12 +189,15 @@ ArrayDataStream.prototype.readTag2_3SVariable = function (values) {
   }
 };
 
-ArrayDataStream.prototype.readTag8_4S16_v1 = function (values) {
+ArrayDataStream.prototype.readTag8_4S16_v1 = function (
+  this: ArrayDataStream,
+  values: number[],
+): void {
   const FIELD_ZERO = 0,
     FIELD_4BIT = 1,
     FIELD_8BIT = 2,
     FIELD_16BIT = 3;
-  let selector, combinedChar, char1, char2, i;
+  let selector: number, combinedChar: number, char1: number, char2: number, i: number;
 
   selector = this.readByte();
 
@@ -205,12 +232,20 @@ ArrayDataStream.prototype.readTag8_4S16_v1 = function (values) {
   }
 };
 
-ArrayDataStream.prototype.readTag8_4S16_v2 = function (values) {
+ArrayDataStream.prototype.readTag8_4S16_v2 = function (
+  this: ArrayDataStream,
+  values: number[],
+): void {
   const FIELD_ZERO = 0,
     FIELD_4BIT = 1,
     FIELD_8BIT = 2,
     FIELD_16BIT = 3;
-  let selector, i, char1, char2, buffer, nibbleIndex;
+  let selector: number,
+    i: number,
+    char1: number,
+    char2: number,
+    buffer = 0,
+    nibbleIndex: number;
 
   selector = this.readByte();
 
@@ -270,8 +305,12 @@ ArrayDataStream.prototype.readTag8_4S16_v2 = function (values) {
   }
 };
 
-ArrayDataStream.prototype.readTag8_8SVB = function (values, valueCount) {
-  let i, header;
+ArrayDataStream.prototype.readTag8_8SVB = function (
+  this: ArrayDataStream,
+  values: number[],
+  valueCount: number,
+): void {
+  let i: number, header: number;
 
   if (valueCount === 1) {
     values[0] = this.readSignedVB();
