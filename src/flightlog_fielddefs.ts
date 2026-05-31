@@ -1,9 +1,9 @@
 import semver from "semver";
 
-function makeReadOnly(x) {
+function makeReadOnly<T>(x: T): T {
   // Make read-only if browser supports it:
   if (Object.freeze) {
-    return Object.freeze(x);
+    return Object.freeze(x) as T;
   }
 
   // Otherwise a no-op
@@ -50,7 +50,7 @@ export const AXIS = makeReadOnly({
   YAW: 2,
 });
 
-export let FLIGHT_LOG_FLIGHT_MODE_NAME = [];
+export let FLIGHT_LOG_FLIGHT_MODE_NAME: string[] = [];
 
 export const FLIGHT_LOG_FLIGHT_MODE_NAME_PRE_3_3 = makeReadOnly([
   "ARM",
@@ -265,7 +265,7 @@ export const RC_SMOOTHING_DEBUG_AXIS = makeReadOnly([
 
 export const FILTER_TYPE = makeReadOnly(["PT1", "BIQUAD", "PT2", "PT3"]);
 
-export let DEBUG_MODE = [];
+export let DEBUG_MODE: string[] = [];
 
 export const DEBUG_MODE_COMPLETE = makeReadOnly([
   "NONE",
@@ -386,7 +386,7 @@ export const GYRO_HARDWARE_LPF = makeReadOnly([
 
 export const GYRO_32KHZ_HARDWARE_LPF = makeReadOnly(["NORMAL", "EXPERIMENTAL"]);
 
-export let ACC_HARDWARE = [];
+export let ACC_HARDWARE: string[] = [];
 
 const ACC_HARDWARE_COMPLETE = makeReadOnly([
   "AUTO",
@@ -426,7 +426,7 @@ export const BARO_HARDWARE = makeReadOnly([
   "2SMPB_02B",
 ]);
 
-export let MAG_HARDWARE = [];
+export let MAG_HARDWARE: string[] = [];
 
 const MAG_HARDWARE_COMPLETE = makeReadOnly([
   "AUTO",
@@ -511,7 +511,10 @@ export const SIMPLIFIED_PIDS_MODE = makeReadOnly([
 
 export const THROTTLE_LIMIT_TYPE = makeReadOnly(["OFF", "SCALE", "CLIP"]);
 
-export function adjustFieldDefsList(firmwareType, firmwareVersion) {
+export function adjustFieldDefsList(
+  firmwareType: number,
+  firmwareVersion: string,
+): void {
   if (
     firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
     semver.gte(firmwareVersion, "3.3.0")
