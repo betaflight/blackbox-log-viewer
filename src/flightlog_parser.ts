@@ -20,8 +20,52 @@ import {
   stringHasComma,
   parseCommaSeparatedString,
 } from "./tools";
+import type {
+  SysConfig,
+  FrameDef,
+  FrameDefs,
+  FrameArray,
+  Stats,
+  OnFrameReady,
+  FlightLogEventData,
+} from "./flightlog_types";
 
-export function FlightLogParser(logData) {
+// Instance shape (old-style constructor function). Members are assigned onto
+// `this` in the constructor; the constants/resetStats live on the prototype.
+export interface FlightLogParser {
+  frameDefs: FrameDefs;
+  sysConfig: SysConfig;
+  onFrameReady: OnFrameReady | null;
+  stats: Stats;
+  parseHeader(startOffset?: number, endOffset?: number): void;
+  parseLogData(raw: boolean, startOffset?: number, endOffset?: number): void;
+  resetDataState(): void;
+  resetAllState(): void;
+  setGPSHomeHistory(newGPSHome: number[]): void;
+  resetStats(): void;
+  FLIGHT_LOG_START_MARKER: number[];
+  FLIGHT_LOG_FIELD_UNSIGNED: number;
+  FLIGHT_LOG_FIELD_SIGNED: number;
+  FLIGHT_LOG_FIELD_INDEX_ITERATION: number;
+  FLIGHT_LOG_FIELD_INDEX_TIME: number;
+}
+
+// Local helper aliases used throughout the parser.
+type HeaderHandler = (fn: string, fv: string) => void;
+type FrameValues = number[];
+type CompleteFn = (
+  frameType: string,
+  frameStart: number,
+  frameEnd: number,
+  raw: boolean,
+) => boolean;
+interface FrameType {
+  marker: string;
+  parse: (raw: boolean) => void;
+  complete?: CompleteFn;
+}
+
+export function FlightLogParser(this: FlightLogParser, logData: Uint8Array | number[]) {
   //Private constants:
   const FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
     //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
@@ -161,7 +205,7 @@ export function FlightLogParser(logData) {
     ];
 
   //Private variables:
-  let dataVersion;
+  let dataVersion: number;
   const defaultSysConfig = {
       frameIntervalI: 32,
       frameIntervalPNum: 1,
@@ -357,7 +401,7 @@ export function FlightLogParser(logData) {
   // Translation of the field values name to the sysConfig var where it must be stored
   // on the left are field names from the latest versions of blackbox.c
   // on the right are older field names that must exist in the list above
-  const translationValues = {
+  const translationValues: Record<string, string> = {
       acc_limit_yaw: "yawRateAccelLimit",
       accel_limit: "rateAccelLimit",
       acc_limit: "rateAccelLimit",
@@ -453,23 +497,23 @@ export function FlightLogParser(logData) {
     };
   // frameTypes and stream are initialized at the end of the constructor (after function definitions)
   // Blackbox state:
-  let mainHistoryRing;
+  let mainHistoryRing: FrameArray[];
   /* Points into blackboxHistoryRing to give us a circular buffer.
    *
    * 0 - space to decode new frames into, 1 - previous frame, 2 - previous previous frame
    *
    * Previous frame pointers are null when no valid history exists of that age.
    */
-  const mainHistory = [null, null, null];
+  const mainHistory: Array<FrameArray | null> = [null, null, null];
   let mainStreamIsValid = false;
-  let gpsHomeHistory = new Array(2); // 0 - space to decode new frames into, 1 - previous frame
+  let gpsHomeHistory: FrameArray[] = new Array(2); // 0 - space to decode new frames into, 1 - previous frame
   let gpsHomeIsValid = false;
   //Because these events don't depend on previous events, we don't keep copies of the old state, just the current one:
-  let lastEvent, lastGPS, lastSlow;
+  let lastEvent: FlightLogEventData | null, lastGPS: FrameArray, lastSlow: FrameArray;
   // How many intentionally un-logged frames did we skip over before we decoded the current frame?
-  let lastSkippedFrames;
+  let lastSkippedFrames: number;
   // Details about the last main frame that was successfully parsed
-  let lastMainFrameIteration, lastMainFrameTime;
+  let lastMainFrameIteration: number, lastMainFrameTime: number;
 
   //Public fields:
 
@@ -488,8 +532,8 @@ export function FlightLogParser(logData) {
    */
   this.onFrameReady = null;
 
-  function mapFieldNamesToIndex(fieldNames) {
-    const result = {};
+  function mapFieldNamesToIndex(fieldNames: string[]) {
+    const result: Record<string, number> = {};
 
     for (let i = 0; i < fieldNames.length; i++) {
       result[fieldNames[i]] = i;
@@ -501,7 +545,7 @@ export function FlightLogParser(logData) {
   /**
    * Translates old field names in the given array to their modern equivalents and return the passed array.
    */
-  function translateLegacyFieldNames(names) {
+  function translateLegacyFieldNames(names: string[]) {
     for (let i = 0; i < names.length; i++) {
       let matches;
 
@@ -519,7 +563,7 @@ export function FlightLogParser(logData) {
    * fieldName Name of the field to translate
    * returns The equivalent in the sysConfig object or the fieldName if not found
    */
-  function translateFieldName(fieldName) {
+  function translateFieldName(fieldName: string) {
     const translation = translationValues[fieldName];
     if (translation !== undefined) {
       return translation;
@@ -634,10 +678,10 @@ export function FlightLogParser(logData) {
   /**
    * Parse "Firmware revision" header value and set firmware type/version in sysConfig
    */
-  const parseFirmwareRevision = (fieldValue) => {
+  const parseFirmwareRevision = (fieldValue: string) => {
     // Extract the firmware revision in case of Betaflight/Raceflight/Cleanflight 2.x/Other
     const fwMatches = /((?:Beta|Race|Clean|Base|Butter)flight)\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(fieldValue);
-    const FIRMWARE_NAME_MAP = {
+    const FIRMWARE_NAME_MAP: Record<string, number> = {
       betaflight: FIRMWARE_TYPE_BETAFLIGHT,
       raceflight: FIRMWARE_TYPE_BETAFLIGHT,
       butterflight: FIRMWARE_TYPE_BETAFLIGHT,
@@ -675,7 +719,7 @@ export function FlightLogParser(logData) {
   /**
    * Parse "Field X ..." header and update frameDefs
    */
-  const parseFieldDefinition = (fieldName, fieldValue) => {
+  const parseFieldDefinition = (fieldName: string, fieldValue: string) => {
     const matches = fieldName.match(/^Field (.) (.+)$/);
     if (!matches) {
       return false;
@@ -697,7 +741,7 @@ export function FlightLogParser(logData) {
 
     const frameDef = this.frameDefs[frameName];
 
-    const frameInfoHandlers = {
+    const frameInfoHandlers: Record<string, () => void> = {
       predictor: () => { frameDef.predictor = parseCommaSeparatedString(fieldValue); },
       encoding: () => { frameDef.encoding = parseCommaSeparatedString(fieldValue); },
       name: () => {
@@ -724,19 +768,19 @@ export function FlightLogParser(logData) {
   };
 
   // Unified dispatch map for all header fields (replaces Set lookups + switch)
-  const parseIntHandler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10); };
-  const csvHandler = (fn, fv) => { this.sysConfig[fn] = parseCommaSeparatedString(fv); };
-  const versionCondIntHandler = (fn, fv) => {
+  const parseIntHandler: HeaderHandler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10); };
+  const csvHandler: HeaderHandler = (fn, fv) => { this.sysConfig[fn] = parseCommaSeparatedString(fv); };
+  const versionCondIntHandler: HeaderHandler = (fn, fv) => {
     this.sysConfig[fn] = isModernFilterFirmware()
       ? Number.parseInt(fv, 10)
       : Number.parseInt(fv, 10) / 100;
   };
-  const versionCondCsvHandler = (fn, fv) => {
+  const versionCondCsvHandler: HeaderHandler = (fn, fv) => {
     this.sysConfig[fn] = isModernFilterFirmware()
       ? parseCommaSeparatedString(fv)
       : Number.parseInt(fv, 10) / 100;
   };
-  const accelLimitHandler = (fn, fv) => {
+  const accelLimitHandler: HeaderHandler = (fn, fv) => {
     const isBfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
       semver.gte(this.sysConfig.firmwareVersion, "3.1.0");
     const isCfModern = this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
@@ -745,9 +789,9 @@ export function FlightLogParser(logData) {
       ? Number.parseInt(fv, 10) / 1000
       : Number.parseInt(fv, 10);
   };
-  const divide100Handler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10) / 100; };
-  const stringHandler = (fn, fv) => { this.sysConfig[fn] = fv; };
-  const rcExpoRateHandler = (fn, fv) => {
+  const divide100Handler: HeaderHandler = (fn, fv) => { this.sysConfig[fn] = Number.parseInt(fv, 10) / 100; };
+  const stringHandler: HeaderHandler = (fn, fv) => { this.sysConfig[fn] = fv; };
+  const rcExpoRateHandler: HeaderHandler = (fn, fv) => {
     if (stringHasComma(fv)) {
       this.sysConfig[fn] = parseCommaSeparatedString(fv);
     } else {
@@ -755,18 +799,18 @@ export function FlightLogParser(logData) {
       this.sysConfig[fn][1] = Number.parseInt(fv, 10);
     }
   };
-  const pidArrayPushHandler = (_fn, fv) => {
+  const pidArrayPushHandler: HeaderHandler = (_fn, fv) => {
     const values = parseCommaSeparatedString(fv);
     this.sysConfig["rollPID"].push(values[0]);
     this.sysConfig["pitchPID"].push(values[1]);
     this.sysConfig["yawPID"].push(values[2]);
   };
-  const currentMeterHandler = (_fn, fv) => {
+  const currentMeterHandler: HeaderHandler = (_fn, fv) => {
     const params = parseCommaSeparatedString(fv);
     this.sysConfig.currentMeterOffset = params[0];
     this.sysConfig.currentMeterScale = params[1];
   };
-  const gyroScaleHandler = (_fn, fv) => {
+  const gyroScaleHandler: HeaderHandler = (_fn, fv) => {
     this.sysConfig.gyroScale = hexToFloat(fv);
     /* Legacy firmware uses a gyroScale that'll give radians per microsecond as output, whereas modern firmware produces degrees
      * per second and leaves the conversion to radians per us to the IMU. Let's convert the scale to
@@ -779,9 +823,9 @@ export function FlightLogParser(logData) {
       this.sysConfig.gyroScale *= (Math.PI / 180) * 0.000001;
     }
   };
-  const noopHandler = () => {};
+  const noopHandler: HeaderHandler = () => {};
 
-  const HEADER_HANDLERS = {};
+  const HEADER_HANDLERS: Record<string, HeaderHandler> = {};
   for (const field of PARSE_INT_FIELDS) { HEADER_HANDLERS[field] = parseIntHandler; }
   for (const field of CSV_FIELDS) { HEADER_HANDLERS[field] = csvHandler; }
   for (const field of VERSION_CONDITIONAL_INT_FIELDS) { HEADER_HANDLERS[field] = versionCondIntHandler; }
@@ -858,7 +902,7 @@ export function FlightLogParser(logData) {
 
   const parseHeaderLine = () => {
     const COLON = ":".codePointAt(0);
-    let separatorPos = false;
+    let separatorPos: number | false = false;
 
     if (stream.peekChar() !== " ") {
       return;
@@ -890,10 +934,10 @@ export function FlightLogParser(logData) {
     const lineEnd = stream.pos;
 
     const fieldName = translateFieldName(
-      asciiArrayToString(stream.data.subarray(lineStart, separatorPos)),
+      asciiArrayToString((stream.data as Uint8Array).subarray(lineStart, separatorPos)),
     );
     const fieldValue = asciiArrayToString(
-      stream.data.subarray(separatorPos + 1, lineEnd),
+      (stream.data as Uint8Array).subarray(separatorPos + 1, lineEnd),
     );
 
     const handler = HEADER_HANDLERS[fieldName];
@@ -920,7 +964,7 @@ export function FlightLogParser(logData) {
   /**
    * Use data from the given frame to update field statistics for the given frame type.
    */
-  const updateFieldStatistics = (frameType, frame) => {
+  const updateFieldStatistics = (frameType: string, frame: FrameArray) => {
     const fieldStats = this.stats.frame[frameType].field;
 
     for (let i = 0; i < frame.length; i++) {
@@ -936,7 +980,7 @@ export function FlightLogParser(logData) {
     }
   };
 
-  const completeIntraframe = (frameType, frameStart, frameEnd, raw) => {
+  const completeIntraframe: CompleteFn = (frameType, frameStart, frameEnd, raw) => {
     let acceptFrame = true;
 
     // Do we have a previous frame to use as a reference to validate field values against?
@@ -945,37 +989,37 @@ export function FlightLogParser(logData) {
        * Check that iteration count and time didn't move backwards, and didn't move forward too much.
        */
       acceptFrame =
-        mainHistory[0][
+        mainHistory[0]![
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
         ] >= lastMainFrameIteration &&
-        mainHistory[0][
+        mainHistory[0]![
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
         ] <
           lastMainFrameIteration + MAXIMUM_ITERATION_JUMP_BETWEEN_FRAMES &&
-        mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >=
+        mainHistory[0]![FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >=
           lastMainFrameTime &&
-        mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] <
+        mainHistory[0]![FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] <
           lastMainFrameTime + MAXIMUM_TIME_JUMP_BETWEEN_FRAMES;
     }
 
     if (acceptFrame) {
       this.stats.intentionallyAbsentIterations +=
         countIntentionallySkippedFramesTo(
-          mainHistory[0][
+          mainHistory[0]![
             FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
           ],
         );
 
       lastMainFrameIteration =
-        mainHistory[0][
+        mainHistory[0]![
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
         ];
       lastMainFrameTime =
-        mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+        mainHistory[0]![FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
 
       mainStreamIsValid = true;
 
-      updateFieldStatistics(frameType, mainHistory[0]);
+      updateFieldStatistics(frameType, mainHistory[0]!);
     } else {
       invalidateMainStream();
     }
@@ -1008,7 +1052,7 @@ export function FlightLogParser(logData) {
   /**
    * Should a frame with the given index exist in this log (based on the user's selection of sampling rates)?
    */
-  const shouldHaveFrame = (frameIndex) => {
+  const shouldHaveFrame = (frameIndex: number) => {
     return (
       ((frameIndex % this.sysConfig.frameIntervalI) +
         this.sysConfig.frameIntervalPNum -
@@ -1027,17 +1071,17 @@ export function FlightLogParser(logData) {
    * skippedFrames - Set to the number of field iterations that were skipped over by rate settings since the last frame.
    */
   function parseFrame(
-    frameDef,
-    current,
-    previous,
-    previous2,
-    skippedFrames,
-    raw,
+    frameDef: FrameDef,
+    current: FrameArray,
+    previous: FrameArray | null,
+    previous2: FrameArray | null,
+    skippedFrames: number,
+    raw: boolean,
   ) {
     const predictor = frameDef.predictor,
       encoding = frameDef.encoding,
-      values = new Array(8);
-    let i, j, groupCount;
+      values: FrameValues = new Array(8);
+    let i, j: number, groupCount: number;
 
     i = 0;
     while (i < frameDef.count) {
@@ -1152,14 +1196,14 @@ export function FlightLogParser(logData) {
     }
   }
 
-  const parseIntraframe = (raw) => {
+  const parseIntraframe = (raw: boolean) => {
     const current = mainHistory[0],
       previous = mainHistory[1];
 
-    parseFrame(this.frameDefs.I, current, previous, null, 0, raw);
+    parseFrame(this.frameDefs.I, current!, previous, null, 0, raw);
   };
 
-  const completeGPSHomeFrame = (frameType, frameStart, frameEnd, _raw) => {
+  const completeGPSHomeFrame: CompleteFn = (frameType, frameStart, frameEnd, _raw) => {
     updateFieldStatistics(frameType, gpsHomeHistory[0]);
 
     this.setGPSHomeHistory(gpsHomeHistory[0]);
@@ -1177,7 +1221,7 @@ export function FlightLogParser(logData) {
     return true;
   };
 
-  const completeGPSFrame = (frameType, frameStart, frameEnd, _raw) => {
+  const completeGPSFrame: CompleteFn = (frameType, frameStart, frameEnd, _raw) => {
     if (gpsHomeIsValid) {
       updateFieldStatistics(frameType, lastGPS);
     }
@@ -1195,7 +1239,7 @@ export function FlightLogParser(logData) {
     return gpsHomeIsValid;
   };
 
-  const completeSlowFrame = (frameType, frameStart, frameEnd, _raw) => {
+  const completeSlowFrame: CompleteFn = (frameType, frameStart, frameEnd, _raw) => {
     updateFieldStatistics(frameType, lastSlow);
 
     if (this.onFrameReady) {
@@ -1210,14 +1254,14 @@ export function FlightLogParser(logData) {
     return true;
   };
 
-  const completeInterframe = (frameType, frameStart, frameEnd, raw) => {
+  const completeInterframe: CompleteFn = (frameType, frameStart, frameEnd, raw) => {
     // Reject this frame if the time or iteration count jumped too far
     if (
       mainStreamIsValid &&
       !raw &&
-      (mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >
+      (mainHistory[0]![FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME] >
         lastMainFrameTime + MAXIMUM_TIME_JUMP_BETWEEN_FRAMES ||
-        mainHistory[0][
+        mainHistory[0]![
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
         ] >
           lastMainFrameIteration + MAXIMUM_ITERATION_JUMP_BETWEEN_FRAMES)
@@ -1227,15 +1271,15 @@ export function FlightLogParser(logData) {
 
     if (mainStreamIsValid) {
       lastMainFrameIteration =
-        mainHistory[0][
+        mainHistory[0]![
           FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
         ];
       lastMainFrameTime =
-        mainHistory[0][FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
+        mainHistory[0]![FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
 
       this.stats.intentionallyAbsentIterations += lastSkippedFrames;
 
-      updateFieldStatistics(frameType, mainHistory[0]);
+      updateFieldStatistics(frameType, mainHistory[0]!);
     }
 
     //Receiving a P frame can't resynchronise the stream so it doesn't set mainStreamIsValid to true
@@ -1270,12 +1314,12 @@ export function FlightLogParser(logData) {
    * Take the raw value for a a field, apply the prediction that is configured for it, and return it.
    */
   const applyPrediction = (
-    fieldIndex,
-    predictor,
-    value,
-    current,
-    previous,
-    previous2,
+    fieldIndex: number,
+    predictor: number,
+    value: number,
+    current: FrameArray,
+    previous: FrameArray | null,
+    previous2: FrameArray | null,
   ) => {
     switch (predictor) {
       case FLIGHT_LOG_FIELD_PREDICTOR_0:
@@ -1319,13 +1363,13 @@ export function FlightLogParser(logData) {
       case FLIGHT_LOG_FIELD_PREDICTOR_STRAIGHT_LINE:
         if (!previous) break;
 
-        value += 2 * previous[fieldIndex] - previous2[fieldIndex];
+        value += 2 * previous[fieldIndex] - previous2![fieldIndex];
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_AVERAGE_2:
         if (!previous) break;
 
         //Round toward zero like C would do for integer division:
-        value += ~~((previous[fieldIndex] + previous2[fieldIndex]) / 2);
+        value += ~~((previous[fieldIndex] + previous2![fieldIndex]) / 2);
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_HOME_COORD:
         if (
@@ -1387,7 +1431,7 @@ export function FlightLogParser(logData) {
    * Based on the log sampling rate, work out how many frames would have been skipped after the last frame that was
    * parsed until we get to the iteration with the given index.
    */
-  function countIntentionallySkippedFramesTo(targetIteration) {
+  function countIntentionallySkippedFramesTo(targetIteration: number) {
     let count = 0,
       frameIndex;
 
@@ -1409,7 +1453,7 @@ export function FlightLogParser(logData) {
     return count;
   }
 
-  const parseInterframe = (raw) => {
+  const parseInterframe = (raw: boolean) => {
     const current = mainHistory[0],
       previous = mainHistory[1],
       previous2 = mainHistory[2];
@@ -1418,7 +1462,7 @@ export function FlightLogParser(logData) {
 
     parseFrame(
       this.frameDefs.P,
-      current,
+      current!,
       previous,
       previous2,
       lastSkippedFrames,
@@ -1426,26 +1470,26 @@ export function FlightLogParser(logData) {
     );
   };
 
-  const parseGPSFrame = (raw) => {
+  const parseGPSFrame = (raw: boolean) => {
     // Only parse a GPS frame if we have GPS header definitions
     if (this.frameDefs.G) {
       parseFrame(this.frameDefs.G, lastGPS, null, null, 0, raw);
     }
   };
 
-  const parseGPSHomeFrame = (raw) => {
+  const parseGPSHomeFrame = (raw: boolean) => {
     if (this.frameDefs.H) {
       parseFrame(this.frameDefs.H, gpsHomeHistory[0], null, null, 0, raw);
     }
   };
 
-  const parseSlowFrame = (raw) => {
+  const parseSlowFrame = (raw: boolean) => {
     if (this.frameDefs.S) {
       parseFrame(this.frameDefs.S, lastSlow, null, null, 0, raw);
     }
   };
 
-  const completeEventFrame = (frameType, frameStart, frameEnd, _raw) => {
+  const completeEventFrame: CompleteFn = (frameType, frameStart, frameEnd, _raw) => {
     if (lastEvent) {
       switch (lastEvent.event) {
         case FlightLogEvent.LOGGING_RESUME:
@@ -1474,7 +1518,7 @@ export function FlightLogParser(logData) {
     return false;
   };
 
-  const TWITCH_TEST_NAMES = {
+  const TWITCH_TEST_NAMES: Record<number, string> = {
     1: "Response Time->",
     2: "Half Setpoint Time->",
     3: "Setpoint Time->",
@@ -1482,7 +1526,7 @@ export function FlightLogParser(logData) {
     5: "Initial Setpoint->",
   };
 
-  function parseInflightAdjustment(data) {
+  function parseInflightAdjustment(data: FlightLogEventData["data"]) {
     const tmp = stream.readU8();
     data.name = "Unknown";
     data.func = tmp & 127;
@@ -1498,7 +1542,7 @@ export function FlightLogParser(logData) {
     }
   }
 
-  function parseEventFrame(_raw) {
+  function parseEventFrame(_raw: boolean) {
     const END_OF_LOG_MESSAGE = "End of log\0",
       eventType = stream.readByte();
 
@@ -1586,7 +1630,7 @@ export function FlightLogParser(logData) {
     }
   }
 
-  function getFrameType(command) {
+  function getFrameType(command: string | number) {
     return frameTypes[command];
   }
 
@@ -1620,7 +1664,7 @@ export function FlightLogParser(logData) {
   };
 
   // Check that the given frame definition contains some fields and the right number of predictors & encodings to match
-  const isFrameDefComplete = (frameDef) => {
+  const isFrameDefComplete = (frameDef: FrameDef | undefined) => {
     return (
       frameDef &&
       frameDef.count > 0 &&
@@ -1859,7 +1903,7 @@ export function FlightLogParser(logData) {
     return true;
   };
 
-  const frameTypes = {
+  const frameTypes: Record<string, FrameType> = {
     I: { marker: "I", parse: parseIntraframe, complete: completeIntraframe },
     P: { marker: "P", parse: parseInterframe, complete: completeInterframe },
     G: { marker: "G", parse: parseGPSFrame, complete: completeGPSFrame },
