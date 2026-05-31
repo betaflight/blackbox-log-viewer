@@ -1,0 +1,181 @@
+{
+  "logByteLength": 377,
+  "sysConfig": {
+    "firmwareType": 3,
+    "firmwareVersion": "4.5.0",
+    "firmware": "4.5",
+    "firmwarePatch": 0,
+    "frameIntervalI": 1,
+    "frameIntervalPNum": 1,
+    "frameIntervalPDenom": 1
+  },
+  "frameDefs": {
+    "I": {
+      "name": [
+        "loopIteration",
+        "time",
+        "axisP[0]",
+        "motor[0]"
+      ],
+      "count": 4,
+      "signed": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "predictor": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "encoding": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "nameToIndex": {
+        "loopIteration": 0,
+        "time": 1,
+        "axisP[0]": 2,
+        "motor[0]": 3
+      }
+    },
+    "P": {
+      "name": [
+        "loopIteration",
+        "time",
+        "axisP[0]",
+        "motor[0]"
+      ],
+      "count": 4,
+      "signed": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "predictor": [
+        6,
+        1,
+        1,
+        1
+      ],
+      "encoding": [
+        9,
+        0,
+        0,
+        0
+      ],
+      "nameToIndex": {
+        "loopIteration": 0,
+        "time": 1,
+        "axisP[0]": 2,
+        "motor[0]": 3
+      }
+    }
+  },
+  "stats": {
+    "totalBytes": 22,
+    "totalCorruptFrames": 0,
+    "intentionallyAbsentIterations": 0,
+    "frame": {
+      "I": {
+        "bytes": 8,
+        "validCount": 1,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 0,
+            "min": 0
+          },
+          {
+            "max": 1000,
+            "min": 1000
+          },
+          {
+            "max": -5,
+            "min": -5
+          },
+          {
+            "max": 1100,
+            "min": 1100
+          }
+        ]
+      },
+      "P": {
+        "bytes": 17,
+        "validCount": 3,
+        "corruptCount": 0,
+        "desyncCount": 0,
+        "field": [
+          {
+            "max": 3,
+            "min": 1
+          },
+          {
+            "max": 4000,
+            "min": 2000
+          },
+          {
+            "max": -2,
+            "min": -10
+          },
+          {
+            "max": 1131,
+            "min": 1106
+          }
+        ]
+      }
+    }
+  },
+  "frames": [
+    {
+      "valid": true,
+      "frameType": "I",
+      "frameLength": 8,
+      "frame": [
+        0,
+        1000,
+        -5,
+        1100
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "P",
+      "frameLength": 6,
+      "frame": [
+        1,
+        2000,
+        -2,
+        1110
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "P",
+      "frameLength": 6,
+      "frame": [
+        2,
+        3001,
+        -10,
+        1106
+      ]
+    },
+    {
+      "valid": true,
+      "frameType": "P",
+      "frameLength": 5,
+      "frame": [
+        3,
+        4000,
+        -10,
+        1131
+      ]
+    }
+  ]
+}
