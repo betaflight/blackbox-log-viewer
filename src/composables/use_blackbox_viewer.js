@@ -38,19 +38,26 @@ function createNewBlackboxWindow(_fileToOpen) {
   globalThis.open(globalThis.location.href, "_blank").focus();
 }
 
-// Singleton that owns the renderer instances and imperative operations.
-// Stores hold reactive state; this composable provides the actions that drive
-// the renderers. Initialized once at app bootstrap (main.js); components call
-// it to reach the operations (collapsing the legacy callback bridge).
-let viewerInstance = null;
+// Imperative operations exposed to components (the legacy callback bridge,
+// collapsed). Shared by reference and populated by initBlackboxViewer().
+const ops = {};
+let initialized = false;
 
+// Components call this in setup() to reach the operations. It does NOT trigger
+// initialization — it just hands back the shared `ops` object (populated once
+// the viewer is initialized at bootstrap).
 export function useBlackboxViewer() {
-  if (viewerInstance) {
-    return viewerInstance;
-  }
+  return ops;
+}
 
-  // Operations exposed to components (instead of via store callback refs).
-  const ops = {};
+// Owns the renderer instances and wires the operations. Must run AFTER the Vue
+// app has mounted, so Vue-rendered canvases (e.g. #analyserCanvas, rendered by
+// SpectrumAnalyser.vue) exist. Called once from main.js.
+export function initBlackboxViewer() {
+  if (initialized) {
+    return ops;
+  }
+  initialized = true;
 
   function supportsRequiredAPIs() {
     return (
@@ -714,6 +721,5 @@ export function useBlackboxViewer() {
       }
     },
   });
-  viewerInstance = ops;
   return ops;
 }
