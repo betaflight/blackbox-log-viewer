@@ -17,20 +17,53 @@ import { useGraphStore } from "./stores/graph.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { ThemeColors } from "./theme_colors";
 
+// flightLog, the renderer sub-objects (sticks/craft/analyser/lapTimer), the
+// per-field graph config entries and the options bag are free-form structures
+// from the still-JS layer; access stays loose, consistent with the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). Lives in type space; the value
+// `FlightLogGrapher` below is the constructor function.
+export interface FlightLogGrapher {
+  onSeek: ((delta: number) => void) | null;
+  getAnalyser(): Loose;
+  resize(width: number, height: number): void;
+  render(windowCenterTimeMicros: number): void;
+  refreshGraphConfig(): void;
+  initializeCraftModel(): void;
+  destroy(): void;
+  refreshTheme(): void;
+  setGraphZoom(zoom: number): void;
+  setInTime(time: number): void;
+  setOutTime(time: number): void;
+  getWindowWidthTime(): number;
+  getWindowCenterTime(): number;
+  getMarkedInTime(): number | false;
+  getMarkedOutTime(): number | false;
+  setDrawSticks(state: boolean): void;
+  setDrawAnalyser(state: boolean, ctrlKey?: boolean): void;
+  hasMultiSpectrumAnalyser(): boolean;
+  setAnalyser(state: boolean): void;
+  refreshOptions(newSettings: Loose): void;
+  refreshLogo(): void;
+}
+
 export function FlightLogGrapher(
-  flightLog,
-  graphConfig,
-  canvas,
-  stickCanvas,
-  craftCanvas,
-  analyserCanvas,
-  options,
+  this: FlightLogGrapher,
+  flightLog: Loose,
+  graphConfig: GraphConfig,
+  canvas: HTMLCanvasElement,
+  stickCanvas: HTMLCanvasElement,
+  craftCanvas: HTMLCanvasElement,
+  analyserCanvas: HTMLCanvasElement,
+  options: Loose,
 ) {
   const graphStore = useGraphStore();
   const workspaceStore = useWorkspaceStore();
 
   const DEFAULT_FONT_FACE = "Verdana, Arial, sans-serif";
-  let drawingParams = {
+  let drawingParams: Loose = {
     fontSizePIDTableLabel: null,
     fontSizeAxisLabel: null,
     fontSizeFrameLabel: null,
@@ -54,8 +87,8 @@ export function FlightLogGrapher(
   ];
   const WINDOW_WIDTH_MICROS_DEFAULT = 1000000;
 
-  let windowStartTime, windowCenterTime, windowEndTime;
-  const canvasContext = canvas.getContext("2d");
+  let windowStartTime: number, windowCenterTime: number, windowEndTime: number;
+  const canvasContext = canvas.getContext("2d")!;
   const defaultOptions = {
     gapless: false,
     craftType: "3D",
@@ -67,27 +100,27 @@ export function FlightLogGrapher(
     eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
   };
   let windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
-    idents,
-    graphs = [],
-    inTime = false,
-    outTime = false,
-    lastMouseX,
-    sticks = null,
-    craft3D = null,
-    craft2D = null,
-    analyser = null /* define a new spectrum analyser */,
-    watermarkLogo /* Watermark feature */;
+    idents: Loose,
+    graphs: Loose[] = [],
+    inTime: number | false = false,
+    outTime: number | false = false,
+    lastMouseX: number,
+    sticks: Loose = null,
+    craft3D: Loose = null,
+    craft2D: Loose = null,
+    analyser: Loose = null /* define a new spectrum analyser */,
+    watermarkLogo: Loose /* Watermark feature */;
   this.onSeek = null;
 
   this.getAnalyser = function () {
     return analyser;
   };
 
-  function extend(base, top) {
+  function extend(base: Loose, top: Loose): Loose {
     return { ...base, ...top };
   }
 
-  const onMouseMove = (e) => {
+  const onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
 
     if (this.onSeek) {
@@ -98,7 +131,7 @@ export function FlightLogGrapher(
     lastMouseX = e.pageX;
   };
 
-  const onTouchMove = (e) => {
+  const onTouchMove = (e: Loose) => {
     e.preventDefault();
 
     if (this.onSeek) {
@@ -112,7 +145,7 @@ export function FlightLogGrapher(
     lastMouseX = e.originalEvent.touches[0].pageX;
   };
 
-  function onMouseDown(e) {
+  function onMouseDown(e: MouseEvent) {
     if (e.which === 1) {
       //Left mouse button only for seeking
       lastMouseX = e.pageX;
@@ -130,7 +163,7 @@ export function FlightLogGrapher(
     }
   }
 
-  function onTouchStart(e) {
+  function onTouchStart(e: Loose) {
     if (e.which === 0) {
       lastMouseX = e.originalEvent.touches[0].pageX;
 
@@ -148,7 +181,7 @@ export function FlightLogGrapher(
   }
 
   function identifyFields() {
-    let motorGraphColorIndex = 0, fieldIndex;
+    let motorGraphColorIndex = 0, fieldIndex: number;
     const fieldNames = flightLog.getMainFieldNames();
 
     idents = {
@@ -179,7 +212,7 @@ export function FlightLogGrapher(
 
     for (fieldIndex = 0; fieldIndex < fieldNames.length; fieldIndex++) {
       const fieldName = fieldNames[fieldIndex];
-      let matches;
+      let matches: RegExpMatchArray | null;
 
       if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
         const motorIndex = matches[1];
@@ -188,7 +221,7 @@ export function FlightLogGrapher(
         idents.motorColors[motorIndex] =
           lineColors[motorGraphColorIndex++ % lineColors.length];
       } else if ((matches = fieldName.match(/^rcCommand\[(\d+)]$/))) {
-        const rcCommandIndex = matches[1];
+        const rcCommandIndex = Number(matches[1]);
 
         if (rcCommandIndex >= 0 && rcCommandIndex < 4) {
           idents.rcCommandFields[rcCommandIndex] = fieldIndex;
@@ -263,10 +296,10 @@ export function FlightLogGrapher(
     lapTimer.drawCanvas(canvas, options);
   }
 
-  let frameLabelTextWidthFrameNumber = null,
-    frameLabelTextWidthFrameTime = null;
+  let frameLabelTextWidthFrameNumber: number | null = null,
+    frameLabelTextWidthFrameTime: number | null = null;
 
-  function drawFrameLabel(frameIndex, timeMsec) {
+  function drawFrameLabel(frameIndex: number, timeMsec: number) {
     canvasContext.font = `${drawingParams.fontSizeFrameLabel}pt ${DEFAULT_FONT_FACE}`;
     canvasContext.fillStyle = ThemeColors.getGraphTextSecondary();
 
@@ -296,17 +329,17 @@ export function FlightLogGrapher(
    * value reaches 1.0 it'll be drawn plotHeight pixels away from the origin.
    */
   function plotField(
-    chunks,
-    startFrameIndex,
-    fieldIndex,
-    curve,
-    plotHeight,
-    color,
-    lineWidth,
-    highlight,
+    chunks: Loose[],
+    startFrameIndex: number,
+    fieldIndex: number,
+    curve: Loose,
+    plotHeight: number,
+    color: Loose,
+    lineWidth: number | null,
+    highlight: boolean,
   ) {
     const GAP_WARNING_BOX_RADIUS = 3;
-    let chunkIndex, frameIndex;
+    let chunkIndex: number, frameIndex: number;
     let drawingLine = false,
       notInBounds = -5, // when <0, then line is always drawn, (this allows us to paritially dash the line when the bounds is exceeded)
       inGap = false;
@@ -427,7 +460,7 @@ export function FlightLogGrapher(
   }
 
   //Draw an background for the line for a graph (at the origin and spanning the window)
-  function drawAxisBackground(plotHeight) {
+  function drawAxisBackground(plotHeight: number) {
     const axisGradient = canvasContext.createLinearGradient(
       0,
       -plotHeight / 2,
@@ -444,7 +477,7 @@ export function FlightLogGrapher(
   }
 
   //Draw a grid
-  function drawGrid(curve, plotHeight) {
+  function drawGrid(curve: Loose, plotHeight: number) {
     const settings = curve.getCurve(),
       GRID_LINES = 10,
       min = -settings.inputRange - settings.offset,
@@ -467,7 +500,7 @@ export function FlightLogGrapher(
     }
     // vertical lines
     for (
-      let i = (windowStartTime / 100000).toFixed(0) * 100000;
+      let i = Number((windowStartTime / 100000).toFixed(0)) * 100000;
       i < windowEndTime;
       i += 100000
     ) {
@@ -484,7 +517,7 @@ export function FlightLogGrapher(
     //drawAxisLabel(min.toFixed(0), -yScale - 8);
   }
 
-  function drawAxisLabel(axisLabel, y) {
+  function drawAxisLabel(axisLabel: string, y?: number) {
     canvasContext.font = `${drawingParams.fontSizeAxisLabel}pt ${DEFAULT_FONT_FACE}`;
     canvasContext.fillStyle = ThemeColors.getGraphText();
     canvasContext.textAlign = "right";
@@ -492,7 +525,15 @@ export function FlightLogGrapher(
     canvasContext.fillText(axisLabel, canvas.width - 8, y ? y : -8);
   }
 
-  function drawEventLine(x, labelY, label, color, width, labelColor, align) {
+  function drawEventLine(
+    x: number,
+    labelY = 0,
+    label?: string,
+    color?: string,
+    width?: number,
+    labelColor?: string | null,
+    align?: string,
+  ) {
     width = width || 1.0;
 
     canvasContext.lineWidth = width;
@@ -510,7 +551,7 @@ export function FlightLogGrapher(
         labelWidth = canvasContext.measureText(label).width + 2 * margin;
 
       align = align || "left";
-      canvasContext.textAlign = align;
+      canvasContext.textAlign = align as CanvasTextAlign;
       const labelDirection = align === "left" ? 1 : -1;
 
       canvasContext.lineWidth = 1;
@@ -551,11 +592,11 @@ export function FlightLogGrapher(
     }
   }
 
-  function timeToCanvasX(time) {
+  function timeToCanvasX(time: number): number {
     return (canvas.width / windowWidthMicros) * (time - windowStartTime);
   }
 
-  function drawEvent(event, sequenceNum) {
+  function drawEvent(event: Loose, sequenceNum: number) {
     const x = timeToCanvasX(event.time),
       labelY = (sequenceNum + 1) * (drawingParams.fontSizeEventLabel + 10);
 
@@ -652,7 +693,7 @@ export function FlightLogGrapher(
     }
   }
 
-  function drawEvents(chunks) {
+  function drawEvents(chunks: Loose[]) {
     /*
      * Also draw events that are a little left of the window, so that their labels don't suddenly
      * disappear when they scroll out of view:
@@ -736,17 +777,17 @@ export function FlightLogGrapher(
     // Draw Bookmarks Event Line
     if (bookmarkEvents != null) {
       for (let i = 0; i <= 9; i++) {
-        if (bookmarkEvents[i] != null) {
-          if (bookmarkEvents[i].state)
+        const be = bookmarkEvents[i];
+        if (be != null) {
+          if (be.state)
             if (
-              bookmarkEvents[i].time >=
-                windowStartTime - BEGIN_MARGIN_MICROSECONDS &&
-              bookmarkEvents[i].time < windowEndTime
+              be.time >= windowStartTime - BEGIN_MARGIN_MICROSECONDS &&
+              be.time < windowEndTime
             ) {
               drawEvent(
                 {
                   event: FlightLogEvent.CUSTOM,
-                  time: bookmarkEvents[i].time,
+                  time: be.time,
                   label: i,
                 },
                 sequenceNum++,
@@ -774,13 +815,13 @@ export function FlightLogGrapher(
         canvasContext.fillRect(
           0,
           0,
-          Math.min(inMarkerX, canvas.width),
+          Math.min(inMarkerX as number, canvas.width),
           canvas.height,
         );
       }
 
       if (outTime !== false && outTime < windowEndTime) {
-        const outMarkerXClipped = Math.max(outMarkerX, 0);
+        const outMarkerXClipped = Math.max(outMarkerX as number, 0);
         canvasContext.fillRect(
           outMarkerXClipped,
           0,
@@ -835,7 +876,7 @@ export function FlightLogGrapher(
     drawingParams = extend(drawingParams, newParams);
   }
 
-  this.resize = function (width, height) {
+  this.resize = function (width: number, height: number) {
     canvas.width = width;
     canvas.height = height;
 
@@ -887,7 +928,7 @@ export function FlightLogGrapher(
     computeDrawingParameters();
   };
 
-  this.render = function (windowCenterTimeMicros) {
+  this.render = function (windowCenterTimeMicros: number) {
     windowCenterTime = windowCenterTimeMicros;
     windowStartTime = windowCenterTime - windowWidthMicros / 2;
     windowEndTime = windowStartTime + windowWidthMicros;
@@ -906,7 +947,7 @@ export function FlightLogGrapher(
       windowStartTime,
       windowEndTime,
     );
-    let startFrameIndex, i, j;
+    let startFrameIndex: number, i: number, j: number;
 
     if (chunks.length) {
       //Find the first sample that lies inside the window
@@ -1052,8 +1093,12 @@ export function FlightLogGrapher(
   };
 
   this.refreshGraphConfig = function () {
-    const smoothing = {};
-    let heightSum = 0, allocatedHeight, graphHeight, i, graph;
+    const smoothing: Record<string, number> = {};
+    let heightSum = 0,
+      allocatedHeight: number,
+      graphHeight: number,
+      i: number,
+      graph: Loose;
 
     graphs = JSON.parse(JSON.stringify(graphConfig.getGraphs())); // NOSONAR — structuredClone fails on Vue reactive proxies
 
@@ -1068,24 +1113,29 @@ export function FlightLogGrapher(
         field.index = flightLog.getMainFieldIndexByName(field.name);
 
         // Compute inputRange and offset from min-max values
+        // ConvertFieldValue is numeric here (a chart-unit min/max); cast is type-only.
         const min = FlightLogFieldPresenter.ConvertFieldValue(
           flightLog,
           field.name,
           false,
           field.curve.MinMax.min,
-        );
+        ) as number;
         const max = FlightLogFieldPresenter.ConvertFieldValue(
           flightLog,
           field.name,
           false,
           field.curve.MinMax.max,
-        );
+        ) as number;
         const inputRange = (max - min) / 2;
         const offset = -(max + min) / 2;
         const outputRange = 1.0; // There is no direct zoom now, set outputRange to 1
 
-        // Convert the field's curve settings into an actual expo curve object:
-        field.curve = new ExpoCurve(
+        // Convert the field's curve settings into an actual expo curve object.
+        // ExpoCurve is an Option-A typed-`this` constructor fn (no construct
+        // signature for TS); the cast restores `new`-ability.
+        field.curve = new (ExpoCurve as unknown as new (
+          ...args: Loose[]
+        ) => Loose)(
           offset,
           options.graphExpoOverride ? 1.0 : field.curve.power,
           inputRange,
@@ -1159,25 +1209,25 @@ export function FlightLogGrapher(
     // The next render will use the new theme colors
   };
 
-  this.setGraphZoom = function (zoom) {
+  this.setGraphZoom = function (zoom: number) {
     windowWidthMicros = Math.round(WINDOW_WIDTH_MICROS_DEFAULT / zoom);
   };
 
-  this.setInTime = function (time) {
+  this.setInTime = function (time: number) {
     inTime = time;
     analyser.setInTime(inTime);
 
-    if (outTime <= inTime) {
+    if ((outTime as number) <= inTime) {
       outTime = false;
       analyser.setOutTime(outTime);
     }
   };
 
-  this.setOutTime = function (time) {
+  this.setOutTime = function (time: number) {
     outTime = time;
     analyser.setOutTime(outTime);
 
-    if (inTime >= outTime) {
+    if ((inTime as number) >= outTime) {
       inTime = false;
       analyser.setInTime(inTime);
     }
@@ -1204,12 +1254,16 @@ export function FlightLogGrapher(
   };
 
   // Add option toggling
-  this.setDrawSticks = function (state) {
+  this.setDrawSticks = function (state: boolean) {
     options.drawSticks = state;
   };
 
   // Add option toggling
-  this.setDrawAnalyser = function (state, ctrlKey = false) {
+  this.setDrawAnalyser = function (
+    this: FlightLogGrapher,
+    state: boolean,
+    ctrlKey = false,
+  ) {
     if (state) {
       if (ctrlKey) {
         analyser.prepareSpectrumForComparison();
@@ -1227,12 +1281,12 @@ export function FlightLogGrapher(
   };
 
   // Add analyser zoom toggling
-  this.setAnalyser = function (state) {
+  this.setAnalyser = function (state: boolean) {
     analyser.setFullscreen(state);
   };
 
   // Update user options
-  this.refreshOptions = function (newSettings) {
+  this.refreshOptions = function (newSettings: Loose) {
     options = { ...defaultOptions, ...newSettings };
   };
 
@@ -1248,8 +1302,10 @@ export function FlightLogGrapher(
 
   identifyFields();
 
-  /* Create the FlightLogSticks object */
-  sticks = new FlightLogSticks(
+  /* Create the FlightLogSticks object.
+     FlightLogSticks takes 3 params; the 4th (options) is a long-standing dead
+     arg that JS ignored — kept verbatim, so the constructor is cast to Loose. */
+  sticks = new (FlightLogSticks as Loose)(
     flightLog,
     idents.rcCommandFields,
     stickCanvas,
