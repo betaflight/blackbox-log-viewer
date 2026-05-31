@@ -1,31 +1,27 @@
-/**
- * @typedef {object} ExportOptions
- * @property {string} columnDelimiter
- * @property {string} stringDelimiter
- * @property {boolean} quoteStrings
- */
+import type { FlightLog } from "./flightlog";
 
-/**
- * @constructor
- * @param {FlightLog} flightLog
- * @param {ExportOptions} [opts={}]
- */
-export function CsvExporter(flightLog, opts = {}) {
-  opts = {
+export interface CsvExportOptions {
+  columnDelimiter: string;
+  stringDelimiter: string;
+  quoteStrings: boolean;
+}
+
+export function CsvExporter(
+  flightLog: FlightLog,
+  opts: Partial<CsvExportOptions> = {},
+) {
+  const options: CsvExportOptions = {
     columnDelimiter: ",",
     stringDelimiter: '"',
     quoteStrings: true,
     ...opts,
   };
 
-  /**
-   * @param {function} success is a callback triggered when export is done
-   */
-  function dump(success) {
+  function dump(success: (data: unknown) => void) {
     const frames = flightLog
         .getChunksInTimeRange(
-          flightLog.getMinTime(),
-          flightLog.getMaxTime(),
+          flightLog.getMinTime() as number,
+          flightLog.getMaxTime() as number,
         )
         .map((chunk) => chunk.frames),
       worker = new Worker("/js/webworkers/csv-export-worker.js");
@@ -38,7 +34,7 @@ export function CsvExporter(flightLog, opts = {}) {
       sysConfig: flightLog.getSysConfig(),
       fieldNames: flightLog.getMainFieldNames(),
       frames: frames,
-      opts: opts,
+      opts: options,
     });
   }
 

@@ -1,11 +1,30 @@
 import { triggerDownload } from "./tools.js";
 
-export function upgradeWorkspaceFormat(oldFormat) {
+interface GraphConfigEntry {
+  label: string;
+}
+
+interface OldWorkspaceFormat {
+  graphConfig?: Array<GraphConfigEntry[] | null>;
+}
+
+type WorkspaceConfigs = Array<{
+  title: string;
+  graphConfig: GraphConfigEntry[];
+} | null>;
+
+interface WorkspaceStoreLike {
+  workspaceGraphConfigs: WorkspaceConfigs;
+}
+
+export function upgradeWorkspaceFormat(
+  oldFormat: OldWorkspaceFormat,
+): OldWorkspaceFormat | WorkspaceConfigs {
   if (!oldFormat.graphConfig) {
     return oldFormat;
   }
 
-  const newFormat = [];
+  const newFormat: WorkspaceConfigs = [];
 
   oldFormat.graphConfig.forEach((element, id) => {
     if (element) {
@@ -26,7 +45,10 @@ export function upgradeWorkspaceFormat(oldFormat) {
   return newFormat;
 }
 
-export function saveWorkspaces(workspaceGraphConfigs, file) {
+export function saveWorkspaces(
+  workspaceGraphConfigs: WorkspaceConfigs | null | undefined,
+  file?: string,
+) {
   if (!workspaceGraphConfigs) {
     return null;
   }
@@ -40,7 +62,11 @@ export function saveWorkspaces(workspaceGraphConfigs, file) {
   }
 }
 
-export function loadWorkspaces(file, workspaceStore, onSwitchWorkspace) {
+export function loadWorkspaces(
+  file: File,
+  workspaceStore: WorkspaceStoreLike,
+  onSwitchWorkspace: (configs: WorkspaceConfigs, index: number) => void,
+) {
   file.text().then((data) => {
     let tmp = JSON.parse(data);
     if (tmp.graphConfig) {

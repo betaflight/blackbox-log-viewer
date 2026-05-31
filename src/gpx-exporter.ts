@@ -1,16 +1,11 @@
-/**
- * @constructor
- * @param {FlightLog} flightLog
- */
-export function GpxExporter(flightLog) {
-  /**
-   * @param {function} success is a callback triggered when export is done
-   */
-  function dump(success) {
+import type { FlightLog } from "./flightlog";
+
+export function GpxExporter(flightLog: FlightLog) {
+  function dump(success: (data: unknown) => void) {
     const frames = flightLog
         .getChunksInTimeRange(
-          flightLog.getMinTime(),
-          flightLog.getMaxTime(),
+          flightLog.getMinTime() as number,
+          flightLog.getMaxTime() as number,
         )
         .map((chunk) => chunk.frames),
       worker = new Worker("/js/webworkers/gpx-export-worker.js");

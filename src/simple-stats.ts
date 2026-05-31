@@ -1,14 +1,23 @@
-export function SimpleStats(flightLog) {
+import type { FlightLog } from "./flightlog";
+
+interface FieldStat {
+  name: string;
+  min: number;
+  max: number;
+  mean: number;
+}
+
+export function SimpleStats(flightLog: FlightLog) {
   const chunks = flightLog.getChunksInTimeRange(
-    flightLog.getMinTime(),
-    flightLog.getMaxTime(),
+    flightLog.getMinTime() as number,
+    flightLog.getMaxTime() as number,
   );
   const frames = chunks.flatMap((chunk) => chunk.frames);
-  const fields = flightLog.getMainFieldNames().map((f) =>
-    f === "BaroAlt" ? "baroAlt" : f,
-  );
+  const fields = flightLog
+    .getMainFieldNames()
+    .map((f) => (f === "BaroAlt" ? "baroAlt" : f));
 
-  const getMinMaxMean = (fieldName) => {
+  const getMinMaxMean = (fieldName: string): FieldStat | undefined => {
     const index = fields.indexOf(fieldName);
     if (
       index === -1 ||
@@ -18,11 +27,17 @@ export function SimpleStats(flightLog) {
     ) {
       return undefined;
     }
-    let min = Infinity, max = -Infinity, sum = 0;
+    let min = Infinity,
+      max = -Infinity,
+      sum = 0;
     for (const f of frames) {
       const v = f[index];
-      if (v < min) { min = v; }
-      if (v > max) { max = v; }
+      if (v < min) {
+        min = v;
+      }
+      if (v > max) {
+        max = v;
+      }
       sum += v;
     }
     return {

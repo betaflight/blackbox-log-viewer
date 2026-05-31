@@ -1,13 +1,34 @@
+interface ExpoCurveInfo {
+  offset: number;
+  power: number;
+  inputRange: number;
+  outputRange: number;
+  steps: number;
+}
+
+export interface ExpoCurve {
+  lookup(input: number): number;
+  lookupRaw(input: number): number;
+  getCurve(): ExpoCurveInfo;
+}
+
 /**
  * Creates a lookup-table based expo curve, which takes values that range between -inputrange and +inputRange, and
  * scales them to -outputRange to +outputRange with the given power curve (curve <1.0 exaggerates values near the origin,
  * curve = 1.0 is a straight line mapping).
  */
-export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
-  let curve, inputScale;
+export function ExpoCurve(
+  this: ExpoCurve,
+  offset: number,
+  power: number,
+  inputRange: number,
+  outputRange: number,
+  steps?: number,
+) {
+  let curve: number[], inputScale: number;
   const rawInputScale = outputRange / inputRange;
 
-  function lookupStraightLine(input) {
+  function lookupStraightLine(input: number) {
     return (input + offset) * inputScale;
   }
 
@@ -21,7 +42,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
       power: power,
       inputRange: inputRange,
       outputRange: outputRange,
-      steps: steps,
+      steps: steps!,
     };
   };
 
@@ -32,7 +53,7 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
    * The error will be largest in the area of the curve where the slope changes the fastest with respect to input
    * (e.g. the approximation will be too straight near the origin when power < 1.0, but a good fit far from the origin)
    */
-  function lookupInterpolatedCurve(input) {
+  function lookupInterpolatedCurve(input: number) {
     input += offset;
 
     const valueInCurve = Math.abs(input * inputScale);
@@ -41,8 +62,8 @@ export function ExpoCurve(offset, power, inputRange, outputRange, steps) {
     /* If the input value lies beyond the stated input range, use the final
      * two points of the curve to extrapolate out (the "curve" out there is a straight line, though)
      */
-    if (prevStepIndex > steps - 2) {
-      prevStepIndex = steps - 2;
+    if (prevStepIndex > steps! - 2) {
+      prevStepIndex = steps! - 2;
     }
 
     //Straight-line interpolation between the two curve points
