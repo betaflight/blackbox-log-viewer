@@ -162,11 +162,13 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useGraphStore } from "../stores/graph.js";
+import { useBlackboxViewer } from "../composables/use_blackbox_viewer.js";
 import { useAppStore } from "../stores/app.js";
 import { useLogStore } from "../stores/log.js";
 import { useSettingsStore } from "../stores/settings.js";
 
 const graphStore = useGraphStore();
+const viewer = useBlackboxViewer();
 const appStore = useAppStore();
 const logStore = useLogStore();
 const settingsStore = useSettingsStore();
@@ -202,9 +204,9 @@ function onFieldClick(e, gi, fi, field) {
 function onGraphClick(e, gi) {
   if (e.button !== 0) { return; }
   if (e.altKey) {
-    graphStore.expandGraphConfig?.(gi);
+    viewer.expandGraphConfig(gi);
   } else {
-    graphStore.zoomGraphConfig?.(gi);
+    viewer.zoomGraphConfig(gi);
   }
   e.preventDefault();
 }
@@ -258,7 +260,7 @@ function setupDragContainer(el) {
     e.preventDefault();
     const newOrder = Array.from(el.querySelectorAll(".graph-legend"))
       .map((div) => Number.parseInt(div.dataset.index));
-    graphStore.reorderGraphs?.(newOrder);
+    viewer.reorderGraphs(newOrder);
   });
 }
 
@@ -284,13 +286,13 @@ watch(legendContainer, (el) => {
 
 // --- Pen reset (middle-click) and field wheel adjustments ---
 function onResetPen(gi, fi) {
-  graphStore.resetPen?.(gi, fi);
+  viewer.resetPen(gi, fi);
 }
 
 function onFieldWheel(e, gi, fi) {
   if (e.shiftKey || e.altKey || e.ctrlKey) {
     const delta = e.deltaY < 0 ? 1 : -1;
-    graphStore.fieldWheel?.(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
+    viewer.fieldWheel(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
   }
 }
 
@@ -312,6 +314,6 @@ function openGraphConfig() {
 }
 
 function onLogIndexChange(val) {
-  graphStore.selectLogIndex?.(val);
+  viewer.selectLogIndex(val);
 }
 </script>

@@ -50,7 +50,7 @@ export function useBlackboxViewer() {
   }
 
   // Operations exposed to components (instead of via store callback refs).
-  let spectrumExport, spectrumImport, spectrumClear;
+  const ops = {};
 
   function supportsRequiredAPIs() {
     return (
@@ -423,7 +423,7 @@ export function useBlackboxViewer() {
       invalidateGraph();
     }
     userSettings = settingsStore.userSettings;
-    workspaceStore.gotoBookmark = (index) => {
+    ops.gotoBookmark = (index) => {
       if (workspaceStore.bookmarkTimes?.[index] != null) {
         setCurrentBlackboxTime(workspaceStore.bookmarkTimes[index]);
         invalidateGraph();
@@ -431,9 +431,9 @@ export function useBlackboxViewer() {
     };
 
     // Spectrum operations (exposed via the composable return; no longer on graphStore)
-    spectrumExport = () => exportSpectrumToCsv(graph.getAnalyser(), appStore.logFilename);
-    spectrumImport = (files) => graph.getAnalyser()?.importSpectrumFromCSV(files);
-    spectrumClear = () => graph.getAnalyser()?.removeImportedSpectrums();
+    ops.spectrumExport = () => exportSpectrumToCsv(graph.getAnalyser(), appStore.logFilename);
+    ops.spectrumImport = (files) => graph.getAnalyser()?.importSpectrumFromCSV(files);
+    ops.spectrumClear = () => graph.getAnalyser()?.removeImportedSpectrums();
 
     window.addEventListener("resize", function () {
       updateCanvasSize();
@@ -580,19 +580,19 @@ export function useBlackboxViewer() {
       }
     });
 
-    graphStore.zoomGraphConfig = (gi) => zoomGraphConfig(gi);
-    graphStore.expandGraphConfig = (gi) => expandGraphConfig(gi);
-    graphStore.reorderGraphs = (newOrder) => {
+    ops.zoomGraphConfig = (gi) => zoomGraphConfig(gi);
+    ops.expandGraphConfig = (gi) => expandGraphConfig(gi);
+    ops.reorderGraphs = (newOrder) => {
       const oldGraphs = graphStore.graphConfig;
       const newGraphs = newOrder.map((i) => oldGraphs[i]);
       newGraphConfig(newGraphs);
     };
-    graphStore.resetPen = (gi, fi) => {
+    ops.resetPen = (gi, fi) => {
       const graphs = graphStore.activeGraphConfig.getGraphs();
       const msg = restorePenDefaults(graphs, String(gi), fi == null ? null : String(fi));
       applyPenChange(msg);
     };
-    graphStore.fieldWheel = (gi, fi, delta, shiftKey, altKey, ctrlKey) => {
+    ops.fieldWheel = (gi, fi, delta, shiftKey, altKey, ctrlKey) => {
       const graphs = graphStore.activeGraphConfig.getGraphs();
       const g = String(gi);
       const f = String(fi);
@@ -607,17 +607,17 @@ export function useBlackboxViewer() {
       }
       applyPenChange(msg);
     };
-    playbackStore.logSyncHere = logSyncHere;
-    playbackStore.logSyncBack = logSyncBack;
-    playbackStore.logSyncForward = logSyncForward;
-    playbackStore.logSmartSync = logSmartSync;
-    playbackStore.setVideoOffsetValue = (val) => {
+    ops.logSyncHere = logSyncHere;
+    ops.logSyncBack = logSyncBack;
+    ops.logSyncForward = logSyncForward;
+    ops.logSmartSync = logSmartSync;
+    ops.setVideoOffsetValue = (val) => {
       const offset = Number.parseFloat(val);
       if (!Number.isNaN(offset)) {
         setVideoOffset(offset, true);
       }
     };
-    playbackStore.setGraphTime = (timeStr) => {
+    ops.setGraphTime = (timeStr) => {
       let newTime = stringTimetoMsec(timeStr);
       if (!isNaN(newTime)) {
         if (logStore.hasVideo) {
@@ -629,20 +629,20 @@ export function useBlackboxViewer() {
         invalidateGraph();
       }
     };
-    graphStore.setSeekBarMode = setSeekBarMode;
-    graphStore.selectLogIndex = (index) => {
+    ops.setSeekBarMode = setSeekBarMode;
+    ops.selectLogIndex = (index) => {
       selectLog(Number.parseInt(index, 10));
       if (graph) {
         graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       }
     };
-    workspaceStore.switchWorkspace = (id) => {
+    ops.switchWorkspace = (id) => {
       if (workspaceStore.workspaceGraphConfigs[id] != null) {
         onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
       }
     };
-    workspaceStore.saveWorkspace = (id, title) => onSaveWorkspace(id, title);
-    workspaceStore.applyDefaultWorkspace = (index) => {
+    ops.saveWorkspace = (id, title) => onSaveWorkspace(id, title);
+    ops.applyDefaultWorkspace = (index) => {
       const presets = [null, structuredClone(ctzsnoozeWorkspace), structuredClone(supaflyWorkspace)];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
@@ -650,28 +650,25 @@ export function useBlackboxViewer() {
     };
   }
 
-  graphStore.applyGraphZoom = setGraphZoom;
-  playbackStore.applyPlaybackRate = setPlaybackRate;
-  playbackStore.logPlayPause = logPlayPause;
-  playbackStore.logJumpBack = () => logJumpBack(null);
-  playbackStore.logJumpForward = () => logJumpForward(null);
-  playbackStore.logJumpStart = logJumpStart;
-  playbackStore.logJumpEnd = logJumpEnd;
-  playbackStore.videoJumpStart = () => {
+  ops.applyGraphZoom = setGraphZoom;
+  ops.applyPlaybackRate = setPlaybackRate;
+  ops.logPlayPause = logPlayPause;
+  ops.logJumpBack = () => logJumpBack(null);
+  ops.logJumpForward = () => logJumpForward(null);
+  ops.logJumpStart = logJumpStart;
+  ops.logJumpEnd = logJumpEnd;
+  ops.videoJumpStart = () => {
     setVideoTime(0);
     setGraphState(GRAPH_STATE_PAUSED);
   };
-  playbackStore.videoJumpEnd = () => {
+  ops.videoJumpEnd = () => {
     if (video.duration) {
       setVideoTime(video.duration);
       setGraphState(GRAPH_STATE_PAUSED);
     }
   };
 
-  viewerInstance = {
-    spectrumExport: (...args) => spectrumExport?.(...args),
-    spectrumImport: (...args) => spectrumImport?.(...args),
-    spectrumClear: (...args) => spectrumClear?.(...args),
+  Object.assign(ops, {
     refreshGraph,
     loadFiles,
     // Note: internal newGraphConfig takes `noRedraw` (inverted). Callers pass `redrawChart` (true = redraw).
@@ -716,6 +713,7 @@ export function useBlackboxViewer() {
         updateCanvasSize();
       }
     },
-  };
-  return viewerInstance;
+  });
+  viewerInstance = ops;
+  return ops;
 }

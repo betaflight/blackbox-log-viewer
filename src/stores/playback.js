@@ -27,20 +27,6 @@ export const usePlaybackStore = defineStore("playback", () => {
   const isPaused = computed(() => graphState.value === GRAPH_STATE_PAUSED);
 
   // Callbacks registered by main.js (need video element + renderer closures)
-  const logPlayPause = shallowRef(null);
-  const logJumpBack = shallowRef(null);
-  const logJumpForward = shallowRef(null);
-  const logJumpStart = shallowRef(null);
-  const logJumpEnd = shallowRef(null);
-  const videoJumpStart = shallowRef(null);
-  const videoJumpEnd = shallowRef(null);
-  const logSyncHere = shallowRef(null);
-  const logSyncBack = shallowRef(null);
-  const logSyncForward = shallowRef(null);
-  const logSmartSync = shallowRef(null);
-  const setVideoOffsetValue = shallowRef(null);
-  const setGraphTime = shallowRef(null);
-  const applyPlaybackRate = shallowRef(null);
 
   function setPlaybackRate(rate) {
     playbackRate.value = Math.max(
@@ -65,20 +51,6 @@ export const usePlaybackStore = defineStore("playback", () => {
     currentOffsetCache,
     isPlaying,
     isPaused,
-    logPlayPause,
-    logJumpBack,
-    logJumpForward,
-    logJumpStart,
-    logJumpEnd,
-    videoJumpStart,
-    videoJumpEnd,
-    logSyncHere,
-    logSyncBack,
-    logSyncForward,
-    logSmartSync,
-    setVideoOffsetValue,
-    setGraphTime,
-    applyPlaybackRate,
     setPlaybackRate,
     setVideoOffset,
   };

@@ -265,63 +265,63 @@ function onToggleMap() {
 }
 
 function onRateChange(rate) {
-  playbackStore.applyPlaybackRate?.(rate);
+  viewer.applyPlaybackRate(rate);
 }
 
 function onZoomChange(zoom) {
-  graphStore.applyGraphZoom?.(zoom);
+  viewer.applyGraphZoom(zoom);
 }
 
 function onSyncBack() {
-  playbackStore.logSyncBack?.();
+  viewer.logSyncBack();
 }
 
 function onSyncForward() {
-  playbackStore.logSyncForward?.();
+  viewer.logSyncForward();
 }
 
 function onSyncHere() {
-  playbackStore.logSyncHere?.();
+  viewer.logSyncHere();
 }
 
 function onSmartSync() {
-  playbackStore.logSmartSync?.();
+  viewer.logSmartSync();
 }
 
 function onOffsetChange(val) {
-  playbackStore.setVideoOffsetValue?.(val);
+  viewer.setVideoOffsetValue(val);
 }
 
 function onTimeChange(timeStr) {
-  playbackStore.setGraphTime?.(timeStr);
+  viewer.setGraphTime(timeStr);
 }
 
 function onPlayPause() {
-  playbackStore.logPlayPause?.();
+  viewer.logPlayPause();
 }
 
 function onJumpStart() {
-  playbackStore.logJumpStart?.();
+  viewer.logJumpStart();
 }
 
 function onJumpEnd() {
-  playbackStore.logJumpEnd?.();
+  viewer.logJumpEnd();
 }
 
 function onStepBack() {
-  playbackStore.logJumpBack?.();
+  viewer.logJumpBack();
 }
 
 function onStepForward() {
-  playbackStore.logJumpForward?.();
+  viewer.logJumpForward();
 }
 
 function onVideoJumpStart() {
-  playbackStore.videoJumpStart?.();
+  viewer.videoJumpStart();
 }
 
 function onVideoJumpEnd() {
-  playbackStore.videoJumpEnd?.();
+  viewer.videoJumpEnd();
 }
 
 function onSaveSettings(newSettings) {
@@ -341,19 +341,19 @@ function onSaveVideoConfig(cfg) {
 }
 
 function onSwitchWorkspace(id) {
-  workspaceStore.switchWorkspace?.(id);
+  viewer.switchWorkspace(id);
 }
 
 function onSaveWorkspace(id, title) {
-  workspaceStore.saveWorkspace?.(id, title);
+  viewer.saveWorkspace(id, title);
 }
 
 function onApplyDefaultWorkspace(index) {
-  workspaceStore.applyDefaultWorkspace?.(index);
+  viewer.applyDefaultWorkspace(index);
 }
 
 function onGotoBookmark(index) {
-  workspaceStore.gotoBookmark?.(index + 1);
+  viewer.gotoBookmark(index + 1);
 }
 
 // Drag-and-drop file loading (window-level)

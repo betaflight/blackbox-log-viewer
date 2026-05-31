@@ -14,8 +14,10 @@
 <script setup>
 import { computed } from "vue";
 import { useGraphStore } from "../stores/graph.js";
+import { useBlackboxViewer } from "../composables/use_blackbox_viewer.js";
 
 const graphStore = useGraphStore();
+const viewer = useBlackboxViewer();
 
 const seekbarOptions = [
   { label: "Average motor throttle", value: "avgThrottle" },
@@ -25,6 +27,6 @@ const seekbarOptions = [
 
 const seekbarType = computed({
   get: () => graphStore.seekBarMode || "avgThrottle",
-  set: (val) => graphStore.setSeekBarMode?.(val),
+  set: (val) => viewer.setSeekBarMode(val),
 });
 </script>

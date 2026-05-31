@@ -59,14 +59,6 @@ export const useGraphStore = defineStore("graph", () => {
   // Callbacks registered by main.js
   const invalidateGraph = shallowRef(null);
   const updateCanvasSize = shallowRef(null);
-  const zoomGraphConfig = shallowRef(null);
-  const expandGraphConfig = shallowRef(null);
-  const reorderGraphs = shallowRef(null);
-  const resetPen = shallowRef(null);
-  const fieldWheel = shallowRef(null);
-  const applyGraphZoom = shallowRef(null);
-  const selectLogIndex = shallowRef(null);
-  const setSeekBarMode = shallowRef(null);
 
   // --- Legend actions ---
 
@@ -210,14 +202,6 @@ export const useGraphStore = defineStore("graph", () => {
     seekBarMode,
     invalidateGraph,
     updateCanvasSize,
-    zoomGraphConfig,
-    expandGraphConfig,
-    reorderGraphs,
-    resetPen,
-    fieldWheel,
-    applyGraphZoom,
-    selectLogIndex,
-    setSeekBarMode,
     buildLegendGraphs,
     highlightLegendField,
     selectLegendField,
