@@ -123,6 +123,21 @@ GraphSpectrumCalc.setPointsPerSegmentPSD = function (pointsCount) {
 GraphSpectrumCalc.dataLoadPSD = function (_analyserZoomY) {
   const flightSamples = this._getFlightSamplesFreq(false);
   const totalCount = flightSamples.count; // actual samples, not padded length
+  // Guard an empty selected range: getNearPower2Value(0) is 0 and FFTComplex(0) throws,
+  // so short-circuit before the FFT with a valid empty result the caller can render.
+  if (totalCount === 0) {
+    return {
+      fieldIndex: this._dataBuffer.fieldIndex,
+      fieldName: this._dataBuffer.fieldName,
+      fftLength: 0,
+      fftOutput: new Float64Array(0),
+      blackBoxRate: this._blackBoxRate,
+      minimum: 0,
+      maximum: 0,
+      maxNoiseFrequency: 0,
+      maximalSegmentsLength: 0,
+    };
+  }
   const pointsPerSegment = Math.min(this._pointsPerSegmentPSD, totalCount);
   // Non-overlapping when single full-segment; otherwise 75% overlap
   const overlapCount =
@@ -222,9 +237,17 @@ GraphSpectrumCalc._dataLoadFrequencyVsX = function (
       }
       // Translate the average vs value to a bin index
       const avgVsValue = sumVsValues / fftChunkLength;
-      const vsBinIndex = Math.round(
-        ((NUM_VS_BINS - 1) * (avgVsValue - flightSamples.minValue)) /
-          (flightSamples.maxValue - flightSamples.minValue),
+      // Clamp to a valid bin: a degenerate or out-of-range average must never index
+      // outside the matrix (would dereference an undefined row — issue #922).
+      const vsBinIndex = Math.max(
+        0,
+        Math.min(
+          NUM_VS_BINS - 1,
+          Math.round(
+            ((NUM_VS_BINS - 1) * (avgVsValue - flightSamples.minValue)) /
+              (flightSamples.maxValue - flightSamples.minValue),
+          ),
+        ),
       );
       numberSamples[vsBinIndex]++;
 
@@ -321,9 +344,17 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function (
       }
       // Translate the average vs value to a bin index
       const avgVsValue = sumVsValues / fftChunkLength;
-      const vsBinIndex = Math.round(
-        ((NUM_VS_BINS - 1) * (avgVsValue - flightSamples.minValue)) /
-          (flightSamples.maxValue - flightSamples.minValue),
+      // Clamp to a valid bin: a degenerate or out-of-range average must never index
+      // outside the matrix (would dereference an undefined row — issue #922).
+      const vsBinIndex = Math.max(
+        0,
+        Math.min(
+          NUM_VS_BINS - 1,
+          Math.round(
+            ((NUM_VS_BINS - 1) * (avgVsValue - flightSamples.minValue)) /
+              (flightSamples.maxValue - flightSamples.minValue),
+          ),
+        ),
       );
       numberSamples[vsBinIndex]++;
 
@@ -332,6 +363,14 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function (
         matrixPsdOutput[vsBinIndex][i] += psd.psdOutput[i];
       }
     }
+  }
+
+  // Empty selected range: no chunks were processed, so the lazily-created matrix is
+  // still undefined. Return an empty matrix so fftOutput is never undefined.
+  if (matrixPsdOutput === undefined) {
+    matrixPsdOutput = new Array(NUM_VS_BINS)
+      .fill(null)
+      .map(() => new Float64Array(0));
   }
 
   // Divide the values from the fft in each row (vs value bin) by the number of samples in the bin
@@ -459,9 +498,26 @@ GraphSpectrumCalc._getFlightChunks = function () {
 GraphSpectrumCalc._getFlightSamplesFreq = function (scaled = true) {
   const allChunks = this._getFlightChunks();
 
-  const samples = new Float64Array(
-    (MAX_ANALYSER_LENGTH / (1000 * 1000)) * this._blackBoxRate,
-  );
+  // Size the sample buffer from the real number of logged frames in the selected
+  // chunks, not from a _blackBoxRate estimate. The estimate can undershoot the actual
+  // frame count for long logs and silently truncate the FFT input (see issue #922).
+  let frameCount = 0;
+  for (const chunk of allChunks) {
+    frameCount += chunk.frames.length;
+  }
+
+  // The FFT input size is power 2 to get maximal performance
+  // Limit fft input count for simple spectrum chart to get normal charts plot quality
+  let fftBufferSize;
+  if (scaled && frameCount < MIN_SPECTRUM_SAMPLES_COUNT) {
+    fftBufferSize = MIN_SPECTRUM_SAMPLES_COUNT;
+  } else {
+    fftBufferSize = this.getNearPower2Value(frameCount);
+  }
+
+  // Allocate at least fftBufferSize: slice() clamps without zero-padding, so the buffer
+  // must cover the (possibly larger, power-of-2) FFT window for short logs.
+  const samples = new Float64Array(Math.max(frameCount, fftBufferSize));
 
   // Loop through all the samples in the chunks and assign them to a sample array ready to pass to the FFT.
   let samplesCount = 0;
@@ -476,15 +532,6 @@ GraphSpectrumCalc._getFlightSamplesFreq = function (scaled = true) {
       }
       samplesCount++;
     }
-  }
-
-  // The FFT input size is power 2 to get maximal performance
-  // Limit fft input count for simple spectrum chart to get normal charts plot quality
-  let fftBufferSize;
-  if (scaled && samplesCount < MIN_SPECTRUM_SAMPLES_COUNT) {
-    fftBufferSize = MIN_SPECTRUM_SAMPLES_COUNT;
-  } else {
-    fftBufferSize = this.getNearPower2Value(samplesCount);
   }
 
   return {
@@ -512,17 +559,19 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
   const allChunks = this._getFlightChunks();
   const vsIndexes = this._getVsIndexes(vsFieldNames);
 
-  const samples = new Float64Array(
-    (MAX_ANALYSER_LENGTH / (1000 * 1000)) * this._blackBoxRate,
-  );
+  // Size the buffers from the real number of logged frames in the selected chunks.
+  // A _blackBoxRate estimate can undershoot the actual frame count for long logs,
+  // overflowing the buffers; the out-of-range reads then poisoned minValue/maxValue
+  // with NaN and crashed the binning in _dataLoadFrequencyVsX (issue #922).
+  let frameCount = 0;
+  for (const chunk of allChunks) {
+    frameCount += chunk.frames.length;
+  }
+
+  const samples = new Float64Array(frameCount);
   const vsValues = new Array(vsIndexes.length)
     .fill(null)
-    .map(
-      () =>
-        new Float64Array(
-          (MAX_ANALYSER_LENGTH / (1000 * 1000)) * this._blackBoxRate,
-        ),
-    );
+    .map(() => new Float64Array(frameCount));
 
   let samplesCount = 0;
   for (const chunk of allChunks) {
@@ -586,21 +635,27 @@ GraphSpectrumCalc._getFlightSamplesFreqVsX = function (
     maxValue += ((maxValue - minValue) * RPM_AXIS_TOP_MARGIN_PERCENT) / 100;
   }
 
-  if (minValue > maxValue) {
+  // Reject any non-usable range: non-finite bounds (empty/too-short window leaves the
+  // Infinity/-Infinity defaults, or a buffer overflow would leave NaN) and the
+  // degenerate equal-bounds case (constant VS value → maxValue - minValue === 0 →
+  // divide-by-zero in the bin index). Fall back to a safe 0..100 range.
+  if (
+    !Number.isFinite(minValue) ||
+    !Number.isFinite(maxValue) ||
+    minValue >= maxValue
+  ) {
     if (minValue === Infinity) {
       // this should never happen
-      minValue = 0;
-      maxValue = 100;
       console.warn("Invalid minimum value");
     } else {
       console.warn(
-        "Maximum value %f smaller than minimum value %d",
-        maxValue,
+        "Invalid value range for spectrum binning (min %s, max %s)",
         minValue,
+        maxValue,
       );
-      minValue = 0;
-      maxValue = 100;
     }
+    minValue = 0;
+    maxValue = 100;
   }
 
   const slicedVsValues = [];
