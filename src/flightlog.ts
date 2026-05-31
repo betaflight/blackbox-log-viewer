@@ -22,11 +22,120 @@ import {
   validate,
   firmwareGreaterOrEqual,
 } from "./tools";
+import type {
+  SysConfig,
+  FrameArray,
+  FlightLogChunk,
+  FlightLogEventData,
+} from "./flightlog_types";
+
+// Instance shape (old-style constructor function). Public methods are assigned
+// onto `this` in the constructor; the raw->unit converters live on the prototype.
+export interface FlightLog {
+  parser: FlightLogParser;
+  getMainFieldCount(): number;
+  getMainFieldNames(): string[];
+  getLogError(logIndex?: number): string | false;
+  getStats(logIndex?: number): LogStats;
+  getMinTime(index?: number): number;
+  getMaxTime(index?: number): number;
+  getActualLoggedTime(index?: number): number;
+  getSysConfig(): SysConfig;
+  setSysConfig(newSysConfig: SysConfig): void;
+  getLogIndex(): number;
+  getLogCount(): number;
+  getActivitySummary(): unknown;
+  getMainFieldIndexByName(name: string): number | undefined;
+  getMainFieldIndexes(_name?: string): unknown;
+  getFrameAtTime(startTime: number): FrameArray | false;
+  getSmoothedFrameAtTime(startTime: number): FrameArray | false;
+  getCurrentFrameAtTime(startTime: number): unknown;
+  getNumCellsEstimate(): number | false;
+  getNumMotors(): number | false;
+  getChunksInTimeRange(startTime: number, endTime: number): FlightLogChunk[];
+  setFieldSmoothing(newSmoothing: Record<number, number>): void;
+  getSmoothedChunksInTimeRange(startTime: number, endTime: number): FlightLogChunk[];
+  openLog(index: number): boolean;
+  hasGpsData(): boolean;
+  getMinMaxForFieldDuringAllTime(field_name: string): { min: number; max: number };
+  getMinMaxForFieldDuringTimeInterval(
+    field_name: string,
+    start_time: number,
+    end_time: number,
+  ): { min: number; max: number } | undefined;
+  getCurrentLogRowsCount(): number;
+  // prototype methods
+  accRawToGs(value: number): number;
+  gyroRawToDegreesPerSecond(value: number): number;
+  rcCommandRawToDegreesPerSecond(
+    value: number,
+    axis: number,
+    currentFlightMode?: number,
+  ): number;
+  rcCommandRawToThrottle(value: number): number;
+  ThrottleTorcCommandRaw(value: number): number;
+  rcMotorRawToPctPhysical(value: number): number;
+  PctPhysicalTorcMotorRaw(value: number): number;
+  isDigitalProtocol(): boolean;
+  getPIDPercentage(value: number): number;
+  getReferenceVoltageMillivolts(): number;
+  vbatADCToMillivolts(vbatADC: number): number;
+  amperageADCToMillivolts(amperageADC: number): number;
+  getFlightMode(currentFlightMode: number): Record<string, boolean>;
+  getFeatures(enabledFeatures: number): unknown;
+  isFieldDisabled(): Record<string, boolean>;
+}
+
+type Frame = number[];
+// Field-index lists are an array of indices, or `false` when the source field
+// is absent. An explicit ComputeCtx (below) keeps `false` from widening.
+type FieldIndexList = number[] | false;
+type IMUInstance = InstanceType<typeof IMU>;
+
+// Resolved field indices used to inject computed fields (see resolveFieldIndices).
+interface ComputeCtx {
+  gyroADC: FieldIndexList;
+  accSmooth: FieldIndexList;
+  magADC: FieldIndexList;
+  imuQuaternion: FieldIndexList;
+  rcCommand: FieldIndexList;
+  setpoint: FieldIndexList;
+  gpsCoord: FieldIndexList;
+  gpsVelNED: FieldIndexList;
+  axisPID: number[][] | false;
+  numSatIndex: number;
+  flightModeFlagsIndex: number;
+  sysConfig: SysConfig;
+  disabledFields: Record<string, boolean>;
+}
+
+// Per-log stats originate from the still-JS flightlog_index; accessed both as
+// `.field[i]` (min/max) and `.frame[type].validCount`.
+interface LogStats {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  field?: Array<{ min: number; max: number }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  frame: Record<string, any>;
+}
+
+// Per-log intraframe directory produced by FlightLogIndex (loosely typed — it
+// originates from the still-JS flightlog_index module).
+interface IframeDirectory {
+  offsets: number[];
+  times: number[];
+  stats: LogStats;
+  initialIMU: unknown[];
+  initialSlow: number[][];
+  initialGPS: number[][];
+  initialGPSHome?: number[][];
+  error?: string;
+}
 
 /*
  * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
  */
-function verifyChunkIndexes(_chunks) {
+function verifyChunkIndexes(_chunks: FlightLogChunk[]) {
   // Uncomment for debugging...
   /*
       for (let i = 0; i < chunks.length - 1; i++) {
@@ -45,23 +154,27 @@ function verifyChunkIndexes(_chunks) {
  * Additional computed fields are derived from the original data set and added as new fields in the resulting data.
  * Window based smoothing of fields is offered.
  */
-export function FlightLog(logData) {
+export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
   const ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/;
   let logIndex = 0;
   const logIndexes = new FlightLogIndex(logData);
-  const parser = new FlightLogParser(logData);
-  let iframeDirectory;
+  // FlightLogParser is an old-style constructor function with a typed `this`,
+  // which TS doesn't expose a construct signature for; cast to construct it.
+  const parser = new (FlightLogParser as unknown as new (
+    logData: Uint8Array | number[],
+  ) => FlightLogParser)(logData);
+  let iframeDirectory: IframeDirectory;
   // We cache these details so they don't have to be recomputed on every request:
-  let numCells = false,
-    numMotors = false;
-  let fieldNames = [],
-    fieldNameToIndex = {};
+  let numCells: number | false = false,
+    numMotors: number | false = false;
+  let fieldNames: string[] = [],
+    fieldNameToIndex: Record<string, number> = {};
   const chunkCache = new FIFOCache(2);
   // Map from field indexes to smoothing window size in microseconds
-  let fieldSmoothing = {},
+  let fieldSmoothing: Record<number, number> = {},
     maxSmoothing = 0;
   const smoothedCache = new FIFOCache(2);
-  let gpsTransform = null;
+  let gpsTransform: InstanceType<typeof GPS_transform> | null = null;
 
   //Public fields:
   this.parser = parser;
@@ -90,7 +203,7 @@ export function FlightLog(logData) {
    * Get the stats for the log of the given index, or leave off the logIndex argument to fetch the stats
    * for the current log.
    */
-  function getRawStats(logIndex) {
+  function getRawStats(logIndex?: number) {
     if (logIndex === undefined) {
       return iframeDirectory.stats;
     } else {
@@ -263,7 +376,7 @@ export function FlightLog(logData) {
     } else return false;
   };
 
-  const addComputedFieldNames = (disabled) => {
+  const addComputedFieldNames = (disabled: Record<string, boolean>) => {
     // Heading: ATTITUDE enabled (quaternion available) OR both GYRO and ACC enabled (IMU estimation)
     const hasQuaternion = fieldNames.includes("imuQuaternion[0]");
     const hasGyroAndAcc = fieldNames.includes("gyroADC[0]") && fieldNames.includes("accSmooth[0]");
@@ -359,9 +472,9 @@ export function FlightLog(logData) {
    *
    * When the cache misses, this will result in parsing the original log file to create chunks.
    */
-  function getChunksInIndexRange(startIndex, endIndex) {
-    const resultChunks = [],
-      eventNeedsTimestamp = [];
+  function getChunksInIndexRange(startIndex: number, endIndex: number) {
+    const resultChunks: FlightLogChunk[] = [],
+      eventNeedsTimestamp: FlightLogEventData[] = [];
 
     if (startIndex < 0) startIndex = 0;
 
@@ -640,10 +753,24 @@ export function FlightLog(logData) {
    * Returns updated fieldIndex.
    */
   const computeAttitude = (
-    srcFrame,
-    destFrame,
-    fieldIndex,
-    { imuQuaternion, gyroADC, accSmooth, magADC, chunkIMU, sysConfig },
+    srcFrame: Frame,
+    destFrame: Frame,
+    fieldIndex: number,
+    {
+      imuQuaternion,
+      gyroADC,
+      accSmooth,
+      magADC,
+      chunkIMU,
+      sysConfig,
+    }: {
+      imuQuaternion: FieldIndexList;
+      gyroADC: FieldIndexList;
+      accSmooth: FieldIndexList;
+      magADC: FieldIndexList;
+      chunkIMU: IMUInstance;
+      sysConfig: SysConfig;
+    },
   ) => {
     if (imuQuaternion) {
       const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
@@ -698,7 +825,7 @@ export function FlightLog(logData) {
       );
       destFrame[fieldIndex++] = attitude.roll;
       destFrame[fieldIndex++] = attitude.pitch;
-      destFrame[fieldIndex++] = attitude.heading;
+      destFrame[fieldIndex++] = (attitude as unknown as { heading: number }).heading;
     }
     return fieldIndex;
   };
@@ -706,7 +833,7 @@ export function FlightLog(logData) {
   /**
    * Read a single PID component value from the source frame, returning 0 if the field is absent.
    */
-  const readPidComponent = (srcFrame, components, index) => {
+  const readPidComponent = (srcFrame: Frame, components: number[], index: number) => {
     if (components[index] === undefined) { return 0; }
     return srcFrame[components[index]];
   };
@@ -717,11 +844,11 @@ export function FlightLog(logData) {
    * Returns updated fieldIndex.
    */
   const computePidSums = (
-    srcFrame,
-    destFrame,
-    fieldIndex,
-    axisPID,
-    sysConfig,
+    srcFrame: Frame,
+    destFrame: Frame,
+    fieldIndex: number,
+    axisPID: number[][],
+    sysConfig: SysConfig,
   ) => {
     for (let axis = 0; axis < 3; axis++) {
       let pidSum = 0;
@@ -747,13 +874,13 @@ export function FlightLog(logData) {
    * Returns updated fieldIndex.
    */
   const computeScaledRcCommands = (
-    srcFrame,
-    destFrame,
-    fieldIndex,
-    setpoint,
-    rcCommand,
-    currentFlightMode,
-    sysConfig,
+    srcFrame: Frame,
+    destFrame: Frame,
+    fieldIndex: number,
+    setpoint: number[],
+    rcCommand: number[],
+    currentFlightMode: number,
+    sysConfig: SysConfig,
   ) => {
     if (
       sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
@@ -788,11 +915,11 @@ export function FlightLog(logData) {
    * Returns updated fieldIndex.
    */
   const computePidErrors = (
-    srcFrame,
-    destFrame,
-    fieldIndex,
-    fieldIndexRcCommands,
-    gyroADC,
+    srcFrame: Frame,
+    destFrame: Frame,
+    fieldIndex: number,
+    fieldIndexRcCommands: number,
+    gyroADC: number[],
   ) => {
     for (let axis = 0; axis < 3; axis++) {
       const gyroADCdegrees =
@@ -811,15 +938,15 @@ export function FlightLog(logData) {
    * Returns updated fieldIndex.
    */
   const computeGpsFields = (
-    srcFrame,
-    destFrame,
-    fieldIndex,
-    gpsCoord,
-    numSatIndex,
+    srcFrame: Frame,
+    destFrame: Frame,
+    fieldIndex: number,
+    gpsCoord: number[],
+    numSatIndex: number,
   ) => {
     const numSat = numSatIndex ? srcFrame[numSatIndex] : 0;
     if (numSat > 4) {
-      const gpsCartesianCoords = gpsTransform.WGS_BS(
+      const gpsCartesianCoords = gpsTransform!.WGS_BS(
         srcFrame[gpsCoord[0]] / 10000000,
         srcFrame[gpsCoord[1]] / 10000000,
         srcFrame[gpsCoord[2]] / 10,
@@ -854,7 +981,7 @@ export function FlightLog(logData) {
    * Writes 1 field to destFrame at fieldIndex.
    * Returns updated fieldIndex.
    */
-  const computeTrajectoryTilt = (srcFrame, destFrame, fieldIndex, gpsVelNED) => {
+  const computeTrajectoryTilt = (srcFrame: Frame, destFrame: Frame, fieldIndex: number, gpsVelNED: number[]) => {
     const Vn = srcFrame[gpsVelNED[0]],
       Ve = srcFrame[gpsVelNED[1]],
       Vd = srcFrame[gpsVelNED[2]];
@@ -873,16 +1000,16 @@ export function FlightLog(logData) {
    * Resolve field indices from fieldNameToIndex for computed field injection.
    * Sets arrays to false when the primary field is absent.
    */
-  const resolveFieldIndices = () => {
-    let gyroADC = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
-    let accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
-    let magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
-    let imuQuaternion = [fieldNameToIndex["imuQuaternion[0]"], fieldNameToIndex["imuQuaternion[1]"], fieldNameToIndex["imuQuaternion[2]"]];
-    let rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]];
-    let setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]];
-    let gpsCoord = [fieldNameToIndex["GPS_coord[0]"], fieldNameToIndex["GPS_coord[1]"], fieldNameToIndex["GPS_altitude"]];
-    let gpsVelNED = [fieldNameToIndex["GPS_velned[0]"], fieldNameToIndex["GPS_velned[1]"], fieldNameToIndex["GPS_velned[2]"]];
-    let axisPID = [
+  const resolveFieldIndices = (): ComputeCtx => {
+    let gyroADC: FieldIndexList = [fieldNameToIndex["gyroADC[0]"], fieldNameToIndex["gyroADC[1]"], fieldNameToIndex["gyroADC[2]"]];
+    let accSmooth: FieldIndexList = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
+    let magADC: FieldIndexList = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
+    let imuQuaternion: FieldIndexList = [fieldNameToIndex["imuQuaternion[0]"], fieldNameToIndex["imuQuaternion[1]"], fieldNameToIndex["imuQuaternion[2]"]];
+    let rcCommand: FieldIndexList = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]];
+    let setpoint: FieldIndexList = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]];
+    let gpsCoord: FieldIndexList = [fieldNameToIndex["GPS_coord[0]"], fieldNameToIndex["GPS_coord[1]"], fieldNameToIndex["GPS_altitude"]];
+    let gpsVelNED: FieldIndexList = [fieldNameToIndex["GPS_velned[0]"], fieldNameToIndex["GPS_velned[1]"], fieldNameToIndex["GPS_velned[2]"]];
+    let axisPID: number[][] | false = [
       [fieldNameToIndex["axisP[0]"], fieldNameToIndex["axisI[0]"], fieldNameToIndex["axisD[0]"], fieldNameToIndex["axisF[0]"], fieldNameToIndex["axisS[0]"]],
       [fieldNameToIndex["axisP[1]"], fieldNameToIndex["axisI[1]"], fieldNameToIndex["axisD[1]"], fieldNameToIndex["axisF[1]"], fieldNameToIndex["axisS[1]"]],
       [fieldNameToIndex["axisP[2]"], fieldNameToIndex["axisI[2]"], fieldNameToIndex["axisD[2]"], fieldNameToIndex["axisF[2]"], fieldNameToIndex["axisS[2]"]],
@@ -911,7 +1038,12 @@ export function FlightLog(logData) {
   /**
    * Compute all additional fields for a single frame.
    */
-  const computeFrameFields = (srcFrame, destFrame, chunkIMU, ctx) => {
+  const computeFrameFields = (
+    srcFrame: Frame,
+    destFrame: Frame,
+    chunkIMU: IMUInstance,
+    ctx: ComputeCtx,
+  ) => {
     let fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
     fieldIndex = computeAttitude(srcFrame, destFrame, fieldIndex, {
@@ -924,18 +1056,18 @@ export function FlightLog(logData) {
     });
 
     if (!ctx.disabledFields.PID) {
-      fieldIndex = computePidSums(srcFrame, destFrame, fieldIndex, ctx.axisPID, ctx.sysConfig);
+      fieldIndex = computePidSums(srcFrame, destFrame, fieldIndex, ctx.axisPID as number[][], ctx.sysConfig);
     }
 
     const currentFlightMode = srcFrame[ctx.flightModeFlagsIndex];
     const fieldIndexRcCommands = fieldIndex;
 
     if (!ctx.disabledFields.SETPOINT) {
-      fieldIndex = computeScaledRcCommands(srcFrame, destFrame, fieldIndex, ctx.setpoint, ctx.rcCommand, currentFlightMode, ctx.sysConfig);
+      fieldIndex = computeScaledRcCommands(srcFrame, destFrame, fieldIndex, ctx.setpoint as number[], ctx.rcCommand as number[], currentFlightMode, ctx.sysConfig);
     }
 
     if (!ctx.disabledFields.GYRO && !ctx.disabledFields.SETPOINT) {
-      fieldIndex = computePidErrors(srcFrame, destFrame, fieldIndex, fieldIndexRcCommands, ctx.gyroADC);
+      fieldIndex = computePidErrors(srcFrame, destFrame, fieldIndex, fieldIndexRcCommands, ctx.gyroADC as number[]);
     }
 
     if (gpsTransform && ctx.gpsCoord) {
@@ -955,7 +1087,7 @@ export function FlightLog(logData) {
    *
    * sourceChunks and destChunks can be the same array.
    */
-  const injectComputedFields = (sourceChunks, destChunks) => {
+  const injectComputedFields = (sourceChunks: FlightLogChunk[], destChunks: FlightLogChunk[]) => {
     if (destChunks.length === 0) { return; }
 
     const ctx = resolveFieldIndices();
@@ -989,7 +1121,7 @@ export function FlightLog(logData) {
    *
    * Set processLastChunk to true if the last chunk of this array is the final chunk in the file.
    */
-  function addMissingEventTimes(chunks, processLastChunk) {
+  function addMissingEventTimes(chunks: FlightLogChunk[], processLastChunk: boolean) {
     /*
      * If we're at the end of the file then we will compute event times for the last chunk, otherwise we'll
      * wait until we have the next chunk to fill in times for this last chunk.
@@ -1236,7 +1368,7 @@ export function FlightLog(logData) {
               ) {
                 accumulator -=
                   sourceChunks[leftChunkIndex].frames[leftFrameIndex][
-                    fieldIndex
+                    fieldIndex as unknown as number
                   ];
                 valuesInHistory--;
 
@@ -1259,7 +1391,7 @@ export function FlightLog(logData) {
               ) {
                 accumulator +=
                   sourceChunks[rightChunkIndex].frames[rightFrameIndex][
-                    fieldIndex
+                    fieldIndex as unknown as number
                   ];
                 valuesInHistory++;
 
@@ -1368,7 +1500,7 @@ export function FlightLog(logData) {
       max = -Number.MAX_VALUE;
 
     const fieldIndex = this.getMainFieldIndexByName(field_name),
-      fieldStat = fieldIndex !== undefined ? stats.field[fieldIndex] : false;
+      fieldStat = fieldIndex !== undefined ? stats.field![fieldIndex] : false;
 
     if (fieldStat) {
       min = Math.min(min, fieldStat.min);
@@ -1459,11 +1591,11 @@ export function FlightLog(logData) {
   };
 }
 
-FlightLog.prototype.accRawToGs = function (value) {
+FlightLog.prototype.accRawToGs = function (value: number) {
   return value / this.getSysConfig().acc_1G;
 };
 
-FlightLog.prototype.gyroRawToDegreesPerSecond = function (value) {
+FlightLog.prototype.gyroRawToDegreesPerSecond = function (value: number) {
   return (
     ((this.getSysConfig().gyroScale * 1000000) / (Math.PI / 180.0)) * value
   );
@@ -1478,9 +1610,9 @@ FlightLog.prototype.gyroRawToDegreesPerSecond = function (value) {
 
 // Convert rcCommand to degrees per second
 FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
-  value,
-  axis,
-  currentFlightMode,
+  value: number,
+  axis: number,
+  currentFlightMode: number,
 ) {
   const sysConfig = this.getSysConfig();
 
@@ -1488,7 +1620,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
     const RC_RATE_INCREMENTAL = 14.54;
     const RC_EXPO_POWER = 3;
 
-    const calculateSetpointRate = function (axis, rc) {
+    const calculateSetpointRate = function (axis: number, rc: number) {
       let rcCommandf = rc / 500.0;
       const rcCommandfAbs = Math.abs(rcCommandf);
 
@@ -1539,7 +1671,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
       return sysConfig.features & FEATURE_SUPEREXPO_RATES;
     };
 
-    const calculateRate = function (value, axis) {
+    const calculateRate = function (value: number, axis: number) {
       let angleRate;
 
       if (isSuperExpoActive()) {
@@ -1570,7 +1702,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
   } else {
     // earlier version of betaflight
 
-    const calculateExpoPlus = (value, axis) => {
+    const calculateExpoPlus = (value: number, axis: number) => {
       let propFactor;
       let superExpoFactor;
 
@@ -1592,13 +1724,13 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
 
     if (axis === AXIS.YAW /*YAW*/) {
       if (
-        sysConfig.superExpoYawMode === SUPER_EXPO_YAW.ON &&
+        sysConfig.superExpoYawMode === (SUPER_EXPO_YAW as unknown as Record<string, unknown>).ON &&
         currentFlightMode == null
       )
         superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
       if (
-        sysConfig.superExpoYawMode === SUPER_EXPO_YAW.ALWAYS ||
-        (sysConfig.superExpoYawMode === SUPER_EXPO_YAW.ON &&
+        sysConfig.superExpoYawMode === (SUPER_EXPO_YAW as unknown as Record<string, unknown>).ALWAYS ||
+        (sysConfig.superExpoYawMode === (SUPER_EXPO_YAW as unknown as Record<string, unknown>).ON &&
           this.getFlightMode(currentFlightMode).SuperExpo)
       ) {
         return (
@@ -1623,7 +1755,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
   }
 };
 
-FlightLog.prototype.rcCommandRawToThrottle = function (value) {
+FlightLog.prototype.rcCommandRawToThrottle = function (value: number) {
   // Throttle displayed as percentage
   return Math.min(
     Math.max(
@@ -1637,7 +1769,7 @@ FlightLog.prototype.rcCommandRawToThrottle = function (value) {
 };
 
 // rcCommandThrottle back transform function
-FlightLog.prototype.ThrottleTorcCommandRaw = function (value) {
+FlightLog.prototype.ThrottleTorcCommandRaw = function (value: number) {
   // Throttle displayed as percentage
   return (
     (value / 100) *
@@ -1646,7 +1778,7 @@ FlightLog.prototype.ThrottleTorcCommandRaw = function (value) {
   );
 };
 
-FlightLog.prototype.rcMotorRawToPctPhysical = function (value) {
+FlightLog.prototype.rcMotorRawToPctPhysical = function (value: number) {
   // Motor displayed as percentage
   let motorPct;
   if (this.isDigitalProtocol()) {
@@ -1660,7 +1792,7 @@ FlightLog.prototype.rcMotorRawToPctPhysical = function (value) {
   return Math.min(Math.max(motorPct, 0.0), 100.0);
 };
 // rcMotorRaw back transform function
-FlightLog.prototype.PctPhysicalTorcMotorRaw = function (value) {
+FlightLog.prototype.PctPhysicalTorcMotorRaw = function (value: number) {
   // Motor displayed as percentage
   let motorRaw;
   if (this.isDigitalProtocol()) {
@@ -1696,7 +1828,7 @@ FlightLog.prototype.isDigitalProtocol = function () {
   return digitalProtocol;
 };
 
-FlightLog.prototype.getPIDPercentage = function (value) {
+FlightLog.prototype.getPIDPercentage = function (value: number) {
   // PID components and outputs are displayed as percentage (raw value is 0-1000)
   return value / 10.0;
 };
@@ -1719,14 +1851,14 @@ FlightLog.prototype.getReferenceVoltageMillivolts = function () {
   }
 };
 
-FlightLog.prototype.vbatADCToMillivolts = function (vbatADC) {
+FlightLog.prototype.vbatADCToMillivolts = function (vbatADC: number) {
   const ADCVREF = 33;
 
   // ADC is 12 bit (i.e. max 0xFFF), voltage reference is 3.3V, vbatscale is premultiplied by 100
   return (vbatADC * ADCVREF * 10 * this.getSysConfig().vbatscale) / 0xfff;
 };
 
-FlightLog.prototype.amperageADCToMillivolts = function (amperageADC) {
+FlightLog.prototype.amperageADCToMillivolts = function (amperageADC: number) {
   const ADCVREF = 33;
   let millivolts = (amperageADC * ADCVREF * 100) / 4095;
 
@@ -1735,7 +1867,7 @@ FlightLog.prototype.amperageADCToMillivolts = function (amperageADC) {
   return (millivolts * 10000) / this.getSysConfig().currentMeterScale;
 };
 
-FlightLog.prototype.getFlightMode = function (currentFlightMode) {
+FlightLog.prototype.getFlightMode = function (currentFlightMode: number) {
   return {
     Arm: (currentFlightMode & 1) !== 0,
     Angle: (currentFlightMode & (1 << 1)) !== 0,
@@ -1771,7 +1903,7 @@ FlightLog.prototype.getFlightMode = function (currentFlightMode) {
   };
 };
 
-FlightLog.prototype.getFeatures = function (enabledFeatures) {
+FlightLog.prototype.getFeatures = function (enabledFeatures: number) {
   return {
     RX_PPM: (enabledFeatures & 1) !== 0,
     VBAT: (enabledFeatures & (1 << 1)) !== 0,
@@ -1803,7 +1935,7 @@ FlightLog.prototype.getFeatures = function (enabledFeatures) {
 
 FlightLog.prototype.isFieldDisabled = function () {
   const disabledFields = this.getSysConfig().fields_disabled_mask;
-  const disabledFieldsFlags = {};
+  const disabledFieldsFlags: Record<string, boolean> = {};
   if (
     this.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
     firmwareGreaterOrEqual(this.getSysConfig(), "2025.12.0")

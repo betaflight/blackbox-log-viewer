@@ -73,12 +73,29 @@ export interface FlightLogEventData {
 export type FrameArray = number[];
 
 /**
+ * A cached block of decoded, time-aligned frames (with computed fields injected
+ * on demand). Several fields are added/removed dynamically during processing.
+ */
+export interface FlightLogChunk {
+  index: number;
+  frames: number[][];
+  gapStartsHere: Record<number, boolean>;
+  events: FlightLogEventData[];
+  initialIMU?: unknown;
+  hasAdditionalFields?: boolean;
+  needsEventTimes?: boolean;
+}
+
+/**
  * Callback invoked when a frame has been decoded.
  * (frameValid, frame, frameType, frameOffset, frameSize)
  */
 export type OnFrameReady = (
   frameValid: boolean,
-  frame: FrameArray | FlightLogEventData | null,
+  // Polymorphic: a numeric frame, a decoded event object, or null — consumers
+  // discriminate by frameType. Kept loose to match the dynamic JS callers.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  frame: any,
   frameType: string,
   frameOffset: number,
   frameSize: number,
