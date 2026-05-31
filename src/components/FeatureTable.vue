@@ -21,8 +21,11 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  data: { type: Array, required: true },
-});
+<script setup lang="ts">
+interface FeatureItem {
+  enabled: boolean;
+  name: string;
+  description?: string;
+}
+defineProps<{ data: FeatureItem[] }>();
 </script>

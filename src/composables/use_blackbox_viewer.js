@@ -46,16 +46,18 @@ let initialized = false;
 // Components call this in setup() to reach the operations. It does NOT trigger
 // initialization — it just hands back the shared `ops` object (populated once
 // the viewer is initialized at bootstrap).
+/** @returns {import("./blackbox_viewer_ops").BlackboxViewerOps} */
 export function useBlackboxViewer() {
-  return ops;
+  return /** @type {import("./blackbox_viewer_ops").BlackboxViewerOps} */ (ops);
 }
 
 // Owns the renderer instances and wires the operations. Must run AFTER the Vue
 // app has mounted, so Vue-rendered canvases (e.g. #analyserCanvas, rendered by
 // SpectrumAnalyser.vue) exist. Called once from main.js.
+/** @returns {import("./blackbox_viewer_ops").BlackboxViewerOps} */
 export function initBlackboxViewer() {
   if (initialized) {
-    return ops;
+    return /** @type {import("./blackbox_viewer_ops").BlackboxViewerOps} */ (ops);
   }
   initialized = true;
 

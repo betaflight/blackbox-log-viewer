@@ -28,7 +28,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useAppStore } from "../stores/app.js";
 import { useWorkspaceStore } from "../stores/workspace.js";
 

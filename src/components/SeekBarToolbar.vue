@@ -11,7 +11,7 @@
   </span>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 import { useBlackboxViewer } from "../composables/use_blackbox_viewer.js";

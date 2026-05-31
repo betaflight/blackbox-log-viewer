@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   top: { type: String, default: "0%" },
   left: { type: String, default: "0%" },
@@ -60,7 +60,7 @@ defineProps({
 
 defineEmits(["update:top", "update:left", "update:size"]);
 
-function parseVal(v) {
+function parseVal(v: string) {
   return Number.parseInt(v) || 0;
 }
 </script>

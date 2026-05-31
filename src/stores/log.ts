@@ -30,8 +30,8 @@ export const useLogStore = defineStore("log", () => {
   const videoURL = ref<string | null>(null);
 
   // Field values table data (updated by updateValuesChart in main.js)
-  const fieldValues = shallowRef<unknown[]>([]);
-  const fieldStats = shallowRef<unknown[]>([]);
+  const fieldValues = shallowRef<Array<Record<string, unknown>>>([]);
+  const fieldStats = shallowRef<Array<Record<string, unknown>>>([]);
 
   // Log index picker (multiple logs in one file)
   const logIndexEntries = shallowRef<Array<{ label: string; value: number; disabled?: boolean }>>([]);

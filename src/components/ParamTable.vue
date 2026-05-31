@@ -24,7 +24,7 @@
   </UTable>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   params: { type: Array, required: true },
 });
