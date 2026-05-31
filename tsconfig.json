@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    /* Incremental migration: TS and JS coexist. */
+    "allowJs": true,
+    /* Existing .js is not type-checked yet — files opt in by being renamed to .ts
+       (see issue #924, Phase 2+). Flip to true once the core is converted. */
+    "checkJs": false,
+
+    /* Vite/esbuild transpiles; tsc & vue-tsc are type-checkers only. */
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "useDefineForClassFields": true,
+
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "vite-plugin-pwa/client"],
+
+    /* Strict by default for new TypeScript code. */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
+  "exclude": ["node_modules", "dist", "src/vendor"]
+}
