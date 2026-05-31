@@ -178,7 +178,7 @@
                         resetMin(field);
                         emitUpdate();
                       "
-                      @keydown="(e) => {
+                      @keydown="(e: KeyboardEvent) => {
                         if (e.key === 'Control' && field.curve) {
                           field.curve.highPrecise = !field.curve.highPrecise;
                         }
@@ -200,7 +200,7 @@
                         resetMax(field);
                         emitUpdate();
                       "
-                      @keydown="(e) => {
+                      @keydown="(e: KeyboardEvent) => {
                         if (e.key === 'Control' && field.curve) {
                           field.curve.highPrecise = !field.curve.highPrecise;
                         }
@@ -248,7 +248,7 @@
   </UModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, computed } from "vue";
 import UiBox from "./UiBox.vue";
 import { GraphConfig } from "../graph_config.js";
@@ -264,12 +264,26 @@ const props = defineProps({
 
 const emit = defineEmits(["save", "update"]);
 
+// Grapher/GraphConfig instances live in still-JS modules; typed loosely.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+interface GraphField {
+  name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [k: string]: any;
+}
+interface GraphCfg {
+  label: string;
+  height: number;
+  fields: GraphField[];
+}
+
 const palette = GraphConfig.PALETTE;
 const noGrouping = { useGrouping: false };
-const localGraphs = ref([]);
-const prevConfig = ref(null);
-const offeredFields = ref([]);
-const exampleGraphs = ref([]);
+const localGraphs = ref<GraphCfg[]>([]);
+const prevConfig = ref<Loose>(null);
+const offeredFields = ref<string[]>([]);
+const exampleGraphs = ref<Loose[]>([]);
 
 const heightOptions = [
   { label: "1", value: 1 },
@@ -297,7 +311,7 @@ const addGraphItems = computed(() => [
   })),
 ]);
 
-const BLACKLISTED_FIELDS = {
+const BLACKLISTED_FIELDS: Record<string, boolean> = {
   time: true,
   loopIteration: true,
   "setpoint[0]": true,
@@ -307,7 +321,7 @@ const BLACKLISTED_FIELDS = {
 };
 const ARRAY_FIELD_PATTERN = /^(.+)\[\d+\]$/;
 
-function collectFieldsFromLog(fieldNames, result, seen) {
+function collectFieldsFromLog(fieldNames: string[], result: string[], seen: Record<string, boolean>) {
   let lastRoot = null;
   for (const name of fieldNames) {
     if (BLACKLISTED_FIELDS[name]) {
@@ -327,7 +341,7 @@ function collectFieldsFromLog(fieldNames, result, seen) {
   }
 }
 
-function collectFieldsFromConfig(graphConfig, result, seen) {
+function collectFieldsFromConfig(graphConfig: Loose, result: string[], seen: Record<string, boolean>) {
   const graphs = graphConfig.getGraphs();
   for (const g of graphs) {
     for (const f of g.fields) {
@@ -346,8 +360,8 @@ function buildOfferedFields() {
   }
 
   const fieldNames = props.flightLog.getMainFieldNames();
-  const result = [];
-  const seen = {};
+  const result: string[] = [];
+  const seen: Record<string, boolean> = {};
 
   collectFieldsFromLog(fieldNames, result, seen);
 
@@ -363,7 +377,7 @@ function buildExampleGraphs() {
   if (!props.flightLog) {
     return;
   }
-  const examples = GraphConfig.getExampleGraphConfigs(props.flightLog);
+  const examples: Loose[] = GraphConfig.getExampleGraphConfigs(props.flightLog);
   examples.unshift({
     label: "Custom graph",
     fields: [{ name: "" }],
@@ -372,18 +386,14 @@ function buildExampleGraphs() {
   exampleGraphs.value = examples;
 }
 
-function cloneGraphs(graphs) {
-  return structuredClone(graphs);
-}
-
 // Convert internal graph config to the format expected by legacy code
 function convertToConfig() {
-  return localGraphs.value.map((g) => ({
+  return localGraphs.value.map((g: GraphCfg) => ({
     label: g.label || "",
     height: g.height || 1,
     fields: g.fields
-      .filter((f) => f.name)
-      .map((f) => ({
+      .filter((f: GraphField) => f.name)
+      .map((f: GraphField) => ({
         name: f.name,
         smoothing: f.smoothing,
         curve: {
@@ -407,12 +417,16 @@ function convertToConfig() {
   }));
 }
 
-function friendlyName(fieldName) {
+function friendlyName(fieldName: string) {
   const debugMode = props.flightLog?.getSysConfig()?.debug_mode;
   return FlightLogFieldPresenter.fieldNameToFriendly(fieldName, debugMode);
 }
 
-function getDefaults(fieldName) {
+function getDefaults(fieldName: string): {
+  smoothing: number;
+  power: number;
+  MinMax: { min: number; max: number };
+} {
   if (!props.flightLog) {
     return { smoothing: 0, power: 1, MinMax: { min: -500, max: 500 } };
   }
@@ -421,29 +435,14 @@ function getDefaults(fieldName) {
     fieldName,
   );
   const curve = GraphConfig.getDefaultCurveForField(props.flightLog, fieldName);
-  return { smoothing, ...curve };
+  return { smoothing, ...curve } as {
+    smoothing: number;
+    power: number;
+    MinMax: { min: number; max: number };
+  };
 }
 
-function formatSmoothing(field) {
-  return `${((field.smoothing ?? 0) / 100).toFixed(0)}%`;
-}
-
-function parseSmoothing(field, val) {
-  field.smoothing = Number.parseInt(val) * 100;
-}
-
-function formatExpo(field) {
-  return `${((field.curve?.power ?? 1) * 100).toFixed(0)}%`;
-}
-
-function parseExpo(field, val) {
-  if (!field.curve) {
-    field.curve = {};
-  }
-  field.curve.power = Number.parseInt(val) / 100;
-}
-
-function ensureCurveMinMax(field) {
+function ensureCurveMinMax(field: GraphField) {
   if (!field.curve) {
     field.curve = {};
   }
@@ -452,33 +451,33 @@ function ensureCurveMinMax(field) {
   }
 }
 
-function setMin(field, val) {
+function setMin(field: GraphField, val: string | number) {
   ensureCurveMinMax(field);
-  const num = Number.parseFloat(val);
+  const num = Number.parseFloat(String(val));
   if (Number.isFinite(num)) {
     field.curve.MinMax.min = num;
   }
 }
 
-function setMax(field, val) {
+function setMax(field: GraphField, val: string | number) {
   ensureCurveMinMax(field);
-  const num = Number.parseFloat(val);
+  const num = Number.parseFloat(String(val));
   if (Number.isFinite(num)) {
     field.curve.MinMax.max = num;
   }
 }
 
-function resetMin(field) {
+function resetMin(field: GraphField) {
   const defaults = getDefaults(field.name);
   setMin(field, defaults.MinMax.min);
 }
 
-function resetMax(field) {
+function resetMax(field: GraphField) {
   const defaults = getDefaults(field.name);
   setMax(field, defaults.MinMax.max);
 }
 
-function onFieldChange(graph, field) {
+function onFieldChange(graph: GraphCfg, field: GraphField) {
   if (!field.name || !props.flightLog || !props.graphConfig) {
     return;
   }
@@ -491,7 +490,7 @@ function onFieldChange(graph, field) {
     // Replace this field with the expanded set
     const idx = graph.fields.indexOf(field);
     const colorStart = idx;
-    const newFields = expanded.map((ef, i) => {
+    const newFields = expanded.map((ef: Loose, i: number) => {
       const c = palette[(colorStart + i) % palette.length].color;
       return makeField(ef.name, ef, c);
     });
@@ -504,7 +503,7 @@ function onFieldChange(graph, field) {
   }
 }
 
-function makeField(name, existing, color) {
+function makeField(name: string, existing: Loose, color?: string) {
   const defaults = getDefaults(name);
   return {
     name,
@@ -520,19 +519,19 @@ function makeField(name, existing, color) {
   };
 }
 
-function cycleColor(field) {
-  const idx = palette.findIndex((c) => c.color === field.color);
+function cycleColor(field: GraphField) {
+  const idx = palette.findIndex((c: Loose) => c.color === field.color);
   field.color = palette[(idx + 1) % palette.length].color;
   emitUpdate();
 }
 
-function addField(graph) {
+function addField(graph: GraphCfg) {
   const colorIdx = graph.fields.length;
   const color = palette[colorIdx % palette.length].color;
   graph.fields.push(makeField("", {}, color));
 }
 
-function removeField(graph, fIdx) {
+function removeField(graph: GraphCfg, fIdx: number) {
   graph.fields.splice(fIdx, 1);
   if (graph.fields.length === 0) {
     const gIdx = localGraphs.value.indexOf(graph);
@@ -543,9 +542,9 @@ function removeField(graph, fIdx) {
   emitUpdate();
 }
 
-function addExampleGraph(example) {
+function addExampleGraph(example: Loose) {
   const colorBase = 0;
-  const fields = [];
+  const fields: GraphField[] = [];
   for (const f of example.fields) {
     if (!props.flightLog || !props.graphConfig) {
       fields.push(
@@ -589,8 +588,8 @@ function onCancel() {
   open.value = false;
 }
 
-function cloneGraphToLocal(g) {
-  const fields = [];
+function cloneGraphToLocal(g: Loose) {
+  const fields: GraphField[] = [];
   for (const f of g.fields) {
     if (!props.flightLog) {
       continue;
@@ -645,14 +644,19 @@ function defineFieldsResolution() {
 // Right mouse click at min-max input to show simple menu
 // Shift + right mouse click to show extended menu
 
-const currentState = ref({
+const currentState = ref<{
+  graph: GraphCfg | null;
+  field: GraphField | null;
+  isFieldChecked: boolean[] | null;
+  shiftKey: boolean;
+}>({
   graph: null,
   field: null,
   isFieldChecked: null,
   shiftKey: false,
 });
 
-function setMinMaxToDefault(setCheckedOnly) {
+function setMinMaxToDefault(setCheckedOnly?: boolean) {
   if (currentState.value.graph?.fields) {
     for (const [index, field] of currentState.value.graph.fields.entries()) {
       if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
@@ -672,7 +676,7 @@ function setMinMaxSelectedDefault() {
   }
 }
 
-function setMinMaxLikeThis(setCheckedOnly) {
+function setMinMaxLikeThis(setCheckedOnly?: boolean) {
   const mm = currentState.value.field?.curve?.MinMax;
   if (currentState.value.graph?.fields && mm?.min !== undefined && mm?.max !== undefined) {
     const min = mm.min;
@@ -687,7 +691,7 @@ function setMinMaxLikeThis(setCheckedOnly) {
   }
 }
 
-function setMinMaxOneScale(setCheckedOnly) {
+function setMinMaxOneScale(setCheckedOnly?: boolean) {
   let max = -Number.MAX_VALUE;
   let min = Number.MAX_VALUE;
 
@@ -714,7 +718,7 @@ function setMinMaxOneScale(setCheckedOnly) {
   }
 }
 
-function setMinMaxCentered(setCheckedOnly) {
+function setMinMaxCentered(setCheckedOnly?: boolean) {
   if (currentState.value.graph?.fields) {
     for (const [index, field] of currentState.value.graph.fields.entries()) {
       if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
@@ -738,13 +742,13 @@ function setMinMaxSelectedCentered() {
   if (mm?.min !== undefined && mm?.max !== undefined) {
     const max = Math.max(Math.abs(mm.min), Math.abs(mm.max));
     const min = -max;
-    setMin(currentState.value.field, min);
-    setMax(currentState.value.field, max);
+    setMin(currentState.value.field!, min);
+    setMax(currentState.value.field!, max);
     emitUpdate();
   }
 }
 
-function setMinMaxZoom(zoom, setCheckedOnly) {
+function setMinMaxZoom(zoom: number, setCheckedOnly?: boolean) {
   if (currentState.value.graph?.fields) {
     for (const [index, field] of currentState.value.graph.fields.entries()) {
       if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
@@ -761,18 +765,18 @@ function setMinMaxZoom(zoom, setCheckedOnly) {
   }
 }
 
-function setMinMaxSelectedZoom(zoom) {
+function setMinMaxSelectedZoom(zoom: number) {
   const mm = currentState.value.field?.curve?.MinMax;
   if (mm?.min !== undefined && mm?.max !== undefined) {
     const middle = (mm.min + mm.max) / 2;
     const halfRange = (mm.max - mm.min) / 2;
-    setMin(currentState.value.field, middle - halfRange * zoom);
-    setMax(currentState.value.field, middle + halfRange * zoom);
+    setMin(currentState.value.field!, middle - halfRange * zoom);
+    setMax(currentState.value.field!, middle + halfRange * zoom);
     emitUpdate();
   }
 }
 
-function setMinMaxToFullRangeDuringAllTime(setCheckedOnly) {
+function setMinMaxToFullRangeDuringAllTime(setCheckedOnly?: boolean) {
   if (currentState.value.graph?.fields && props.flightLog) {
     for (const [index, field] of currentState.value.graph.fields.entries()) {
       if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
@@ -787,7 +791,7 @@ function setMinMaxToFullRangeDuringAllTime(setCheckedOnly) {
   }
 }
 
-function getMinMaxForFieldDuringWindowTimeInterval(setCheckedOnly) {
+function getMinMaxForFieldDuringWindowTimeInterval(setCheckedOnly?: boolean) {
   if (currentState.value.graph?.fields && props.flightLog && props.grapher) {
     for (const [index, field] of currentState.value.graph.fields.entries()) {
       if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
@@ -802,7 +806,7 @@ function getMinMaxForFieldDuringWindowTimeInterval(setCheckedOnly) {
   }
 }
 
-function getMinMaxForFieldDuringMarkedInterval(setCheckedOnly) {
+function getMinMaxForFieldDuringMarkedInterval(setCheckedOnly?: boolean) {
   if (currentState.value.graph?.fields && props.flightLog && props.grapher) {
     for (const [index, field] of currentState.value.graph.fields.entries()) {
       if ((!setCheckedOnly || !currentState.value.isFieldChecked) || currentState.value.isFieldChecked[index]) {
@@ -860,14 +864,14 @@ const simpleMenuItems = computed(() => [
   [
     {
       label: 'Zoom In',
-      onSelect(e) {
+      onSelect(e: Event) {
         e.preventDefault();
           setMinMaxZoom(1 / zoom);
       },
     },
     {
       label: 'Zoom Out',
-      onSelect(e) {
+      onSelect(e: Event) {
         e.preventDefault();
         setMinMaxZoom(zoom);
       },
@@ -902,14 +906,14 @@ const simpleMenuItems = computed(() => [
         [
           {
             label: 'Zoom In',
-            onSelect(e) {
+            onSelect(e: Event) {
               e.preventDefault();
               setMinMaxSelectedZoom(1 / zoom);
             },
           },
           {
             label: 'Zoom Out',
-            onSelect(e) {
+            onSelect(e: Event) {
               e.preventDefault();
               setMinMaxSelectedZoom(zoom);
             },
@@ -930,15 +934,16 @@ const simpleMenuItems = computed(() => [
 
 function getFieldsCheckboxedSubmenu() {
   const fields = currentState.value.graph?.fields;
-  if (fields && currentState.value.isFieldChecked) {
-    return currentState.value.graph.fields.map((field, index) => ({
+  const checked = currentState.value.isFieldChecked;
+  if (fields && checked) {
+    return fields.map((field, index) => ({
       type: "checkbox",
       label: friendlyName(field.name),
-      checked: currentState.value.isFieldChecked[index],
-      onUpdateChecked(state) {
-        currentState.value.isFieldChecked[index] = state;
+      checked: checked[index],
+      onUpdateChecked(state: boolean) {
+        checked[index] = state;
       },
-      onSelect(e) {
+      onSelect(e: Event) {
         e.preventDefault();
       },
     }));
@@ -966,7 +971,7 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: "SET",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxLikeThis(true);
               e.preventDefault();
             },
@@ -993,21 +998,21 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: "At the all time",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxToFullRangeDuringAllTime(true);
               e.preventDefault();
             },
           },
           {
             label: "At the window time",
-            onSelect(e) {
+            onSelect(e: Event) {
               getMinMaxForFieldDuringWindowTimeInterval(true);
               e.preventDefault();
             },
           },
           {
             label: "At the markers time",
-            onSelect(e) {
+            onSelect(e: Event) {
               getMinMaxForFieldDuringMarkedInterval(true);
               e.preventDefault();
             },
@@ -1028,7 +1033,7 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: "SET CURVES TO SAME SCALE",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxOneScale(true);
               e.preventDefault();
             },
@@ -1049,7 +1054,7 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: "SET CURVES TO ZERO OFFSET",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxCentered(true);
               e.preventDefault();
             },
@@ -1072,14 +1077,14 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: "ZOOM IN",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxZoom(1 / zoom, true);
               e.preventDefault();
             },
           },
           {
             label: "ZOOM OUT",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxZoom(zoom, true);
               e.preventDefault();
             },
@@ -1102,7 +1107,7 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: "SET CURVES TO DEFAULT",
-            onSelect(e) {
+            onSelect(e: Event) {
               setMinMaxToDefault(true);
               e.preventDefault();
             },
@@ -1122,7 +1127,7 @@ const extendedMenuItems = computed(() => [
               [
                 {
                   label: "At the all time",
-                  onSelect(e) {
+                  onSelect(e: Event) {
                     setMinMaxSelectedToFullRangeDuringAllTime();
                     e.preventDefault();
                   },
@@ -1130,14 +1135,14 @@ const extendedMenuItems = computed(() => [
                 {
                   label: "At the window time",
                   disabled: true,
-                  onSelect(e) {
+                  onSelect(e: Event) {
                     e.preventDefault();
                   },
                 },
                 {
                   label: "At the markers time",
                   disabled: true,
-                  onSelect(e) {
+                  onSelect(e: Event) {
                     e.preventDefault();
                   },
                 },
@@ -1154,14 +1159,14 @@ const extendedMenuItems = computed(() => [
         [
           {
             label: 'Zoom In',
-            onSelect(e) {
+            onSelect(e: Event) {
               e.preventDefault();
               setMinMaxSelectedZoom(1 / zoom);
             },
           },
           {
             label: 'Zoom Out',
-            onSelect(e) {
+            onSelect(e: Event) {
               e.preventDefault();
               setMinMaxSelectedZoom(zoom);
             },
@@ -1188,7 +1193,7 @@ const menuItems = computed(() => {
   }
 });
 
-function onContextMenu(event, graph, field) {
+function onContextMenu(event: MouseEvent, graph: GraphCfg, field: GraphField) {
   currentState.value.graph = graph;
   currentState.value.field = field;
   currentState.value.shiftKey = event.shiftKey;

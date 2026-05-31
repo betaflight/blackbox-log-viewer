@@ -8,6 +8,9 @@ declare module "*.vue" {
   export default component;
 }
 
+// Third-party module without bundled type declarations.
+declare module "sortablejs";
+
 // Injected by Vite `define` (see vite.config.js).
 declare const __APP_VERSION__: string;
 
