@@ -48,7 +48,7 @@ export interface FlightLog {
   getLogCount(): number;
   getActivitySummary(): unknown;
   getMainFieldIndexByName(name: string): number | undefined;
-  getMainFieldIndexes(_name?: string): unknown;
+  getMainFieldIndexes(_name?: string): Record<string, number>;
   getFrameAtTime(startTime: number): FrameArray | false;
   getSmoothedFrameAtTime(startTime: number): FrameArray | false;
   getCurrentFrameAtTime(startTime: number): unknown;

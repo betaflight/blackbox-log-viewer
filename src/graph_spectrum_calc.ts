@@ -1,6 +1,110 @@
 import { FFTComplex } from "./fft_complex.js";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { useSettingsStore } from "./stores/settings.js";
+import type { FlightLog } from "./flightlog";
+import type { SysConfig, FlightLogChunk } from "./flightlog_types";
+
+interface FlightSamples {
+  samples: Float64Array;
+  count: number;
+}
+interface FlightSamplesVsX {
+  samples: Float64Array;
+  vsValues: Float64Array[];
+  count: number;
+  minValue: number;
+  maxValue: number;
+}
+interface FlightSamplesPidError {
+  piderror: Int16Array;
+  setpoint: Int16Array;
+  maxSetpoint: number;
+  count: number;
+}
+interface PsdResult {
+  psdOutput: Float64Array;
+  min: number;
+  max: number;
+  maxNoiseFrequency: number;
+}
+interface FftResult {
+  fieldIndex: number;
+  fieldName: string | null;
+  fftLength: number;
+  fftOutput: Float64Array;
+  maxNoiseFrequency: number;
+  blackBoxRate: number;
+}
+interface VsXResult {
+  vsRange: { min: number; max: number };
+}
+interface Curve {
+  lookupRaw(value: number): number;
+}
+
+// Singleton with methods added below; `this` and params are typed via this
+// interface (the object is cast to it, since methods are assigned afterwards).
+interface GraphSpectrumCalcType {
+  _analyserTimeRange: { in: number; out: number };
+  _blackBoxRate: number;
+  _dataBuffer: { fieldIndex: number; curve: Curve; fieldName: string };
+  _flightLog: FlightLog;
+  _sysConfig: SysConfig;
+  _motorPoles: number;
+  _pointsPerSegmentPSD: number;
+  _BetaflightRate: number;
+  _actualeRate: number;
+  initialize(
+    flightLog: FlightLog,
+    sysConfig: SysConfig,
+  ): { actualRate: number; betaflightRate: number } | undefined;
+  setInTime(time: number): number;
+  setOutTime(time: number): number;
+  setDataBuffer(fieldIndex: number, curve: Curve, fieldName: string): undefined;
+  dataLoadFrequency(): unknown;
+  setPointsPerSegmentPSD(pointsCount: number): void;
+  dataLoadPSD(_analyserZoomY?: unknown): unknown;
+  dataLoadFrequencyVsThrottle(): VsXResult;
+  dataLoadPowerSpectralDensityVsThrottle(): VsXResult;
+  dataLoadFrequencyVsRpm(): VsXResult;
+  dataLoadPowerSpectralDensityVsRpm(): VsXResult;
+  dataLoadPidErrorVsSetpoint(): unknown;
+  getNearPower2Value(size: number): number;
+  _dataLoadFrequencyVsX(
+    vsFieldNames: string[],
+    minValue?: number,
+    maxValue?: number,
+  ): VsXResult;
+  _dataLoadPowerSpectralDensityVsX(
+    vsFieldNames: string[],
+    minValue?: number,
+    maxValue?: number,
+  ): VsXResult;
+  _getFlightChunks(): FlightLogChunk[];
+  _getFlightSamplesFreq(scaled?: boolean): FlightSamples;
+  _getVsIndexes(vsFieldNames: string[]): number[];
+  _getFlightSamplesFreqVsX(
+    vsFieldNames: string[],
+    minValue?: number,
+    maxValue?: number,
+    scaled?: boolean,
+  ): FlightSamplesVsX;
+  _getFlightSamplesPidErrorVsSetpoint(axisIndex: number): FlightSamplesPidError;
+  _hanningWindow(samples: Float64Array | number[], size: number): void;
+  _fft(samples: Float64Array | number[], type?: string): Float64Array;
+  _normalizeFft(fftOutput: Float64Array): FftResult;
+  _psd(
+    samples: Float64Array | number[],
+    pointsPerSegment: number,
+    overlapCount: number,
+    scaling?: string,
+  ): PsdResult;
+  _fft_segmented(
+    samples: Float64Array | number[],
+    pointsPerSegment: number,
+    overlapCount: number,
+  ): Float64Array[];
+}
 
 const FIELD_THROTTLE_NAME = ["rcCommands[3]"],
   FIELD_RPM_NAMES = [
@@ -37,7 +141,7 @@ export const GraphSpectrumCalc = {
   _sysConfig: null,
   _motorPoles: null,
   _pointsPerSegmentPSD: 64,
-};
+} as unknown as GraphSpectrumCalcType;
 
 GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
   this._flightLog = flightLog;
@@ -46,7 +150,7 @@ GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
   const gyroRate = (1000000 / this._sysConfig["looptime"]).toFixed(0);
   this._motorPoles = flightLog.getSysConfig()["motor_poles"];
   this._blackBoxRate =
-    (gyroRate * this._sysConfig["frameIntervalPNum"]) /
+    ((gyroRate as unknown as number) * this._sysConfig["frameIntervalPNum"]) /
     this._sysConfig["frameIntervalPDenom"];
   if (this._sysConfig.pid_process_denom != null) {
     this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
@@ -432,11 +536,13 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
     axisIndex = 2;
   }
 
-  const flightSamples = this._getFlightSamplesPidErrorVsSetpoint(axisIndex);
+  const flightSamples = this._getFlightSamplesPidErrorVsSetpoint(axisIndex as number);
 
   // Add the total error by absolute position
-  const errorBySetpoint = Array.from({ length: flightSamples.maxSetpoint + 1 });
-  const numberOfSamplesBySetpoint = Array.from({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorBySetpoint: any[] = Array.from({ length: flightSamples.maxSetpoint + 1 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const numberOfSamplesBySetpoint: any[] = Array.from({
     length: flightSamples.maxSetpoint + 1,
   });
 
@@ -480,9 +586,11 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
 };
 
 GraphSpectrumCalc._getFlightChunks = function () {
-  const logStart = this._analyserTimeRange.in || this._flightLog.getMinTime();
+  const logStart =
+    this._analyserTimeRange.in || (this._flightLog.getMinTime() as number);
 
-  let logEnd = this._analyserTimeRange.out || this._flightLog.getMaxTime();
+  let logEnd =
+    this._analyserTimeRange.out || (this._flightLog.getMaxTime() as number);
 
   // Limit size
   logEnd =
@@ -541,10 +649,10 @@ GraphSpectrumCalc._getFlightSamplesFreq = function (scaled = true) {
 };
 
 GraphSpectrumCalc._getVsIndexes = function (vsFieldNames) {
-  const fieldIndexes = [];
+  const fieldIndexes: number[] = [];
   for (const fieldName of vsFieldNames) {
     if (Object.hasOwn(this._flightLog.getMainFieldIndexes(), fieldName)) {
-      fieldIndexes.push(this._flightLog.getMainFieldIndexByName(fieldName));
+      fieldIndexes.push(this._flightLog.getMainFieldIndexByName(fieldName)!);
     }
   }
   return fieldIndexes;
@@ -678,10 +786,10 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function (axisIndex) {
   // Get the PID Error field
   const FIELD_PIDERROR_INDEX = this._flightLog.getMainFieldIndexByName(
     `axisError[${axisIndex}]`,
-  );
+  ) as number;
   const FIELD_SETPOINT_INDEX = this._flightLog.getMainFieldIndexByName(
     `setpoint[${axisIndex}]`,
-  );
+  ) as number;
 
   const piderror = new Int16Array(
     (MAX_ANALYSER_LENGTH / (1000 * 1000)) * this._blackBoxRate,
