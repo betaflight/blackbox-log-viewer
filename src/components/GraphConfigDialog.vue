@@ -164,7 +164,8 @@
                   <div style="display: contents;" @contextmenu="(e) => onContextMenu(e, graph, field)">
                     <UInputNumber
                       :model-value="field.curve?.MinMax?.min ?? -500"
-                      :step="10"
+                      :step="field.curve?.highPrecise ? smallMinMaxStep : normalMinMaxStep"
+                      :class="{ 'italic': field.curve?.highPrecise }"
                       :format-options="noGrouping"
                       size="xs"
                       orientation="vertical"
@@ -177,10 +178,16 @@
                         resetMin(field);
                         emitUpdate();
                       "
+                      @keydown="(e) => {
+                        if (e.key === 'Control' && field.curve) {
+                          field.curve.highPrecise = !field.curve.highPrecise;
+                        }
+                      }"
                     />
                     <UInputNumber
                       :model-value="field.curve?.MinMax?.max ?? 500"
-                      :step="10"
+                      :step="field.curve?.highPrecise ? smallMinMaxStep : normalMinMaxStep"
+                      :class="{ 'italic': field.curve?.highPrecise }"
                       :format-options="noGrouping"
                       size="xs"
                       orientation="vertical"
@@ -193,6 +200,11 @@
                         resetMax(field);
                         emitUpdate();
                       "
+                      @keydown="(e) => {
+                        if (e.key === 'Control' && field.curve) {
+                          field.curve.highPrecise = !field.curve.highPrecise;
+                        }
+                      }"
                     />
                   </div>
                 </UContextMenu>
@@ -607,8 +619,31 @@ watch(open, (val) => {
   if (props.graphConfig) {
     localGraphs.value = props.graphConfig.getGraphs().map(cloneGraphToLocal);
     prevConfig.value = convertToConfig();
+    defineFieldsResolution();
   }
 });
+
+// Set curves min-max values changes step. Switch between normal 10 or precesion 0.1 step by using Ctrl key.
+// The precesion value input has italic font.
+
+const normalMinMaxStep = 10;
+const smallMinMaxStep = 0.1;
+
+function defineFieldsResolution() {
+  for (const graph of localGraphs.value) {
+    for (const field of graph.fields) {
+      const min = field?.curve?.MinMax?.min;
+      const max = field?.curve?.MinMax?.max;
+      if (min != null && max != null) {
+        field.curve.highPrecise = min % normalMinMaxStep !== 0 || max % normalMinMaxStep !== 0;
+      }
+    }
+  }
+}
+
+// Context menu to manage curves min-max values
+// Right mouse click at min-max input to show simple menu
+// Shift + right mouse click to show extended menu
 
 const currentState = ref({
   graph: null,
