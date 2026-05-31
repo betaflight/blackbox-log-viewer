@@ -11,12 +11,59 @@ import {
 } from "./flightlog_fielddefs";
 import { formatTime } from "./tools";
 import { useSettingsStore } from "./stores/settings.js";
+import type { FlightLog } from "./flightlog";
 
-export function FlightLogFieldPresenter() {
-  // this is intentional
+// Namespace of static presentation helpers (no instance state). Methods are
+// assigned below; the cast gives them contextual param/return typing.
+interface FlightLogFieldPresenterType {
+  (): void;
+  adjustDebugDefsList(firmwareType: number, firmwareVersion: string): void;
+  presentFlags(flags: number, flagNames: string[]): string;
+  presentChangeEvent(
+    flags: number,
+    lastFlags: number,
+    flagNames: string[],
+  ): string;
+  presentEnum(value: number, enumNames: string[]): number | string;
+  decodeCorrectAltitude(
+    altitude: number,
+    altitudeUnits: number,
+  ): number | string | undefined;
+  decodeAltitudeLogToChart(
+    altitude: number,
+    altitudeUnits: number,
+  ): number | undefined;
+  decodeFieldToFriendly(
+    flightLog: FlightLog,
+    fieldName: string,
+    value: number,
+    _currentFlightMode?: number,
+  ): string | number | undefined;
+  decodeDebugFieldToFriendly(
+    flightLog: FlightLog,
+    fieldName: string,
+    value: number,
+  ): string | number | undefined;
+  fieldNameToFriendly(fieldName: string, debugMode?: number): string;
+  ConvertFieldValue(
+    flightLog: FlightLog,
+    fieldName: string,
+    toFriendly: boolean,
+    value: number,
+  ): string | number | undefined;
+  ConvertDebugFieldValue(
+    flightLog: FlightLog,
+    fieldName: string,
+    toFriendly: boolean,
+    value: number,
+  ): string | number | undefined;
 }
 
-const FRIENDLY_FIELD_NAMES = {
+export const FlightLogFieldPresenter = function FlightLogFieldPresenter() {
+  // this is intentional
+} as unknown as FlightLogFieldPresenterType;
+
+const FRIENDLY_FIELD_NAMES: Record<string, string> = {
   "axisP[all]": "PID P",
   "axisP[0]": "PID P [roll]",
   "axisP[1]": "PID P [pitch]",
@@ -148,7 +195,7 @@ const FRIENDLY_FIELD_NAMES = {
   gpsTrajectoryTiltAngle: "GPS Traject. tilt angle",
 };
 
-const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
+const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL: Record<string, Record<string, string>> = {
   NONE: {
     "debug[all]": "Debug [all]",
     "debug[0]": "Debug [0]",
@@ -1157,7 +1204,7 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
   },
 };
 
-let DEBUG_FRIENDLY_FIELD_NAMES = null;
+let DEBUG_FRIENDLY_FIELD_NAMES: Record<string, Record<string, string>> = {};
 
 FlightLogFieldPresenter.adjustDebugDefsList = function (
   firmwareType,
@@ -1739,7 +1786,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       ) {
         return (
           `${(value / 100).toFixed(2)}V` +
-          `, ${(value / 100 / flightLog.getNumCellsEstimate()).toFixed(
+          `, ${(value / 100 / (flightLog.getNumCellsEstimate() as number)).toFixed(
             2,
           )} V/cell`
         );
@@ -1751,7 +1798,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       ) {
         return (
           `${(value / 10).toFixed(2)}V` +
-          `, ${(value / 10 / flightLog.getNumCellsEstimate()).toFixed(
+          `, ${(value / 10 / (flightLog.getNumCellsEstimate() as number)).toFixed(
             2,
           )} V/cell`
         );
@@ -1761,7 +1808,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
           `, ${(
             flightLog.vbatADCToMillivolts(value) /
             1000 /
-            flightLog.getNumCellsEstimate()
+            (flightLog.getNumCellsEstimate() as number)
           ).toFixed(2)} V/cell`
         );
       }
@@ -1775,7 +1822,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       ) {
         return (
           `${(value / 100).toFixed(2)}A` +
-          `, ${(value / 100 / flightLog.getNumMotors()).toFixed(2)} A/motor`
+          `, ${(value / 100 / (flightLog.getNumMotors() as number)).toFixed(2)} A/motor`
         );
       } else if (
         flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
@@ -1783,7 +1830,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
       ) {
         return (
           `${(value / 100).toFixed(2)}A` +
-          `, ${(value / 100 / flightLog.getNumMotors()).toFixed(2)} A/motor`
+          `, ${(value / 100 / (flightLog.getNumMotors() as number)).toFixed(2)} A/motor`
         );
       } else {
         return (
@@ -1791,7 +1838,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
           `, ${(
             flightLog.amperageADCToMillivolts(value) /
             1000 /
-            flightLog.getNumMotors()
+            (flightLog.getNumMotors() as number)
           ).toFixed(2)} A/motor`
         );
       }
@@ -2561,10 +2608,10 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
             userSettings.altitudeUnits,
           )
         : (value * 100) /
-            FlightLogFieldPresenter.decodeAltitudeLogToChart(
+            (FlightLogFieldPresenter.decodeAltitudeLogToChart(
               1.0,
               userSettings.altitudeUnits,
-            );
+            ) as number);
 
     case "flightModeFlags":
       return value;
@@ -2594,10 +2641,10 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
             userSettings.altitudeUnits,
           )
         : (value * 10) /
-            FlightLogFieldPresenter.decodeAltitudeLogToChart(
+            (FlightLogFieldPresenter.decodeAltitudeLogToChart(
               1.0,
               userSettings.altitudeUnits,
-            );
+            ) as number);
     case "GPS_speed":
       switch (userSettings.speedUnits) {
         case 1:
