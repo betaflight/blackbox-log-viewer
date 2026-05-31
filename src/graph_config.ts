@@ -2,16 +2,58 @@ import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
 
-export function GraphConfig(graphConfig) {
-  const listeners = [];
-  const that = this;
-  let graphs = graphConfig ?? [];
+// The graph/field/curve config objects are free-form, user-editable structures
+// shared with the still-JS renderer (grapher) and the now-typed config dialog;
+// access stays intentionally loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
 
-  function notifyListeners() {
+interface MinMax {
+  min: number;
+  max: number;
+}
+
+interface Curve {
+  power: number;
+  MinMax?: MinMax;
+  offset?: number;
+  inputRange?: number;
+  outputRange?: number;
+}
+
+interface ExampleGraph {
+  label: string;
+  fields: Array<{ name: string; color: number }>;
+  height: number;
+}
+
+// Instance shape (the constructor's `this`). Lives in type space; the value
+// `GraphConfig` below is the constructor function carrying the static helpers.
+export interface GraphConfig {
+  selectedFieldName: string | null;
+  selectedGraphIndex: number;
+  selectedFieldIndex: number;
+  highlightGraphIndex: number | null;
+  highlightFieldIndex: number | null;
+  getGraphs(): Loose[];
+  setRedrawChart(isRedraw: boolean): void;
+  setGraphs(newGraphs: Loose[]): void;
+  extendFields(flightLog: Loose, field: Loose): Loose[];
+  adaptGraphs(flightLog: Loose, graphs: Loose[]): void;
+  addListener(listener: (graphConfig: GraphConfig) => void): void;
+  toggleGraphField(graphIndex: number, fieldIndex: number): void;
+  isGraphFieldHidden(graphIndex: number, fieldIndex: number): boolean;
+}
+
+export function GraphConfig(this: GraphConfig, graphConfig?: Loose[] | null) {
+  const listeners: Array<(graphConfig: GraphConfig) => void> = [];
+  let graphs: Loose[] = graphConfig ?? [];
+
+  const notifyListeners = () => {
     for (const listener of listeners) {
-      listener(that);
+      listener(this);
     }
-  }
+  };
 
   this.selectedFieldName = null;
   this.selectedGraphIndex = 0;
@@ -20,21 +62,21 @@ export function GraphConfig(graphConfig) {
   this.highlightGraphIndex = null;
   this.highlightFieldIndex = null;
 
-  const hiddenGraphFields = new Set();
+  const hiddenGraphFields = new Set<string>();
 
   this.getGraphs = function () {
     return graphs;
   };
 
   let redrawChart = true;
-  this.setRedrawChart = function (isRedraw) {
+  this.setRedrawChart = function (isRedraw: boolean) {
     redrawChart = isRedraw;
   };
 
   /**
    * newGraphs is an array of objects like {label: "graph label", height:, fields:[{name: curve:{power:, MinMax:, steps:}, color:, }, ...]}
    */
-  this.setGraphs = function (newGraphs) {
+  this.setGraphs = function (newGraphs: Loose[]) {
     graphs = newGraphs;
 
     hiddenGraphFields.clear();
@@ -43,10 +85,10 @@ export function GraphConfig(graphConfig) {
     }
   };
 
-  this.extendFields = function (flightLog, field) {
+  this.extendFields = function (flightLog: Loose, field: Loose) {
     const matches = field.name.match(/^(.+)\[all\]$/);
     const logFieldNames = flightLog.getMainFieldNames();
-    const fields = [];
+    const fields: Loose[] = [];
     const setupColor = field?.color === -1;
     if (matches) {
       const nameRoot = matches[1],
@@ -94,7 +136,11 @@ export function GraphConfig(graphConfig) {
     return fields;
   };
 
-  const adaptField = function (flightLog, field, forceNewCurve) {
+  const adaptField = function (
+    flightLog: Loose,
+    field: Loose,
+    forceNewCurve?: boolean,
+  ) {
     const defaultCurve = GraphConfig.getDefaultCurveForField(
       flightLog,
       field.name,
@@ -118,12 +164,12 @@ export function GraphConfig(graphConfig) {
   /**
    * Convert the given graph configs to make them appropriate for the given flight log.
    */
-  this.adaptGraphs = function (flightLog, graphs) {
+  this.adaptGraphs = function (this: GraphConfig, flightLog: Loose, graphs: Loose[]) {
     const // Make copies of graphs into here so we can modify them without wrecking caller's copy
-      newGraphs = [];
+      newGraphs: Loose[] = [];
 
     for (const graph of graphs) {
-      const newGraph = {
+      const newGraph: Loose = {
         // Default values for missing properties:
         height: 1,
         // The old graph
@@ -143,11 +189,11 @@ export function GraphConfig(graphConfig) {
     this.setGraphs(newGraphs);
   };
 
-  this.addListener = function (listener) {
+  this.addListener = function (listener: (graphConfig: GraphConfig) => void) {
     listeners.push(listener);
   };
 
-  this.toggleGraphField = (graphIndex, fieldIndex) => {
+  this.toggleGraphField = (graphIndex: number, fieldIndex: number) => {
     const item = `${graphIndex}:${fieldIndex}`;
     if (hiddenGraphFields.has(item)) {
       hiddenGraphFields.delete(item);
@@ -156,7 +202,7 @@ export function GraphConfig(graphConfig) {
     }
   };
 
-  this.isGraphFieldHidden = (graphIndex, fieldIndex) => {
+  this.isGraphFieldHidden = (graphIndex: number, fieldIndex: number) => {
     return hiddenGraphFields.has(`${graphIndex}:${fieldIndex}`);
   };
 }
@@ -176,7 +222,7 @@ GraphConfig.PALETTE = [
   { color: "#ffed6f", name: "Dark Yellow" },
 ];
 
-GraphConfig.load = function (config) {
+GraphConfig.load = function (config: Loose): Loose {
   // Upgrade legacy configs to suit the newer standard by translating field names
   if (config) {
     for (const graph of config) {
@@ -194,7 +240,10 @@ GraphConfig.load = function (config) {
   return config;
 };
 
-GraphConfig.getDefaultSmoothingForField = function (flightLog, fieldName) {
+GraphConfig.getDefaultSmoothingForField = function (
+  _flightLog: Loose,
+  fieldName: string,
+): number {
   try {
     if (fieldName.match(/^motor(Raw)?\[/)) {
       return 5000;
@@ -216,10 +265,13 @@ GraphConfig.getDefaultSmoothingForField = function (flightLog, fieldName) {
   }
 };
 
-GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
+GraphConfig.getDefaultCurveForField = function (
+  flightLog: Loose,
+  fieldName: string,
+): Curve {
   const sysConfig = flightLog.getSysConfig();
 
-  const maxDegreesSecond = function (scale) {
+  const maxDegreesSecond = function (scale: number): number {
     switch (sysConfig["rates_type"]) {
       case RATES_TYPE.indexOf("ACTUAL"):
       case RATES_TYPE.indexOf("QUICK"):
@@ -237,7 +289,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     }
   };
 
-  const getMinMaxForFields = function (...fieldNames) {
+  const getMinMaxForFields = function (...fieldNames: string[]): MinMax {
     // helper to make a curve scale based on the combined min/max of one or more fields
     let min = Number.MAX_VALUE,
       max = -Number.MAX_VALUE;
@@ -255,22 +307,23 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     return { min: -500, max: 500 };
   };
 
-  const getCurveForMinMaxFields = function (...fieldNames) {
+  const getCurveForMinMaxFields = function (...fieldNames: string[]): Curve {
     const mm = getMinMaxForFields(...fieldNames);
     // added convertation min max values from log file units to friendly chart
-    const mmChartUnits = {
+    // ConvertFieldValue is numeric here (a chart-unit min/max); cast is type-only.
+    const mmChartUnits: MinMax = {
       min: FlightLogFieldPresenter.ConvertFieldValue(
         flightLog,
         fieldName,
         true,
         mm.min,
-      ),
+      ) as number,
       max: FlightLogFieldPresenter.ConvertFieldValue(
         flightLog,
         fieldName,
         true,
         mm.max,
-      ),
+      ) as number,
     };
     return {
       power: 1,
@@ -279,22 +332,23 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
   };
 
   const getCurveForMinMaxFieldsZeroOffset =
-    function (...fieldNames) {
+    function (...fieldNames: string[]): Curve {
       const mm = getMinMaxForFields(...fieldNames);
       // added convertation min max values from log file units to friendly chart
-      const mmChartUnits = {
+      // ConvertFieldValue is numeric here (a chart-unit min/max); cast is type-only.
+      const mmChartUnits: MinMax = {
         min: FlightLogFieldPresenter.ConvertFieldValue(
           flightLog,
           fieldName,
           true,
           mm.min,
-        ),
+        ) as number,
         max: FlightLogFieldPresenter.ConvertFieldValue(
           flightLog,
           fieldName,
           true,
           mm.max,
-        ),
+        ) as number,
       };
       mmChartUnits.max = Math.max(
         Math.max(Math.abs(mmChartUnits.max), Math.abs(mmChartUnits.min)),
@@ -1457,10 +1511,10 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
  * @param fieldName Name of the field
  */
 GraphConfig.getMinMaxForFieldDuringWindowTimeInterval = function (
-  flightLog,
-  logGrapher,
-  fieldName,
-) {
+  flightLog: Loose,
+  logGrapher: Loose,
+  fieldName: string,
+): MinMax {
   const WindowCenterTime = logGrapher.getWindowCenterTime();
   const WindowWidthTime = logGrapher.getWindowWidthTime();
   const minTime = WindowCenterTime - WindowWidthTime / 2;
@@ -1500,10 +1554,10 @@ GraphConfig.getMinMaxForFieldDuringWindowTimeInterval = function (
  * @param fieldName Name of the field
  */
 GraphConfig.getMinMaxForFieldDuringMarkedInterval = function (
-  flightLog,
-  logGrapher,
-  fieldName,
-) {
+  flightLog: Loose,
+  logGrapher: Loose,
+  fieldName: string,
+): MinMax {
   let minTime = logGrapher.getMarkedInTime();
   let maxTime = logGrapher.getMarkedOutTime();
   if (minTime === false) { minTime = flightLog.getMinTime(); }
@@ -1539,7 +1593,10 @@ GraphConfig.getMinMaxForFieldDuringMarkedInterval = function (
  * Compute min-max values for field during all time.
  * @param fieldName Name of the field
  */
-GraphConfig.getMinMaxForFieldDuringAllTime = function (flightLog, fieldName) {
+GraphConfig.getMinMaxForFieldDuringAllTime = function (
+  flightLog: Loose,
+  fieldName: string,
+): MinMax {
   const mm = flightLog.getMinMaxForFieldDuringAllTime(fieldName);
   if (mm.min === Number.MAX_VALUE || mm.max === -Number.MAX_VALUE) {
     return {
@@ -1568,9 +1625,12 @@ GraphConfig.getMinMaxForFieldDuringAllTime = function (flightLog, fieldName) {
  *
  * Supply an array of strings `graphNames` to only fetch the graph with the given names.
  */
-GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
-  const result = [];
-  const EXAMPLE_GRAPHS = [];
+GraphConfig.getExampleGraphConfigs = function (
+  flightLog: Loose,
+  graphNames?: string[],
+): ExampleGraph[] {
+  const result: ExampleGraph[] = [];
+  const EXAMPLE_GRAPHS: Loose[] = [];
 
   if (!flightLog.isFieldDisabled().MOTORS) {
     EXAMPLE_GRAPHS.push({
@@ -1655,12 +1715,12 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
   }
 
   for (const srcGraph of EXAMPLE_GRAPHS) {
-    const destGraph = {
+    const destGraph: ExampleGraph = {
       label: srcGraph.label,
       fields: [],
       height: srcGraph.height || 1,
     };
-    let found;
+    let found: boolean;
 
     if (graphNames !== undefined) {
       found = false;
