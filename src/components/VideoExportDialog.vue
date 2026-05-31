@@ -99,7 +99,7 @@
   </UModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from "vue";
 import { FlightLogVideoRenderer } from "../flightlog_video_renderer.js";
 
@@ -158,9 +158,10 @@ const fileSizeWarning = ref(false);
 const remainingText = ref("");
 const resultText = ref("");
 
-let videoRenderer = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let videoRenderer: any = null;
 let renderStartTime = 0;
-let lastEstimatedTimeMsec = null;
+let lastEstimatedTimeMsec: number | null = null;
 
 const hasFlightVideo = computed(() => !!props.logParameters?.flightVideo);
 
@@ -190,7 +191,8 @@ const title = computed(() => {
   return "Export video";
 });
 
-function populateConfig(cfg) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function populateConfig(cfg: Record<string, any>) {
   if (cfg.frameRate) {
     frameRate.value = String(cfg.frameRate);
   }
@@ -216,13 +218,13 @@ function buildVideoConfig() {
   };
 }
 
-function leftPad(value, pad, width) {
+function leftPad(value: string | number, pad: string, width: number) {
   value = `${value}`;
   while (value.length < width) { value = pad + value; }
   return value;
 }
 
-function formatTime(secs) {
+function formatTime(secs: number) {
   let mins = Math.floor(secs / 60);
   secs = secs % 60;
   const hours = Math.floor(mins / 60);
@@ -233,7 +235,7 @@ function formatTime(secs) {
   return `${mins}:${leftPad(secs, "0", 2)}`;
 }
 
-function formatFilesize(bytes) {
+function formatFilesize(bytes: number) {
   return `${Math.round(bytes / (1024 * 1024))}MB`;
 }
 
@@ -256,7 +258,7 @@ function onStartExport() {
     logParams,
     videoConfig,
     {
-      onProgress(frameIndex, frameCount) {
+      onProgress(frameIndex: number, frameCount: number) {
         progressMax.value = frameCount - 1;
         progressValue.value = frameIndex;
         renderedFramesText.value = `${frameIndex + 1} / ${frameCount} (${(((frameIndex + 1) / frameCount) * 100).toFixed(1)}%)`;
@@ -282,7 +284,7 @@ function onStartExport() {
           }
         }
       },
-      onComplete(success, frameCount) {
+      onComplete(success: boolean, frameCount: number) {
         if (success) {
           resultText.value = `Rendered ${frameCount} frames in ${formatTime(Math.round((Date.now() - renderStartTime) / 1000))}`;
           mode.value = "complete";

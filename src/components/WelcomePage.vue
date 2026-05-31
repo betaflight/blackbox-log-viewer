@@ -89,7 +89,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useLogStore } from "../stores/log.js";
 import LogFileInput from "./LogFileInput.vue";
 

@@ -88,7 +88,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 import { useSettingsStore } from "../stores/settings.js";
@@ -99,7 +99,7 @@ const graphStore = useGraphStore();
 const viewer = useBlackboxViewer();
 const { userSettings } = useSettingsStore();
 
-const importInput = ref(null);
+const importInput = ref<HTMLInputElement | null>(null);
 
 const spectrumTypeOptions = [
   { label: "Frequency", value: "0" },
@@ -197,10 +197,10 @@ const zoomYStyle = computed(() => ({
   height: `${Math.min(layout.value.height - 60, 100)}px`,
 }));
 
-function psdInputStyle(topPx) {
+function psdInputStyle(topPx: number) {
   return { left: `${layout.value.width - 90}px`, top: `${topPx}px` };
 }
-function psdLabelStyle(topPx) {
+function psdLabelStyle(topPx: number) {
   return { left: `${layout.value.width - 150}px`, top: `${topPx}px` };
 }
 const psdLowLevelLabelStyle = computed(() => ({
@@ -233,9 +233,10 @@ const spectrumMenuItems = [
   ],
 ];
 
-function onImportChange(e) {
-  viewer.spectrumImport(e.target.files);
-  e.target.value = "";
+function onImportChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  viewer.spectrumImport(target.files);
+  target.value = "";
 }
 
 function toggleFullscreen() {

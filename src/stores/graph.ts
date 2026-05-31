@@ -9,6 +9,17 @@ import { PrefStorage } from "../pref_storage.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
 
+interface LegendField {
+  name: string;
+  friendlyName: string;
+  color: string;
+  hidden: boolean;
+}
+interface LegendGraph {
+  label: string;
+  fields: LegendField[];
+}
+
 export const GRAPH_MIN_ZOOM = 1;
 export const GRAPH_MAX_ZOOM = 1000;
 export const GRAPH_DEFAULT_ZOOM = 100;
@@ -47,7 +58,7 @@ export const useGraphStore = defineStore("graph", () => {
   // Legend
   const legendVisible = ref(true);
   const legendTitle = ref("Legend");
-  const legendGraphs = shallowRef<Loose[]>([]);
+  const legendGraphs = shallowRef<LegendGraph[]>([]);
   // Each: { label, fields: [{ name, friendlyName, color, hidden }] }
   const legendValues = shallowRef<Record<string, Loose>>({});
   // Map of fieldName → { value, settings }
@@ -80,7 +91,7 @@ export const useGraphStore = defineStore("graph", () => {
     }));
   }
 
-  function highlightLegendField(gi: number, fi: number) {
+  function highlightLegendField(gi: number | null, fi: number | null) {
     if (!activeGraphConfig.value) {
       return;
     }
