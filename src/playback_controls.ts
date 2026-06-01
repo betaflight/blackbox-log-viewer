@@ -9,12 +9,16 @@ import { FlightLogParser } from "./flightlog_parser.js";
 import { blackboxTimeFromVideoTime, syncLogToVideo, setVideoTime, setVideoOffset } from "./video_handler.js";
 import { updateValuesChart } from "./values_display.js";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+
 const SMALL_JUMP_TIME = 100 * 1000;
 
-let lastRenderTime = false;
+let lastRenderTime: number | false = false;
 let animationFrameIsQueued = false;
-let updateValuesRateLimited = null;
-let seekBarRepaintRateLimited = null;
+let updateValuesRateLimited: Loose = null;
+let seekBarRepaintRateLimited: Loose = null;
 
 function ensureThrottles() {
   if (!updateValuesRateLimited) {
@@ -56,8 +60,8 @@ export function animationLoop() {
 
     logStore.currentBlackboxTime += delta;
 
-    if (logStore.currentBlackboxTime > logStore.flightLog.getMaxTime()) {
-      logStore.currentBlackboxTime = logStore.flightLog.getMaxTime();
+    if (logStore.currentBlackboxTime > (logStore.flightLog as Loose).getMaxTime()) {
+      logStore.currentBlackboxTime = (logStore.flightLog as Loose).getMaxTime();
       setGraphState(GRAPH_STATE_PAUSED);
     }
   }
@@ -67,7 +71,7 @@ export function animationLoop() {
   graphStore.seekBar.setCurrentTime(logStore.currentBlackboxTime);
   graphStore.seekBar.setWindow(graphStore.graph.getWindowWidthTime());
 
-  if (logStore.flightLog.hasGpsData()) {
+  if ((logStore.flightLog as Loose).hasGpsData()) {
     graphStore.mapGrapher.setCurrentTime(logStore.currentBlackboxTime);
   }
 
@@ -105,7 +109,7 @@ export function updateCanvasSize() {
 
     graphStore.graph.resize(width, height);
     graphStore.seekBar.resize(canvas.offsetWidth, 50);
-    if (logStore.flightLog.hasGpsData()) {
+    if ((logStore.flightLog as Loose).hasGpsData()) {
       graphStore.mapGrapher.resize(width, height);
     }
 
@@ -113,7 +117,7 @@ export function updateCanvasSize() {
   }
 }
 
-export function setGraphState(newState) {
+export function setGraphState(newState: number) {
   const playbackStore = usePlaybackStore(pinia);
   const logStore = useLogStore(pinia);
 
@@ -123,12 +127,12 @@ export function setGraphState(newState) {
   switch (newState) {
     case GRAPH_STATE_PLAY:
       if (logStore.hasVideo) {
-        playbackStore.videoElement.play();
+        playbackStore.videoElement!.play();
       }
       break;
     case GRAPH_STATE_PAUSED:
       if (logStore.hasVideo) {
-        playbackStore.videoElement.pause();
+        playbackStore.videoElement!.pause();
       }
       break;
   }
@@ -136,13 +140,13 @@ export function setGraphState(newState) {
   invalidateGraph();
 }
 
-export function setCurrentBlackboxTime(newTime) {
+export function setCurrentBlackboxTime(newTime: number) {
   const logStore = useLogStore(pinia);
   const playbackStore = usePlaybackStore(pinia);
 
   if (logStore.hasVideo) {
-    playbackStore.videoElement.currentTime =
-      (newTime - logStore.flightLog.getMinTime()) / 1000000 + playbackStore.videoOffset;
+    playbackStore.videoElement!.currentTime =
+      (newTime - (logStore.flightLog as Loose).getMinTime()) / 1000000 + playbackStore.videoOffset;
 
     syncLogToVideo();
   } else {
@@ -152,18 +156,18 @@ export function setCurrentBlackboxTime(newTime) {
   invalidateGraph();
 }
 
-export function setPlaybackRate(rate) {
+export function setPlaybackRate(rate: number) {
   const playbackStore = usePlaybackStore(pinia);
   if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
     playbackStore.playbackRate = rate;
 
     if (playbackStore.videoElement) {
-      playbackStore.videoElement.playbackRate = rate / 100;
+      playbackStore.videoElement!.playbackRate = rate / 100;
     }
   }
 }
 
-export function setGraphZoom(zoom) {
+export function setGraphZoom(zoom: number | null) {
   const graphStore = useGraphStore(pinia);
   if (zoom == null) {
     zoom = graphStore.lastGraphZoom;
@@ -179,7 +183,7 @@ export function setGraphZoom(zoom) {
   }
 }
 
-export function showConfigFile(state) {
+export function showConfigFile(state?: Loose) {
   const graphStore = useGraphStore(pinia);
   if (graphStore.hasConfig) {
     if (state == null) {
@@ -190,7 +194,7 @@ export function showConfigFile(state) {
   }
 }
 
-export function showValueTable(state) {
+export function showValueTable(state?: Loose) {
   const graphStore = useGraphStore(pinia);
   const logStore = useLogStore(pinia);
   const appStore = useAppStore(pinia);
@@ -204,7 +208,7 @@ export function showValueTable(state) {
   updateValuesChart(logStore, graphStore, appStore, settingsStore.userSettings);
 }
 
-export function logJumpBack(fast, slow) {
+export function logJumpBack(fast?: Loose, slow?: Loose) {
   const logStore = useLogStore(pinia);
   const playbackStore = usePlaybackStore(pinia);
   const graphStore = useGraphStore(pinia);
@@ -218,9 +222,9 @@ export function logJumpBack(fast, slow) {
     if (slow) {
       scrollTime = (1 / 60) * 1000000;
     }
-    setVideoTime(playbackStore.videoElement.currentTime - scrollTime / 1000000);
+    setVideoTime(playbackStore.videoElement!.currentTime - scrollTime / 1000000);
   } else {
-    const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
+    const currentFrame = (logStore.flightLog as Loose).getCurrentFrameAtTime(
       logStore.currentBlackboxTime,
     );
     if (currentFrame?.previous && slow) {
@@ -237,7 +241,7 @@ export function logJumpBack(fast, slow) {
   setGraphState(GRAPH_STATE_PAUSED);
 }
 
-export function logJumpForward(fast, slow) {
+export function logJumpForward(fast?: Loose, slow?: Loose) {
   const logStore = useLogStore(pinia);
   const playbackStore = usePlaybackStore(pinia);
   const graphStore = useGraphStore(pinia);
@@ -251,9 +255,9 @@ export function logJumpForward(fast, slow) {
     if (slow) {
       scrollTime = (1 / 60) * 1000000;
     }
-    setVideoTime(playbackStore.videoElement.currentTime + scrollTime / 1000000);
+    setVideoTime(playbackStore.videoElement!.currentTime + scrollTime / 1000000);
   } else {
-    const currentFrame = logStore.flightLog.getCurrentFrameAtTime(
+    const currentFrame = (logStore.flightLog as Loose).getCurrentFrameAtTime(
       logStore.currentBlackboxTime,
     );
     if (currentFrame?.next && slow) {
@@ -272,13 +276,13 @@ export function logJumpForward(fast, slow) {
 
 export function logJumpStart() {
   const logStore = useLogStore(pinia);
-  setCurrentBlackboxTime(logStore.flightLog.getMinTime());
+  setCurrentBlackboxTime((logStore.flightLog as Loose).getMinTime());
   setGraphState(GRAPH_STATE_PAUSED);
 }
 
 export function logJumpEnd() {
   const logStore = useLogStore(pinia);
-  setCurrentBlackboxTime(logStore.flightLog.getMaxTime());
+  setCurrentBlackboxTime((logStore.flightLog as Loose).getMaxTime());
   setGraphState(GRAPH_STATE_PAUSED);
 }
 
@@ -293,7 +297,7 @@ export function logPlayPause() {
 
 export function logSyncHere() {
   const playbackStore = usePlaybackStore(pinia);
-  setVideoOffset(playbackStore.videoElement.currentTime, true);
+  setVideoOffset(playbackStore.videoElement!.currentTime, true);
 }
 
 export function logSyncBack() {
@@ -306,7 +310,7 @@ export function logSyncForward() {
   setVideoOffset(playbackStore.videoOffset + 1 / 15, true);
 }
 
-export function setMarker(state) {
+export function setMarker(state: Loose) {
   const graphStore = useGraphStore(pinia);
   graphStore.hasMarker = state;
 }

@@ -25,7 +25,7 @@ export const GRAPH_MAX_ZOOM = 1000;
 export const GRAPH_DEFAULT_ZOOM = 100;
 
 export const useGraphStore = defineStore("graph", () => {
-  const prefs = new PrefStorage();
+  const prefs = new (PrefStorage as unknown as new () => PrefStorage)();
 
   // Renderer instances — registered by main.js after creation
   const graph = shallowRef<Loose>(null);

@@ -23,4 +23,6 @@ declare const THREE: any;
 // Leaflet — loaded via <script>, no bundled types; used as a rich untyped API.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const L: any;
-declare const chrome: unknown; // Chrome/Electron extension APIs (pref_storage.js)
+// Chrome/Electron extension APIs (pref_storage); rich untyped global.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const chrome: any;

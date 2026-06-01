@@ -4,29 +4,33 @@ import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { formatTime, stringLoopTime } from "./tools.js";
 
-export function renderLogFileInfo(file) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+
+export function renderLogFileInfo(file: File) {
   const logStore = useLogStore(pinia);
   const appStore = useAppStore(pinia);
 
   appStore.logFilename = file.name;
 
-  const logCount = logStore.flightLog.getLogCount();
-  const entries = [];
+  const logCount = (logStore.flightLog as Loose).getLogCount();
+  const entries: Loose[] = [];
   for (let index = 0; index < logCount; index++) {
-    const error = logStore.flightLog.getLogError(index);
+    const error = (logStore.flightLog as Loose).getLogError(index);
     let logLabel;
     if (error) {
       logLabel = error;
     } else {
       logLabel = `${formatTime(
-        logStore.flightLog.getMinTime(index) / 1000,
+        (logStore.flightLog as Loose).getMinTime(index) / 1000,
         false,
       )} - ${formatTime(
-        logStore.flightLog.getMaxTime(index) / 1000,
+        (logStore.flightLog as Loose).getMaxTime(index) / 1000,
         false,
       )} [${formatTime(
         Math.ceil(
-          (logStore.flightLog.getMaxTime(index) - logStore.flightLog.getMinTime(index)) / 1000,
+          ((logStore.flightLog as Loose).getMaxTime(index) - (logStore.flightLog as Loose).getMinTime(index)) / 1000,
         ),
         false,
       )}]`;
@@ -45,17 +49,17 @@ export function renderSelectedLogInfo() {
   const appStore = useAppStore(pinia);
   const graphStore = useGraphStore(pinia);
 
-  logStore.activeLogIndex = logStore.flightLog.getLogIndex();
+  logStore.activeLogIndex = (logStore.flightLog as Loose).getLogIndex();
 
-  if (logStore.flightLog.getNumCellsEstimate()) {
-    appStore.statusCells = `${logStore.flightLog.getNumCellsEstimate()}S (${Number(
-      logStore.flightLog.getReferenceVoltageMillivolts() / 1000,
+  if ((logStore.flightLog as Loose).getNumCellsEstimate()) {
+    appStore.statusCells = `${(logStore.flightLog as Loose).getNumCellsEstimate()}S (${Number(
+      (logStore.flightLog as Loose).getReferenceVoltageMillivolts() / 1000,
     ).toFixed(2)}V)`;
   } else {
     appStore.statusCells = "";
   }
 
-  const sysConfig = logStore.flightLog.getSysConfig();
+  const sysConfig = (logStore.flightLog as Loose).getSysConfig();
 
   const versionText =
     (sysConfig["Craft name"]?.length
@@ -84,16 +88,16 @@ export function renderSelectedLogInfo() {
 
   const seekBar = graphStore.seekBar;
   seekBar.setTimeRange(
-    logStore.flightLog.getMinTime(),
-    logStore.flightLog.getMaxTime(),
+    (logStore.flightLog as Loose).getMinTime(),
+    (logStore.flightLog as Loose).getMaxTime(),
     logStore.currentBlackboxTime,
   );
   seekBar.setActivityRange(
-    logStore.flightLog.getSysConfig().motorOutput[0],
-    logStore.flightLog.getSysConfig().motorOutput[1],
+    (logStore.flightLog as Loose).getSysConfig().motorOutput[0],
+    (logStore.flightLog as Loose).getSysConfig().motorOutput[1],
   );
 
-  const activity = logStore.flightLog.getActivitySummary();
+  const activity = (logStore.flightLog as Loose).getActivitySummary();
   seekBar.setActivity(
     activity.times,
     activity[graphStore.seekBarMode],
@@ -101,18 +105,18 @@ export function renderSelectedLogInfo() {
   );
   seekBar.repaint();
 
-  if (logStore.flightLog.hasGpsData()) {
+  if ((logStore.flightLog as Loose).hasGpsData()) {
     graphStore.mapGrapher.setFlightLog(logStore.flightLog);
   }
 }
 
-export function setSeekBarMode(mode) {
+export function setSeekBarMode(mode: Loose) {
   const logStore = useLogStore(pinia);
   const graphStore = useGraphStore(pinia);
 
   graphStore.seekBarMode = mode;
   if (logStore.flightLog) {
-    const activity = logStore.flightLog.getActivitySummary();
+    const activity = (logStore.flightLog as Loose).getActivitySummary();
     graphStore.seekBar.setActivity(activity.times, activity[mode], activity.hasEvent);
     graphStore.seekBar.repaint();
   }

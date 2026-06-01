@@ -15,6 +15,11 @@
 import { useAppStore } from "./stores/app.js";
 import { useBlackboxViewer } from "./composables/use_blackbox_viewer.js";
 
+// prefs (PrefStorage) and mediaQuery are runtime-assigned objects; access stays
+// loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
 export const DarkTheme = {
   // Preference key name
   configName: "darkTheme",
@@ -30,23 +35,23 @@ export const DarkTheme = {
   currentMode: 2,
 
   // Reference to prefs storage
-  prefs: null,
+  prefs: null as Loose,
 
   // Current enabled state
   enabled: false,
 
   // Media query for system preference
-  mediaQuery: null,
+  mediaQuery: null as Loose,
 
   /**
    * Initialize the dark theme system
    * @param {PrefStorage} prefsStorage - The preference storage instance
    */
-  init: function (prefsStorage) {
+  init: function (prefsStorage: Loose) {
     this.prefs = prefsStorage;
 
     // Load saved preference
-    this.prefs.get(this.configName, (value) => {
+    this.prefs.get(this.configName, (value: Loose) => {
       // Validate the persisted mode value
       const allowedModes = Object.values(this.modes);
       if (
@@ -94,7 +99,7 @@ export const DarkTheme = {
    * @param {number} mode - One of the modes (ON, OFF, AUTO)
    * @param {function} callback - Optional callback after theme is applied
    */
-  setMode: function (mode, callback) {
+  setMode: function (mode: number, callback?: Loose) {
     if (
       mode !== this.modes.ON &&
       mode !== this.modes.OFF &&

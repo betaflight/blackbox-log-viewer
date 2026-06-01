@@ -3,7 +3,7 @@ import { reactive, toRaw } from "vue";
 import { defaultUserSettings } from "../user_settings_data.js";
 import { PrefStorage } from "../pref_storage.js";
 
-const prefs = new PrefStorage();
+const prefs = new (PrefStorage as unknown as new () => PrefStorage)();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function deepMerge(target: Record<string, any>, source: Record<string, any>) {

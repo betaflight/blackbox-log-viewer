@@ -1,6 +1,10 @@
 import { formatTime } from "./tools.js";
 import { GRAPH_MIN_ZOOM } from "./stores/graph.js";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+
 /**
  * Create a keydown event handler for the document.
  *
@@ -32,7 +36,7 @@ import { GRAPH_MIN_ZOOM } from "./stores/graph.js";
  * @param {Function} ctx.onSaveWorkspace - Save workspace
  * @returns {Function} keydown event handler
  */
-export function createKeydownHandler(ctx) {
+export function createKeydownHandler(ctx: Loose) {
   const {
     hasGraph, graphStore, logStore, playbackStore, workspaceStore, appStore,
     logPlayPause, logJumpBack, logJumpForward, logJumpStart, logJumpEnd,
@@ -42,7 +46,7 @@ export function createKeydownHandler(ctx) {
     onSwitchWorkspace, onSaveWorkspace, lastGraphConfig,
   } = ctx;
 
-  function handleWorkspaceKey(id, shiftKey) {
+  function handleWorkspaceKey(id: Loose, shiftKey: Loose) {
     if (!shiftKey) {
       if (workspaceStore.workspaceGraphConfigs[id] != null) {
         onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
@@ -54,7 +58,7 @@ export function createKeydownHandler(ctx) {
     }
   }
 
-  function handleBookmarkSave(id) {
+  function handleBookmarkSave(id: Loose) {
     if (id === 0) {
       workspaceStore.bookmarkTimes = [];
     } else if (workspaceStore.bookmarkTimes == null) {
@@ -68,7 +72,7 @@ export function createKeydownHandler(ctx) {
     invalidateGraph();
   }
 
-  function handleDigitKey(e) {
+  function handleDigitKey(e: Loose) {
     const id = Number.parseInt(e.code.slice(5), 10);
     if (!e.altKey) {
       handleWorkspaceKey(id, e.shiftKey);
@@ -80,7 +84,7 @@ export function createKeydownHandler(ctx) {
     }
   }
 
-  function handleAnalyserKey(shifted) {
+  function handleAnalyserKey(shifted: Loose) {
     if (shifted) {
       graphStore.toggleAnalyserFullscreen();
     } else {
@@ -88,7 +92,7 @@ export function createKeydownHandler(ctx) {
     }
   }
 
-  function handleKeyVideoIn(e, shifted) {
+  function handleKeyVideoIn(e: Loose, shifted: Loose) {
     if (!shifted) {
       setVideoInTime(
         playbackStore.videoExportInTime === logStore.currentBlackboxTime
@@ -99,7 +103,7 @@ export function createKeydownHandler(ctx) {
     e.preventDefault();
   }
 
-  function handleKeyVideoOut(e, shifted) {
+  function handleKeyVideoOut(e: Loose, shifted: Loose) {
     if (!shifted) {
       setVideoOutTime(
         playbackStore.videoExportOutTime === logStore.currentBlackboxTime
@@ -110,7 +114,7 @@ export function createKeydownHandler(ctx) {
     e.preventDefault();
   }
 
-  function handleKeyMarker(e) {
+  function handleKeyMarker(e: Loose) {
     if (e.altKey) {
       logSmartSync();
     } else {
@@ -124,7 +128,7 @@ export function createKeydownHandler(ctx) {
     e.preventDefault();
   }
 
-  function handleKeyConfig(e, shifted) {
+  function handleKeyConfig(e: Loose, shifted: Loose) {
     if (!shifted) {
       appStore.headerDialogOpen = false;
       showValueTable(false);
@@ -133,7 +137,7 @@ export function createKeydownHandler(ctx) {
     }
   }
 
-  function handleKeyTable(e, shifted) {
+  function handleKeyTable(e: Loose, shifted: Loose) {
     if (!shifted) {
       appStore.headerDialogOpen = false;
       showValueTable();
@@ -143,7 +147,7 @@ export function createKeydownHandler(ctx) {
     }
   }
 
-  function handleKeyZoom(e) {
+  function handleKeyZoom(e: Loose) {
     try {
       if (e.ctrlKey) {
         if (lastGraphConfig() != null) {
@@ -160,7 +164,7 @@ export function createKeydownHandler(ctx) {
     e.preventDefault();
   }
 
-  function handleKeySave(e, shifted) {
+  function handleKeySave(e: Loose, shifted: Loose) {
     try {
       if (!shifted) {
         toggleOverrideStatus("graphSmoothOverride");
@@ -178,7 +182,7 @@ export function createKeydownHandler(ctx) {
     e.preventDefault();
   }
 
-  function handleKeyOverride(settingKey, e, shifted) {
+  function handleKeyOverride(settingKey: Loose, e: Loose, shifted: Loose) {
     try {
       if (!shifted) {
         toggleOverrideStatus(settingKey);
@@ -189,7 +193,7 @@ export function createKeydownHandler(ctx) {
     e.preventDefault();
   }
 
-  const letterKeyHandlers = {
+  const letterKeyHandlers: Record<string, (e: Loose, shifted: Loose) => void> = {
     KeyI: handleKeyVideoIn,
     KeyO: handleKeyVideoOut,
     KeyM: handleKeyMarker,
@@ -226,7 +230,7 @@ export function createKeydownHandler(ctx) {
     },
   };
 
-  function handleLetterKey(e, shifted) {
+  function handleLetterKey(e: Loose, shifted: Loose) {
     const handler = letterKeyHandlers[e.code];
     if (!handler) {
       return false;
@@ -235,7 +239,7 @@ export function createKeydownHandler(ctx) {
     return true;
   }
 
-  function handleNavigationKey(e) {
+  function handleNavigationKey(e: Loose) {
     switch (e.code) {
       case "Space":
         logPlayPause();
@@ -273,7 +277,7 @@ export function createKeydownHandler(ctx) {
     return true;
   }
 
-  return function (e) {
+  return function (e: Loose) {
     const shifted = e.altKey || e.shiftKey || e.ctrlKey || e.metaKey;
     if (
       e.key === "Enter" &&

@@ -8,7 +8,7 @@ import { createRouter, createMemoryHistory } from "vue-router";
 
 const emptyRouteComponent = { render: () => h("span") };
 
-let router;
+let router: ReturnType<typeof createRouter> | undefined;
 
 export function getNuxtUiRouter() {
   if (!router) {

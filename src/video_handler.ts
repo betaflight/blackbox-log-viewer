@@ -4,11 +4,15 @@ import { useGraphStore } from "./stores/graph.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useAppStore } from "./stores/app.js";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+
 export function blackboxTimeFromVideoTime() {
   const playbackStore = usePlaybackStore(pinia);
   const logStore = useLogStore(pinia);
-  const video = playbackStore.videoElement;
-  return (video.currentTime - playbackStore.videoOffset) * 1000000 + logStore.flightLog.getMinTime();
+  const video = playbackStore.videoElement!;
+  return (video.currentTime - playbackStore.videoOffset) * 1000000 + (logStore.flightLog as Loose).getMinTime();
 }
 
 export function syncLogToVideo() {
@@ -18,7 +22,7 @@ export function syncLogToVideo() {
   }
 }
 
-export function setVideoOffset(offset, withRefresh) {
+export function setVideoOffset(offset: number, withRefresh?: Loose) {
   const playbackStore = usePlaybackStore(pinia);
   const appStore = useAppStore(pinia);
   const graphStore = useGraphStore(pinia);
@@ -31,13 +35,13 @@ export function setVideoOffset(offset, withRefresh) {
   }
 }
 
-export function setVideoTime(newTime) {
+export function setVideoTime(newTime: number) {
   const playbackStore = usePlaybackStore(pinia);
-  playbackStore.videoElement.currentTime = newTime;
+  playbackStore.videoElement!.currentTime = newTime;
   syncLogToVideo();
 }
 
-export function setVideoInTime(inTime) {
+export function setVideoInTime(inTime: number | null) {
   const playbackStore = usePlaybackStore(pinia);
   const graphStore = useGraphStore(pinia);
 
@@ -50,7 +54,7 @@ export function setVideoInTime(inTime) {
   }
 }
 
-export function setVideoOutTime(outTime) {
+export function setVideoOutTime(outTime: number | null) {
   const playbackStore = usePlaybackStore(pinia);
   const graphStore = useGraphStore(pinia);
 
@@ -63,7 +67,7 @@ export function setVideoOutTime(outTime) {
   }
 }
 
-export function loadVideo(file) {
+export function loadVideo(file: File) {
   const playbackStore = usePlaybackStore(pinia);
   const logStore = useLogStore(pinia);
 
@@ -82,13 +86,13 @@ export function loadVideo(file) {
   }
 
   logStore.videoURL = URL.createObjectURL(file);
-  const video = playbackStore.videoElement;
+  const video = playbackStore.videoElement!;
   video.volume = 1;
   video.src = logStore.videoURL;
   video.playbackRate = playbackStore.playbackRate / 100;
 }
 
-export function reportVideoError(e) {
+export function reportVideoError(e: Loose) {
   let errorMessage = "Error while loading the video.";
   if (e.currentTarget.error.code) {
     errorMessage += ` ERROR (${e.currentTarget.error.code}): ${e.currentTarget.error.message}`;

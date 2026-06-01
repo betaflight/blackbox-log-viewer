@@ -67,14 +67,14 @@ export function MapGrapher(this: MapGrapher) {
     zoom: 1,
   };
 
-  const craftIcon = L.icon({
+  const craftIcon = (L as Loose).icon({
     iconUrl: "../images/markers/craft.png",
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     className: "icon",
   });
 
-  const homeIcon = L.icon({
+  const homeIcon = (L as Loose).icon({
     iconUrl: "../images/markers/home.png",
     iconSize: [40, 40],
     iconAnchor: [20, 35],
@@ -113,9 +113,9 @@ export function MapGrapher(this: MapGrapher) {
       return;
     }
 
-    myMap = L.map("mapContainer", mapOptions);
+    myMap = (L as Loose).map("mapContainer", mapOptions);
 
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    (L as Loose).tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       minZoom: 1,
       attribution:
@@ -166,7 +166,7 @@ export function MapGrapher(this: MapGrapher) {
     const hasGpsData = latlngs.length > 0;
 
     if (hasGpsData) {
-      const polyline = L.polyline(latlngs, polylineOptions);
+      const polyline = (L as Loose).polyline(latlngs, polylineOptions);
 
       const polylineC = this.createAltitudeColoredPolyline(
         latlngs,
@@ -253,7 +253,7 @@ export function MapGrapher(this: MapGrapher) {
       altThresholds.push(threshold);
     }
 
-    return L.multiOptionsPolyline(latlngs, {
+    return (L as Loose).multiOptionsPolyline(latlngs, {
       multiOptions: {
         optionIdxFn: function (latLng: Loose) {
           for (let i = 0; i < altThresholds.length; i++) {
@@ -329,13 +329,13 @@ export function MapGrapher(this: MapGrapher) {
       } else {
         homeMarker = {};
 
-        homeMarker.icon = L.marker(homePosition, {
+        homeMarker.icon = (L as Loose).marker(homePosition, {
           icon: homeIcon,
         }).addTo(myMap);
 
         // debug circle
         if (debugCircle) {
-          homeMarker.circle = L.circle(homePosition, debugCircleOptions).addTo(
+          homeMarker.circle = (L as Loose).circle(homePosition, debugCircleOptions).addTo(
             myMap,
           );
         }
@@ -354,7 +354,7 @@ export function MapGrapher(this: MapGrapher) {
         }
       } else {
         craftMarker = {};
-        craftMarker.icon = L.rotatedMarker(craftPosition, {
+        craftMarker.icon = (L as Loose).rotatedMarker(craftPosition, {
           icon: craftIcon,
           rotationAngle: groundCourse,
           rotationOrigin: "center center",
@@ -362,7 +362,7 @@ export function MapGrapher(this: MapGrapher) {
 
         // debug circle
         if (debugCircle) {
-          craftMarker.circle = L.circle(
+          craftMarker.circle = (L as Loose).circle(
             craftPosition,
             debugCircleOptions,
           ).addTo(myMap);
@@ -440,7 +440,7 @@ export function MapGrapher(this: MapGrapher) {
     const alt = frame[altitudeIndex];
 
     return this.isNumber(lat) && this.isNumber(lng)
-      ? L.latLng(
+      ? (L as Loose).latLng(
           lat / coordinateDivider,
           lng / coordinateDivider,
           alt / altitudeDivider,

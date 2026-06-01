@@ -68,7 +68,7 @@ export function FlightLogAnalyser(
 
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const that = this,
-    prefs = new PrefStorage(),
+    prefs = new (PrefStorage as unknown as new () => PrefStorage)(),
     DEFAULT_PSD_HEATMAP_MIN = -40,
     DEFAULT_PSD_HEATMAP_MAX = 10,
     DEFAULT_PSD_SEGMENT_LENGTH_POWER = 9;
