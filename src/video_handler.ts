@@ -41,7 +41,7 @@ export function setVideoTime(newTime: number) {
   syncLogToVideo();
 }
 
-export function setVideoInTime(inTime: number | null) {
+export function setVideoInTime(inTime: number | false | null) {
   const playbackStore = usePlaybackStore(pinia);
   const graphStore = useGraphStore(pinia);
 
@@ -54,7 +54,7 @@ export function setVideoInTime(inTime: number | null) {
   }
 }
 
-export function setVideoOutTime(outTime: number | null) {
+export function setVideoOutTime(outTime: number | false | null) {
   const playbackStore = usePlaybackStore(pinia);
   const graphStore = useGraphStore(pinia);
 

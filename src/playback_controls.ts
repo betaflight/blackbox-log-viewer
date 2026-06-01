@@ -167,7 +167,7 @@ export function setPlaybackRate(rate: number) {
   }
 }
 
-export function setGraphZoom(zoom: number | null) {
+export function setGraphZoom(zoom: number | null, _instant?: Loose) {
   const graphStore = useGraphStore(pinia);
   if (zoom == null) {
     zoom = graphStore.lastGraphZoom;

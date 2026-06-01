@@ -32,32 +32,36 @@ import { useWorkspaceStore } from "../stores/workspace.js";
 import { useAppStore } from "../stores/app.js";
 import { useSettingsStore } from "../stores/settings.js";
 import { watch } from "vue";
+import type { BlackboxViewerOps } from "./blackbox_viewer_ops";
 
+// flightLog, renderer instances, the user-settings bag and the various
+// graph/workspace config objects are free-form structures from the still-loose
+// layer; access stays loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
 
-function createNewBlackboxWindow(_fileToOpen) {
-  globalThis.open(globalThis.location.href, "_blank").focus();
+function createNewBlackboxWindow(_fileToOpen?: Loose) {
+  globalThis.open(globalThis.location.href, "_blank")!.focus();
 }
 
 // Imperative operations exposed to components (the legacy callback bridge,
 // collapsed). Shared by reference and populated by initBlackboxViewer().
-const ops = {};
+const ops = {} as BlackboxViewerOps;
 let initialized = false;
 
 // Components call this in setup() to reach the operations. It does NOT trigger
 // initialization — it just hands back the shared `ops` object (populated once
 // the viewer is initialized at bootstrap).
-/** @returns {import("./blackbox_viewer_ops").BlackboxViewerOps} */
-export function useBlackboxViewer() {
-  return /** @type {import("./blackbox_viewer_ops").BlackboxViewerOps} */ (ops);
+export function useBlackboxViewer(): BlackboxViewerOps {
+  return ops;
 }
 
 // Owns the renderer instances and wires the operations. Must run AFTER the Vue
 // app has mounted, so Vue-rendered canvases (e.g. #analyserCanvas, rendered by
 // SpectrumAnalyser.vue) exist. Called once from main.js.
-/** @returns {import("./blackbox_viewer_ops").BlackboxViewerOps} */
-export function initBlackboxViewer() {
+export function initBlackboxViewer(): BlackboxViewerOps {
   if (initialized) {
-    return /** @type {import("./blackbox_viewer_ops").BlackboxViewerOps} */ (ops);
+    return ops;
   }
   initialized = true;
 
@@ -76,18 +80,18 @@ export function initBlackboxViewer() {
     );
   }
 
-  let graph = null;
-  const prefs = new PrefStorage();
-  const configurationDefaults = new ConfigurationDefaults(prefs);
-  const video = document.getElementById("logVideo");
-  const canvas = document.getElementById("graphCanvas");
-  const analyserCanvas = document.getElementById("analyserCanvas");
-  const stickCanvas = document.getElementById("stickCanvas");
-  const craftCanvas = document.getElementById("craftCanvas");
-  let userSettings;
-  const seekBarCanvas = document.getElementById("seekbarCanvas");
-  const seekBar = new SeekBar(seekBarCanvas);
-  const mapGrapher = new MapGrapher();
+  let graph: Loose = null;
+  const prefs = new (PrefStorage as unknown as new () => PrefStorage)();
+  const configurationDefaults = new (ConfigurationDefaults as Loose)(prefs);
+  const video = document.getElementById("logVideo") as HTMLVideoElement;
+  const canvas = document.getElementById("graphCanvas") as HTMLCanvasElement;
+  const analyserCanvas = document.getElementById("analyserCanvas") as HTMLCanvasElement;
+  const stickCanvas = document.getElementById("stickCanvas") as HTMLCanvasElement;
+  const craftCanvas = document.getElementById("craftCanvas") as HTMLCanvasElement;
+  let userSettings: Loose;
+  const seekBarCanvas = document.getElementById("seekbarCanvas") as HTMLCanvasElement;
+  const seekBar = new (SeekBar as Loose)(seekBarCanvas);
+  const mapGrapher = new (MapGrapher as Loose)();
 
   // --- Pinia store sync ---
   // Initialize stores outside Vue component context using the shared Pinia instance.
@@ -99,7 +103,7 @@ export function initBlackboxViewer() {
   const workspaceStore = useWorkspaceStore(pinia);
   const appStore = useAppStore(pinia);
   const settingsStore = useSettingsStore(pinia);
-  graphStore.activeGraphConfig = new GraphConfig();
+  graphStore.activeGraphConfig = new (GraphConfig as Loose)();
   graphStore.mapGrapher = mapGrapher;
   graphStore.seekBar = seekBar;
   graphStore.canvasRefs = { canvas, analyserCanvas, stickCanvas, craftCanvas };
@@ -113,13 +117,13 @@ export function initBlackboxViewer() {
    * Set the index of the log from the log file that should be viewed. Pass "null" as the index to open the first
    * available log.
    */
-  function selectLog(logIndex) {
+  function selectLog(logIndex: number | null) {
     let success = false;
 
     try {
       if (logIndex === null) {
-        for (let i = 0; i < logStore.flightLog.getLogCount(); i++) {
-          if (logStore.flightLog.openLog(i)) {
+        for (let i = 0; i < (logStore.flightLog as Loose).getLogCount(); i++) {
+          if ((logStore.flightLog as Loose).openLog(i)) {
             success = true;
             playbackStore.currentOffsetCache.index = i;
             break;
@@ -130,7 +134,7 @@ export function initBlackboxViewer() {
           throw "No logs in this file could be parsed successfully";
         }
       } else {
-        logStore.flightLog.openLog(logIndex);
+        (logStore.flightLog as Loose).openLog(logIndex);
         playbackStore.currentOffsetCache.index = logIndex;
       }
     } catch (e) {
@@ -144,19 +148,19 @@ export function initBlackboxViewer() {
     }
 
     if (
-      logStore.flightLog.getSysConfig().looptime != null &&
-      logStore.flightLog.getSysConfig().frameIntervalPNum != null &&
-      logStore.flightLog.getSysConfig().frameIntervalPDenom != null
+      (logStore.flightLog as Loose).getSysConfig().looptime != null &&
+      (logStore.flightLog as Loose).getSysConfig().frameIntervalPNum != null &&
+      (logStore.flightLog as Loose).getSysConfig().frameIntervalPDenom != null
     ) {
       userSettings.analyserSampleRate =
         1000000 /
-        ((logStore.flightLog.getSysConfig().looptime *
-          validate(logStore.flightLog.getSysConfig().pid_process_denom, 1) *
-          logStore.flightLog.getSysConfig().frameIntervalPDenom) /
-          logStore.flightLog.getSysConfig().frameIntervalPNum);
+        (((logStore.flightLog as Loose).getSysConfig().looptime *
+          validate((logStore.flightLog as Loose).getSysConfig().pid_process_denom, 1) *
+          (logStore.flightLog as Loose).getSysConfig().frameIntervalPDenom) /
+          (logStore.flightLog as Loose).getSysConfig().frameIntervalPNum);
     }
 
-    graph = new FlightLogGrapher(
+    graph = new (FlightLogGrapher as Loose)(
       logStore.flightLog,
       graphStore.activeGraphConfig,
       canvas,
@@ -172,7 +176,7 @@ export function initBlackboxViewer() {
 
     graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
-    graph.onSeek = function (offset) {
+    graph.onSeek = function (offset: number) {
       //Seek faster
       offset *= 2;
 
@@ -188,7 +192,7 @@ export function initBlackboxViewer() {
       syncLogToVideo();
     } else {
       // Start at beginning:
-      logStore.currentBlackboxTime = logStore.flightLog.getMinTime();
+      logStore.currentBlackboxTime = (logStore.flightLog as Loose).getMinTime();
     }
 
     renderSelectedLogInfo();
@@ -199,7 +203,7 @@ export function initBlackboxViewer() {
     setGraphZoom(graphStore.graphZoom, true);
   }
 
-  function loadFiles(files) {
+  function loadFiles(files: Loose) {
     for (const file of files) {
       let isLog = file.name.match(/\.(BBL|TXT|CFL|BFL|LOG)$/i);
       let isVideo = file.name.match(/\.(AVI|MOV|MP4|MPEG)$/i);
@@ -216,7 +220,7 @@ export function initBlackboxViewer() {
       } else if (isVideo) {
         loadVideo(file);
       } else if (isWorkspaces) {
-        loadWorkspaces(file, workspaceStore, onSwitchWorkspace);
+        loadWorkspaces(file, workspaceStore as Loose, onSwitchWorkspace);
       }
     }
 
@@ -227,15 +231,15 @@ export function initBlackboxViewer() {
         playbackStore.currentOffsetCache.index === cahesOffset.index &&
         playbackStore.currentOffsetCache.video === cahesOffset.video
       ) {
-        setVideoOffset(cahesOffset.offset, true);
+        setVideoOffset(cahesOffset.offset as number, true);
       }
     }
   }
 
-  function loadLogFile(file) {
+  function loadLogFile(file: File) {
     const reader = new FileReader();
 
-    reader.onload = function (e) {
+    reader.onload = function (e: Loose) {
       const bytes = e.target.result;
 
       const fileContents = String.fromCodePoint(
@@ -251,7 +255,7 @@ export function initBlackboxViewer() {
           if (file.name.match(/default/i)) {
             configurationDefaults.loadFile(file);
           } else {
-            new Configuration(file); // NOSONAR — side effect: sets graphStore.configLines
+            new (Configuration as Loose)(file); // NOSONAR — side effect: sets graphStore.configLines
             graphStore.hasConfig = true;
           }
         } catch {
@@ -263,7 +267,7 @@ export function initBlackboxViewer() {
       logStore.flightLogDataArray = new Uint8Array(bytes);
 
       try {
-        logStore.flightLog = new FlightLog(logStore.flightLogDataArray);
+        logStore.flightLog = new (FlightLog as unknown as new (d: Loose) => FlightLog)(logStore.flightLogDataArray);
       } catch (err) {
         alert(
           `Sorry, an error occurred while trying to open this log:\n\n${err}`,
@@ -312,7 +316,7 @@ export function initBlackboxViewer() {
 
 
 
-  function newGraphConfig(newConfig, noRedraw) {
+  function newGraphConfig(newConfig: Loose, noRedraw?: Loose) {
     graphStore.lastGraphConfig = graphStore.graphConfig; // Remember the last configuration.
     graphStore.graphConfig = newConfig;
     graphStore.activeGraphConfig.setRedrawChart(!noRedraw);
@@ -322,7 +326,7 @@ export function initBlackboxViewer() {
   }
 
   // Store to local cache and update Workspace Selector control
-  function onSwitchWorkspace(newWorkspaces, newActiveId) {
+  function onSwitchWorkspace(newWorkspaces: Loose, newActiveId: Loose) {
     prefs.set("activeWorkspace", newActiveId);
     prefs.set("workspaceGraphConfigs", newWorkspaces);
     workspaceStore.workspaceGraphConfigs = newWorkspaces || [];
@@ -338,7 +342,7 @@ export function initBlackboxViewer() {
   }
 
   // Save current config
-  function onSaveWorkspace(id, title) {
+  function onSaveWorkspace(id: Loose, title: Loose) {
     workspaceStore.workspaceGraphConfigs[id] = {
       title: title,
       graphConfig: graphStore.graphConfig,
@@ -364,7 +368,7 @@ export function initBlackboxViewer() {
     // initial load of the configuration defaults if we have them
     prefs.get("workspaceGraphConfigs", function (item) {
       if (item) {
-        workspaceStore.workspaceGraphConfigs = upgradeWorkspaceFormat(item);
+        workspaceStore.workspaceGraphConfigs = upgradeWorkspaceFormat(item) as Loose;
       } else {
         workspaceStore.workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
       }
@@ -391,14 +395,14 @@ export function initBlackboxViewer() {
     // Reset the analyser window on application startup.
     graphStore.hasAnalyser = false;
 
-    function expandGraphConfig(index) {
+    function expandGraphConfig(index: number) {
       // Put each of the fields into a separate graph
 
       const expandedGraphConfig = [];
 
       for (const field of graphStore.graphConfig[index].fields) {
         // Loop through each of the fields
-        const singleGraph = { fields: [], label: "", height: 1 };
+        const singleGraph = { fields: [] as Loose[], label: "", height: 1 };
         singleGraph.fields.push(field);
         singleGraph.label = field.name;
         expandedGraphConfig.push(singleGraph);
@@ -408,7 +412,7 @@ export function initBlackboxViewer() {
       invalidateGraph();
     }
 
-    function zoomGraphConfig(index) {
+    function zoomGraphConfig(index: number) {
       // Put each of the fields onto one graph and clear the others
 
       if (graphStore.graphConfig.length === 1) {
@@ -418,7 +422,7 @@ export function initBlackboxViewer() {
         }
       } else {
         const expandedGraphConfig = [];
-        const singleGraph = { fields: [], label: "", height: 1 };
+        const singleGraph = { fields: [] as Loose[], label: "", height: 1 };
 
         for (const field of graphStore.graphConfig[index].fields) {
           // Loop through each of the fields
@@ -448,7 +452,7 @@ export function initBlackboxViewer() {
       updateCanvasSize();
     });
 
-    function toggleOverrideStatus(userSetting) {
+    function toggleOverrideStatus(userSetting: Loose) {
       settingsStore.saveSetting(userSetting, !userSettings[userSetting]);
     }
 
@@ -467,7 +471,7 @@ export function initBlackboxViewer() {
     // Watch drawSticks and update graph renderer
     watch(
       () => userSettings.drawSticks,
-      (val) => {
+      (val: Loose) => {
         if (graph) {
           graph.setDrawSticks(val);
           invalidateGraph();
@@ -475,7 +479,7 @@ export function initBlackboxViewer() {
       },
     );
 
-    function handleGraphCanvasWheel(e, delta) {
+    function handleGraphCanvasWheel(e: Loose, delta: number) {
       const zoomStep = 10 + (e.altKey ? 15 : 0);
       if (delta < 0) {
         if (e.altKey || e.shiftKey) {
@@ -493,12 +497,12 @@ export function initBlackboxViewer() {
       e.preventDefault();
     }
 
-    function applyPenChange(refreshRequired) {
+    function applyPenChange(refreshRequired: Loose) {
       if (refreshRequired) {
         graph.refreshGraphConfig();
         invalidateGraph();
         mouseNotification.show(
-          document.getElementById("log-graph"),
+          document.getElementById("log-graph")!,
           null,
           null,
           refreshRequired,
@@ -512,7 +516,7 @@ export function initBlackboxViewer() {
 
     document.addEventListener(
       "wheel",
-      function (e) {
+      function (e: Loose) {
         if (e.target.classList.contains("no-wheel")) {
           e.preventDefault();
           return;
@@ -552,7 +556,7 @@ export function initBlackboxViewer() {
     seekBar.onSeek = setCurrentBlackboxTime;
 
     if ("launchQueue" in globalThis) {
-      launchQueue.setConsumer(async (launchParams) => {
+      (globalThis as Loose).launchQueue.setConsumer(async (launchParams: Loose) => {
         console.log("Opening files by extension in the desktop:", launchParams);
         const files = [];
         for (const fileHandler of launchParams.files) {
@@ -621,7 +625,7 @@ export function initBlackboxViewer() {
     ops.logSyncForward = logSyncForward;
     ops.logSmartSync = logSmartSync;
     ops.setVideoOffsetValue = (val) => {
-      const offset = Number.parseFloat(val);
+      const offset = Number.parseFloat(String(val));
       if (!Number.isNaN(offset)) {
         setVideoOffset(offset, true);
       }
@@ -632,7 +636,7 @@ export function initBlackboxViewer() {
         if (logStore.hasVideo) {
           setVideoTime(newTime / 1000000 + playbackStore.videoOffset);
         } else {
-          newTime += logStore.flightLog?.getMinTime() ?? 0;
+          newTime += (logStore.flightLog as Loose)?.getMinTime() ?? 0;
           setCurrentBlackboxTime(newTime);
         }
         invalidateGraph();
@@ -640,7 +644,7 @@ export function initBlackboxViewer() {
     };
     ops.setSeekBarMode = setSeekBarMode;
     ops.selectLogIndex = (index) => {
-      selectLog(Number.parseInt(index, 10));
+      selectLog(Number.parseInt(String(index), 10));
       if (graph) {
         graph.setAnalyser(graphStore.hasAnalyserFullscreen);
       }
@@ -681,18 +685,18 @@ export function initBlackboxViewer() {
     refreshGraph,
     loadFiles,
     // Note: internal newGraphConfig takes `noRedraw` (inverted). Callers pass `redrawChart` (true = redraw).
-    newGraphConfig: (newConfig, redrawChart) => newGraphConfig(newConfig, !redrawChart),
+    newGraphConfig: (newConfig: Loose, redrawChart?: Loose) => newGraphConfig(newConfig, !redrawChart),
     exportCsv: () => {
       setGraphState(GRAPH_STATE_PAUSED);
-      exportCsv(logStore.flightLog, appStore.logFilename);
+      exportCsv(logStore.flightLog as Loose, appStore.logFilename);
     },
     exportGpx: () => {
       setGraphState(GRAPH_STATE_PAUSED);
-      exportGpx(logStore.flightLog, appStore.logFilename);
+      exportGpx(logStore.flightLog as Loose, appStore.logFilename);
     },
     exportWorkspaces: () => {
       setGraphState(GRAPH_STATE_PAUSED);
-      saveWorkspaces(workspaceStore.workspaceGraphConfigs);
+      saveWorkspaces(workspaceStore.workspaceGraphConfigs as Loose);
     },
     pauseForExport: () => setGraphState(GRAPH_STATE_PAUSED),
     getVideoExportParams: () => ({
@@ -705,12 +709,12 @@ export function initBlackboxViewer() {
       hasAnalyser: graphStore.hasAnalyser,
       hasSticks: userSettings.drawSticks,
     }),
-    saveVideoConfig: (newConfig) => {
+    saveVideoConfig: (newConfig: Loose) => {
       playbackStore.videoConfig = newConfig;
       prefs.set("videoConfig", newConfig);
     },
     openNewWindow: () => createNewBlackboxWindow(),
-    saveUserSettings: (newSettings) => {
+    saveUserSettings: (newSettings: Loose) => {
       settingsStore.saveAll(newSettings);
       if (newSettings.darkMode !== undefined) {
         DarkTheme.setMode(newSettings.darkMode);

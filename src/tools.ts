@@ -395,11 +395,11 @@ export const mouseNotification = {
   timeout: null as ReturnType<typeof setTimeout> | null,
   show: function (
     target: Element | string,
-    x: number,
-    y: number,
+    x: number | null,
+    y: number | null,
     message: string,
     delay: number,
-    messageClass?: string,
+    messageClass?: string | null,
     align?: string | null,
     margin?: number,
   ) {

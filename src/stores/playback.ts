@@ -19,8 +19,9 @@ export const usePlaybackStore = defineStore("playback", () => {
   const graphState = ref(GRAPH_STATE_PAUSED);
   const playbackRate = ref(PLAYBACK_DEFAULT_RATE);
   const videoOffset = ref(0);
-  const videoExportInTime = ref<number | null>(null);
-  const videoExportOutTime = ref<number | null>(null);
+  // `false` is the "unset" sentinel used by the renderer (seekBar/graph setInTime).
+  const videoExportInTime = ref<number | false | null>(null);
+  const videoExportOutTime = ref<number | false | null>(null);
   const videoConfig = ref({ width: 1280, height: 720, frameRate: 30, videoDim: 0.4 });
 
   // Video DOM element — registered by main.js
