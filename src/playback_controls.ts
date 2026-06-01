@@ -66,10 +66,10 @@ export function animationLoop() {
     }
   }
 
-  graphStore.graph!.render(logStore.currentBlackboxTime);
+  graphStore.graph.render(logStore.currentBlackboxTime);
 
   graphStore.seekBar!.setCurrentTime(logStore.currentBlackboxTime);
-  graphStore.seekBar!.setWindow(graphStore.graph!.getWindowWidthTime());
+  graphStore.seekBar!.setWindow(graphStore.graph.getWindowWidthTime());
 
   if (logStore.flightLog!.hasGpsData()) {
     graphStore.mapGrapher!.setCurrentTime(logStore.currentBlackboxTime);
@@ -107,7 +107,7 @@ export function updateCanvasSize() {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
 
-    graphStore.graph!.resize(width, height);
+    graphStore.graph.resize(width, height);
     graphStore.seekBar!.resize(canvas.offsetWidth, 50);
     if (logStore.flightLog!.hasGpsData()) {
       graphStore.mapGrapher!.resize(width, height);
@@ -162,7 +162,7 @@ export function setPlaybackRate(rate: number) {
     playbackStore.playbackRate = rate;
 
     if (playbackStore.videoElement) {
-      playbackStore.videoElement!.playbackRate = rate / 100;
+      playbackStore.videoElement.playbackRate = rate / 100;
     }
   }
 }
@@ -177,7 +177,7 @@ export function setGraphZoom(zoom: number | null, _instant?: Loose) {
     graphStore.graphZoom = zoom;
 
     if (graphStore.graph) {
-      graphStore.graph!.setGraphZoom(zoom / 100);
+      graphStore.graph.setGraphZoom(zoom / 100);
       invalidateGraph();
     }
   }

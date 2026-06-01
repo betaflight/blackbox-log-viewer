@@ -125,7 +125,7 @@ export function Craft3D(
     const path = new THREE.Path(),
       ARM_WIDTH_RADIANS = 0.15,
       //How much wider is the motor mount than the arm
-      MOTOR_MOUNT_WIDTH_RATIO = 2.0,
+      MOTOR_MOUNT_WIDTH_RATIO = 2,
       //What portion of the arm length is motor mount
       MOTOR_MOUNT_LENGTH_RATIO = 0.1,
       //What portion of the arm length is the bevel at the beginning and end of the motor mount
@@ -251,7 +251,7 @@ export function Craft3D(
 
   for (let i = 0; i < numMotors; i++) {
     const propShell = new THREE.Mesh(
-      propGeometry[propGeometry.length - 1],
+      propGeometry.at(-1),
       propShellMaterial,
     );
 
@@ -309,7 +309,7 @@ export function Craft3D(
             0,
           ) /
             (sysInfo.motorOutput[1] - sysInfo.motorOutput[0]),
-          1.0,
+          1,
         ),
         propLevel = Math.round(throttlePos * (NUM_PROP_LEVELS - 1)),
         geometry = propGeometry[propLevel],

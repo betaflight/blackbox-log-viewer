@@ -215,36 +215,36 @@ export function FlightLogGrapher(
       const fieldName = fieldNames[fieldIndex];
       let matches: RegExpMatchArray | null;
 
-      if ((matches = fieldName.match(/^motor\[(\d+)]$/))) {
+      if ((matches = /^motor\[(\d+)]$/.exec(fieldName))) {
         const motorIndex = matches[1];
 
         idents.motorFields[motorIndex] = fieldIndex;
         idents.motorColors[motorIndex] =
           lineColors[motorGraphColorIndex++ % lineColors.length];
-      } else if ((matches = fieldName.match(/^rcCommand\[(\d+)]$/))) {
+      } else if ((matches = /^rcCommand\[(\d+)]$/.exec(fieldName))) {
         const rcCommandIndex = Number(matches[1]);
 
         if (rcCommandIndex >= 0 && rcCommandIndex < 4) {
           idents.rcCommandFields[rcCommandIndex] = fieldIndex;
         }
-      } else if ((matches = fieldName.match(/^axisPID\[(\d+)]$/))) {
+      } else if ((matches = /^axisPID\[(\d+)]$/.exec(fieldName))) {
         const axisIndex = matches[1];
 
         idents.axisPIDSum[axisIndex] = fieldIndex;
-      } else if ((matches = fieldName.match(/^axis(.)\[(\d+)]$/))) {
+      } else if ((matches = /^axis(.)\[(\d+)]$/.exec(fieldName))) {
         const axisIndex = matches[2];
 
         idents.axisPIDFields[matches[1]] = axisIndex;
         idents.hasPIDs = true;
-      } else if ((matches = fieldName.match(/^gyroADC\[(\d+)]$/))) {
+      } else if ((matches = /^gyroADC\[(\d+)]$/.exec(fieldName))) {
         const axisIndex = matches[1];
 
         idents.gyroFields[axisIndex] = fieldIndex;
-      } else if ((matches = fieldName.match(/^accSmooth\[(\d+)]$/))) {
+      } else if ((matches = /^accSmooth\[(\d+)]$/.exec(fieldName))) {
         const axisIndex = matches[1];
 
         idents.accFields[axisIndex] = fieldIndex;
-      } else if ((matches = fieldName.match(/^servo\[(\d+)]$/))) {
+      } else if ((matches = /^servo\[(\d+)]$/.exec(fieldName))) {
         const servoIndex = matches[1];
 
         idents.numServos++;
@@ -353,9 +353,7 @@ export function FlightLogGrapher(
     frameIndex = startFrameIndex;
 
     canvasContext.strokeStyle = color;
-    canvasContext.lineWidth = lineWidth
-      ? lineWidth
-      : drawingParams.plotLineWidth;
+    canvasContext.lineWidth = lineWidth || drawingParams.plotLineWidth;
 
     canvasContext.beginPath();
 
@@ -441,7 +439,7 @@ export function FlightLogGrapher(
       canvasContext.globalAlpha = 0.5;
       canvasContext.stroke();
       canvasContext.lineWidth = lineWidthTemp;
-      canvasContext.globalAlpha = 1.0;
+      canvasContext.globalAlpha = 1;
     }
 
     canvasContext.stroke();
@@ -468,11 +466,11 @@ export function FlightLogGrapher(
       0,
       plotHeight / 2,
     );
-    axisGradient.addColorStop(0.0, "rgba(255,255,255,0.1)");
+    axisGradient.addColorStop(0, "rgba(255,255,255,0.1)");
     axisGradient.addColorStop(0.15, "rgba(0,0,0,0)");
     axisGradient.addColorStop(0.5, "rgba(0,0,0,0)");
     axisGradient.addColorStop(0.85, "rgba(0,0,0,0)");
-    axisGradient.addColorStop(1.0, "rgba(255,255,255,0.1)");
+    axisGradient.addColorStop(1, "rgba(255,255,255,0.1)");
     canvasContext.fillStyle = axisGradient;
     canvasContext.fillRect(0, -plotHeight / 2, canvas.width, plotHeight);
   }
@@ -523,7 +521,7 @@ export function FlightLogGrapher(
     canvasContext.fillStyle = ThemeColors.getGraphText();
     canvasContext.textAlign = "right";
 
-    canvasContext.fillText(axisLabel, canvas.width - 8, y ? y : -8);
+    canvasContext.fillText(axisLabel, canvas.width - 8, y || -8);
   }
 
   function drawEventLine(
@@ -535,7 +533,7 @@ export function FlightLogGrapher(
     labelColor?: string | null,
     align?: string,
   ) {
-    width = width || 1.0;
+    width = width || 1;
 
     canvasContext.lineWidth = width;
     canvasContext.strokeStyle = color || "rgba(255,255,255,0.5)";
@@ -1106,7 +1104,7 @@ export function FlightLogGrapher(
     for (i = 0; i < graphs.length; i++) {
       graph = graphs[i];
 
-      heightSum += graph.height ? graph.height : 1.0;
+      heightSum += graph.height ? graph.height : 1;
 
       for (let j = 0; j < graphs[i].fields.length; j++) {
         const field = graphs[i].fields[j];
@@ -1129,7 +1127,7 @@ export function FlightLogGrapher(
         ) as number;
         const inputRange = (max - min) / 2;
         const offset = -(max + min) / 2;
-        const outputRange = 1.0; // There is no direct zoom now, set outputRange to 1
+        const outputRange = 1; // There is no direct zoom now, set outputRange to 1
 
         // Convert the field's curve settings into an actual expo curve object.
         // ExpoCurve is an Option-A typed-`this` constructor fn (no construct
@@ -1138,7 +1136,7 @@ export function FlightLogGrapher(
           ...args: Loose[]
         ) => Loose)(
           offset,
-          options.graphExpoOverride ? 1.0 : field.curve.power,
+          options.graphExpoOverride ? 1 : field.curve.power,
           inputRange,
           outputRange,
           field.curve.steps,

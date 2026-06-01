@@ -78,7 +78,7 @@ export function Craft2D(
   }
 
   function makeColorHalfStrength(color: Loose) {
-    color = parseInt(color.substring(1), 16);
+    color = Number.parseInt(color.substring(1), 16);
 
     return `rgba(${(color >> 16) & 0xff},${(color >> 8) & 0xff},${
       color & 0xff

@@ -56,10 +56,10 @@ export function LapTimer(this: LapTimer) {
       DEFAULT_FONT_FACE = "8pt Verdana, Arial, sans-serif",
       fgColor = "rgba(191,191,191,1.0)", // Text and highlights color
       bgColor = `rgba(76,76,76,${
-        parseInt(options.laptimer.transparency, 10) / 100.0
+        Number.parseInt(options.laptimer.transparency, 10) / 100
       })`, // background color
-      left = (canvas.width * parseInt(options.laptimer.left, 10)) / 100.0,
-      top = (canvas.height * parseInt(options.laptimer.top, 10)) / 100.0,
+      left = (canvas.width * Number.parseInt(options.laptimer.left, 10)) / 100,
+      top = (canvas.height * Number.parseInt(options.laptimer.top, 10)) / 100,
       margin = 4, // pixels
       rows = 5 + (lapTime.laps.length > 0 ? 1 + lapTime.laps.length : 0);
 

@@ -252,7 +252,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
           // Firstly, is this a configuration defaults file
           // (the filename contains the word 'default')
 
-          if (file.name.match(/default/i)) {
+          if (/default/i.exec(file.name)) {
             configurationDefaults.loadFile(file);
           } else {
             new (Configuration as Loose)(file); // NOSONAR — side effect: sets graphStore.configLines
@@ -333,8 +333,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     workspaceStore.activeWorkspace = newActiveId;
     if (
       logStore.flightLog &&
-      newWorkspaces[newActiveId] &&
-      newWorkspaces[newActiveId].graphConfig
+      newWorkspaces[newActiveId]?.graphConfig
     ) {
       newGraphConfig(newWorkspaces[newActiveId].graphConfig);
       graphStore.legendTitle = newWorkspaces[newActiveId].title;
@@ -632,7 +631,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     };
     ops.setGraphTime = (timeStr) => {
       let newTime = stringTimetoMsec(timeStr);
-      if (!isNaN(newTime)) {
+      if (!Number.isNaN(newTime)) {
         if (logStore.hasVideo) {
           setVideoTime(newTime / 1000000 + playbackStore.videoOffset);
         } else {

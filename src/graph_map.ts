@@ -450,7 +450,7 @@ export function MapGrapher(this: MapGrapher) {
   };
 
   this.isNumber = function (n: Loose) {
-    return typeof n === "number" && !isNaN(n);
+    return typeof n === "number" && !Number.isNaN(n);
   };
 
   this.getGroundCourseFromFrame = function (

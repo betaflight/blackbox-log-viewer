@@ -549,7 +549,7 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
     for (let i = 0; i < names.length; i++) {
       let matches;
 
-      if ((matches = names[i].match(/^gyroData(.+)$/))) {
+      if ((matches = /^gyroData(.+)$/.exec(names[i]))) {
         names[i] = `gyroADC${matches[1]}`;
       }
     }
@@ -720,7 +720,7 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
    * Parse "Field X ..." header and update frameDefs
    */
   const parseFieldDefinition = (fieldName: string, fieldValue: string) => {
-    const matches = fieldName.match(/^Field (.) (.+)$/);
+    const matches = /^Field (.) (.+)$/.exec(fieldName);
     if (!matches) {
       return false;
     }

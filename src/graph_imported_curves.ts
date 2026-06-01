@@ -77,8 +77,8 @@ export function ImportedCurves(
 
           const curvesData = stringRows.map(function (row: Loose) {
             const data = row.split(","),
-              x = parseFloat(data[0].trim()),
-              y = parseFloat(data[1].trim());
+              x = Number.parseFloat(data[0].trim()),
+              y = Number.parseFloat(data[1].trim());
             _that.minX = Math.min(x, _that.minX);
             _that.maxX = Math.max(x, _that.maxX);
             _that.minY = Math.min(y, _that.minY);

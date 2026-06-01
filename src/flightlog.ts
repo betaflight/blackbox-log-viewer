@@ -652,7 +652,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
                 gpsTransform = new (GPS_transform as unknown as Ctor<
                   GPS_transform,
                   [number, number, number, number]
-                >)(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0.0);
+                >)(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0);
                 break;
               }
               case "G":
@@ -773,12 +773,12 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
         x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
         y: srcFrame[imuQuaternion[1]] / scaleFromFixedInt16,
         z: srcFrame[imuQuaternion[2]] / scaleFromFixedInt16,
-        w: 1.0,
+        w: 1,
       };
 
       let m = q.x ** 2 + q.y ** 2 + q.z ** 2;
-      if (m < 1.0) {
-        q.w = Math.sqrt(1.0 - m);
+      if (m < 1) {
+        q.w = Math.sqrt(1 - m);
       } else {
         m = Math.sqrt(m);
         q.x /= m;
@@ -1223,7 +1223,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
       const sourceChunk = sourceChunks[i];
       let resultChunk = smoothedCache.get(sourceChunk.index);
 
-      chunkAlreadyDone[i] = resultChunk ? true : false;
+      chunkAlreadyDone[i] = Boolean(resultChunk);
 
       //If we haven't already smoothed this chunk
       if (!chunkAlreadyDone[i]) {
@@ -1488,7 +1488,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
   };
 
   this.hasGpsData = function () {
-    return this.getStats()?.frame?.G ? true : false;
+    return Boolean(this.getStats()?.frame?.G);
   };
 
   this.getMinMaxForFieldDuringAllTime = function (field_name) {
@@ -1594,7 +1594,7 @@ FlightLog.prototype.accRawToGs = function (value: number) {
 
 FlightLog.prototype.gyroRawToDegreesPerSecond = function (value: number) {
   return (
-    ((this.getSysConfig().gyroScale * 1000000) / (Math.PI / 180.0)) * value
+    ((this.getSysConfig().gyroScale * 1000000) / (Math.PI / 180)) * value
   );
 };
 
@@ -1618,7 +1618,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
     const RC_EXPO_POWER = 3;
 
     const calculateSetpointRate = function (axis: number, rc: number) {
-      let rcCommandf = rc / 500.0;
+      let rcCommandf = rc / 500;
       const rcCommandfAbs = Math.abs(rcCommandf);
 
       if (sysConfig["rc_expo"][axis]) {
@@ -1628,19 +1628,19 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
           rcCommandf * (1 - expof);
       }
 
-      let rcRate = sysConfig["rc_rates"][axis] / 100.0;
-      if (rcRate > 2.0) {
-        rcRate += RC_RATE_INCREMENTAL * (rcRate - 2.0);
+      let rcRate = sysConfig["rc_rates"][axis] / 100;
+      if (rcRate > 2) {
+        rcRate += RC_RATE_INCREMENTAL * (rcRate - 2);
       }
 
-      let angleRate = 200.0 * rcRate * rcCommandf;
+      let angleRate = 200 * rcRate * rcCommandf;
       if (sysConfig.rates[axis]) {
         const rcSuperfactor =
-          1.0 /
+          1 /
           constrain(
-            1.0 - rcCommandfAbs * (sysConfig.rates[axis] / 100.0),
+            1 - rcCommandfAbs * (sysConfig.rates[axis] / 100),
             0.01,
-            1.0,
+            1,
           );
         angleRate *= rcSuperfactor;
       }
@@ -1654,9 +1654,9 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
       const limit = sysConfig["rate_limits"][axis];
       if (sysConfig.pidController === 0 || limit == null) {
         /* LEGACY */
-        return constrain(angleRate * 4.1, -8190.0, 8190.0) >> 2; // Rate limit protection
+        return constrain(angleRate * 4.1, -8190, 8190) >> 2; // Rate limit protection
       } else {
-        return constrain(angleRate, -1.0 * limit, limit); // Rate limit protection (deg/sec)
+        return constrain(angleRate, -1 * limit, limit); // Rate limit protection (deg/sec)
       }
     };
 
@@ -1675,24 +1675,24 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
         let rcFactor =
           axis === AXIS.YAW
             ? Math.abs(value) /
-              (500.0 * (validate(sysConfig.rc_rates[2], 100) / 100.0))
+              (500 * (validate(sysConfig.rc_rates[2], 100) / 100))
             : Math.abs(value) /
-              (500.0 * (validate(sysConfig.rc_rates[0], 100) / 100.0));
+              (500 * (validate(sysConfig.rc_rates[0], 100) / 100));
         rcFactor =
-          1.0 /
+          1 /
           constrain(
-            1.0 - rcFactor * (validate(sysConfig.rates[axis], 100) / 100.0),
+            1 - rcFactor * (validate(sysConfig.rates[axis], 100) / 100),
             0.01,
-            1.0,
+            1,
           );
 
-        angleRate = rcFactor * ((27 * value) / 16.0);
+        angleRate = rcFactor * ((27 * value) / 16);
       } else {
         angleRate =
-          ((validate(sysConfig.rates[axis], 100) + 27) * value) / 16.0;
+          ((validate(sysConfig.rates[axis], 100) + 27) * value) / 16;
       }
 
-      return constrain(angleRate, -8190.0, 8190.0); // Rate limit protection
+      return constrain(angleRate, -8190, 8190); // Rate limit protection
     };
 
     return calculateRate(value, axis) >> 2; // the shift by 2 is to counterbalance the divide by 4 that occurs on the gyro to calculate the error
@@ -1704,27 +1704,27 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
       let superExpoFactor;
 
       if (axis === AXIS.YAW && !this.getSysConfig().superExpoYawMode) {
-        propFactor = 1.0;
+        propFactor = 1;
       } else {
         superExpoFactor =
           axis === AXIS.YAW
             ? this.getSysConfig().superExpoFactorYaw
             : this.getSysConfig().superExpoFactor;
         propFactor =
-          1.0 - (superExpoFactor / 100.0) * (Math.abs(value) / 500.0);
+          1 - (superExpoFactor / 100) * (Math.abs(value) / 500);
       }
 
       return propFactor;
     };
 
-    let superExpoFactor = 1.0 / calculateExpoPlus(value, axis);
+    let superExpoFactor = 1 / calculateExpoPlus(value, axis);
 
     if (axis === AXIS.YAW /*YAW*/) {
       if (
         sysConfig.superExpoYawMode === (SUPER_EXPO_YAW as unknown as Record<string, unknown>).ON &&
         currentFlightMode == null
       )
-        superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
+        superExpoFactor = 1; // If we don't know the flight mode, then reset the super expo mode.
       if (
         sysConfig.superExpoYawMode === (SUPER_EXPO_YAW as unknown as Record<string, unknown>).ALWAYS ||
         (sysConfig.superExpoYawMode === (SUPER_EXPO_YAW as unknown as Record<string, unknown>).ON &&
@@ -1738,7 +1738,7 @@ FlightLog.prototype.rcCommandRawToDegreesPerSecond = function (
       }
     } else {
       /*ROLL or PITCH */
-      if (currentFlightMode == null) superExpoFactor = 1.0; // If we don't know the flight mode, then reset the super expo mode.
+      if (currentFlightMode == null) superExpoFactor = 1; // If we don't know the flight mode, then reset the super expo mode.
       return (
         (superExpoFactor *
           (((axis === AXIS.ROLL
@@ -1758,10 +1758,10 @@ FlightLog.prototype.rcCommandRawToThrottle = function (value: number) {
     Math.max(
       ((value - this.getSysConfig().minthrottle) /
         (this.getSysConfig().maxthrottle - this.getSysConfig().minthrottle)) *
-        100.0,
-      0.0,
+        100,
+      0,
     ),
-    100.0,
+    100,
   );
 };
 
@@ -1786,7 +1786,7 @@ FlightLog.prototype.rcMotorRawToPctPhysical = function (value: number) {
     const ANALOG_RANGE = MAX_ANALOG_VALUE - MIN_ANALOG_VALUE;
     motorPct = ((value - MIN_ANALOG_VALUE) / ANALOG_RANGE) * 100;
   }
-  return Math.min(Math.max(motorPct, 0.0), 100.0);
+  return Math.min(Math.max(motorPct, 0), 100);
 };
 // rcMotorRaw back transform function
 FlightLog.prototype.PctPhysicalTorcMotorRaw = function (value: number) {
@@ -1827,7 +1827,7 @@ FlightLog.prototype.isDigitalProtocol = function () {
 
 FlightLog.prototype.getPIDPercentage = function (value: number) {
   // PID components and outputs are displayed as percentage (raw value is 0-1000)
-  return value / 10.0;
+  return value / 10;
 };
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function () {

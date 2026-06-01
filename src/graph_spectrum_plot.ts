@@ -253,8 +253,8 @@ export const GraphSpectrumPlot = {
   _overdrawType: null,
   _spectrumType: null,
   _sysConfig: null,
-  _zoomX: 1.0,
-  _zoomY: 1.0,
+  _zoomX: 1,
+  _zoomY: 1,
   // _minPSD, _maxPSD, _lowLevelPSD will initialize later in FlightLogAnalyser from stored settings
   _minPSD: 0,
   _maxPSD: 0,
@@ -676,9 +676,9 @@ GraphSpectrumPlot._drawLegend = function (
   importedCurves,
 ) {
   const { userSettings } = useSettingsStore();
-  const left = parseFloat(userSettings?.analyser_legend?.left);
-  const top = parseFloat(userSettings?.analyser_legend?.top);
-  const width = parseFloat(userSettings?.analyser_legend?.width);
+  const left = Number.parseFloat(userSettings?.analyser_legend?.left);
+  const top = Number.parseFloat(userSettings?.analyser_legend?.top);
+  const width = Number.parseFloat(userSettings?.analyser_legend?.width);
   if (
     !Number.isFinite(left) ||
     !Number.isFinite(top) ||

@@ -234,17 +234,17 @@ GraphConfig.getDefaultSmoothingForField = function (
   fieldName: string,
 ): number {
   try {
-    if (fieldName.match(/^motor(Raw)?\[/)) {
+    if (/^motor(Raw)?\[/.exec(fieldName)) {
       return 5000;
-    } else if (fieldName.match(/^servo\[/)) {
+    } else if (/^servo\[/.exec(fieldName)) {
       return 5000;
-    } else if (fieldName.match(/^gyroADC.*\[/)) {
+    } else if (/^gyroADC.*\[/.exec(fieldName)) {
       return 3000;
-    } else if (fieldName.match(/^gyroUnfilt.*\[/)) {
+    } else if (/^gyroUnfilt.*\[/.exec(fieldName)) {
       return 3000;
-    } else if (fieldName.match(/^accSmooth\[/)) {
+    } else if (/^accSmooth\[/.exec(fieldName)) {
       return 3000;
-    } else if (fieldName.match(/^axis.+\[/)) {
+    } else if (/^axis.+\[/.exec(fieldName)) {
       return 3000;
     } else {
       return 0;
@@ -265,9 +265,9 @@ GraphConfig.getDefaultCurveForField = function (
       case RATES_TYPE.indexOf("ACTUAL"):
       case RATES_TYPE.indexOf("QUICK"):
         return Math.max(
-          sysConfig["rates"][0] * 10.0 * scale,
-          sysConfig["rates"][1] * 10.0 * scale,
-          sysConfig["rates"][2] * 10.0 * scale,
+          sysConfig["rates"][0] * 10 * scale,
+          sysConfig["rates"][1] * 10 * scale,
+          sysConfig["rates"][2] * 10 * scale,
         );
       default:
         return Math.max(
@@ -354,9 +354,9 @@ GraphConfig.getDefaultCurveForField = function (
   const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
   try {
     if (
-      fieldName.match(/^motor\[/) ||
+      (/^motor\[/.exec(fieldName)) ||
       fieldName === "rcCommands[3]" || // Throttle scaled
-      fieldName.match(/^rssi.*/)
+      (/^rssi.*/.exec(fieldName))
     ) {
       return {
         power: 1,
@@ -365,7 +365,7 @@ GraphConfig.getDefaultCurveForField = function (
           max: 100,
         },
       };
-    } else if (fieldName.match(/^eRPM\[/)) {
+    } else if (/^eRPM\[/.exec(fieldName)) {
       return getCurveForMinMaxFields(
         "eRPM[0]",
         "eRPM[1]",
@@ -376,7 +376,7 @@ GraphConfig.getDefaultCurveForField = function (
         "eRPM[6]",
         "eRPM[7]",
       );
-    } else if (fieldName.match(/^accSmooth\[/)) {
+    } else if (/^accSmooth\[/.exec(fieldName)) {
       return {
         power: 1,
         MinMax: {
@@ -385,10 +385,10 @@ GraphConfig.getDefaultCurveForField = function (
         },
       };
     } else if (
-      fieldName.match(/^axisError\[/) || // Gyro, Gyro Scaled, RC Command Scaled and axisError
-      fieldName.match(/^rcCommands\[/) || // These use the same scaling as they are in the
-      fieldName.match(/^gyroADC\[/) || // same range.
-      fieldName.match(/^gyroUnfilt\[/)
+      (/^axisError\[/.exec(fieldName)) || // Gyro, Gyro Scaled, RC Command Scaled and axisError
+      (/^rcCommands\[/.exec(fieldName)) || // These use the same scaling as they are in the
+      (/^gyroADC\[/.exec(fieldName)) || // same range.
+      (/^gyroUnfilt\[/.exec(fieldName))
     ) {
       return {
         power: 1,
@@ -398,7 +398,7 @@ GraphConfig.getDefaultCurveForField = function (
         },
       };
     } else if (
-      fieldName.match(/^axis.+\[/) ||
+      (/^axis.+\[/.exec(fieldName)) ||
       fieldName === "GPS_speed"
     ) {
       return {
@@ -409,8 +409,8 @@ GraphConfig.getDefaultCurveForField = function (
         },
       };
     } else if (
-      fieldName.match(/^servo\[/) ||
-      fieldName.match(/^rcCommand\[/)
+      (/^servo\[/.exec(fieldName)) ||
+      (/^rcCommand\[/.exec(fieldName))
     ) {
       return {
         power: 1,
@@ -431,7 +431,7 @@ GraphConfig.getDefaultCurveForField = function (
           max: 360,
         },
       };
-    } else if (fieldName.match(/^heading\[/)) {
+    } else if (/^heading\[/.exec(fieldName)) {
       return {
         power: 1,
         MinMax: {
@@ -439,7 +439,7 @@ GraphConfig.getDefaultCurveForField = function (
           max: 180,
         },
       };
-    } else if (fieldName.match(/^sonar.*/)) {
+    } else if (/^sonar.*/.exec(fieldName)) {
       return {
         power: 1,
         MinMax: {
@@ -455,7 +455,7 @@ GraphConfig.getDefaultCurveForField = function (
           max: 40,
         },
       };
-    } else if (fieldName.match(/^GPS_velned\[/)) {
+    } else if (/^GPS_velned\[/.exec(fieldName)) {
       return {
         power: 1,
         MinMax: {
@@ -471,7 +471,7 @@ GraphConfig.getDefaultCurveForField = function (
           max: 90,
         },
       };
-    } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode != null) {
+    } else if ((/^debug.*/.exec(fieldName)) && sysConfig.debug_mode != null) {
       const debugModeName = DEBUG_MODE[sysConfig.debug_mode];
       switch (debugModeName) {
         case "CYCLETIME":

@@ -3,7 +3,7 @@ import semver from "semver";
 function makeReadOnly<T>(x: T): T {
   // Make read-only if browser supports it:
   if (Object.freeze) {
-    return Object.freeze(x) as T;
+    return Object.freeze(x);
   }
 
   // Otherwise a no-op

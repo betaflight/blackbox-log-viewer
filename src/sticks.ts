@@ -56,7 +56,7 @@ export function FlightLogSticks(
       0,
       0.7,
       (500 * (sysConfig.rcRate ? sysConfig.rcRate : 100)) / 100,
-      1.0,
+      1,
       10,
     );
 

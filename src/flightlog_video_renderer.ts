@@ -65,17 +65,17 @@ export function FlightLogVideoRenderer(
   let visibilityChange: string;
 
   // From https://developer.mozilla.org/en-US/docs/Web/Guide/User_experience/Using_the_Page_Visibility_API
-  if (typeof document.hidden !== "undefined") {
+  if (document.hidden !== undefined) {
     // Opera 12.10 and Firefox 18 and later support
     hidden = "hidden";
     visibilityChange = "visibilitychange";
-  } else if (typeof (document as Loose).mozHidden !== "undefined") {
+  } else if ((document as Loose).mozHidden !== undefined) {
     hidden = "mozHidden";
     visibilityChange = "mozvisibilitychange";
-  } else if (typeof (document as Loose).msHidden !== "undefined") {
+  } else if ((document as Loose).msHidden !== undefined) {
     hidden = "msHidden";
     visibilityChange = "msvisibilitychange";
-  } else if (typeof (document as Loose).webkitHidden !== "undefined") {
+  } else if ((document as Loose).webkitHidden !== undefined) {
     hidden = "webkitHidden";
     visibilityChange = "webkitvisibilitychange";
   }
@@ -93,7 +93,7 @@ export function FlightLogVideoRenderer(
   }
 
   function installVisibilityHandler() {
-    if (typeof (document as Loose)[hidden] !== "undefined") {
+    if ((document as Loose)[hidden] !== undefined) {
       document.addEventListener(
         visibilityChange,
         handleVisibilityChange,
@@ -103,7 +103,7 @@ export function FlightLogVideoRenderer(
   }
 
   function removeVisibilityHandler() {
-    if (typeof (document as Loose)[hidden] !== "undefined") {
+    if ((document as Loose)[hidden] !== undefined) {
       document.removeEventListener(visibilityChange, handleVisibilityChange);
     }
   }
@@ -111,7 +111,7 @@ export function FlightLogVideoRenderer(
   function notifyCompletion(success: boolean, frameCount?: number) {
     removeVisibilityHandler();
 
-    if (events && events.onComplete) {
+    if (events?.onComplete) {
       events.onComplete(success, frameCount);
     }
   }
@@ -142,7 +142,7 @@ export function FlightLogVideoRenderer(
     }
 
     const completeChunk = function () {
-        if (events && events.onProgress) {
+        if (events?.onProgress) {
           events.onProgress(frameIndex, frameCount);
         }
 
@@ -262,7 +262,7 @@ export function FlightLogVideoRenderer(
   canvas.height = videoOptions.height;
 
   // If we've asked to blank the flight video completely then just don't render that
-  if (videoOptions.videoDim >= 1.0) {
+  if (videoOptions.videoDim >= 1) {
     delete logParameters.flightVideo;
   }
 
@@ -320,5 +320,5 @@ FlightLogVideoRenderer.isSupported = function (): Loose {
   // (kept verbatim); cast keeps it type-clean.
   const encoded = canvas.toDataURL("image/webp", { quality: 0.9 } as Loose);
 
-  return encoded && encoded.match(/^data:image\/webp;/);
+  return encoded && (/^data:image\/webp;/.exec(encoded));
 };

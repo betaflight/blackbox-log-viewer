@@ -33,7 +33,7 @@ export interface IMU {
 
 export function IMU(this: IMU, copyFrom?: IMU) {
   // Constants:
-  const RAD = Math.PI / 180.0,
+  const RAD = Math.PI / 180,
     ROLL = 0,
     PITCH = 1,
     YAW = 2,
@@ -114,7 +114,7 @@ export function IMU(this: IMU, copyFrom?: IMU) {
       vec.Z * sinePitch * cosineRoll;
     const headingY = vec.Y * cosineRoll - vec.Z * sineRoll;
     let heading =
-      Math.atan2(headingY, headingX) + (magneticDeclination / 10.0) * RAD; // RAD = pi/180
+      Math.atan2(headingY, headingX) + (magneticDeclination / 10) * RAD; // RAD = pi/180
 
     heading += 2 * Math.PI; // positive all the time, we want zero to return pi
     if (heading > 2 * Math.PI) {

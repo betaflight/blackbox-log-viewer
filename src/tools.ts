@@ -8,7 +8,7 @@ import type { SysConfig } from "./flightlog_types";
 //Convert a hexadecimal string (that represents a binary 32-bit float) into a float
 export function hexToFloat(string: string): number {
   const arr = new Uint32Array(1);
-  arr[0] = parseInt(string, 16);
+  arr[0] = Number.parseInt(string, 16);
 
   const floatArr = new Float32Array(arr.buffer);
 
@@ -118,18 +118,18 @@ export function parseCommaSeparatedString(string: string, length?: number): any 
   if (length < 2) {
     // this is not actually a list, just return the value
     value = parts[0].includes(".")
-      ? parseFloat(parts[0])
-      : parseInt(parts[0], 10);
-    return isNaN(value) ? string : value;
+      ? Number.parseFloat(parts[0])
+      : Number.parseInt(parts[0], 10);
+    return Number.isNaN(value) ? string : value;
   } else {
     // this really is a list; build an array
     result = new Array(length);
     for (let i = 0; i < length; i++) {
       if (i < parts.length) {
         value = parts[i].includes(".")
-          ? parseFloat(parts[i])
-          : parseInt(parts[i], 10);
-        result[i] = isNaN(value) ? parts[i] : value;
+          ? Number.parseFloat(parts[i])
+          : Number.parseInt(parts[i], 10);
+        result[i] = Number.isNaN(value) ? parts[i] : value;
       } else {
         result[i] = null;
       }
@@ -226,11 +226,11 @@ export function stringLoopTime(
 ): string {
   let returnString = "";
   if (loopTime != null) {
-    returnString = `${loopTime}μS (${parseFloat(
+    returnString = `${loopTime}μS (${Number.parseFloat(
       (1000 / loopTime).toFixed(3),
     )}kHz`;
     if (pid_process_denom != null) {
-      returnString += `/${parseFloat(
+      returnString += `/${Number.parseFloat(
         (1000 / (loopTime * pid_process_denom)).toFixed(3),
       )}kHz`;
       if (unsynced_fast_pwm != null) {
@@ -238,7 +238,7 @@ export function stringLoopTime(
           unsynced_fast_pwm === 0
             ? "/SYNCED"
             : motor_pwm_rate != null
-              ? `/${parseFloat((motor_pwm_rate / 1000).toFixed(3))}kHz`
+              ? `/${Number.parseFloat((motor_pwm_rate / 1000).toFixed(3))}kHz`
               : "UNSYNCED";
       }
     }
@@ -249,7 +249,7 @@ export function stringLoopTime(
 
 export function stringTimetoMsec(input: string): number {
   try {
-    const matches = input.match(/(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/);
+    const matches = /(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/.exec(input);
     if (!matches) {
       return 0;
     }
@@ -487,7 +487,7 @@ export function firmwareGreaterOrEqual(
 }
 
 export function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return string.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 
 export function triggerDownload(blob: Blob, filename: string): void {

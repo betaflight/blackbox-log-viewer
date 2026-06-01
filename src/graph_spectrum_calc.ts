@@ -863,7 +863,7 @@ GraphSpectrumCalc._normalizeFft = function (fftOutput) {
   // The fft output contains complex values (re, im pairs) of two-side spectrum
   // Compute magnitudes for one spectrum side
   const magnitudeLength = Math.floor(fftLength / 2);
-  const maxFrequency = this._blackBoxRate / 2.0;
+  const maxFrequency = this._blackBoxRate / 2;
   const noiseLowEndIdx = (100 / maxFrequency) * magnitudeLength;
   const magnitudes = new Float64Array(magnitudeLength);
   let maxNoiseIdx = 0;
@@ -919,7 +919,7 @@ GraphSpectrumCalc._psd = function (
   // Compute power scale coef
   let scale = 1;
   if (userSettings.analyserHanning) {
-    const window = Array(pointsPerSegment).fill(1);
+    const window = new Array(pointsPerSegment).fill(1);
     this._hanningWindow(window, pointsPerSegment);
     if (scaling === "density") {
       let skSum = 0;
@@ -952,13 +952,13 @@ GraphSpectrumCalc._psd = function (
       maxNoiseFrequency: 0,
     };
   }
-  const maxFrequency = this._blackBoxRate / 2.0;
+  const maxFrequency = this._blackBoxRate / 2;
   const noise50HzIdx = (50 / maxFrequency) * dataCount;
   const noise3HzIdx = (3 / maxFrequency) * dataCount;
   let maxNoiseIdx = 0;
   let maxNoise = -100;
   for (let i = 0; i < dataCount; i++) {
-    psdOutput[i] = 0.0;
+    psdOutput[i] = 0;
     for (let j = 0; j < segmentsCount; j++) {
       let p = scale * fftOutput[j][i] ** 2;
       if (i !== 0) {
