@@ -4,7 +4,30 @@ import { ExpoCurve } from "./expo";
 import { roundRect } from "./tools";
 import { useSettingsStore } from "./stores/settings.js";
 
-export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
+// flightLog, the per-frame data and the stick-position/label scratch arrays are
+// free-form structures from the still-JS layer; access stays loose, consistent
+// with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `FlightLogSticks` below
+// is the constructor function.
+export interface FlightLogSticks {
+  resize(width: number, height: number): void;
+  render(
+    centerFrame: Loose,
+    chunks: Loose,
+    startFrameIndex: number,
+    windowCenterTime: number,
+  ): void;
+}
+
+export function FlightLogSticks(
+  this: FlightLogSticks,
+  flightLog: Loose,
+  rcCommandFields: Loose,
+  canvas: HTMLCanvasElement,
+) {
   const { userSettings } = useSettingsStore();
   const // inefficient; copied from grapher.js. Font could be a global?
 
@@ -24,9 +47,11 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       stickSurroundRadius: 0,
     };
 
-  const canvasContext = canvas.getContext("2d"),
+  const canvasContext = canvas.getContext("2d")!,
     sysConfig = flightLog.getSysConfig(),
-    pitchStickCurve = new ExpoCurve(
+    pitchStickCurve = new (ExpoCurve as unknown as new (
+      ...args: Loose[]
+    ) => Loose)(
       0,
       0.7,
       (500 * (sysConfig.rcRate ? sysConfig.rcRate : 100)) / 100,
@@ -34,7 +59,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       10,
     );
 
-  this.resize = function (width, height) {
+  this.resize = function (width: number, height: number) {
     // Resize canvas if size changed
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
@@ -66,10 +91,10 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
   };
 
   this.render = function (
-    centerFrame,
-    chunks,
-    startFrameIndex,
-    windowCenterTime,
+    centerFrame: Loose,
+    chunks: Loose,
+    startFrameIndex: number,
+    windowCenterTime: number,
   ) {
     if (userSettings.eraseBackground) {
       canvasContext.clearRect(0, 0, canvas.width, canvas.height);
@@ -80,8 +105,8 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
       stickAreaColor = "rgba(76,76,76,0.2)",
       crosshairColor = "rgba(191,191,191,0.5)";
 
-    const stickPositions = [],
-      stickLabel = [];
+    const stickPositions: Loose[] = [],
+      stickLabel: Loose[] = [];
 
     canvasContext.save();
 
@@ -98,7 +123,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         // we have the data for the stick trails
 
         //We may start partway through the first chunk:
-        let frameIndex = startFrameIndex;
+        let frameIndex: number = startFrameIndex;
         stickLoop: for (
           let chunkIndex = 0;
           chunkIndex < chunks.length;
@@ -111,7 +136,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
                 chunk.frames[frameIndex][
                   FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME
                 ],
-              frameStickPositions = [];
+              frameStickPositions: Loose[] = [];
 
             if (frameTime > windowCenterTime - 500000) {
               // only go back 500ms
@@ -240,10 +265,15 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     canvasContext.restore();
   };
 
-  function getStickValues(frame, stickPositions, stickLabel, config) {
-    let stickIndex;
-    const rcCommand = [];
-    const rcCommandLabels = [];
+  function getStickValues(
+    frame: Loose,
+    stickPositions: Loose[],
+    stickLabel: Loose[] | null,
+    config: Loose,
+  ) {
+    let stickIndex: number;
+    const rcCommand: Loose[] = [];
+    const rcCommandLabels: Loose[] = [];
 
     const highResolutionScale =
       flightLog.getSysConfig().blackbox_high_resolution > 0 ? 10 : 1;

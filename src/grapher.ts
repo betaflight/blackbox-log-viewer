@@ -1182,7 +1182,12 @@ export function FlightLogGrapher(
     if (options.craftType === "3D") {
       if (craftCanvas) {
         try {
-          craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
+          // Craft3D is an Option-A typed-`this` fn; cast restores `new`-ability.
+          craft3D = new (Craft3D as Loose)(
+            flightLog,
+            craftCanvas,
+            idents.motorColors,
+          );
         } catch {
           //WebGL not supported, fall back to 2D rendering
           options.craftType = "2D";
@@ -1194,7 +1199,12 @@ export function FlightLogGrapher(
     }
 
     if (options.craftType === "2D") {
-      craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
+      // Craft2D is an Option-A typed-`this` fn; cast restores `new`-ability.
+      craft2D = new (Craft2D as Loose)(
+        flightLog,
+        craftCanvas,
+        idents.motorColors,
+      );
     }
   };
 

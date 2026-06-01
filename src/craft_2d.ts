@@ -1,31 +1,49 @@
 import { useSettingsStore } from "./stores/settings.js";
 
-export function Craft2D(flightLog, canvas, propColors) {
+// flightLog, the prop colours, frame data and the derived craft-parameter
+// objects are free-form structures from the still-JS layer; access stays loose,
+// consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `Craft2D` below is the
+// constructor function.
+export interface Craft2D {
+  render(frame: Loose, frameFieldIndexes: Loose): void;
+  resize(width: number, height: number): void;
+}
+
+export function Craft2D(
+  this: Craft2D,
+  flightLog: Loose,
+  canvas: HTMLCanvasElement,
+  propColors: Loose,
+) {
   const { userSettings } = useSettingsStore();
 
   const ARM_THICKNESS_MULTIPLIER = 0.18,
     ARM_EXTEND_BEYOND_MOTOR_MULTIPLIER = 1.1,
     CENTRAL_HUB_SIZE_MULTIPLIER = 0.3;
 
-  const canvasContext = canvas.getContext("2d");
+  const canvasContext = canvas.getContext("2d")!;
 
-  const craftParameters = {};
+  const craftParameters: Loose = {};
 
-  const customMix = userSettings.customMix ?? null;
+  const customMix: Loose = userSettings.customMix ?? null;
 
-  let numMotors;
+  let numMotors: number;
   if (!customMix) {
     numMotors = propColors.length;
   } else {
     numMotors = customMix.motorOrder.length;
   }
 
-  const shadeColors = [];
+  const shadeColors: Loose[] = [];
   const craftColor = "rgb(76,76,76)";
-  let armLength;
-  let bladeRadius;
+  let armLength: number;
+  let bladeRadius: number;
 
-  let motorOrder, yawOffset;
+  let motorOrder: Loose, yawOffset: Loose;
 
   // Motor numbering in counter-clockwise order starting from the 3 o'clock position
   if (!customMix) {
@@ -58,7 +76,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     yawOffset = customMix.yawOffset;
   }
 
-  function makeColorHalfStrength(color) {
+  function makeColorHalfStrength(color: Loose) {
     color = parseInt(color.substring(1), 16);
 
     return `rgba(${(color >> 16) & 0xff},${(color >> 8) & 0xff},${
@@ -155,7 +173,7 @@ export function Craft2D(flightLog, canvas, propColors) {
     return craftParameters;
   }
 
-  this.render = function (frame, frameFieldIndexes) {
+  this.render = function (frame: Loose, frameFieldIndexes: Loose) {
     const sysConfig = flightLog.getSysConfig();
 
     canvasContext.save();
@@ -265,7 +283,7 @@ export function Craft2D(flightLog, canvas, propColors) {
 
   decide2DCraftParameters();
 
-  this.resize = function (width, height) {
+  this.resize = function (width: number, height: number) {
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;

@@ -1,6 +1,24 @@
 import { useSettingsStore } from "./stores/settings.js";
 
-export function Craft3D(flightLog, canvas, propColors) {
+// flightLog, the prop colours, frame data and the three.js scene objects are
+// free-form structures from the still-JS layer; access stays loose, consistent
+// with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `Craft3D` below is the
+// constructor function.
+export interface Craft3D {
+  render(frame: Loose, frameFieldIndexes: Loose): void;
+  resize(width: number, height: number): void;
+}
+
+export function Craft3D(
+  this: Craft3D,
+  flightLog: Loose,
+  canvas: HTMLCanvasElement,
+  propColors: Loose,
+) {
   const { userSettings } = useSettingsStore();
 
   const // Sets the distance between the center point and the center of the motor mount
@@ -10,9 +28,9 @@ export function Craft3D(flightLog, canvas, propColors) {
     CRAFT_DEPTH = ARM_LENGTH * 0.08,
     ARROW_DEPTH = CRAFT_DEPTH * 0.5;
 
-  const customMix = userSettings.customMix ?? null;
+  const customMix: Loose = userSettings.customMix ?? null;
 
-  let numMotors;
+  let numMotors: number;
   if (customMix === null) {
     numMotors = propColors.length;
   } else {
@@ -202,9 +220,9 @@ export function Craft3D(flightLog, canvas, propColors) {
   const propGeometry = buildPropGeometry();
   const props = new Array(numMotors);
   const propShells = new Array(numMotors);
-  let motorOrder;
+  let motorOrder: Loose;
   const sysInfo = flightLog.getSysConfig();
-  let yawOffset;
+  let yawOffset: Loose;
 
   // The craft object will hold the props and craft body
   // We'll rotate this to bring the front direction of the model to the correct position
@@ -279,7 +297,7 @@ export function Craft3D(flightLog, canvas, propColors) {
   // Rotate the craft mesh and props to bring the board's direction arrow to the right direction
   craft.rotation.z = yawOffset;
 
-  this.render = function (frame, frameFieldIndexes) {
+  this.render = function (frame: Loose, frameFieldIndexes: Loose) {
     for (let i = 0; i < numMotors; i++) {
       if (props[i]) propShells[i].remove(props[i]);
 
@@ -318,7 +336,7 @@ export function Craft3D(flightLog, canvas, propColors) {
     renderer.render(scene, camera);
   };
 
-  this.resize = function (width, height) {
+  this.resize = function (width: number, height: number) {
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
