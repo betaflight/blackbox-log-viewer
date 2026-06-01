@@ -29,6 +29,7 @@ import type {
   FlightLogEventData,
   IntraIndex,
   LogStats,
+  ActivitySummary,
 } from "./flightlog_types";
 
 // Instance shape (old-style constructor function). Public methods are assigned
@@ -46,7 +47,7 @@ export interface FlightLog {
   setSysConfig(newSysConfig: SysConfig): void;
   getLogIndex(): number;
   getLogCount(): number;
-  getActivitySummary(): unknown;
+  getActivitySummary(): ActivitySummary;
   getMainFieldIndexByName(name: string): number | undefined;
   getMainFieldIndexes(_name?: string): Record<string, number>;
   getFrameAtTime(startTime: number): FrameArray | false;

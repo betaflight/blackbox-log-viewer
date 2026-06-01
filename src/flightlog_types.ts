@@ -88,6 +88,15 @@ export interface LogStats {
  * The intraframe directory FlightLogIndex builds per log, consumed by FlightLog
  * for seeking and the activity summary.
  */
+/** Per-log activity summary returned by FlightLog.getActivitySummary(). */
+export interface ActivitySummary {
+  times: number[];
+  avgThrottle: number[];
+  maxMotorDiff: number[];
+  maxRC: number[];
+  hasEvent: boolean[];
+}
+
 export interface IntraIndex {
   times: number[];
   offsets: number[];

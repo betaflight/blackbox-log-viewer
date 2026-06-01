@@ -3,34 +3,39 @@ import { useLogStore } from "./stores/log.js";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { formatTime, stringLoopTime } from "./tools.js";
+import type { ActivitySummary } from "./flightlog_types.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
 
-
 export function renderLogFileInfo(file: File) {
   const logStore = useLogStore(pinia);
   const appStore = useAppStore(pinia);
+  // A log is always loaded when this runs; getMinTime/getMaxTime/getLogError
+  // return number|false / unknown for invalid indexes, so cast at the use site.
+  const flightLog = logStore.flightLog!;
 
   appStore.logFilename = file.name;
 
-  const logCount = (logStore.flightLog as Loose).getLogCount();
+  const logCount = flightLog.getLogCount();
   const entries: Loose[] = [];
   for (let index = 0; index < logCount; index++) {
-    const error = (logStore.flightLog as Loose).getLogError(index);
-    let logLabel;
+    const error = flightLog.getLogError(index);
+    let logLabel: string;
     if (error) {
-      logLabel = error;
+      logLabel = String(error);
     } else {
       logLabel = `${formatTime(
-        (logStore.flightLog as Loose).getMinTime(index) / 1000,
+        (flightLog.getMinTime(index) as number) / 1000,
         false,
       )} - ${formatTime(
-        (logStore.flightLog as Loose).getMaxTime(index) / 1000,
+        (flightLog.getMaxTime(index) as number) / 1000,
         false,
       )} [${formatTime(
         Math.ceil(
-          ((logStore.flightLog as Loose).getMaxTime(index) - (logStore.flightLog as Loose).getMinTime(index)) / 1000,
+          ((flightLog.getMaxTime(index) as number) -
+            (flightLog.getMinTime(index) as number)) /
+            1000,
         ),
         false,
       )}]`;
@@ -48,18 +53,19 @@ export function renderSelectedLogInfo() {
   const logStore = useLogStore(pinia);
   const appStore = useAppStore(pinia);
   const graphStore = useGraphStore(pinia);
+  const flightLog = logStore.flightLog!;
 
-  logStore.activeLogIndex = (logStore.flightLog as Loose).getLogIndex();
+  logStore.activeLogIndex = flightLog.getLogIndex();
 
-  if ((logStore.flightLog as Loose).getNumCellsEstimate()) {
-    appStore.statusCells = `${(logStore.flightLog as Loose).getNumCellsEstimate()}S (${Number(
-      (logStore.flightLog as Loose).getReferenceVoltageMillivolts() / 1000,
+  if (flightLog.getNumCellsEstimate()) {
+    appStore.statusCells = `${flightLog.getNumCellsEstimate()}S (${Number(
+      flightLog.getReferenceVoltageMillivolts() / 1000,
     ).toFixed(2)}V)`;
   } else {
     appStore.statusCells = "";
   }
 
-  const sysConfig = (logStore.flightLog as Loose).getSysConfig();
+  const sysConfig = flightLog.getSysConfig();
 
   const versionText =
     (sysConfig["Craft name"]?.length
@@ -88,25 +94,25 @@ export function renderSelectedLogInfo() {
 
   const seekBar = graphStore.seekBar!;
   seekBar.setTimeRange(
-    (logStore.flightLog as Loose).getMinTime(),
-    (logStore.flightLog as Loose).getMaxTime(),
+    flightLog.getMinTime() as number,
+    flightLog.getMaxTime() as number,
     logStore.currentBlackboxTime,
   );
   seekBar.setActivityRange(
-    (logStore.flightLog as Loose).getSysConfig().motorOutput[0],
-    (logStore.flightLog as Loose).getSysConfig().motorOutput[1],
+    sysConfig.motorOutput[0],
+    sysConfig.motorOutput[1],
   );
 
-  const activity = (logStore.flightLog as Loose).getActivitySummary();
+  const activity = flightLog.getActivitySummary();
   seekBar.setActivity(
     activity.times,
-    activity[graphStore.seekBarMode],
+    activity[graphStore.seekBarMode as keyof ActivitySummary],
     activity.hasEvent,
   );
   seekBar.repaint();
 
-  if ((logStore.flightLog as Loose).hasGpsData()) {
-    graphStore.mapGrapher!.setFlightLog(logStore.flightLog);
+  if (flightLog.hasGpsData()) {
+    graphStore.mapGrapher!.setFlightLog(flightLog);
   }
 }
 
@@ -116,8 +122,12 @@ export function setSeekBarMode(mode: Loose) {
 
   graphStore.seekBarMode = mode;
   if (logStore.flightLog) {
-    const activity = (logStore.flightLog as Loose).getActivitySummary();
-    graphStore.seekBar!.setActivity(activity.times, activity[mode], activity.hasEvent);
+    const activity = logStore.flightLog.getActivitySummary();
+    graphStore.seekBar!.setActivity(
+      activity.times,
+      activity[mode as keyof ActivitySummary],
+      activity.hasEvent,
+    );
     graphStore.seekBar!.repaint();
   }
 }
