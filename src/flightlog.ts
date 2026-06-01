@@ -1,7 +1,7 @@
 import semver from "semver";
 import { FlightLogIndex } from "./flightlog_index";
 import { FlightLogParser } from "./flightlog_parser";
-import { GPS_transform } from "./gps_transform";
+import { GpsTransform } from "./gps_transform";
 import {
   MAX_MOTOR_NUMBER,
   DSHOT_MIN_VALUE,
@@ -164,7 +164,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
   let fieldSmoothing: Record<number, number> = {},
     maxSmoothing = 0;
   const smoothedCache = new (FIFOCache as unknown as Ctor<FIFOCache, [number]>)(2);
-  let gpsTransform: GPS_transform | null = null;
+  let gpsTransform: GpsTransform | null = null;
 
   //Public fields:
   this.parser = parser;
@@ -495,8 +495,8 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
         // Use the first event in the chunk to fill in event times at the trailing end of the previous one
         const frame = chunk.frames[0];
 
-        for (let i = 0; i < eventNeedsTimestamp.length; i++) {
-          eventNeedsTimestamp[i].time =
+        for (const event of eventNeedsTimestamp) {
+          event.time =
             frame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME];
         }
         eventNeedsTimestamp.length = 0;
@@ -593,9 +593,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
                   slowFrameIndex++
                 ) {
                   destFrame[slowFrameIndex + destFrame_currentIndex] =
-                    lastSlow[slowFrameIndex] === undefined
-                      ? null
-                      : lastSlow[slowFrameIndex];
+                    lastSlow[slowFrameIndex] ?? null;
                 }
                 destFrame_currentIndex += slowFrameLength;
 
@@ -606,9 +604,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
                   gpsFrameIndex++
                 ) {
                   destFrame[gpsFrameIndex + destFrame_currentIndex] =
-                    lastGPS[gpsFrameIndex] === undefined
-                      ? null
-                      : lastGPS[gpsFrameIndex];
+                    lastGPS[gpsFrameIndex] ?? null;
                 }
                 // destFrame_currentIndex += lastGPSLength; Add this line if you wish to add more fields.
 
@@ -649,8 +645,8 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
                 break;
               case "H": {
                 const homeAltitude = frame.length > 2 ? frame[2] / 10 : 0; // will work after BF firmware improvement
-                gpsTransform = new (GPS_transform as unknown as Ctor<
-                  GPS_transform,
+                gpsTransform = new (GpsTransform as unknown as Ctor<
+                  GpsTransform,
                   [number, number, number, number]
                 >)(frame[0] / 10000000, frame[1] / 10000000, homeAltitude, 0);
                 break;
@@ -679,8 +675,8 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
         if (initialGPSHome) {
           parser.setGPSHomeHistory(initialGPSHome);
           const homeAltitude = initialGPSHome.length > 2 ? initialGPSHome[2] / 10 : 0;
-          gpsTransform = new (GPS_transform as unknown as Ctor<
-            GPS_transform,
+          gpsTransform = new (GpsTransform as unknown as Ctor<
+            GpsTransform,
             [number, number, number, number]
           >)(
             initialGPSHome[0] / 10000000,
@@ -1558,12 +1554,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
     if (startFrameIndex > 0) startFrameIndex--;
 
     let frameIndex = startFrameIndex;
-    findingLoop: for (
-      let chunkIndex = 0;
-      chunkIndex < chunks.length;
-      chunkIndex++
-    ) {
-      const chunk = chunks[chunkIndex];
+    findingLoop: for (const chunk of chunks) {
       for (; frameIndex < chunk.frames.length; frameIndex++) {
         const fieldValue = chunk.frames[frameIndex][fieldIndex];
         const frameTime =

@@ -12,7 +12,9 @@
 const NEWLINE = 0x0a;
 
 function pushAscii(arr, str) {
-  for (let i = 0; i < str.length; i++) arr.push(str.charCodeAt(i));
+  for (let i = 0; i < str.length; i++) {
+    arr.push(str.charCodeAt(i));
+  }
 }
 
 function header(arr, line) {
@@ -92,9 +94,13 @@ function writeTag8_8SVB(arr, values) {
     return;
   }
   let header = 0;
-  for (let i = 0; i < values.length; i++) header |= 1 << i;
+  for (let i = 0; i < values.length; i++) {
+    header |= 1 << i;
+  }
   arr.push(header & 0xff);
-  for (let i = 0; i < values.length; i++) writeSignedVB(arr, values[i]);
+  for (let i = 0; i < values.length; i++) {
+    writeSignedVB(arr, values[i]);
+  }
 }
 
 /**

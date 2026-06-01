@@ -24,8 +24,12 @@ const CASES = [
 ];
 
 function serializeFrame(frame) {
-  if (frame == null) return null;
-  if (Array.isArray(frame)) return Array.from(frame);
+  if (frame == null) {
+    return null;
+  }
+  if (Array.isArray(frame)) {
+    return Array.from(frame);
+  }
   // Event frames pass the decoded event object rather than a numeric array.
   return JSON.parse(JSON.stringify(frame));
 }
@@ -142,5 +146,7 @@ for (const c of CASES) {
   }
 }
 
-if (update) process.exit(0);
+if (update) {
+  process.exit(0);
+}
 process.exit(failures === 0 ? 0 : 1);

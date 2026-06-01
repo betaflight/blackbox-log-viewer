@@ -471,11 +471,9 @@ GraphSpectrumCalc._dataLoadPowerSpectralDensityVsX = function (
 
   // Empty selected range: no chunks were processed, so the lazily-created matrix is
   // still undefined. Return an empty matrix so fftOutput is never undefined.
-  if (matrixPsdOutput === undefined) {
-    matrixPsdOutput = new Array(NUM_VS_BINS)
-      .fill(null)
-      .map(() => new Float64Array(0));
-  }
+  matrixPsdOutput ??= new Array(NUM_VS_BINS)
+    .fill(null)
+    .map(() => new Float64Array(0));
 
   // Divide the values from the fft in each row (vs value bin) by the number of samples in the bin
   for (let i = 0; i < NUM_VS_BINS; i++) {

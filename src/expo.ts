@@ -77,9 +77,7 @@ export function ExpoCurve(
   }
 
   // If steps argument isn't supplied, use a reasonable default
-  if (steps === undefined) {
-    steps = 12;
-  }
+  steps ??= 12;
 
   if (steps <= 2 || power === 1) {
     //Curve is actually a straight line

@@ -18,8 +18,8 @@ export class ArrayDataStream {
 
   constructor(data: Uint8Array, start?: number, end?: number) {
     this.data = data;
-    this.start = start === undefined ? 0 : start;
-    this.end = end === undefined ? data.length : end;
+    this.start = start ?? 0;
+    this.end = end ?? data.length;
     this.pos = this.start;
   }
 
@@ -30,7 +30,7 @@ export class ArrayDataStream {
    * is set).
    */
   readChar(): string | number {
-    if (this.pos < this.end) return String.fromCharCode(this.data[this.pos++]);
+    if (this.pos < this.end) return String.fromCodePoint(this.data[this.pos++]);
 
     this.eof = true;
     return EOF;
@@ -62,7 +62,7 @@ export class ArrayDataStream {
   }
 
   peekChar(): string | number {
-    if (this.pos < this.end) return String.fromCharCode(this.data[this.pos]);
+    if (this.pos < this.end) return String.fromCodePoint(this.data[this.pos]);
 
     this.eof = true;
     return EOF;

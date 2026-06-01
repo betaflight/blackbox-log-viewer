@@ -738,9 +738,7 @@ GraphSpectrumPlot._drawFrequencyVsXGraph = function (
 
   canvasCtx.translate(LEFT, TOP);
 
-  if (this._cachedDataCanvas == null) {
-    this._cachedDataCanvas = this._drawHeatMap(drawPSD);
-  }
+  this._cachedDataCanvas ??= this._drawHeatMap(drawPSD);
 
   canvasCtx.drawImage(this._cachedDataCanvas, 0, 0, WIDTH, HEIGHT);
 
@@ -2011,7 +2009,7 @@ GraphSpectrumPlot._drawCurve = function (canvasCtx, points, tension) {
   canvasCtx.beginPath();
   canvasCtx.moveTo(points[0].x, points[0].y);
 
-  const t = tension != null ? tension : 1;
+  const t = tension ?? 1;
   for (let i = 0; i < points.length - 1; i++) {
     const p0 = i > 0 ? points[i - 1] : points[0];
     const p1 = points[i];

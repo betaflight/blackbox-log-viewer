@@ -283,7 +283,7 @@ export function constrain(value: number, min: number, max: number): number {
 }
 
 export function validate<T>(value: T | null | undefined, defaultValue: T): T {
-  return value != null ? value : defaultValue;
+  return value ?? defaultValue;
 }
 
 interface CornerRadius {

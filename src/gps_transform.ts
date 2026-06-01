@@ -4,14 +4,14 @@ interface Vec3 {
   z: number;
 }
 
-export interface GPS_transform {
+export interface GpsTransform {
   WGS_ECEF(Lat: number, Lon: number, H: number): Vec3;
   ECEF_BS(pos: Vec3): Vec3;
   WGS_BS(Lat: number, Lon: number, H: number): Vec3;
 }
 
-export function GPS_transform(
-  this: GPS_transform,
+export function GpsTransform(
+  this: GpsTransform,
   Lat0: number,
   Lon0: number,
   H0: number,

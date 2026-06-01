@@ -13,6 +13,10 @@ import { formatTime } from "./tools";
 import { useSettingsStore } from "./stores/settings.js";
 import type { FlightLog } from "./flightlog";
 
+// A decoded field value: numeric, a friendly string, or undefined when no
+// conversion applies.
+type FriendlyFieldValue = string | number | undefined;
+
 // Namespace of static presentation helpers (no instance state). Methods are
 // assigned below; the cast gives them contextual param/return typing.
 interface FlightLogFieldPresenterType {
@@ -28,7 +32,7 @@ interface FlightLogFieldPresenterType {
   decodeCorrectAltitude(
     altitude: number,
     altitudeUnits: number,
-  ): number | string | undefined;
+  ): FriendlyFieldValue;
   decodeAltitudeLogToChart(
     altitude: number,
     altitudeUnits: number,
@@ -38,25 +42,25 @@ interface FlightLogFieldPresenterType {
     fieldName: string,
     value: number,
     _currentFlightMode?: number,
-  ): string | number | undefined;
+  ): FriendlyFieldValue;
   decodeDebugFieldToFriendly(
     flightLog: FlightLog,
     fieldName: string,
     value: number,
-  ): string | number | undefined;
+  ): FriendlyFieldValue;
   fieldNameToFriendly(fieldName: string, debugMode?: number): string;
   ConvertFieldValue(
     flightLog: FlightLog,
     fieldName: string,
     toFriendly: boolean,
     value: number,
-  ): string | number | undefined;
+  ): FriendlyFieldValue;
   ConvertDebugFieldValue(
     flightLog: FlightLog,
     fieldName: string,
     toFriendly: boolean,
     value: number,
-  ): string | number | undefined;
+  ): FriendlyFieldValue;
 }
 
 export const FlightLogFieldPresenter = function FlightLogFieldPresenter() {

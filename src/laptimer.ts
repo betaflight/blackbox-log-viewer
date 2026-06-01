@@ -192,9 +192,9 @@ export function LapTimer(this: LapTimer) {
 
         if (lapTime.laps.length > 0 && currentTime > bookmarkTimesSorted[0]) {
           lapTime.best = maxTime;
-          for (let i = 0; i < lapTime.laps.length; i++) {
-            if (lapTime.laps[i] < lapTime.best) {
-              lapTime.best = lapTime.laps[i];
+          for (const lap of lapTime.laps) {
+            if (lap < lapTime.best) {
+              lapTime.best = lap;
             }
           }
         }

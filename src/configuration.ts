@@ -111,8 +111,8 @@ export function ConfigurationDefaults(
     if (!fileLinesArray) {
       return true;
     }
-    for (let i = 0; i < fileLinesArray.length; i++) {
-      if (line !== fileLinesArray[i]) {
+    for (const fileLine of fileLinesArray) {
+      if (line !== fileLine) {
         continue;
       }
       return true;

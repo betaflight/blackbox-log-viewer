@@ -110,7 +110,7 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
     FLIGHT_LOG_FIELD_ENCODING_NULL = 9, // Nothing is written to the file, take value to be zero
     FLIGHT_LOG_FIELD_ENCODING_TAG2_3SVARIABLE = 10,
     EOF = ArrayDataStream.prototype.EOF,
-    NEWLINE = "\n".charCodeAt(0),
+    NEWLINE = "\n".codePointAt(0),
     INFLIGHT_ADJUSTMENT_FUNCTIONS = [
       {
         name: "None",
@@ -547,9 +547,8 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
    */
   function translateLegacyFieldNames(names: string[]) {
     for (let i = 0; i < names.length; i++) {
-      let matches;
-
-      if ((matches = /^gyroData(.+)$/.exec(names[i]))) {
+      const matches = /^gyroData(.+)$/.exec(names[i]);
+      if (matches) {
         names[i] = `gyroADC${matches[1]}`;
       }
     }
@@ -1677,9 +1676,9 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
     this.resetAllState();
 
     //Set parsing ranges up
-    stream.start = startOffset === undefined ? stream.pos : startOffset;
+    stream.start = startOffset ?? stream.pos;
     stream.pos = stream.start;
-    stream.end = endOffset === undefined ? stream.end : endOffset;
+    stream.end = endOffset ?? stream.end;
     stream.eof = false;
 
     mainloop: while (true) {
@@ -1804,9 +1803,9 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
     invalidateMainStream();
 
     //Set parsing ranges up for the log the caller selected
-    stream.start = startOffset === undefined ? stream.pos : startOffset;
+    stream.start = startOffset ?? stream.pos;
     stream.pos = stream.start;
-    stream.end = endOffset === undefined ? stream.end : endOffset;
+    stream.end = endOffset ?? stream.end;
     stream.eof = false;
     while (true) {
       const command = stream.readChar();

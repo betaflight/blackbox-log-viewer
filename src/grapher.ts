@@ -304,9 +304,8 @@ export function FlightLogGrapher(
     canvasContext.font = `${drawingParams.fontSizeFrameLabel}pt ${DEFAULT_FONT_FACE}`;
     canvasContext.fillStyle = ThemeColors.getGraphTextSecondary();
 
-    if (frameLabelTextWidthFrameNumber == null)
-      frameLabelTextWidthFrameNumber =
-        canvasContext.measureText("#0000000").width;
+    frameLabelTextWidthFrameNumber ??=
+      canvasContext.measureText("#0000000").width;
 
     canvasContext.fillText(
       `#${leftPad(frameIndex, "0", 7)}`,
@@ -314,9 +313,8 @@ export function FlightLogGrapher(
       canvas.height - 8,
     );
 
-    if (frameLabelTextWidthFrameTime == null)
-      frameLabelTextWidthFrameTime =
-        canvasContext.measureText("00:00.000").width;
+    frameLabelTextWidthFrameTime ??=
+      canvasContext.measureText("00:00.000").width;
 
     canvasContext.fillText(
       formatTime(timeMsec, true),
@@ -1106,9 +1104,7 @@ export function FlightLogGrapher(
 
       heightSum += graph.height ? graph.height : 1;
 
-      for (let j = 0; j < graphs[i].fields.length; j++) {
-        const field = graphs[i].fields[j];
-
+      for (const field of graphs[i].fields) {
         field.index = flightLog.getMainFieldIndexByName(field.name);
 
         // Compute inputRange and offset from min-max values

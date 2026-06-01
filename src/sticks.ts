@@ -125,12 +125,7 @@ export function FlightLogSticks(
 
         //We may start partway through the first chunk:
         let frameIndex: number = startFrameIndex;
-        stickLoop: for (
-          let chunkIndex = 0;
-          chunkIndex < chunks.length;
-          chunkIndex++
-        ) {
-          const chunk = chunks[chunkIndex];
+        stickLoop: for (const chunk of chunks) {
 
           for (; frameIndex < chunk.frames.length; frameIndex++) {
             const frameTime =
