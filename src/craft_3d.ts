@@ -1,4 +1,5 @@
 import { useSettingsStore } from "./stores/settings.js";
+import type { FlightLog } from "./flightlog";
 
 // flightLog, the prop colours, frame data and the three.js scene objects are
 // free-form structures from the still-JS layer; access stays loose, consistent
@@ -15,7 +16,7 @@ export interface Craft3D {
 
 export function Craft3D(
   this: Craft3D,
-  flightLog: Loose,
+  flightLog: FlightLog,
   canvas: HTMLCanvasElement,
   propColors: Loose,
 ) {

@@ -1,4 +1,5 @@
 import { debounce } from "throttle-debounce";
+import type { FlightLog } from "./flightlog";
 import { GraphSpectrumCalc } from "./graph_spectrum_calc";
 import {
   GraphSpectrumPlot,
@@ -53,7 +54,7 @@ export interface FlightLogAnalyser {
 
 export function FlightLogAnalyser(
   this: FlightLogAnalyser,
-  flightLog: Loose,
+  flightLog: FlightLog,
   canvas: HTMLCanvasElement,
   analyserCanvas: HTMLCanvasElement,
 ) {

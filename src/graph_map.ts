@@ -1,4 +1,5 @@
 import { useSettingsStore } from "./stores/settings.js";
+import type { FlightLog } from "./flightlog";
 
 // flightLog, Leaflet map/marker/polyline objects, frame coordinates and the
 // per-log trail layers are free-form structures from the still-JS layer;
@@ -56,7 +57,7 @@ export function MapGrapher(this: MapGrapher) {
     lngIndexAtFrame: Loose,
     altitudeIndexAtFrame: Loose,
     groundCourseIndexAtFrame: Loose,
-    flightLog: Loose;
+    flightLog: FlightLog;
 
   const coordinateDivider = 10000000;
   const altitudeDivider = 10;
@@ -198,8 +199,8 @@ export function MapGrapher(this: MapGrapher) {
     let minAlt = Number.MAX_VALUE;
 
     const chunks = flightLog.getChunksInTimeRange(
-      flightLog.getMinTime(),
-      flightLog.getMaxTime(),
+      flightLog.getMinTime() as number,
+      flightLog.getMaxTime() as number,
     );
 
     let frameCount = 0;
@@ -274,7 +275,7 @@ export function MapGrapher(this: MapGrapher) {
 
   this.updateCurrentPosition = function () {
     try {
-      const frame = flightLog.getCurrentFrameAtTime(currentTime);
+      const frame: Loose = flightLog.getCurrentFrameAtTime(currentTime);
       craftPosition = this.getCoordinatesFromFrame(
         frame.current,
         latIndexAtFrame,

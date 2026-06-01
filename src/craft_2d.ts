@@ -1,4 +1,5 @@
 import { useSettingsStore } from "./stores/settings.js";
+import type { FlightLog } from "./flightlog";
 
 // flightLog, the prop colours, frame data and the derived craft-parameter
 // objects are free-form structures from the still-JS layer; access stays loose,
@@ -15,7 +16,7 @@ export interface Craft2D {
 
 export function Craft2D(
   this: Craft2D,
-  flightLog: Loose,
+  flightLog: FlightLog,
   canvas: HTMLCanvasElement,
   propColors: Loose,
 ) {

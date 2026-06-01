@@ -1,4 +1,5 @@
 import { FlightLogParser } from "./flightlog_parser";
+import type { FlightLog } from "./flightlog";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { ExpoCurve } from "./expo";
 import { roundRect } from "./tools";
@@ -24,7 +25,7 @@ export interface FlightLogSticks {
 
 export function FlightLogSticks(
   this: FlightLogSticks,
-  flightLog: Loose,
+  flightLog: FlightLog,
   rcCommandFields: Loose,
   canvas: HTMLCanvasElement,
 ) {
@@ -291,7 +292,7 @@ export function FlightLogSticks(
         if (userSettings.stickUnits != null) {
           if (userSettings.stickUnits) {
             const currentFlightMode =
-              frame[flightLog.getMainFieldIndexByName("flightModeFlags")];
+              frame[flightLog.getMainFieldIndexByName("flightModeFlags")!];
             rcCommandLabels[stickIndex] =
               FlightLogFieldPresenter.decodeFieldToFriendly(
                 flightLog,
