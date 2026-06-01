@@ -90,7 +90,7 @@ export function stringHasComma(string: string): boolean {
    * returns              true if at least one comma is found.
    *                      false if no comma is found.
    ***/
-  return string.match(/.*,.*/) != null;
+  return string.includes(",");
 }
 
 // Returns a scalar or a heterogeneous array depending on the input; callers
