@@ -8,10 +8,15 @@ interface FieldStat {
 }
 
 export function SimpleStats(flightLog: FlightLog) {
-  const chunks = flightLog.getChunksInTimeRange(
-    flightLog.getMinTime() || 0,
-    flightLog.getMaxTime() || 0,
-  );
+  // getMinTime/getMaxTime are `number | false` (false until P/I frames are
+  // parsed). Only query a real time range; otherwise there is no data, so the
+  // stats short-circuit to empty via the !frames.length guard below.
+  const minTime = flightLog.getMinTime();
+  const maxTime = flightLog.getMaxTime();
+  const chunks =
+    minTime === false || maxTime === false
+      ? []
+      : flightLog.getChunksInTimeRange(minTime, maxTime);
   const frames = chunks.flatMap((chunk) => chunk.frames);
   const fields = flightLog
     .getMainFieldNames()
