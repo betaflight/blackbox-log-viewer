@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    /* Migration complete: the only remaining .js is the trivial side-effect
-       vendor bundle. Type-check JS too. */
-    "allowJs": true,
-    "checkJs": true,
+    /* Migration complete: src is 100% TypeScript (.ts/.vue) and no .js file is
+       part of the program, so allowJs/checkJs are no longer needed. The ".js"
+       import specifiers are bundler-mode extension rewrites that resolve to the
+       sibling .ts files. */
 
     /* Vite/esbuild transpiles; tsc & vue-tsc are type-checkers only. */
     "noEmit": true,
