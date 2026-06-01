@@ -106,9 +106,9 @@ export function FlightLogGrapher(
     inTime: number | false = false,
     outTime: number | false = false,
     lastMouseX: number,
-    sticks: Loose = null,
-    craft3D: Loose = null,
-    craft2D: Loose = null,
+    sticks: FlightLogSticks | null = null,
+    craft3D: Craft3D | null = null,
+    craft2D: Craft2D | null = null,
     analyser: Loose = null /* define a new spectrum analyser */,
     watermarkLogo: Loose /* Watermark feature */;
   this.onSeek = null;
@@ -1048,7 +1048,7 @@ export function FlightLogGrapher(
 
       if (centerFrame) {
         if (options.drawSticks) {
-          sticks.render(centerFrame, chunks, startFrameIndex, windowCenterTime);
+          sticks!.render(centerFrame, chunks, startFrameIndex, windowCenterTime);
         }
 
         if (options.drawTime) {
@@ -1061,9 +1061,9 @@ export function FlightLogGrapher(
         }
 
         if (options.craftType === "3D") {
-          craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
+          craft3D!.render(centerFrame, flightLog.getMainFieldIndexes());
         } else if (options.craftType === "2D") {
-          craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
+          craft2D!.render(centerFrame, flightLog.getMainFieldIndexes());
         }
       }
 
