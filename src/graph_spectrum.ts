@@ -11,7 +11,52 @@ import { useSettingsStore } from "./stores/settings.js";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 
-export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
+// flightLog, the FFT data payload and the curve descriptor are free-form
+// structures from the still-JS layer; access stays loose, consistent with the
+// rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `FlightLogAnalyser`
+// below is the constructor function.
+export interface FlightLogAnalyser {
+  setFullscreen(size: boolean): void;
+  prepareSpectrumForComparison(): void;
+  setInTime(time: number): number;
+  setOutTime(time: number): number;
+  resize(): void;
+  shouldAddCurrentSpectrumBeforeReload(): boolean;
+  plotSpectrum(fieldIndex: number, curve: Loose, fieldName: Loose): void;
+  destroy(): void;
+  refresh(): void;
+  draw(): void;
+  setSpectrumType(type: string): void;
+  setOverdrawType(type: string): void;
+  setZoomX(value: number): void;
+  resetZoomX(): void;
+  setZoomY(value: number): void;
+  resetZoomY(): void;
+  setMinPSD(value: number): void;
+  resetMinPSD(): void;
+  setMaxPSD(value: number): void;
+  resetMaxPSD(): void;
+  setLowLevelPSD(value: number): void;
+  resetLowLevelPSD(minValue: number): void;
+  setSegmentLength(value: number): void;
+  resetSegmentLength(): void;
+  exportSpectrumToCSV(onSuccess: Loose, options: Loose): void;
+  importSpectrumFromCSV(files: Loose): void;
+  removeImportedSpectrums(): void;
+  getExportedFileName(): string;
+  isMultiSpectrum(): boolean;
+}
+
+export function FlightLogAnalyser(
+  this: FlightLogAnalyser,
+  flightLog: Loose,
+  canvas: HTMLCanvasElement,
+  analyserCanvas: HTMLCanvasElement,
+) {
   const { userSettings } = useSettingsStore();
   const graphStore = useGraphStore();
   const appStore = useAppStore();
@@ -21,6 +66,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     ANALYSER_LARGE_HEIGHT_MARGIN = 20,
     ANALYSER_LARGE_WIDTH_MARGIN = 20;
 
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const that = this,
     prefs = new PrefStorage(),
     DEFAULT_PSD_HEATMAP_MIN = -40,
@@ -29,7 +75,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   let analyserZoomX = 1,
     analyserZoomY = 1,
     dataReload = false,
-    fftData = null,
+    fftData: Loose = null,
     addSpectrumForComparison = false;
 
   try {
@@ -109,7 +155,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
       // Position the analyser canvas container
-      const parentElem = analyserCanvas.parentElement;
+      const parentElem = analyserCanvas.parentElement!;
       parentElem.style.left = `${newSize.left}px`;
       parentElem.style.top = `${newSize.top}px`;
 
@@ -122,7 +168,11 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       };
     };
 
-    const dataLoad = function (fieldIndex, curve, fieldName) {
+    const dataLoad = function (
+      fieldIndex: number = -1,
+      curve: Loose = null,
+      fieldName: Loose = null,
+    ) {
       if (fieldIndex > 0 && curve != null && fieldName != null) {
         GraphSpectrumCalc.setDataBuffer(fieldIndex, curve, fieldName);
       }
@@ -200,7 +250,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.draw();
     };
 
-    function onMouseMoveAnalyser(e) {
+    function onMouseMoveAnalyser(e: Loose) {
       if (e.shiftKey) {
         graphStore.spectrumShiftActive = true;
         const rect = analyserCanvas.getBoundingClientRect();
@@ -252,7 +302,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       }
     };
 
-    this.setZoomX = debounce(100, function (value) {
+    this.setZoomX = debounce(100, function (value: number) {
       analyserZoomX = value / 100;
       GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
       that.refresh();
@@ -264,7 +314,7 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.refresh();
     };
 
-    this.setZoomY = debounce(100, function (value) {
+    this.setZoomY = debounce(100, function (value: number) {
       analyserZoomY = 1 / (value / 100);
       GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
       that.refresh();
@@ -276,8 +326,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.refresh();
     };
 
-    this.setMinPSD = debounce(100, function (value) {
-      const min = Number.parseInt(value, 10);
+    this.setMinPSD = debounce(100, function (value: number) {
+      const min = Number.parseInt(String(value), 10);
       GraphSpectrumPlot.setMinPSD(min);
       saveOneUserSetting("psdHeatmapMin", min);
       that.refresh();
@@ -288,8 +338,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.refresh();
     };
 
-    this.setMaxPSD = debounce(100, function (value) {
-      const max = Number.parseInt(value, 10);
+    this.setMaxPSD = debounce(100, function (value: number) {
+      const max = Number.parseInt(String(value), 10);
       GraphSpectrumPlot.setMaxPSD(max);
       saveOneUserSetting("psdHeatmapMax", max);
       that.refresh();
@@ -300,19 +350,19 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.refresh();
     };
 
-    this.setLowLevelPSD = debounce(100, function (value) {
-      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(value, 10));
+    this.setLowLevelPSD = debounce(100, function (value: number) {
+      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(String(value), 10));
       that.refresh();
     });
 
     this.resetLowLevelPSD = function (minValue) {
-      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(minValue, 10));
+      GraphSpectrumPlot.setLowLevelPSD(Number.parseInt(String(minValue), 10));
       that.refresh();
     };
 
-    this.setSegmentLength = debounce(100, function (value) {
+    this.setSegmentLength = debounce(100, function (value: number) {
       GraphSpectrumCalc.setPointsPerSegmentPSD(
-        2 ** Number.parseInt(value, 10),
+        2 ** Number.parseInt(String(value), 10),
       );
       dataLoad();
       GraphSpectrumPlot.setData(fftData, userSettings.spectrumType);
@@ -328,8 +378,8 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
       that.refresh();
     };
 
-    function saveOneUserSetting(name, value) {
-      prefs.get("userSettings", function (data) {
+    function saveOneUserSetting(name: string, value: Loose) {
+      prefs.get("userSettings", function (data: Loose) {
         data = data || {};
         data[name] = value;
         prefs.set("userSettings", data);

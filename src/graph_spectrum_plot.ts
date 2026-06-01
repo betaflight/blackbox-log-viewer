@@ -35,6 +35,211 @@ export const SPECTRUM_OVERDRAW_TYPE = {
   AUTO: 5,
 };
 
+// Canvas contexts, the fftData payload, sysConfig and the imported-curve
+// helpers are free-form structures from the still-JS layer; access stays loose,
+// consistent with the rest of the migration. Scalars are typed precisely.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Singleton with methods added below; `this`, params and returns are typed via
+// this interface (the object literal is cast to it, since the methods are
+// assigned afterwards). Mirrors the graph_spectrum_calc.ts idiom.
+interface GraphSpectrumPlotType {
+  _isFullScreen: boolean;
+  _cachedCanvas: Loose;
+  _cachedDataCanvas: Loose;
+  _canvasCtx: Loose;
+  _fftData: Loose;
+  _mousePosition: { x: number; y: number };
+  _overdrawType: number | null;
+  _spectrumType: number | null;
+  _sysConfig: Loose;
+  _zoomX: number;
+  _zoomY: number;
+  _minPSD: number;
+  _maxPSD: number;
+  _lowLevelPSD: number;
+  _drawingParams: {
+    fontSizeFrameLabel: string;
+    fontSizeFrameLabelFullscreen: string;
+  };
+  _importedSpectrums: Loose;
+  _importedPSD: Loose;
+  _logRateWarning?: Loose;
+  curvesColors: string[];
+
+  initialize(canvas: Loose, sysConfig: Loose): void;
+  setZoom(zoomX: number, zoomY: number): void;
+  setMinPSD(min: number): void;
+  setMaxPSD(max: number): void;
+  setLowLevelPSD(lowLevel: number): void;
+  setSize(width: number, height: number): void;
+  setFullScreen(isFullScreen: boolean): void;
+  setData(fftData: Loose, spectrumType: number): void;
+  redraw(): void;
+  setOverdraw(overdrawType: number): void;
+  setMousePosition(x: number, y: number): void;
+  draw(): void;
+  _drawCachedElements(): void;
+  _drawGraph(canvasCtx: Loose): void;
+  getCurveColor(index: number): string;
+  _drawFrequencyGraph(canvasCtx: Loose): void;
+  _drawPowerSpectralDensityGraph(canvasCtx: Loose): void;
+  _drawLegend(
+    canvasCtx: Loose,
+    WIDTH: number,
+    HEIGHT: number,
+    importedCurves: Loose,
+  ): void;
+  getPSDbyFreq(frequency: number): number;
+  _drawFrequencyVsXGraph(canvasCtx: Loose, drawPSD?: boolean): void;
+  _drawHeatMap(drawPSD?: boolean): Loose;
+  getValueFromMatrixFFT(frequency: number, vsArgument: number): number;
+  _drawPidErrorVsSetpointGraph(canvasCtx: Loose): void;
+  _drawPidErrorVsSetpointGraphProcessData(): Loose;
+  _drawPidErrorVsSetpointGraphLine(
+    canvasCtx: Loose,
+    pidErrorArray: Loose,
+    currentDrawMaxSetpoint: number,
+    currentDrawMaxPidError: number,
+    WIDTH: number,
+    HEIGHT: number,
+  ): void;
+  _drawPidErrorVsSetpointGraphGroups(
+    canvasCtx: Loose,
+    currentDataMaxSetpoint: number,
+    currentDrawMaxSetpoint: number,
+    currentDrawMaxPidError: number,
+    WIDTH: number,
+    HEIGHT: number,
+  ): void;
+  _drawFiltersAndMarkers(canvasCtx: Loose): void;
+  _drawNotCachedElements(): void;
+  _drawAxisLabel(
+    canvasCtx: Loose,
+    axisLabel: string,
+    X: number,
+    Y: number,
+    align?: string,
+    baseline?: string,
+  ): void;
+  _drawHorizontalGridLines(
+    canvasCtx: Loose,
+    maxValue: number,
+    LEFT: number,
+    TOP: number,
+    WIDTH: number,
+    HEIGHT: number,
+    MARGIN_UP_LABEL: number,
+    unitsLabel: string,
+  ): void;
+  _drawVerticalGridLines(
+    canvasCtx: Loose,
+    LEFT: number,
+    TOP: number,
+    WIDTH: number,
+    HEIGHT: number,
+    minValue: number,
+    maxValue: number,
+    label: string,
+    ticks?: number,
+  ): void;
+  _drawVerticalMarkerLine(
+    canvasCtx: Loose,
+    value: number,
+    axisMaximum: number,
+    label: string | null,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): number;
+  _drawHorizontalMarkerLine(
+    canvasCtx: Loose,
+    value: number,
+    minAxisValue: number,
+    maxAxisValue: number,
+    label: string | null,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): number;
+  _drawGradientBackground(canvasCtx: Loose, WIDTH: number, HEIGHT: number): void;
+  _drawInterestFrequency(
+    canvasCtx: Loose,
+    frequency: number,
+    maximalFrequency: number,
+    label: string,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): number;
+  _drawLowpassFilter(
+    canvasCtx: Loose,
+    frequency: number,
+    maximalFrequency: number,
+    label: string,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): number;
+  _drawLowpassDynFilter(
+    canvasCtx: Loose,
+    frequency1: number,
+    frequency2: number,
+    expo: Loose,
+    maximalFrequency: number,
+    label: string,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): void;
+  _drawNotchFilter(
+    canvasCtx: Loose,
+    center: number,
+    cutoff: number,
+    maximalFrequency: number,
+    label: string,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): void;
+  _drawMousePosition(
+    canvasCtx: Loose,
+    mouseX: number,
+    mouseY: number,
+    WIDTH: number,
+    HEIGHT: number,
+    OFFSET: number,
+    stroke?: string,
+    lineWidth?: number,
+  ): void;
+  _getActualMarginLeft(): number;
+  _drawCurve(canvasCtx: Loose, points: Loose[], tension?: number): void;
+  _invalidateCache(): void;
+  _invalidateDataCache(): void;
+  setLogRateWarningInfo(logRateInfo: Loose): void;
+  _drawRateWarning(canvasCtx: Loose): void;
+  importCurvesFromCSV(files: Loose): void;
+  removeImportedCurves(): void;
+  isNewComparedCurve(name: string): boolean;
+  addCurrentSpectrumIntoImport(): void;
+  removeComparedCurve(name: string): void;
+  isMultiSpectrum(): boolean;
+  isImportedCurvesMaxCount(): boolean;
+}
+
 export const GraphSpectrumPlot = {
   _isFullScreen: false,
   _cachedCanvas: null,
@@ -68,7 +273,7 @@ export const GraphSpectrumPlot = {
     "DarkCyan",
     "Chocolate",
   ],
-};
+} as unknown as GraphSpectrumPlotType;
 
 GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
   this._importedSpectrums = new ImportedCurves(() =>
@@ -604,7 +809,7 @@ GraphSpectrumPlot._drawHeatMap = function (drawPSD = false) {
   // This value will be maximum color
 
   const heatMapCanvas = document.createElement("canvas");
-  const canvasCtx = heatMapCanvas.getContext("2d", { alpha: false });
+  const canvasCtx = heatMapCanvas.getContext("2d", { alpha: false })!;
 
   // We use always a canvas of the size of the FFT data (is not too big)
   canvasCtx.canvas.width = this._fftData.fftLength;
@@ -1190,8 +1395,8 @@ GraphSpectrumPlot._drawAxisLabel = function (
 GraphSpectrumPlot._drawHorizontalGridLines = function (
   canvasCtx,
   maxValue,
-  LEFT,
-  TOP,
+  _LEFT,
+  _TOP,
   WIDTH,
   HEIGHT,
   MARGIN_UP_LABEL,
@@ -1234,8 +1439,8 @@ GraphSpectrumPlot._drawHorizontalGridLines = function (
 
 GraphSpectrumPlot._drawVerticalGridLines = function (
   canvasCtx,
-  LEFT,
-  TOP,
+  _LEFT,
+  _TOP,
   WIDTH,
   HEIGHT,
   minValue,

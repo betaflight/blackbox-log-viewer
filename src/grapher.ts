@@ -1316,8 +1316,14 @@ export function FlightLogGrapher(
 
   this.refreshLogo();
 
-  /* Create the FlightLogAnalyser object */
-  analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
+  /* Create the FlightLogAnalyser object.
+     FlightLogAnalyser is an Option-A typed-`this` constructor fn (no construct
+     signature for TS); the cast restores `new`-ability. */
+  analyser = new (FlightLogAnalyser as Loose)(
+    flightLog,
+    canvas,
+    analyserCanvas,
+  );
 
   /* Create the Lap Timer object */
   const lapTimer = new LapTimer();
