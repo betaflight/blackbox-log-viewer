@@ -16,6 +16,7 @@ import { leftPad, formatTime } from "./tools";
 import { useGraphStore } from "./stores/graph.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
 import { ThemeColors } from "./theme_colors";
+import type { FlightLog } from "./flightlog";
 
 // flightLog, the renderer sub-objects (sticks/craft/analyser/lapTimer), the
 // per-field graph config entries and the options bag are free-form structures
@@ -51,7 +52,7 @@ export interface FlightLogGrapher {
 
 export function FlightLogGrapher(
   this: FlightLogGrapher,
-  flightLog: Loose,
+  flightLog: FlightLog,
   graphConfig: GraphConfig,
   canvas: HTMLCanvasElement,
   stickCanvas: HTMLCanvasElement,
@@ -745,7 +746,7 @@ export function FlightLogGrapher(
               event: FlightLogEvent.CUSTOM,
               time: markerEvent.time,
               label: `Marker:${formatTime(
-                (markerEvent.time - flightLog.getMinTime()) / 1000,
+                (markerEvent.time - (flightLog.getMinTime() as number)) / 1000,
                 true,
               )}`,
               align: markerEvent.time < windowCenterTime ? "left" : "right",
@@ -1055,7 +1056,7 @@ export function FlightLogGrapher(
             centerFrame[
               FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_ITERATION
             ],
-            Math.round((windowCenterTime - flightLog.getMinTime()) / 1000),
+            Math.round((windowCenterTime - (flightLog.getMinTime() as number)) / 1000),
           );
         }
 
