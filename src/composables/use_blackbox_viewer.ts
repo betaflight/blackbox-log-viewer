@@ -174,7 +174,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     setVideoInTime(false);
     setVideoOutTime(false);
 
-    graphStore.activeGraphConfig!.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
+    graphStore.activeGraphConfig!.adaptGraphs(logStore.flightLog, graphStore.graphConfig!);
 
     graph.onSeek = function (offset: number) {
       //Seek faster
@@ -320,7 +320,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     graphStore.lastGraphConfig = graphStore.graphConfig; // Remember the last configuration.
     graphStore.graphConfig = newConfig;
     graphStore.activeGraphConfig!.setRedrawChart(!noRedraw);
-    graphStore.activeGraphConfig!.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
+    graphStore.activeGraphConfig!.adaptGraphs(logStore.flightLog, graphStore.graphConfig!);
 
     prefs.set("graphConfig", graphStore.graphConfig);
   }
@@ -400,7 +400,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
 
       const expandedGraphConfig = [];
 
-      for (const field of graphStore.graphConfig[index].fields) {
+      for (const field of graphStore.graphConfig![index].fields) {
         // Loop through each of the fields
         const singleGraph = { fields: [] as Loose[], label: "", height: 1 };
         singleGraph.fields.push(field);
@@ -415,7 +415,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     function zoomGraphConfig(index: number) {
       // Put each of the fields onto one graph and clear the others
 
-      if (graphStore.graphConfig.length === 1) {
+      if (graphStore.graphConfig!.length === 1) {
         // if there is only one graph, then return to previous configuration
         if (graphStore.lastGraphConfig != null) {
           newGraphConfig(graphStore.lastGraphConfig);
@@ -424,10 +424,10 @@ export function initBlackboxViewer(): BlackboxViewerOps {
         const expandedGraphConfig = [];
         const singleGraph = { fields: [] as Loose[], label: "", height: 1 };
 
-        for (const field of graphStore.graphConfig[index].fields) {
+        for (const field of graphStore.graphConfig![index].fields) {
           // Loop through each of the fields
           singleGraph.fields.push(field);
-          singleGraph.label = graphStore.graphConfig[index].label;
+          singleGraph.label = graphStore.graphConfig![index].label;
         }
         expandedGraphConfig.push(singleGraph);
 
@@ -596,7 +596,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     ops.zoomGraphConfig = (gi) => zoomGraphConfig(gi);
     ops.expandGraphConfig = (gi) => expandGraphConfig(gi);
     ops.reorderGraphs = (newOrder) => {
-      const oldGraphs = graphStore.graphConfig;
+      const oldGraphs = graphStore.graphConfig!;
       const newGraphs = newOrder.map((i) => oldGraphs[i]);
       newGraphConfig(newGraphs);
     };

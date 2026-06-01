@@ -2,24 +2,13 @@ import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
 
-// The graph/field/curve config objects are free-form, user-editable structures
-// shared with the still-JS renderer (grapher) and the now-typed config dialog;
-// access stays intentionally loose, consistent with the rest of the migration.
+import type { MinMax, Curve } from "./graph_types";
+
+// The graph/field config arrays are free-form, user-editable structures shared
+// with the renderer (grapher); access stays intentionally loose. The curve/
+// min-max shapes are the shared graph_types model.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
-
-interface MinMax {
-  min: number;
-  max: number;
-}
-
-interface Curve {
-  power: number;
-  MinMax?: MinMax;
-  offset?: number;
-  inputRange?: number;
-  outputRange?: number;
-}
 
 interface ExampleGraph {
   label: string;

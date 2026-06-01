@@ -152,7 +152,7 @@
                 <div class="flex justify-center">
                   <span
                     class="inline-block w-6 h-6 rounded-sm cursor-pointer border border-neutral-200 dark:border-neutral-700"
-                    :style="{ backgroundColor: field.color }"
+                    :style="{ backgroundColor: field.color as string }"
                     :title="
                       palette.find((c) => c.color === field.color)?.name ||
                       'Color'
@@ -255,6 +255,11 @@ import { GraphConfig } from "../graph_config.js";
 import { FlightLogFieldPresenter } from "../flightlog_fields_presenter.js";
 import type { FlightLog } from "../flightlog.js";
 import type { FlightLogGrapher } from "../grapher.js";
+import type {
+  GraphField,
+  GraphConfigEntry as GraphCfg,
+  MinMax,
+} from "../graph_types";
 
 const open = defineModel("open", { type: Boolean, default: false });
 
@@ -269,21 +274,11 @@ const props = withDefaults(
 
 const emit = defineEmits(["save", "update"]);
 
-// The per-graph/field config entries the dialog edits are free-form,
-// user-editable structures; access stays loose. (flightLog/graphConfig/grapher
-// props are now typed against their interfaces.)
+// The per-graph/field config the dialog edits uses the shared graph_types
+// model (GraphField / GraphConfigEntry). `Loose` remains for the example-config
+// and extendFields outputs, which are still produced by loosely-typed code.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
-interface GraphField {
-  name: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [k: string]: any;
-}
-interface GraphCfg {
-  label: string;
-  height: number;
-  fields: GraphField[];
-}
 
 const palette = GraphConfig.PALETTE;
 const noGrouping = { useGrouping: false };
@@ -454,7 +449,8 @@ function ensureCurveMinMax(field: GraphField) {
     field.curve = {};
   }
   if (!field.curve.MinMax) {
-    field.curve.MinMax = {};
+    // Transient empty min/max; setMin/setMax fill it immediately after.
+    field.curve.MinMax = {} as MinMax;
   }
 }
 
@@ -462,7 +458,7 @@ function setMin(field: GraphField, val: string | number) {
   ensureCurveMinMax(field);
   const num = Number.parseFloat(String(val));
   if (Number.isFinite(num)) {
-    field.curve.MinMax.min = num;
+    field.curve!.MinMax!.min = num;
   }
 }
 
@@ -470,7 +466,7 @@ function setMax(field: GraphField, val: string | number) {
   ensureCurveMinMax(field);
   const num = Number.parseFloat(String(val));
   if (Number.isFinite(num)) {
-    field.curve.MinMax.max = num;
+    field.curve!.MinMax!.max = num;
   }
 }
 
@@ -595,7 +591,7 @@ function onCancel() {
   open.value = false;
 }
 
-function cloneGraphToLocal(g: Loose) {
+function cloneGraphToLocal(g: Loose): GraphCfg {
   const fields: GraphField[] = [];
   for (const f of g.fields) {
     if (!props.flightLog) {
@@ -642,7 +638,7 @@ function defineFieldsResolution() {
       const min = field?.curve?.MinMax?.min;
       const max = field?.curve?.MinMax?.max;
       if (min != null && max != null) {
-        field.curve.highPrecise = min % normalMinMaxStep !== 0 || max % normalMinMaxStep !== 0;
+        field.curve!.highPrecise = min % normalMinMaxStep !== 0 || max % normalMinMaxStep !== 0;
       }
     }
   }

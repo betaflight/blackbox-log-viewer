@@ -7,6 +7,7 @@ import type { FlightLogGrapher } from "../grapher.js";
 import type { SeekBar } from "../seekbar.js";
 import type { MapGrapher } from "../graph_map.js";
 import type { GraphConfig } from "../graph_config.js";
+import type { GraphConfigList } from "../graph_types.js";
 
 // The graph/field config arrays and legend value maps are free-form,
 // user-editable structures; access stays loose. (The renderer instances
@@ -40,9 +41,9 @@ export const useGraphStore = defineStore("graph", () => {
   // Canvas DOM refs — registered by the composable
   const canvasRefs = shallowRef<Loose>(null);
 
-  const graphConfig = ref<Loose>(null);
+  const graphConfig = ref<GraphConfigList | null>(null);
   const activeGraphConfig = shallowRef<GraphConfig | null>(null);
-  const lastGraphConfig = ref<Loose>(null);
+  const lastGraphConfig = ref<GraphConfigList | null>(null);
   const graphZoom = ref(GRAPH_DEFAULT_ZOOM);
   const lastGraphZoom = ref(GRAPH_DEFAULT_ZOOM);
 
