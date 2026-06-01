@@ -50,7 +50,7 @@ export function saveWorkspaces(
   file?: string,
 ) {
   if (!workspaceGraphConfigs) {
-    return null;
+    return;
   }
   if (!file) {
     file = "workspaces.json";

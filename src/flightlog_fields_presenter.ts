@@ -1643,6 +1643,7 @@ FlightLogFieldPresenter.decodeCorrectAltitude = function (
     case 2: // Translate it into feet.
       return `${(altitude * 3.28).toFixed(2)} ft`;
   }
+  return undefined;
 };
 
 // Altitude back convertacion function
@@ -1656,6 +1657,7 @@ FlightLogFieldPresenter.decodeAltitudeLogToChart = function (
     case 2: // Translate it into feet.
       return altitude * 3.28;
   }
+  return undefined;
 };
 
 /**

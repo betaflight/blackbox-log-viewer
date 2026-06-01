@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    /* Incremental migration: TS and JS coexist. */
+    /* Migration complete: the only remaining .js is the trivial side-effect
+       vendor bundle. Type-check JS too. */
     "allowJs": true,
-    /* Existing .js is not type-checked yet — files opt in by being renamed to .ts
-       (see issue #924, Phase 2+). Flip to true once the core is converted. */
-    "checkJs": false,
+    "checkJs": true,
 
     /* Vite/esbuild transpiles; tsc & vue-tsc are type-checkers only. */
     "noEmit": true,
@@ -23,6 +22,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "allowUnreachableCode": false,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -33,5 +35,5 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
-  "exclude": ["node_modules", "dist", "src/vendor"]
+  "exclude": ["node_modules", "dist"]
 }
