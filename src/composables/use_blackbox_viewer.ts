@@ -122,8 +122,8 @@ export function initBlackboxViewer(): BlackboxViewerOps {
 
     try {
       if (logIndex === null) {
-        for (let i = 0; i < (logStore.flightLog as Loose).getLogCount(); i++) {
-          if ((logStore.flightLog as Loose).openLog(i)) {
+        for (let i = 0; i < logStore.flightLog!.getLogCount(); i++) {
+          if (logStore.flightLog!.openLog(i)) {
             success = true;
             playbackStore.currentOffsetCache.index = i;
             break;
@@ -134,7 +134,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
           throw "No logs in this file could be parsed successfully";
         }
       } else {
-        (logStore.flightLog as Loose).openLog(logIndex);
+        logStore.flightLog!.openLog(logIndex);
         playbackStore.currentOffsetCache.index = logIndex;
       }
     } catch (e) {
@@ -148,16 +148,16 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     }
 
     if (
-      (logStore.flightLog as Loose).getSysConfig().looptime != null &&
-      (logStore.flightLog as Loose).getSysConfig().frameIntervalPNum != null &&
-      (logStore.flightLog as Loose).getSysConfig().frameIntervalPDenom != null
+      logStore.flightLog!.getSysConfig().looptime != null &&
+      logStore.flightLog!.getSysConfig().frameIntervalPNum != null &&
+      logStore.flightLog!.getSysConfig().frameIntervalPDenom != null
     ) {
       userSettings.analyserSampleRate =
         1000000 /
-        (((logStore.flightLog as Loose).getSysConfig().looptime *
-          validate((logStore.flightLog as Loose).getSysConfig().pid_process_denom, 1) *
-          (logStore.flightLog as Loose).getSysConfig().frameIntervalPDenom) /
-          (logStore.flightLog as Loose).getSysConfig().frameIntervalPNum);
+        ((logStore.flightLog!.getSysConfig().looptime *
+          validate(logStore.flightLog!.getSysConfig().pid_process_denom, 1) *
+          logStore.flightLog!.getSysConfig().frameIntervalPDenom) /
+          logStore.flightLog!.getSysConfig().frameIntervalPNum);
     }
 
     graph = new (FlightLogGrapher as Loose)(
@@ -192,7 +192,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
       syncLogToVideo();
     } else {
       // Start at beginning:
-      logStore.currentBlackboxTime = (logStore.flightLog as Loose).getMinTime();
+      logStore.currentBlackboxTime = logStore.flightLog!.getMinTime() as number;
     }
 
     renderSelectedLogInfo();
@@ -636,7 +636,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
         if (logStore.hasVideo) {
           setVideoTime(newTime / 1000000 + playbackStore.videoOffset);
         } else {
-          newTime += (logStore.flightLog as Loose)?.getMinTime() ?? 0;
+          newTime += (logStore.flightLog?.getMinTime() ?? 0) as number;
           setCurrentBlackboxTime(newTime);
         }
         invalidateGraph();
@@ -688,11 +688,11 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     newGraphConfig: (newConfig: Loose, redrawChart?: Loose) => newGraphConfig(newConfig, !redrawChart),
     exportCsv: () => {
       setGraphState(GRAPH_STATE_PAUSED);
-      exportCsv(logStore.flightLog as Loose, appStore.logFilename);
+      exportCsv(logStore.flightLog!, appStore.logFilename);
     },
     exportGpx: () => {
       setGraphState(GRAPH_STATE_PAUSED);
-      exportGpx(logStore.flightLog as Loose, appStore.logFilename);
+      exportGpx(logStore.flightLog!, appStore.logFilename);
     },
     exportWorkspaces: () => {
       setGraphState(GRAPH_STATE_PAUSED);
