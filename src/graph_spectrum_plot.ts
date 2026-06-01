@@ -276,10 +276,13 @@ export const GraphSpectrumPlot = {
 } as unknown as GraphSpectrumPlotType;
 
 GraphSpectrumPlot.initialize = function (canvas, sysConfig) {
-  this._importedSpectrums = new ImportedCurves(() =>
+  // ImportedCurves is an Option-A typed-`this` fn; cast restores `new`-ability.
+  this._importedSpectrums = new (ImportedCurves as Loose)(() =>
     GraphSpectrumPlot.redraw(),
   );
-  this._importedPSD = new ImportedCurves(() => GraphSpectrumPlot.redraw());
+  this._importedPSD = new (ImportedCurves as Loose)(() =>
+    GraphSpectrumPlot.redraw(),
+  );
   this._canvasCtx = canvas.getContext("2d");
   this._sysConfig = sysConfig;
   this._invalidateCache();

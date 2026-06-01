@@ -9,9 +9,9 @@
 import { useAppStore } from "./stores/app.js";
 
 export const ThemeColors = {
-  colorCache: {},
+  colorCache: {} as Record<string, string>,
 
-  getCSSVariable: function (variableName) {
+  getCSSVariable: function (variableName: string) {
     if (this.colorCache[variableName]) {
       return this.colorCache[variableName];
     }

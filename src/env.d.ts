@@ -11,6 +11,7 @@ declare module "*.vue" {
 // Third-party modules without bundled type declarations.
 declare module "sortablejs";
 declare module "throttle-debounce";
+declare module "webm-writer";
 
 // Injected by Vite `define` (see vite.config.js).
 declare const __APP_VERSION__: string;

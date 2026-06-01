@@ -1335,8 +1335,9 @@ export function FlightLogGrapher(
     analyserCanvas,
   );
 
-  /* Create the Lap Timer object */
-  const lapTimer = new LapTimer();
+  /* Create the Lap Timer object.
+     LapTimer is an Option-A typed-`this` fn; cast restores `new`-ability. */
+  const lapTimer = new (LapTimer as Loose)();
 
   //Handle dragging events
   canvas.addEventListener("mousedown", onMouseDown);

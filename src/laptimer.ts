@@ -1,7 +1,28 @@
 import { formatTime, roundRect } from "./tools";
 
-export function LapTimer() {
-  const lapTime = {
+// options/bookmarkTimes are free-form structures from the still-JS layer;
+// access stays loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `LapTimer` below is the
+// constructor function.
+export interface LapTimer {
+  currentLapTime(): number | string;
+  lastLapTime(): number | string;
+  bestLapTime(): number | string;
+  laps(): number[];
+  drawCanvas(canvas: HTMLCanvasElement, options: Loose): void;
+  refresh(currentTime: number, maxTime: number, bookmarkTimes: Loose): void;
+}
+
+export function LapTimer(this: LapTimer) {
+  const lapTime: {
+    current: number | null;
+    last: number | null;
+    best: number | null;
+    laps: number[];
+  } = {
     current: null,
     last: null,
     best: null,
@@ -24,9 +45,9 @@ export function LapTimer() {
     return lapTime.laps;
   };
 
-  this.drawCanvas = function (canvas, options) {
+  this.drawCanvas = function (canvas: HTMLCanvasElement, options: Loose) {
     // Draw the LapTimes using a canvas
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d")!;
 
     const lineHeight = 14, //px
       DEFAULT_FONT_FACE = "8pt Verdana, Arial, sans-serif",
@@ -77,19 +98,19 @@ export function LapTimer() {
     ctx.font = DEFAULT_FONT_FACE;
     ctx.fillText("Current", margin, lineHeight * currentRow);
     ctx.fillText(
-      formatTime(lapTime.current, true),
+      formatTime(lapTime.current as number, true),
       margin + firstColumnWidth + margin,
       lineHeight * currentRow++,
     );
     ctx.fillText("Last", margin, lineHeight * currentRow);
     ctx.fillText(
-      formatTime(lapTime.last, true),
+      formatTime(lapTime.last as number, true),
       margin + firstColumnWidth + margin,
       lineHeight * currentRow++,
     );
     ctx.fillText("Best", margin, lineHeight * currentRow);
     ctx.fillText(
-      formatTime(lapTime.best, true),
+      formatTime(lapTime.best as number, true),
       margin + firstColumnWidth + margin,
       lineHeight * currentRow++,
     );
@@ -122,14 +143,18 @@ export function LapTimer() {
     ctx.restore();
   };
 
-  this.refresh = function (currentTime, maxTime, bookmarkTimes) {
+  this.refresh = function (
+    currentTime: number,
+    maxTime: number,
+    bookmarkTimes: Loose,
+  ) {
     // Update the lapTimeTable with the current information
 
     if (currentTime != null && bookmarkTimes != null)
       if (bookmarkTimes.length > 0) {
         const bookmarkTimesSorted = bookmarkTimes.slice(0);
         bookmarkTimesSorted.push(maxTime); // add end time
-        bookmarkTimesSorted.sort((a, b) => a - b); // sort on value (rather than default alphabetically)
+        bookmarkTimesSorted.sort((a: number, b: number) => a - b); // sort on value (rather than default alphabetically)
 
         lapTime.laps = []; // Clear the array
 

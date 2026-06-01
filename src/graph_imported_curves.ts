@@ -1,6 +1,33 @@
-export function ImportedCurves(curvesChanged) {
+// The imported curve records (name + points + range) are free-form data;
+// access stays loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `ImportedCurves` below
+// is the constructor function.
+export interface ImportedCurves {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  curvesCount(): number;
+  getCurve(index: number): Loose;
+  importCurvesFromCSV(files: Loose): void;
+  addCurve(points: Loose, name: Loose): void;
+  isNewCurve(name: Loose): boolean;
+  removeAllCurves(): void;
+  removeCurve(name: Loose): void;
+  isFull(): boolean;
+  isEmpty(): boolean;
+}
+
+export function ImportedCurves(
+  this: ImportedCurves,
+  curvesChanged: () => void,
+) {
   const MAX_IMPORT_COUNT = 6; // This value is limited by legends size and curves colors visibility. May be increased if needed by users
-  const _curvesData = [];
+  const _curvesData: Loose[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const _that = this;
   this.minX = Number.MAX_VALUE;
   this.maxX = -Number.MAX_VALUE;
@@ -11,7 +38,7 @@ export function ImportedCurves(curvesChanged) {
     return _curvesData.length;
   };
 
-  this.getCurve = function (index) {
+  this.getCurve = function (index: number) {
     if (index < _curvesData.length) {
       return _curvesData[index];
     } else {
@@ -21,7 +48,7 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  this.importCurvesFromCSV = function (files) {
+  this.importCurvesFromCSV = function (files: Loose) {
     let importsLeft = MAX_IMPORT_COUNT - _curvesData.length;
 
     for (const file of files) {
@@ -29,7 +56,7 @@ export function ImportedCurves(curvesChanged) {
         break;
       }
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = function (e: Loose) {
         try {
           const stringRows = e.target.result.split("\n");
 
@@ -48,7 +75,7 @@ export function ImportedCurves(curvesChanged) {
             stringRows.pop();
           }
 
-          const curvesData = stringRows.map(function (row) {
+          const curvesData = stringRows.map(function (row: Loose) {
             const data = row.split(","),
               x = parseFloat(data[0].trim()),
               y = parseFloat(data[1].trim());
@@ -69,7 +96,7 @@ export function ImportedCurves(curvesChanged) {
           _curvesData.push(curve);
           curvesChanged();
         } catch (e) {
-          alert(`Curves data import error: ${e.message}`);
+          alert(`Curves data import error: ${(e as Error).message}`);
           return;
         }
       };
@@ -78,7 +105,7 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  const getCurveRange = function (points) {
+  const getCurveRange = function (points: Loose) {
     let minX = Number.MAX_VALUE,
       maxX = -Number.MAX_VALUE,
       minY = Number.MAX_VALUE,
@@ -110,7 +137,7 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  this.addCurve = function (points, name) {
+  this.addCurve = function (points: Loose, name: Loose) {
     if (this.curvesCount() < MAX_IMPORT_COUNT) {
       const range = getCurveRange(points);
       _curvesData.push({
@@ -128,7 +155,7 @@ export function ImportedCurves(curvesChanged) {
     }
   };
 
-  this.isNewCurve = function (name) {
+  this.isNewCurve = function (name: Loose) {
     for (const curve of _curvesData) {
       if (curve.name === name) {
         return false;
@@ -143,7 +170,7 @@ export function ImportedCurves(curvesChanged) {
     curvesChanged();
   };
 
-  this.removeCurve = function (name) {
+  this.removeCurve = function (name: Loose) {
     for (let index = 0; index < _curvesData.length; index++) {
       if (_curvesData[index].name === name) {
         _curvesData.splice(index, 1);

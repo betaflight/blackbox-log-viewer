@@ -2,11 +2,16 @@ import { FlightLogFieldPresenter } from "./flightlog_fields_presenter.js";
 import { SimpleStats } from "./simple-stats.js";
 import { formatTime } from "./tools.js";
 
-function isInteger(value) {
+// log/frame/stores/userSettings are free-form structures from the still-JS
+// layer; access stays loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+function isInteger(value: number) {
   return Math.trunc(value) === value;
 }
 
-function atMost2DecPlaces(value) {
+function atMost2DecPlaces(value: Loose) {
   if (isInteger(value)) {
     return value;
   }
@@ -18,11 +23,16 @@ function atMost2DecPlaces(value) {
   return value.toFixed(2);
 }
 
-export function updateLegendValues(log, frame, graphStore, userSettings) {
+export function updateLegendValues(
+  log: Loose,
+  frame: Loose,
+  graphStore: Loose,
+  userSettings: Loose,
+) {
   try {
     const currentFlightMode = frame[log.getMainFieldIndexByName("flightModeFlags")];
     const graphs = graphStore.activeGraphConfig.getGraphs();
-    const vals = {};
+    const vals: Record<string, Loose> = {};
     for (const graph of graphs) {
       for (const field of graph.fields) {
         let value = frame[log.getMainFieldIndexByName(field.name)];
@@ -43,7 +53,12 @@ export function updateLegendValues(log, frame, graphStore, userSettings) {
   }
 }
 
-export function updateValuesChart(logStore, graphStore, appStore, userSettings) {
+export function updateValuesChart(
+  logStore: Loose,
+  graphStore: Loose,
+  appStore: Loose,
+  userSettings: Loose,
+) {
   const frame = logStore.flightLog.getSmoothedFrameAtTime(logStore.currentBlackboxTime);
   if (!frame) {
     return;
@@ -55,7 +70,7 @@ export function updateValuesChart(logStore, graphStore, appStore, userSettings) 
 
   if (graphStore.hasTableOverlay) {
     const debugMode = logStore.flightLog.getSysConfig().debug_mode;
-    const values = [];
+    const values: Loose[] = [];
 
     for (let i = 0; i < fieldNames.length; i++) {
       values.push({
@@ -66,8 +81,8 @@ export function updateValuesChart(logStore, graphStore, appStore, userSettings) 
     }
     logStore.fieldValues = values;
 
-    const statRows = [];
-    const stats = SimpleStats(logStore.flightLog).calculate();
+    const statRows: Loose[] = [];
+    const stats: Loose = SimpleStats(logStore.flightLog).calculate();
     for (const field of Object.keys(stats)) {
       const stat = stats[field];
       if (stat === undefined) {
@@ -84,10 +99,10 @@ export function updateValuesChart(logStore, graphStore, appStore, userSettings) 
   }
 
   appStore.statusFlightMode = FlightLogFieldPresenter.decodeFieldToFriendly(
-    null,
+    null as Loose,
     "flightModeFlags",
     currentFlightMode,
-    null,
+    null as Loose,
   );
 
   appStore.graphTimeDisplay = formatTime(

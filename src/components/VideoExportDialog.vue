@@ -253,7 +253,9 @@ function onStartExport() {
 
   let lastWrittenBytes = 0;
 
-  videoRenderer = new FlightLogVideoRenderer(
+  // FlightLogVideoRenderer is an Option-A typed-`this` fn; cast restores `new`.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  videoRenderer = new (FlightLogVideoRenderer as any)(
     props.flightLog,
     logParams,
     videoConfig,

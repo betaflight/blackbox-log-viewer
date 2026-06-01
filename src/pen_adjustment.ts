@@ -1,6 +1,16 @@
 import { constrain } from "./tools.js";
 
-export function savePenDefaults(graphs, group, field) {
+// graphs/group/field are the free-form graph-config structures and string/null
+// pen selectors from the still-JS layer; access stays loose, consistent with
+// the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+export function savePenDefaults(
+  graphs: Loose,
+  group: Loose,
+  field: Loose,
+): string | null {
   if (group == null && field == null) {
     return null;
   }
@@ -29,7 +39,11 @@ export function savePenDefaults(graphs, group, field) {
   return null;
 }
 
-export function restorePenDefaults(graphs, group, field) {
+export function restorePenDefaults(
+  graphs: Loose,
+  group: Loose,
+  field: Loose,
+): string | null {
   if (group == null && field == null) {
     return null;
   }
@@ -58,7 +72,12 @@ export function restorePenDefaults(graphs, group, field) {
   return null;
 }
 
-export function changePenSmoothing(graphs, group, field, delta) {
+export function changePenSmoothing(
+  graphs: Loose,
+  group: Loose,
+  field: Loose,
+  delta: Loose,
+): string | null {
   const range = { min: 0, max: 10000 };
   const scroll = 1000;
 
@@ -88,7 +107,12 @@ export function changePenSmoothing(graphs, group, field, delta) {
   return null;
 }
 
-export function changePenZoom(graphs, group, field, delta) {
+export function changePenZoom(
+  graphs: Loose,
+  group: Loose,
+  field: Loose,
+  delta: Loose,
+): string | null {
   if (group == null && field == null) {
     return null;
   }
@@ -117,7 +141,12 @@ export function changePenZoom(graphs, group, field, delta) {
   return null;
 }
 
-export function changePenExpo(graphs, group, field, delta) {
+export function changePenExpo(
+  graphs: Loose,
+  group: Loose,
+  field: Loose,
+  delta: Loose,
+): string | null {
   const range = { min: 0.05, max: 1 };
   const scroll = 0.05;
 

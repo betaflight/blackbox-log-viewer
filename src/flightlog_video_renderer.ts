@@ -25,41 +25,57 @@ import { useSettingsStore } from "./stores/settings.js";
  *     onComplete - On render completion, called with (success, frameCount)
  *     onProgress - Called periodically with (frameIndex, frameCount) to report progress
  */
+// flightLog, the log/video parameters, video options and event callbacks are
+// free-form structures from the still-JS layer; access stays loose, consistent
+// with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `FlightLogVideoRenderer`
+// below is the constructor function (it also carries the static isSupported).
+export interface FlightLogVideoRenderer {
+  cancel(): void;
+  start(): void;
+  getWrittenSize(): number;
+  willWriteDirectToDisk(): boolean;
+}
+
 export function FlightLogVideoRenderer(
-  flightLog,
-  logParameters,
-  videoOptions,
-  events,
+  this: FlightLogVideoRenderer,
+  flightLog: Loose,
+  logParameters: Loose,
+  videoOptions: Loose,
+  events: Loose,
 ) {
   const { userSettings } = useSettingsStore();
 
   const WORK_CHUNK_SIZE_FOCUSED = 8;
   const WORK_CHUNK_SIZE_UNFOCUSED = 32;
-  let videoWriter;
+  let videoWriter: Loose;
   const canvas = document.createElement("canvas");
   const stickCanvas = document.createElement("canvas");
   const craftCanvas = document.createElement("canvas");
   const analyserCanvas = document.createElement("canvas");
-  const canvasContext = canvas.getContext("2d");
-  let frameTime;
-  let frameIndex;
+  const canvasContext = canvas.getContext("2d")!;
+  let frameTime: number;
+  let frameIndex: number;
   let cancel = false;
   let workChunkSize = WORK_CHUNK_SIZE_FOCUSED;
-  let hidden;
-  let visibilityChange;
+  let hidden: string;
+  let visibilityChange: string;
 
   // From https://developer.mozilla.org/en-US/docs/Web/Guide/User_experience/Using_the_Page_Visibility_API
   if (typeof document.hidden !== "undefined") {
     // Opera 12.10 and Firefox 18 and later support
     hidden = "hidden";
     visibilityChange = "visibilitychange";
-  } else if (typeof document.mozHidden !== "undefined") {
+  } else if (typeof (document as Loose).mozHidden !== "undefined") {
     hidden = "mozHidden";
     visibilityChange = "mozvisibilitychange";
-  } else if (typeof document.msHidden !== "undefined") {
+  } else if (typeof (document as Loose).msHidden !== "undefined") {
     hidden = "msHidden";
     visibilityChange = "msvisibilitychange";
-  } else if (typeof document.webkitHidden !== "undefined") {
+  } else if (typeof (document as Loose).webkitHidden !== "undefined") {
     hidden = "webkitHidden";
     visibilityChange = "webkitvisibilitychange";
   }
@@ -69,7 +85,7 @@ export function FlightLogVideoRenderer(
    * in a chunk) in order to compensate.
    */
   function handleVisibilityChange() {
-    if (document[hidden]) {
+    if ((document as Loose)[hidden]) {
       workChunkSize = WORK_CHUNK_SIZE_UNFOCUSED;
     } else {
       workChunkSize = WORK_CHUNK_SIZE_FOCUSED;
@@ -77,7 +93,7 @@ export function FlightLogVideoRenderer(
   }
 
   function installVisibilityHandler() {
-    if (typeof document[hidden] !== "undefined") {
+    if (typeof (document as Loose)[hidden] !== "undefined") {
       document.addEventListener(
         visibilityChange,
         handleVisibilityChange,
@@ -87,12 +103,12 @@ export function FlightLogVideoRenderer(
   }
 
   function removeVisibilityHandler() {
-    if (typeof document[hidden] !== "undefined") {
+    if (typeof (document as Loose)[hidden] !== "undefined") {
       document.removeEventListener(visibilityChange, handleVisibilityChange);
     }
   }
 
-  function notifyCompletion(success, frameCount) {
+  function notifyCompletion(success: boolean, frameCount?: number) {
     removeVisibilityHandler();
 
     if (events && events.onComplete) {
@@ -101,7 +117,7 @@ export function FlightLogVideoRenderer(
   }
 
   function finishRender() {
-    videoWriter.complete().then(function (webM) {
+    videoWriter.complete().then(function (webM: Loose) {
       if (webM) {
         triggerDownload(webM, "video.webm");
       }
@@ -160,7 +176,7 @@ export function FlightLogVideoRenderer(
       };
 
     if (logParameters.flightVideo) {
-      const renderFrames = function (frameCount) {
+      const renderFrames = function (frameCount: number) {
         if (frameCount === 0) {
           completeChunk();
           return;
@@ -252,7 +268,7 @@ export function FlightLogVideoRenderer(
 
   const options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
 
-  const graph = new FlightLogGrapher(
+  const graph = new (FlightLogGrapher as Loose)(
     flightLog,
     logParameters.graphConfig,
     canvas,
@@ -294,13 +310,15 @@ export function FlightLogVideoRenderer(
 /**
  * Is video rendering supported on this web browser? We require the ability to encode canvases to WebP.
  */
-FlightLogVideoRenderer.isSupported = function () {
+FlightLogVideoRenderer.isSupported = function (): Loose {
   const canvas = document.createElement("canvas");
 
   canvas.width = 16;
   canvas.height = 16;
 
-  const encoded = canvas.toDataURL("image/webp", { quality: 0.9 });
+  // Pre-existing call shape: toDataURL's quality arg is given an object here
+  // (kept verbatim); cast keeps it type-clean.
+  const encoded = canvas.toDataURL("image/webp", { quality: 0.9 } as Loose);
 
   return encoded && encoded.match(/^data:image\/webp;/);
 };
