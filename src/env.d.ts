@@ -17,5 +17,7 @@ declare const __APP_VERSION__: string;
 
 // Globals loaded via <script> tags (vendored libraries) and platform APIs.
 declare const THREE: unknown; // vendored three.min.js (r70)
-declare const L: unknown; // Leaflet
+// Leaflet — loaded via <script>, no bundled types; used as a rich untyped API.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const L: any;
 declare const chrome: unknown; // Chrome/Electron extension APIs (pref_storage.js)

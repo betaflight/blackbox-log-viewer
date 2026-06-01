@@ -1,22 +1,62 @@
 import { useSettingsStore } from "./stores/settings.js";
 
-export function MapGrapher() {
+// flightLog, Leaflet map/marker/polyline objects, frame coordinates and the
+// per-log trail layers are free-form structures from the still-JS layer;
+// access stays loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+// Instance shape (the constructor's `this`). The value `MapGrapher` below is
+// the constructor function.
+export interface MapGrapher {
+  initialize(): void;
+  reset(): void;
+  setFlightLog(newFlightLog: Loose): void;
+  setFlightLogIndexs(): void;
+  getPolylinesData(): Loose;
+  createAltitudeColoredPolyline(
+    latlngs: Loose,
+    maxAlt: number,
+    minAlt: number,
+  ): Loose;
+  updateCurrentPosition(): void;
+  redrawAll(): void;
+  redrawFlightTrail(): void;
+  redrawHomeMarker(): void;
+  redrawCraftMarker(): void;
+  clearMap(trailIndex: Loose): void;
+  clearMapFlightTrails(trailIndex: Loose): void;
+  clearMapMarkers(): void;
+  resize(width: number, height: number): void;
+  getCoordinatesFromFrame(
+    frame: Loose,
+    latIndex: number,
+    lngIndex: number,
+    altitudeIndex: number,
+  ): Loose;
+  isNumber(n: Loose): boolean;
+  getGroundCourseFromFrame(frame: Loose, groundCourseIndex: number): number;
+  getHomeCoordinatesFromFlightLog(flightLog: Loose): Loose;
+  setCurrentTime(newTime: Loose): void;
+}
+
+export function MapGrapher(this: MapGrapher) {
   const { userSettings } = useSettingsStore();
-  let myMap,
-    currentLogStartDateTime,
-    currentTime,
-    craftPosition,
-    groundCourse,
-    homePosition,
-    craftMarker,
-    homeMarker,
+  let myMap: Loose,
+    currentLogStartDateTime: Loose,
+    currentTime: Loose,
+    craftPosition: Loose,
+    groundCourse: Loose,
+    homePosition: Loose,
+    craftMarker: Loose,
+    homeMarker: Loose,
     trailLayers = new Map(),
-    previousLogIndex,
-    latIndexAtFrame,
-    lngIndexAtFrame,
-    altitudeIndexAtFrame,
-    groundCourseIndexAtFrame,
-    flightLog;
+    previousLogIndex: Loose,
+    latIndexAtFrame: Loose,
+    lngIndexAtFrame: Loose,
+    altitudeIndexAtFrame: Loose,
+    groundCourseIndexAtFrame: Loose,
+    flightLog: Loose;
 
   const coordinateDivider = 10000000;
   const altitudeDivider = 10;
@@ -104,7 +144,7 @@ export function MapGrapher() {
     myMap.setView(mapOptions.center, mapOptions.zoom);
   };
 
-  this.setFlightLog = function (newFlightLog) {
+  this.setFlightLog = function (newFlightLog: Loose) {
     flightLog = newFlightLog;
 
     const newLogStartDateTime = flightLog.getSysConfig()["Log start datetime"];
@@ -153,7 +193,7 @@ export function MapGrapher() {
   };
 
   this.getPolylinesData = function () {
-    const latlngs = [];
+    const latlngs: Loose[] = [];
     let maxAlt = Number.MIN_VALUE;
     let minAlt = Number.MAX_VALUE;
 
@@ -194,14 +234,18 @@ export function MapGrapher() {
     return { latlngs, maxAlt, minAlt };
   };
 
-  this.createAltitudeColoredPolyline = function (latlngs, maxAlt, minAlt) {
+  this.createAltitudeColoredPolyline = function (
+    latlngs: Loose,
+    maxAlt: number,
+    minAlt: number,
+  ) {
     const divider = colorTrailGradient.length - 1;
 
     const delta = maxAlt - minAlt;
 
     const thresholdIncrement = delta / divider;
 
-    const altThresholds = [];
+    const altThresholds: number[] = [];
     let threshold = minAlt;
     for (let i = 0; i < divider; i++) {
       //amount of colors - min and max that are set
@@ -211,7 +255,7 @@ export function MapGrapher() {
 
     return L.multiOptionsPolyline(latlngs, {
       multiOptions: {
-        optionIdxFn: function (latLng) {
+        optionIdxFn: function (latLng: Loose) {
           for (let i = 0; i < altThresholds.length; i++) {
             if (latLng.alt <= altThresholds[i]) {
               return i;
@@ -327,12 +371,12 @@ export function MapGrapher() {
     }
   };
 
-  this.clearMap = function (trailIndex) {
+  this.clearMap = function (trailIndex: Loose) {
     this.clearMapFlightTrails(trailIndex);
     this.clearMapMarkers();
   };
 
-  this.clearMapFlightTrails = function (trailIndex) {
+  this.clearMapFlightTrails = function (trailIndex: Loose) {
     if (trailLayers.has(trailIndex)) {
       const p = trailLayers.get(trailIndex).polyline;
       const pc = trailLayers.get(trailIndex).polylineC;
@@ -364,7 +408,7 @@ export function MapGrapher() {
     }
   };
 
-  this.resize = function (width, height) {
+  this.resize = function (width: number, height: number) {
     if (!userSettings) {
       return;
     }
@@ -386,10 +430,10 @@ export function MapGrapher() {
   };
 
   this.getCoordinatesFromFrame = function (
-    frame,
-    latIndex,
-    lngIndex,
-    altitudeIndex,
+    frame: Loose,
+    latIndex: number,
+    lngIndex: number,
+    altitudeIndex: number,
   ) {
     const lat = frame[latIndex];
     const lng = frame[lngIndex];
@@ -404,21 +448,24 @@ export function MapGrapher() {
       : null;
   };
 
-  this.isNumber = function (n) {
+  this.isNumber = function (n: Loose) {
     return typeof n === "number" && !isNaN(n);
   };
 
-  this.getGroundCourseFromFrame = function (frame, groundCourseIndex) {
+  this.getGroundCourseFromFrame = function (
+    frame: Loose,
+    groundCourseIndex: number,
+  ) {
     const gc = frame[groundCourseIndex];
     return typeof gc === "number" ? gc / grounCourseDivider : 0;
   };
 
-  this.getHomeCoordinatesFromFlightLog = function (flightLog) {
+  this.getHomeCoordinatesFromFlightLog = function (flightLog: Loose) {
     const home = flightLog.getStats().frame.H.field;
     return [home[0].min / coordinateDivider, home[1].min / coordinateDivider];
   };
 
-  this.setCurrentTime = function (newTime) {
+  this.setCurrentTime = function (newTime: Loose) {
     currentTime = newTime;
     this.updateCurrentPosition();
     this.redrawAll();

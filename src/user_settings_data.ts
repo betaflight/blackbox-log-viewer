@@ -66,6 +66,7 @@ export const defaultUserSettings = {
   analyser: { left: "2%", top: "60%", size: "35%" },
   analyser_legend: { left: "88%", top: "7%", width: "10%" },
   map: { left: "2%", top: "5%", size: "35%" },
+  mapTrailAltitudeColored: false,
   watermark: { left: "3%", top: "90%", size: "100%", transparency: "100%", logo: null },
   laptimer: { left: "5%", top: "50%", transparency: "40%" },
 };

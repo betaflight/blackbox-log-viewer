@@ -27,28 +27,62 @@ function getCursorStyleWindow() {
   return "rgba(255, 65, 64, 0.15)"; // Red window overlay works in both themes
 }
 
-export function SeekBar(canvas) {
+// The activity arrays are free-form data passed from the still-JS layer;
+// access stays loose, consistent with the rest of the migration.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = any;
+
+interface DirtyRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+// Instance shape (the constructor's `this`). The value `SeekBar` below is the
+// constructor function.
+export interface SeekBar {
+  onSeek: ((time: number) => void) | false;
+  destroy(): void;
+  resize(width: number, height: number): void;
+  setActivityRange(min: number, max: number): void;
+  setTimeRange(newMin: number, newMax: number, newCurrent: number): void;
+  setActivity(
+    newActivityTimes: Loose,
+    newActivityStrengths: Loose,
+    newHasEvent: Loose,
+  ): void;
+  setCurrentTime(newTime: number): void;
+  setWindow(newTime: number): void;
+  repaint(): void;
+  setInTime(newInTime: number | false): void;
+  setOutTime(newOutTime: number | false): void;
+  refreshTheme(): void;
+}
+
+export function SeekBar(this: SeekBar, canvas: HTMLCanvasElement) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const that = this;
   //Times:
-  let min;
-  let max;
-  let current;
+  let min: number;
+  let max: number;
+  let current: number;
   let currentWindow = 0;
   //Activity to display on bar:
-  let activityStrength;
-  let activityTime;
+  let activityStrength: Loose;
+  let activityTime: Loose;
   //Whether a special event exists at the given time:
-  let hasEvent;
+  let hasEvent: Loose;
   //Expect to be plotting PWM-like data by default:
   let activityMin = 1000;
   let activityMax = 2000;
-  const canvasContext = canvas.getContext("2d");
+  const canvasContext = canvas.getContext("2d")!;
   const background = document.createElement("canvas");
-  const backgroundContext = background.getContext("2d");
-  let inTime = false;
-  let outTime = false;
+  const backgroundContext = background.getContext("2d")!;
+  let inTime: number | false = false;
+  let outTime: number | false = false;
   let backgroundValid = false;
-  let dirtyRegion = false;
+  let dirtyRegion: false | DirtyRegion = false;
   //Current time cursor:
   let CURSOR_WIDTH = 1;
   // The bar begins a couple of px inset from the left to allow the cursor to hang over the edge at start&end
@@ -56,9 +90,9 @@ export function SeekBar(canvas) {
 
   this.onSeek = false;
 
-  function seekToDOMPixel(x) {
+  function seekToDOMPixel(x: number) {
     const bounding = canvas.getBoundingClientRect();
-    let time;
+    let time: number;
 
     // Compensate for canvas being stretched on the page
     x = (x / (bounding.right - bounding.left)) * canvas.width;
@@ -84,14 +118,14 @@ export function SeekBar(canvas) {
     return canvas.getBoundingClientRect().left + window.scrollX;
   }
 
-  let cancelMouseDrag = null;
-  let cancelTouchDrag = null;
+  let cancelMouseDrag: (() => void) | null = null;
+  let cancelTouchDrag: (() => void) | null = null;
 
-  function onMouseMove(e) {
+  function onMouseMove(e: MouseEvent) {
     if (e.button === 0) { seekToDOMPixel(e.pageX - getCanvasOffsetLeft()); }
   }
 
-  function onMouseDown(e) {
+  function onMouseDown(e: MouseEvent) {
     e.preventDefault();
 
     if (e.button === 0) {
@@ -110,11 +144,11 @@ export function SeekBar(canvas) {
 
   canvas.addEventListener("mousedown", onMouseDown);
 
-  function onTouchMove(e) {
+  function onTouchMove(e: TouchEvent) {
     seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
   }
 
-  function onTouchStart(e) {
+  function onTouchStart(e: TouchEvent) {
     e.preventDefault();
 
     seekToDOMPixel(e.touches[0].pageX - getCanvasOffsetLeft());
@@ -140,7 +174,7 @@ export function SeekBar(canvas) {
     if (cancelTouchDrag) { cancelTouchDrag(); }
   };
 
-  this.resize = function (width, height) {
+  this.resize = function (width: number, height: number) {
     const ratio = globalThis.devicePixelRatio ? globalThis.devicePixelRatio : 1;
 
     canvas.width = width * ratio;
@@ -157,14 +191,18 @@ export function SeekBar(canvas) {
     that.repaint();
   };
 
-  this.setActivityRange = function (min, max) {
+  this.setActivityRange = function (min: number, max: number) {
     activityMin = min;
     activityMax = max;
 
     invalidateBackground();
   };
 
-  this.setTimeRange = function (newMin, newMax, newCurrent) {
+  this.setTimeRange = function (
+    newMin: number,
+    newMax: number,
+    newCurrent: number,
+  ) {
     min = newMin;
     max = newMax;
     current = newCurrent;
@@ -173,9 +211,9 @@ export function SeekBar(canvas) {
   };
 
   this.setActivity = function (
-    newActivityTimes,
-    newActivityStrengths,
-    newHasEvent,
+    newActivityTimes: Loose,
+    newActivityStrengths: Loose,
+    newHasEvent: Loose,
   ) {
     activityTime = newActivityTimes;
     activityStrength = newActivityStrengths;
@@ -184,16 +222,20 @@ export function SeekBar(canvas) {
     invalidateBackground();
   };
 
-  this.setCurrentTime = function (newTime) {
+  this.setCurrentTime = function (newTime: number) {
     current = newTime;
   };
 
-  this.setWindow = function (newTime) {
+  this.setWindow = function (newTime: number) {
     currentWindow = newTime;
   };
 
   function rebuildBackground() {
-    let x, activityIndex, activity, pixelTimeStep, time;
+    let x: number,
+      activityIndex: number,
+      activity: number,
+      pixelTimeStep: number,
+      time: number;
 
     backgroundContext.fillStyle = getBackgroundStyle();
     backgroundContext.fillRect(0, 0, canvas.width, canvas.height);
@@ -362,12 +404,12 @@ export function SeekBar(canvas) {
     };
   };
 
-  this.setInTime = function (newInTime) {
+  this.setInTime = function (newInTime: number | false) {
     inTime = newInTime;
     invalidateBackground();
   };
 
-  this.setOutTime = function (newOutTime) {
+  this.setOutTime = function (newOutTime: number | false) {
     outTime = newOutTime;
     invalidateBackground();
   };
