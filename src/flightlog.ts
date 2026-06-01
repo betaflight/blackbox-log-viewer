@@ -52,7 +52,9 @@ export interface FlightLog {
   getMainFieldIndexes(_name?: string): Record<string, number>;
   getFrameAtTime(startTime: number): FrameArray | false;
   getSmoothedFrameAtTime(startTime: number): FrameArray | false;
-  getCurrentFrameAtTime(startTime: number): unknown;
+  getCurrentFrameAtTime(startTime: number):
+    | { previous: FrameArray | null; current: FrameArray | null; next: FrameArray | null }
+    | false;
   getNumCellsEstimate(): number | false;
   getNumMotors(): number | false;
   getChunksInTimeRange(startTime: number, endTime: number): FlightLogChunk[];
