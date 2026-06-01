@@ -2,7 +2,7 @@ import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
 
-import type { MinMax, Curve } from "./graph_types";
+import type { MinMax, Curve, GraphConfigEntry } from "./graph_types";
 
 // The graph/field config arrays are free-form, user-editable structures shared
 // with the renderer (grapher); access stays intentionally loose. The curve/
@@ -24,9 +24,9 @@ export interface GraphConfig {
   selectedFieldIndex: number;
   highlightGraphIndex: number | null;
   highlightFieldIndex: number | null;
-  getGraphs(): Loose[];
+  getGraphs(): GraphConfigEntry[];
   setRedrawChart(isRedraw: boolean): void;
-  setGraphs(newGraphs: Loose[]): void;
+  setGraphs(newGraphs: GraphConfigEntry[]): void;
   extendFields(flightLog: Loose, field: Loose): Loose[];
   adaptGraphs(flightLog: Loose, graphs: Loose[]): void;
   addListener(listener: (graphConfig: GraphConfig) => void): void;
