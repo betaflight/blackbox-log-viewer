@@ -29,7 +29,7 @@ function ensureThrottles() {
     updateValuesRateLimited = throttle(250, () =>
       updateValuesChart(logStore, graphStore, appStore, settingsStore.userSettings),
     );
-    seekBarRepaintRateLimited = throttle(200, () => graphStore.seekBar.repaint());
+    seekBarRepaintRateLimited = throttle(200, () => graphStore.seekBar!.repaint());
   }
 }
 
@@ -66,13 +66,13 @@ export function animationLoop() {
     }
   }
 
-  graphStore.graph.render(logStore.currentBlackboxTime);
+  graphStore.graph!.render(logStore.currentBlackboxTime);
 
-  graphStore.seekBar.setCurrentTime(logStore.currentBlackboxTime);
-  graphStore.seekBar.setWindow(graphStore.graph.getWindowWidthTime());
+  graphStore.seekBar!.setCurrentTime(logStore.currentBlackboxTime);
+  graphStore.seekBar!.setWindow(graphStore.graph!.getWindowWidthTime());
 
   if ((logStore.flightLog as Loose).hasGpsData()) {
-    graphStore.mapGrapher.setCurrentTime(logStore.currentBlackboxTime);
+    graphStore.mapGrapher!.setCurrentTime(logStore.currentBlackboxTime);
   }
 
   updateValuesRateLimited();
@@ -85,7 +85,7 @@ export function animationLoop() {
     animationFrameIsQueued = true;
     requestAnimationFrame(animationLoop);
   } else {
-    graphStore.seekBar.repaint();
+    graphStore.seekBar!.repaint();
 
     animationFrameIsQueued = false;
   }
@@ -107,10 +107,10 @@ export function updateCanvasSize() {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
 
-    graphStore.graph.resize(width, height);
-    graphStore.seekBar.resize(canvas.offsetWidth, 50);
+    graphStore.graph!.resize(width, height);
+    graphStore.seekBar!.resize(canvas.offsetWidth, 50);
     if ((logStore.flightLog as Loose).hasGpsData()) {
-      graphStore.mapGrapher.resize(width, height);
+      graphStore.mapGrapher!.resize(width, height);
     }
 
     invalidateGraph();
@@ -177,7 +177,7 @@ export function setGraphZoom(zoom: number | null, _instant?: Loose) {
     graphStore.graphZoom = zoom;
 
     if (graphStore.graph) {
-      graphStore.graph.setGraphZoom(zoom / 100);
+      graphStore.graph!.setGraphZoom(zoom / 100);
       invalidateGraph();
     }
   }
@@ -216,7 +216,7 @@ export function logJumpBack(fast?: Loose, slow?: Loose) {
   let scrollTime = SMALL_JUMP_TIME;
   if (fast != null) {
     scrollTime =
-      fast === 0 ? scrollTime : graphStore.graph.getWindowWidthTime() * fast;
+      fast === 0 ? scrollTime : graphStore.graph!.getWindowWidthTime() * fast;
   }
   if (logStore.hasVideo) {
     if (slow) {
@@ -249,7 +249,7 @@ export function logJumpForward(fast?: Loose, slow?: Loose) {
   let scrollTime = SMALL_JUMP_TIME;
   if (fast != null) {
     scrollTime =
-      fast === 0 ? scrollTime : graphStore.graph.getWindowWidthTime() * fast;
+      fast === 0 ? scrollTime : graphStore.graph!.getWindowWidthTime() * fast;
   }
   if (logStore.hasVideo) {
     if (slow) {

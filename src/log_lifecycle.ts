@@ -86,7 +86,7 @@ export function renderSelectedLogInfo() {
       : "";
   appStore.statusLograte = lograteText;
 
-  const seekBar = graphStore.seekBar;
+  const seekBar = graphStore.seekBar!;
   seekBar.setTimeRange(
     (logStore.flightLog as Loose).getMinTime(),
     (logStore.flightLog as Loose).getMaxTime(),
@@ -106,7 +106,7 @@ export function renderSelectedLogInfo() {
   seekBar.repaint();
 
   if ((logStore.flightLog as Loose).hasGpsData()) {
-    graphStore.mapGrapher.setFlightLog(logStore.flightLog);
+    graphStore.mapGrapher!.setFlightLog(logStore.flightLog);
   }
 }
 
@@ -117,7 +117,7 @@ export function setSeekBarMode(mode: Loose) {
   graphStore.seekBarMode = mode;
   if (logStore.flightLog) {
     const activity = (logStore.flightLog as Loose).getActivitySummary();
-    graphStore.seekBar.setActivity(activity.times, activity[mode], activity.hasEvent);
-    graphStore.seekBar.repaint();
+    graphStore.seekBar!.setActivity(activity.times, activity[mode], activity.hasEvent);
+    graphStore.seekBar!.repaint();
   }
 }

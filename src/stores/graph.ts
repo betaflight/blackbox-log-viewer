@@ -3,9 +3,14 @@ import { ref, shallowRef, computed } from "vue";
 import { useSettingsStore } from "./settings.js";
 import { useLogStore } from "./log.js";
 import { PrefStorage } from "../pref_storage.js";
+import type { FlightLogGrapher } from "../grapher.js";
+import type { SeekBar } from "../seekbar.js";
+import type { MapGrapher } from "../graph_map.js";
+import type { GraphConfig } from "../graph_config.js";
 
-// Renderer/config instances live in still-JS modules (grapher, graph_config);
-// typed loosely until those are converted.
+// The graph/field config arrays and legend value maps are free-form,
+// user-editable structures; access stays loose. (The renderer instances
+// themselves are now typed against their interfaces.)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
 
@@ -27,16 +32,16 @@ export const GRAPH_DEFAULT_ZOOM = 100;
 export const useGraphStore = defineStore("graph", () => {
   const prefs = new (PrefStorage as unknown as new () => PrefStorage)();
 
-  // Renderer instances — registered by main.js after creation
-  const graph = shallowRef<Loose>(null);
-  const mapGrapher = shallowRef<Loose>(null);
-  const seekBar = shallowRef<Loose>(null);
+  // Renderer instances — registered by the composable after creation
+  const graph = shallowRef<FlightLogGrapher | null>(null);
+  const mapGrapher = shallowRef<MapGrapher | null>(null);
+  const seekBar = shallowRef<SeekBar | null>(null);
 
-  // Canvas DOM refs — registered by main.js
+  // Canvas DOM refs — registered by the composable
   const canvasRefs = shallowRef<Loose>(null);
 
   const graphConfig = ref<Loose>(null);
-  const activeGraphConfig = shallowRef<Loose>(null);
+  const activeGraphConfig = shallowRef<GraphConfig | null>(null);
   const lastGraphConfig = ref<Loose>(null);
   const graphZoom = ref(GRAPH_DEFAULT_ZOOM);
   const lastGraphZoom = ref(GRAPH_DEFAULT_ZOOM);
@@ -79,14 +84,16 @@ export const useGraphStore = defineStore("graph", () => {
   // --- Legend actions ---
 
   function buildLegendGraphs() {
-    const graphs: Loose[] = activeGraphConfig.value?.getGraphs() ?? [];
+    const cfg = activeGraphConfig.value;
+    const graphs: Loose[] = cfg?.getGraphs() ?? [];
     legendGraphs.value = graphs.map((g: Loose, gi: number) => ({
       label: g.label,
       fields: g.fields.map((f: Loose, fi: number) => ({
         name: f.name,
         friendlyName: f.friendlyName,
         color: f.color,
-        hidden: activeGraphConfig.value.isGraphFieldHidden(gi, fi),
+        // cfg is non-null here: a non-empty `graphs` came from cfg.getGraphs().
+        hidden: cfg!.isGraphFieldHidden(gi, fi),
       })),
     }));
   }
@@ -139,9 +146,10 @@ export const useGraphStore = defineStore("graph", () => {
       if (graphs.length === 0 || graphs[0].fields.length === 0) {
         hasAnalyser.value = false;
       } else {
-        activeGraphConfig.value.selectedFieldName = graphs[0].fields[0].friendlyName;
-        activeGraphConfig.value.selectedGraphIndex = 0;
-        activeGraphConfig.value.selectedFieldIndex = 0;
+        // Non-empty graphs implies activeGraphConfig.value is non-null.
+        activeGraphConfig.value!.selectedFieldName = graphs[0].fields[0].friendlyName;
+        activeGraphConfig.value!.selectedGraphIndex = 0;
+        activeGraphConfig.value!.selectedFieldIndex = 0;
         hasAnalyser.value = true;
       }
     } else {

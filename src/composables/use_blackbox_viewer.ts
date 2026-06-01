@@ -174,7 +174,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     setVideoInTime(false);
     setVideoOutTime(false);
 
-    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
+    graphStore.activeGraphConfig!.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
     graph.onSeek = function (offset: number) {
       //Seek faster
@@ -319,8 +319,8 @@ export function initBlackboxViewer(): BlackboxViewerOps {
   function newGraphConfig(newConfig: Loose, noRedraw?: Loose) {
     graphStore.lastGraphConfig = graphStore.graphConfig; // Remember the last configuration.
     graphStore.graphConfig = newConfig;
-    graphStore.activeGraphConfig.setRedrawChart(!noRedraw);
-    graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
+    graphStore.activeGraphConfig!.setRedrawChart(!noRedraw);
+    graphStore.activeGraphConfig!.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
     prefs.set("graphConfig", graphStore.graphConfig);
   }
@@ -350,7 +350,7 @@ export function initBlackboxViewer(): BlackboxViewerOps {
     onSwitchWorkspace(workspaceStore.workspaceGraphConfigs, id);
   }
 
-  graphStore.activeGraphConfig.addListener(function () {
+  graphStore.activeGraphConfig!.addListener(function () {
     graphStore.buildLegendGraphs();
     invalidateGraph();
   });
@@ -601,12 +601,12 @@ export function initBlackboxViewer(): BlackboxViewerOps {
       newGraphConfig(newGraphs);
     };
     ops.resetPen = (gi, fi) => {
-      const graphs = graphStore.activeGraphConfig.getGraphs();
+      const graphs = graphStore.activeGraphConfig!.getGraphs();
       const msg = restorePenDefaults(graphs, String(gi), fi == null ? null : String(fi));
       applyPenChange(msg);
     };
     ops.fieldWheel = (gi, fi, delta, shiftKey, altKey, ctrlKey) => {
-      const graphs = graphStore.activeGraphConfig.getGraphs();
+      const graphs = graphStore.activeGraphConfig!.getGraphs();
       const g = String(gi);
       const f = String(fi);
       const increase = delta >= 0;
