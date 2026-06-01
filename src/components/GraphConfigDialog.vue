@@ -253,18 +253,25 @@ import { ref, watch, computed } from "vue";
 import UiBox from "./UiBox.vue";
 import { GraphConfig } from "../graph_config.js";
 import { FlightLogFieldPresenter } from "../flightlog_fields_presenter.js";
+import type { FlightLog } from "../flightlog.js";
+import type { FlightLogGrapher } from "../grapher.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
 
-const props = defineProps({
-  flightLog: { type: Object, default: null },
-  graphConfig: { type: Object, default: null },
-  grapher: { type: Object, default: null },
-});
+const props = withDefaults(
+  defineProps<{
+    flightLog?: FlightLog | null;
+    graphConfig?: GraphConfig | null;
+    grapher?: FlightLogGrapher | null;
+  }>(),
+  { flightLog: null, graphConfig: null, grapher: null },
+);
 
 const emit = defineEmits(["save", "update"]);
 
-// Grapher/GraphConfig instances live in still-JS modules; typed loosely.
+// The per-graph/field config entries the dialog edits are free-form,
+// user-editable structures; access stays loose. (flightLog/graphConfig/grapher
+// props are now typed against their interfaces.)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
 interface GraphField {
@@ -594,7 +601,8 @@ function cloneGraphToLocal(g: Loose) {
     if (!props.flightLog) {
       continue;
     }
-    const expanded = props.graphConfig.extendFields(props.flightLog, f);
+    // cloneGraphToLocal only runs from within an `if (props.graphConfig)` guard.
+    const expanded = props.graphConfig!.extendFields(props.flightLog, f);
     for (const ef of expanded) {
       const c =
         ef.color && ef.color !== -1

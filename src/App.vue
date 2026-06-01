@@ -98,9 +98,9 @@
       />
       <GraphConfigDialog
         v-model:open="appStore.graphConfigDialogOpen"
-        :flightLog="logStore.flightLog ?? undefined"
-        :graphConfig="graphStore.activeGraphConfig ?? undefined"
-        :grapher="graphStore.graph ?? undefined"
+        :flightLog="logStore.flightLog"
+        :graphConfig="graphStore.activeGraphConfig"
+        :grapher="graphStore.graph"
         @save="onGraphConfigSave"
         @update="onGraphConfigUpdate"
       />
