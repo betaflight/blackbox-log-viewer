@@ -12,7 +12,7 @@ export function blackboxTimeFromVideoTime() {
   const playbackStore = usePlaybackStore(pinia);
   const logStore = useLogStore(pinia);
   const video = playbackStore.videoElement!;
-  return (video.currentTime - playbackStore.videoOffset) * 1000000 + (logStore.flightLog as Loose).getMinTime();
+  return (video.currentTime - playbackStore.videoOffset) * 1000000 + (logStore.flightLog!.getMinTime() as number);
 }
 
 export function syncLogToVideo() {

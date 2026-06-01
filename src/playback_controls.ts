@@ -60,8 +60,8 @@ export function animationLoop() {
 
     logStore.currentBlackboxTime += delta;
 
-    if (logStore.currentBlackboxTime > (logStore.flightLog as Loose).getMaxTime()) {
-      logStore.currentBlackboxTime = (logStore.flightLog as Loose).getMaxTime();
+    if (logStore.currentBlackboxTime > (logStore.flightLog!.getMaxTime() as number)) {
+      logStore.currentBlackboxTime = (logStore.flightLog!.getMaxTime() as number);
       setGraphState(GRAPH_STATE_PAUSED);
     }
   }
@@ -71,7 +71,7 @@ export function animationLoop() {
   graphStore.seekBar!.setCurrentTime(logStore.currentBlackboxTime);
   graphStore.seekBar!.setWindow(graphStore.graph!.getWindowWidthTime());
 
-  if ((logStore.flightLog as Loose).hasGpsData()) {
+  if (logStore.flightLog!.hasGpsData()) {
     graphStore.mapGrapher!.setCurrentTime(logStore.currentBlackboxTime);
   }
 
@@ -109,7 +109,7 @@ export function updateCanvasSize() {
 
     graphStore.graph!.resize(width, height);
     graphStore.seekBar!.resize(canvas.offsetWidth, 50);
-    if ((logStore.flightLog as Loose).hasGpsData()) {
+    if (logStore.flightLog!.hasGpsData()) {
       graphStore.mapGrapher!.resize(width, height);
     }
 
@@ -146,7 +146,7 @@ export function setCurrentBlackboxTime(newTime: number) {
 
   if (logStore.hasVideo) {
     playbackStore.videoElement!.currentTime =
-      (newTime - (logStore.flightLog as Loose).getMinTime()) / 1000000 + playbackStore.videoOffset;
+      (newTime - (logStore.flightLog!.getMinTime() as number)) / 1000000 + playbackStore.videoOffset;
 
     syncLogToVideo();
   } else {
@@ -224,7 +224,7 @@ export function logJumpBack(fast?: Loose, slow?: Loose) {
     }
     setVideoTime(playbackStore.videoElement!.currentTime - scrollTime / 1000000);
   } else {
-    const currentFrame = (logStore.flightLog as Loose).getCurrentFrameAtTime(
+    const currentFrame: Loose = logStore.flightLog!.getCurrentFrameAtTime(
       logStore.currentBlackboxTime,
     );
     if (currentFrame?.previous && slow) {
@@ -257,7 +257,7 @@ export function logJumpForward(fast?: Loose, slow?: Loose) {
     }
     setVideoTime(playbackStore.videoElement!.currentTime + scrollTime / 1000000);
   } else {
-    const currentFrame = (logStore.flightLog as Loose).getCurrentFrameAtTime(
+    const currentFrame: Loose = logStore.flightLog!.getCurrentFrameAtTime(
       logStore.currentBlackboxTime,
     );
     if (currentFrame?.next && slow) {
@@ -276,13 +276,13 @@ export function logJumpForward(fast?: Loose, slow?: Loose) {
 
 export function logJumpStart() {
   const logStore = useLogStore(pinia);
-  setCurrentBlackboxTime((logStore.flightLog as Loose).getMinTime());
+  setCurrentBlackboxTime((logStore.flightLog!.getMinTime() as number));
   setGraphState(GRAPH_STATE_PAUSED);
 }
 
 export function logJumpEnd() {
   const logStore = useLogStore(pinia);
-  setCurrentBlackboxTime((logStore.flightLog as Loose).getMaxTime());
+  setCurrentBlackboxTime((logStore.flightLog!.getMaxTime() as number));
   setGraphState(GRAPH_STATE_PAUSED);
 }
 
