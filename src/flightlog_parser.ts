@@ -65,7 +65,7 @@ interface FrameType {
   complete?: CompleteFn;
 }
 
-export function FlightLogParser(this: FlightLogParser, logData: Uint8Array | number[]) {
+export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
   //Private constants:
   const FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
     //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
@@ -934,10 +934,10 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array | num
     const lineEnd = stream.pos;
 
     const fieldName = translateFieldName(
-      asciiArrayToString((stream.data as Uint8Array).subarray(lineStart, separatorPos)),
+      asciiArrayToString(stream.data.subarray(lineStart, separatorPos)),
     );
     const fieldValue = asciiArrayToString(
-      (stream.data as Uint8Array).subarray(separatorPos + 1, lineEnd),
+      stream.data.subarray(separatorPos + 1, lineEnd),
     );
 
     const handler = HEADER_HANDLERS[fieldName];

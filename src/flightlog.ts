@@ -141,17 +141,17 @@ function verifyChunkIndexes(_chunks: FlightLogChunk[]) {
  * Additional computed fields are derived from the original data set and added as new fields in the resulting data.
  * Window based smoothing of fields is offered.
  */
-export function FlightLog(this: FlightLog, logData: Uint8Array | number[]) {
+export function FlightLog(this: FlightLog, logData: Uint8Array) {
   const ADDITIONAL_COMPUTED_FIELD_COUNT = 21 /** attitude + PID_SUM + PID_ERROR + RCCOMMAND_SCALED + GPS coord, distance, azimuth, trajectory tilt angle **/;
   let logIndex = 0;
   const logIndexes = new (FlightLogIndex as unknown as Ctor<
     FlightLogIndex,
-    [Uint8Array | number[]]
+    [Uint8Array]
   >)(logData);
   // FlightLogParser is an old-style constructor function with a typed `this`,
   // which TS doesn't expose a construct signature for; cast to construct it.
   const parser = new (FlightLogParser as unknown as new (
-    logData: Uint8Array | number[],
+    logData: Uint8Array,
   ) => FlightLogParser)(logData);
   let iframeDirectory: IntraIndex;
   // We cache these details so they don't have to be recomputed on every request:

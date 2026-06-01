@@ -47,7 +47,10 @@ export function LapTimer(this: LapTimer) {
 
   this.drawCanvas = function (canvas: HTMLCanvasElement, options: Loose) {
     // Draw the LapTimes using a canvas
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
 
     const lineHeight = 14, //px
       DEFAULT_FONT_FACE = "8pt Verdana, Arial, sans-serif",

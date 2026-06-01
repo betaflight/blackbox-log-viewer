@@ -587,10 +587,10 @@ GraphSpectrumCalc.dataLoadPidErrorVsSetpoint = function () {
 
 GraphSpectrumCalc._getFlightChunks = function () {
   const logStart =
-    this._analyserTimeRange.in || (this._flightLog.getMinTime() as number);
+    this._analyserTimeRange.in || this._flightLog.getMinTime() || 0;
 
   let logEnd =
-    this._analyserTimeRange.out || (this._flightLog.getMaxTime() as number);
+    this._analyserTimeRange.out || this._flightLog.getMaxTime() || 0;
 
   // Limit size
   logEnd =
@@ -786,10 +786,19 @@ GraphSpectrumCalc._getFlightSamplesPidErrorVsSetpoint = function (axisIndex) {
   // Get the PID Error field
   const FIELD_PIDERROR_INDEX = this._flightLog.getMainFieldIndexByName(
     `axisError[${axisIndex}]`,
-  ) as number;
+  );
   const FIELD_SETPOINT_INDEX = this._flightLog.getMainFieldIndexByName(
     `setpoint[${axisIndex}]`,
-  ) as number;
+  );
+
+  if (FIELD_PIDERROR_INDEX === undefined || FIELD_SETPOINT_INDEX === undefined) {
+    return {
+      piderror: new Int16Array(0),
+      setpoint: new Int16Array(0),
+      maxSetpoint: 0,
+      count: 0,
+    };
+  }
 
   const piderror = new Int16Array(
     (MAX_ANALYSER_LENGTH / (1000 * 1000)) * this._blackBoxRate,

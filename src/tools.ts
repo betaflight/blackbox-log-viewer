@@ -117,16 +117,16 @@ export function parseCommaSeparatedString(string: string, length?: number): any 
 
   if (length < 2) {
     // this is not actually a list, just return the value
-    value = parts.indexOf(".")
-      ? parseFloat(parts as unknown as string)
-      : parseInt(parts as unknown as string, 10);
+    value = parts[0].includes(".")
+      ? parseFloat(parts[0])
+      : parseInt(parts[0], 10);
     return isNaN(value) ? string : value;
   } else {
     // this really is a list; build an array
     result = new Array(length);
     for (let i = 0; i < length; i++) {
       if (i < parts.length) {
-        value = parts[i].indexOf(".")
+        value = parts[i].includes(".")
           ? parseFloat(parts[i])
           : parseInt(parts[i], 10);
         result[i] = isNaN(value) ? parts[i] : value;
@@ -249,7 +249,10 @@ export function stringLoopTime(
 
 export function stringTimetoMsec(input: string): number {
   try {
-    const matches = input.match(/(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/)!;
+    const matches = input.match(/(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/);
+    if (!matches) {
+      return 0;
+    }
 
     if (matches.length > 2) {
       // there is a placeholder - either : or .
@@ -257,19 +260,19 @@ export function stringTimetoMsec(input: string): number {
         // time has been entered MM:SS.SSS
         return (
           (matches[1] ? -1 : 1) *
-          ((matches[2] as unknown as number) * 60 * 1000000 +
-            (matches[4] ? (matches[4] as unknown as number) : 0) * 1000000 +
-            ((matches[5] ? `${matches[5]}00`.slice(0, 3) : 0) as unknown as number) * 1000)
+          (Number(matches[2]) * 60 * 1000000 +
+            (matches[4] ? Number(matches[4]) : 0) * 1000000 +
+            Number(matches[5] ? `${matches[5]}00`.slice(0, 3) : 0) * 1000)
         );
       } else {
         return (
           (matches[1] ? -1 : 1) *
-          ((matches[2] as unknown as number) * 1000000 +
-            ((matches[4] ? `${matches[4]}00`.slice(0, 3) : 0) as unknown as number) * 1000)
+          (Number(matches[2]) * 1000000 +
+            Number(matches[4] ? `${matches[4]}00`.slice(0, 3) : 0) * 1000)
         );
       }
     } else
-      return (matches[1] ? -1 : 1) * ((matches[2] as unknown as number) * 1000000);
+      return (matches[1] ? -1 : 1) * (Number(matches[2]) * 1000000);
   } catch {
     return 0;
   }

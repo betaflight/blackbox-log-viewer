@@ -9,8 +9,8 @@ interface FieldStat {
 
 export function SimpleStats(flightLog: FlightLog) {
   const chunks = flightLog.getChunksInTimeRange(
-    flightLog.getMinTime() as number,
-    flightLog.getMaxTime() as number,
+    flightLog.getMinTime() || 0,
+    flightLog.getMaxTime() || 0,
   );
   const frames = chunks.flatMap((chunk) => chunk.frames);
   const fields = flightLog

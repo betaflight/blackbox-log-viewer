@@ -20,7 +20,7 @@ type Ctor<T, A extends unknown[]> = new (...args: A) => T;
 
 export function FlightLogIndex(
   this: FlightLogIndex,
-  logData: Uint8Array | number[],
+  logData: Uint8Array,
 ) {
   //Private:
   // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -57,7 +57,7 @@ export function FlightLogIndex(
   function buildIntraframeDirectories() {
     const parser = new (FlightLogParser as unknown as Ctor<
       FlightLogParser,
-      [Uint8Array | number[], unknown?]
+      [Uint8Array, unknown?]
     >)(logData, that);
 
     const directories: IntraIndex[] = (intraframeDirectories = []);

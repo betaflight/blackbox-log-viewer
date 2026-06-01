@@ -1815,35 +1815,27 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
         );
       }
 
-    case "amperageLatest":
+    case "amperageLatest": {
+      const motorCount = flightLog.getNumMotors();
+      const perMotor = (totalAmps: number) =>
+        motorCount ? `, ${(totalAmps / motorCount).toFixed(2)} A/motor` : "";
       if (
         (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
           semver.gte(flightLog.getSysConfig().firmwareVersion, "3.1.7")) ||
         (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
           semver.gte(flightLog.getSysConfig().firmwareVersion, "2.0.0"))
       ) {
-        return (
-          `${(value / 100).toFixed(2)}A` +
-          `, ${(value / 100 / (flightLog.getNumMotors() as number)).toFixed(2)} A/motor`
-        );
+        return `${(value / 100).toFixed(2)}A${perMotor(value / 100)}`;
       } else if (
         flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
         semver.gte(flightLog.getSysConfig().firmwareVersion, "3.1.0")
       ) {
-        return (
-          `${(value / 100).toFixed(2)}A` +
-          `, ${(value / 100 / (flightLog.getNumMotors() as number)).toFixed(2)} A/motor`
-        );
+        return `${(value / 100).toFixed(2)}A${perMotor(value / 100)}`;
       } else {
-        return (
-          `${(flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2)}A` +
-          `, ${(
-            flightLog.amperageADCToMillivolts(value) /
-            1000 /
-            (flightLog.getNumMotors() as number)
-          ).toFixed(2)} A/motor`
-        );
+        const amps = flightLog.amperageADCToMillivolts(value) / 1000;
+        return `${amps.toFixed(2)}A${perMotor(amps)}`;
       }
+    }
 
     case "heading[0]":
     case "heading[1]":
@@ -2613,7 +2605,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
             (FlightLogFieldPresenter.decodeAltitudeLogToChart(
               1.0,
               userSettings.altitudeUnits,
-            ) as number);
+            ) ?? 1);
 
     case "flightModeFlags":
       return value;
@@ -2646,7 +2638,7 @@ FlightLogFieldPresenter.ConvertFieldValue = function (
             (FlightLogFieldPresenter.decodeAltitudeLogToChart(
               1.0,
               userSettings.altitudeUnits,
-            ) as number);
+            ) ?? 1);
     case "GPS_speed":
       switch (userSettings.speedUnits) {
         case 1:

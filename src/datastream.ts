@@ -7,7 +7,7 @@ const EOF = -1;
  * for reading data in different formats.
  */
 export class ArrayDataStream {
-  data: Uint8Array | number[];
+  data: Uint8Array;
   eof = false;
   start: number;
   end: number;
@@ -16,7 +16,7 @@ export class ArrayDataStream {
   // Assigned on the prototype below so `ArrayDataStream.prototype.EOF` keeps working.
   declare EOF: number;
 
-  constructor(data: Uint8Array | number[], start?: number, end?: number) {
+  constructor(data: Uint8Array, start?: number, end?: number) {
     this.data = data;
     this.start = start === undefined ? 0 : start;
     this.end = end === undefined ? data.length : end;
