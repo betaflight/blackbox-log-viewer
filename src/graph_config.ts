@@ -106,21 +106,19 @@ export function GraphConfig(this: GraphConfig, graphConfig?: Loose[] | null) {
           );
         }
       }
-    } else {
       // Don't add fields if they don't exist in this log
-      if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
-        fields.push(
-          adaptField(
-            flightLog,
-            { ...field, curve: { ...field.curve },
-              friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(
-                field.name,
-                flightLog.getSysConfig().debug_mode,
-              ),
-            },
-          ),
-        );
-      }
+    } else if (flightLog.getMainFieldIndexByName(field.name) !== undefined) {
+      fields.push(
+        adaptField(
+          flightLog,
+          { ...field, curve: { ...field.curve },
+            friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(
+              field.name,
+              flightLog.getSysConfig().debug_mode,
+            ),
+          },
+        ),
+      );
     }
     return fields;
   };

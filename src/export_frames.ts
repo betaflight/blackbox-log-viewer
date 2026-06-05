@@ -15,11 +15,12 @@ export interface FlatFrames {
 }
 
 /**
- * Flatten chunk frames into a transferable Float64Array. Returns `null` when
- * the frames are empty or ragged (non-uniform row width), so the caller can
- * fall back to posting the original nested array unchanged.
+ * Measure the frame set: total row count and the (uniform) row width. Returns
+ * `null` when the frames are empty or ragged (non-uniform row width).
  */
-export function flattenFrames(chunkFrames: number[][][]): FlatFrames | null {
+function measureFrames(
+  chunkFrames: number[][][],
+): { rowCount: number; rowLength: number } | null {
   let rowCount = 0;
   let rowLength = -1;
   for (const chunk of chunkFrames) {
@@ -32,17 +33,27 @@ export function flattenFrames(chunkFrames: number[][][]): FlatFrames | null {
       rowCount++;
     }
   }
-  if (rowCount === 0 || rowLength <= 0) {
+  return rowCount === 0 || rowLength <= 0 ? null : { rowCount, rowLength };
+}
+
+/**
+ * Flatten chunk frames into a transferable Float64Array. Returns `null` when
+ * the frames are empty or ragged, so the caller can fall back to posting the
+ * original nested array unchanged.
+ */
+export function flattenFrames(chunkFrames: number[][][]): FlatFrames | null {
+  const dims = measureFrames(chunkFrames);
+  if (!dims) {
     return null;
   }
+  const { rowCount, rowLength } = dims;
 
   const flat = new Float64Array(rowCount * rowLength);
   let i = 0;
   for (const chunk of chunkFrames) {
     for (const frame of chunk) {
       for (let c = 0; c < rowLength; c++) {
-        const v = frame[c];
-        flat[i++] = v == null ? NaN : v;
+        flat[i++] = frame[c] ?? Number.NaN;
       }
     }
   }

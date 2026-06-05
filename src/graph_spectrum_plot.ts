@@ -1154,25 +1154,23 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
             offset++;
           }
         }
-      } else {
         // only a single gyro notch to display
-        if (
-          this._sysConfig.gyro_notch_hz > 0 &&
-          this._sysConfig.gyro_notch_cutoff > 0
-        ) {
-          this._drawNotchFilter(
-            canvasCtx,
-            this._sysConfig.gyro_notch_hz,
-            this._sysConfig.gyro_notch_cutoff,
-            MAXIMAL_PLOTTED_FREQUENCY,
-            "GYRO Notch",
-            WIDTH,
-            HEIGHT,
-            15 * offset + MARGIN,
-            "rgba(0, 148, 134, 0.50)",
-          );
-          offset++;
-        }
+      } else if (
+        this._sysConfig.gyro_notch_hz > 0 &&
+        this._sysConfig.gyro_notch_cutoff > 0
+      ) {
+        this._drawNotchFilter(
+          canvasCtx,
+          this._sysConfig.gyro_notch_hz,
+          this._sysConfig.gyro_notch_cutoff,
+          MAXIMAL_PLOTTED_FREQUENCY,
+          "GYRO Notch",
+          WIDTH,
+          HEIGHT,
+          15 * offset + MARGIN,
+          "rgba(0, 148, 134, 0.50)",
+        );
+        offset++;
       }
     }
   }

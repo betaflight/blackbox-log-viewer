@@ -486,12 +486,10 @@ export function initBlackboxViewer(): BlackboxViewerOps {
         } else {
           logJumpBack(0.1);
         }
+      } else if (e.altKey || e.shiftKey) {
+        setGraphZoom(graphStore.graphZoom + zoomStep, true);
       } else {
-        if (e.altKey || e.shiftKey) {
-          setGraphZoom(graphStore.graphZoom + zoomStep, true);
-        } else {
-          logJumpForward(0.1);
-        }
+        logJumpForward(0.1);
       }
       e.preventDefault();
     }
