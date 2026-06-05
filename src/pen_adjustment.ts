@@ -82,8 +82,8 @@ export function restorePenDefaults(
     if (graphs[gi].fields[fi].default == null) {
       return null;
     }
-    graphs[gi].fields[fi].smoothing = graphs[gi].fields[fi].default!.smoothing!;
-    graphs[gi].fields[fi].curve.power = graphs[gi].fields[fi].default!.power!;
+    graphs[gi].fields[fi].smoothing = graphs[gi].fields[fi].default.smoothing!;
+    graphs[gi].fields[fi].curve.power = graphs[gi].fields[fi].default.power!;
     return "<h4>Restored defaults for single pen</h4>";
   }
   return null;

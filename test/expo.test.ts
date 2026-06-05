@@ -13,17 +13,17 @@ function assert(condition: boolean, message: string): void {
 }
 
 function testExpoCurve(): void {
-  const curve = new ExpoCurve(0, 0.7, 750, 1.0, 10);
-  assert(curve.lookup(0) === 0.0, "ExpoCurve lookup(0) === 0");
-  assert(curve.lookup(-750) === -1.0, "ExpoCurve lookup(-750) === -1");
-  assert(curve.lookup(750) === 1.0, "ExpoCurve lookup(750) === 1");
+  const curve = new ExpoCurve(0, 0.7, 750, 1, 10);
+  assert(curve.lookup(0) === 0, "ExpoCurve lookup(0) === 0");
+  assert(curve.lookup(-750) === -1, "ExpoCurve lookup(-750) === -1");
+  assert(curve.lookup(750) === 1, "ExpoCurve lookup(750) === 1");
 }
 
 function testExpoStraightLine(): void {
-  const curve = new ExpoCurve(0, 1.0, 500, 1.0, 1);
-  assert(curve.lookup(0) === 0.0, "straight lookup(0) === 0");
-  assert(curve.lookup(-500) === -1.0, "straight lookup(-500) === -1");
-  assert(curve.lookup(500) === 1.0, "straight lookup(500) === 1");
+  const curve = new ExpoCurve(0, 1, 500, 1, 1);
+  assert(curve.lookup(0) === 0, "straight lookup(0) === 0");
+  assert(curve.lookup(-500) === -1, "straight lookup(-500) === -1");
+  assert(curve.lookup(500) === 1, "straight lookup(500) === 1");
   assert(curve.lookup(-250) === -0.5, "straight lookup(-250) === -0.5");
   assert(curve.lookup(250) === 0.5, "straight lookup(250) === 0.5");
 }
