@@ -16,7 +16,7 @@
 //   npm run test:parser -- --update     # regenerate the golden snapshots
 import { readFileSync, writeFileSync } from "node:fs";
 import { FlightLogParser } from "../src/flightlog_parser.js";
-import { buildSyntheticLog, buildComplexLog } from "./fixtures/synthetic_log.mjs";
+import { buildSyntheticLog, buildComplexLog } from "./fixtures/synthetic_log.js";
 
 const CASES = [
   { name: "simple", build: buildSyntheticLog, golden: "test/fixtures/parser.golden.json" },

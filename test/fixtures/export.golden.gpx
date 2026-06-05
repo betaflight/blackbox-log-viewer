@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/gpx_style/0/2 http://www.topografix.com/GPX/gpx_style/0/2/gpx_style.xsd" xmlns:gpx_style="http://www.topografix.com/GPX/gpx_style/0/2" 
+  version="1.1" 
+  creator="https://github.com/betaflight/blackbox-log-viewer">
+  <metadata>
+    <author>
+      <name>Betaflight Blackbox Explorer</name>
+      <link href="https://github.com/betaflight/blackbox-log-viewer"></link>
+    </author>
+  </metadata>
+  <trk>
+    <trkseg>
+      <trkpt lat="47.3712345" lon="8.5342111"><ele>123.4</ele><time>2024-01-01T00:00:00.000Z</time></trkpt>
+<trkpt lat="47.3712999" lon="8.5342999"><ele>125</ele><time>2024-01-01T00:00:00.003Z</time></trkpt>
+
+    </trkseg>
+  </trk>
+</gpx>

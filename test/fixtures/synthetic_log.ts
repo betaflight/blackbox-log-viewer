@@ -11,19 +11,19 @@
 
 const NEWLINE = 0x0a;
 
-function pushAscii(arr, str) {
+function pushAscii(arr: number[], str: string): void {
   for (let i = 0; i < str.length; i++) {
     arr.push(str.charCodeAt(i));
   }
 }
 
-function header(arr, line) {
+function header(arr: number[], line: string): void {
   arr.push(0x48, 0x20); // 'H', ' '
   pushAscii(arr, line);
   arr.push(NEWLINE);
 }
 
-function writeUnsignedVB(arr, value) {
+function writeUnsignedVB(arr: number[], value: number): void {
   value >>>= 0;
   while (value > 0x7f) {
     arr.push((value & 0x7f) | 0x80);
@@ -32,14 +32,14 @@ function writeUnsignedVB(arr, value) {
   arr.push(value & 0x7f);
 }
 
-function writeSignedVB(arr, value) {
+function writeSignedVB(arr: number[], value: number): void {
   // ZigZag encode then unsigned VB (matches ArrayDataStream.readSignedVB).
   const zig = ((value << 1) ^ (value >> 31)) >>> 0;
   writeUnsignedVB(arr, zig);
 }
 
-export function buildSyntheticLog() {
-  const arr = [];
+export function buildSyntheticLog(): Uint8Array {
+  const arr: number[] = [];
 
   // --- Header ---
   header(arr, "Product:Blackbox flight data recorder by Nicholas Sherlock");
@@ -82,13 +82,18 @@ export function buildSyntheticLog() {
 // --- Tag-encoding writers (mirror ArrayDataStream decoders) ---
 
 // TAG2_3S32, selector 0: three 2-bit signed fields (values must be in [-2, 1]).
-function writeTag2_3S32_case0(arr, v0, v1, v2) {
-  const code = (v) => v & 0x03; // inverse of signExtend2Bit for [-2..1]
+function writeTag2_3S32_case0(
+  arr: number[],
+  v0: number,
+  v1: number,
+  v2: number,
+): void {
+  const code = (v: number) => v & 0x03; // inverse of signExtend2Bit for [-2..1]
   arr.push((code(v0) << 4) | (code(v1) << 2) | code(v2));
 }
 
 // TAG8_8SVB group: header bitmask (one bit per value) then a signed VB per set bit.
-function writeTag8_8SVB(arr, values) {
+function writeTag8_8SVB(arr: number[], values: number[]): void {
   if (values.length === 1) {
     writeSignedVB(arr, values[0]); // matches the valueCount === 1 fast path
     return;
@@ -120,8 +125,8 @@ function writeTag8_8SVB(arr, values) {
  *   7 motor[2]    /
  *   8 debug[0]       NEG_14BIT, pred 0
  */
-export function buildComplexLog() {
-  const arr = [];
+export function buildComplexLog(): Uint8Array {
+  const arr: number[] = [];
 
   header(arr, "Product:Blackbox flight data recorder by Nicholas Sherlock");
   header(arr, "Data version:2");

@@ -35,8 +35,8 @@ jobs:
       - run: npm ci
       - name: Type check
         run: npm run type-check
-      - name: Parser golden test
-        run: npm run test:parser
+      - name: Golden tests (parser + export)
+        run: npm test
       - name: Build
         run: npm run build
         env:
