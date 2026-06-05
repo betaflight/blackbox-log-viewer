@@ -2,6 +2,8 @@ import WebMWriter from "webm-writer";
 import { FlightLogGrapher } from "./grapher";
 import { triggerDownload } from "./tools.js";
 import { useSettingsStore } from "./stores/settings.js";
+import type { FlightLog } from "./flightlog";
+import type { GraphConfig } from "./graph_config";
 
 /**
  * Render a video of the given log using the given videoOptions (user video settings) and logParameters.
@@ -25,11 +27,39 @@ import { useSettingsStore } from "./stores/settings.js";
  *     onComplete - On render completion, called with (success, frameCount)
  *     onProgress - Called periodically with (frameIndex, frameCount) to report progress
  */
-// flightLog, the log/video parameters, video options and event callbacks are
-// free-form structures from the still-JS layer; access stays loose, consistent
-// with the rest of the migration.
+// The WebM writer, the vendored grapher construction and the vendor-prefixed
+// document.hidden probes are genuinely dynamic; access there stays loose.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Loose = any;
+
+/** User-chosen output video settings. */
+export interface VideoOptions {
+  width: number;
+  height: number;
+  frameRate: number;
+  // Amount of dimming applied to the background video, 0.0–1.0.
+  videoDim: number;
+}
+
+/** What and how to render (the selected range, overlays and optional video). */
+export interface VideoLogParameters {
+  // Time codes, or `false` to mean start-of-log / end-of-log (the renderer
+  // resolves `false` against the flight log).
+  inTime: number | false;
+  outTime: number | false;
+  graphConfig: GraphConfig;
+  flightVideo?: HTMLVideoElement | null;
+  flightVideoOffset?: number;
+  hasCraft?: boolean;
+  hasSticks?: boolean;
+  hasAnalyser?: boolean;
+}
+
+/** Progress / completion callbacks. */
+export interface VideoExportEvents {
+  onComplete?: (success: boolean, frameCount?: number) => void;
+  onProgress?: (frameIndex: number, frameCount: number) => void;
+}
 
 // Instance shape (the constructor's `this`). The value `FlightLogVideoRenderer`
 // below is the constructor function (it also carries the static isSupported).
@@ -42,10 +72,10 @@ export interface FlightLogVideoRenderer {
 
 export function FlightLogVideoRenderer(
   this: FlightLogVideoRenderer,
-  flightLog: Loose,
-  logParameters: Loose,
-  videoOptions: Loose,
-  events: Loose,
+  flightLog: FlightLog,
+  logParameters: VideoLogParameters,
+  videoOptions: VideoOptions,
+  events: VideoExportEvents,
 ) {
   const { userSettings } = useSettingsStore();
 
@@ -176,15 +206,16 @@ export function FlightLogVideoRenderer(
       };
 
     if (logParameters.flightVideo) {
+      const flightVideo = logParameters.flightVideo;
       const renderFrames = function (frameCount: number) {
         if (frameCount === 0) {
           completeChunk();
           return;
         }
 
-        logParameters.flightVideo.onseeked = function () {
+        flightVideo.onseeked = function () {
           canvasContext.drawImage(
-            logParameters.flightVideo,
+            flightVideo,
             0,
             0,
             videoOptions.width,
@@ -203,8 +234,8 @@ export function FlightLogVideoRenderer(
           renderFrames(frameCount - 1);
         };
 
-        logParameters.flightVideo.currentTime =
-          (frameTime - flightLog.getMinTime()) / 1000000 +
+        flightVideo.currentTime =
+          (frameTime - (flightLog.getMinTime() || 0)) / 1000000 +
           (logParameters.flightVideoOffset || 0);
       };
 
@@ -232,7 +263,7 @@ export function FlightLogVideoRenderer(
   this.start = function () {
     cancel = false;
 
-    frameTime = logParameters.inTime;
+    frameTime = logParameters.inTime || 0;
     frameIndex = 0;
 
     installVisibilityHandler();
@@ -299,7 +330,7 @@ export function FlightLogVideoRenderer(
 
   // If the in -> out time is not an exact number of frames, we'll round the end time of the video to make it so:
   const frameCount = Math.round(
-    (logParameters.outTime - logParameters.inTime) / frameDuration,
+    ((logParameters.outTime || 0) - (logParameters.inTime || 0)) / frameDuration,
   );
 
   if (logParameters.flightVideo) {
@@ -310,7 +341,7 @@ export function FlightLogVideoRenderer(
 /**
  * Is video rendering supported on this web browser? We require the ability to encode canvases to WebP.
  */
-FlightLogVideoRenderer.isSupported = function (): Loose {
+FlightLogVideoRenderer.isSupported = function (): boolean {
   const canvas = document.createElement("canvas");
 
   canvas.width = 16;
@@ -320,5 +351,5 @@ FlightLogVideoRenderer.isSupported = function (): Loose {
   // (kept verbatim); cast keeps it type-clean.
   const encoded = canvas.toDataURL("image/webp", { quality: 0.9 } as Loose);
 
-  return encoded && (/^data:image\/webp;/.exec(encoded));
+  return Boolean(encoded && /^data:image\/webp;/.exec(encoded));
 };

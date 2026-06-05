@@ -13,7 +13,7 @@ import {
   validate,
   mouseNotification,
 } from "../tools.js";
-import { restorePenDefaults, changePenSmoothing, changePenZoom, changePenExpo } from "../pen_adjustment.js";
+import { restorePenDefaults, changePenSmoothing, changePenZoom, changePenExpo, type PenGraph } from "../pen_adjustment.js";
 import { createKeydownHandler } from "../keyboard_handler.js";
 import { upgradeWorkspaceFormat, saveWorkspaces, loadWorkspaces } from "../workspace_io.js";
 import { exportCsv, exportGpx, exportSpectrumToCsv } from "../export_utils.js";
@@ -598,12 +598,12 @@ export function initBlackboxViewer(): BlackboxViewerOps {
       newGraphConfig(newGraphs);
     };
     ops.resetPen = (gi, fi) => {
-      const graphs = graphStore.activeGraphConfig!.getGraphs();
+      const graphs = graphStore.activeGraphConfig!.getGraphs() as unknown as PenGraph[];
       const msg = restorePenDefaults(graphs, String(gi), fi == null ? null : String(fi));
       applyPenChange(msg);
     };
     ops.fieldWheel = (gi, fi, delta, shiftKey, altKey, ctrlKey) => {
-      const graphs = graphStore.activeGraphConfig!.getGraphs();
+      const graphs = graphStore.activeGraphConfig!.getGraphs() as unknown as PenGraph[];
       const g = String(gi);
       const f = String(fi);
       const increase = delta >= 0;

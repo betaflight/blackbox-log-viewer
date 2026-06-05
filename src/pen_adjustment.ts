@@ -1,15 +1,32 @@
 import { constrain } from "./tools.js";
 
-// graphs/group/field are the free-form graph-config structures and string/null
-// pen selectors from the still-JS layer; access stays loose, consistent with
-// the rest of the migration.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Loose = any;
+// The runtime-adapted graph/field shape the pen adjustments mutate: by the time
+// these run the graphs have been expanded against a log, so `curve.power`,
+// `curve.MinMax` and `smoothing` are present (the stored model types them
+// optional). `default` is a legacy array that also carries `.smoothing`/`.power`
+// — kept as an array so it serializes exactly as before.
+interface PenDefault extends Array<number> {
+  smoothing?: number;
+  power?: number;
+}
+interface PenCurve {
+  power: number;
+  MinMax: { min: number; max: number };
+}
+interface PenField {
+  smoothing: number;
+  curve: PenCurve;
+  friendlyName: string;
+  default?: PenDefault;
+}
+export interface PenGraph {
+  fields: PenField[];
+}
 
 export function savePenDefaults(
-  graphs: Loose,
-  group: Loose,
-  field: Loose,
+  graphs: PenGraph[],
+  group: string | null,
+  field: string | null,
 ): string | null {
   if (group == null && field == null) {
     return null;
@@ -40,9 +57,9 @@ export function savePenDefaults(
 }
 
 export function restorePenDefaults(
-  graphs: Loose,
-  group: Loose,
-  field: Loose,
+  graphs: PenGraph[],
+  group: string | null,
+  field: string | null,
 ): string | null {
   if (group == null && field == null) {
     return null;
@@ -54,8 +71,8 @@ export function restorePenDefaults(
       if (configField.default == null) {
         return null;
       }
-      configField.smoothing = configField.default.smoothing;
-      configField.curve.power = configField.default.power;
+      configField.smoothing = configField.default.smoothing!;
+      configField.curve.power = configField.default.power!;
     }
     return "<h4>Restored defaults for all pens</h4>";
   }
@@ -65,18 +82,18 @@ export function restorePenDefaults(
     if (graphs[gi].fields[fi].default == null) {
       return null;
     }
-    graphs[gi].fields[fi].smoothing = graphs[gi].fields[fi].default.smoothing;
-    graphs[gi].fields[fi].curve.power = graphs[gi].fields[fi].default.power;
+    graphs[gi].fields[fi].smoothing = graphs[gi].fields[fi].default!.smoothing!;
+    graphs[gi].fields[fi].curve.power = graphs[gi].fields[fi].default!.power!;
     return "<h4>Restored defaults for single pen</h4>";
   }
   return null;
 }
 
 export function changePenSmoothing(
-  graphs: Loose,
-  group: Loose,
-  field: Loose,
-  delta: Loose,
+  graphs: PenGraph[],
+  group: string | null,
+  field: string | null,
+  delta: boolean,
 ): string | null {
   const range = { min: 0, max: 10000 };
   const scroll = 1000;
@@ -108,10 +125,10 @@ export function changePenSmoothing(
 }
 
 export function changePenZoom(
-  graphs: Loose,
-  group: Loose,
-  field: Loose,
-  delta: Loose,
+  graphs: PenGraph[],
+  group: string | null,
+  field: string | null,
+  delta: boolean,
 ): string | null {
   if (group == null && field == null) {
     return null;
@@ -134,18 +151,19 @@ export function changePenZoom(
   }
   if (group != null && field != null) {
     const gi = Number.parseInt(group, 10);
-    graphs[gi].fields[field].curve.MinMax.min *= scale;
-    graphs[gi].fields[field].curve.MinMax.max *= scale;
-    return `<h4></h4>${direction}${graphs[gi].fields[field].friendlyName}\n`;
+    const fi = Number.parseInt(field, 10);
+    graphs[gi].fields[fi].curve.MinMax.min *= scale;
+    graphs[gi].fields[fi].curve.MinMax.max *= scale;
+    return `<h4></h4>${direction}${graphs[gi].fields[fi].friendlyName}\n`;
   }
   return null;
 }
 
 export function changePenExpo(
-  graphs: Loose,
-  group: Loose,
-  field: Loose,
-  delta: Loose,
+  graphs: PenGraph[],
+  group: string | null,
+  field: string | null,
+  delta: boolean,
 ): string | null {
   const range = { min: 0.05, max: 1 };
   const scroll = 0.05;

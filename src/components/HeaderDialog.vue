@@ -218,11 +218,7 @@ import {
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_INAV,
 } from "../flightlog_fielddefs";
-
-// sysConfig is a dynamic key→value header map (hundreds of optional fields);
-// access is intentionally untyped, consistent with the rest of the migration.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Loose = any;
+import type { SysConfig } from "../flightlog_types";
 
 interface HeaderParam {
   name: string;
@@ -234,13 +230,13 @@ const open = defineModel<boolean>("open", { default: false });
 const cols = ref<number | null>(null);
 
 const props = withDefaults(
-  defineProps<{ sysConfig?: Loose }>(),
+  defineProps<{ sysConfig?: SysConfig | null }>(),
   { sysConfig: null },
 );
 
 // --- Helpers ---
 
-const sc = computed(() => props.sysConfig || {});
+const sc = computed<SysConfig>(() => props.sysConfig ?? ({} as SysConfig));
 const filteredSc = computed(() => {
   if (hiddenFields.value.size === 0) {
     return sc.value;
@@ -280,7 +276,7 @@ function fmtFloat(data: number | null | undefined, decimalPlaces: number): strin
   return data.toFixed(decimalPlaces);
 }
 
-function selectVal(data: number | null | undefined, list: Loose): string | null {
+function selectVal(data: number | null | undefined, list: readonly string[]): string | null {
   if (data == null || !list) {
     return null;
   }
@@ -709,7 +705,7 @@ const rpmFilterParams = computed(() => {
 
 // --- RC Smoothing ---
 
-function buildRcSmoothing43(s: Loose): HeaderParam[] {
+function buildRcSmoothing43(s: SysConfig): HeaderParam[] {
   const result = [
     param("Mode", selectVal(s.rc_smoothing_mode, RC_SMOOTHING_MODE)),
     param("Setpoint Hz", fmtVal(s.rc_smoothing_setpoint_hz, 0)),
@@ -749,7 +745,7 @@ function buildRcSmoothing43(s: Loose): HeaderParam[] {
   return result;
 }
 
-function buildRcSmoothing34(s: Loose): HeaderParam[] {
+function buildRcSmoothing34(s: SysConfig): HeaderParam[] {
   const result = [
     param("Mode", selectVal(s.rc_smoothing_mode, RC_SMOOTHING_TYPE)),
   ];
@@ -1276,7 +1272,7 @@ const HEADER_SKIP_KEYS = new Set([
   "flightControllerVersion",
 ]);
 
-function buildGroupMap(s: Loose) {
+function buildGroupMap(s: SysConfig) {
   const groups: Record<string, Array<{ name: string; value: string; group: string }>> = {};
   for (const key of Object.keys(s)) {
     if (HEADER_SKIP_KEYS.has(key)) {
