@@ -25,17 +25,42 @@ onmessage = function(event) {
 
   /**
    * Converts `null` entries in columns and other empty non-numeric values to NaN value string.
+   * Uses a plain loop so it works on both Array rows and (transferred)
+   * Float64Array rows.
    *
-   * @param {array} columns
+   * @param {array|Float64Array} columns
    * @returns {string}
    */
   function joinColumnValues(columns) {
-    return columns
-      .map(value =>
-        (typeof value === "number" || value)
-        ? value
-        : "NaN")
-      .join(opts.columnDelimiter);
+    let row = "";
+    for (let i = 0; i < columns.length; i++) {
+      if (i > 0) {
+        row += opts.columnDelimiter;
+      }
+      const value = columns[i];
+      row += (typeof value === "number" || value) ? value : "NaN";
+    }
+    return row;
+  }
+
+  /**
+   * Rows arrive either as the original nested frames array (chunks of frames)
+   * or as a flat Float64Array (rowCount × rowLength) transferred zero-copy.
+   *
+   * @returns {Array<Array|Float64Array>}
+   */
+  function getRows() {
+    if (event.data.flat) {
+      const flat = event.data.flat,
+        rowLength = event.data.rowLength,
+        rowCount = event.data.rowCount,
+        rows = new Array(rowCount);
+      for (let r = 0; r < rowCount; r++) {
+        rows[r] = flat.subarray(r * rowLength, (r + 1) * rowLength);
+      }
+      return rows;
+    }
+    return event.data.frames.flat();
   }
 
   let opts = event.data.opts,
@@ -43,8 +68,7 @@ onmessage = function(event) {
       ? opts.stringDelimiter
       : "",
     mainFields = [joinColumns(event.data.fieldNames)]
-      .concat(event.data.frames
-        .flat()
+      .concat(getRows()
         .map(row => joinColumnValues(row)))
       .join("\n"),
     headers = Object.entries(event.data.sysConfig)

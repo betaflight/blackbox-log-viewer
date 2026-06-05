@@ -1,4 +1,5 @@
 import type { FlightLog } from "./flightlog";
+import { flattenFrames } from "./export_frames";
 
 export interface CsvExportOptions {
   columnDelimiter: string;
@@ -18,24 +19,37 @@ export function CsvExporter(
   };
 
   function dump(success: (data: unknown) => void) {
-    const frames = flightLog
-        .getChunksInTimeRange(
-          flightLog.getMinTime() as number,
-          flightLog.getMaxTime() as number,
-        )
-        .map((chunk) => chunk.frames),
-      worker = new Worker("/js/webworkers/csv-export-worker.js");
+    const minTime = flightLog.getMinTime();
+    const maxTime = flightLog.getMaxTime();
+    const frames =
+      minTime === false || maxTime === false
+        ? []
+        : flightLog
+            .getChunksInTimeRange(minTime, maxTime)
+            .map((chunk) => chunk.frames);
+    const worker = new Worker("/js/webworkers/csv-export-worker.js");
 
     worker.onmessage = (event) => {
       success(event.data);
       worker.terminate();
     };
-    worker.postMessage({
+
+    const base = {
       sysConfig: flightLog.getSysConfig(),
       fieldNames: flightLog.getMainFieldNames(),
-      frames: frames,
       opts: options,
-    });
+    };
+    // Transfer a flattened Float64Array (zero-copy) instead of structure-cloning
+    // the nested frames; fall back to the nested array when it can't be flattened.
+    const flat = flattenFrames(frames);
+    if (flat) {
+      worker.postMessage(
+        { ...base, flat: flat.flat, rowLength: flat.rowLength, rowCount: flat.rowCount },
+        [flat.flat.buffer],
+      );
+    } else {
+      worker.postMessage({ ...base, frames });
+    }
   }
 
   // exposed functions
