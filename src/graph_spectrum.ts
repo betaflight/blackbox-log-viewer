@@ -155,8 +155,14 @@ export function FlightLogAnalyser(
       const newSize = getSize();
       GraphSpectrumPlot.setSize(newSize.width, newSize.height);
 
-      // Position the analyser canvas container
-      const parentElem = analyserCanvas.parentElement!;
+      // Position the analyser canvas container. When the grapher is built
+      // off-DOM (e.g. the video-export renderer) the analyser canvas has no
+      // parent and there is no Vue layout to position, so skip the DOM/store
+      // work — otherwise `parentElem.style` throws on a null parent.
+      const parentElem = analyserCanvas.parentElement;
+      if (!parentElem) {
+        return;
+      }
       parentElem.style.left = `${newSize.left}px`;
       parentElem.style.top = `${newSize.top}px`;
 
