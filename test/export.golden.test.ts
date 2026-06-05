@@ -148,4 +148,4 @@ const spectrumOut = buildSpectrumCsv({
 });
 compareGolden("spectrum", "test/fixtures/export.golden.spectrum.csv", spectrumOut);
 
-process.exit(update ? 0 : failures === 0 ? 0 : 1);
+process.exit(update || failures === 0 ? 0 : 1);

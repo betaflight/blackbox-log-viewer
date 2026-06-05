@@ -564,11 +564,7 @@ export function FlightLogParser(this: FlightLogParser, logData: Uint8Array) {
    */
   function translateFieldName(fieldName: string) {
     const translation = translationValues[fieldName];
-    if (translation !== undefined) {
-      return translation;
-    } else {
-      return fieldName;
-    }
+    return translation === undefined ? fieldName : translation;
   }
 
   // Sets of field names for dispatch-based header parsing (avoids large switch statement)

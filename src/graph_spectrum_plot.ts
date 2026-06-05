@@ -2012,7 +2012,7 @@ GraphSpectrumPlot._drawCurve = function (canvasCtx, points, tension) {
     const p0 = i > 0 ? points[i - 1] : points[0];
     const p1 = points[i];
     const p2 = points[i + 1];
-    const p3 = i !== points.length - 2 ? points[i + 2] : p2;
+    const p3 = i === points.length - 2 ? p2 : points[i + 2];
 
     const cp1x = p1.x + ((p2.x - p0.x) / 6) * t;
     const cp1y = p1.y + ((p2.y - p0.y) / 6) * t;

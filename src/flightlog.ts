@@ -884,18 +884,18 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
     } else {
       for (let axis = 0; axis <= AXIS.YAW; axis++) {
         destFrame[fieldIndex++] =
-          rcCommand[axis] !== undefined
-            ? this.rcCommandRawToDegreesPerSecond(
+          rcCommand[axis] === undefined
+            ? 0
+            : this.rcCommandRawToDegreesPerSecond(
                 srcFrame[rcCommand[axis]],
                 axis,
                 currentFlightMode,
-              )
-            : 0;
+              );
       }
       destFrame[fieldIndex++] =
-        rcCommand[AXIS.YAW + 1] !== undefined
-          ? this.rcCommandRawToThrottle(srcFrame[rcCommand[AXIS.YAW + 1]])
-          : 0;
+        rcCommand[AXIS.YAW + 1] === undefined
+          ? 0
+          : this.rcCommandRawToThrottle(srcFrame[rcCommand[AXIS.YAW + 1]]);
     }
     return fieldIndex;
   };
@@ -914,9 +914,9 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
   ) => {
     for (let axis = 0; axis < 3; axis++) {
       const gyroADCdegrees =
-        gyroADC[axis] !== undefined
-          ? this.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]])
-          : 0;
+        gyroADC[axis] === undefined
+          ? 0
+          : this.gyroRawToDegreesPerSecond(srcFrame[gyroADC[axis]]);
       destFrame[fieldIndex++] =
         destFrame[fieldIndexRcCommands + axis] - gyroADCdegrees;
     }
@@ -1493,7 +1493,7 @@ export function FlightLog(this: FlightLog, logData: Uint8Array) {
       max = -Number.MAX_VALUE;
 
     const fieldIndex = this.getMainFieldIndexByName(field_name),
-      fieldStat = fieldIndex !== undefined ? stats.field![fieldIndex] : false;
+      fieldStat = fieldIndex === undefined ? false : stats.field![fieldIndex];
 
     if (fieldStat) {
       min = Math.min(min, fieldStat.min);

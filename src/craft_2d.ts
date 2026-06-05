@@ -33,10 +33,10 @@ export function Craft2D(
   const customMix: Loose = userSettings.customMix ?? null;
 
   let numMotors: number;
-  if (!customMix) {
-    numMotors = propColors.length;
-  } else {
+  if (customMix) {
     numMotors = customMix.motorOrder.length;
+  } else {
+    numMotors = propColors.length;
   }
 
   const shadeColors: Loose[] = [];
