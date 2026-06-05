@@ -122,6 +122,13 @@ export const useGraphStore = defineStore("graph", () => {
       activeGraphConfig.value.selectedFieldIndex = fi;
       hasAnalyser.value = true;
     }
+    // Hiding the analyser via the legend must also drop fullscreen (same as the
+    // toolbar toggle), otherwise the fullscreen spectrum parameter controls
+    // stay visible after the chart is gone.
+    if (!hasAnalyser.value) {
+      hasAnalyserFullscreen.value = false;
+      graph.value?.setAnalyser(false);
+    }
     graph.value?.setDrawAnalyser(hasAnalyser.value, ctrlKey);
     prefs.set("hasAnalyser", hasAnalyser.value);
     invalidateGraph.value?.();
