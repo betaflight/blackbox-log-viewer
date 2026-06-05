@@ -11,7 +11,10 @@ export function GpxExporter(flightLog: FlightLog) {
         : flightLog
             .getChunksInTimeRange(minTime, maxTime)
             .map((chunk) => chunk.frames);
-    const worker = new Worker("/js/webworkers/gpx-export-worker.js");
+    const worker = new Worker(
+      new URL("./workers/gpx-export-worker.ts", import.meta.url),
+      { type: "module" },
+    );
 
     worker.onmessage = (event) => {
       success(event.data);

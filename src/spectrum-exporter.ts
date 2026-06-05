@@ -20,7 +20,10 @@ export function SpectrumExporter(
   };
 
   function dump(success: (data: unknown) => void) {
-    const worker = new Worker("/js/webworkers/spectrum-export-worker.js");
+    const worker = new Worker(
+      new URL("./workers/spectrum-export-worker.ts", import.meta.url),
+      { type: "module" },
+    );
 
     worker.onmessage = (event) => {
       success(event.data);
