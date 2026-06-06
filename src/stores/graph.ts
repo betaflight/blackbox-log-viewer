@@ -50,6 +50,10 @@ export const useGraphStore = defineStore("graph", () => {
   const hasTableOverlay = ref(false);
   const hasAnalyser = ref(false);
   const hasAnalyserFullscreen = ref(false);
+  // Remembered fullscreen preference, so it survives hiding and re-showing the
+  // analyser (the live `hasAnalyserFullscreen` is collapsed while hidden so the
+  // chart/params/layout don't linger).
+  let rememberedAnalyserFullscreen = false;
   const hasAnalyserSticks = ref(false);
   const settingsStore = useSettingsStore();
   const hasCraft = computed(() => !!settingsStore.userSettings.drawCraft);
@@ -108,10 +112,25 @@ export const useGraphStore = defineStore("graph", () => {
     invalidateGraph.value?.();
   }
 
+  // Keep fullscreen consistent across an analyser show/hide toggle: while
+  // hidden, collapse fullscreen (so the chart/params/layout don't linger) but
+  // remember it; when shown again, restore the remembered state.
+  function applyAnalyserFullscreenOnToggle(wasShown: boolean) {
+    if (!hasAnalyser.value) {
+      rememberedAnalyserFullscreen = hasAnalyserFullscreen.value;
+      hasAnalyserFullscreen.value = false;
+      graph.value?.setAnalyser(false);
+    } else if (!wasShown) {
+      hasAnalyserFullscreen.value = rememberedAnalyserFullscreen;
+      graph.value?.setAnalyser(hasAnalyserFullscreen.value);
+    }
+  }
+
   function selectLegendField(gi: number, fi: number, fieldName: string, ctrlKey: boolean) {
     if (!activeGraphConfig.value) {
       return;
     }
+    const wasAnalyserShown = hasAnalyser.value;
     const toggleAnalizer = activeGraphConfig.value.selectedFieldName === fieldName;
     const lockAnalyserHide = ctrlKey || graph.value?.hasMultiSpectrumAnalyser();
     if (toggleAnalizer) {
@@ -122,13 +141,7 @@ export const useGraphStore = defineStore("graph", () => {
       activeGraphConfig.value.selectedFieldIndex = fi;
       hasAnalyser.value = true;
     }
-    // Hiding the analyser via the legend must also drop fullscreen (same as the
-    // toolbar toggle), otherwise the fullscreen spectrum parameter controls
-    // stay visible after the chart is gone.
-    if (!hasAnalyser.value) {
-      hasAnalyserFullscreen.value = false;
-      graph.value?.setAnalyser(false);
-    }
+    applyAnalyserFullscreenOnToggle(wasAnalyserShown);
     graph.value?.setDrawAnalyser(hasAnalyser.value, ctrlKey);
     prefs.set("hasAnalyser", hasAnalyser.value);
     invalidateGraph.value?.();
@@ -149,6 +162,7 @@ export const useGraphStore = defineStore("graph", () => {
   }
 
   function toggleAnalyser() {
+    const wasAnalyserShown = hasAnalyser.value;
     if (activeGraphConfig.value?.selectedFieldName == null) {
       const graphs: Loose[] = activeGraphConfig.value?.getGraphs() ?? [];
       if (graphs.length === 0 || graphs[0].fields.length === 0) {
@@ -163,10 +177,7 @@ export const useGraphStore = defineStore("graph", () => {
     } else {
       hasAnalyser.value = !hasAnalyser.value;
     }
-    if (!hasAnalyser.value) {
-      hasAnalyserFullscreen.value = false;
-      graph.value?.setAnalyser(false);
-    }
+    applyAnalyserFullscreenOnToggle(wasAnalyserShown);
     graph.value?.setDrawAnalyser(hasAnalyser.value);
     prefs.set("hasAnalyser", hasAnalyser.value);
     invalidateGraph.value?.();
