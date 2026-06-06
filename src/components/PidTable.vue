@@ -48,16 +48,23 @@
   </UTable>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 
-const props = defineProps({
-  rows: { type: Array, required: true },
-  showDMax: { type: Boolean, default: false },
-  srOnly: { type: Boolean, default: false },
-});
+interface PidRow {
+  label: string;
+  p: number | null;
+  i: number | null;
+  d: number | null;
+  dMax?: number | null;
+  f: number | null;
+}
+const props = withDefaults(
+  defineProps<{ rows: PidRow[]; showDMax?: boolean; srOnly?: boolean }>(),
+  { showDMax: false, srOnly: false },
+);
 
-function fmtPid(val) {
+function fmtPid(val: number | null | undefined) {
   if (val == null) {
     return "-";
   }

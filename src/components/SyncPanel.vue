@@ -45,7 +45,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useAppStore } from "../stores/app.js";
 
 defineEmits(["sync-back", "sync-forward", "sync-here", "smart-sync", "offset-change"]);

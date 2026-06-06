@@ -159,27 +159,29 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useGraphStore } from "../stores/graph.js";
+import { useBlackboxViewer } from "../composables/use_blackbox_viewer.js";
 import { useAppStore } from "../stores/app.js";
 import { useLogStore } from "../stores/log.js";
 import { useSettingsStore } from "../stores/settings.js";
 
 const graphStore = useGraphStore();
+const viewer = useBlackboxViewer();
 const appStore = useAppStore();
 const logStore = useLogStore();
 const settingsStore = useSettingsStore();
 const { userSettings } = settingsStore;
-const legendContainer = ref(null);
+const legendContainer = ref<HTMLElement | null>(null);
 
 const legendValues = computed(() => graphStore.legendValues);
 
 // --- Highlight ---
-const highlightGi = ref(null);
-const highlightFi = ref(null);
+const highlightGi = ref<number | null>(null);
+const highlightFi = ref<number | null>(null);
 
-function onFieldHover(gi, fi) {
+function onFieldHover(gi: number, fi: number) {
   highlightGi.value = gi;
   highlightFi.value = fi;
   graphStore.highlightLegendField(gi, fi);
@@ -192,25 +194,25 @@ function onFieldLeave() {
 }
 
 // --- Field click → analyser selection ---
-function onFieldClick(e, gi, fi, field) {
+function onFieldClick(e: MouseEvent, gi: number, fi: number, field: { friendlyName: string }) {
   if (e.button !== 0 || e.altKey) { return; }
   graphStore.selectLegendField(gi, fi, field.friendlyName, e.ctrlKey);
   e.preventDefault();
 }
 
 // --- Graph title click → zoom/expand ---
-function onGraphClick(e, gi) {
+function onGraphClick(e: MouseEvent, gi: number) {
   if (e.button !== 0) { return; }
   if (e.altKey) {
-    graphStore.expandGraphConfig?.(gi);
+    viewer.expandGraphConfig(gi);
   } else {
-    graphStore.zoomGraphConfig?.(gi);
+    viewer.zoomGraphConfig(gi);
   }
   e.preventDefault();
 }
 
 // --- Visibility toggle ---
-function onToggleVisibility(gi, fi) {
+function onToggleVisibility(gi: number, fi: number) {
   graphStore.toggleLegendField(gi, fi);
 }
 
@@ -226,24 +228,20 @@ function hideLegend() {
 }
 
 // --- Drag & drop for graph reorder ---
-let dragIndex = null;
-
-function onDragStart(e, gi) {
-  dragIndex = gi;
-  e.dataTransfer.effectAllowed = "move";
-  e.dataTransfer.setData("text/plain", String(gi));
-  e.target.classList.add("dragging");
+function onDragStart(e: DragEvent, gi: number) {
+  e.dataTransfer!.effectAllowed = "move";
+  e.dataTransfer!.setData("text/plain", String(gi));
+  (e.target as HTMLElement).classList.add("dragging");
 }
 
-function onDragEnd(e) {
-  e.target.classList.remove("dragging");
-  dragIndex = null;
+function onDragEnd(e: DragEvent) {
+  (e.target as HTMLElement).classList.remove("dragging");
 }
 
 // Dragover/drop on the container
-function setupDragContainer(el) {
+function setupDragContainer(el: HTMLElement) {
   if (!el) { return; }
-  el.addEventListener("dragover", (e) => {
+  el.addEventListener("dragover", (e: DragEvent) => {
     e.preventDefault();
     const dragging = el.querySelector(".dragging");
     if (!dragging) { return; }
@@ -254,17 +252,17 @@ function setupDragContainer(el) {
       el.appendChild(dragging);
     }
   });
-  el.addEventListener("drop", (e) => {
+  el.addEventListener("drop", (e: DragEvent) => {
     e.preventDefault();
     const newOrder = Array.from(el.querySelectorAll(".graph-legend"))
-      .map((div) => Number.parseInt(div.dataset.index));
-    graphStore.reorderGraphs?.(newOrder);
+      .map((div) => Number.parseInt((div as HTMLElement).dataset.index!));
+    viewer.reorderGraphs(newOrder);
   });
 }
 
-function getDragAfterElement(container, y) {
+function getDragAfterElement(container: HTMLElement, y: number) {
   const draggables = [...container.querySelectorAll(".graph-legend:not(.dragging)")];
-  return draggables.reduce(
+  return draggables.reduce<{ offset: number; element?: Element }>(
     (closest, child) => {
       const box = child.getBoundingClientRect();
       const offset = y - box.top - box.height / 2;
@@ -283,14 +281,14 @@ watch(legendContainer, (el) => {
 });
 
 // --- Pen reset (middle-click) and field wheel adjustments ---
-function onResetPen(gi, fi) {
-  graphStore.resetPen?.(gi, fi);
+function onResetPen(gi: number, fi: number | null) {
+  viewer.resetPen(gi, fi);
 }
 
-function onFieldWheel(e, gi, fi) {
+function onFieldWheel(e: WheelEvent, gi: number, fi: number) {
   if (e.shiftKey || e.altKey || e.ctrlKey) {
     const delta = e.deltaY < 0 ? 1 : -1;
-    graphStore.fieldWheel?.(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
+    viewer.fieldWheel(gi, fi, delta, e.shiftKey, e.altKey, e.ctrlKey);
   }
 }
 
@@ -311,7 +309,7 @@ function openGraphConfig() {
   appStore.graphConfigDialogOpen = true;
 }
 
-function onLogIndexChange(val) {
-  graphStore.selectLogIndex?.(val);
+function onLogIndexChange(val: string | number) {
+  viewer.selectLogIndex(val);
 }
 </script>

@@ -1,0 +1,7 @@
+"Firmware revision","Betaflight 4.5.0"
+"Log start datetime","2024-01-01T00:00:00.000Z"
+"time","GPS_coord[0]","GPS_coord[1]","GPS_altitude","gyroADC[0]","rcCommand[3]"
+0,473712345,85342111,1234,12,1500
+1000,NaN,85342111,1234,-7,NaN
+2000,0,85342111,1234,4,1501
+3000,473712999,85342999,1250,NaN,1502

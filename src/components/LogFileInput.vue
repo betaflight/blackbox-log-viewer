@@ -4,7 +4,7 @@
     color="primary"
     :label="label"
     icon="i-lucide-folder-open"
-    @click="$refs.fileInput.click()"
+    @click="fileInput?.click()"
   />
   <input
     ref="fileInput"
@@ -16,7 +16,7 @@
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 
 defineProps({
@@ -31,14 +31,15 @@ defineProps({
 });
 
 const emit = defineEmits(["files-selected"]);
-const fileInput = ref(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
-function onFileChange(event) {
-  const files = event.target.files;
-  if (files.length > 0) {
+function onFileChange(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const files = target.files;
+  if (files && files.length > 0) {
     emit("files-selected", files);
   }
   // Reset input so same file can be selected again
-  event.target.value = "";
+  target.value = "";
 }
 </script>

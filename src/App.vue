@@ -106,12 +106,12 @@
       />
       <HeaderDialog
         v-model:open="appStore.headerDialogOpen"
-        :sysConfig="sysConfig"
+        :sysConfig="sysConfig ?? undefined"
       />
       <VideoExportDialog
         v-model:open="appStore.videoExportDialogOpen"
-        :flightLog="logStore.flightLog"
-        :logParameters="videoExportParams"
+        :flightLog="logStore.flightLog ?? undefined"
+        :logParameters="videoExportParams ?? undefined"
         :videoConfig="playbackStore.videoConfig"
         @save-config="onSaveVideoConfig"
       />
@@ -119,14 +119,14 @@
   </UApp>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watchEffect, onMounted, onUnmounted } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
+import { useBlackboxViewer } from "./composables/use_blackbox_viewer.js";
 import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useSettingsStore } from "./stores/settings.js";
-import { useWorkspaceStore } from "./stores/workspace.js";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -150,10 +150,10 @@ import SeekBarToolbar from "./components/SeekBarToolbar.vue";
 
 const graphStore = useGraphStore();
 const appStore = useAppStore();
+const viewer = useBlackboxViewer();
 const logStore = useLogStore();
 const playbackStore = usePlaybackStore();
 const settingsStore = useSettingsStore();
-const workspaceStore = useWorkspaceStore();
 
 // Centralized CSS class binding — replaces 27 imperative html.classList calls in main.js
 watchEffect(() => {
@@ -185,10 +185,10 @@ watchEffect(() => {
 const sysConfig = computed(() => logStore.flightLog?.getSysConfig?.() ?? null);
 
 // Video export params — built at dialog open time from store state
-const videoExportParams = ref(null);
+const videoExportParams = ref<Record<string, unknown> | null>(null);
 
-function onFilesSelected(files) {
-  appStore.loadFiles?.(files);
+function onFilesSelected(files: FileList | File[]) {
+  viewer.loadFiles(files);
 }
 
 function onOpenSettings() {
@@ -200,25 +200,25 @@ function onOpenKeys() {
 }
 
 function onExportCsv() {
-  appStore.exportCsv?.();
+  viewer.exportCsv();
 }
 
 function onExportGpx() {
-  appStore.exportGpx?.();
+  viewer.exportGpx();
 }
 
 function onExportVideo() {
-  appStore.pauseForExport?.();
-  videoExportParams.value = appStore.getVideoExportParams?.() ?? null;
+  viewer.pauseForExport();
+  videoExportParams.value = (viewer.getVideoExportParams() ?? null) as Record<string, unknown> | null;
   appStore.videoExportDialogOpen = true;
 }
 
 function onExportWorkspaces() {
-  appStore.exportWorkspaces?.();
+  viewer.exportWorkspaces();
 }
 
 function onNewWindow() {
-  appStore.openNewWindow?.();
+  viewer.openNewWindow();
 }
 
 function onViewConfig() {
@@ -262,109 +262,109 @@ function onToggleMap() {
   graphStore.toggleMap();
 }
 
-function onRateChange(rate) {
-  playbackStore.applyPlaybackRate?.(rate);
+function onRateChange(rate: number) {
+  viewer.applyPlaybackRate(rate);
 }
 
-function onZoomChange(zoom) {
-  graphStore.applyGraphZoom?.(zoom);
+function onZoomChange(zoom: number) {
+  viewer.applyGraphZoom(zoom);
 }
 
 function onSyncBack() {
-  playbackStore.logSyncBack?.();
+  viewer.logSyncBack();
 }
 
 function onSyncForward() {
-  playbackStore.logSyncForward?.();
+  viewer.logSyncForward();
 }
 
 function onSyncHere() {
-  playbackStore.logSyncHere?.();
+  viewer.logSyncHere();
 }
 
 function onSmartSync() {
-  playbackStore.logSmartSync?.();
+  viewer.logSmartSync();
 }
 
-function onOffsetChange(val) {
-  playbackStore.setVideoOffsetValue?.(val);
+function onOffsetChange(val: string | number) {
+  viewer.setVideoOffsetValue(val);
 }
 
-function onTimeChange(timeStr) {
-  playbackStore.setGraphTime?.(timeStr);
+function onTimeChange(timeStr: string) {
+  viewer.setGraphTime(timeStr);
 }
 
 function onPlayPause() {
-  playbackStore.logPlayPause?.();
+  viewer.logPlayPause();
 }
 
 function onJumpStart() {
-  playbackStore.logJumpStart?.();
+  viewer.logJumpStart();
 }
 
 function onJumpEnd() {
-  playbackStore.logJumpEnd?.();
+  viewer.logJumpEnd();
 }
 
 function onStepBack() {
-  playbackStore.logJumpBack?.();
+  viewer.logJumpBack();
 }
 
 function onStepForward() {
-  playbackStore.logJumpForward?.();
+  viewer.logJumpForward();
 }
 
 function onVideoJumpStart() {
-  playbackStore.videoJumpStart?.();
+  viewer.videoJumpStart();
 }
 
 function onVideoJumpEnd() {
-  playbackStore.videoJumpEnd?.();
+  viewer.videoJumpEnd();
 }
 
-function onSaveSettings(newSettings) {
-  appStore.saveUserSettings?.(newSettings);
+function onSaveSettings(newSettings: Record<string, unknown>) {
+  viewer.saveUserSettings(newSettings);
 }
 
-function onGraphConfigSave(newConfig) {
-  appStore.newGraphConfig?.(newConfig, true);
+function onGraphConfigSave(newConfig: unknown) {
+  viewer.newGraphConfig(newConfig, true);
 }
 
-function onGraphConfigUpdate(newConfig) {
-  appStore.newGraphConfig?.(newConfig, true);
+function onGraphConfigUpdate(newConfig: unknown) {
+  viewer.newGraphConfig(newConfig, true);
 }
 
-function onSaveVideoConfig(cfg) {
-  appStore.saveVideoConfig?.(cfg);
+function onSaveVideoConfig(cfg: unknown) {
+  viewer.saveVideoConfig(cfg);
 }
 
-function onSwitchWorkspace(id) {
-  workspaceStore.switchWorkspace?.(id);
+function onSwitchWorkspace(id: number) {
+  viewer.switchWorkspace(id);
 }
 
-function onSaveWorkspace(id, title) {
-  workspaceStore.saveWorkspace?.(id, title);
+function onSaveWorkspace(id: number, title: string) {
+  viewer.saveWorkspace(id, title);
 }
 
-function onApplyDefaultWorkspace(index) {
-  workspaceStore.applyDefaultWorkspace?.(index);
+function onApplyDefaultWorkspace(index: number) {
+  viewer.applyDefaultWorkspace(index);
 }
 
-function onGotoBookmark(index) {
-  workspaceStore.gotoBookmark?.(index + 1);
+function onGotoBookmark(index: number) {
+  viewer.gotoBookmark(index + 1);
 }
 
 // Drag-and-drop file loading (window-level)
-function onDragOver(e) {
+function onDragOver(e: DragEvent) {
   e.preventDefault();
-  e.dataTransfer.dropEffect = "copy";
+  if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
 }
-function onDrop(e) {
+function onDrop(e: DragEvent) {
   e.preventDefault();
-  const item = e.dataTransfer.items?.[0];
+  const item = e.dataTransfer?.items?.[0];
   const entry = item?.webkitGetAsEntry?.();
   if (entry?.isFile) {
-    appStore.loadFiles?.([e.dataTransfer.files[0]]);
+    viewer.loadFiles([e.dataTransfer!.files[0]]);
   }
 }
 onMounted(() => {

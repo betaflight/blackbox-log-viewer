@@ -209,7 +209,7 @@
   </UModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, computed, toRaw } from "vue";
 import UiBox from "./UiBox.vue";
 import SettingRow from "./SettingRow.vue";
@@ -283,7 +283,15 @@ const darkModeOptions = [
 
 // Overlay position rows — driven by local state so grid columns align
 const positionRows = computed(() => {
-  const rows = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows: Array<{
+    label: string;
+    obj: any;
+    topKey: string;
+    leftKey: string;
+    sizeKey?: string;
+    sizeLabel?: string;
+  }> = [
     { label: "Sticks", obj: local.value.sticks, topKey: "top", leftKey: "left", sizeKey: "size" },
     { label: "Craft", obj: local.value.craft, topKey: "top", leftKey: "left", sizeKey: "size" },
     { label: "Analyser", obj: local.value.analyser, topKey: "top", leftKey: "left", sizeKey: "size" },
@@ -299,16 +307,16 @@ const positionRows = computed(() => {
   return rows;
 });
 
-function pv(v) {
+function pv(v: string) {
   return Number.parseInt(v) || 0;
 }
 
-function onLogoChange(e) {
-  const file = e.target.files?.[0];
+function onLogoChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0];
   if (!file) { return; }
   const reader = new FileReader();
-  reader.onload = (ev) => {
-    local.value.watermark.logo = ev.target.result;
+  reader.onload = (ev: ProgressEvent<FileReader>) => {
+    local.value.watermark.logo = (ev.target as FileReader).result;
   };
   reader.readAsDataURL(file);
 }

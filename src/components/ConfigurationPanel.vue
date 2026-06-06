@@ -39,22 +39,30 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
+
+interface ConfigLine {
+  text?: string;
+  empty?: boolean;
+  before?: string;
+  match?: string;
+  after?: string;
+}
 import { useGraphStore } from "../stores/graph.js";
 
 const graphStore = useGraphStore();
 const filter = ref("");
 
-function escapeHtml(str) {
+function escapeHtml(str: string) {
   return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-function highlightHtml(line) {
-  return `${escapeHtml(line.before)}<b class="text-highlighted">${escapeHtml(line.match)}</b>${escapeHtml(line.after)}`;
+function highlightHtml(line: ConfigLine) {
+  return `${escapeHtml(line.before!)}<b class="text-highlighted">${escapeHtml(line.match!)}</b>${escapeHtml(line.after!)}`;
 }
 
-const filteredLines = computed(() => {
+const filteredLines = computed<ConfigLine[]>(() => {
   const lines = graphStore.configLines;
   if (!lines.length) { return []; }
 

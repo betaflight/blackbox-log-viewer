@@ -33,6 +33,10 @@ jobs:
           cache-dependency-path: 'package-lock.json'
 
       - run: npm ci
+      - name: Type check
+        run: npm run type-check
+      - name: Golden tests (parser + export)
+        run: npm test
       - name: Build
         run: npm run build
         env:

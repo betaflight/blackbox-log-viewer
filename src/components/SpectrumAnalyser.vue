@@ -88,16 +88,18 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 import { useSettingsStore } from "../stores/settings.js";
 import { SPECTRUM_TYPE } from "../graph_spectrum_plot";
+import { useBlackboxViewer } from "../composables/use_blackbox_viewer.js";
 
 const graphStore = useGraphStore();
+const viewer = useBlackboxViewer();
 const { userSettings } = useSettingsStore();
 
-const importInput = ref(null);
+const importInput = ref<HTMLInputElement | null>(null);
 
 const spectrumTypeOptions = [
   { label: "Frequency", value: "0" },
@@ -195,10 +197,10 @@ const zoomYStyle = computed(() => ({
   height: `${Math.min(layout.value.height - 60, 100)}px`,
 }));
 
-function psdInputStyle(topPx) {
+function psdInputStyle(topPx: number) {
   return { left: `${layout.value.width - 90}px`, top: `${topPx}px` };
 }
-function psdLabelStyle(topPx) {
+function psdLabelStyle(topPx: number) {
   return { left: `${layout.value.width - 150}px`, top: `${topPx}px` };
 }
 const psdLowLevelLabelStyle = computed(() => ({
@@ -225,15 +227,16 @@ function resetSegmentLength() { segmentLength.value = 9; getAnalyser()?.resetSeg
 // --- Spectrum actions ---
 const spectrumMenuItems = [
   [
-    { label: "Export CSV", icon: "i-lucide-download", onSelect: () => graphStore.spectrumExport?.() },
+    { label: "Export CSV", icon: "i-lucide-download", onSelect: () => viewer.spectrumExport() },
     { label: "Import CSV", icon: "i-lucide-upload", onSelect: () => importInput.value?.click() },
-    { label: "Clear imported", icon: "i-lucide-trash-2", onSelect: () => graphStore.spectrumClear?.() },
+    { label: "Clear imported", icon: "i-lucide-trash-2", onSelect: () => viewer.spectrumClear() },
   ],
 ];
 
-function onImportChange(e) {
-  graphStore.spectrumImport?.(e.target.files);
-  e.target.value = "";
+function onImportChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  viewer.spectrumImport(target.files);
+  target.value = "";
 }
 
 function toggleFullscreen() {

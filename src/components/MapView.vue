@@ -6,7 +6,7 @@
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { useGraphStore } from "../stores/graph.js";
 

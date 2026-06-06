@@ -1,0 +1,62 @@
+import { defineStore } from "pinia";
+import { ref } from "vue";
+
+export const useAppStore = defineStore("app", () => {
+  const legendHidden = ref(false);
+  const viewVideo = ref(true);
+  const darkThemeEnabled = ref(false);
+
+  // Filename of loaded log (pushed from legacy code)
+  const logFilename = ref("");
+
+  // Status bar display strings (pushed from legacy code)
+  const statusVersion = ref("-");
+  const statusCells = ref("");
+  const statusLooptime = ref("-");
+  const statusLograte = ref("-");
+  const statusFlightMode = ref("-");
+  const statusMarkerOffset = ref("00:00.000");
+  const statusViewerVersion = ref("-");
+  const graphTimeDisplay = ref("1.0");
+  const videoOffsetDisplay = ref("+0.0");
+
+  // Dialog open states (shared between legacy JS and Vue)
+  const graphConfigDialogOpen = ref(false);
+  const headerDialogOpen = ref(false);
+  const videoExportDialogOpen = ref(false);
+  const settingsDialogOpen = ref(false);
+  const keysDialogOpen = ref(false);
+
+  // (Imperative operations moved to the useBlackboxViewer composable.)
+
+  function setLegendHidden(hidden: boolean) {
+    legendHidden.value = hidden;
+  }
+
+  function setViewVideo(visible: boolean) {
+    viewVideo.value = visible;
+  }
+
+  return {
+    legendHidden,
+    viewVideo,
+    darkThemeEnabled,
+    logFilename,
+    statusVersion,
+    statusCells,
+    statusLooptime,
+    statusLograte,
+    statusFlightMode,
+    statusMarkerOffset,
+    statusViewerVersion,
+    graphTimeDisplay,
+    videoOffsetDisplay,
+    graphConfigDialogOpen,
+    headerDialogOpen,
+    videoExportDialogOpen,
+    settingsDialogOpen,
+    keysDialogOpen,
+    setLegendHidden,
+    setViewVideo,
+  };
+});

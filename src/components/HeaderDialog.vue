@@ -184,7 +184,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import semver from "semver";
 import Sortable from "sortablejs";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
@@ -218,17 +218,25 @@ import {
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_INAV,
 } from "../flightlog_fielddefs";
+import type { SysConfig } from "../flightlog_types";
 
-const open = defineModel("open", { type: Boolean, default: false });
-const cols = ref(null);
+interface HeaderParam {
+  name: string;
+  value: string | number;
+  missing?: boolean;
+}
 
-const props = defineProps({
-  sysConfig: { type: Object, default: null },
-});
+const open = defineModel<boolean>("open", { default: false });
+const cols = ref<number | null>(null);
+
+const props = withDefaults(
+  defineProps<{ sysConfig?: SysConfig | null }>(),
+  { sysConfig: null },
+);
 
 // --- Helpers ---
 
-const sc = computed(() => props.sysConfig || {});
+const sc = computed<SysConfig>(() => props.sysConfig ?? ({} as SysConfig));
 const filteredSc = computed(() => {
   if (hiddenFields.value.size === 0) {
     return sc.value;
@@ -244,38 +252,38 @@ const fwVer = computed(() => sc.value.firmwareVersion || "0.0.0");
 const isBF = computed(() => fwType.value === FIRMWARE_TYPE_BETAFLIGHT);
 const isINAV = computed(() => fwType.value === FIRMWARE_TYPE_INAV);
 
-function gte(ver) {
+function gte(ver: string) {
   return semver.gte(fwVer.value, ver);
 }
-function lt(ver) {
+function lt(ver: string) {
   return semver.lt(fwVer.value, ver);
 }
-function lte(ver) {
+function lte(ver: string) {
   return semver.lte(fwVer.value, ver);
 }
 
-function fmtVal(data, decimalPlaces) {
+function fmtVal(data: number | null | undefined, decimalPlaces: number): string | null {
   if (data == null) {
     return null;
   }
   return (data / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces);
 }
 
-function fmtFloat(data, decimalPlaces) {
+function fmtFloat(data: number | null | undefined, decimalPlaces: number): string | null {
   if (data == null) {
     return null;
   }
   return data.toFixed(decimalPlaces);
 }
 
-function selectVal(data, list) {
+function selectVal(data: number | null | undefined, list: readonly string[]): string | null {
   if (data == null || !list) {
     return null;
   }
   return list[data] ?? String(data);
 }
 
-function bitmaskVal(data, totalBits = 8) {
+function bitmaskVal(data: number | null | undefined, totalBits = 8): string | null {
   if (data == null) {
     return null;
   }
@@ -283,13 +291,13 @@ function bitmaskVal(data, totalBits = 8) {
   return `${data} (${bin})`;
 }
 
-function param(name, value, opts = {}) {
+function param(name: string, value: string | number | null | undefined, opts: Record<string, unknown> = {}): HeaderParam {
   return { name, value: value ?? "-", missing: value == null, ...opts };
 }
 
 // --- Copy to clipboard ---
 
-function formatParams(title, params) {
+function formatParams(title: string, params: HeaderParam[]): string {
   if (!params.length) { return ""; }
   const lines = params.map((p) => `  ${p.name}: ${p.value}`).join("\n");
   return `${title}\n${lines}\n`;
@@ -347,7 +355,7 @@ const allPids = computed(() => [
   ...gpsPids.value,
 ]);
 
-function pidRow(label, data) {
+function pidRow(label: string, data: number[] | null | undefined) {
   if (!data) {
     return {
       label,
@@ -429,7 +437,7 @@ const feedforwardParams = computed(() => {
 
 // --- Rates ---
 
-function rateValue(rates, index, rMul, rDec) {
+function rateValue(rates: number[] | undefined, index: number, rMul: number, rDec: number) {
   return fmtVal(rates?.[index] == null ? null : rates[index] * rMul, rDec);
 }
 
@@ -697,7 +705,7 @@ const rpmFilterParams = computed(() => {
 
 // --- RC Smoothing ---
 
-function buildRcSmoothing43(s) {
+function buildRcSmoothing43(s: SysConfig): HeaderParam[] {
   const result = [
     param("Mode", selectVal(s.rc_smoothing_mode, RC_SMOOTHING_MODE)),
     param("Setpoint Hz", fmtVal(s.rc_smoothing_setpoint_hz, 0)),
@@ -737,7 +745,7 @@ function buildRcSmoothing43(s) {
   return result;
 }
 
-function buildRcSmoothing34(s) {
+function buildRcSmoothing34(s: SysConfig): HeaderParam[] {
   const result = [
     param("Mode", selectVal(s.rc_smoothing_mode, RC_SMOOTHING_TYPE)),
   ];
@@ -769,7 +777,7 @@ const rcSmoothingParams = computed(() => {
     return [];
   }
   const s = filteredSc.value;
-  let result;
+  let result: HeaderParam[];
 
   if (gte("4.3.0")) {
     result = buildRcSmoothing43(s);
@@ -975,9 +983,9 @@ const headerFieldColumns = [
 const headerSearch = ref("");
 const headerSortAlpha = ref(false);
 const headerSortGroups = ref(false);
-const expandedHeaderGroups = ref(new Set());
-const hiddenGroups = ref(new Set());
-const hiddenFields = ref(new Set());
+const expandedHeaderGroups = ref<Set<string>>(new Set());
+const hiddenGroups = ref<Set<string>>(new Set());
+const hiddenFields = ref<Set<string>>(new Set());
 
 // Persist hidden groups/fields
 function loadHiddenPrefs() {
@@ -1020,7 +1028,7 @@ function loadPaneOrder() {
     const saved = localStorage.getItem("bbv-pane-order");
     if (saved) {
       const parsed = JSON.parse(saved);
-      const order = parsed.filter((id) => DEFAULT_PANE_ORDER.includes(id));
+      const order = parsed.filter((id: string) => DEFAULT_PANE_ORDER.includes(id));
       for (const id of DEFAULT_PANE_ORDER) {
         if (!order.includes(id)) {
           order.push(id);
@@ -1041,7 +1049,7 @@ function savePaneOrder() {
 }
 loadPaneOrder();
 
-const groupParamMap = computed(() => ({
+const groupParamMap = computed<Record<string, HeaderParam[]>>(() => ({
   "PID Sliders": pidSliderParams.value,
   "PID Controller": pidControllerParams.value,
   "Feedforward": feedforwardParams.value,
@@ -1056,11 +1064,11 @@ const groupParamMap = computed(() => ({
   "RC Smoothing": rcSmoothingParams.value,
 }));
 
-function paneHasData(group) {
+function paneHasData(group: string) {
   if (group === "PID Settings") { return allPids.value.length > 0; }
   if (group === "Features") { return featuresList.value.length > 0; }
   if (group === "Disabled Fields") { return disabledFieldsList.value.length > 0; }
-  const params = groupParamMap.value[group];
+  const params = (groupParamMap.value as Record<string, unknown[]>)[group];
   return params && params.length > 0;
 }
 
@@ -1069,8 +1077,8 @@ const visiblePanes = computed(() =>
 );
 
 // --- Sortable.js drag-and-drop ---
-const gridEl = ref(null);
-let sortable = null;
+const gridEl = ref<HTMLElement | null>(null);
+let sortable: ReturnType<typeof Sortable.create> | null = null;
 
 watch(gridEl, (el) => {
   if (sortable) { sortable.destroy(); sortable = null; }
@@ -1081,7 +1089,7 @@ watch(gridEl, (el) => {
     animation: 0,
     onStart() {
       // Freeze all pane positions to prevent CSS columns reflow during drag
-      const children = Array.from(el.children);
+      const children = Array.from(el.children) as HTMLElement[];
       const containerRect = el.getBoundingClientRect();
       const rects = children.map((c) => c.getBoundingClientRect());
       el.style.columns = "auto";
@@ -1099,7 +1107,7 @@ watch(gridEl, (el) => {
     },
     onEnd() {
       // Unfreeze — clear inline styles, restore CSS columns layout
-      for (const c of el.children) {
+      for (const c of Array.from(el.children) as HTMLElement[]) {
         c.style.position = "";
         c.style.left = "";
         c.style.top = "";
@@ -1110,9 +1118,9 @@ watch(gridEl, (el) => {
       el.style.position = "";
       el.style.height = "";
       // Read reordered visible groups from DOM (Sortable already moved elements)
-      const newVisible = Array.from(el.children)
+      const newVisible = (Array.from(el.children) as HTMLElement[])
         .map((c) => c.dataset.group)
-        .filter(Boolean);
+        .filter((g): g is string => Boolean(g));
       // Rebuild full order: reordered visible + hidden groups preserved
       const visibleSet = new Set(newVisible);
       const hidden = paneOrder.value.filter((g) => !visibleSet.has(g));
@@ -1126,7 +1134,7 @@ onBeforeUnmount(() => {
   if (sortable) { sortable.destroy(); }
 });
 
-function toggleGroupVisibility(group) {
+function toggleGroupVisibility(group: string) {
   const s = hiddenGroups.value;
   if (s.has(group)) {
     s.delete(group);
@@ -1137,7 +1145,7 @@ function toggleGroupVisibility(group) {
   saveHiddenPrefs();
 }
 
-function toggleFieldVisibility(key) {
+function toggleFieldVisibility(key: string) {
   const s = hiddenFields.value;
   if (s.has(key)) {
     s.delete(key);
@@ -1148,7 +1156,7 @@ function toggleFieldVisibility(key) {
   saveHiddenPrefs();
 }
 
-function toggleGroupExpand(group) {
+function toggleGroupExpand(group: string) {
   const s = expandedHeaderGroups.value;
   if (s.has(group)) {
     s.delete(group);
@@ -1172,7 +1180,7 @@ function toggleAllGroups() {
 }
 
 // Group assignment by sysConfig key
-const EXPLICIT_GROUPS = {
+const EXPLICIT_GROUPS: Record<string, string> = {
   rollPID: "PID Settings", pitchPID: "PID Settings", yawPID: "PID Settings",
   levelPID: "PID Settings", altPID: "PID Settings", velPID: "PID Settings",
   magPID: "PID Settings", posPID: "PID Settings", posrPID: "PID Settings",
@@ -1210,7 +1218,7 @@ const EXPLICIT_GROUPS = {
   digitalIdleOffset: "Motor / ESC",
 };
 
-const PREFIX_GROUPS = [
+const PREFIX_GROUPS: Array<[string, string]> = [
   ["simplified_", "PID Sliders"],
   ["ff_", "Feedforward"],
   ["anti_gravity_", "PID Controller"],
@@ -1232,7 +1240,7 @@ const PREFIX_GROUPS = [
   ["fast_pwm_", "Motor / ESC"],
 ];
 
-function getHeaderGroup(key) {
+function getHeaderGroup(key: string) {
   if (EXPLICIT_GROUPS[key]) { return EXPLICIT_GROUPS[key]; }
   for (const [prefix, group] of PREFIX_GROUPS) {
     if (key.startsWith(prefix)) { return group; }
@@ -1240,7 +1248,7 @@ function getHeaderGroup(key) {
   return "Parameters";
 }
 
-function formatHeaderValue(val) {
+function formatHeaderValue(val: unknown): string | null {
   if (val == null) {
     return null;
   }
@@ -1264,8 +1272,8 @@ const HEADER_SKIP_KEYS = new Set([
   "flightControllerVersion",
 ]);
 
-function buildGroupMap(s) {
-  const groups = {};
+function buildGroupMap(s: SysConfig) {
+  const groups: Record<string, Array<{ name: string; value: string; group: string }>> = {};
   for (const key of Object.keys(s)) {
     if (HEADER_SKIP_KEYS.has(key)) {
       continue;
@@ -1287,7 +1295,7 @@ function buildGroupMap(s) {
   return groups;
 }
 
-function filterAndSort(fields, query, sortAlpha) {
+function filterAndSort(fields: Array<{ name: string; value: string }>, query: string, sortAlpha: boolean) {
   let result = fields;
   if (query) {
     result = result.filter(
