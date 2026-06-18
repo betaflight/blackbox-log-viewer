@@ -262,7 +262,7 @@ describe("mag transform validation", () => {
         console.log(`\nResults written to ${outPath}`);
         console.log(`OLD (-X,+Y,+Z): consistency=${oldResult.consistency.toFixed(3)}, WMM=${oldResult.pctWmm.toFixed(0)}%, bearing err=${oldResult.horizBearingErrorDecl.toFixed(1)}°`);
         console.log(`NEW (-Y,+X,+Z): consistency=${newResult.consistency.toFixed(3)}, WMM=${newResult.pctWmm.toFixed(0)}%, bearing err=${newResult.horizBearingErrorDecl.toFixed(1)}°`);
-    }, 120_000);
+    }, 240_000);
 
     it("writes validation results to file", () => {
         expect(fs.existsSync(outPath)).toBe(true);

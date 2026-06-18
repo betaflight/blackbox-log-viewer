@@ -110,7 +110,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import { generatePoseKml, PoseKmlNotImplemented } from "../pose/poseKmlExport.js";
+import { generatePoseKml } from "../pose/poseKmlExport.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
 
@@ -196,8 +196,8 @@ async function onGenerate() {
       open.value = false;
       return;
     }
-    if (err instanceof PoseKmlNotImplemented || err?.code === "NOT_IMPLEMENTED") {
-      errorText.value = "Backend not wired yet — the interface is ready.";
+    if (err?.code === "NOT_IMPLEMENTED") {
+      errorText.value = "Backend not available.";
       errorHint.value = err.message;
     } else {
       errorText.value = err?.message ?? String(err);
