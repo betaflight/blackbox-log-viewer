@@ -15,6 +15,7 @@
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src",
     "test": "vitest run",
+    "test:full": "cross-env RUN_INTEGRATION=1 vitest run",
     "typecheck": "vue-tsc --noEmit"
   },
   "repository": {
@@ -42,6 +43,7 @@
     "@nuxt/ui": "^4.7.1",
     "@types/node": "^25.9.3",
     "@vitejs/plugin-vue": "^6.0.6",
+    "cross-env": "^10.1.0",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",

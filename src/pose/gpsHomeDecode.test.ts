@@ -19,6 +19,7 @@
  * This test is kept as documentation of the expected behavior once getGPSHome is available.
  */
 import { describe, it, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -43,7 +44,7 @@ interface HomeCoords {
 
 const HOME: HomeCoords = { lat: 48.4023468, lon: -71.1696256, alt: 134.2 };
 
-describe('GPS home decode (H-frame) — acro1/LOG00007.BFL', () => {
+describeIntegration('GPS home decode (H-frame) — acro1/LOG00007.BFL', () => {
   it('decodes home from the H-frame via getGPSHome() and ingestion', async () => {
     if (!have()) {
       console.warn('SKIP gpsHomeDecode: LOG00007.BFL not present');

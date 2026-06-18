@@ -13,6 +13,7 @@
  *   (c) freefall/flips: |accel| < 0.5g (any |omega|)
  */
 import { describe, it, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -126,7 +127,7 @@ interface AccuracyReport {
   caveats: Record<string, string>;
 }
 
-describe('accuracy report', () => {
+describeIntegration('accuracy report', () => {
   it(
     'produces per-regime accuracy metrics and writes report',
     async () => {

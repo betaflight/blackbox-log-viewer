@@ -11,6 +11,7 @@
  * degrade fidelity-critical maneuvers.
  */
 import { describe, it, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -41,7 +42,7 @@ interface RateResult {
     _trackRef?: PoseTrack;
 }
 
-describe("outputHz fidelity", () => {
+describeIntegration("outputHz fidelity", () => {
     it("attitude fidelity preserved across output rates (20/50/100/250/500 Hz)", async () => {
         if (!hasFiles()) { console.warn("SKIP: acro1 files not available"); return; }
 

@@ -2,6 +2,7 @@
  * Unit tests for analyzeLogCapabilities — fast, no estimator run.
  */
 import { describe, it, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -74,7 +75,7 @@ describe('analyzeLogCapabilities', () => {
   });
 });
 
-describe('analyzeLogCapabilities — acro1 real log', () => {
+describeIntegration('analyzeLogCapabilities — acro1 real log', () => {
   it('all six prerequisites satisfied on acro1 (canGenerate=true)', async () => {
     const bflPath = path.join(__dirname, '__fixtures__', 'acro1', 'LOG00007.BFL');
     if (!fs.existsSync(bflPath)) {

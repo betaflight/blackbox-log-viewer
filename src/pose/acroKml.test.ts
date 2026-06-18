@@ -4,6 +4,7 @@
  * live in acroFixture.test.ts. Skips when the (uncommitted) BFL is absent.
  */
 import { describe, it, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,7 +31,7 @@ function hasFiles(): boolean {
   }
 }
 
-describe('acro1 KML output', () => {
+describeIntegration('acro1 KML output', () => {
   it(
     'produces a valid KML from the real acro1 log',
     async () => {

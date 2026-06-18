@@ -21,6 +21,7 @@
  * vitest swallows stdout — all quantitative output goes to the JSON file.
  */
 import { describe, it, beforeAll, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -137,7 +138,7 @@ interface ValidationResults {
     };
 }
 
-describe("mag transform validation", () => {
+describeIntegration("mag transform validation", () => {
     let wmmNed: number[];
     let wmmDecl: number;
     let wmmMag: number;

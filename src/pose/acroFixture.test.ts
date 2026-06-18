@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, expect } from 'vitest';
+import { describeIntegration } from './testHelpers.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -106,7 +107,7 @@ for (const fx of FIXTURES) {
   const T: ThresholdOverrides = manifest.thresholds || {};
   const haveBfl = (): boolean => { try { fs.accessSync(bflPath, fs.constants.R_OK); return true; } catch { return false; } };
 
-  describe(`acro fixture: ${fx.id}`, () => {
+  describeIntegration(`acro fixture: ${fx.id}`, () => {
     let ctx: FixtureContext | null = null;
     let modelBoundsOk = false;
     let skip = false;
