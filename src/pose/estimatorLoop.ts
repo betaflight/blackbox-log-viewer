@@ -98,9 +98,6 @@ export interface EstimatorOpts {
    *  false, every FC quaternion is corrected by this angle about world-Z
    *  before entering the quaternion prior.  Computed by computeMagHeadingBias(). */
   rawMagBiasRad?: number;
-  /** Gyro rate threshold (deg/s) above which GPS velocity updates are skipped
-   *  during rapid rotation.  Infinity = never gate.  Default 120 deg/s. */
-  snapGyroGateDps?: number;
   sigmaBaInit?: number;
   sigmaBgInit?: number;
   sigmaBaRW?: number;
@@ -142,7 +139,6 @@ interface TraceEntry {
   gpsPos?: number[];
   posErrSmGpsM?: number;
 }
-
 
 interface EstimationResult {
   smoothed: SmoothedPose[];
@@ -249,7 +245,6 @@ function _runEstimation(
     sigmaBaRW = 2e-4,
     sigmaBgRW = 3e-5,
     sigmaBgPrior = 0,
-    snapGyroGateDps = 120,
     onProgress,
     gpsDelayMs = 0,
     gpsPosSigmaFloor = 2.0,
@@ -510,20 +505,6 @@ function _runEstimation(
           const gpsF = gps[gpsVelIdx];
 
           if (gpsF.velNed) {
-            // Suppress GPS velocity→yaw fusion during rapid rotation (snap turns).
-            // Momentum keeps GPS track curving slowly while the nose has already
-            // snapped → the −skew(R·a)·dt cross-covariance would mis-attribute the
-            // velocity/heading mismatch as a yaw error. Gate the measurement,
-            // not the propagation (which is legitimate physics).
-            const peakGyroDps = Math.hypot(
-              imu[imuIdx].gyro[0],
-              imu[imuIdx].gyro[1],
-              imu[imuIdx].gyro[2],
-            ) * (180 / Math.PI);
-            if (peakGyroDps >= snapGyroGateDps) {
-              gpsVelIdx++;
-              continue;
-            }
             const fV = createGpsVelocityFactor(
               {
                 n: gpsF.velNed[0],
