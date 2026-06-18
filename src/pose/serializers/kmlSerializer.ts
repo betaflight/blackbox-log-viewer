@@ -79,7 +79,7 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
 
   const lines: string[] = [];
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
-  lines.push('<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">');
+  lines.push('<kml xmlns="http://www.opengis.net/kml/2.2">');
   lines.push('  <Document>');
   lines.push(`    <name>Betaflight Pose Track</name>`);
   lines.push(
@@ -103,40 +103,9 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
     `    <Style id="upStyle"><LineStyle><color>${colorUp}</color><width>${lineWidth}</width></LineStyle></Style>`,
   );
 
-  // Fused path with timeline — synthetic relative timestamps.
-  // Blackbox has no wall-clock time. Anchor to arbitrary epoch + tUs/1e6.
+  // Fused path
   if (showPath) {
-    const t0Us = samples[0]?.tUs ?? 0;
-    const epochMs = 0; // 1970-01-01T00:00:00.000Z
-    const trackSamples = samples.filter((s) => s.lla);
     lines.push('    <Folder><name>Fused Path</name><visibility>1</visibility>');
-    lines.push('      <Placemark>');
-    lines.push('        <name>Estimated Trajectory</name>');
-    lines.push('        <styleUrl>#pathStyle</styleUrl>');
-    lines.push('        <gx:Track>');
-    lines.push('          <altitudeMode>absolute</altitudeMode>');
-    // <gx:Track> uses parallel arrays: all <when>, then all <gx:coord>, then all <gx:angles>.
-    for (const s of trackSamples) {
-      const tIso = new Date(epochMs + ((s.tUs - t0Us) / 1e6) * 1000).toISOString();
-      lines.push(`          <when>${tIso}</when>`);
-    }
-    for (const s of trackSamples) {
-      lines.push(`          <gx:coord>${s.lla!.lon} ${s.lla!.lat} ${s.lla!.alt}</gx:coord>`);
-    }
-    for (const s of trackSamples) {
-      const h = s.euler?.headingDeg ?? 0;
-      const t = s.euler?.tiltDeg ?? 0;
-      const r = s.euler?.rollDeg ?? 0;
-      lines.push(`          <gx:angles>${h.toFixed(1)} ${t.toFixed(1)} ${r.toFixed(1)}</gx:angles>`);
-    }
-    lines.push('        </gx:Track>');
-    lines.push('      </Placemark>');
-    lines.push('    </Folder>');
-  }
-
-  // Static fused path (no timestamps) — kept as backup when <gx:Track> is unsupported.
-  {
-    lines.push('    <Folder><name>Fused Path (Static)</name><visibility>0</visibility>');
     lines.push('      <Placemark>');
     lines.push('        <name>Estimated Trajectory</name>');
     lines.push('        <styleUrl>#pathStyle</styleUrl>');
