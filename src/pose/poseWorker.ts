@@ -13,7 +13,8 @@
 
 import { estimatePoseTrack } from './estimatorLoop.js';
 import type { EstimatorData, EstimatorOrigin, EstimatorOpts } from './estimatorLoop.js';
-import type { PoseTrackWithTrace } from './estimatorLoop.js';
+import type { PoseTrackMeta } from './poseTrack.js';
+import type { PoseSampleInternal } from './poseSample.js';
 
 interface EstimateRequest {
   type: 'estimate';
@@ -33,7 +34,8 @@ interface ProgressMessage {
 
 interface ResultMessage {
   type: 'result';
-  track: PoseTrackWithTrace;
+  meta: PoseTrackMeta;
+  samples: PoseSampleInternal[];
 }
 
 interface ErrorMessage {
@@ -64,7 +66,18 @@ self.onmessage = async (e: MessageEvent<EstimateRequest>) => {
       ...opts,
       onProgress,
     });
-    const msg: ResultMessage = { type: 'result', track };
+    // Only post plain-data fields; sampleAt() is a function and cannot be
+    // cloned by structuredClone (used internally by postMessage). The main
+    // thread rebuilds the full PoseTrack via createPoseTrack().
+    // _traceForward is omitted — it is large, unused downstream, and would
+    // bloat the transfer.
+    const payload = { meta: track.meta, samples: track.samples };
+    // Dev-time clone-safety guard: catch any future regression where a
+    // non-serializable value sneaks into the payload before it hits postMessage.
+    if (typeof structuredClone === 'function') {
+      structuredClone(payload); // throws DataCloneError if not serializable
+    }
+    const msg: ResultMessage = { type: 'result', ...payload };
     self.postMessage(msg);
   } catch (err) {
     const msg: ErrorMessage = {

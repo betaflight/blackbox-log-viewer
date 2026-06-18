@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, toRaw } from "vue";
 import { generatePoseKml } from "../pose/poseKmlExport.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
@@ -181,8 +181,11 @@ async function onGenerate() {
   abortController = new AbortController();
   try {
     const { filename, kml } = await generatePoseKml({
-      flightLog: props.flightLog,
-      magModel: magModel.value,
+      // Detach from Vue reactivity: the flight log (store ref) and the loaded
+      // mag model (ref) are reactive Proxies, and a Proxy cannot be cloned
+      // across the Web Worker boundary. toRaw() hands over plain objects.
+      flightLog: toRaw(props.flightLog),
+      magModel: magModel.value ? toRaw(magModel.value) : null,
       triadsPerSecond: triadsPerSecond.value,
       onProgress,
       signal: abortController.signal,

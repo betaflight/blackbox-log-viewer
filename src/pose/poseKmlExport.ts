@@ -12,12 +12,13 @@
  */
 
 import { ingestFlightLog, correctMagStream } from './flightIngestion.js';
-import { resamplePoseTrack } from './poseTrack.js';
+import { createPoseTrack } from './poseTrack.js';
 import { poseTrackToKml } from './serializers/kmlSerializer.js';
 import { loadMagCharacterizationModel } from './mag_model.js';
 import type { IngestedData } from './flightIngestion.js';
 import type { EstimatorOrigin, EstimatorOpts, PoseTrackWithTrace } from './estimatorLoop.js';
-import type { PoseTrack } from './poseTrack.js';
+import type { PoseTrackMeta } from './poseTrack.js';
+import type { PoseSampleInternal } from './poseSample.js';
 
 export interface ProgressEvent {
   phase: 'parsing' | 'estimating' | 'exporting';
@@ -51,7 +52,8 @@ interface WorkerProgressMessage {
 
 interface WorkerResultMessage {
   type: 'result';
-  track: PoseTrackWithTrace;
+  meta: PoseTrackMeta;
+  samples: PoseSampleInternal[];
 }
 
 interface WorkerErrorMessage {
@@ -61,11 +63,16 @@ interface WorkerErrorMessage {
 
 type WorkerResponse = WorkerProgressMessage | WorkerResultMessage | WorkerErrorMessage;
 
+/** Estimator output rate (Hz). The flight PATH is rendered at this full
+ *  resolution; "triads per second" only controls how often a triad is drawn. */
+const OUTPUT_HZ = 20;
+
 /**
  * Run the full body-pose reconstruction pipeline and produce a triad KML.
  *
  * Pipeline: ingest log -> choose origin -> estimate (Web Worker) ->
- *           resample -> serialize to KML.
+ *           serialize to KML (path at full resolution, triads at the requested
+ *           density, raw GPS fixes overlaid for comparison).
  */
 export async function generatePoseKml({
   flightLog,
@@ -136,11 +143,12 @@ export async function generatePoseKml({
     estimatorData,
     origin,
     {
-      outputHz: 20,
+      outputHz: OUTPUT_HZ,
       sigmaYawMax: 0.1,
       magModel: magModelForEst as EstimatorOpts['magModel'],
     },
     signal,
+    onProgress,
   );
 
   throwIfAborted();
@@ -148,11 +156,17 @@ export async function generatePoseKml({
   // --- Phase 3: Serialize ---
   report('exporting', 0, 'Generating KML…');
 
-  const resampled: PoseTrack = resamplePoseTrack(track, triadsPerSecond);
-  const kml = poseTrackToKml(resampled, {
-    everyN: 10,
+  // The PATH is drawn at full estimation resolution (smooth). "Triads per
+  // second" controls only triad density: at OUTPUT_HZ samples/s, draw a triad
+  // every round(OUTPUT_HZ / triadsPerSecond) samples. Raw GPS fixes are
+  // overlaid as a separate line so the fused track can be compared to them.
+  const everyN = Math.max(1, Math.round(OUTPUT_HZ / triadsPerSecond));
+  const kml = poseTrackToKml(track, {
+    everyN,
     showTriads: true,
     showPath: true,
+    showRawGps: true,
+    rawGps: data.gps.map((g) => ({ lat: g.lat, lon: g.lon, alt: g.alt ?? 0 })),
     axisLengthMeters: 2.0,
   });
 
@@ -161,6 +175,28 @@ export async function generatePoseKml({
 
   const filename = 'track.kml';
   return { filename, kml };
+}
+
+/**
+ * Collapse the estimator's internal phases ('forward' / 'smooth' / 'done') —
+ * whose fraction already advances 0->1 across the whole run — onto the public
+ * 'estimating' phase, so the UI progress bar moves monotonically without
+ * needing to know the estimator's internals.
+ */
+function toEstimatingEvent(ev: {
+  phase?: string;
+  iteration?: number;
+  totalIterations?: number;
+  fraction?: number;
+  detail?: string;
+}): ProgressEvent {
+  return {
+    phase: 'estimating',
+    iteration: ev.iteration,
+    totalIterations: ev.totalIterations,
+    fraction: ev.fraction,
+    detail: ev.detail,
+  };
 }
 
 /**
@@ -175,11 +211,12 @@ async function runEstimationInWorker(
   origin: EstimatorOrigin,
   opts: EstimatorOpts,
   signal?: AbortSignal,
+  onProgress?: (ev: ProgressEvent) => void,
 ): Promise<PoseTrackWithTrace> {
   // Try worker first; fall back to main thread if Worker is unavailable
   if (typeof Worker !== 'undefined') {
     try {
-      return await runInWorker(data, origin, opts, signal);
+      return await runInWorker(data, origin, opts, signal, onProgress);
     } catch (err) {
       // If the worker fails to load (e.g., in vitest without DOM),
       // fall through to main-thread path.
@@ -195,7 +232,7 @@ async function runEstimationInWorker(
       }
     }
   }
-  return runInMainThread(data, origin, opts, signal);
+  return runInMainThread(data, origin, opts, signal, onProgress);
 }
 
 async function runInWorker(
@@ -203,6 +240,7 @@ async function runInWorker(
   origin: EstimatorOrigin,
   opts: EstimatorOpts,
   signal?: AbortSignal,
+  onProgress?: (ev: ProgressEvent) => void,
 ): Promise<PoseTrackWithTrace> {
   const worker = new Worker(new URL('./poseWorker.ts', import.meta.url), {
     type: 'module',
@@ -218,15 +256,20 @@ async function runInWorker(
     worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
       const msg = e.data;
       if (msg.type === 'progress') {
-        // Progress events are relayed by the caller's onProgress,
-        // which is threaded through the opts.onProgress to the UI.
-        // The worker's postMessage goes to this handler; we don't
-        // need to relay it further here because onProgress is wired
-        // inside the worker's opts.
+        // The onProgress function can't cross the worker boundary, so the
+        // worker posts plain progress messages and we forward them here.
+        onProgress?.(toEstimatingEvent(msg));
       } else if (msg.type === 'result') {
         signal?.removeEventListener('abort', abortHandler);
         worker.terminate();
-        resolve(msg.track);
+        // sampleAt() is a function and cannot cross the worker boundary via
+        // structuredClone. Rebuild the full PoseTrack on the main thread so
+        // resamplePoseTrack() (which calls sampleAt()) works correctly.
+        resolve(createPoseTrack({
+          samples: msg.samples,
+          georefOrigin: msg.meta.georefOrigin,
+          source: msg.meta.source,
+        }) as PoseTrackWithTrace);
       } else if (msg.type === 'error') {
         signal?.removeEventListener('abort', abortHandler);
         worker.terminate();
@@ -254,6 +297,7 @@ async function runInMainThread(
   origin: EstimatorOrigin,
   opts: EstimatorOpts,
   signal?: AbortSignal,
+  onProgress?: (ev: ProgressEvent) => void,
 ): Promise<PoseTrackWithTrace> {
   // Dynamic import so the heavy estimator isn't bundled into the entry chunk
   const { estimatePoseTrack } = await import('./estimatorLoop.js');
@@ -268,7 +312,7 @@ async function runInMainThread(
       const track = estimatePoseTrack(
         data as Parameters<typeof estimatePoseTrack>[0],
         origin,
-        opts,
+        { ...opts, onProgress: onProgress ? (ev) => onProgress(toEstimatingEvent(ev)) : undefined },
       );
       signal?.removeEventListener('abort', abortHandler);
       resolve(track);
