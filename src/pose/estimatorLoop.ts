@@ -8,6 +8,7 @@ import {
   createMagFactor,
   createDeclinationFactor,
   computeAdaptiveSigmaYaw,
+  computeGpsNoise,
   SIGMA_YAW_DEFAULT_MAX,
 } from './measurements.js';
 import type { NedMeas } from './measurements.js';
@@ -97,6 +98,15 @@ export interface EstimatorOpts {
   sigmaBgRW?: number;
   sigmaBgPrior?: number;
   onProgress?: (progress: OnProgress) => void;
+  /** GPS transport delay in milliseconds (subtracted from GPS timestamps).
+   *  Default 0. u-blox M10: ~150-200 ms. */
+  gpsDelayMs?: number;
+  /** GPS position sigma floor in metres. Only used when useGpsAccuracyScaling=true.
+   *  Per-fix sigma = max(floor, numSat-model). Default 1.0 m. */
+  gpsPosSigmaFloor?: number;
+  /** When true, scale GPS position sigma per-fix from satellite count.
+   *  Good sats (≥12) → tighter (~1.5m); degraded → looser. Default false. */
+  useGpsAccuracyScaling?: boolean;
 }
 
 interface SmoothedPose {
@@ -208,7 +218,7 @@ function _runEstimation(
     outputHz = 20,
     gpsPosSigma = 2.5,
     gpsVelSigma = 0.5,
-    baroSigma = 1.0,
+    baroSigma = 2.0,
     attSigma = 0.02,
     sigmaYaw = 0.025,
     sigmaYawMax = SIGMA_YAW_DEFAULT_MAX,
@@ -229,9 +239,72 @@ function _runEstimation(
     sigmaBgRW = 3e-5,
     sigmaBgPrior = 0,
     onProgress,
+    gpsDelayMs = 0,
+    gpsPosSigmaFloor = 1.0,
+    useGpsAccuracyScaling = false,
   } = opts;
 
-  const { imu, gps, baro, quat, mag } = data;
+  let { imu, gps, baro, quat, mag } = data;
+
+  // ---- iTOW-based GPS position timing ----
+  // If the log carries GPS_time (u-blox iTOW), compute true position measurement
+  // instants from the receiver's own fix epoch.  The iTOW is a millisecond counter
+  // (GPS time-of-week, wraps at 604 800 000 ms = 7 days).  Inter-fix intervals
+  // from iTOW are accurate to ~1 ms regardless of FC parse jitter.
+  //
+  // Without iTOW, we fall back to FC timestamps for both position and velocity.
+  //
+  // SANITY GUARD:  iTOW must advance monotonically between GPS fixes and differ
+  // materially from FC time.  If GPS_time equals the FC frame time or does not
+  // advance, it is NOT a real iTOW (NMEA / non-NAV-PVT logs set it to FC time).
+  let gpsPosTimes: number[] | null = null;
+  let useItoW = false;
+  if (gps.length >= 2 && gps[0].gpsTimeItoW != null && gps[gps.length - 1].gpsTimeItoW != null) {
+    const i0 = gps[0].gpsTimeItoW!;
+    const iN = gps[gps.length - 1].gpsTimeItoW!;
+    const fcSpanMs = (gps[gps.length - 1].tUs - gps[0].tUs) / 1000;
+    const iTowSpanMs = iN - i0;
+    // If iTOW span is <= 10% of the FC time span, the field is stale (NMEA fallback)
+    if (iTowSpanMs > fcSpanMs * 0.1 && iTowSpanMs > 1000) {
+      useItoW = true;
+      const firstFcUs = gps[0].tUs;
+      const transportDelayUs = Math.round((gpsDelayMs ?? 0) * 1000);
+      gpsPosTimes = gps.map((g) => {
+        const deltaMs = g.gpsTimeItoW! - i0;
+        return firstFcUs + deltaMs * 1000 - transportDelayUs;
+      });
+      console.log(
+        `[GPS-iTOW] Using iTOW for position timing.  ` +
+        `iTOW span=${iTowSpanMs} ms, FC span=${fcSpanMs.toFixed(0)} ms, ` +
+        `transport delay offset=${transportDelayUs / 1000} ms`,
+      );
+    }
+  }
+
+  // When iTOW timing is active, velocity stays at FC time (Doppler is near-instant).
+  // Do NOT shift all GPS entries — only position times (above) are corrected.
+  // If iTOW is NOT active, apply gpsDelayMs to all GPS timestamps as before.
+  if (!useItoW) {
+    // Apply GPS transport delay: shift timestamps back so GPS fixes are
+    // associated with the drone's position at the earlier physical epoch.
+    // u-blox M10 transport latency is ~150-200 ms.
+    if (gpsDelayMs > 0) {
+      const delayUs = Math.round(gpsDelayMs * 1000);
+      gps = gps.map((entry) => ({ ...entry, tUs: entry.tUs - delayUs }));
+    }
+  } else {
+    // iTOW active: zero out gpsDelayMs for the old shift path (L252-255)
+    // so velocity scans use unmodified FC timestamps.
+    // gpsDelayMs is already subtracted from gpsPosTimes above.
+  }
+
+  // Per-fix GPS position sigma from satellite count model (opt-in).
+  // When enabled, GPS is trusted more tightly in good-sky conditions (~1.5m)
+  // and loosened automatically when sats drop.
+  const getGpsPosSigma = (numSat: number): number =>
+    useGpsAccuracyScaling
+      ? Math.max(gpsPosSigmaFloor, computeGpsNoise(numSat))
+      : gpsPosSigma;
   if (!imu || imu.length === 0)
     return { smoothed: [], t0Us: 0, lat0: 0, lon0: 0, alt0: 0, _traceForward: [] };
 
@@ -367,7 +440,8 @@ function _runEstimation(
     }
     const eskf: EskfState = createEskf(eskfOpts);
     const steps: Step[] = [];
-    let gpsIdx = 0;
+    let gpsPosIdx = 0;
+    let gpsVelIdx = 0;
     let baroIdx = 0;
     let quatIdx = 0;
     let magIdx = 0;
@@ -411,12 +485,18 @@ function _runEstimation(
 
         const currAmps = current && current.length ? findCurrent(nowUs) : 0;
 
-        // GPS update if fix is available near this time
+        const gpsRobustOpts: RobustOpts = useDcs
+          ? { dcs: true, dcsPhi: 1.0 }
+          : {};
+
+        // ---- GPS position update (iTOW-timed when available, FC-timed fallback) ----
         while (
-          gpsIdx < gps.length &&
-          gps[gpsIdx].tUs <= nextKfUs + outputIntervalUs * 0.5
+          gpsPosIdx < gps.length &&
+          (useItoW
+            ? gpsPosTimes![gpsPosIdx]
+            : gps[gpsPosIdx].tUs) <= nextKfUs + outputIntervalUs * 0.5
         ) {
-          const gpsF = gps[gpsIdx];
+          const gpsF = gps[gpsPosIdx];
           const gNed = llhToNed(
             gpsF.lat,
             gpsF.lon,
@@ -425,13 +505,11 @@ function _runEstimation(
             lon0,
             alt0,
           );
+          const effectivePosSigma = getGpsPosSigma(gpsF.numSat);
           const fP = createGpsPositionFactor(
             { n: gNed.n, e: gNed.e, d: gNed.d },
-            gpsPosSigma,
+            effectivePosSigma,
           );
-          const gpsRobustOpts: RobustOpts = useDcs
-            ? { dcs: true, dcsPhi: 1.0 }
-            : {};
           if (
             eskfUpdate(
               eskf,
@@ -442,6 +520,17 @@ function _runEstimation(
             )
           )
             hasUpdate = true;
+
+          gpsPosIdx++;
+        }
+
+        // ---- GPS velocity update (always FC-timed; Doppler is near-instant) ----
+        while (
+          gpsVelIdx < gps.length &&
+          gps[gpsVelIdx].tUs <= nextKfUs + outputIntervalUs * 0.5
+        ) {
+          const gpsF = gps[gpsVelIdx];
+
           if (gpsF.velNed) {
             const fV = createGpsVelocityFactor(
               {
@@ -467,10 +556,13 @@ function _runEstimation(
               hasUpdate = true;
           }
 
-          gpsIdx++;
+          gpsVelIdx++;
         }
 
         // Baro update — only the LAST sample before this keyframe.
+        // Dynamic baro R: inflates on high throttle/climb-rate (propwash / dynamic-pressure
+        // spikes corrupt the barometer). Tight σ=1.0–2.0 in steady level flight; widens
+        // to σ≈5–10 m during punch-outs where pressure fluctuations dominate.
         {
           let lastBaro: BaroEntry | null = null;
           while (baroIdx < baro.length && baro[baroIdx].tUs <= nextKfUs) {
@@ -478,7 +570,15 @@ function _runEstimation(
             baroIdx++;
           }
           if (lastBaro) {
-            const fB = createBaroFactor(lastBaro.alt, baroOffset, baroSigma);
+            // Climb rate from current ESKF state (NED D-axis; negative = climbing)
+            const climbRateMs = Math.abs(eskf.v[2]);
+            // Inflate on high current (>20A) OR high climb rate (>5 m/s)
+            let baroInflate = 1.0;
+            if (currAmps > 20) baroInflate += (currAmps - 20) / 10;       // +1 sigma per 10A above 20A
+            if (climbRateMs > 5) baroInflate += (climbRateMs - 5) * 0.5;   // +0.5 sigma per m/s above 5 m/s
+            const effectiveBaroSigma = baroSigma * Math.max(1.0, baroInflate);
+
+            const fB = createBaroFactor(lastBaro.alt, baroOffset, effectiveBaroSigma);
             if (eskfUpdate(eskf, fB as any, lastBaro.alt)) hasUpdate = true;
           }
         }
@@ -820,6 +920,8 @@ export function estimatePoseTrack(
         outputHz: opts.outputHz || 20,
         gpsPosSigma: opts.gpsPosSigma || 2.5,
         gpsVelSigma: opts.gpsVelSigma || 0.5,
+        gpsDelayMs: opts.gpsDelayMs || 0,
+        gpsPosSigmaFloor: opts.gpsPosSigmaFloor ?? 1.0,
         baroSigma: opts.baroSigma || 1.0,
         attSigma: opts.attSigma || 0.1,
         useMag: !!(

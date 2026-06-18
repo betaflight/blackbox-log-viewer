@@ -1,20 +1,20 @@
 {
     "files": [
         {
-            "sha256": "DBFABCA82EDB2BA2EA3363FF2A184A0C5A5966AD9861F330CC0A6D169E6E998E",
+            "sha256": "7C9DC2EDEB469FC4DEEE64EFB4F0F5FA3E5477945369C01AA07B3FFD4817613A",
             "file": "acro1_posetrack.json"
         },
         {
-            "sha256": "6A9D6F7D5BB4298A3A362C962F038477C1CC7BCA907DA935D87DCD5D5259F47B",
+            "sha256": "8267CF04163380F382E8A593AE2690086EAFFC641DBCD881375806EAA9AD25FB",
             "file": "acro1_track.kml"
         },
         {
-            "sha256": "0DC7F6A11FEE41C5E533A0CAF88DEC9BD2DAA3012DBDA4722581CFCE710A36CE",
+            "sha256": "41421D9D2ADC5628CA1D7FA1CFD2E7123D58266B691E7DB26031294B76A4A5C2",
             "file": "accuracy_report.json"
         }
     ],
-    "description": "Reference output checksums for acro1 flight. Generated from TS port on feature/body-pose-reconstruction-ts. Run `npm run test:full` to regenerate and verify.",
+    "description": "Reference output checksums for acro1 flight. Generated from TS port on feature/body-pose-reconstruction-ts. Run `npm run test:full` to regenerate and verify. Updated 2026-06-18: GPS iTOW position timing + dynamic baro R.",
     "source_branch": "feature/body-pose-reconstruction-ts",
-    "generated": "2026-06-18T00:00:00.000Z",
+    "generated": "2026-06-18T12:00:00.000Z",
     "source_repo": "C:/code/betaflightz/blackbox_ts/blackbox-log-viewer"
 }

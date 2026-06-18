@@ -38,6 +38,11 @@ export interface GpsEntry {
   speed?: number;
   course?: number;
   numSat: number;
+  /** u-blox iTOW (GPS_msToW) from GPS_time field, in milliseconds.
+   *  Undefined if the log does not carry GPS_time (pre-NAV-PVT or NMEA).
+   *  The iTOW is the receiver's true fix epoch — it removes FC parse jitter
+   *  and allows per-fix position timing independent of velocity timing. */
+  gpsTimeItoW?: number;
 }
 
 export interface BaroEntry {
@@ -147,6 +152,9 @@ export interface IngestOpts {
   startUs?: number;
   endUs?: number;
   gpsDecimation?: number;
+  /** GPS transport delay in milliseconds (subtracted from GPS timestamps at ingestion).
+   *  Default 0. Typical u-blox M10 transport delay ~150-200 ms. */
+  gpsDelayMs?: number;
 }
 
 /**
@@ -165,6 +173,7 @@ export function ingestFlightLog(
     startUs = 0,
     endUs = Number.MAX_SAFE_INTEGER,
     gpsDecimation = 1,
+    gpsDelayMs = 0,
   } = opts;
 
   const sysConfig = flightLog.getSysConfig();
@@ -187,6 +196,8 @@ export function ingestFlightLog(
   const idxGpsCourse = idx('GPS_ground_course');
   const idxGpsVelned = [idx('GPS_velned[0]'), idx('GPS_velned[1]'), idx('GPS_velned[2]')];
   const idxGpsNumSat = idx('GPS_numSat');
+  const idxGpsTime = idx('GPS_time');
+  const hasGpsTime = idxGpsTime != null;
   const gpsHome: GpsHome | null =
     typeof flightLog.getGPSHome === 'function' ? flightLog.getGPSHome() : null;
   const idxCurrent = idx('amperageLatest');
@@ -323,8 +334,19 @@ export function ingestFlightLog(
             const numSatRaw = frame[idxGpsNumSat!] != null ? (frame[idxGpsNumSat!] as number) : 0;
             const numSat = numSatRaw > 100 ? 0 : numSatRaw;
 
+            // Extract GPS_time (u-blox iTOW) if available.
+            // The iTOW is the receiver's true fix epoch in ms GPS-time-of-week.
+            // It removes FC parse jitter and enables per-fix position timing
+            // independent of velocity (Doppler) timing.
+            const gpsTimeItoW: number | undefined =
+              hasGpsTime && idxGpsTime != null ? (frame[idxGpsTime] as number) : undefined;
+
+            // Apply GPS transport delay: shift timestamp back so GPS fix at
+            // physical time T is associated with keyframe near (T - delay).
+            const gpsTUs = tUs - Math.round(gpsDelayMs * 1000);
+
             gps.push({
-              tUs,
+              tUs: gpsTUs,
               lat,
               lon,
               alt: altMsl,
@@ -332,6 +354,7 @@ export function ingestFlightLog(
               speed,
               course,
               numSat,
+              gpsTimeItoW,
             });
           }
         }

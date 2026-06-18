@@ -525,3 +525,207 @@ export function gateMagHeadingTracksGPS(
     `(need < ${maxMedianErrDeg}°). signed mean = ${signedMean.toFixed(1)}° ` +
     `${mirrorSuspect ? '(SUSPECT MIRROR)' : ''}`);
 }
+
+// ===========================================================================
+// STEP 12: Scientific gate calibration — tightened, witness-grounded gates
+// ===========================================================================
+
+/**
+ * Horizontal position vs GPS — per-regime median & p95.
+ *
+ * Witness model (GPS, sat-count derived):
+ *   ≥12 sats → hAcc≈1.5 m   8–11 → 2.5 m   <8 → 5 m
+ * Per-regime tolerance = k·witnessσ(t) + reconBudget, k≈1.5–2.
+ *
+ * @param samples  Reconstruction samples
+ * @param gpsNed   GPS positions in NED (same origin)
+ * @param maxMedianM  Max allowed median horizontal error in metres
+ * @param maxP95M     Max allowed p95 horizontal error in metres
+ * @param regimeFilter Optional function to select regime (e.g., only gentle cruise)
+ */
+export function gateHorizontalPositionVsGPS(
+  samples: PoseSampleInternal[],
+  gpsNed: Array<{ tUs: number; n: number; e: number; d?: number }>,
+  maxMedianM = 3,
+  maxP95M = 8,
+  regimeFilter?: (s: PoseSampleInternal, gpsIdx: number) => boolean,
+): GateResult {
+  const errs: number[] = [];
+  for (const s of samples) {
+    const g = nearestByTUs(gpsNed, s.tUs);
+    if (regimeFilter && !regimeFilter(s, gpsNed.indexOf(g as any))) continue;
+    const h = Math.hypot(s.p[0] - g.n, s.p[1] - g.e);
+    errs.push(h);
+  }
+  if (errs.length < 10) return mk('horizontal-vs-GPS', false,
+    `only ${errs.length} samples with GPS match`);
+
+  const sorted = errs.sort((a, b) => a - b);
+  const med = sorted[Math.floor(sorted.length / 2)];
+  const p9 = sorted[Math.floor(sorted.length * 0.95)];
+
+  const pass = med <= maxMedianM && p9 <= maxP95M;
+  return mk('horizontal-vs-GPS', pass,
+    `median ${med.toFixed(1)} m (need ≤${maxMedianM} m), p95 ${p9.toFixed(1)} m (need ≤${maxP95M} m), ` +
+    `n=${errs.length}`);
+}
+
+/**
+ * No-underground: the reconstruction must never sink more than maxBelowM
+ * below the nearest GPS altitude (which is the absolute reference).
+ *
+ * In NED: D=down. recon deeper than GPS ⇒ recon.d > gps.d ⇒ (gps.d - recon.d) < 0.
+ * We track the most negative value (deepest penetration below GPS).
+ *
+ * Witness model: GPS vertical accuracy ~3 m in good conditions, 5-10 m degraded.
+ * A recon that is >5 m below GPS is physically implausible (underground).
+ *
+ * @param samples   Reconstruction samples
+ * @param gpsNed    GPS positions including d (down) component
+ * @param maxBelowM Max allowed penetration below GPS (metres)
+ */
+export function gateNoUnderground(
+  samples: PoseSampleInternal[],
+  gpsNed: Array<{ tUs: number; n: number; e: number; d: number }>,
+  maxBelowM = 5,
+): GateResult {
+  let worstBelow = 0;      // most negative (deepest penetration)
+  let worstTUs = 0;
+  let nChecked = 0;
+  for (const s of samples) {
+    const g = nearestByTUs(gpsNed, s.tUs);
+    if (!g || !isFinite(g.d)) continue;
+    nChecked++;
+    const below = g.d - s.p[2];   // negative = recon deeper than GPS reference
+    if (below < worstBelow) {
+      worstBelow = below;
+      worstTUs = s.tUs;
+    }
+  }
+  const penetrationM = Math.abs(worstBelow);
+  const pass = penetrationM <= maxBelowM;
+  return mk('no-underground', pass,
+    `worst penetration below GPS = ${penetrationM.toFixed(1)} m at tUs=${worstTUs} ` +
+    `(need ≤${maxBelowM} m), ${nChecked} samples checked`);
+}
+
+/**
+ * Tilt fidelity in near-static 1g windows.
+ *
+ * Witness: accelerometer at rest — the body-frame gravity vector from the
+ * quaternion must align with the measured accel. Only valid when:
+ *   |accel| ∈ [0.97, 1.03]g, |gyro| < 10°/s, speed < 3 m/s.
+ *
+ * @param samples   Reconstruction samples
+ * @param imu       IMU entries (for accel + gyro)
+ * @param maxMedianTiltDeg  Max allowed median tilt error (degrees)
+ */
+export function gateTiltIn1gWindows(
+  samples: PoseSampleInternal[],
+  imu: ImuEntry[],
+  maxMedianTiltDeg = 3,
+): GateResult {
+  const G = 9.80665;
+  const DEG = 180 / Math.PI;
+  const DEG_RAD = Math.PI / 180;
+  const maxGyro = 10 * DEG_RAD;   // 10 °/s
+  const tilts: number[] = [];
+
+  for (const s of samples) {
+    // Find nearest IMU sample within 50ms
+    const i = nearestByTUs(imu, s.tUs);
+    if (!i) continue;
+    const dt = Math.abs(i.tUs - s.tUs);
+    if (dt > 50_000) continue;
+
+    const accMag = Math.hypot(i.accel[0], i.accel[1], i.accel[2]);
+    const gFrac = accMag / G;
+    if (gFrac < 0.97 || gFrac > 1.03) continue;
+
+    const gyroMag = Math.hypot(i.gyro[0], i.gyro[1], i.gyro[2]);
+    if (gyroMag > maxGyro) continue;
+
+    const spd = speed(s.v);
+    if (spd > 3) continue;
+
+    // Body-frame gravity from quaternion: R^T * [0,0,G] = row2 of R scaled by G
+    const R = quatToR(s.q);
+    const gravBodyX = R[2][0] * G;
+    const gravBodyY = R[2][1] * G;
+    const gravBodyZ = R[2][2] * G;
+
+    const dot = (gravBodyX * i.accel[0] + gravBodyY * i.accel[1] + gravBodyZ * i.accel[2]) / (G * accMag);
+    if (dot < -1 || dot > 1) continue;
+    const tiltDeg = Math.acos(dot) * DEG;
+    tilts.push(tiltDeg);
+  }
+
+  if (tilts.length < 5) return mk('tilt-in-1g', false,
+    `only ${tilts.length} near-static 1g samples (need ≥5)`);
+
+  const sorted = tilts.sort((a, b) => a - b);
+  const med = sorted[Math.floor(sorted.length / 2)];
+
+  const pass = med <= maxMedianTiltDeg;
+  return mk('tilt-in-1g', pass,
+    `median tilt error in 1g = ${med.toFixed(1)}° (need ≤${maxMedianTiltDeg}°), ` +
+    `n=${tilts.length}`);
+}
+
+/**
+ * Heading vs GPS course — tighter than `gateForwardCrab`.
+ * Uses the same filter regime (speed > minSpeed, yaw rate < maxYawRate)
+ * but with a tighter tolerance for benign cruise.
+ *
+ * @param maxMedianDeg  Max median |crab| in degrees (default 12)
+ */
+export function gateHeadingVsCourse(
+  samples: PoseSampleInternal[],
+  maxMedianDeg = 12,
+  minSpeed = 5,
+  maxYawRate = 15,
+): GateResult {
+  const yr = yawRateSeries(samples);
+  const errors: number[] = [];
+  for (let i = 0; i < samples.length; i++) {
+    if (speed(samples[i].v) < minSpeed || Math.abs(yr[i]) > maxYawRate) continue;
+    errors.push(Math.abs(crabDeg(samples[i].q, samples[i].v)));
+  }
+  if (errors.length < 10) return mk('heading-vs-course', false,
+    `only ${errors.length} qualifying samples`);
+
+  const sorted = errors.sort((a, b) => a - b);
+  const med = sorted[Math.floor(sorted.length / 2)];
+
+  const pass = med <= maxMedianDeg;
+  return mk('heading-vs-course', pass,
+    `median |crab| = ${med.toFixed(1)}° (need ≤${maxMedianDeg}°), n=${errors.length}`);
+}
+
+/**
+ * Attitude consistency vs FC quaternion — tighter than `gateAttitudeTracksFC`.
+ * Uses median geodesic error on all samples.
+ */
+export function gateAttitudeTracksFC_Tight(
+  samples: PoseSampleInternal[],
+  fcQuat: QuatEntry[],
+  maxMedianDeg = 5,
+): GateResult {
+  const errors: number[] = [];
+  for (const s of samples) {
+    const f = nearestByTUs(fcQuat, s.tUs);
+    if (!f) continue;
+    const dt = Math.abs(f.tUs - s.tUs);
+    if (dt > 500_000) continue;   // 0.5s max staleness
+    errors.push(quatAngleDeg(s.q, f.q));
+  }
+  if (errors.length < 10) return mk('attitude-tracks-FC-tight', false,
+    `only ${errors.length} samples with FC quat match`);
+
+  const sorted = errors.sort((a, b) => a - b);
+  const med = sorted[Math.floor(sorted.length / 2)];
+
+  const pass = med <= maxMedianDeg;
+  return mk('attitude-tracks-FC-tight', pass,
+    `median FC attitude error = ${med.toFixed(1)}° (need ≤${maxMedianDeg}°), n=${errors.length}`);
+}

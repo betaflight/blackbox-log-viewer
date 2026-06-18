@@ -14,6 +14,8 @@ export default defineConfig({
     include: ["src/pose/**/*.test.{ts,js}"],
     // 120s timeout for the full acro1 fixture test
     testTimeout: 120_000,
+    // Allow long-running beforeAll hooks (estimator init ~25s)
+    hookTimeout: 120_000,
     // Isolate each test file in its own context
     pool: "forks",
   },
