@@ -79,7 +79,7 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
 
   const lines: string[] = [];
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
-  lines.push('<kml xmlns="http://www.opengis.net/kml/2.2">');
+  lines.push('<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">');
   lines.push('  <Document>');
   lines.push(`    <name>Betaflight Pose Track</name>`);
   lines.push(
@@ -119,6 +119,33 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
     }
     lines.push('          </coordinates>');
     lines.push('        </LineString>');
+    lines.push('      </Placemark>');
+    lines.push('    </Folder>');
+  }
+
+  // Animated <gx:Track> layer — synthetic relative timestamps.
+  // Blackbox has no wall-clock time. Anchor to arbitrary epoch + tUs/1e6.
+  // Visibility off by default; enable in Google Earth sidebar.
+  {
+    const t0Us = samples[0]?.tUs ?? 0;
+    const epochMs = 0; // 1970-01-01T00:00:00.000Z
+    lines.push('    <Folder><name>Animated Track</name><visibility>0</visibility>');
+    lines.push('      <Placemark>');
+    lines.push('        <name>Reconstructed Path</name>');
+    lines.push('        <styleUrl>#pathStyle</styleUrl>');
+    lines.push('        <gx:Track>');
+    lines.push('          <altitudeMode>absolute</altitudeMode>');
+    for (const s of samples) {
+      if (!s.lla) continue;
+      const tSec = (s.tUs - t0Us) / 1e6;
+      const tIso = new Date(epochMs + tSec * 1000).toISOString();
+      lines.push(`          <when>${tIso}</when>`);
+      lines.push(`          <gx:coord>${s.lla.lon} ${s.lla.lat} ${s.lla.alt}</gx:coord>`);
+      if (s.euler) {
+        lines.push(`          <gx:angles>${s.euler.headingDeg.toFixed(1)} ${s.euler.tiltDeg.toFixed(1)} ${s.euler.rollDeg.toFixed(1)}</gx:angles>`);
+      }
+    }
+    lines.push('        </gx:Track>');
     lines.push('      </Placemark>');
     lines.push('    </Folder>');
   }
