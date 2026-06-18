@@ -294,6 +294,71 @@ export const SIGMA_YAW_DEFAULT_MAX   = 0.10;
 export const SIGMA_YAW_OBS_THRESH_LO = 0.70;
 export const SIGMA_YAW_OBS_THRESH_HI = 1.00;
 
+// Adaptive sigma tilt constants (planv5/06 §9.2)
+export const SIGMA_TILT_NOMINAL  = 0.02;   // rad — clean gravity, low spin
+export const SIGMA_TILT_FREEFALL = 1.0;    // rad — true freefall (no gravity reference)
+
+/**
+ * Adaptive sigma tilt — modulates quat-prior tilt (roll/pitch) trust on
+ * three regimes, with kinematic ω×v correction to isolate gravity.
+ *
+ * Branch 1 (clean gravity):            σ_tilt = NOMINAL (0.02 rad)
+ *   when |a_gravity| ≈ g AND |ω| < 0.5 rad/s
+ * Branch 2 (true freefall):            σ_tilt = FREEFALL (1.0 rad)
+ *   when |a_gravity| < 0.5·g
+ * Branch 3 (high-G spinning):          σ_tilt = linear interpolation
+ *   between NOMINAL and FREEFALL
+ *
+ * The kinematic correction subtracts ω × v_body from measured accel to
+ * isolate gravity.  This prevents false freefall detection during banked
+ * turns (a 3g turn has |a_raw| ≈ 1.15g but |a_gravity| ≈ 1.0g after
+ * correction).
+ *
+ * @param accelBody   Measured accel, body FRD [m/s²] (includes gravity)
+ * @param gyroBody    Measured gyro, body FRD [rad/s]
+ * @param vNed        Current ESKF velocity, world NED [m/s]
+ * @param qEst        Current ESKF attitude [qw,qx,qy,qz] body→world
+ * @returns           adapted sigma tilt in radians
+ */
+export function computeAdaptiveSigmaTilt(
+  accelBody: Vec3,
+  gyroBody: Vec3,
+  vNed: Vec3,
+  qEst: Quat,
+): number {
+    const g = GRAVITY_MAG;
+    const R = quatToRotMat(qEst);
+
+    // Rotate world velocity to body frame: v_body = Rᵀ · v_world
+    const vBx = R[0]*vNed[0] + R[3]*vNed[1] + R[6]*vNed[2];
+    const vBy = R[1]*vNed[0] + R[4]*vNed[1] + R[7]*vNed[2];
+    const vBz = R[2]*vNed[0] + R[5]*vNed[1] + R[8]*vNed[2];
+
+    // a_kinematic = ω × v_body
+    const akinX = gyroBody[1]*vBz - gyroBody[2]*vBy;
+    const akinY = gyroBody[2]*vBx - gyroBody[0]*vBz;
+    const akinZ = gyroBody[0]*vBy - gyroBody[1]*vBx;
+
+    // a_gravity = a_measured − a_kinematic
+    const agX = accelBody[0] - akinX;
+    const agY = accelBody[1] - akinY;
+    const agZ = accelBody[2] - akinZ;
+    const agMag = Math.hypot(agX, agY, agZ);
+    const delta = Math.abs(agMag - g);
+
+    const gyroMag = Math.hypot(gyroBody[0], gyroBody[1], gyroBody[2]);
+
+    if (delta < 1.0 && gyroMag < 0.5) {
+        return SIGMA_TILT_NOMINAL;               // 0.02 rad — clean gravity, low spin
+    } else if (agMag < 0.5 * g) {
+        return SIGMA_TILT_FREEFALL;              // 1.0 rad — true freefall
+    } else {
+        // High-G spinning: interpolate
+        const t = Math.min(1.0, delta / (2.0 * g));
+        return SIGMA_TILT_NOMINAL + t * (SIGMA_TILT_FREEFALL - SIGMA_TILT_NOMINAL);
+    }
+}
+
 /**
  * Adaptive sigma yaw — modulates quat-prior yaw trust on TWO independent signals:
  *

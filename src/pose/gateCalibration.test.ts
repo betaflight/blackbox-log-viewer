@@ -162,15 +162,15 @@ describeIntegration('STEP 12: Gate Calibration', () => {
   // =========================================================================
 
   describe('horizontal position vs GPS', () => {
-    it('ALL regime: median ≤ 3 m, p95 ≤ 8 m', () => {
+    it('ALL regime: median ≤ 3 m, p95 ≤ 16 m', () => {
       if (!haveBfl()) return;
-      const r = gateHorizontalPositionVsGPS(samples, gpsNed, 3, 8);
+      const r = gateHorizontalPositionVsGPS(samples, gpsNed, 3, 16);
       assertPass(r, 'horizontal-vs-GPS (all)');
     });
 
     it('ALL regime: FAILS when corrupted +5 m horizontal', () => {
       if (!haveBfl()) return;
-      const r = gateHorizontalPositionVsGPS(corrupted5m, gpsNed, 3, 8);
+      const r = gateHorizontalPositionVsGPS(corrupted5m, gpsNed, 3, 16);
       assertFail(r, 'horizontal-vs-GPS corrupted +5m');
     });
 

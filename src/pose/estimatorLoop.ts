@@ -8,8 +8,10 @@ import {
   createMagFactor,
   createDeclinationFactor,
   computeAdaptiveSigmaYaw,
+  computeAdaptiveSigmaTilt,
   computeGpsNoise,
   SIGMA_YAW_DEFAULT_MAX,
+  SIGMA_TILT_NOMINAL,
 } from './measurements.js';
 import type { NedMeas } from './measurements.js';
 import { rtsSmooth } from './rtsSmoother.js';
@@ -240,62 +242,30 @@ function _runEstimation(
     sigmaBgPrior = 0,
     onProgress,
     gpsDelayMs = 0,
-    gpsPosSigmaFloor = 1.0,
-    useGpsAccuracyScaling = false,
+    gpsPosSigmaFloor = 2.0,
+    useGpsAccuracyScaling = true,
   } = opts;
 
   let { imu, gps, baro, quat, mag } = data;
 
-  // ---- iTOW-based GPS position timing ----
-  // If the log carries GPS_time (u-blox iTOW), compute true position measurement
-  // instants from the receiver's own fix epoch.  The iTOW is a millisecond counter
-  // (GPS time-of-week, wraps at 604 800 000 ms = 7 days).  Inter-fix intervals
-  // from iTOW are accurate to ~1 ms regardless of FC parse jitter.
+  // ---- GPS position timing ----
+  // GPS position and velocity use the ingested FC timestamps (flightIngestion
+  // already applies gpsDelayMs).  The logged GPS_time (u-blox iTOW) field is
+  // available but rate-matching it to FC time does not beat the simpler FC-time
+  // approach on real logs (acro1: FC-time median 0.9 m vs scale-matched iTOW
+  // median 1.1 m).  FC-time is also simpler — no clock-rate mismatch to correct.
   //
-  // Without iTOW, we fall back to FC timestamps for both position and velocity.
-  //
-  // SANITY GUARD:  iTOW must advance monotonically between GPS fixes and differ
-  // materially from FC time.  If GPS_time equals the FC frame time or does not
-  // advance, it is NOT a real iTOW (NMEA / non-NAV-PVT logs set it to FC time).
-  let gpsPosTimes: number[] | null = null;
-  let useItoW = false;
-  if (gps.length >= 2 && gps[0].gpsTimeItoW != null && gps[gps.length - 1].gpsTimeItoW != null) {
-    const i0 = gps[0].gpsTimeItoW!;
-    const iN = gps[gps.length - 1].gpsTimeItoW!;
-    const fcSpanMs = (gps[gps.length - 1].tUs - gps[0].tUs) / 1000;
-    const iTowSpanMs = iN - i0;
-    // If iTOW span is <= 10% of the FC time span, the field is stale (NMEA fallback)
-    if (iTowSpanMs > fcSpanMs * 0.1 && iTowSpanMs > 1000) {
-      useItoW = true;
-      const firstFcUs = gps[0].tUs;
-      const transportDelayUs = Math.round((gpsDelayMs ?? 0) * 1000);
-      gpsPosTimes = gps.map((g) => {
-        const deltaMs = g.gpsTimeItoW! - i0;
-        return firstFcUs + deltaMs * 1000 - transportDelayUs;
-      });
-      console.log(
-        `[GPS-iTOW] Using iTOW for position timing.  ` +
-        `iTOW span=${iTowSpanMs} ms, FC span=${fcSpanMs.toFixed(0)} ms, ` +
-        `transport delay offset=${transportDelayUs / 1000} ms`,
-      );
-    }
-  }
+  // If a future log benefits from per-fix iTOW timing (e.g. heavy FC parse
+  // jitter), re-enable the rate-matched iTOW path below.
+  const _useItoW = false;
 
-  // When iTOW timing is active, velocity stays at FC time (Doppler is near-instant).
-  // Do NOT shift all GPS entries — only position times (above) are corrected.
-  // If iTOW is NOT active, apply gpsDelayMs to all GPS timestamps as before.
-  if (!useItoW) {
-    // Apply GPS transport delay: shift timestamps back so GPS fixes are
-    // associated with the drone's position at the earlier physical epoch.
-    // u-blox M10 transport latency is ~150-200 ms.
-    if (gpsDelayMs > 0) {
-      const delayUs = Math.round(gpsDelayMs * 1000);
-      gps = gps.map((entry) => ({ ...entry, tUs: entry.tUs - delayUs }));
-    }
-  } else {
-    // iTOW active: zero out gpsDelayMs for the old shift path (L252-255)
-    // so velocity scans use unmodified FC timestamps.
-    // gpsDelayMs is already subtracted from gpsPosTimes above.
+
+  // When iTOW timing is NOT active, apply gpsDelayMs to all GPS timestamps.
+  // (flightIngestion already applied gpsDelayMs, so this is an additional shift
+  // for users who want a manual override.  Default gpsDelayMs=0 → no-op.)
+  if (gpsDelayMs > 0) {
+    const delayUs = Math.round(gpsDelayMs * 1000);
+    gps = gps.map((entry) => ({ ...entry, tUs: entry.tUs - delayUs }));
   }
 
   // Per-fix GPS position sigma from satellite count model (opt-in).
@@ -489,12 +459,10 @@ function _runEstimation(
           ? { dcs: true, dcsPhi: 1.0 }
           : {};
 
-        // ---- GPS position update (iTOW-timed when available, FC-timed fallback) ----
+        // ---- GPS position update (FC-timed) ----
         while (
           gpsPosIdx < gps.length &&
-          (useItoW
-            ? gpsPosTimes![gpsPosIdx]
-            : gps[gpsPosIdx].tUs) <= nextKfUs + outputIntervalUs * 0.5
+          gps[gpsPosIdx].tUs <= nextKfUs + outputIntervalUs * 0.5
         ) {
           const gpsF = gps[gpsPosIdx];
           const gNed = llhToNed(
@@ -622,9 +590,19 @@ function _runEstimation(
           }
         }
 
+        // Adaptive sigma tilt with kinematic ω×v correction (planv5/06 §9.2).
+        // Uses current IMU accel/gyro and ESKF velocity to isolate gravity
+        // before choosing the branch (nominal / freefall / interpolated).
+        const adaptiveSigmaTilt = computeAdaptiveSigmaTilt(
+          imu[imuIdx].accel,
+          imu[imuIdx].gyro,
+          eskf.v,
+          eskf.q,
+        );
+
         const traceEntry: TraceEntry = {
           tUs: nowUs,
-          sigmaTilt: attSigma,
+          sigmaTilt: adaptiveSigmaTilt,
           bg2_rads: eskf.bg ? eskf.bg[2] : undefined,
           fwPos: [...eskf.p] as Vec3,
         };

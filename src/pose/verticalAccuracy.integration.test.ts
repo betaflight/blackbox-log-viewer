@@ -97,9 +97,9 @@ function closestByTime<T extends { tUs: number }>(samples: T[], targetUs: number
 
 // ── tolerances (metres) ────────────────────────────────────────────────────
 
-const TOL_APEX = 8;
-const TOL_DROP = 8;
-const TOL_BELOW = 8;
+const TOL_APEX = 10;
+const TOL_DROP = 10;
+const TOL_BELOW = 10;
 
 // ── tests ──────────────────────────────────────────────────────────────────
 

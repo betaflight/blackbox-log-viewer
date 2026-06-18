@@ -81,6 +81,7 @@ describe("B3 — robust kernels + gating + NEES consistency", () => {
             gpsPosSigma: 2.0,
             maxIter: 2,
             useDcs: true,
+            useGpsAccuracyScaling: false, // explicit: this test tunes GPS sigma directly
         });
         expect(trackDcs.samples.length).toBeGreaterThan(0);
         for (const s of trackDcs.samples) {
@@ -132,6 +133,7 @@ describe("B3 — robust kernels + gating + NEES consistency", () => {
             outputHz: 20,
             gpsPosSigma: 2.5,
             maxIter: 3,
+            useGpsAccuracyScaling: false, // explicit: this test tunes GPS sigma directly
         });
 
         const neesVals: number[] = computeNees(traj, track);
@@ -168,6 +170,7 @@ describe("B3 — robust kernels + gating + NEES consistency", () => {
             outputHz: 20,
             gpsPosSigma: 2.0,
             maxIter: 2,
+            useGpsAccuracyScaling: false, // explicit: this test tunes GPS sigma directly
         });
 
         for (const s of track.samples) {

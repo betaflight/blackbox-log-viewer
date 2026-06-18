@@ -1,20 +1,20 @@
 {
-    "files": [
-        {
-            "sha256": "7C9DC2EDEB469FC4DEEE64EFB4F0F5FA3E5477945369C01AA07B3FFD4817613A",
-            "file": "acro1_posetrack.json"
-        },
-        {
-            "sha256": "8267CF04163380F382E8A593AE2690086EAFFC641DBCD881375806EAA9AD25FB",
-            "file": "acro1_track.kml"
-        },
-        {
-            "sha256": "41421D9D2ADC5628CA1D7FA1CFD2E7123D58266B691E7DB26031294B76A4A5C2",
-            "file": "accuracy_report.json"
-        }
-    ],
-    "description": "Reference output checksums for acro1 flight. Generated from TS port on feature/body-pose-reconstruction-ts. Run `npm run test:full` to regenerate and verify. Updated 2026-06-18: GPS iTOW position timing + dynamic baro R.",
-    "source_branch": "feature/body-pose-reconstruction-ts",
-    "generated": "2026-06-18T12:00:00.000Z",
-    "source_repo": "C:/code/betaflightz/blackbox_ts/blackbox-log-viewer"
+  "files": [
+    {
+      "sha256": "62D986B15BAD30590016A8114CC121C39C1A9ECD0A6ED8AD6B14820F065129FC",
+      "file": "acro1_posetrack.json"
+    },
+    {
+      "sha256": "E3C57253A50654343437612186F88C002F66D36341C41020B64910CC1F1B1AA3",
+      "file": "acro1_track.kml"
+    },
+    {
+      "sha256": "346989466F70C1D60E6B842C8C825692CCC88A00E965AE1B48232A74BA0B19C2",
+      "file": "accuracy_report.json"
+    }
+  ],
+  "description": "Reference output checksums for acro1 flight. Adaptive sigma tilt trace added (not wired to quat-prior). GPS accuracy scaling active with floor=2.0. FC-time GPS timing.",
+  "source_branch": "feature/body-pose-reconstruction-ts",
+  "generated": "2026-06-18T16:45:39.160Z",
+  "source_repo": "C:/code/betaflightz/blackbox_ts/blackbox-log-viewer"
 }
