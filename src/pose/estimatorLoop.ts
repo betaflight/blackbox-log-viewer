@@ -140,6 +140,10 @@ interface TraceEntry {
   posErrSmGpsM?: number;
 }
 
+/** Gyro rate threshold (deg/s) above which GPS velocity→yaw fusion is suppressed during snaps.
+ *  Infinity = off (current behavior). Set to ~120 to gate during rapid rotation. */
+const SNAP_GYRO_GATE_DPS = Infinity;
+
 interface EstimationResult {
   smoothed: SmoothedPose[];
   t0Us: number;
@@ -505,6 +509,20 @@ function _runEstimation(
           const gpsF = gps[gpsVelIdx];
 
           if (gpsF.velNed) {
+            // Suppress GPS velocity→yaw fusion during rapid rotation (snap turns).
+            // Momentum keeps GPS track curving slowly while the nose has already
+            // snapped → the −skew(R·a)·dt cross-covariance would mis-attribute the
+            // velocity/heading mismatch as a yaw error. Gate the measurement,
+            // not the propagation (which is legitimate physics).
+            const peakGyroDps = Math.hypot(
+              imu[imuIdx].gyro[0],
+              imu[imuIdx].gyro[1],
+              imu[imuIdx].gyro[2],
+            ) * (180 / Math.PI);
+            if (peakGyroDps >= SNAP_GYRO_GATE_DPS) {
+              gpsVelIdx++;
+              continue;
+            }
             const fV = createGpsVelocityFactor(
               {
                 n: gpsF.velNed[0],
