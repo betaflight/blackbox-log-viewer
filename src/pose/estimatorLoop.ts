@@ -98,6 +98,9 @@ export interface EstimatorOpts {
    *  false, every FC quaternion is corrected by this angle about world-Z
    *  before entering the quaternion prior.  Computed by computeMagHeadingBias(). */
   rawMagBiasRad?: number;
+  /** Gyro rate threshold (deg/s) above which GPS velocity updates are skipped
+   *  during rapid rotation.  Infinity = never gate.  Default 120 deg/s. */
+  snapGyroGateDps?: number;
   sigmaBaInit?: number;
   sigmaBgInit?: number;
   sigmaBaRW?: number;
@@ -140,9 +143,6 @@ interface TraceEntry {
   posErrSmGpsM?: number;
 }
 
-/** Gyro rate threshold (deg/s) above which GPS velocity→yaw fusion is suppressed during snaps.
- *  Infinity = off (current behavior). Set to ~120 to gate during rapid rotation. */
-const SNAP_GYRO_GATE_DPS = Infinity;
 
 interface EstimationResult {
   smoothed: SmoothedPose[];
@@ -249,6 +249,7 @@ function _runEstimation(
     sigmaBaRW = 2e-4,
     sigmaBgRW = 3e-5,
     sigmaBgPrior = 0,
+    snapGyroGateDps = 120,
     onProgress,
     gpsDelayMs = 0,
     gpsPosSigmaFloor = 2.0,
@@ -519,7 +520,7 @@ function _runEstimation(
               imu[imuIdx].gyro[1],
               imu[imuIdx].gyro[2],
             ) * (180 / Math.PI);
-            if (peakGyroDps >= SNAP_GYRO_GATE_DPS) {
+            if (peakGyroDps >= snapGyroGateDps) {
               gpsVelIdx++;
               continue;
             }
