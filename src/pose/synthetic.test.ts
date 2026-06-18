@@ -94,7 +94,7 @@ describe('synthetic — straight trajectory', () => {
   });
 });
 
-describe('synthetic — GPS altitude round-trip (Fix 2 gate)', () => {
+describe('synthetic — GPS altitude round-trip', () => {
   it('GPS↔NED round-trips through test origin to < 20 cm (flat-earth vs WGS84 tolerance)', () => {
     const origin = { lat: 48.408, lon: -71.164, alt: 200 };
     const { traj } = generateDynamicTrajectory({ freqHz: 200 });

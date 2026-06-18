@@ -205,7 +205,7 @@ export function createGpsVelocityFactor(meas: NedMeas, sigma = 0.5): Measurement
  * location, they match without an offset. Adding baroOffset (~GPS MSL altitude,
  * typically >100 m) creates a constant innovation offset that saturates the 3σ gate
  * and silently rejects all baro measurements — the D coordinate then drifts uncorrected.
- * (planv5/18 §35 — baro-offset bug, 2026-06-15)
+ * Adding baroOffset creates a constant innovation offset that saturates the gate.
  *
  * @param baroAlt     Raw barometer altitude (m, relative to arm point)
  * @param baroOffset  (UNUSED — retained for API compat only)
@@ -235,7 +235,7 @@ export function createBaroFactor(baroAlt: number, baroOffset: number, sigma = 1.
  * Supports both isotropic (single sigma) and anisotropic (sigmaTilt + sigmaYaw)
  * noise models. In anisotropic mode, the measurement covariance R is the
  * body-frame noise diag(σ_tilt², σ_tilt², σ_yaw²) rotated to the world frame
- * of the residual:  R_world = R_bw · R_body · R_bwᵀ  (Fix 3, planv5/06 §9).
+ * of the residual:  R_world = R_bw · R_body · R_bwᵀ.
  * The FC's tilt is gravity-bounded (~1°); yaw is gyro-only dead-reckoned
  * (drifting 10–30°/flight). The anisotropic R lets the quat-prior and mag
  * factor coexist: the prior owns tilt, the mag owns yaw.

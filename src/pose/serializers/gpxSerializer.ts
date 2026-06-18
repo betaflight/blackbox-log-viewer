@@ -6,7 +6,7 @@
  * attitude output — the GPX extensions are a convenience for GIS tools
  * that can consume per-point metadata.
  *
- * Eulers per planv5/01 §7 (pitch: negative=nose UP) §8 (heading: 0=North CW+).
+ * Euler conventions: pitch negative = nose UP; heading 0=North clockwise positive.
  */
 
 import type { PoseTrack } from '../poseTrack.js';

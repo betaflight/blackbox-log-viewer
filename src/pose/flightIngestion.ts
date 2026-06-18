@@ -12,7 +12,7 @@
  *  - Body: FRD (Forward=X, Right=Y, Down=Z)
  *  - World: NED (North, East, Down)
  *  - Quaternion: Hamilton, body(FRD) → world(NED), scalar-first [w, x, y, z]
- *  - Q1 frame adapter at L232: [qw, qx, -qy, -qz] (180°-about-X relabel, FLU/NWU→FRD/NED)
+ *  - Frame adapter: [qw, qx, -qy, -qz] (180°-about-X quaternion conjugation relabels FLU/NWU→FRD/NED)
  */
 
 import { FlightLogParser } from '../flightlog_parser.js';
@@ -257,11 +257,10 @@ export function ingestFlightLog(
       // Betaflight logs attitude as Hamilton scalar-first [w,x,y,z].
       // Components stored as int16/32767; qw reconstructed from unit-norm.
       //
-      // Q1 FRAME ADAPTER (VERIFIED 2026-06-16, all 21 acro1 gates green):
-      // Apply [qw, qx, -qy, -qz]. This is conjugation of q by the 180°-about-X
-      // quaternion (a PROPER rotation, det +1) — exactly the FLU/NWU → FRD/NED
-      // relabel (flip body Y,Z and world Y,Z). Fixes heading, pitch, and roll
-      // simultaneously.
+      // FRAME ADAPTER: re-label the FC's native frame (Forward-Left-Up / North-West-Up)
+      // into our Forward-Right-Down / North-East-Down convention. Apply [qw, qx, -qy, -qz].
+      // This is conjugation of q by the 180°-about-X quaternion (a proper rotation, det +1),
+      // flipping both body Y,Z and world Y,Z. Corrects heading, pitch, and roll together.
       if (hasQuat) {
         const qx = frame[idxQuat[0]!] / 32767;
         const qy = frame[idxQuat[1]!] / 32767;
@@ -273,7 +272,7 @@ export function ingestFlightLog(
         } else {
           qw = 0;
         }
-        // Q1 frame adapter: FLU/NWU → FRD/NED
+        // Frame adapter: negate Y and Z quaternion components (FLU/NWU → FRD/NED)
         const qFixed: Quat = [qw, qx, -qy, -qz];
         quat.push({ tUs, q: qFixed });
       }

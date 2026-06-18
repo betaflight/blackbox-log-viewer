@@ -4,8 +4,8 @@
  * Flat row per sample: tMs, lat, lon, altMsl, qw, qx, qy, qz,
  * rollDeg, pitchDeg, headingDeg, tiltDeg, vn, ve, vd, sigmaPos, sigmaAtt.
  *
- * Euler conventions per planv5/01 §7 (pitch: negative = nose UP, positive = nose DOWN),
- * §8 (heading: 0=North CW+), §10 (tiltFromUpright: 0=level, 180=inverted).
+ * Euler conventions: pitch negative = nose UP, positive = nose DOWN;
+ * heading 0=North, clockwise positive; tilt 0=level, 180=inverted.
  */
 
 import type { PoseTrack } from '../poseTrack.js';
@@ -64,7 +64,7 @@ export function poseTrackToCsv(poseTrack: PoseTrack, opts: CsvOpts = {}): string
     row.push(s.q[1].toFixed(precision));
     row.push(s.q[2].toFixed(precision));
     row.push(s.q[3].toFixed(precision));
-    // Euler angles — computed from Q1-adapted quaternion at sample build time.
+    // Euler angles — pre-computed at sample build time.
     // Absent (empty string) for legacy samples before euler was added.
     row.push(s.euler ? s.euler.rollDeg.toFixed(2) : '');
     row.push(s.euler ? s.euler.pitchDeg.toFixed(2) : '');

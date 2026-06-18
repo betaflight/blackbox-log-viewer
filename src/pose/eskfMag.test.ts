@@ -3,7 +3,7 @@ import { createEskf, eskfUpdate } from './eskf.js';
 import { createMagFactor, createDeclinationFactor } from './measurements.js';
 import type { Vec3, Quat } from './poseSample.js';
 
-describe("eskf — 21-state with mag fusion (Q3: unconditional 15-state base + 6 mag)", () => {
+describe("eskf — 21-state with mag fusion (15-state base + 6 mag states)", () => {
     it("initializes with magnetic field states", () => {
         const eskf = createEskf({
             p0: [0, 0, -200] as Vec3,
@@ -22,7 +22,7 @@ describe("eskf — 21-state with mag fusion (Q3: unconditional 15-state base + 6
         expect(eskf.bg).toEqual([0, 0, 0]);
     });
 
-    it("15-state base ESKF works (no mag; unconditional b_a/b_g, Q3)", () => {
+    it("15-state base ESKF works (no mag; b_a/b_g always-on)", () => {
         const eskf = createEskf({
             p0: [0, 0, -200] as Vec3,
             v0: [7, 7, 0] as Vec3,

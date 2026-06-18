@@ -14,7 +14,8 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,7 @@
     "@eslint/js": "^10.0.1",
     "@iconify-json/lucide": "^1.2.105",
     "@nuxt/ui": "^4.7.1",
+    "@types/node": "^25.9.3",
     "@vitejs/plugin-vue": "^6.0.6",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",

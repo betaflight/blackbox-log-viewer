@@ -9,18 +9,17 @@
  * divergence and that the mag field states remain stable over a dynamic
  * trajectory (banked turns, climbs, yaw sweeps).
  *
- * The prior-masked-mag-failure bug class (planv5/18 §17) taught us that green
- * tests with a tight prior prove nothing about the mag path itself. The
+ * Tests with a tight prior prove nothing about the mag path itself. The
  * assertions below therefore ALSO check m_earth stability: if the mag factor
  * were producing wrong updates, the earth-field state would drift from its
  * seed. A tight attitude prior + stable m_earth = the mag path is contributing
  * correctly.
  *
  * The wrong-yaw cold-start recovery case (attSigma=0.8, 40° initial error) is
- * tracked as a known limitation: with the 21-state bias coupling (Task A), the
- * RTS smoother feedback loop through F_θ_bg prevents solo-mag convergence from
- * a wrong start. A convergence guard on the bias coupling (planv5/18 §33.3)
- * will re-enable this test case.
+ * tracked as a known limitation: with the 21-state bias coupling, the RTS
+ * smoother feedback loop through F_theta_bg prevents solo-mag convergence from
+ * a wrong start. A convergence guard on the bias coupling will re-enable this
+ * test case.
  */
 import { describe, it, expect } from 'vitest';
 import { generateDynamicTrajectory, generateSensorStreams } from './synthetic.js';

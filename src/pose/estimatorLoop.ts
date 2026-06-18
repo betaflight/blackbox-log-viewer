@@ -261,7 +261,7 @@ function _runEstimation(
   }
   if (quat.length > 0) q0 = quat[0].q;
 
-  // ---- Static-window bias initialization (Q1) ----
+  // ---- Static-window bias initialization ----
   let bg0: Vec3 = [0, 0, 0];
   let _sigmaBgInit = sigmaBgInit;
   const staticWindowUs = 5e6;

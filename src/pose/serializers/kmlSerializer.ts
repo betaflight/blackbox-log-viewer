@@ -2,7 +2,6 @@
  * KML serializer — produces KML 2.2 with the true-attitude triad.
  *
  * Consumes a PoseTrack IR. Pure string-building; no DOM/Vue dependencies.
- * Spec: planv5/10_visualization_kml.md
  *
  * Layers:
  *   - Fused path (LineString through all positions)

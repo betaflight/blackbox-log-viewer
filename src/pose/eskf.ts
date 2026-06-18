@@ -8,9 +8,9 @@
  *   0-2: dp, 3-5: dv, 6-8: dth, 9-11: b_a, 12-14: b_g,
  *   15-17: m_earth, 18-20: m_body
  *
- * b_a/b_g are unconditional (Q3, planv5/18 S32.3). The knob is prior covariance,
- * not state presence. Tight prior from static window for b_g; moderate prior for
- * b_a (refined in flight via GPS/velned observability).
+ * b_a/b_g are always-on states. The knob is prior covariance, not state presence.
+ * Tight prior from static window for b_g; moderate prior for b_a (refined in
+ * flight via GPS/velned observability).
  *
  * Conventions:
  *   World: NED    Body: FRD

@@ -1,8 +1,8 @@
 /**
  * Mag transform validation probe — Step 1 CHECKPOINT.
  *
- * Loads acro1 BFL, applies correctMagToBody (raw FLU body vectors from the
- * wizard), then tests TWO transforms against the Q1-adapted quaternion:
+ * Loads acro1 BFL, applies correctMagToBody (raw body vectors from the
+ * wizard), then tests TWO transforms against the frame-adapted quaternion:
  *
  *   OLD (reflection):  (-mBody[0], +mBody[1], +mBody[2])  det = -1
  *   NEW (X↔Y SWAP):    (-mBody[1], +mBody[0], +mBody[2])  det = +1  [90° about +Z]
@@ -16,7 +16,7 @@
  *   (d) |m_earth| estimate (|mean(e)|) vs WMM 0.539 G
  *   (e) dot(WMM_NED, individual e_i) stats (median, p90, CV)
  *
- * Writes results to planv5/blackbox/acro1/mag_transform_validation.json.
+ * Writes results to the fixture directory as mag_transform_validation.json.
  *
  * vitest swallows stdout — all quantitative output goes to the JSON file.
  */

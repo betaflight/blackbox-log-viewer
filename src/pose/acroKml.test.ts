@@ -43,8 +43,7 @@ describe('acro1 KML output', () => {
       const data = ingestFlightLog(fl as Parameters<typeof ingestFlightLog>[0]);
 
       // Load and validate the mag characterization model. The corrected mag stream
-      // (with X-axis sign fix for Q1 frame alignment) provides 3-axis body-frame
-      // Gauss measurements for the ESKF mag factor.
+      // provides 3-axis body-frame Gauss measurements for the ESKF mag factor.
       const mr = loadMagCharacterizationModel(JSON.parse(fs.readFileSync(MODEL_PATH, 'utf-8')));
       const magGauss = mr.model ? correctMagStream(data.mag, mr.model as Parameters<typeof correctMagStream>[1]) : [];
       const magModelForEst = mr.model && mr.model.fusion?.earthFieldNedGauss ? mr.model : null;
@@ -52,7 +51,7 @@ describe('acro1 KML output', () => {
       const origin = data.gpsHome || {
         lat: data.gps[0].lat,
         lon: data.gps[0].lon,
-        alt: data.gps[0].alt,
+        alt: data.gps[0].alt ?? 0,
       };
       const opts: EstimatorOpts = {
         outputHz: 20,
@@ -68,7 +67,7 @@ describe('acro1 KML output', () => {
         showTriads: true,
         showPath: true,
         showRawGps: true,
-        rawGps: data.gps.map((g) => ({ lat: g.lat, lon: g.lon, alt: g.alt })),
+        rawGps: data.gps.map((g) => ({ lat: g.lat, lon: g.lon, alt: g.alt ?? 0 })),
         axisLengthMeters: 2.0,
       });
       const json = poseTrackToJson(track);

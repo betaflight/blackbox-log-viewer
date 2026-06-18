@@ -147,7 +147,7 @@ describe('accuracy report', () => {
       const origin: EstimatorOrigin = d.gpsHome || {
         lat: d.gps[0].lat,
         lon: d.gps[0].lon,
-        alt: d.gps[0].alt,
+        alt: d.gps[0].alt ?? 0,
       };
 
       const track = estimatePoseTrack(
