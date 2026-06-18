@@ -290,6 +290,8 @@ function _runEstimation(
 
   // ---- Build keyframe schedule ----
   const outputIntervalUs = 1e6 / outputHz;
+  const kfTotal = Math.max(1, Math.ceil((imu[imu.length - 1].tUs - imu[0].tUs) / outputIntervalUs));
+
   const hasMag =
     magModel != null &&
     magModel.fusion?.earthFieldNedGauss != null &&
@@ -335,15 +337,11 @@ function _runEstimation(
   };
 
   for (let iter = 0; iter < maxIter; iter++) {
-    if (onProgress) {
-      onProgress({
-        phase: 'forward',
-        iteration: iter,
-        totalIterations: maxIter,
-        fraction: iter / maxIter,
-        detail: `GN iteration ${iter + 1}/${maxIter}: ESKF forward pass`,
-      });
-    }
+    // Within-iteration decile tracker for progress cadence.
+    // Emits ~10 events per forward pass across ~4500 keyframes, so the
+    // progress bar advances roughly every 2 s instead of freezing for 20 s.
+    let kfIndex = 0;
+    let lastDecile = -1;
 
     const eskfOpts: EskfOptions = {
       p0,
@@ -626,6 +624,22 @@ function _runEstimation(
           hasUpdate,
         });
 
+        // Emit progress whenever the keyframe decile changes.
+        // Cap at 9 so the smooth event at (iter + 0.95)/maxIter is always
+        // strictly after the last forward decile and before the next iteration.
+        const decile = Math.min(9, Math.floor((kfIndex / kfTotal) * 10));
+        if (onProgress && decile > lastDecile) {
+          lastDecile = decile;
+          onProgress({
+            phase: 'forward',
+            iteration: iter,
+            totalIterations: maxIter,
+            fraction: (iter + decile / 10) / maxIter,
+            detail: `GN iteration ${iter + 1}/${maxIter}: ${decile * 10}% of keyframes`,
+          });
+        }
+        kfIndex++;
+
         F_acc = buildIdentityF(eskf.dim);
         nextKfUs += outputIntervalUs;
       }
@@ -639,7 +653,7 @@ function _runEstimation(
         phase: 'smooth',
         iteration: iter,
         totalIterations: maxIter,
-        fraction: (iter + 0.5) / maxIter,
+        fraction: (iter + 0.95) / maxIter,
         detail: `GN iteration ${iter + 1}/${maxIter}: RTS backward smooth`,
       });
     }
