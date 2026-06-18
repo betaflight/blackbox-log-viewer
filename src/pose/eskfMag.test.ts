@@ -30,7 +30,7 @@ describe("eskf — 21-state with mag fusion (15-state base + 6 mag states)", () 
         });
 
         expect(eskf.dim).toBe(15);
-        expect(eskf.mEarth).toBeNull();
+        expect(eskf.mEarth).toBeUndefined();
         expect(eskf.P.length).toBe(15);
         expect(eskf.ba).toEqual([0, 0, 0]);
         expect(eskf.bg).toEqual([0, 0, 0]);

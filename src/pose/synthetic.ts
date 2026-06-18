@@ -193,6 +193,7 @@ function quatToRotMatrixLocal(q: Quat): number[][] {
 
 export interface DynamicTrajectoryOpts {
   freqHz?: number;
+  durationS?: number;
 }
 
 export interface DynamicTrajectoryResult {

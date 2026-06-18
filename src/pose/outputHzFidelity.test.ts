@@ -52,7 +52,7 @@ describeIntegration("outputHz fidelity", () => {
         const mr = loadMagCharacterizationModel(model);
         const magGauss = mr.model ? correctMagStream(d.mag, mr.model) : [];
         const magModelForEst = mr.model && mr.model.fusion?.earthFieldNedGauss ? mr.model : null;
-        const origin = d.gpsHome || { lat: d.gps[0].lat, lon: d.gps[0].lon, alt: d.gps[0].alt };
+        const origin = d.gpsHome || { lat: d.gps[0].lat, lon: d.gps[0].lon, alt: d.gps[0].alt ?? 0 };
 
         const offsetSec: number = -195.323;
         const backFlipT0: number = 144;

@@ -175,7 +175,7 @@ describeIntegration("mag transform validation", () => {
         ): TransformResult {
             const eWorld: number[][] = [];
             for (const p of pairs) {
-                const r: MagCorrectionResult | null = correctMagToBody(p.mag.meas, model);
+                const r: MagCorrectionResult | null = correctMagToBody(p.mag.meas, model!);
                 if (!r) continue;
                 const gpu: number = r.gaussPerCorrectedUnit ?? 1;
                 const mFrd: number[] = txFn(r.mBody, gpu);

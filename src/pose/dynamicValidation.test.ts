@@ -15,10 +15,10 @@ describe("dynamic trajectory round-trip (Task A)", () => {
     it("recovers position and attitude on a banked-turn-climb-spin trajectory", () => {
         const { traj } = generateDynamicTrajectory({ freqHz: 200 });
         const origin = { lat: 48.408, lon: -71.164, alt: 200 };
-        const { imu, gps, baro, quat } = generateSensorStreams(traj, { gpsNoiseStd: 0.5, origin });
+        const { imu, gps, baro, quat, mag } = generateSensorStreams(traj, { gpsNoiseStd: 0.5, origin });
 
         const poses: LegacyPose[] = estimatePoses(
-            { imu, gps, baro, quat },
+            { imu, gps, baro, quat, mag },
             origin,
             { outputHz: 50, gpsPosSigma: 0.5, gpsVelSigma: 0.3, baroSigma: 0.5, attSigma: 0.05, maxIter: 1 },
         );

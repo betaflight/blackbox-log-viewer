@@ -55,15 +55,15 @@ export interface NominalState {
     q: Quat;
     ba: Vec3;
     bg: Vec3;
-    mEarth: Vec3 | null;
-    mBody: Vec3 | null;
+    mEarth?: Vec3;
+    mBody?: Vec3;
 }
 
 export interface MeasurementFactor {
     H: Mat;
     R: Mat;
     residual(z: unknown, x: NominalState): number[];
-    h?: (x: NominalState) => number[];
+    h?: (x: NominalState) => number | number[];
 }
 
 export interface RobustOpts {
@@ -78,8 +78,8 @@ export interface EskfState {
     q: Quat;
     ba: Vec3;
     bg: Vec3;
-    mEarth: Vec3 | null;
-    mBody: Vec3 | null;
+    mEarth?: Vec3;
+    mBody?: Vec3;
     P: Mat;
     sigmaAcc: number;
     sigmaGyro: number;
@@ -96,8 +96,8 @@ export interface EskfSnapshot {
     q: Quat;
     ba: Vec3 | null;
     bg: Vec3 | null;
-    mEarth: Vec3 | null;
-    mBody: Vec3 | null;
+    mEarth?: Vec3;
+    mBody?: Vec3;
     sigmaPos: number;
     sigmaAtt: number;
 }
@@ -443,8 +443,8 @@ export function createEskf({
 
     const ba: Vec3 = ba0 ? ba0.slice() as Vec3 : [0, 0, 0];
     const bg: Vec3 = bg0 ? bg0.slice() as Vec3 : [0, 0, 0];
-    const me: Vec3 | null = hasMag ? mEarth0!.slice() as Vec3 : null;
-    const mb: Vec3 | null = hasMag ? (mBody0 ? mBody0.slice() as Vec3 : [0, 0, 0]) : null;
+    const me: Vec3 | undefined = hasMag ? mEarth0!.slice() as Vec3 : undefined;
+    const mb: Vec3 | undefined = hasMag ? (mBody0 ? mBody0.slice() as Vec3 : [0, 0, 0]) : undefined;
 
     if (hasMag) {
         P[15][15] = P[16][16] = P[17][17] = sigmaMagEarth * sigmaMagEarth;
@@ -612,8 +612,8 @@ export function eskfGetState(eskf: EskfState): EskfSnapshot {
         q: eskf.q.slice() as Quat,
         ba: eskf.ba ? eskf.ba.slice() as Vec3 : null,
         bg: eskf.bg ? eskf.bg.slice() as Vec3 : null,
-        mEarth: eskf.mEarth ? eskf.mEarth.slice() as Vec3 : null,
-        mBody: eskf.mBody ? eskf.mBody.slice() as Vec3 : null,
+        mEarth: eskf.mEarth ? eskf.mEarth.slice() as Vec3 : undefined,
+        mBody: eskf.mBody ? eskf.mBody.slice() as Vec3 : undefined,
         sigmaPos: Math.sqrt(Math.max(0, (eskf.P[0][0]+eskf.P[1][1]+eskf.P[2][2])/3)),
         sigmaAtt: Math.sqrt(Math.max(0, (eskf.P[6][6]+eskf.P[7][7]+eskf.P[8][8])/3))*(180/Math.PI),
     };

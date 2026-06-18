@@ -70,7 +70,7 @@ interface FixtureContext {
   gpsNed: Array<{ tUs: number } & NedPos>;
   offsetSec: number;
   magRaw: MagRawEntry[];
-  gps: Array<{ tUs: number; course: number; speed: number }>;
+  gps: Array<{ tUs: number; course?: number; speed?: number }>;
   magGauss: MagGaussEntry[];
   magModel: Record<string, unknown> | null;
   _traceForward: unknown[];
@@ -170,8 +170,8 @@ for (const fx of FIXTURES) {
       };
 
       const tracePath = path.join(dir, 'trace_step0.json');
-      fs.writeFileSync(tracePath, JSON.stringify(ctx._traceForward, null, 2));
-      console.warn(`[trace] Wrote ${ctx._traceForward.length} trace entries to ${tracePath}`);
+      fs.writeFileSync(tracePath, JSON.stringify(ctx!._traceForward, null, 2));
+      console.warn(`[trace] Wrote ${ctx!._traceForward.length} trace entries to ${tracePath}`);
     }, 120_000);
 
     it('mag model loads and is validly configured (bounds_ok)', () => {

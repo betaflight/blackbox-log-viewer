@@ -13,7 +13,7 @@ describe('progress cadence', () => {
   it('emits events with strictly non-decreasing fractions in [0,1]', () => {
     const { traj } = generateDynamicTrajectory({ freqHz: 200, durationS: 8 });
     const origin = { lat: 48.408, lon: -71.164, alt: 200 };
-    const { imu, gps, baro, quat } = generateSensorStreams(traj, {
+    const { imu, gps, baro, quat, mag } = generateSensorStreams(traj, {
       gpsNoiseStd: 0.5,
       origin,
     });
@@ -22,7 +22,7 @@ describe('progress cadence', () => {
     const onProgress = (ev: OnProgress) => events.push({ ...ev });
 
     const poses = estimatePoses(
-      { imu, gps, baro, quat },
+      { imu, gps, baro, quat, mag },
       origin,
       {
         outputHz: 20,
@@ -65,7 +65,7 @@ describe('progress cadence', () => {
     const onProgress = (ev: OnProgress) => events.push({ ...ev });
 
     estimatePoses(
-      { imu: [], gps: [], baro: [], quat: [] },
+      { imu: [], gps: [], baro: [], quat: [], mag: [] },
       { lat: 0, lon: 0, alt: 0 },
       { onProgress },
     );

@@ -35,8 +35,8 @@ export interface GpsEntry {
   lon: number;
   alt: number | null;
   velNed: Vec3 | null;
-  speed: number;
-  course: number;
+  speed?: number;
+  course?: number;
   numSat: number;
 }
 
