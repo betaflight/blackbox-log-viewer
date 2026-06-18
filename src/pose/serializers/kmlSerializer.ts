@@ -135,20 +135,21 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
     lines.push('        <styleUrl>#pathStyle</styleUrl>');
     lines.push('        <gx:Track>');
     lines.push('          <altitudeMode>absolute</altitudeMode>');
-    // <gx:Track> uses parallel arrays: all <when> first, then all <gx:coord>, then all <gx:angles>.
-    // Emit each array group in a separate pass.
-    for (const s of samples) {
-      if (!s.lla) continue;
+    // <gx:Track> uses parallel arrays: all <when>, then all <gx:coord>, then all <gx:angles>.
+    // All three arrays MUST have identical lengths. Collect once, emit three times.
+    const trackSamples = samples.filter((s) => s.lla);
+    for (const s of trackSamples) {
       const tIso = new Date(epochMs + ((s.tUs - t0Us) / 1e6) * 1000).toISOString();
       lines.push(`          <when>${tIso}</when>`);
     }
-    for (const s of samples) {
-      if (!s.lla) continue;
-      lines.push(`          <gx:coord>${s.lla.lon} ${s.lla.lat} ${s.lla.alt}</gx:coord>`);
+    for (const s of trackSamples) {
+      lines.push(`          <gx:coord>${s.lla!.lon} ${s.lla!.lat} ${s.lla!.alt}</gx:coord>`);
     }
-    for (const s of samples) {
-      if (!s.lla || !s.euler) continue;
-      lines.push(`          <gx:angles>${s.euler.headingDeg.toFixed(1)} ${s.euler.tiltDeg.toFixed(1)} ${s.euler.rollDeg.toFixed(1)}</gx:angles>`);
+    for (const s of trackSamples) {
+      const h = s.euler?.headingDeg ?? 0;
+      const t = s.euler?.tiltDeg ?? 0;
+      const r = s.euler?.rollDeg ?? 0;
+      lines.push(`          <gx:angles>${h.toFixed(1)} ${t.toFixed(1)} ${r.toFixed(1)}</gx:angles>`);
     }
     lines.push('        </gx:Track>');
     lines.push('      </Placemark>');
