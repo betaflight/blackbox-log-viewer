@@ -83,7 +83,7 @@ function buildGpsNed(gps: GpsEntry[], lat0: number, lon0: number, alt0: number):
 //   ≥12 sats → hAcc≈1.5 m    8–11 → 2.5 m    <8 → 5 m
 // acro1: 18-20 sats throughout → hAcc≈1.5 m (good sky)
 // GPS vertical accuracy: ≈1.5× horizontal → vAcc≈2-3 m
-// GPS course: 2–5° noise at >5 m/s
+// GPS velocity direction: 2–5° noise at >5 m/s
 // Magnetometer: QMC5883L ~3-5° heading accuracy (from calibration wizard)
 // Accelerometer: gravity witness only in |accel| ∈ [0.97,1.03]g, |ω|<10°/s
 // FC quaternion: ~1° tilt accuracy in 1g, yaw drifts 10-30°/flight
@@ -93,7 +93,7 @@ function buildGpsNed(gps: GpsEntry[], lat0: number, lon0: number, alt0: number):
 const WITNESS = {
   gpsHAccGood: 1.5,       // m, ≥12 sats
   gpsVAccGood: 3.0,        // m, ≥12 sats
-  gpsCourseSigma: 3.0,     // deg, at >5 m/s
+  gpsTrackSigma: 3.0,     // deg, at >5 m/s (GPS velocity direction noise)
   fcTiltAccuracy: 1.0,     // deg, in 1g
   fcYawDrift: 15,           // deg, over flight
   magHeadingAccuracy: 4.0, // deg

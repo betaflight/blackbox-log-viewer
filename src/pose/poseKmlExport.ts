@@ -15,6 +15,7 @@ import { ingestFlightLog, correctMagStream } from './flightIngestion.js';
 import { createPoseTrack } from './poseTrack.js';
 import { poseTrackToKml } from './serializers/kmlSerializer.js';
 import { loadMagCharacterizationModel } from './mag_model.js';
+import { computeMagHeadingBias } from './rawMagBias.js';
 import type { IngestedData } from './flightIngestion.js';
 import type { EstimatorOrigin, EstimatorOpts, PoseTrackWithTrace } from './estimatorLoop.js';
 import type { PoseTrackMeta } from './poseTrack.js';
@@ -121,6 +122,22 @@ export async function generatePoseKml({
     }
   }
 
+  // When no mag model was uploaded but raw mag data is present, compute a
+  // model-free heading bias by fitting a hard-iron sphere and comparing the
+  // tilt-compensated mag heading against the FC quaternion heading.  Passing
+  // this bias into the estimator corrects the FC's sustained yaw offset
+  // (~2-3° for a calibrated quad) without needing the wizard.
+  let rawMagBiasRad = 0;
+  if (!magModelForEst && data.mag.length > 0 && data.quat.length > 0) {
+    const biasResult = computeMagHeadingBias(data.mag, data.quat);
+    if (biasResult.valid) {
+      rawMagBiasRad = biasResult.biasRad;
+      console.log(`[MAG-BIAS] ${biasResult.message}`);
+    } else {
+      console.log(`[MAG-BIAS] ${biasResult.message}`);
+    }
+  }
+
   report('parsing', 1.0, 'Log parsed. Starting estimation…');
   throwIfAborted();
 
@@ -146,6 +163,7 @@ export async function generatePoseKml({
       outputHz: OUTPUT_HZ,
       sigmaYawMax: 0.1,
       magModel: magModelForEst as EstimatorOpts['magModel'],
+      rawMagBiasRad,
     },
     signal,
     onProgress,

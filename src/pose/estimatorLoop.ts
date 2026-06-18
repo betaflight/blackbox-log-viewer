@@ -20,7 +20,7 @@ import { llhToNed, nedToLlh } from './geodesy.js';
 import type { NedPos } from './geodesy.js';
 import { createPoseTrack } from './poseTrack.js';
 import type { PoseTrack } from './poseTrack.js';
-import { quatToRot } from './imuMechanization.js';
+import { quatToRot, quatFromAxisAngle, quatMultiply } from './imuMechanization.js';
 import { pitchDeg, noseBearingDeg, tiltFromUprightDeg } from './acroGates.js';
 import type { PoseSampleInternal, Vec3, Quat, LLA } from './poseSample.js';
 import type {
@@ -94,6 +94,10 @@ export interface EstimatorOpts {
   gpsPosGate?: number;
   gpsVelGate?: number;
   magGate?: number;
+  /** Model-free raw-mag heading-bias estimate (rad).  When set and useMag is
+   *  false, every FC quaternion is corrected by this angle about world-Z
+   *  before entering the quaternion prior.  Computed by computeMagHeadingBias(). */
+  rawMagBiasRad?: number;
   sigmaBaInit?: number;
   sigmaBgInit?: number;
   sigmaBaRW?: number;
@@ -222,7 +226,7 @@ function _runEstimation(
     gpsVelSigma = 0.5,
     baroSigma = 2.0,
     attSigma = 0.02,
-    sigmaYaw = 0.025,
+    sigmaYaw = 0.15,
     sigmaYawMax = SIGMA_YAW_DEFAULT_MAX,
     maxIter = 3,
     magSigma = 0.05,
@@ -235,6 +239,7 @@ function _runEstimation(
     gpsPosGate = 4.5,
     gpsVelGate = 15.0,
     magGate = 3.0,
+    rawMagBiasRad = 0,
     sigmaBaInit = 0.5,
     sigmaBgInit = 0.01,
     sigmaBaRW = 2e-4,
@@ -607,17 +612,32 @@ function _runEstimation(
           fwPos: [...eskf.p] as Vec3,
         };
 
+        // Raw-mag heading-bias pre-rotation: when no model is loaded but an
+        // in-flight hard-iron bias has been estimated, rotate every FC
+        // quaternion by +bias about world-Z before the quaternion prior sees it.
+        // bias = median(mag_heading − fc_heading), so adding it corrects the
+        // FC heading toward the mag's estimate of true heading.
+        const applyRawMagBias = !useMag && rawMagBiasRad !== 0;
+        const qMagBiasCorr = applyRawMagBias
+          ? quatFromAxisAngle([0, 0, 1] as Vec3, rawMagBiasRad)
+          : null;
+
         while (quatIdx < quat.length && quat[quatIdx].tUs <= nextKfUs) {
           const adaptiveSigmaYaw = useMag
             ? computeAdaptiveSigmaYaw(eskf.q, magDisturbScale, sigmaYawMax)
             : sigmaYaw;
           traceEntry.sigmaYaw = adaptiveSigmaYaw;
+
+          const qMeas = applyRawMagBias
+            ? quatMultiply(qMagBiasCorr!, quat[quatIdx].q)
+            : quat[quatIdx].q;
+
           const fQ = createQuaternionPrior(
-            quat[quatIdx].q,
+            qMeas,
             attSigma,
             adaptiveSigmaYaw,
           );
-          if (eskfUpdate(eskf, fQ as any, quat[quatIdx].q, Infinity))
+          if (eskfUpdate(eskf, fQ as any, qMeas, Infinity))
             hasUpdate = true;
           quatIdx++;
         }
