@@ -283,12 +283,20 @@ async function runInWorker(
       reject(new Error(err.message));
     };
 
-    worker.postMessage({
-      type: 'estimate',
-      data: data as unknown as Record<string, unknown>,
-      origin,
-      opts,
-    });
+    // Strip callbacks from opts before posting to the worker — functions
+    // cannot be cloned by structuredClone (used internally by postMessage).
+    // The worker uses its own onProgress that posts plain-data messages back.
+    const safeOpts = { ...opts };
+    delete (safeOpts as Record<string, unknown>).onProgress;
+
+    // Dev-time clone-safety guard: verify the payload is serializable before
+    // posting. A DataCloneError here means a non-cloneable value (function,
+    // Symbol, DOM node) leaked into data/origin/opts.
+    const inputPayload = { type: 'estimate', data, origin, opts: safeOpts };
+    if (typeof structuredClone === 'function') {
+      structuredClone(inputPayload);
+    }
+    worker.postMessage(inputPayload);
   });
 }
 
