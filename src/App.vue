@@ -12,6 +12,7 @@
           @open-keys="onOpenKeys"
           @export-csv="onExportCsv"
           @export-gpx="onExportGpx"
+          @export-kml="onExportKml"
           @export-video="onExportVideo"
           @export-workspaces="onExportWorkspaces"
           @new-window="onNewWindow"
@@ -115,6 +116,10 @@
         :videoConfig="playbackStore.videoConfig"
         @save-config="onSaveVideoConfig"
       />
+      <KmlExportDialog
+        v-model:open="appStore.kmlExportDialogOpen"
+        :flightLog="logStore.flightLog"
+      />
     </div>
   </UApp>
 </template>
@@ -142,6 +147,7 @@ import UserSettingsDialog from "./components/UserSettingsDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
 import VideoExportDialog from "./components/VideoExportDialog.vue";
+import KmlExportDialog from "./components/KmlExportDialog.vue";
 import SpectrumAnalyser from "./components/SpectrumAnalyser.vue";
 import LegendPanel from "./components/LegendPanel.vue";
 import FieldValuesPanel from "./components/FieldValuesPanel.vue";
@@ -205,6 +211,10 @@ function onExportCsv() {
 
 function onExportGpx() {
   appStore.exportGpx?.();
+}
+
+function onExportKml() {
+  appStore.kmlExportDialogOpen = true;
 }
 
 function onExportVideo() {

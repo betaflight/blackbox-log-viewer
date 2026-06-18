@@ -1,0 +1,20 @@
+﻿{
+    "files":  [
+                  {
+                      "sha256":  "CC676867EAE1373CC8BEB455664DAF22011CF1BBDCA8DC367B7A08945B781EFC",
+                      "file":  "acro1_posetrack.json"
+                  },
+                  {
+                      "sha256":  "37867BB2A452FD129F6366CC4B60AE59D647813843EB00F41DB9F8817454BEC7",
+                      "file":  "acro1_track.kml"
+                  },
+                  {
+                      "sha256":  "836E242C5F428B97EE167D9501A56722C10A4EDEBB037372ED9DD3B5341A9178",
+                      "file":  "accuracy_report.json"
+                  }
+              ],
+    "description":  "Reference output checksums for acro1 flight. Generated from SOURCE repo (JS, feature/body-pose-reconstruction). TS port must reproduce these byte-for-byte.",
+    "source_branch":  "feature/body-pose-reconstruction",
+    "generated":  "2026-06-17T00:00:00.000Z",
+    "source_repo":  "C:/code/betaflightz/blackbox-log-viewer"
+}
