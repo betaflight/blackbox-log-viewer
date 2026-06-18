@@ -5,6 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { describeIntegration } from './testHelpers.js';
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -97,6 +98,30 @@ describeIntegration('acro1 KML output', () => {
       expect(kml).toContain('kml');
       expect(json).toContain('schemaVersion');
       expect(track.samples.length).toBeGreaterThan(0);
+
+      // Verify reference checksums (detect output drift)
+      const checksumsPath = path.join(DIR, 'checksums.json');
+      if (fs.existsSync(checksumsPath)) {
+        let raw = fs.readFileSync(checksumsPath, 'utf-8');
+        // Strip UTF-8 BOM if present
+        if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
+        const checksums = JSON.parse(raw);
+        for (const entry of checksums.files) {
+          const filePath = path.join(DIR, entry.file);
+          if (fs.existsSync(filePath)) {
+            const hash = crypto
+              .createHash('sha256')
+              .update(fs.readFileSync(filePath))
+              .digest('hex')
+              .toUpperCase();
+            expect(
+              hash,
+              `checksum mismatch for ${entry.file}: regenerated ${hash}, expected ${entry.sha256}. ` +
+                'If the output changed intentionally, update checksums.json.',
+            ).toBe(entry.sha256);
+          }
+        }
+      }
     },
     60000,
   );
