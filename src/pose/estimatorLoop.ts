@@ -625,7 +625,7 @@ function _runEstimation(
         while (quatIdx < quat.length && quat[quatIdx].tUs <= nextKfUs) {
           const adaptiveSigmaYaw = useMag
             ? computeAdaptiveSigmaYaw(eskf.q, magDisturbScale, sigmaYawMax)
-            : sigmaYaw;
+            : computeAdaptiveSigmaYaw(eskf.q, 1.0, sigmaYaw);
           traceEntry.sigmaYaw = adaptiveSigmaYaw;
 
           const qMeas = applyRawMagBias
