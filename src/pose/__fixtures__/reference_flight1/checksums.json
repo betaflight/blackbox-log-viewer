@@ -1,0 +1,20 @@
+{
+  "files": [
+    {
+      "sha256": "F9330CDB79AFD77CE5A5C47D4877C71429063B76BD0B403A9F343B10D8759686",
+      "file": "reference_flight1_posetrack.json"
+    },
+    {
+      "sha256": "3A3274BB261249CA8860DDE528C27759BF6456C655F3CB4F0655B37E5781738B",
+      "file": "reference_flight1_track.kml"
+    },
+    {
+      "sha256": "E19CD4E344C18BA02D8A444D5F5DE5B8BC2E937532009E0FF4466E6D7B8B26D3",
+      "file": "accuracy_report.json"
+    }
+  ],
+  "description": "Reference output fingerprints for reference_flight1. Quality is guarded by the 24 reconstruction gates (acroFixture.test.ts); these detect unintended byte drift. Regenerated after the accuracy-scaling default was set off.",
+  "source_branch": "feature/body-pose-reconstruction-ts",
+  "generated": "2026-06-19T00:41:07.764Z",
+  "source_repo": "C:/code/betaflightz/blackbox_ts/blackbox-log-viewer"
+}

@@ -13,7 +13,10 @@
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "test": "vitest run",
+    "test:full": "cross-env RUN_INTEGRATION=1 vitest run",
+    "typecheck": "vue-tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -38,14 +41,17 @@
     "@eslint/js": "^10.0.1",
     "@iconify-json/lucide": "^1.2.105",
     "@nuxt/ui": "^4.7.1",
+    "@types/node": "^25.9.3",
     "@vitejs/plugin-vue": "^6.0.6",
+    "cross-env": "^10.1.0",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",
     "prettier": "^3.8.3",
     "tailwindcss": "^4.2.4",
     "vite": "^7.3.2",
-    "vite-plugin-pwa": "^1.0.3"
+    "vite-plugin-pwa": "^1.0.3",
+    "vitest": "^4.1.9"
   },
   "overrides": {
     "@rollup/plugin-terser": "^1.0.0"

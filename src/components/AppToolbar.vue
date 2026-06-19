@@ -58,6 +58,14 @@
           size="xs"
           @click="$emit('export-gpx')"
         />
+        <UButton
+          variant="ghost"
+          color="neutral"
+          label="KML"
+          icon="i-lucide-globe"
+          size="xs"
+          @click="$emit('export-kml')"
+        />
       </div>
       <div class="flex items-center gap-1">
         <UButton
@@ -90,6 +98,7 @@ defineEmits([
   "files-selected",
   "export-csv",
   "export-gpx",
+  "export-kml",
   "export-video",
   "export-workspaces",
   "new-window",

@@ -24,6 +24,7 @@ export const useAppStore = defineStore("app", () => {
   const graphConfigDialogOpen = ref(false);
   const headerDialogOpen = ref(false);
   const videoExportDialogOpen = ref(false);
+  const kmlExportDialogOpen = ref(false);
   const settingsDialogOpen = ref(false);
   const keysDialogOpen = ref(false);
 
@@ -65,6 +66,7 @@ export const useAppStore = defineStore("app", () => {
     graphConfigDialogOpen,
     headerDialogOpen,
     videoExportDialogOpen,
+    kmlExportDialogOpen,
     settingsDialogOpen,
     keysDialogOpen,
     loadFiles,
