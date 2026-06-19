@@ -31,8 +31,8 @@
 
           <!-- Mag optimization mode -->
           <div class="flex items-center justify-between">
-            <span class="text-sm font-medium">Mag optimization</span>
-            <select v-model="magMode" class="w-40 border border-gray-300 rounded px-2 py-1 text-sm">
+            <label for="mag-mode-select" class="text-sm font-medium">Mag optimization</label>
+            <select id="mag-mode-select" v-model="magMode" class="w-40 border border-gray-300 rounded px-2 py-1 text-sm">
               <option value="auto">AUTO</option>
               <option value="off">OFF</option>
               <option value="manual">MANUAL</option>

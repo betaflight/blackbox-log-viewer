@@ -20,13 +20,13 @@ import { generateDynamicTrajectory, generateSensorStreams, createRng } from './s
 import type { SyntheticPose } from './synthetic.js';
 import type { PoseSampleInternal } from './poseSample.js';
 
-function isFinite(x: number): boolean { return Number.isFinite(x); }
+function isFiniteNum(x: number): boolean { return Number.isFinite(x); }
 
 function computeNees(traj: SyntheticPose[], track: { samples: PoseSampleInternal[] }): number[] {
     const neesValues: number[] = [];
     let gtIdx0 = 0;
     for (const s of track.samples) {
-        if (s.tUs == null || !isFinite(s.tUs)) continue;
+        if (s.tUs == null || !isFiniteNum(s.tUs)) continue;
         const tS: number = (s.tUs - track.samples[0].tUs) / 1e6;
         let best: SyntheticPose = traj[0];
         let bestDt: number = Math.abs(best.t - tS);
@@ -85,14 +85,14 @@ describe("B3 — robust kernels + gating + NEES consistency", () => {
         });
         expect(trackDcs.samples.length).toBeGreaterThan(0);
         for (const s of trackDcs.samples) {
-            expect(isFinite(s.p[0])).toBe(true);
-            expect(isFinite(s.tUs)).toBe(true);
+            expect(isFiniteNum(s.p[0])).toBe(true);
+            expect(isFiniteNum(s.tUs)).toBe(true);
         }
 
         let maxPosErr = 0;
         let gtIdx0 = 0;
         for (const s of trackDcs.samples) {
-            if (s.tUs == null || !isFinite(s.tUs)) continue;
+            if (s.tUs == null || !isFiniteNum(s.tUs)) continue;
             const tS: number = (s.tUs - trackDcs.samples[0].tUs) / 1e6;
             let best: SyntheticPose = traj[gtIdx0];
             let bestDt: number = Math.abs(best.t - tS);
@@ -174,15 +174,15 @@ describe("B3 — robust kernels + gating + NEES consistency", () => {
         });
 
         for (const s of track.samples) {
-            expect(isFinite(s.p[0]), `NaN with gps spike`).toBe(true);
-            expect(isFinite(s.p[1]), `NaN with gps spike`).toBe(true);
-            expect(isFinite(s.tUs)).toBe(true);
+            expect(isFiniteNum(s.p[0]), `NaN with gps spike`).toBe(true);
+            expect(isFiniteNum(s.p[1]), `NaN with gps spike`).toBe(true);
+            expect(isFiniteNum(s.tUs)).toBe(true);
         }
 
         let maxHorizErr = 0;
         let gtIdx0 = 0;
         for (const s of track.samples) {
-            if (s.tUs == null || !isFinite(s.tUs)) continue;
+            if (s.tUs == null || !isFiniteNum(s.tUs)) continue;
             const tS: number = (s.tUs - track.samples[0].tUs) / 1e6;
             let best: SyntheticPose = traj[gtIdx0];
             let bestDt: number = Math.abs(best.t - tS);
