@@ -10,11 +10,30 @@
  * Applying this bias corrects the FC's sustained heading error (typically
  * ~2–3°) without needing the configurator calibration wizard.
  *
+ * Scope vs. the uploaded characterization model:
+ *  - This estimator removes HARD-IRON only (a constant offset: m − center).
+ *    The full characterization model additionally captures SOFT-IRON — the
+ *    scale/cross-axis distortion that warps the field sphere into an ellipsoid —
+ *    as a 3×3 matrix W_inv applied as newCombined·W_inv·(m − center). Soft iron
+ *    makes the heading error orientation-dependent, so a single scalar bias
+ *    cannot represent it. Fitting an ellipsoid here (and threading W_inv into
+ *    the estimator as a per-sample correction rather than a constant yaw offset)
+ *    is the known next step for full parity with the model path; it is
+ *    deliberately not attempted yet to keep this path simple and robust.
+ *  - We subtract the hard-iron center BEFORE deriving heading (a "correct-then-
+ *    compare" order). Comparing on raw, un-centered data entangles the offset
+ *    into the heading estimate — the configurator measured this as roughly
+ *    11–13° vs ~5° error, so the ordering here is the important part.
+ *  - The bias is aggregated with a MEDIAN, not a circular mean: motor-EMI
+ *    spikes produce occasional large outliers, and the median rejects them
+ *    where a mean would be dragged. The residual angles are small (a few
+ *    degrees), so wrap-around bias near ±180° is not a concern.
+ *
  * Frame conventions:
  *  - Raw magADC: post-firmware-alignment, already in FRD body frame
  *  - Hard-iron center: computed in the same FRD frame as the raw data
  *  - Calibrated mag: FRD after hard-iron removal (no frame swap needed)
- *  - FC quaternion: Q1-adapted (body FRD → world NED)
+ *  - FC quaternion: standard body FRD → world NED
  *  - Heading: 0°=North, CW+
  */
 
@@ -125,6 +144,15 @@ function zeros4(): number[][] {
 
 /** Minimum heading spread (degrees) for a reliable sphere fit + bias estimate */
 const MIN_COVERAGE_SPREAD_DEG = 90;
+
+/**
+ * Maximum normalized sphere-fit residual (RMS / radius) we accept. Above this
+ * the raw mag does not lie on a sphere — strong soft-iron warp, environmental
+ * interference, or bad data — and a hard-iron-only center is not meaningful, so
+ * we decline rather than inject a bogus bias. The configurator targets ~2% for a
+ * controlled bench tumble; in-flight data is noisier, so this bound is looser.
+ */
+const MAX_NORMALIZED_RESIDUAL = 0.15;
 
 export interface CoverageCheck {
   minDeg: number;
@@ -259,7 +287,7 @@ export interface MagHeadingBiasResult {
  * difference between mag heading and FC heading.
  *
  * @param magRaw  Raw mag ADC entries (firmware FLU frame, post alignment)
- * @param fcQuat  FC quaternion stream (Q1-adapted, FRD→NED)
+ * @param fcQuat  FC quaternion stream (body FRD → world NED)
  * @returns       Bias estimate with full diagnostics
  */
 export function computeMagHeadingBias(
@@ -282,10 +310,24 @@ export function computeMagHeadingBias(
   const hi = fitHardIron(magRaw.map((m) => m.meas));
   if (!hi.valid) return fail('Hard-iron sphere fit failed (singular matrix)');
 
+  // ----- Fit-quality gate -----
+  // Reject a poorly-fitting sphere: a high residual means the data is not
+  // sphere-like (soft iron / interference), so the hard-iron center — and any
+  // bias derived from it — would be unreliable.
+  const normResidual = hi.radius > 0 ? hi.rms / hi.radius : Infinity;
+  if (normResidual > MAX_NORMALIZED_RESIDUAL) {
+    return fail(
+      `Sphere fit residual ${(normResidual * 100).toFixed(1)}% > ` +
+      `${(MAX_NORMALIZED_RESIDUAL * 100).toFixed(0)}% (data not sphere-like; ` +
+      `likely soft-iron warp or interference). Falling back to FC-only heading.`,
+    );
+  }
+
   // ----- Heading coverage -----
   const coverage = checkHeadingCoverage(fcQuat);
 
   // ----- Match mag and FC quaternion on time -----
+  const MAX_MATCH_DT_US = 100_000; // 100 ms — reject stale attitude during dropouts
   const diffs: number[] = [];
   const D = 180 / Math.PI;
   let fcIdx = 0;
@@ -296,7 +338,10 @@ export function computeMagHeadingBias(
       fcIdx++;
     }
     if (fcIdx >= fcQuat.length) break;
-    const fc = fcQuat[fcIdx];
+    const a = fcQuat[fcIdx];
+    const b = fcIdx + 1 < fcQuat.length ? fcQuat[fcIdx + 1] : null;
+    const fc = b && Math.abs(b.tUs - mag.tUs) < Math.abs(a.tUs - mag.tUs) ? b : a;
+    if (Math.abs(fc.tUs - mag.tUs) > MAX_MATCH_DT_US) continue;
 
     // Hard-iron removal.  The raw magADC from the blackbox log is in the
     // FC's native body frame.  We do NOT apply a frame swap here — instead

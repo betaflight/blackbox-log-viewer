@@ -24,9 +24,9 @@ import type { PoseSampleInternal, Quat } from './poseSample.js';
 import type { PoseTrack } from './poseTrack.js';
 
 const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
-const DIR: string = path.resolve(__dirname, './__fixtures__/acro1/');
+const DIR: string = path.resolve(__dirname, './__fixtures__/reference_flight1/');
 const BFL_PATH: string = path.join(DIR, 'LOG00007.BFL');
-const MODEL_PATH: string = path.join(DIR, 'acro1_mag_model.json');
+const MODEL_PATH: string = path.join(DIR, 'reference_flight1_mag_model.json');
 
 function hasFiles(): boolean {
     try { fs.accessSync(BFL_PATH, fs.constants.R_OK); fs.accessSync(MODEL_PATH, fs.constants.R_OK); return true; } catch { return false; }
@@ -44,7 +44,7 @@ interface RateResult {
 
 describeIntegration("outputHz fidelity", () => {
     it("attitude fidelity preserved across output rates (20/50/100/250/500 Hz)", async () => {
-        if (!hasFiles()) { console.warn("SKIP: acro1 files not available"); return; }
+        if (!hasFiles()) { console.warn("SKIP: reference_flight1 files not available"); return; }
 
         const fl: unknown = await loadFlightLogFromBuffer(new Uint8Array(fs.readFileSync(BFL_PATH)));
         const d = ingestFlightLog(fl as Parameters<typeof ingestFlightLog>[0]);

@@ -17,11 +17,6 @@
  *  6. Attitude quaternion            (imuQuaternion)
  */
 
-import { FlightLogParser } from '../flightlog_parser.js';
-
-const FLIGHT_LOG_FIELD_INDEX_TIME =
-  FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME as number;
-
 /** Minimum satellites for a reliable 3D fix at takeoff. */
 const MIN_SATS_FOR_LOCK = 6;
 /** Maximum GPS frames to scan for the takeoff-lock check. */
@@ -127,7 +122,6 @@ export function analyzeLogCapabilities(
   // We peek at the first few GPS frames via getChunksInTimeRange.
   let gpsLocked = false;
   if (hasGpsPos && hasGpsNumSat) {
-    const idxTime = FLIGHT_LOG_FIELD_INDEX_TIME;
     const idxGpsLat = idx('GPS_coord[0]')!;
     const idxGpsLon = idx('GPS_coord[1]')!;
     const idxGpsAlt = idx('GPS_altitude');

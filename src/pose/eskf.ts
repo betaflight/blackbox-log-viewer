@@ -118,7 +118,6 @@ const _sparseStencilCache: Record<number, number[][]> = {};
 function getSparseStencil(dim: number): number[][] {
     if (!_sparseStencilCache[dim]) {
         const stencil = new Array<number[]>(dim);
-        const hasBias = dim >= 12;
         const hasBg = dim >= 15;
 
         for (let j = 0; j < dim; j++) {

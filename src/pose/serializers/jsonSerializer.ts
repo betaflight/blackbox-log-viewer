@@ -36,6 +36,19 @@ export function poseTrackToJson(track: PoseTrack): string {
 export function poseTrackFromJson(json: string): PoseTrack {
   const parsed = JSON.parse(json);
 
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    !parsed.meta ||
+    !parsed.meta.georefOrigin ||
+    !Array.isArray(parsed.samples)
+  ) {
+    throw new Error('Invalid PoseTrack JSON payload.');
+  }
+  if (parsed.meta.schemaVersion !== undefined && parsed.meta.schemaVersion !== 1) {
+    throw new Error(`Unsupported PoseTrack schemaVersion: ${parsed.meta.schemaVersion}`);
+  }
+
   const samples: PoseSampleInternal[] = (parsed.samples || []).map(
     (s: Record<string, unknown>) => ({
       tUs: s.tUs as number,

@@ -161,8 +161,25 @@ export function loadMagCharacterizationModel(json) {
     if (!align) {
         return { valid: false, error: "Model missing alignment data." };
     }
-    if (!geo || geo.field_strength_nt == null) {
+    const isFiniteNumber = (v) => typeof v === "number" && Number.isFinite(v);
+
+    if (
+        !geo ||
+        !isFiniteNumber(geo.field_strength_nt) ||
+        geo.field_strength_nt <= 0 ||
+        !isFiniteNumber(geo.inclination_deg) ||
+        !isFiniteNumber(geo.declination_deg)
+    ) {
         return { valid: false, error: "Model missing geo_reference with field strength." };
+    }
+    if (
+        !ec.center ||
+        !isFiniteNumber(ec.center.x) ||
+        !isFiniteNumber(ec.center.y) ||
+        !isFiniteNumber(ec.center.z) ||
+        !Array.isArray(ec.soft_iron)
+    ) {
+        return { valid: false, error: "Model missing valid ellipsoid_correction fields." };
     }
 
     let alignmentMatrix;

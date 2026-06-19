@@ -9,55 +9,52 @@
         <!-- Settings mode -->
         <template v-if="mode === 'settings'">
           <p class="text-xs text-dimmed">
-            Reconstruct the body-pose trajectory from the loaded blackbox log and export a
-            georeferenced KML with a body-axis triad (nose&nbsp;=&nbsp;red, right&nbsp;=&nbsp;green,
-            up&nbsp;=&nbsp;blue) drawn at each frame.
+            See your flight in 3D in Google Earth with a body-axis triad
+            (nose&nbsp;=&nbsp;red, right&nbsp;=&nbsp;green, up&nbsp;=&nbsp;blue) drawn at each frame.
+            Just import the exported .kml file.
           </p>
 
           <!-- Log-capability checklist -->
-          <div class="border border-gray-200 rounded-md p-3">
-            <p class="text-xs font-medium mb-2">Log data requirements</p>
-            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-              <div class="flex items-center gap-1.5">
-                <span :class="caps?.gyro ? 'text-green-600' : 'text-red-500'">
-                  {{ caps?.gyro ? '&#x2713;' : '&#x2717;' }}
-                </span>
-                <span class="text-xs" :class="caps?.gyro ? 'text-dimmed' : 'text-red-600'">Gyroscope</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span :class="caps?.accel ? 'text-green-600' : 'text-red-500'">
-                  {{ caps?.accel ? '&#x2713;' : '&#x2717;' }}
-                </span>
-                <span class="text-xs" :class="caps?.accel ? 'text-dimmed' : 'text-red-600'">Accelerometer</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span :class="caps?.mag ? 'text-green-600' : 'text-red-500'">
-                  {{ caps?.mag ? '&#x2713;' : '&#x2717;' }}
-                </span>
-                <span class="text-xs" :class="caps?.mag ? 'text-dimmed' : 'text-red-600'">Magnetometer</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span :class="caps?.baro ? 'text-green-600' : 'text-red-500'">
-                  {{ caps?.baro ? '&#x2713;' : '&#x2717;' }}
-                </span>
-                <span class="text-xs" :class="caps?.baro ? 'text-dimmed' : 'text-red-600'">Barometer</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span :class="caps?.gpsLockAtTakeoff ? 'text-green-600' : 'text-red-500'">
-                  {{ caps?.gpsLockAtTakeoff ? '&#x2713;' : '&#x2717;' }}
-                </span>
-                <span class="text-xs" :class="caps?.gpsLockAtTakeoff ? 'text-dimmed' : 'text-red-600'">GPS lock at takeoff</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span :class="caps?.attitude ? 'text-green-600' : 'text-red-500'">
-                  {{ caps?.attitude ? '&#x2713;' : '&#x2717;' }}
-                </span>
-                <span class="text-xs" :class="caps?.attitude ? 'text-dimmed' : 'text-red-600'">Attitude (quaternion)</span>
-              </div>
+          <div class="border border-gray-200 rounded-md p-2">
+            <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
+              <span :class="caps?.gyro ? 'text-green-600' : 'text-red-500'">{{ caps?.gyro ? '✓' : '✗' }} Gyro</span>
+              <span :class="caps?.accel ? 'text-green-600' : 'text-red-500'">{{ caps?.accel ? '✓' : '✗' }} Accel</span>
+              <span :class="caps?.mag ? 'text-green-600' : 'text-red-500'">{{ caps?.mag ? '✓' : '✗' }} Mag</span>
+              <span :class="caps?.baro ? 'text-green-600' : 'text-red-500'">{{ caps?.baro ? '✓' : '✗' }} Baro</span>
+              <span :class="caps?.gpsLockAtTakeoff ? 'text-green-600' : 'text-red-500'">{{ caps?.gpsLockAtTakeoff ? '✓' : '✗' }} GPS lock</span>
+              <span :class="caps?.attitude ? 'text-green-600' : 'text-red-500'">{{ caps?.attitude ? '✓' : '✗' }} Att (2026.06+)</span>
             </div>
-            <p v-if="caps && !caps.canGenerate" class="text-xs text-red-500 mt-2">
+            <p v-if="caps && !caps.canGenerate" class="text-xs text-red-500 mt-1">
               Missing: {{ caps.missing.join(', ') }}
             </p>
+          </div>
+
+          <!-- Mag optimization mode -->
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium">Mag optimization</span>
+            <select v-model="magMode" class="w-40 border border-gray-300 rounded px-2 py-1 text-sm">
+              <option value="auto">AUTO</option>
+              <option value="off">OFF</option>
+              <option value="manual">MANUAL</option>
+            </select>
+          </div>
+
+          <!-- Manual model input (shown only when MANUAL is selected) -->
+          <div v-if="magMode === 'manual'" class="flex flex-col gap-1">
+            <span class="text-xs text-dimmed">Load a characterization model (configurator bench cal or flight-exported JSON).</span>
+            <div class="flex items-center gap-2">
+              <label for="mag-model-file-input" class="sr-only">Load mag characterization model JSON</label>
+              <UInput
+                id="mag-model-file-input"
+                type="file"
+                accept=".json"
+                class="flex-1 text-xs"
+                @change="onModelFileSelected"
+              />
+              <span v-if="manualModelName" class="text-xs text-green-600">{{ manualModelName }}</span>
+              <span v-else class="text-xs text-dimmed">No model loaded</span>
+            </div>
+            <p v-if="manualModelError" class="text-xs text-red-500">{{ manualModelError }}</p>
           </div>
 
           <!-- Triads per second -->
@@ -65,46 +62,12 @@
             <span class="text-sm font-medium">Triads per second</span>
             <UInputNumber
               v-model="triadsPerSecond"
-              :min="0.1"
+              :min="0.5"
               :step="0.5"
               :format-options="{ useGrouping: false }"
               class="w-40"
             />
           </div>
-
-          <!-- Mag model JSON -->
-          <div class="flex items-start justify-between gap-3">
-            <span class="text-sm font-medium pt-1">Mag model (JSON)</span>
-            <div class="flex flex-col items-end gap-1">
-              <UButton
-                variant="outline"
-                color="neutral"
-                size="xs"
-                icon="i-lucide-upload"
-                :label="magModel ? 'Replace file…' : 'Choose file…'"
-                @click="pickMagModel"
-              />
-              <input
-                ref="magFileInput"
-                type="file"
-                accept=".json,application/json"
-                class="hidden"
-                @change="onMagFileChange"
-              />
-              <span
-                v-if="magModelName"
-                class="text-xs text-dimmed max-w-[220px] truncate"
-                :title="magModelName"
-              >
-                {{ magModelName }}
-              </span>
-            </div>
-          </div>
-          <p v-if="magError" class="text-xs text-red-500">{{ magError }}</p>
-          <p v-else-if="!magModel" class="text-xs text-dimmed">
-            Optional — the flight controller already fuses the magnetometer into the
-            logged attitude. Upload a characterization model for additional refinement.
-          </p>
         </template>
 
         <!-- Progress mode -->
@@ -116,6 +79,22 @@
         <!-- Done mode -->
         <template v-else-if="mode === 'done'">
           <p class="text-sm">{{ resultText }}</p>
+          <p v-if="calMessage" class="text-xs text-dimmed mt-1">{{ calMessage }}</p>
+          <template v-if="calCoverage">
+            <span v-if="calCoverage === 'good'" class="text-xs text-green-600">Coverage: good ✓</span>
+            <span v-else-if="calCoverage === 'marginal'" class="text-xs text-yellow-600">Coverage: marginal ⚠</span>
+            <span v-else class="text-xs text-red-500">Coverage: insufficient ✗</span>
+          </template>
+          <!-- Save mag model button (shown only after successful AUTO) -->
+          <UButton
+            v-if="magModelForSave"
+            variant="outline"
+            color="neutral"
+            size="sm"
+            label="Save mag model"
+            class="mt-2"
+            @click="onSaveMagModel"
+          />
         </template>
 
         <!-- Error mode -->
@@ -175,12 +154,17 @@ const props = defineProps({
 });
 
 // Settings
-const triadsPerSecond = ref(2);
+const triadsPerSecond = ref(3);
+const magMode = ref("auto");
+const manualModelName = ref("");
+const manualModelError = ref("");
+const manualModelContent = ref<Record<string, unknown> | null>(null);
 const caps = ref<LogCapabilities | null>(null);
-const magModel = ref<Record<string, unknown> | null>(null);
-const magModelName = ref("");
-const magError = ref("");
-const magFileInput = ref<HTMLInputElement | null>(null);
+
+// Done — cal reporting and export
+const calMessage = ref<string | null>(null);
+const calCoverage = ref<string | null>(null);
+const magModelForSave = ref<Record<string, unknown> | null>(null);
 
 // State machine: settings | progress | done | error
 const mode = ref("settings");
@@ -197,39 +181,53 @@ let abortController: AbortController | null = null;
 const PHASE_BASE = { parsing: 0, estimating: 10, exporting: 90 };
 const PHASE_SPAN = { parsing: 10, estimating: 80, exporting: 10 };
 
-function pickMagModel() {
-  magError.value = "";
-  magFileInput.value?.click();
-}
-
-function onMagFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
-  const file = input.files?.[0];
-  input.value = ""; // allow re-selecting the same file later
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      magModel.value = JSON.parse(reader.result as string);
-      magModelName.value = file.name;
-      magError.value = "";
-    } catch (err) {
-      magModel.value = null;
-      magModelName.value = "";
-      magError.value = `Could not parse JSON: ${(err as Error).message}`;
-    }
-  };
-  reader.onerror = () => {
-    magError.value = "Could not read the selected file.";
-  };
-  reader.readAsText(file);
-}
-
 function onProgress(ev: ProgressEvent) {
   if (ev.detail) progressDetail.value = ev.detail;
   const base = PHASE_BASE[ev.phase] ?? 0;
   const span = PHASE_SPAN[ev.phase] ?? 0;
   progressPercent.value = Math.min(99, Math.round(base + span * (ev.fraction ?? 0)));
+}
+
+function onModelFileSelected(ev: Event) {
+  const target = ev.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) {
+    manualModelName.value = "";
+    manualModelContent.value = null;
+    manualModelError.value = "";
+    return;
+  }
+  manualModelName.value = file.name;
+  manualModelError.value = "";
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const json = JSON.parse(reader.result as string);
+      if (!json || typeof json !== 'object') throw new Error('Not a valid JSON object');
+      manualModelContent.value = json;
+      manualModelError.value = "";
+    } catch (e: unknown) {
+      manualModelError.value = 'Invalid model file: ' + ((e as Error).message ?? String(e));
+      manualModelContent.value = null;
+    }
+  };
+  reader.onerror = () => {
+    manualModelError.value = 'Failed to read file.';
+    manualModelContent.value = null;
+  };
+  reader.readAsText(file);
+}
+
+function onSaveMagModel() {
+  if (!magModelForSave.value) return;
+  const json = JSON.stringify(magModelForSave.value, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flight_mag_model.json';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 async function onGenerate() {
@@ -238,19 +236,24 @@ async function onGenerate() {
   progressDetail.value = "Starting…";
   abortController = new AbortController();
   try {
-    const { filename, kml } = await generatePoseKml({
+    const result = await generatePoseKml({
       // Detach from Vue reactivity: the flight log (store ref) and the loaded
       // mag model (ref) are reactive Proxies, and a Proxy cannot be cloned
       // across the Web Worker boundary. toRaw() hands over plain objects.
       flightLog: toRaw(props.flightLog),
-      magModel: magModel.value ? toRaw(magModel.value) : null,
+      magModel: magMode.value === 'manual' ? manualModelContent.value : null,
+      magMode: magMode.value as 'off' | 'auto' | 'manual',
+      filename: ((props.flightLog as any)?.name ?? 'track').replace(/\.\w+$/, '') + '.kml',
       triadsPerSecond: triadsPerSecond.value,
       onProgress,
       signal: abortController.signal,
     });
-    downloadText(filename, kml, "application/vnd.google-earth.kml+xml");
+    downloadText(result.filename, result.kml, "application/vnd.google-earth.kml+xml");
     progressPercent.value = 100;
-    resultText.value = `Saved ${filename}.`;
+    resultText.value = `Saved ${result.filename}.`;
+    calMessage.value = result.calMessage ?? null;
+    calCoverage.value = result.coverage ?? null;
+    magModelForSave.value = result.magModelForExport ?? null;
     mode.value = "done";
   } catch (err: unknown) {
     const e = err as Error & { code?: string };
@@ -298,7 +301,9 @@ watch(open, (val) => {
     resultText.value = "";
     errorText.value = "";
     errorHint.value = "";
-    magError.value = "";
+    calMessage.value = null;
+    calCoverage.value = null;
+    magModelForSave.value = null;
     // Probe log capabilities for the checklist
     try {
       caps.value = analyzeLogCapabilities(

@@ -294,7 +294,7 @@ export const SIGMA_YAW_DEFAULT_MAX   = 0.10;
 export const SIGMA_YAW_OBS_THRESH_LO = 0.70;
 export const SIGMA_YAW_OBS_THRESH_HI = 1.00;
 
-// Adaptive sigma tilt constants (planv5/06 §9.2)
+// Adaptive sigma tilt constants
 export const SIGMA_TILT_NOMINAL  = 0.02;   // rad — clean gravity, low spin
 export const SIGMA_TILT_FREEFALL = 1.0;    // rad — true freefall (no gravity reference)
 
@@ -498,13 +498,15 @@ export function createDeclinationFactor(declRad: number, sigma = 0.34): Measurem
         return Math.atan2(me[1], me[0]);
     }
 
+    const wrapAngle = (a: number): number => Math.atan2(Math.sin(a), Math.cos(a));
+
     function residual(z: number, x: NominalState): number[] {
         const me = x.mEarth || [0,0,0];
         const n2e2 = me[0]*me[0] + me[1]*me[1];
         const dHdN = n2e2 > 1e-12 ? -me[1]/n2e2 : 0;
         const dHdE = n2e2 > 1e-12 ? me[0]/n2e2 : 0;
         cachedH = [[0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0, dHdN,dHdE,0, 0,0,0]];
-        return [z - h(x)];
+        return [wrapAngle(z - h(x))];
     }
 
     return {

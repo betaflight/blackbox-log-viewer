@@ -1,11 +1,11 @@
 /**
  * Accuracy Report.
  *
- * Runs the estimator on acro1 and measures reconstruction accuracy against
+ * Runs the estimator on reference_flight1 and measures reconstruction accuracy against
  * GPS ground course (heading witness) and accelerometer gravity (tilt witness),
  * broken down by flight regime.
  *
- * Outputs: __fixtures__/acro1/accuracy_report.json + console summary.
+ * Outputs: __fixtures__/reference_flight1/accuracy_report.json + console summary.
  *
  * Regimes:
  *   (a) gentle 1g cruise: |accel| in [0.95, 1.05]g, |omega| < 30 deg/s
@@ -36,9 +36,9 @@ import type { PoseSampleInternal, Quat, Vec3 } from './poseSample.js';
 import type { MagModel } from './flightIngestion.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIR = path.resolve(__dirname, './__fixtures__/acro1/');
+const DIR = path.resolve(__dirname, './__fixtures__/reference_flight1/');
 const BFL_PATH = path.join(DIR, 'LOG00007.BFL');
-const MODEL_PATH = path.join(DIR, 'acro1_mag_model.json');
+const MODEL_PATH = path.join(DIR, 'reference_flight1_mag_model.json');
 
 function hasFiles(): boolean {
   try {
@@ -132,7 +132,7 @@ describeIntegration('accuracy report', () => {
     'produces per-regime accuracy metrics and writes report',
     async () => {
       if (!hasFiles()) {
-        console.warn('SKIP: acro1 files not available');
+        console.warn('SKIP: reference_flight1 files not available');
         return;
       }
 
@@ -411,7 +411,7 @@ describeIntegration('accuracy report', () => {
 
       const report: AccuracyReport = {
         generated: '2026-06-17T00:00:00.000Z', // Fixed for deterministic reference output
-        fixture: 'acro1',
+        fixture: 'reference_flight1',
         regimes: {
           gentle: { desc: '|accel| in [0.95,1.05]g, |omega| < 30 deg/s' },
           aggressive: { desc: '|omega| >= 30 deg/s, |accel| >= 0.5g' },
@@ -464,7 +464,7 @@ describeIntegration('accuracy report', () => {
       const hs = report.headingSustained.gentle;
       const tv = report.tiltValidated.gentle;
       const st = report.staticTilt;
-      console.log(`\n=== ACCURACY REPORT — acro1 ===`);
+      console.log(`\n=== ACCURACY REPORT — reference_flight1 ===`);
       console.log(`\nHEADLINE: Gentle 1g flight:`);
       console.log(
         `  Heading (all, low yaw-rate): median ${h.median} deg RMS ${h.rms} deg (${h.n} samples)`,
@@ -507,10 +507,12 @@ describeIntegration('accuracy report', () => {
         }
       }
 
-      // Write JSON report
+      // Write JSON report only when explicitly requested
       const outPath = path.join(DIR, 'accuracy_report.json');
-      fs.writeFileSync(outPath, JSON.stringify(report, null, 2), 'utf-8');
-      console.log(`\nReport written: ${outPath}`);
+      if (process.env.UPDATE_POSE_FIXTURES === '1') {
+        fs.writeFileSync(outPath, JSON.stringify(report, null, 2), 'utf-8');
+        console.log(`\nReport written: ${outPath}`);
+      }
 
       // --- Assertions (matches acroFixture gates) ---
       expect(st.median, `Static tilt median ${st.median} deg > 20 deg`).toBeLessThan(20);
@@ -530,7 +532,7 @@ describeIntegration('accuracy report', () => {
 
       if (report.heading.freefall.n > 0) {
         console.log(
-          `\nFreefall honesty: heading median ${report.heading.freefall.median} deg — degraded due to b_g deadlock.`,
+          `\nFreefall honesty: heading median ${report.heading.freefall.median} deg — degraded during zero-g (no gravity reference for yaw).`,
         );
       }
     },

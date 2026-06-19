@@ -10,7 +10,7 @@
  *  - Accel: m/s² in body FRD (includes gravity contribution)
  */
 
-import type { Quat, Vec3 } from './poseSample.js';
+import type { Quat, Vec3, Euler } from './poseSample.js';
 
 /** Gravitational acceleration in world NED [m/s²] */
 export const G_WORLD: Readonly<Vec3> = Object.freeze([0, 0, 9.80665]) as Readonly<Vec3>;
@@ -171,6 +171,32 @@ export function quatToRot(q: Quat): number[][] {
     [2 * (xy + wz), 1 - 2 * (xx + zz), 2 * (yz - wx)],
     [2 * (xz - wy), 2 * (yz + wx), 1 - 2 * (xx + yy)],
   ];
+}
+
+/**
+ * Decompose a body(FRD)→world(NED) quaternion into the human-readable Euler
+ * angles the serializers emit. This is the single definition of those angles;
+ * the estimator (per-sample build) and the PoseTrack interpolator both call it,
+ * so a pose sampled at an arbitrary time reports the same convention as a
+ * sample produced directly by the estimator.
+ *
+ * ZYX intrinsic decomposition of R = quatToRot(q):
+ *   roll    = atan2(R[2][1], R[2][2])              rotation about forward axis
+ *   pitch   = -asin(R[2][0])                       negative = nose UP (convention)
+ *   heading = atan2(R[1][0], R[0][0])              nose bearing, 0=North, CW+
+ *   tilt    = acos(R[2][2])                        angle off upright, 0=level..180=inverted
+ * asin/acos arguments are clamped to [-1, 1] to stay finite at gimbal extremes.
+ */
+export function eulerFromQuat(q: Quat): Euler {
+  const DEG = 180 / Math.PI;
+  const R = quatToRot(q);
+  const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v);
+  return {
+    rollDeg: Math.atan2(R[2][1], R[2][2]) * DEG,
+    pitchDeg: -Math.asin(clamp(R[2][0])) * DEG,
+    headingDeg: ((Math.atan2(R[1][0], R[0][0]) * DEG) % 360 + 360) % 360,
+    tiltDeg: Math.acos(clamp(R[2][2])) * DEG,
+  };
 }
 
 /**

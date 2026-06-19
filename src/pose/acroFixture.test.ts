@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 import { ingestFlightLog, loadFlightLogFromBuffer, correctMagStream } from './flightIngestion.js';
 import type { IngestedData, MagRawEntry, MagGaussEntry, QuatEntry, GpsEntry, ImuEntry, BaroEntry } from './flightIngestion.js';
 import { estimatePoseTrack } from './estimatorLoop.js';
-import type { PoseTrackWithTrace, EstimatorOpts, MagModelInput } from './estimatorLoop.js';
+import type { PoseTrack } from './poseTrack.js';
+import type { EstimatorOpts, MagModelInput } from './estimatorLoop.js';
 import { loadMagCharacterizationModel } from './mag_model.js';
 import { correctMagToBody } from './mag_correction.js';
 import { llhToNed } from './geodesy.js';
@@ -73,7 +74,6 @@ interface FixtureContext {
   gps: Array<{ tUs: number; course?: number; speed?: number }>;
   magGauss: MagGaussEntry[];
   magModel: Record<string, unknown> | null;
-  _traceForward: unknown[];
   bounds: TrackBounds;
 }
 
@@ -91,7 +91,7 @@ interface FixtureEntry {
 }
 
 const FIXTURES: FixtureEntry[] = [
-  { id: 'acro1', dir: './__fixtures__/acro1', bfl: 'LOG00007.BFL', manifest: 'acro1_manifest.json' },
+  { id: 'reference_flight1', dir: './__fixtures__/reference_flight1', bfl: 'LOG00007.BFL', manifest: 'reference_flight1_manifest.json' },
 ];
 
 function assertGate(skip: boolean, gateFn: () => GateResult): void {
@@ -129,7 +129,7 @@ for (const fx of FIXTURES) {
       const magModelForEst: MagModelInput | null =
         mr.model && (mr.model as any).fusion?.earthFieldNedGauss ? mr.model as MagModelInput : null;
 
-      const track: PoseTrackWithTrace = estimatePoseTrack(
+      const track: PoseTrack = estimatePoseTrack(
         { ...d, mag: magGauss },
         origin,
         {
@@ -157,21 +157,19 @@ for (const fx of FIXTURES) {
         gps: d.gps.map((g) => ({ tUs: g.tUs, course: g.course, speed: g.speed })),
         magGauss,
         magModel: mr.model ?? null,
-        _traceForward: track._traceForward || [],
         bounds: (() => {
           let nMin = Infinity, nMax = -Infinity, eMin = Infinity, eMax = -Infinity, dMin = Infinity, dMax = -Infinity;
           for (const s of track.samples) {
-            if (s.p[0] < nMin) nMin = s.p[0]; if (s.p[0] > nMax) nMax = s.p[0];
-            if (s.p[1] < eMin) eMin = s.p[1]; if (s.p[1] > eMax) eMax = s.p[1];
-            if (s.p[2] < dMin) dMin = s.p[2]; if (s.p[2] > dMax) dMax = s.p[2];
+            if (s.p[0] < nMin) { nMin = s.p[0]; }
+            if (s.p[0] > nMax) { nMax = s.p[0]; }
+            if (s.p[1] < eMin) { eMin = s.p[1]; }
+            if (s.p[1] > eMax) { eMax = s.p[1]; }
+            if (s.p[2] < dMin) { dMin = s.p[2]; }
+            if (s.p[2] > dMax) { dMax = s.p[2]; }
           }
           return { nMin, nMax, eMin, eMax, dMin, dMax };
         })(),
       };
-
-      const tracePath = path.join(dir, 'trace_step0.json');
-      fs.writeFileSync(tracePath, JSON.stringify(ctx!._traceForward, null, 2));
-      console.warn(`[trace] Wrote ${ctx!._traceForward.length} trace entries to ${tracePath}`);
     }, 120_000);
 
     it('mag model loads and is validly configured (bounds_ok)', () => {
@@ -254,7 +252,8 @@ for (const fx of FIXTURES) {
         if (mx > maxMagX) maxMagX = mx;
       }
       const tCenterSample = ctx!.samples.reduce((best, s) =>
-        Math.abs(s.tUs - tCenter) < Math.abs(best.tUs - tCenter) ? s : best
+        Math.abs(s.tUs - tCenter) < Math.abs(best.tUs - tCenter) ? s : best,
+        ctx!.samples[0],
       );
       const reconPitch = pitchDeg(tCenterSample.q);
 

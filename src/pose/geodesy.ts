@@ -143,12 +143,13 @@ export function nedToLlh(
   const y = originEcef.y + RT[1][0] * enuVec[0] + RT[1][1] * enuVec[1] + RT[1][2] * enuVec[2];
   const z = originEcef.z + RT[2][0] * enuVec[0] + RT[2][1] * enuVec[1] + RT[2][2] * enuVec[2];
 
+  const iters = Math.max(1, Math.floor(iterations));
   const p = Math.sqrt(x * x + y * y);
   let lat = Math.atan2(z, p * (1 - WGS84_E2));
-  let N: number;
-  let alt: number;
+  let N = WGS84_A / Math.sqrt(1 - WGS84_E2 * Math.sin(lat) ** 2);
+  let alt = p / Math.cos(lat) - N;
 
-  for (let i = 0; i < iterations; i++) {
+  for (let i = 0; i < iters; i++) {
     const sinLatI = Math.sin(lat);
     N = WGS84_A / Math.sqrt(1 - WGS84_E2 * sinLatI * sinLatI);
     alt = p / Math.cos(lat) - N;
@@ -160,7 +161,7 @@ export function nedToLlh(
   return {
     lat: rad2deg(lat),
     lon: rad2deg(lon),
-    alt: alt!,
+    alt,
   };
 }
 

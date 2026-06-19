@@ -69,8 +69,6 @@ self.onmessage = async (e: MessageEvent<EstimateRequest>) => {
     // Only post plain-data fields; sampleAt() is a function and cannot be
     // cloned by structuredClone (used internally by postMessage). The main
     // thread rebuilds the full PoseTrack via createPoseTrack().
-    // _traceForward is omitted — it is large, unused downstream, and would
-    // bloat the transfer.
     const payload = { meta: track.meta, samples: track.samples };
     // Dev-time clone-safety guard: catch any future regression where a
     // non-serializable value sneaks into the payload before it hits postMessage.

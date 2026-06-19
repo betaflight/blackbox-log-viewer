@@ -70,6 +70,7 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
     showRawGps = false,
     rawGps = null,
   } = config;
+  const triadStep = Number.isFinite(everyN) ? Math.max(1, Math.floor(everyN)) : 1;
 
   const { samples, meta } = poseTrack;
   if (!samples || samples.length === 0)
@@ -145,7 +146,7 @@ export function poseTrackToKml(poseTrack: PoseTrack, config: KmlConfig = {}): st
   if (showTriads) {
     lines.push('    <Folder><name>Body Axes</name><visibility>1</visibility>');
 
-    for (let i = 0; i < samples.length; i += everyN) {
+    for (let i = 0; i < samples.length; i += triadStep) {
       const s = samples[i];
       if (!s.lla) continue;
 

@@ -175,6 +175,8 @@ export function ingestFlightLog(
     gpsDecimation = 1,
     gpsDelayMs = 0,
   } = opts;
+  const gpsDecimationStep =
+    Number.isInteger(gpsDecimation) && gpsDecimation > 0 ? gpsDecimation : 1;
 
   const sysConfig = flightLog.getSysConfig();
   const acc1G = (sysConfig.acc_1G as number) || 2048;
@@ -318,7 +320,7 @@ export function ingestFlightLog(
             lastGpsAlt = altMsl;
 
             gpsCounter++;
-            if (gpsCounter % gpsDecimation !== 0) continue;
+            if (gpsCounter % gpsDecimationStep !== 0) continue;
 
             let velNed: Vec3 | null = null;
             if (hasGpsVelned) {

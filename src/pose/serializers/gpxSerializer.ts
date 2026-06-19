@@ -34,8 +34,6 @@ export function poseTrackToGpx(poseTrack: PoseTrack, opts: GpxOpts = {}): string
     return '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Betaflight Pose Estimator"><trk><name>Empty</name><trkseg></trkseg></trk></gpx>';
   }
 
-  const t0Us = samples[0].tUs;
-
   const lines: string[] = [];
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
   lines.push(
@@ -48,14 +46,21 @@ export function poseTrackToGpx(poseTrack: PoseTrack, opts: GpxOpts = {}): string
   for (const s of samples) {
     if (!s.lla) continue;
     if (s.tUs == null) continue;
-    const tMs = (s.tUs - t0Us) / 1000;
-    const d = new Date(tMs);
-    if (isNaN(d.getTime())) continue;
-    const iso = d.toISOString();
 
     lines.push(`      <trkpt lat="${s.lla.lat}" lon="${s.lla.lon}">`);
     lines.push(`        <ele>${s.lla.alt}</ele>`);
-    lines.push(`        <time>${iso}</time>`);
+    // <time> intentionally omitted: we have no absolute UTC anchor, so any value
+    // here would be a 1970-epoch fiction that misleads GPX consumers. What the log
+    // DOES carry, for whoever wires real timestamps up later:
+    //   • s.tUs            — microseconds since FC boot; a relative offset only.
+    //   • GPS_time / iTOW  — GPS time-of-WEEK (ms): yields time-of-day but NOT the
+    //                        date, because the GPS week number isn't logged.
+    //   • header "Log start datetime" — absolute UTC of log start, but populated
+    //                        only when the FC's RTC was GPS-synced; it is empty
+    //                        (0000-01-01T00:00:00Z) on the reference log.
+    // To emit true UTC: startDatetime + s.tUs (when the header is set), or
+    // iTOW + a known GPS week. That absolute date is also what you'd feed the WMM
+    // model to match the magnetic field for the day of the flight.
     // Extensions: euler angles when available (roll/pitch/heading/tilt in degrees)
     if (s.euler) {
       lines.push(`        <extensions>`);

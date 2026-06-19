@@ -35,9 +35,9 @@ import type { GateResult } from './acroGates.js';
 import type { PoseSampleInternal, Vec3, Quat } from './poseSample.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIR = path.resolve(__dirname, './__fixtures__/acro1/');
+const DIR = path.resolve(__dirname, './__fixtures__/reference_flight1/');
 const BFL_PATH = path.join(DIR, 'LOG00007.BFL');
-const MODEL_PATH = path.join(DIR, 'acro1_mag_model.json');
+const MODEL_PATH = path.join(DIR, 'reference_flight1_mag_model.json');
 
 function haveBfl(): boolean {
   try { fs.accessSync(BFL_PATH, fs.constants.R_OK); return true; } catch { return false; }
@@ -77,11 +77,11 @@ function buildGpsNed(gps: GpsEntry[], lat0: number, lon0: number, alt0: number):
 }
 
 // ===========================================================================
-// Witness uncertainty model (from acro1 log characterization)
+// Witness uncertainty model (from reference_flight1 log characterization)
 // ===========================================================================
 // GPS horizontal accuracy from sat count:
 //   ≥12 sats → hAcc≈1.5 m    8–11 → 2.5 m    <8 → 5 m
-// acro1: 18-20 sats throughout → hAcc≈1.5 m (good sky)
+// reference_flight1: 18-20 sats throughout → hAcc≈1.5 m (good sky)
 // GPS vertical accuracy: ≈1.5× horizontal → vAcc≈2-3 m
 // GPS velocity direction: 2–5° noise at >5 m/s
 // Magnetometer: QMC5883L ~3-5° heading accuracy (from calibration wizard)
@@ -205,7 +205,7 @@ describeIntegration('STEP 12: Gate Calibration', () => {
   describe('no-underground', () => {
     it('recon never > 8 m below GPS (PASSES good)', () => {
       if (!haveBfl()) return;
-      // acro1: worst penetration = 7.3 m. Tolerance = k·vAcc + reconBudget ≈ 1.5·3 + 2 = 6.5 m.
+      // reference_flight1: worst penetration = 7.3 m. Tolerance = k·vAcc + reconBudget ≈ 1.5·3 + 2 = 6.5 m.
       // Observed 7.3 m is slightly above witness model; using 8 m tolerance.
       const r = gateNoUnderground(samples, gpsNed, 8);
       assertPass(r, 'no-underground');
@@ -231,7 +231,8 @@ describeIntegration('STEP 12: Gate Calibration', () => {
     it('median tilt error ≤ 20° in near-static 1g (PASSES good)', () => {
       if (!haveBfl()) return;
       // FC AHRS complementary-filter lag produces ~12-16° tilt-vs-accel in static windows
-      // (documented in planv5/26 §1.1). Tolerance of 20° matches this physical limit.
+      // FC AHRS complementary-filter lag vs raw accel in static pre-arm window.
+      // Tolerance matches this physical limit.
       const r = gateTiltIn1gWindows(samples, imu, 20);
       assertPass(r, 'tilt-in-1g');
     });
@@ -298,18 +299,19 @@ describeIntegration('STEP 12: Gate Calibration', () => {
   });
 
   // =========================================================================
-  // 7. Witness model validation — verify acro1 GPS quality
+  // 7. Witness model validation — verify reference_flight1 GPS quality
   // =========================================================================
 
   describe('witness model: GPS quality', () => {
-    it('numSat ≥ 12 for >90% of GPS fixes', () => {
+    it('numSat ≥ 12 for >90% of GPS fixes', async () => {
       if (!haveBfl()) return;
-      // Read the raw GPS data from the ingestion
       const flBuf = new Uint8Array(fs.readFileSync(BFL_PATH));
-      // We need access to the raw GPS data — use the gpsNed already built
-      // Actually, we need numSat. Let's use a simpler approach: check from the manifest.
-      // For now, just document: acro1 has 18-20 sats throughout (confirmed in diagnostic)
-      expect(true).toBe(true);  // placeholder — verified in gpsOffsetDiagnostic
+      const fl = await loadFlightLogFromBuffer(flBuf);
+      const d: IngestedData = ingestFlightLog(fl as Parameters<typeof ingestFlightLog>[0]);
+      const valid = d.gps.filter((g) => g.lat !== 0 && g.lon !== 0);
+      expect(valid.length).toBeGreaterThan(0);
+      const good = valid.filter((g) => ((g as any).numSat ?? 0) >= 12).length;
+      expect(good / valid.length).toBeGreaterThanOrEqual(0.9);
     });
   });
 });

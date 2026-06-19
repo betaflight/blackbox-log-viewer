@@ -75,9 +75,9 @@ describe('analyzeLogCapabilities', () => {
   });
 });
 
-describeIntegration('analyzeLogCapabilities — acro1 real log', () => {
-  it('all six prerequisites satisfied on acro1 (canGenerate=true)', async () => {
-    const bflPath = path.join(__dirname, '__fixtures__', 'acro1', 'LOG00007.BFL');
+describeIntegration('analyzeLogCapabilities — reference_flight1 real log', () => {
+  it('all six prerequisites satisfied on reference_flight1 (canGenerate=true)', async () => {
+    const bflPath = path.join(__dirname, '__fixtures__', 'reference_flight1', 'LOG00007.BFL');
     if (!fs.existsSync(bflPath)) {
       console.warn('SKIP: LOG00007.BFL not present');
       return;

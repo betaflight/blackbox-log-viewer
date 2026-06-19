@@ -1,5 +1,5 @@
 /**
- * Adaptive sigma tilt — synthetic sandbox test (planv5/13 §8).
+ * Adaptive sigma tilt — synthetic sandbox test.
  *
  * Exercises `computeAdaptiveSigmaTilt` across all three regimes:
  *   1. straight-and-level cruise (expect σ_tilt = NOMINAL 0.02)

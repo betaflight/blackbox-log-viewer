@@ -1,7 +1,7 @@
 /**
  * Mag transform validation probe — Step 1 CHECKPOINT.
  *
- * Loads acro1 BFL, applies correctMagToBody (raw body vectors from the
+ * Loads reference_flight1 BFL, applies correctMagToBody (raw body vectors from the
  * wizard), then tests TWO transforms against the frame-adapted quaternion:
  *
  *   OLD (reflection):  (-mBody[0], +mBody[1], +mBody[2])  det = -1
@@ -31,9 +31,9 @@ import { loadMagCharacterizationModel } from './mag_model.js';
 import type { Quat, Vec3 } from './poseSample.js';
 
 const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
-const BFL_DIR: string = path.resolve(__dirname, './__fixtures__/acro1');
+const BFL_DIR: string = path.resolve(__dirname, './__fixtures__/reference_flight1');
 const BFL_PATH: string = path.join(BFL_DIR, 'LOG00007.BFL');
-const MODEL_PATH: string = path.join(BFL_DIR, 'acro1_mag_model.json');
+const MODEL_PATH: string = path.join(BFL_DIR, 'reference_flight1_mag_model.json');
 
 const D: number = 180 / Math.PI;
 
@@ -78,9 +78,25 @@ function rotVec(R: number[][], v: number[]): number[] {
 
 function mag3(v: number[]): number { return Math.hypot(v[0], v[1], v[2]); }
 function median(xs: number[]): number { const a: number[] = [...xs].sort((p: number, q: number) => p - q); return a.length ? a[a.length >> 1] : NaN; }
-function mean(xs: number[]): number { if (!xs.length) return NaN; let s = 0; for (const x of xs) s += x; return s / xs.length; }
-function std(xs: number[], mu?: number): number { if (xs.length < 2) return NaN; const m: number = mu ?? mean(xs); let s = 0; for (const x of xs) s += (x - m) ** 2; return Math.sqrt(s / (xs.length - 1)); }
-function wrap180(d: number): number { let v: number = d; while (v > 180) v -= 360; while (v < -180) v += 360; return v; }
+function mean(xs: number[]): number {
+    if (!xs.length) return NaN;
+    let s = 0;
+    for (const x of xs) { s += x; }
+    return s / xs.length;
+}
+function std(xs: number[], mu?: number): number {
+    if (xs.length < 2) return NaN;
+    const m: number = mu ?? mean(xs);
+    let s = 0;
+    for (const x of xs) { s += (x - m) ** 2; }
+    return Math.sqrt(s / (xs.length - 1));
+}
+function wrap180(d: number): number {
+    let v: number = d;
+    while (v > 180) { v -= 360; }
+    while (v < -180) { v += 360; }
+    return v;
+}
 function det3x3(M: number[][]): number {
     return M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1])
          - M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0])
@@ -196,7 +212,7 @@ describeIntegration("mag transform validation", () => {
 
             const dots: number[] = eWorld.map((e: number[]) => e[0] * wmmNed[0] + e[1] * wmmNed[1] + e[2] * wmmNed[2]);
             const dotMedian: number = median(dots);
-            const dotP90: number = dots.sort((a: number, b: number) => a - b)[Math.floor(0.9 * (n - 1))];
+            const dotP90: number = [...dots].sort((a: number, b: number) => a - b)[Math.floor(0.9 * (n - 1))];
 
             const bearings: number[] = eWorld.map((e: number[]) => Math.atan2(e[1], e[0]) * D);
             const bearingMean: number = mean(bearings);

@@ -15,6 +15,7 @@ import {
 import type { HardIronResult, CoverageCheck } from './rawMagBias.js';
 import { quatFromAxisAngle, quatMultiply } from './imuMechanization.js';
 import type { Vec3, Quat } from './poseSample.js';
+import { seededRng } from './testHelpers.js';
 
 // ---------------------------------------------------------------------------
 // Hard-iron sphere fit
@@ -30,10 +31,11 @@ describe('fitHardIron', () => {
   it('recovers known center and radius from noise-free data', () => {
     // Generate points on a sphere with center [500, 200, -100] and radius 1200
     const cx = 500, cy = 200, cz = -100, R = 1200;
+    const rng = seededRng(0x1a2b3c4d);
     const samples: Vec3[] = [];
     for (let i = 0; i < 200; i++) {
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos(2 * Math.random() - 1);
+      const theta = rng() * 2 * Math.PI;
+      const phi = Math.acos(2 * rng() - 1);
       const x = cx + R * Math.sin(phi) * Math.cos(theta);
       const y = cy + R * Math.sin(phi) * Math.sin(theta);
       const z = cz + R * Math.cos(phi);
@@ -51,11 +53,12 @@ describe('fitHardIron', () => {
 
   it('handles data with noise', () => {
     const cx = 300, cy = -400, cz = 800, R = 1000;
+    const rng = seededRng(0xdeadbeef);
+    const noise = () => (rng() - 0.5) * 30; // ±15 ADC noise
     const samples: Vec3[] = [];
     for (let i = 0; i < 500; i++) {
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const noise = () => (Math.random() - 0.5) * 30; // ±15 ADC noise
+      const theta = rng() * 2 * Math.PI;
+      const phi = Math.acos(2 * rng() - 1);
       const x = cx + R * Math.sin(phi) * Math.cos(theta) + noise();
       const y = cy + R * Math.sin(phi) * Math.sin(theta) + noise();
       const z = cz + R * Math.cos(phi) + noise();
@@ -165,6 +168,7 @@ describe('computeMagHeadingBias', () => {
     const fcQuat: Array<{ tUs: number; q: Quat }> = [];
     const hiCenter: Vec3 = [100, 200, -50];
 
+    const rng1 = seededRng(0xabcdef01);
     for (let i = 0; i < 200; i++) {
       const deg = (i / 200) * 45; // 0-45° only — narrow
       const rad = (deg * Math.PI) / 180;
@@ -172,8 +176,8 @@ describe('computeMagHeadingBias', () => {
       fcQuat.push({ tUs: i * 50_000, q });
 
       // Mag on sphere around hiCenter
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos(2 * Math.random() - 1);
+      const theta = rng1() * 2 * Math.PI;
+      const phi = Math.acos(2 * rng1() - 1);
       const R = 800;
       magRaw.push({
         tUs: i * 50_000,
@@ -195,6 +199,7 @@ describe('computeMagHeadingBias', () => {
     const fcQuat: Array<{ tUs: number; q: Quat }> = [];
     const hiCenter: Vec3 = [500, -200, 300];
 
+    const rng2 = seededRng(0xfeedface);
     // Generate a flight with full 360° heading coverage
     for (let i = 0; i < 360; i++) {
       const deg = i; // 0–359°
@@ -209,8 +214,8 @@ describe('computeMagHeadingBias', () => {
       fcQuat.push({ tUs: i * 50_000, q });
 
       // Mag: sphere around hiCenter, but with a heading-consistent component
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos(2 * rng2() - 1);
+      const theta = rng2() * 2 * Math.PI;
       const R = 900;
       magRaw.push({
         tUs: i * 50_000,

@@ -3,7 +3,7 @@
  *
  * HEAVY integration test (test:full only, NOT CI). Verifies that the
  * reconstructed altitude tracks raw GPS altitude through the ~100 m
- * climb+drop maneuver on acro1, using the **UI's exact estimator config**
+ * climb+drop maneuver on reference_flight1, using the **UI's exact estimator config**
  * (maxIter=3, outputHz=20, mag on, sigmaYawMax=0.10).
  *
  * The oracle is PHYSICS: reconstructed altitude must track GPS altitude
@@ -23,9 +23,9 @@ import type { EstimatorOpts } from './estimatorLoop.js';
 import type { PoseSampleInternal } from './poseSample.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIR = path.resolve(__dirname, './__fixtures__/acro1/');
+const DIR = path.resolve(__dirname, './__fixtures__/reference_flight1/');
 const BFL_PATH = path.join(DIR, 'LOG00007.BFL');
-const MODEL_PATH = path.join(DIR, 'acro1_mag_model.json');
+const MODEL_PATH = path.join(DIR, 'reference_flight1_mag_model.json');
 
 function hasFiles(): boolean {
   try {
@@ -107,7 +107,7 @@ describeIntegration('vertical accuracy vs GPS (UI config: maxIter=3)', () => {
   it(
     'recon altitude tracks GPS through climb+drop at TOL=8m',
     async () => {
-      if (!hasFiles()) { console.warn('SKIP: acro1 files not available'); return; }
+      if (!hasFiles()) { console.warn('SKIP: reference_flight1 files not available'); return; }
 
       // ── Ingest & estimate (UI config: maxIter=3, mag on) ──────────────
       const fl = await loadFlightLogFromBuffer(new Uint8Array(fs.readFileSync(BFL_PATH)));

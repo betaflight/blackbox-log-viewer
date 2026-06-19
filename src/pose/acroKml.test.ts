@@ -1,5 +1,5 @@
 /**
- * acro1 KML producer — runs the full pipeline and writes a KML + PoseTrack JSON for
+ * reference_flight1 KML producer — runs the full pipeline and writes a KML + PoseTrack JSON for
  * visual inspection (Google Earth). One-shot producer, not a correctness gate; the gates
  * live in acroFixture.test.ts. Skips when the (uncommitted) BFL is absent.
  */
@@ -18,9 +18,9 @@ import { poseTrackToJson } from './serializers/jsonSerializer.js';
 import type { EstimatorOpts } from './estimatorLoop.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIR = path.resolve(__dirname, './__fixtures__/acro1/');
+const DIR = path.resolve(__dirname, './__fixtures__/reference_flight1/');
 const BFL_PATH = path.join(DIR, 'LOG00007.BFL');
-const MODEL_PATH = path.join(DIR, 'acro1_mag_model.json');
+const MODEL_PATH = path.join(DIR, 'reference_flight1_mag_model.json');
 
 function hasFiles(): boolean {
   try {
@@ -32,12 +32,12 @@ function hasFiles(): boolean {
   }
 }
 
-describeIntegration('acro1 KML output', () => {
+describeIntegration('reference_flight1 KML output', () => {
   it(
-    'produces a valid KML from the real acro1 log',
+    'produces a valid KML from the real reference_flight1 log',
     async () => {
       if (!hasFiles()) {
-        console.warn('SKIP: acro1 files not available');
+        console.warn('SKIP: reference_flight1 files not available');
         return;
       }
 
@@ -74,9 +74,11 @@ describeIntegration('acro1 KML output', () => {
       });
       const json = poseTrackToJson(track);
 
-      // Write reference outputs into the fixture dir
-      fs.writeFileSync(path.join(DIR, 'acro1_track.kml'), kml, 'utf-8');
-      fs.writeFileSync(path.join(DIR, 'acro1_posetrack.json'), json, 'utf-8');
+      // Write reference outputs into the fixture dir only when explicitly requested
+      if (process.env.UPDATE_POSE_FIXTURES === '1') {
+        fs.writeFileSync(path.join(DIR, 'reference_flight1_track.kml'), kml, 'utf-8');
+        fs.writeFileSync(path.join(DIR, 'reference_flight1_posetrack.json'), json, 'utf-8');
+      }
       console.log(`  KML ${kml.length} B, JSON ${json.length} B, ${track.samples.length} samples`);
 
       // EXTRACT b_g[2] from meta.source

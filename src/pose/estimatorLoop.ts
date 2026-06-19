@@ -8,10 +8,8 @@ import {
   createMagFactor,
   createDeclinationFactor,
   computeAdaptiveSigmaYaw,
-  computeAdaptiveSigmaTilt,
   computeGpsNoise,
   SIGMA_YAW_DEFAULT_MAX,
-  SIGMA_TILT_NOMINAL,
 } from './measurements.js';
 import type { NedMeas } from './measurements.js';
 import { rtsSmooth } from './rtsSmoother.js';
@@ -20,8 +18,7 @@ import { llhToNed, nedToLlh } from './geodesy.js';
 import type { NedPos } from './geodesy.js';
 import { createPoseTrack } from './poseTrack.js';
 import type { PoseTrack } from './poseTrack.js';
-import { quatToRot, quatFromAxisAngle, quatMultiply } from './imuMechanization.js';
-import { pitchDeg, noseBearingDeg, tiltFromUprightDeg } from './acroGates.js';
+import { quatToRot, quatFromAxisAngle, quatMultiply, eulerFromQuat } from './imuMechanization.js';
 import type { PoseSampleInternal, Vec3, Quat, LLA } from './poseSample.js';
 import type {
   ImuEntry,
@@ -127,26 +124,12 @@ interface SmoothedPose {
   mBody?: Vec3;
 }
 
-interface TraceEntry {
-  tUs: number;
-  sigmaTilt: number;
-  sigmaYaw?: number;
-  bg2_rads?: number;
-  fwPos: Vec3;
-  smPos?: Vec3;
-  posErrFwSmM?: number;
-  bg2_sm_rads?: number;
-  gpsPos?: number[];
-  posErrSmGpsM?: number;
-}
-
 interface EstimationResult {
   smoothed: SmoothedPose[];
   t0Us: number;
   lat0: number;
   lon0: number;
   alt0: number;
-  _traceForward: TraceEntry[];
 }
 
 interface StepState {
@@ -248,22 +231,31 @@ function _runEstimation(
     onProgress,
     gpsDelayMs = 0,
     gpsPosSigmaFloor = 2.0,
-    useGpsAccuracyScaling = true,
+    // Off by default. Per-fix GPS sigma scaling from satellite count was NOT
+    // validated to help on real logs: on the reference flight the satellite
+    // count never drops (14-20), so scaling adds no benefit and was observed to
+    // roughly double the worst-case horizontal error. Left in as an opt-in knob
+    // for logs that genuinely lose sats mid-flight, but unproven there — enable
+    // and re-validate before trusting it.
+    useGpsAccuracyScaling = false,
   } = opts;
 
   let { imu, gps, baro, quat, mag } = data;
 
   // ---- GPS position timing ----
-  // GPS position and velocity use the ingested FC timestamps (flightIngestion
-  // already applies gpsDelayMs).  The logged GPS_time (u-blox iTOW) field is
-  // available but rate-matching it to FC time does not beat the simpler FC-time
-  // approach on real logs (acro1: FC-time median 0.9 m vs scale-matched iTOW
-  // median 1.1 m).  FC-time is also simpler — no clock-rate mismatch to correct.
+  // GPS position and velocity use the ingested FC (loop-iteration) timestamps.
   //
-  // If a future log benefits from per-fix iTOW timing (e.g. heavy FC parse
-  // jitter), re-enable the rate-matched iTOW path below.
+  // The u-blox iTOW (GPS time-of-week) field gives each fix its own GPS-clock
+  // timestamp, which could in principle place fixes more precisely than the FC
+  // timestamp. The flag below is an intentionally-disabled hook for that path —
+  // kept, not deleted, because it may help a future log. It did NOT win here:
+  // the iTOW span and the FC-time span have slightly different clock rates, so
+  // anchoring fixes by raw iTOW deltas introduces a progressive lag that
+  // *doubled* the median error (reference_flight1: FC-time 0.9 m vs iTOW 1.1 m).
+  // Re-enable only for a log with heavy FC-parse jitter, and only after
+  // rate-matching iTOW to FC time rather than using raw deltas.
   const _useItoW = false;
-
+  void _useItoW;
 
   // When iTOW timing is NOT active, apply gpsDelayMs to all GPS timestamps.
   // (flightIngestion already applied gpsDelayMs, so this is an additional shift
@@ -281,7 +273,7 @@ function _runEstimation(
       ? Math.max(gpsPosSigmaFloor, computeGpsNoise(numSat))
       : gpsPosSigma;
   if (!imu || imu.length === 0)
-    return { smoothed: [], t0Us: 0, lat0: 0, lon0: 0, alt0: 0, _traceForward: [] };
+    return { smoothed: [], t0Us: 0, lat0: 0, lon0: 0, alt0: 0 };
 
   const { lat: lat0, lon: lon0, alt: alt0 } = origin;
   const t0Us = imu[0].tUs;
@@ -347,7 +339,6 @@ function _runEstimation(
     mag.length > 0;
   const useMag = hasMag && magModel!.fusion?.qualityBounds?.bounds_ok !== false;
   let poses: SmoothedPose[] = [];
-  const _traceForward: TraceEntry[] = [];
 
   const MIN_INFLIGHT_MAG_SIGMA = 0.02;
   let magSigmaXY = 0.05;
@@ -595,23 +586,6 @@ function _runEstimation(
           }
         }
 
-        // Adaptive sigma tilt with kinematic ω×v correction (planv5/06 §9.2).
-        // Uses current IMU accel/gyro and ESKF velocity to isolate gravity
-        // before choosing the branch (nominal / freefall / interpolated).
-        const adaptiveSigmaTilt = computeAdaptiveSigmaTilt(
-          imu[imuIdx].accel,
-          imu[imuIdx].gyro,
-          eskf.v,
-          eskf.q,
-        );
-
-        const traceEntry: TraceEntry = {
-          tUs: nowUs,
-          sigmaTilt: adaptiveSigmaTilt,
-          bg2_rads: eskf.bg ? eskf.bg[2] : undefined,
-          fwPos: [...eskf.p] as Vec3,
-        };
-
         // Raw-mag heading-bias pre-rotation: when no model is loaded but an
         // in-flight hard-iron bias has been estimated, rotate every FC
         // quaternion by +bias about world-Z before the quaternion prior sees it.
@@ -626,7 +600,6 @@ function _runEstimation(
           const adaptiveSigmaYaw = useMag
             ? computeAdaptiveSigmaYaw(eskf.q, magDisturbScale, sigmaYawMax)
             : sigmaYaw;
-          traceEntry.sigmaYaw = adaptiveSigmaYaw;
 
           const qMeas = applyRawMagBias
             ? quatMultiply(qMagBiasCorr!, quat[quatIdx].q)
@@ -641,8 +614,6 @@ function _runEstimation(
             hasUpdate = true;
           quatIdx++;
         }
-        if (!traceEntry.sigmaYaw) traceEntry.sigmaYaw = sigmaYaw;
-        _traceForward.push(traceEntry);
 
         // 3-axis mag update — 1 per keyframe (prevents over-counting)
         if (useMag) {
@@ -765,54 +736,6 @@ function _runEstimation(
     const Fmatrices: (Mat | null)[] = steps.slice(1).map((s) => s.F);
     const smoothed: SmoothedResult[] = rtsSmooth(filterResults, Fmatrices);
 
-    // Pair forward trace with smoothed positions + compute GPS errors (last iteration)
-    if (iter === maxIter - 1 && _traceForward.length > 0) {
-      const smByTus = new Map<number, { p: Vec3; bg?: Vec3 }>();
-      for (const s of smoothed) {
-        smByTus.set(s.x.tUs!, {
-          p: [...s.x.p] as Vec3,
-          bg: s.x.bg ? ([...s.x.bg] as Vec3) : undefined,
-        });
-      }
-      const gpsByTus = new Map<number, number[]>();
-      for (const g of gps) {
-        const gn = llhToNed(g.lat, g.lon, g.alt ?? alt0, lat0, lon0, alt0);
-        gpsByTus.set(g.tUs, [gn.n, gn.e, gn.d]);
-      }
-
-      for (const te of _traceForward) {
-        const sm = smByTus.get(te.tUs);
-        if (sm) {
-          te.smPos = [...sm.p] as Vec3;
-          te.posErrFwSmM = Math.hypot(
-            te.fwPos[0] - sm.p[0],
-            te.fwPos[1] - sm.p[1],
-            te.fwPos[2] - sm.p[2],
-          );
-          te.bg2_sm_rads = sm.bg ? sm.bg[2] : undefined;
-        }
-        let bestGps: number[] | null = null;
-        let bestDt = Infinity;
-        for (const [t, gn] of gpsByTus) {
-          const dt = Math.abs(t - te.tUs);
-          if (dt < bestDt && dt < outputIntervalUs * 2) {
-            bestDt = dt;
-            bestGps = gn;
-          }
-        }
-        if (bestGps) {
-          te.gpsPos = bestGps;
-          te.posErrSmGpsM = sm
-            ? Math.hypot(
-                sm.p[0] - bestGps[0],
-                sm.p[1] - bestGps[1],
-                sm.p[2] - bestGps[2],
-              )
-            : undefined;
-        }
-      }
-    }
-
     // ---- Convert to output ----
     poses = smoothed.map((s) => ({
       tUs: s.x.tUs!,
@@ -845,33 +768,25 @@ function _runEstimation(
     });
   }
 
-  return { smoothed: poses, t0Us, lat0, lon0, alt0, _traceForward };
+  return { smoothed: poses, t0Us, lat0, lon0, alt0 };
 }
 
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
-export interface PoseTrackWithTrace extends PoseTrack {
-  _traceForward?: TraceEntry[];
-}
-
 export function estimatePoseTrack(
   data: EstimatorData,
   origin: EstimatorOrigin,
   opts: EstimatorOpts = {},
-): PoseTrackWithTrace {
-  const { smoothed, lat0, lon0, alt0, _traceForward } = _runEstimation(
-    data,
-    origin,
-    opts,
-  );
-
-  const DEG = 180 / Math.PI;
+): PoseTrack {
+  const { smoothed, lat0, lon0, alt0 } = _runEstimation(data, origin, opts);
 
   const trackSamples: PoseSampleInternal[] = smoothed.map((s) => {
     const lla = nedToLlh({ n: s.p[0], e: s.p[1], d: s.p[2] }, lat0, lon0, alt0);
 
+    // Position/attitude covariance are the top-left 3×3 (NED position) and the
+    // attitude 3×3 (rows/cols 6-8) of the 15×15 error-state covariance P.
     const covPos: Mat = [
       s.P[0].slice(0, 3),
       s.P[1].slice(0, 3),
@@ -884,13 +799,7 @@ export function estimatePoseTrack(
       s.P[8].slice(6, 9),
     ];
 
-    const R = quatToRot(s.q);
-    const euler = {
-      rollDeg: Math.atan2(R[2][1], R[2][2]) * DEG,
-      pitchDeg: pitchDeg(s.q),
-      headingDeg: noseBearingDeg(s.q),
-      tiltDeg: tiltFromUprightDeg(s.q),
-    };
+    const euler = eulerFromQuat(s.q);
 
     return {
       tUs: s.tUs,
@@ -906,7 +815,7 @@ export function estimatePoseTrack(
 
   const estimatedParams = computeConvergedParams(smoothed);
 
-  const track: PoseTrackWithTrace = createPoseTrack({
+  const track: PoseTrack = createPoseTrack({
     samples: trackSamples,
     georefOrigin: { lat: origin.lat, lon: origin.lon, alt: origin.alt },
     source: {
@@ -928,8 +837,7 @@ export function estimatePoseTrack(
       },
       estimatedParams,
     },
-  }) as PoseTrackWithTrace;
-  track._traceForward = _traceForward;
+  });
   return track;
 }
 

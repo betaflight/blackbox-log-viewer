@@ -14,6 +14,7 @@
  */
 
 import type { LLA, PoseSampleInternal, Quat } from './poseSample.js';
+import { eulerFromQuat } from './imuMechanization.js';
 
 export const POSE_TRACK_SCHEMA = 1;
 
@@ -200,6 +201,11 @@ export function createPoseTrack({ samples, georefOrigin, source }: CreatePoseTra
         lla,
         covPos: covPos || [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
         covAtt: covAtt || [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+        // Recompute Euler angles from the interpolated (slerped) quaternion.
+        // Without this an interpolated sample would carry no euler, and the CSV
+        // and GPX serializers — which read euler for roll/pitch/heading/tilt —
+        // would emit blank orientation columns for every off-grid timestamp.
+        euler: eulerFromQuat(q),
       };
 
       // Carry diagnostics from the nearest sample
@@ -225,6 +231,9 @@ export function createPoseTrack({ samples, georefOrigin, source }: CreatePoseTra
  *  - resamplePoseTrack for lightweight replay / consumer delivery
  */
 export function resamplePoseTrack(poseTrack: PoseTrack, hz: number): PoseTrack {
+  if (!Number.isFinite(hz) || hz <= 0) {
+    throw new Error('resamplePoseTrack: hz must be a positive finite number.');
+  }
   const { samples, meta } = poseTrack;
   if (!samples || samples.length === 0) {
     return createPoseTrack({
@@ -250,5 +259,36 @@ export function resamplePoseTrack(poseTrack: PoseTrack, hz: number): PoseTrack {
     samples: resampled,
     georefOrigin: meta.georefOrigin,
     source: { ...meta.source, resampledFromHz: hz },
+  });
+}
+
+/**
+ * Extract poses at an explicit, caller-supplied list of timestamps.
+ *
+ * Unlike resamplePoseTrack (which produces a uniform grid), this returns a pose
+ * at each timestamp the caller asks for — the offsets may be irregular, in any
+ * order, and need not align to the estimator's output grid. Each pose is
+ * interpolated (slerp/lerp) and fully populated, including Euler angles, so the
+ * result can be serialized to CSV/JSON/GPX directly. Useful when poses must line
+ * up with events recorded on a separate timeline.
+ *
+ * @param track    a reconstructed PoseTrack
+ * @param timesUs  timestamps in microseconds, on the same clock as the track's
+ *                 samples (FC boot time). Out-of-range values clamp to the
+ *                 first/last sample (matching sampleAt).
+ * @returns a new PoseTrack whose samples are exactly the requested timestamps,
+ *          sorted ascending. Timestamps that cannot be sampled (empty track)
+ *          are skipped.
+ */
+export function samplePosesAt(track: PoseTrack, timesUs: number[]): PoseTrack {
+  const samples: PoseSampleInternal[] = [];
+  for (const tUs of timesUs) {
+    const s = track.sampleAt(tUs);
+    if (s) samples.push(s);
+  }
+  return createPoseTrack({
+    samples,
+    georefOrigin: track.meta.georefOrigin,
+    source: { ...track.meta.source, sampledAtCount: timesUs.length },
   });
 }

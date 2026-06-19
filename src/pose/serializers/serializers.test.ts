@@ -110,7 +110,9 @@ describe('Serializers', () => {
     expect(gpx).toContain('xmlns:pose="https://betaflight.com/pose/v1"');
     expect(gpx).toContain('<trkpt lat="48.408"');
     expect(gpx).toContain('<ele>200</ele>');
-    expect(gpx).toContain('<time>');
+    // <time> is intentionally omitted when no absolute UTC anchor is available
+    // to avoid emitting semantically incorrect 1970-epoch timestamps.
+    expect(gpx).not.toContain('<time>1970');
     expect(gpx).toContain('<extensions>');
     expect(gpx).toContain('<pose:rollDeg>');
     expect(gpx).toContain('<pose:headingDeg>');

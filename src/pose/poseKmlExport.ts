@@ -11,14 +11,17 @@
  *  - Quaternion: Hamilton, body(FRD) -> world(NED), scalar-first [w, x, y, z]
  */
 
-import { ingestFlightLog, correctMagStream } from './flightIngestion.js';
 import { createPoseTrack } from './poseTrack.js';
 import { poseTrackToKml } from './serializers/kmlSerializer.js';
-import { loadMagCharacterizationModel } from './mag_model.js';
-import { computeMagHeadingBias } from './rawMagBias.js';
-import type { IngestedData } from './flightIngestion.js';
-import type { EstimatorOrigin, EstimatorOpts, PoseTrackWithTrace } from './estimatorLoop.js';
-import type { PoseTrackMeta } from './poseTrack.js';
+import {
+  prepareReconstruction,
+  DEFAULT_OUTPUT_HZ,
+  DEFAULT_SIGMA_YAW_MAX,
+  type MagMode,
+} from './poseReconstruction.js';
+import type { MagCoverage } from './inFlightMagCal.js';
+import type { EstimatorData, EstimatorOrigin, EstimatorOpts } from './estimatorLoop.js';
+import type { PoseTrack, PoseTrackMeta } from './poseTrack.js';
 import type { PoseSampleInternal } from './poseSample.js';
 
 export interface ProgressEvent {
@@ -32,7 +35,11 @@ export interface ProgressEvent {
 export interface GeneratePoseKmlOpts {
   flightLog: unknown;
   magModel?: Record<string, unknown> | null;
+  /** Mag optimization mode. Default: 'auto'. */
+  magMode?: MagMode;
   triadsPerSecond?: number;
+  /** Suggested download filename. Defaults to 'track.kml'. */
+  filename?: string;
   onProgress?: (ev: ProgressEvent) => void;
   signal?: AbortSignal;
 }
@@ -40,6 +47,12 @@ export interface GeneratePoseKmlOpts {
 export interface GeneratePoseKmlResult {
   filename: string;
   kml: string;
+  /** Mag calibration message (for UI display) */
+  calMessage?: string | null;
+  /** AUTO coverage level (null when mode ≠ 'auto') */
+  coverage?: MagCoverage | null;
+  /** In-flight model JSON (for export via UI, null if AUTO failed or mode ≠ 'auto') */
+  magModelForExport?: Record<string, unknown> | null;
 }
 
 interface WorkerProgressMessage {
@@ -66,7 +79,7 @@ type WorkerResponse = WorkerProgressMessage | WorkerResultMessage | WorkerErrorM
 
 /** Estimator output rate (Hz). The flight PATH is rendered at this full
  *  resolution; "triads per second" only controls how often a triad is drawn. */
-const OUTPUT_HZ = 20;
+const OUTPUT_HZ = DEFAULT_OUTPUT_HZ;
 
 /**
  * Run the full body-pose reconstruction pipeline and produce a triad KML.
@@ -78,7 +91,9 @@ const OUTPUT_HZ = 20;
 export async function generatePoseKml({
   flightLog,
   magModel = null,
+  magMode = 'auto',
   triadsPerSecond = 2,
+  filename = 'track.kml',
   onProgress,
   signal,
 }: GeneratePoseKmlOpts): Promise<GeneratePoseKmlResult> {
@@ -92,78 +107,25 @@ export async function generatePoseKml({
   // --- Input validation ---
   if (!flightLog) throw new Error('No flight log is loaded.');
   if (!(triadsPerSecond > 0)) throw new Error('Triads per second must be greater than 0.');
-  if (magModel != null && typeof magModel !== 'object') {
-    throw new Error('Mag model must be a parsed JSON object.');
-  }
 
-  // --- Phase 1: Parse & ingest ---
+  // --- Phase 1: Parse & ingest (shared with the library entry reconstructPose) ---
   report('parsing', 0, 'Reading flight log…');
   throwIfAborted();
 
-  const data: IngestedData = ingestFlightLog(
-    flightLog as Parameters<typeof ingestFlightLog>[0],
-  );
-
-  // Load and apply mag model
-  let magGauss: ReturnType<typeof correctMagStream> = [];
-  let magModelForEst: Record<string, unknown> | null = null;
-  if (magModel) {
-    const mr = loadMagCharacterizationModel(
-      magModel as Parameters<typeof loadMagCharacterizationModel>[0],
-    );
-    if (mr.model) {
-      magGauss = correctMagStream(
-        data.mag,
-        mr.model as Parameters<typeof correctMagStream>[1],
-      );
-      if (mr.model.fusion?.earthFieldNedGauss) {
-        magModelForEst = mr.model as unknown as Record<string, unknown>;
-      }
-    }
-  }
-
-  // When no mag model was uploaded but raw mag data is present, compute a
-  // model-free heading bias by fitting a hard-iron sphere and comparing the
-  // tilt-compensated mag heading against the FC quaternion heading.  Passing
-  // this bias into the estimator corrects the FC's sustained yaw offset
-  // (~2-3° for a calibrated quad) without needing the wizard.
-  let rawMagBiasRad = 0;
-  if (!magModelForEst && data.mag.length > 0 && data.quat.length > 0) {
-    const biasResult = computeMagHeadingBias(data.mag, data.quat);
-    if (biasResult.valid) {
-      rawMagBiasRad = biasResult.biasRad;
-      console.log(`[MAG-BIAS] ${biasResult.message}`);
-    } else {
-      console.log(`[MAG-BIAS] ${biasResult.message}`);
-    }
-  }
+  const prep = prepareReconstruction(flightLog, magModel, magMode);
 
   report('parsing', 1.0, 'Log parsed. Starting estimation…');
   throwIfAborted();
 
-  // --- Choose origin ---
-  // Use GPS home if available, otherwise first valid GPS fix.
-  // For acro1, the drone was static at arm location so these are equivalent.
-  const origin: EstimatorOrigin = data.gpsHome || {
-    lat: data.gps[0]?.lat ?? 0,
-    lon: data.gps[0]?.lon ?? 0,
-    alt: data.gps[0]?.alt ?? 0,
-  };
-
-  const estimatorData = {
-    ...data,
-    mag: magGauss,
-  };
-
-  // --- Phase 2: Estimation (Web Worker) ---
+  // --- Phase 2: Estimation (Web Worker for UI responsiveness) ---
   const track = await runEstimationInWorker(
-    estimatorData,
-    origin,
+    prep.data,
+    prep.origin,
     {
       outputHz: OUTPUT_HZ,
-      sigmaYawMax: 0.1,
-      magModel: magModelForEst as EstimatorOpts['magModel'],
-      rawMagBiasRad,
+      sigmaYawMax: DEFAULT_SIGMA_YAW_MAX,
+      magModel: prep.magModelForEst,
+      rawMagBiasRad: prep.rawMagBiasRad,
     },
     signal,
     onProgress,
@@ -184,15 +146,20 @@ export async function generatePoseKml({
     showTriads: true,
     showPath: true,
     showRawGps: true,
-    rawGps: data.gps.map((g) => ({ lat: g.lat, lon: g.lon, alt: g.alt ?? 0 })),
+    rawGps: prep.data.gps.map((g) => ({ lat: g.lat, lon: g.lon, alt: g.alt ?? 0 })),
     axisLengthMeters: 2.0,
   });
 
   report('exporting', 1.0, 'Done.');
   throwIfAborted();
 
-  const filename = 'track.kml';
-  return { filename, kml };
+  return {
+    filename,
+    kml,
+    calMessage: prep.calMessage,
+    coverage: prep.coverage,
+    magModelForExport: prep.inFlightModelForExport as Record<string, unknown> | null,
+  };
 }
 
 /**
@@ -225,12 +192,12 @@ function toEstimatingEvent(ev: {
  * (e.g., in test environments without DOM/Worker support).
  */
 async function runEstimationInWorker(
-  data: IngestedData & { mag: ReturnType<typeof correctMagStream> },
+  data: EstimatorData,
   origin: EstimatorOrigin,
   opts: EstimatorOpts,
   signal?: AbortSignal,
   onProgress?: (ev: ProgressEvent) => void,
-): Promise<PoseTrackWithTrace> {
+): Promise<PoseTrack> {
   // Try worker first; fall back to main thread if Worker is unavailable
   if (typeof Worker !== 'undefined') {
     try {
@@ -254,12 +221,15 @@ async function runEstimationInWorker(
 }
 
 async function runInWorker(
-  data: IngestedData & { mag: ReturnType<typeof correctMagStream> },
+  data: EstimatorData,
   origin: EstimatorOrigin,
   opts: EstimatorOpts,
   signal?: AbortSignal,
   onProgress?: (ev: ProgressEvent) => void,
-): Promise<PoseTrackWithTrace> {
+): Promise<PoseTrack> {
+  if (signal?.aborted) {
+    throw new DOMException('Generation cancelled.', 'AbortError');
+  }
   const worker = new Worker(new URL('./poseWorker.ts', import.meta.url), {
     type: 'module',
   });
@@ -287,7 +257,7 @@ async function runInWorker(
           samples: msg.samples,
           georefOrigin: msg.meta.georefOrigin,
           source: msg.meta.source,
-        }) as PoseTrackWithTrace);
+        }));
       } else if (msg.type === 'error') {
         signal?.removeEventListener('abort', abortHandler);
         worker.terminate();
@@ -319,12 +289,15 @@ async function runInWorker(
 }
 
 async function runInMainThread(
-  data: IngestedData & { mag: ReturnType<typeof correctMagStream> },
+  data: EstimatorData,
   origin: EstimatorOrigin,
   opts: EstimatorOpts,
   signal?: AbortSignal,
   onProgress?: (ev: ProgressEvent) => void,
-): Promise<PoseTrackWithTrace> {
+): Promise<PoseTrack> {
+  if (signal?.aborted) {
+    throw new DOMException('Generation cancelled.', 'AbortError');
+  }
   // Dynamic import so the heavy estimator isn't bundled into the entry chunk
   const { estimatePoseTrack } = await import('./estimatorLoop.js');
 

@@ -50,7 +50,7 @@ const CW270FLIP = [
     [0, 0, -1],
 ];
 
-export const ALIGNMENT_MATRICES = [, CW0, CW90, CW180, CW270, CW0FLIP, CW90FLIP, CW180FLIP, CW270FLIP];
+export const ALIGNMENT_MATRICES = [null, CW0, CW90, CW180, CW270, CW0FLIP, CW90FLIP, CW180FLIP, CW270FLIP];
 
 /**
  * Build ZYX intrinsic rotation matrix from Euler angles (degrees).

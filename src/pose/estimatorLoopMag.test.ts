@@ -25,7 +25,8 @@ import { describe, it, expect } from 'vitest';
 import { generateDynamicTrajectory, generateSensorStreams } from './synthetic.js';
 import { estimatePoseTrack } from './estimatorLoop.js';
 import type { SyntheticPose, MagSample } from './synthetic.js';
-import type { PoseTrackWithTrace, MagModelInput } from './estimatorLoop.js';
+import type { PoseTrack } from './poseTrack.js';
+import type { MagModelInput } from './estimatorLoop.js';
 import type { Vec3, Quat } from './poseSample.js';
 
 function quatMultiply(a: Quat, b: Quat): Quat {
@@ -49,7 +50,7 @@ function quatAngle(qa: Quat, qb: Quat): number {
     return 2 * Math.atan2(vNorm, Math.abs(qrel[0]));
 }
 
-function assertTrackFinite(track: PoseTrackWithTrace): void {
+function assertTrackFinite(track: PoseTrack): void {
     expect(track.samples.length).toBeGreaterThan(10);
     for (let i = 0; i < track.samples.length; i++) {
         const s = track.samples[i];
@@ -59,15 +60,15 @@ function assertTrackFinite(track: PoseTrackWithTrace): void {
     }
 }
 
-function assertMEarthStable(track: PoseTrackWithTrace, mEarthSeed: Vec3, tolGauss = 0.05, horizOnly = false): void {
+function assertMEarthStable(track: PoseTrack, mEarthSeed: Vec3, tolGauss = 0.05, horizOnly = false): void {
     const meEnd = (track.meta.source as any).estimatedParams?.mEarth as Vec3 | undefined;
     expect(meEnd, "m_earth estimate must be exposed").toBeTruthy();
     const maxIdx: number = horizOnly ? 2 : 3;
     for (let i = 0; i < maxIdx; i++) {
         expect(
-            meEnd![i],
-            `m_earth[${i}] end=${meEnd![i].toFixed(4)} vs seed ${mEarthSeed[i].toFixed(4)} (Gauss)`,
-        ).toBeCloseTo(mEarthSeed[i], 0);
+            Math.abs(meEnd![i] - mEarthSeed[i]),
+            `m_earth[${i}] |Δ|=${Math.abs(meEnd![i] - mEarthSeed[i]).toFixed(4)} Gauss (tol ${tolGauss})`,
+        ).toBeLessThanOrEqual(tolGauss);
     }
 }
 
@@ -92,7 +93,7 @@ describe("estimator loop — 3-axis mag fusion (Task C)", () => {
             },
         };
 
-        const track: PoseTrackWithTrace = estimatePoseTrack(
+        const track: PoseTrack = estimatePoseTrack(
             { imu, gps, baro, quat, mag } as any,
             origin,
             {
@@ -135,7 +136,7 @@ describe("estimator loop — 3-axis mag fusion (Task C)", () => {
             },
         };
 
-        const track: PoseTrackWithTrace = estimatePoseTrack(
+        const track: PoseTrack = estimatePoseTrack(
             { imu, gps, baro, quat, mag } as any,
             origin,
             {
@@ -174,7 +175,7 @@ describe("estimator loop — 3-axis mag fusion (Task C)", () => {
             },
         };
 
-        const track: PoseTrackWithTrace = estimatePoseTrack(
+        const track: PoseTrack = estimatePoseTrack(
             { imu, gps, baro, quat, mag } as any,
             origin,
             {

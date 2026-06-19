@@ -109,7 +109,8 @@ export function minAccelInWindow(
   return m;
 }
 
-function nearestByTUs<T extends { tUs: number }>(arr: T[], tUs: number): T {
+function nearestByTUs<T extends { tUs: number }>(arr: T[], tUs: number): T | undefined {
+  if (arr.length === 0) return undefined;
   let lo = 0, hi = arr.length - 1;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
@@ -178,11 +179,14 @@ export function gateAttitudeTracksFC(
   fcQuat: QuatEntry[],
   maxMedianDeg = 25,
 ): GateResult {
+  if (fcQuat.length === 0) return mk('attitude-tracks-FC', false, 'no FC quaternion data');
   const errs: number[] = [];
   for (const s of samples) {
     const f = nearestByTUs(fcQuat, s.tUs);
+    if (!f) continue;
     errs.push(quatAngleDeg(s.q, f.q));
   }
+  if (errs.length === 0) return mk('attitude-tracks-FC', false, 'no matched FC quaternion samples');
   errs.sort((a, b) => a - b);
   const med = errs[errs.length >> 1];
   const p90 = errs[Math.floor(0.9 * (errs.length - 1))];
@@ -196,9 +200,11 @@ export function gatePositionTracksGPS(
   gpsNed: { tUs: number; n: number; e: number }[],
   maxDriftM = 25,
 ): GateResult {
+  if (gpsNed.length === 0) return mk('position-tracks-GPS', false, 'no GPS data');
   let maxD = 0;
   for (const s of samples) {
     const g = nearestByTUs(gpsNed, s.tUs);
+    if (!g) continue;
     const h = Math.hypot(s.p[0] - g.n, s.p[1] - g.e);
     if (h > maxD) maxD = h;
   }
@@ -553,7 +559,8 @@ export function gateHorizontalPositionVsGPS(
   const errs: number[] = [];
   for (const s of samples) {
     const g = nearestByTUs(gpsNed, s.tUs);
-    if (regimeFilter && !regimeFilter(s, gpsNed.indexOf(g as any))) continue;
+    if (!g) continue;
+    if (regimeFilter && !regimeFilter(s, gpsNed.indexOf(g))) continue;
     const h = Math.hypot(s.p[0] - g.n, s.p[1] - g.e);
     errs.push(h);
   }
@@ -562,7 +569,7 @@ export function gateHorizontalPositionVsGPS(
 
   const sorted = errs.sort((a, b) => a - b);
   const med = sorted[Math.floor(sorted.length / 2)];
-  const p9 = sorted[Math.floor(sorted.length * 0.95)];
+  const p9 = sorted[Math.floor((sorted.length - 1) * 0.95)];
 
   const pass = med <= maxMedianM && p9 <= maxP95M;
   return mk('horizontal-vs-GPS', pass,

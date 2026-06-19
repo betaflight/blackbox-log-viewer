@@ -1,11 +1,11 @@
 /**
  * GPS Offset Diagnostic — STEP 13 classification.
  *
- * Runs the full estimator on acro1, extracts smoothed-vs-GPS data, and
+ * Runs the full estimator on reference_flight1, extracts smoothed-vs-GPS data, and
  * classifies the horizontal offset: along-track (latency) vs static/radial
  * (projection/datum) vs noisy-wander (weighting).
  *
- * Output: __fixtures__/acro1/gps_offset_diagnostic.json
+ * Output: __fixtures__/reference_flight1/gps_offset_diagnostic.json
  *
  * Run: npx vitest run src/pose/gpsOffsetDiagnostic.test.ts
  *   or: RUN_INTEGRATION=1 npx vitest run src/pose/gpsOffsetDiagnostic.test.ts
@@ -26,10 +26,10 @@ import { quatToR, noseBearingDeg, speed as vecSpeed, videoToTUs } from './acroGa
 import type { PoseSampleInternal, Quat, Vec3 } from './poseSample.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIR = path.resolve(__dirname, './__fixtures__/acro1/');
+const DIR = path.resolve(__dirname, './__fixtures__/reference_flight1/');
 const BFL_PATH = path.join(DIR, 'LOG00007.BFL');
-const MODEL_PATH = path.join(DIR, 'acro1_mag_model.json');
-const MANIFEST_PATH = path.join(DIR, 'acro1_manifest.json');
+const MODEL_PATH = path.join(DIR, 'reference_flight1_mag_model.json');
+const MANIFEST_PATH = path.join(DIR, 'reference_flight1_manifest.json');
 const OUT_PATH = path.join(DIR, 'gps_offset_diagnostic.json');
 
 interface OffsetPoint {
@@ -202,9 +202,9 @@ function buildSegmentReport(
   const speeds = seg.map(p => p.speedMs);
   const headings = seg.map(p => p.headingDeg);
 
-  const os = offsets.sort((a, b) => a - b);
-  const als = alongs.sort((a, b) => a - b);
-  const cs = crosses.sort((a, b) => a - b);
+  const os = [...offsets].sort((a, b) => a - b);
+  const als = [...alongs].sort((a, b) => a - b);
+  const cs = [...crosses].sort((a, b) => a - b);
 
   return {
     name,
@@ -292,9 +292,9 @@ describeIntegration('GPS Offset Diagnostic', () => {
     const crosses = allPoints.map(p => p.crossTrackM);
     const speeds = allPoints.map(p => p.speedMs);
 
-    const os = offsets.sort((a, b) => a - b);
-    const als = alongs.sort((a, b) => a - b);
-    const cs = crosses.sort((a, b) => a - b);
+    const os = [...offsets].sort((a, b) => a - b);
+    const als = [...alongs].sort((a, b) => a - b);
+    const cs = [...crosses].sort((a, b) => a - b);
 
     // ---- 6. Benign segment definitions ----
     // From the flight narrative, we want:
