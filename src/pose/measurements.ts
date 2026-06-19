@@ -400,7 +400,7 @@ export function computeAdaptiveSigmaYaw(
  *
  * Measurement model: z_mag = R(q)^T · m_earth + m_body + k_I · I(t)
  *
- * H rows are dimensioned for the 25-state layout.
+ * H rows are dimensioned for the 21-state layout (15 base + 6 mag: m_earth[3], m_body[3]).
  *
  * The mag noise is ANISOTROPIC by the calibration fingerprint:
  *   sigma_xy = horizontal (heading-bearing) components (X,Y in body FRD)

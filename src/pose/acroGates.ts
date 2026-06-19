@@ -35,6 +35,8 @@ export function quatToR(q: Quat): number[][] {
 
 export function noseBearingDeg(q: Quat): number {
   const m = quatToR(q);
+  // Standard Hamilton body→world R: m[1][0] = East-of-nose, m[0][0] = North-of-nose.
+  // atan2(East, North) = compass bearing, 0=North, CW+. Verified by takeoff_north gate.
   return ((Math.atan2(m[1][0], m[0][0]) * D) % 360 + 360) % 360;
 }
 

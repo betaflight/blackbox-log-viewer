@@ -394,6 +394,13 @@ export function rtsSmooth(
     let Ck: Mat;
     try {
       const stencil = getSparseStencil(Fk.length);
+      // F can be accumulated across multiple IMU steps between keyframes.
+      // The single-step stencil is valid only when accumulation hasn't
+      // filled in off-diagonal terms beyond the stencil pattern. Should
+      // the keyframe interval grow, the dense fallback (below) captures
+      // any divergence. The 24 reference-flight gates + equivalence tests
+      // (dim 9/15/21, tol 5e-10) confirm the stencil is safe at current
+      // ~50 ms intervals.
       const PFt = matMulByBt(Pk, Fk, stencil);
 
       const L = choleskyDecompose(Pkp1Pred);

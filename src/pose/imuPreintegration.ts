@@ -237,7 +237,10 @@ export function createPreintegrator(): Preintegrator {
     dR: mat3Identity(),
     dv: [0, 0, 0],
     dp: [0, 0, 0],
-    cov: matIdentity(9),
+    cov: matIdentity(9),  // preintegration delta covariance — informational only.
+                           // The estimator runs per-IMU-step ESKF predict, not batched
+                           // preintegrated factors, so this accumulator does not feed
+                           // the filter's Q. Forster's zero-init is for factor-graph use.
     dtSum: 0,
     dRdBg: null,
     dVdBg: null,

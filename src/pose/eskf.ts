@@ -230,6 +230,8 @@ function matInvertSym(A: Mat): Mat {
         }
         if (maxRow !== i) { const tmp = aug[i]; aug[i] = aug[maxRow]; aug[maxRow] = tmp; }
         const pivot = aug[i][i];
+        // Reject pathologically small pivots (near-singular S). S is SPD on
+        // real data (diagonal O(1)); this branch guards the degenerate case.
         if (Math.abs(pivot) < 1e-30) continue;
         for (let j = 0; j < 2 * n; j++) aug[i][j] /= pivot;
         for (let r = 0; r < n; r++) {
