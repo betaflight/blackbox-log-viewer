@@ -18,6 +18,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Runs untrusted PR code on pull_request_target; keep the token read-only.
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
