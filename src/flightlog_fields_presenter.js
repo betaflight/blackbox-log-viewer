@@ -38,6 +38,16 @@ const FRIENDLY_FIELD_NAMES = {
   'axisF[1]': 'PID Feedforward [pitch]',
   'axisF[2]': 'PID Feedforward [yaw]',
 
+  'axisB[all]': 'PID Boost',
+  'axisB[0]': 'PID Boost [roll]',
+  'axisB[1]': 'PID Boost [pitch]',
+  'axisB[2]': 'PID Boost [yaw]',
+
+  'axisO[all]': 'PID Offset',
+  'axisO[0]': 'PID Offset [roll]',
+  'axisO[1]': 'PID Offset [pitch]',
+  'axisO[2]': 'PID Offset [yaw]',
+
   'axisS[all]': 'PID S',
   'axisS[0]': 'PID S [roll]',
   'axisS[1]': 'PID S [pitch]',
@@ -67,6 +77,12 @@ const FRIENDLY_FIELD_NAMES = {
   'rcCommand[1]': 'RC Command [pitch]',
   'rcCommand[2]': 'RC Command [yaw]',
   'rcCommand[3]': 'RC Command [throttle]',
+
+  'mixer[all]': 'Mixer',
+  'mixer[0]': 'Mixer SR [roll]',
+  'mixer[1]': 'Mixer SP [pitch]',
+  'mixer[2]': 'Mixer SY [yaw]',
+  'mixer[3]': 'Mixer SC [collective]',
 
   'gyroADC[all]': 'Gyros',
   'gyroADC[0]': 'Gyro [roll]',
@@ -102,9 +118,47 @@ const FRIENDLY_FIELD_NAMES = {
   'servo[all]': 'Servos',
   'servo[5]': 'Servo Tail',
 
+  headspeed: 'Headspeed',
+
+  govP: 'Gov P',
+  govI: 'Gov I',
+  govD: 'Gov D',
+  govF: 'Gov F',
+  govSum: 'Gov PID sum',
+  govRequest: 'HS Requested',
+  govTarget: 'HS Target',
+
   vbatLatest: 'Battery volt.',
   amperageLatest: 'Amperage',
   baroAlt: 'Barometer',
+
+  Vbat: 'Battery Voltage',
+  Ibat: 'Battery Current',
+  Vbec: 'BEC Voltage',
+  Vbus: '5V Voltage',
+
+  Tmcu: 'MCU Temperature',
+  Tesc: 'ESC Temperature',
+  Tesc2: 'ESC2 Temperature',
+  Tbec: 'BEC Temperature',
+
+  EscV: 'ESC Voltage',
+  EscI: 'ESC Current',
+  EscCap: 'ESC Consumption',
+  EscRPM: 'ESC eRPM',
+  EscThr: 'ESC Throttle',
+  EscPwm: 'ESC PWM',
+
+  Esc2V: 'ESC2 Voltage',
+  Esc2I: 'ESC2 Current',
+  Esc2Cap: 'ESC2 Consumption',
+  Esc2RPM: 'ESC2 eRPM',
+
+  BecV: 'BEC Voltage',
+  BecI: 'BEC Current',
+
+  altitude: 'Altitude',
+  vario: 'Variometer',
 
   'heading[all]': 'Heading',
   'heading[0]': 'Heading [roll]',
@@ -1729,15 +1783,71 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
     case 'axisF[0]':
     case 'axisF[1]':
     case 'axisF[2]':
+    case 'axisB[0]':
+    case 'axisB[1]':
+    case 'axisB[2]':
+    case 'axisO[0]':
+    case 'axisO[1]':
+    case 'axisO[2]':
     case 'axisS[0]':
     case 'axisS[1]':
     case 'axisS[2]':
       return `${flightLog.getPIDPercentage(value).toFixed(1)} %`
 
+    case 'mixer[0]':
+    case 'mixer[1]':
+      return `${(value * 0.012).toFixed(1)}°`
+    case 'mixer[2]':
+      return `${(value * 0.024).toFixed(1)}°`
+    case 'mixer[3]':
+      return `${(value / 10).toFixed(1)}%`
+
     case 'accSmooth[0]':
     case 'accSmooth[1]':
     case 'accSmooth[2]':
       return `${flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision)} g`
+
+    case 'headspeed':
+      return `${value.toFixed(0)} rpm (${(value / 60).toFixed(1)} Hz)`
+
+    case 'Vbat':
+      return `${(value / 100).toFixed(2)}V (${(value / 100 / flightLog.getNumCellsEstimate()).toFixed(2)} V/cell)`
+    case 'Vbec':
+    case 'Vbus':
+    case 'EscV':
+    case 'Esc2V':
+    case 'BecV':
+      return `${(value / 100).toFixed(2)}V`
+
+    case 'Ibat':
+    case 'EscI':
+    case 'Esc2I':
+    case 'BecI':
+      return `${(value / 100).toFixed(2)}A`
+
+    case 'Tmcu':
+    case 'Tesc':
+    case 'Tesc2':
+    case 'Tbec':
+      return `${value.toFixed(0)}°C`
+
+    case 'EscCap':
+    case 'Esc2Cap':
+      return `${value.toFixed(0)} mAh`
+
+    case 'EscRPM':
+    case 'Esc2RPM':
+      return `${value.toFixed(0)} eRpm`
+
+    case 'EscThr':
+    case 'EscPwm':
+      return `${(value / 10).toFixed(1)}%`
+
+    case 'altitude':
+      return `${(value / 100).toFixed(2)}m`
+
+    case 'vario':
+      return `${(value / 100).toFixed(2)}m/s`
 
     case 'vbatLatest':
       if (
@@ -2461,14 +2571,48 @@ FlightLogFieldPresenter.ConvertFieldValue = function (flightLog, fieldName, toFr
     case 'axisS[0]':
     case 'axisS[1]':
     case 'axisS[2]':
+    case 'axisB[0]':
+    case 'axisB[1]':
+    case 'axisB[2]':
+    case 'axisO[0]':
+    case 'axisO[1]':
+    case 'axisO[2]':
       return toFriendly
         ? flightLog.getPIDPercentage(value)
         : value / flightLog.getPIDPercentage(1.0)
+
+    case 'mixer[0]':
+    case 'mixer[1]':
+      return toFriendly ? value * 0.012 : value / 0.012
+    case 'mixer[2]':
+      return toFriendly ? value * 0.024 : value / 0.024
+    case 'mixer[3]':
+      return toFriendly ? value / 10 : value * 10
 
     case 'accSmooth[0]':
     case 'accSmooth[1]':
     case 'accSmooth[2]':
       return toFriendly ? flightLog.accRawToGs(value) : value / flightLog.accRawToGs(1.0)
+
+    case 'Vbat':
+    case 'Vbec':
+    case 'Vbus':
+    case 'EscV':
+    case 'Esc2V':
+    case 'BecV':
+    case 'Ibat':
+    case 'EscI':
+    case 'Esc2I':
+    case 'BecI':
+      return toFriendly ? value / 100 : value * 100
+
+    case 'EscThr':
+    case 'EscPwm':
+      return toFriendly ? value / 10 : value * 10
+
+    case 'altitude':
+    case 'vario':
+      return toFriendly ? value / 100 : value * 100
 
     case 'vbatLatest':
       if (

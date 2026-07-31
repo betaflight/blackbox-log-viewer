@@ -1782,3 +1782,37 @@ FlightLog.prototype.isFieldDisabled = function () {
   }
   return disabledFieldsFlags
 }
+
+/**
+ * Rotorflight logs a positive "fields_mask" header (which field groups are present),
+ * separate from Betaflight's negative fields_disabled_mask handled by isFieldDisabled().
+ * Undefined fields_mask (e.g. Betaflight logs) makes every flag read false.
+ */
+FlightLog.prototype.isFieldEnabled = function () {
+  const fields = this.getSysConfig().fields_mask
+  return {
+    RC_COMMAND: (fields & (1 << 0)) !== 0,
+    SETPOINT: (fields & (1 << 1)) !== 0,
+    MIXER: (fields & (1 << 2)) !== 0,
+    PID: (fields & (1 << 3)) !== 0,
+    ATTITUDE: (fields & (1 << 4)) !== 0,
+    GYRORAW: (fields & (1 << 5)) !== 0,
+    GYRO: (fields & (1 << 6)) !== 0,
+    ACC: (fields & (1 << 7)) !== 0,
+    MAG: (fields & (1 << 8)) !== 0,
+    ALT: (fields & (1 << 9)) !== 0,
+    BATTERY: (fields & (1 << 10)) !== 0,
+    RSSI: (fields & (1 << 11)) !== 0,
+    GPS: (fields & (1 << 12)) !== 0,
+    RPM: (fields & (1 << 13)) !== 0,
+    MOTOR: (fields & (1 << 14)) !== 0,
+    SERVO: (fields & (1 << 15)) !== 0,
+    VBEC: (fields & (1 << 16)) !== 0,
+    VBUS: (fields & (1 << 17)) !== 0,
+    TEMP: (fields & (1 << 18)) !== 0,
+    ESC: (fields & (1 << 19)) !== 0,
+    BEC: (fields & (1 << 20)) !== 0,
+    ESC2: (fields & (1 << 21)) !== 0,
+    GOV: (fields & (1 << 22)) !== 0,
+  }
+}

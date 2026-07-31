@@ -1608,17 +1608,102 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
       { label: "PID Error", fields: ["axisError[all]"] },
       {
         label: "Gyro + PID roll",
-        fields: ["axisP[0]", "axisI[0]", "axisD[0]", "axisF[0]", "gyroADC[0]"],
+        fields: [
+          "axisP[0]",
+          "axisI[0]",
+          "axisD[0]",
+          "axisF[0]",
+          "axisO[0]",
+          "gyroADC[0]",
+        ],
       },
       {
         label: "Gyro + PID pitch",
-        fields: ["axisP[1]", "axisI[1]", "axisD[1]", "axisF[1]", "gyroADC[1]"],
+        fields: [
+          "axisP[1]",
+          "axisI[1]",
+          "axisD[1]",
+          "axisF[1]",
+          "axisO[1]",
+          "gyroADC[1]",
+        ],
       },
       {
         label: "Gyro + PID yaw",
-        fields: ["axisP[2]", "axisI[2]", "axisD[2]", "axisF[2]", "gyroADC[2]"],
+        fields: [
+          "axisP[2]",
+          "axisI[2]",
+          "axisD[2]",
+          "axisF[2]",
+          "axisO[2]",
+          "gyroADC[2]",
+        ],
       },
     );
+  }
+  if (flightLog.isFieldEnabled().MIXER) {
+    EXAMPLE_GRAPHS.push({ label: "Controls", fields: ["mixer[all]"] });
+  }
+  if (flightLog.isFieldEnabled().GOV) {
+    EXAMPLE_GRAPHS.push({
+      label: "Governor",
+      fields: [
+        "govP",
+        "govI",
+        "govD",
+        "govF",
+        "govSum",
+        "govRequest",
+        "govTarget",
+      ],
+    });
+  }
+  if (flightLog.isFieldEnabled().RPM) {
+    EXAMPLE_GRAPHS.push({
+      label: "Rotor Speeds",
+      fields: ["headspeed"],
+    });
+  }
+  if (flightLog.isFieldEnabled().SERVO) {
+    EXAMPLE_GRAPHS.push({ label: "Servos", fields: ["servo[all]"] });
+  }
+  if (flightLog.isFieldEnabled().BATTERY) {
+    EXAMPLE_GRAPHS.push({ label: "Battery", fields: ["Vbat", "Ibat"] });
+  }
+  if (flightLog.isFieldEnabled().VBEC || flightLog.isFieldEnabled().VBUS) {
+    EXAMPLE_GRAPHS.push({ label: "Voltages", fields: ["Vbec", "Vbus"] });
+  }
+  if (
+    flightLog.isFieldEnabled().TEMP ||
+    flightLog.isFieldEnabled().ESC ||
+    flightLog.isFieldEnabled().ESC2 ||
+    flightLog.isFieldEnabled().BEC
+  ) {
+    EXAMPLE_GRAPHS.push({
+      label: "Temperatures",
+      fields: ["Tmcu", "Tesc", "Tesc2", "Tbec"],
+    });
+  }
+  if (flightLog.isFieldEnabled().ESC) {
+    EXAMPLE_GRAPHS.push({
+      label: "ESC Telemetry",
+      fields: ["EscV", "EscI", "EscCap", "EscRPM", "EscThr", "EscPwm"],
+    });
+  }
+  if (flightLog.isFieldEnabled().ESC2) {
+    EXAMPLE_GRAPHS.push({
+      label: "ESC2 Telemetry",
+      fields: ["Esc2V", "Esc2I", "Esc2Cap", "Esc2RPM"],
+    });
+  }
+  if (flightLog.isFieldEnabled().BEC) {
+    EXAMPLE_GRAPHS.push({ label: "BEC Telemetry", fields: ["BecV", "BecI"] });
+  }
+  if (flightLog.isFieldEnabled().RSSI) {
+    EXAMPLE_GRAPHS.push({ label: "RSSI", fields: ["rssi"] });
+  }
+  if (flightLog.isFieldEnabled().ALT) {
+    EXAMPLE_GRAPHS.push({ label: "Altitude", fields: ["altitude", "vario"] });
   }
   if (!flightLog.isFieldDisabled().ACC) {
     EXAMPLE_GRAPHS.push({
