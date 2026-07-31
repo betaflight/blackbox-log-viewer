@@ -1,23 +1,23 @@
 /**
  * Tailwind CSS + Nuxt UI theme
- * Matches Betaflight Configurator color system
+ * Rotorflight brand blue (matches rotorflight-blackbox's isRF accent, rgba(8,80,172,1))
  */
 
 @import "tailwindcss";
 @import "@nuxt/ui";
 
 @theme static {
-  --color-primary-50: #fffeea;
-  --color-primary-100: #fffac5;
-  --color-primary-200: #fff685;
-  --color-primary-300: #ffea46;
-  --color-primary-400: #ffc526;
-  --color-primary-500: #ffbb00;
-  --color-primary-600: #e29000;
-  --color-primary-700: #bb6502;
-  --color-primary-800: #984e08;
-  --color-primary-900: #7c400b;
-  --color-primary-950: #482100;
+  --color-primary-50: #eaf4fb;
+  --color-primary-100: #cde6f7;
+  --color-primary-200: #9bcdef;
+  --color-primary-300: #63b0e3;
+  --color-primary-400: #2f8ed0;
+  --color-primary-500: #0850ac;
+  --color-primary-600: #073f86;
+  --color-primary-700: #063363;
+  --color-primary-800: #052a4f;
+  --color-primary-900: #041f3a;
+  --color-primary-950: #021320;
 
   --color-neutral-850: oklch(23.5% 0 0);
 }

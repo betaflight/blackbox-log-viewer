@@ -61,7 +61,7 @@ const workspaceStore = useWorkspaceStore();
 }
 
 .status-flight-mode {
-  color: var(--color-primary-600, #e69400);
+  color: var(--color-primary-600, #073f86);
   font-weight: 600;
 }
 </style>

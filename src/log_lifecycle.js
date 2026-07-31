@@ -3,6 +3,7 @@ import { useLogStore } from "./stores/log.js";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { formatTime, stringLoopTime } from "./tools.js";
+import { FIRMWARE_TYPE_ROTORFLIGHT } from "./flightlog_fielddefs.js";
 
 export function renderLogFileInfo(file) {
   const logStore = useLogStore(pinia);
@@ -82,16 +83,28 @@ export function renderSelectedLogInfo() {
       : "";
   appStore.statusLograte = lograteText;
 
+  // Rotorflight has no throttle stick to average across motors; show collective position instead,
+  // and there's nothing else meaningful to pick from, so force that mode.
+  const isRotorflight = sysConfig.firmwareType === FIRMWARE_TYPE_ROTORFLIGHT;
+  if (isRotorflight) {
+    graphStore.seekBarMode = "collective";
+  }
+
   const seekBar = graphStore.seekBar;
   seekBar.setTimeRange(
     logStore.flightLog.getMinTime(),
     logStore.flightLog.getMaxTime(),
     logStore.currentBlackboxTime,
   );
-  seekBar.setActivityRange(
-    logStore.flightLog.getSysConfig().motorOutput[0],
-    logStore.flightLog.getSysConfig().motorOutput[1],
-  );
+  if (isRotorflight) {
+    const [collectiveMin, collectiveMax] = sysConfig.collectiveRange ?? [-500, 500];
+    seekBar.setActivityRange(collectiveMin, collectiveMax);
+  } else {
+    seekBar.setActivityRange(
+      logStore.flightLog.getSysConfig().motorOutput[0],
+      logStore.flightLog.getSysConfig().motorOutput[1],
+    );
+  }
 
   const activity = logStore.flightLog.getActivitySummary();
   seekBar.setActivity(

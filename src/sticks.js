@@ -3,6 +3,7 @@ import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { ExpoCurve } from "./expo";
 import { roundRect } from "./tools";
 import { useSettingsStore } from "./stores/settings.js";
+import { FIRMWARE_TYPE_ROTORFLIGHT } from "./flightlog_fielddefs.js";
 
 export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
   const { userSettings } = useSettingsStore();
@@ -240,6 +241,14 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
     canvasContext.restore();
   };
 
+  // Left stick vertical axis: Betaflight/Cleanflight/INAV log an unsigned throttle in the
+  // ~1000-2000 range, while Rotorflight logs a signed, zero-centered collective (like roll/pitch/yaw).
+  function verticalLeftStickValue(rcCommandValue) {
+    return sysConfig.firmwareType === FIRMWARE_TYPE_ROTORFLIGHT
+      ? -rcCommandValue / 500
+      : (1500 - rcCommandValue) / 500;
+  }
+
   function getStickValues(frame, stickPositions, stickLabel, config) {
     let stickIndex;
     const rcCommand = [];
@@ -283,7 +292,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         stickPositions[0] = yawValue / config.yawStickMax; //Yaw
         stickPositions[1] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
         stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-        stickPositions[3] = (1500 - rcCommand[3]) / 500; //Throttle
+        stickPositions[3] = verticalLeftStickValue(rcCommand[3]); //Throttle/Collective
 
         if (stickLabel != null) {
           stickLabel[0] = rcCommandLabels[2];
@@ -297,7 +306,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         stickPositions[0] = pitchStickCurve.lookup(rcCommand[0]); //Roll
         stickPositions[1] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
         stickPositions[2] = yawValue / config.yawStickMax; //Yaw
-        stickPositions[3] = (1500 - rcCommand[3]) / 500; //Throttle
+        stickPositions[3] = verticalLeftStickValue(rcCommand[3]); //Throttle/Collective
 
         if (stickLabel != null) {
           stickLabel[0] = rcCommandLabels[0];
@@ -309,7 +318,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         break;
       case STICK_MODE_4:
         stickPositions[0] = pitchStickCurve.lookup(rcCommand[0]); //Roll
-        stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
+        stickPositions[1] = verticalLeftStickValue(rcCommand[3]); //Throttle/Collective
         stickPositions[2] = yawValue / config.yawStickMax; //Yaw
         stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
 
@@ -323,7 +332,7 @@ export function FlightLogSticks(flightLog, rcCommandFields, canvas) {
         break;
       default: // Mode 2
         stickPositions[0] = yawValue / config.yawStickMax; //Yaw
-        stickPositions[1] = (1500 - rcCommand[3]) / 500; //Throttle
+        stickPositions[1] = verticalLeftStickValue(rcCommand[3]); //Throttle/Collective
         stickPositions[2] = pitchStickCurve.lookup(rcCommand[0]); //Roll
         stickPositions[3] = pitchStickCurve.lookup(-rcCommand[1]); //Pitch
 

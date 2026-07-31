@@ -96,17 +96,17 @@ export default defineConfig({
         theme_color: "#ffffff",
         icons: [
           {
-            src: "/images/pwa/bf_icon_128.png",
+            src: "/images/pwa/rf_icon_128.png",
             sizes: "128x128",
             type: "image/png",
           },
           {
-            src: "/images/pwa/bf_icon_192.png",
+            src: "/images/pwa/rf_icon_192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/images/pwa/bf_icon_256.png",
+            src: "/images/pwa/rf_icon_256.png",
             sizes: "256x256",
             type: "image/png",
           },

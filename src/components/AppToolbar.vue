@@ -3,7 +3,7 @@
     <!-- Logo bar with amber accent bottom border -->
     <div class="toolbar-logo">
       <div class="flex items-center gap-2">
-        <img src="/images/light-wide-2.svg" alt="Betaflight" class="toolbar-logo-img" />
+        <img src="/images/rf_logo_white.svg" alt="Betaflight" class="toolbar-logo-img" />
         <span class="toolbar-logo-subtitle">Blackbox Explorer</span>
       </div>
       <div class="flex items-center gap-3">
@@ -108,7 +108,7 @@ const appStore = useAppStore();
   justify-content: space-between;
   padding: 0.35rem 0.75rem;
   background: hsl(0, 0%, 12%);
-  border-bottom: 2px solid var(--color-primary-500, #ffbb00);
+  border-bottom: 2px solid var(--color-primary-500, #0850ac);
 }
 
 .toolbar-logo-img {
@@ -122,7 +122,7 @@ const appStore = useAppStore();
   font-weight: 300;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-primary-500, #ffbb00);
+  color: var(--color-primary-500, #0850ac);
 }
 
 .toolbar-filename {
