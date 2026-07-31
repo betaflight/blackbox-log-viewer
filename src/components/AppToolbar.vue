@@ -3,7 +3,7 @@
     <!-- Logo bar with amber accent bottom border -->
     <div class="toolbar-logo">
       <div class="flex items-center gap-2">
-        <img src="/images/rf_logo_white.svg" alt="Betaflight" class="toolbar-logo-img" />
+        <img src="/images/rf_logo_white.svg" alt="Rotorflight" class="toolbar-logo-img" />
         <span class="toolbar-logo-subtitle">Blackbox Explorer</span>
       </div>
       <div class="flex items-center gap-3">
