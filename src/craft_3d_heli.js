@@ -1,6 +1,12 @@
 // Renders the Rotorflight helicopter 3D model (a real GLTF asset, not a procedurally-built mesh
 // like the multirotor Craft3D), driven by the log's directly-logged `attitude[0..2]` fields.
 // Ported from https://github.com/rotorflight/rotorflight-blackbox (js/craft_3d.js).
+//
+// Uses the modern `three` npm package (ESM) rather than the vendored legacy three.min.js global,
+// since that vendored build (r70) predates glTF 2.0 support and THREE.SRGBColorSpace.
+
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const MODEL_URL = "/resources/models/bell_cw.gltf";
 
@@ -55,7 +61,7 @@ export function Craft3DHeli(flightLog, canvas) {
     renderer.render(scene, camera);
   };
 
-  const loader = new THREE.GLTFLoader();
+  const loader = new GLTFLoader();
   loader.load(MODEL_URL, (gltf) => {
     model = gltf.scene;
     modelWrapper.add(model);
