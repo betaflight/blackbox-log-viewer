@@ -51,7 +51,7 @@
       <UButton
         variant="ghost"
         :color="craftActive ? 'primary' : 'neutral'"
-        icon="i-lucide-plane"
+        icon="i-lucide-helicopter"
         size="xs"
         :aria-label="craftActive ? 'Hide craft' : 'Show craft'"
         :aria-pressed="craftActive"
