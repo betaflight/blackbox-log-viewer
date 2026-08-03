@@ -307,6 +307,7 @@ function copyToClipboard() {
     formatParams("Rates", rateParams.value),
     formatParams("Rate Limits", rateLimitParams.value),
     formatParams("Parameters", generalParams.value),
+    formatParams("Yaw Precompensation", yawPrecompParams.value),
     formatParams("Motor / ESC", motorParams.value),
     formatParams("Gyro Filters", gyroFilterParams.value),
     formatParams("D-Term Filters", dtermFilterParams.value),
@@ -551,6 +552,20 @@ const generalParams = computed(() => {
     result.push(param("Gyro To Use", selectVal(s.gyro_to_use, GYRO_TO_USE)));
   }
   return result.filter((p) => !p.missing);
+});
+
+// --- Yaw Precompensation (Rotorflight) ---
+
+const yawPrecompParams = computed(() => {
+  const s = filteredSc.value;
+  return [
+    param("Piro Compensation", selectVal(s.piro_compensation, OFF_ON)),
+    param("Cutoff", fmtVal(s.yaw_precomp?.[0], 0)),
+    param("Cyclic", fmtVal(s.yaw_precomp?.[1], 0)),
+    param("Collective", fmtVal(s.yaw_precomp?.[2], 0)),
+    param("Impulse Gain", fmtVal(s.yaw_precomp_impulse?.[0], 0)),
+    param("Impulse Decay", fmtVal(s.yaw_precomp_impulse?.[1], 0)),
+  ].filter((p) => !p.missing);
 });
 
 // --- Gyro Filters ---
@@ -1003,7 +1018,7 @@ loadHiddenPrefs();
 // Group order for display
 const GROUP_ORDER = [
   "PID Settings", "PID Sliders", "PID Controller", "Feedforward", "Rates", "Rate Limits",
-  "Parameters", "Motor / ESC",
+  "Parameters", "Yaw Precompensation", "Motor / ESC",
   "Gyro Filters", "Dynamic Notch", "RPM Filter",
   "D-Term Filters", "RC Smoothing",
   "Features", "Disabled Fields",
@@ -1048,6 +1063,7 @@ const groupParamMap = computed(() => ({
   "Rates": rateParams.value,
   "Rate Limits": rateLimitParams.value,
   "Parameters": generalParams.value,
+  "Yaw Precompensation": yawPrecompParams.value,
   "Motor / ESC": motorParams.value,
   "Gyro Filters": gyroFilterParams.value,
   "Dynamic Notch": dynNotchParams.value,

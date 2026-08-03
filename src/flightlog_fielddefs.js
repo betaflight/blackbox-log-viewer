@@ -449,6 +449,10 @@ export const SERIALRX_PROVIDER = makeReadOnly([
   'FPORT',
   'SRXL2',
   'GHST',
+  'SBUS2',
+  'FPORT2',
+  'FBUS',
+  'XB-A',
 ])
 
 export const ANTI_GRAVITY_MODE = makeReadOnly(['SMOOTH', 'STEP'])
@@ -459,7 +463,24 @@ export const RC_SMOOTHING_MODE = makeReadOnly(['OFF', 'ON'])
 
 export const RC_SMOOTHING_DEBUG_AXIS = makeReadOnly(['ROLL', 'PITCH', 'YAW', 'THROTTLE'])
 
-export const FILTER_TYPE = makeReadOnly(['PT1', 'BIQUAD', 'PT2', 'PT3'])
+const FILTER_TYPE_BETAFLIGHT = makeReadOnly(['PT1', 'BIQUAD', 'PT2', 'PT3'])
+
+// Rotorflight's gyro/D-term filter type enum is unrelated to Betaflight's - more filter types,
+// different order.
+const FILTER_TYPE_ROTORFLIGHT = makeReadOnly([
+  'NONE',
+  'FIRST_ORDER',
+  'SECOND_ORDER',
+  'PT1',
+  'PT2',
+  'PT3',
+  'ORDER1',
+  'BUTTER',
+  'BESSEL',
+  'DAMPED',
+])
+
+export let FILTER_TYPE = FILTER_TYPE_BETAFLIGHT
 
 export let DEBUG_MODE = []
 
@@ -889,6 +910,9 @@ export const FLIGHT_LOG_FAILSAFE_PHASE_NAME = makeReadOnly([
   'RX_LOSS_DETECTED',
   'LANDING',
   'LANDED',
+  'RX_LOSS_MONITORING',
+  'RX_LOSS_RECOVERED',
+  'GPS_RESCUE',
 ])
 
 export const FFT_CALC_STEPS = makeReadOnly([
@@ -955,7 +979,21 @@ export const FLIGHT_LOG_RESCUE_STATES = makeReadOnly([
 
 export const FLIGHT_LOG_AIRBORNE_STATES = makeReadOnly(['LANDING', 'TAKEOFF'])
 
-export const RATES_TYPE = makeReadOnly(['BETAFLIGHT', 'RACEFLIGHT', 'KISS', 'ACTUAL', 'QUICK'])
+const RATES_TYPE_BETAFLIGHT = makeReadOnly(['BETAFLIGHT', 'RACEFLIGHT', 'KISS', 'ACTUAL', 'QUICK'])
+
+// Rotorflight inserts NONE at the front and appends its own native rate type, shifting every
+// other index by one relative to the Betaflight-only enum above.
+const RATES_TYPE_ROTORFLIGHT = makeReadOnly([
+  'NONE',
+  'BETAFLIGHT',
+  'RACEFLIGHT',
+  'KISS',
+  'ACTUAL',
+  'QUICK',
+  'ROTORFLIGHT',
+])
+
+export let RATES_TYPE = RATES_TYPE_BETAFLIGHT
 
 export const GYRO_TO_USE = makeReadOnly(['FIRST', 'SECOND', 'BOTH'])
 
@@ -994,6 +1032,12 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       DEBUG_MODE = DEBUG_MODE_RF_4_2.slice()
     }
     DEBUG_MODE = makeReadOnly(DEBUG_MODE)
+
+    // Rates type
+    RATES_TYPE = RATES_TYPE_ROTORFLIGHT
+
+    // Filter type
+    FILTER_TYPE = FILTER_TYPE_ROTORFLIGHT
 
     // Gov states
     if (semver.gte(firmwareVersion, '4.6.0')) {
