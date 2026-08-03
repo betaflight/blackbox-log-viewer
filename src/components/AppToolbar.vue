@@ -63,6 +63,14 @@
         <UButton
           variant="ghost"
           color="neutral"
+          icon="i-lucide-file-cog"
+          size="xs"
+          title="Load Rotorflight CLI configuration (dump/diff)"
+          @click="$emit('open-craft-config')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
           icon="i-lucide-settings"
           size="xs"
           title="User Settings"
@@ -95,6 +103,7 @@ defineEmits([
   "new-window",
   "open-settings",
   "open-keys",
+  "open-craft-config",
 ]);
 
 const logStore = useLogStore();

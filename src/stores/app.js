@@ -10,7 +10,10 @@ export const useAppStore = defineStore("app", () => {
   const logFilename = ref("");
 
   // Status bar display strings (pushed from legacy code)
-  const statusVersion = ref("-");
+  const statusCraftName = ref("");
+  const statusFirmwareInfo = ref("-");
+  const statusCraftNameStatus = ref(null); // null | "match" | "mismatch"
+  const statusCraftNameTooltip = ref("");
   const statusCells = ref("");
   const statusLooptime = ref("-");
   const statusLograte = ref("-");
@@ -26,6 +29,9 @@ export const useAppStore = defineStore("app", () => {
   const videoExportDialogOpen = ref(false);
   const settingsDialogOpen = ref(false);
   const keysDialogOpen = ref(false);
+  const craftConfigDialogOpen = ref(false);
+  const craftNameMismatchDialogOpen = ref(false);
+  const craftNameMismatchMessage = ref("");
 
   // Callbacks registered by main.js (closure-dependent operations)
   const loadFiles = shallowRef(null);
@@ -53,7 +59,10 @@ export const useAppStore = defineStore("app", () => {
     viewVideo,
     darkThemeEnabled,
     logFilename,
-    statusVersion,
+    statusCraftName,
+    statusFirmwareInfo,
+    statusCraftNameStatus,
+    statusCraftNameTooltip,
     statusCells,
     statusLooptime,
     statusLograte,
@@ -67,6 +76,9 @@ export const useAppStore = defineStore("app", () => {
     videoExportDialogOpen,
     settingsDialogOpen,
     keysDialogOpen,
+    craftConfigDialogOpen,
+    craftNameMismatchDialogOpen,
+    craftNameMismatchMessage,
     loadFiles,
     newGraphConfig,
     exportCsv,

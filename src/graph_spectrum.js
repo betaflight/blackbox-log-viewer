@@ -10,11 +10,13 @@ import { SpectrumExporter } from "./spectrum-exporter";
 import { useSettingsStore } from "./stores/settings.js";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
+import { useCraftConfigStore } from "./stores/craftConfig.js";
 
 export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const { userSettings } = useSettingsStore();
   const graphStore = useGraphStore();
   const appStore = useAppStore();
+  const craftConfigStore = useCraftConfigStore();
 
   const ANALYSER_LARGE_LEFT_MARGIN = 10,
     ANALYSER_LARGE_TOP_MARGIN = 10,
@@ -201,12 +203,26 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     };
 
     function onMouseMoveAnalyser(e) {
-      if (e.shiftKey) {
+      const ctrlHoverActive = e.ctrlKey && craftConfigStore.hasConfig;
+
+      if (e.shiftKey || ctrlHoverActive) {
         graphStore.spectrumShiftActive = true;
         const rect = analyserCanvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
-        GraphSpectrumPlot.setMousePosition(mouseX, mouseY);
+
+        // SHIFT shows the harmonics of the hovered frequency; CTRL (with a craft config loaded)
+        // treats it as the main rotor speed and derives tail rotor / motor lines from the
+        // config's gear ratios instead.
+        const mode = ctrlHoverActive ? "gearRatio" : "harmonics";
+        if (mode === "gearRatio") {
+          GraphSpectrumPlot.setRotorGearRatios({
+            main: craftConfigStore.mainRotorGearRatio,
+            tail: craftConfigStore.tailRotorGearRatio,
+          });
+        }
+
+        GraphSpectrumPlot.setMousePosition(mouseX, mouseY, mode);
         that.refresh();
         e.preventDefault();
       } else {
@@ -255,6 +271,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
     this.setZoomX = debounce(100, function (value) {
       analyserZoomX = value / 100;
       GraphSpectrumPlot.setZoom(analyserZoomX, analyserZoomY);
+      // The frequency window changed, so the mouse-hover overlay lines (SHIFT/CTRL) no longer
+      // line up with the mouse position that produced them - clear them until the next hover.
+      GraphSpectrumPlot.setMousePosition(0, 0);
       that.refresh();
     });
 

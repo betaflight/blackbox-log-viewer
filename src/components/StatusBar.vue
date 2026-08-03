@@ -1,7 +1,15 @@
 <template>
   <div class="status-bar">
     <div class="flex items-center gap-3">
-      <span v-if="appStore.statusVersion" class="status-item">{{ appStore.statusVersion }}</span>
+      <span v-if="appStore.statusCraftName || appStore.statusFirmwareInfo" class="status-item">
+        <span
+          v-if="appStore.statusCraftName"
+          class="craft-name"
+          :class="craftNameClass"
+          :title="appStore.statusCraftNameTooltip"
+          >{{ appStore.statusCraftName }}</span
+        >{{ appStore.statusFirmwareInfo }}</span
+      >
       <span v-if="appStore.statusCells" class="status-item">{{ appStore.statusCells }}</span>
       <span v-if="appStore.statusLooptime" class="status-item">{{ appStore.statusLooptime }}</span>
       <span v-if="appStore.statusLograte" class="status-item">{{ appStore.statusLograte }}</span>
@@ -29,6 +37,7 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useAppStore } from "../stores/app.js";
 import { useWorkspaceStore } from "../stores/workspace.js";
 
@@ -36,6 +45,16 @@ defineEmits(["goto-bookmark"]);
 
 const appStore = useAppStore();
 const workspaceStore = useWorkspaceStore();
+
+const craftNameClass = computed(() => {
+  if (appStore.statusCraftNameStatus === "match") {
+    return "craft-name-match";
+  }
+  if (appStore.statusCraftNameStatus === "mismatch") {
+    return "craft-name-mismatch";
+  }
+  return "";
+});
 </script>
 
 <style scoped>
@@ -62,6 +81,16 @@ const workspaceStore = useWorkspaceStore();
 
 .status-flight-mode {
   color: var(--color-primary-600, #073f86);
+  font-weight: 600;
+}
+
+.craft-name-match {
+  color: var(--color-success-600, #5cb85c);
+  font-weight: 600;
+}
+
+.craft-name-mismatch {
+  color: var(--color-error-600, #d9534f);
   font-weight: 600;
 }
 </style>

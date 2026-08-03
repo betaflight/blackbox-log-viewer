@@ -10,6 +10,7 @@
           @files-selected="onFilesSelected"
           @open-settings="onOpenSettings"
           @open-keys="onOpenKeys"
+          @open-craft-config="onOpenCraftConfig"
           @export-csv="onExportCsv"
           @export-gpx="onExportGpx"
           @export-video="onExportVideo"
@@ -96,6 +97,12 @@
         v-model:open="appStore.settingsDialogOpen"
         @save="onSaveSettings"
       />
+      <CraftConfigDialog v-model:open="appStore.craftConfigDialogOpen" />
+      <CraftNameMismatchDialog
+        v-model:open="appStore.craftNameMismatchDialogOpen"
+        :message="appStore.craftNameMismatchMessage"
+        @confirm="onOpenCraftConfig"
+      />
       <GraphConfigDialog
         v-model:open="appStore.graphConfigDialogOpen"
         :flightLog="logStore.flightLog"
@@ -120,13 +127,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useSettingsStore } from "./stores/settings.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
+import { useCraftConfigStore } from "./stores/craftConfig.js";
+import { recheckCraftConfigMatch } from "./log_lifecycle.js";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -139,6 +148,8 @@ import WorkspacePanel from "./components/WorkspacePanel.vue";
 import StatusBar from "./components/StatusBar.vue";
 import KeysDialog from "./components/KeysDialog.vue";
 import UserSettingsDialog from "./components/UserSettingsDialog.vue";
+import CraftConfigDialog from "./components/CraftConfigDialog.vue";
+import CraftNameMismatchDialog from "./components/CraftNameMismatchDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
 import VideoExportDialog from "./components/VideoExportDialog.vue";
@@ -154,6 +165,14 @@ const logStore = useLogStore();
 const playbackStore = usePlaybackStore();
 const settingsStore = useSettingsStore();
 const workspaceStore = useWorkspaceStore();
+const craftConfigStore = useCraftConfigStore();
+
+// Re-check the currently displayed log against the craft config whenever it's loaded/cleared
+// (without prompting on a mismatch - that's only for when a *log* is newly opened).
+watch(
+  () => [craftConfigStore.hasConfig, craftConfigStore.craftName],
+  () => recheckCraftConfigMatch(),
+);
 
 // Centralized CSS class binding — replaces 27 imperative html.classList calls in main.js
 watchEffect(() => {
@@ -197,6 +216,10 @@ function onOpenSettings() {
 
 function onOpenKeys() {
   appStore.keysDialogOpen = true;
+}
+
+function onOpenCraftConfig() {
+  appStore.craftConfigDialogOpen = true;
 }
 
 function onExportCsv() {

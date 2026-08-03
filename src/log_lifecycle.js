@@ -2,8 +2,57 @@ import pinia from "./pinia_instance.js";
 import { useLogStore } from "./stores/log.js";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
+import { useCraftConfigStore } from "./stores/craftConfig.js";
 import { formatTime, stringLoopTime } from "./tools.js";
 import { FIRMWARE_TYPE_ROTORFLIGHT } from "./flightlog_fielddefs.js";
+
+/**
+ * Compare the flight log's craft name against the loaded craft config (if any), and set the
+ * status bar's match/mismatch indicator and tooltip accordingly. On a mismatch, optionally also
+ * offer (via a confirm dialog) to load a different config file - this should only happen when a
+ * *log* was just opened, not when the *config* changes underneath an already-open log.
+ */
+function checkCraftConfigMatch(logCraftName, promptOnMismatch) {
+  const appStore = useAppStore(pinia);
+  const craftConfigStore = useCraftConfigStore(pinia);
+
+  appStore.statusCraftNameStatus = null;
+  appStore.statusCraftNameTooltip = "";
+
+  if (!craftConfigStore.hasConfig || !logCraftName || !craftConfigStore.craftName) {
+    return;
+  }
+
+  const configCraftName = craftConfigStore.craftName;
+
+  if (logCraftName.trim().toLowerCase() === configCraftName.trim().toLowerCase()) {
+    appStore.statusCraftNameStatus = "match";
+    appStore.statusCraftNameTooltip = `Loaded configuration ("${configCraftName}") matches this flight log's craft.`;
+    return;
+  }
+
+  appStore.statusCraftNameStatus = "mismatch";
+  appStore.statusCraftNameTooltip = `Loaded configuration is for "${configCraftName}", but this flight log is for "${logCraftName}".`;
+
+  if (promptOnMismatch !== false) {
+    appStore.craftNameMismatchMessage = appStore.statusCraftNameTooltip;
+    appStore.craftNameMismatchDialogOpen = true;
+  }
+}
+
+/**
+ * Re-run the craft name comparison for the currently displayed log, without prompting on a
+ * mismatch. Call this when the loaded craft config changes (loaded/cleared) while a log is open.
+ */
+export function recheckCraftConfigMatch() {
+  const logStore = useLogStore(pinia);
+
+  if (!logStore.flightLog) {
+    return;
+  }
+
+  checkCraftConfigMatch(logStore.flightLog.getSysConfig()["Craft name"], false);
+}
 
 export function renderLogFileInfo(file) {
   const logStore = useLogStore(pinia);
@@ -58,15 +107,16 @@ export function renderSelectedLogInfo() {
 
   const sysConfig = logStore.flightLog.getSysConfig();
 
-  const versionText =
-    (sysConfig["Craft name"]?.length
-      ? `${sysConfig["Craft name"]} : `
-      : "") +
+  appStore.statusCraftName = sysConfig["Craft name"]?.length
+    ? `${sysConfig["Craft name"]} : `
+    : "";
+  appStore.statusFirmwareInfo =
     (sysConfig["Firmware revision"] == null
       ? ""
       : `${sysConfig["Firmware revision"]}`) +
     (sysConfig.deviceUID == null ? "" : ` (${sysConfig.deviceUID})`);
-  appStore.statusVersion = versionText;
+
+  checkCraftConfigMatch(sysConfig["Craft name"]);
 
   const looptimeText = stringLoopTime(
     sysConfig.looptime,
