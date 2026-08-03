@@ -30,6 +30,7 @@
           :craft-active="graphStore.hasCraft"
           :sticks-active="graphStore.hasSticks"
           :analyser-active="graphStore.hasAnalyser"
+          :step-response-active="graphStore.hasStepResponse"
           :map-active="graphStore.hasMap"
           @view-config="onViewConfig"
           @toggle-header="onToggleHeader"
@@ -38,6 +39,7 @@
           @toggle-craft="onToggleCraft"
           @toggle-sticks="onToggleSticks"
           @toggle-analyser="onToggleAnalyser"
+          @toggle-step-response="onToggleStepResponse"
           @toggle-map="onToggleMap"
         />
       </Teleport>
@@ -81,6 +83,9 @@
 
       <Teleport to="#vue-analyser">
         <SpectrumAnalyser />
+      </Teleport>
+      <Teleport to="#vue-stepresponse">
+        <StepResponseAnalyser />
       </Teleport>
       <Teleport to="#vue-legend-panel">
         <LegendPanel />
@@ -154,6 +159,7 @@ import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
 import VideoExportDialog from "./components/VideoExportDialog.vue";
 import SpectrumAnalyser from "./components/SpectrumAnalyser.vue";
+import StepResponseAnalyser from "./components/StepResponseAnalyser.vue";
 import LegendPanel from "./components/LegendPanel.vue";
 import FieldValuesPanel from "./components/FieldValuesPanel.vue";
 import ConfigurationPanel from "./components/ConfigurationPanel.vue";
@@ -184,6 +190,8 @@ watchEffect(() => {
   cl.toggle("has-sticks", graphStore.hasSticks);
   cl.toggle("has-analyser", graphStore.hasAnalyser);
   cl.toggle("has-analyser-fullscreen", graphStore.hasAnalyserFullscreen);
+  cl.toggle("has-stepresponse", graphStore.hasStepResponse);
+  cl.toggle("has-stepresponse-fullscreen", graphStore.hasStepResponseFullscreen);
   cl.toggle("has-map", graphStore.hasMap);
   cl.toggle("has-marker", graphStore.hasMarker);
   cl.toggle("is-fullscreen", graphStore.isFullscreen);
@@ -279,6 +287,10 @@ function onToggleSticks() {
 
 function onToggleAnalyser() {
   graphStore.toggleAnalyser();
+}
+
+function onToggleStepResponse() {
+  graphStore.toggleStepResponse();
 }
 
 function onToggleMap() {

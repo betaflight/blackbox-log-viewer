@@ -60,6 +60,7 @@ function BlackboxLogViewer() {
   const video = document.getElementById("logVideo");
   const canvas = document.getElementById("graphCanvas");
   const analyserCanvas = document.getElementById("analyserCanvas");
+  const stepResponseCanvas = document.getElementById("stepResponseCanvas");
   const stickCanvas = document.getElementById("stickCanvas");
   const craftCanvas = document.getElementById("craftCanvas");
   let userSettings;
@@ -80,7 +81,7 @@ function BlackboxLogViewer() {
   graphStore.activeGraphConfig = new GraphConfig();
   graphStore.mapGrapher = mapGrapher;
   graphStore.seekBar = seekBar;
-  graphStore.canvasRefs = { canvas, analyserCanvas, stickCanvas, craftCanvas };
+  graphStore.canvasRefs = { canvas, analyserCanvas, stepResponseCanvas, stickCanvas, craftCanvas };
   playbackStore.videoElement = video;
 
 
@@ -141,6 +142,7 @@ function BlackboxLogViewer() {
       stickCanvas,
       craftCanvas,
       analyserCanvas,
+      stepResponseCanvas,
       userSettings,
     );
     graphStore.graph = graph;

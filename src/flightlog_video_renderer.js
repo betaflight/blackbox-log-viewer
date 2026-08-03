@@ -40,6 +40,7 @@ export function FlightLogVideoRenderer(
   const stickCanvas = document.createElement("canvas");
   const craftCanvas = document.createElement("canvas");
   const analyserCanvas = document.createElement("canvas");
+  const stepResponseCanvas = document.createElement("canvas");
   const canvasContext = canvas.getContext("2d");
   let frameTime;
   let frameIndex;
@@ -250,7 +251,13 @@ export function FlightLogVideoRenderer(
     delete logParameters.flightVideo;
   }
 
-  const options = { ...userSettings, eraseBackground: !logParameters.flightVideo, drawEvents: false, fillBackground: !logParameters.flightVideo };
+  const options = {
+    ...userSettings,
+    eraseBackground: !logParameters.flightVideo,
+    drawEvents: false,
+    fillBackground: !logParameters.flightVideo,
+    drawStepResponse: false,
+  };
 
   const graph = new FlightLogGrapher(
     flightLog,
@@ -259,6 +266,7 @@ export function FlightLogVideoRenderer(
     stickCanvas,
     craftCanvas,
     analyserCanvas,
+    stepResponseCanvas,
     options,
   );
 

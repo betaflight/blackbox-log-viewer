@@ -166,6 +166,7 @@ html.has-log .log-graph-config {
 
 #craftCanvas,
 #analyserCanvas,
+#stepResponseCanvas,
 #mapContainer,
 #stickCanvas {
   position: absolute;
@@ -177,6 +178,7 @@ html.has-log .log-graph-config {
 
 html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas,
+html.has-stepresponse #stepResponseCanvas,
 html.has-map #mapContainer,
 html.has-sticks #stickCanvas {
   display: block;
@@ -209,6 +211,7 @@ html.has-sticks #stickCanvas {
 }
 
 #analyser,
+#stepResponse,
 #log-seek-bar {
   z-index: 10;
 }
@@ -336,9 +339,64 @@ html.has-sticks #stickCanvas {
 }
 
 .analyser,
+.stepResponse,
 .map-container,
 .log-seek-bar {
   position: absolute;
+}
+
+#stepResponseToolbar {
+  color: #bbb;
+  top: 9px;
+  left: 34px;
+  z-index: 9;
+  position: absolute;
+  font-size: 9px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.stepResponseAxis {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: normal;
+}
+
+.stepResponseAxis-roll {
+  color: #fb8072;
+}
+
+.stepResponseAxis-pitch {
+  color: #8dd3c7;
+}
+
+.stepResponseAxis-yaw {
+  color: #ffffb3;
+}
+
+.stepResponse:hover #stepResponseResize.non-shift {
+  opacity: 1;
+  height: auto;
+  transition: opacity 500ms ease-in;
+}
+
+.stepResponse #stepResponseResize {
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  top: 5px;
+  z-index: 9;
+  position: absolute;
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
 #log-seek-bar {
@@ -450,6 +508,22 @@ html.has-analyser .view-analyser-fullscreen {
 }
 
 html:not(.has-analyser) .view-analyser-fullscreen {
+  visibility: hidden;
+}
+
+html:not(.has-stepresponse-fullscreen) .stepresponse-icon-resize-small {
+  display: none;
+}
+
+html.has-stepresponse-fullscreen .stepresponse-icon-resize-full {
+  display: none;
+}
+
+html.has-stepresponse .view-stepresponse-fullscreen {
+  visibility: inherit;
+}
+
+html:not(.has-stepresponse) .view-stepresponse-fullscreen {
   visibility: hidden;
 }
 
