@@ -5,7 +5,7 @@ onmessage = function (event) {
   creator="https://github.com/betaflight/blackbox-log-viewer">
   <metadata>
     <author>
-      <name>Betaflight Blackbox Explorer</name>
+      <name>Rotorflight Blackbox Explorer</name>
       <link href="https://github.com/betaflight/blackbox-log-viewer"></link>
     </author>
   </metadata>`;
