@@ -353,12 +353,16 @@ html.has-sticks #stickCanvas {
   position: absolute;
   font-size: 9px;
   white-space: nowrap;
-  display: flex;
+  display: none;
   align-items: center;
   gap: 10px;
   padding: 4px 8px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.55);
+}
+
+html.has-stepresponse #stepResponseToolbar {
+  display: flex;
 }
 
 .stepResponseAxis {
