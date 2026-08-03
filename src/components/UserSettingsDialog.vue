@@ -114,6 +114,51 @@
             </SettingRow>
           </UiBox>
 
+          <!-- Trim Settings -->
+          <UiBox title="Trim Settings">
+            <SettingRow label="Auto Trim">
+              <USwitch v-model="local.autoTrim" size="sm" />
+            </SettingRow>
+            <p class="text-xs text-dimmed mt-1">
+              When a log is opened, automatically set the In/Out points (same as the I and O
+              keys) using the events below. Governor State is only logged when a governor is
+              active - use Arm/Disarm if you're not running one.
+            </p>
+            <div v-if="local.autoTrim" class="flex flex-col gap-2 mt-2">
+              <SettingRow label="Start Event">
+                <USelect
+                  v-model="local.autoTrimStartEvent"
+                  :items="autoTrimEventOptions"
+                  :ui="{ content: 'z-[300]' }"
+                  size="sm"
+                  class="min-w-44"
+                />
+              </SettingRow>
+              <SettingRow label="Stop Event">
+                <USelect
+                  v-model="local.autoTrimStopEvent"
+                  :items="autoTrimEventOptions"
+                  :ui="{ content: 'z-[300]' }"
+                  size="sm"
+                  class="min-w-44"
+                />
+              </SettingRow>
+              <SettingRow label="Offset">
+                <USelect
+                  v-model="local.autoTrimOffset"
+                  :items="autoTrimOffsetOptions"
+                  :ui="{ content: 'z-[300]' }"
+                  size="sm"
+                  class="min-w-32"
+                />
+              </SettingRow>
+              <p class="text-xs text-dimmed">
+                Trim starts this many seconds after the start event, and ends this many seconds
+                before the stop event.
+              </p>
+            </div>
+          </UiBox>
+
           <!-- Map Settings -->
           <UiBox title="Map Settings">
             <SettingRow label="ACT" help="Use Altitude Colored Trail (slower at loading/changing logs)">
@@ -216,6 +261,7 @@ import SettingRow from "./SettingRow.vue";
 import PercentInput from "./PercentInput.vue";
 import { mixerList } from "../user_settings_data.js";
 import { useSettingsStore } from "../stores/settings.js";
+import { FLIGHT_LOG_GOVSTATES, FLIGHT_LOG_AIRBORNE_STATES } from "../flightlog_fielddefs.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
 
@@ -230,10 +276,34 @@ function cloneSettings() {
 
 const local = ref(cloneSettings());
 
+// FLIGHT_LOG_GOVSTATES/FLIGHT_LOG_AIRBORNE_STATES are plain mutable exports (not reactive) that
+// get re-populated per the currently open log's firmware version, so this list is rebuilt fresh
+// each time the dialog opens rather than computed once.
+function buildAutoTrimEventOptions() {
+  const options = [
+    { label: "Arm", value: "arm" },
+    { label: "Disarm", value: "disarm" },
+  ];
+  for (const state of FLIGHT_LOG_GOVSTATES) {
+    options.push({ label: `GovState: ${state}`, value: `govState:${state}` });
+  }
+  for (const state of FLIGHT_LOG_AIRBORNE_STATES) {
+    options.push({ label: `Airborne: ${state}`, value: `airborne:${state}` });
+  }
+  return options;
+}
+
+const autoTrimEventOptions = ref(buildAutoTrimEventOptions());
+const autoTrimOffsetOptions = [0, 1, 2, 3, 4, 5].map((seconds) => ({
+  label: `${seconds} second${seconds === 1 ? "" : "s"}`,
+  value: seconds,
+}));
+
 // Re-clone when dialog opens to pick up any external changes
 watch(open, (val) => {
   if (val) {
     local.value = cloneSettings();
+    autoTrimEventOptions.value = buildAutoTrimEventOptions();
   }
 });
 

@@ -19,6 +19,7 @@ import { upgradeWorkspaceFormat, saveWorkspaces, loadWorkspaces } from "./worksp
 import { exportCsv, exportGpx, exportSpectrumToCsv } from "./export_utils.js";
 import { syncLogToVideo, setVideoOffset, setVideoTime, setVideoInTime, setVideoOutTime, loadVideo, reportVideoError } from "./video_handler.js";
 import { renderLogFileInfo, renderSelectedLogInfo, setSeekBarMode } from "./log_lifecycle.js";
+import { applyAutoTrim } from "./auto_trim.js";
 import { invalidateGraph, updateCanvasSize, setGraphState, setCurrentBlackboxTime, setPlaybackRate, setGraphZoom, showConfigFile, showValueTable, logJumpBack, logJumpForward, logJumpStart, logJumpEnd, logPlayPause, setMarker, logSyncHere, logSyncBack, logSyncForward, logSmartSync, videoLoaded } from "./playback_controls.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
@@ -149,6 +150,7 @@ function BlackboxLogViewer() {
 
     setVideoInTime(false);
     setVideoOutTime(false);
+    applyAutoTrim(logStore.flightLog, userSettings);
 
     graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
