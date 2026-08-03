@@ -1480,6 +1480,57 @@ GraphSpectrumPlot._drawRotorRpmLines = function (
   }
 };
 
+/**
+ * SHIFT-hover: draws the hovered frequency (1st harmonic) plus its 2nd, 3rd and 4th harmonics,
+ * each labelled with its own Hz and RPM value, so the user can line them up against peaks in the
+ * spectrum.
+ */
+GraphSpectrumPlot._drawHarmonicLines = function (
+  canvasCtx,
+  fundamentalFrequency,
+  maximalFrequency,
+  WIDTH,
+  HEIGHT,
+  OFFSET,
+) {
+  const stroke = "rgba(0,255,0,0.66)";
+
+  if (fundamentalFrequency <= maximalFrequency) {
+    const label = `${fundamentalFrequency.toFixed(1)}Hz (${Math.round(fundamentalFrequency * 60)}rpm)`;
+    this._drawVerticalMarkerLine(
+      canvasCtx,
+      fundamentalFrequency,
+      maximalFrequency,
+      label,
+      WIDTH,
+      HEIGHT,
+      OFFSET,
+      stroke,
+      1,
+    );
+  }
+
+  for (const harmonic of [2, 3, 4]) {
+    const frequency = fundamentalFrequency * harmonic;
+    if (frequency > maximalFrequency) {
+      continue;
+    }
+
+    const label = `${frequency.toFixed(1)}Hz (${Math.round(frequency * 60)}rpm)`;
+    this._drawVerticalMarkerLine(
+      canvasCtx,
+      frequency,
+      maximalFrequency,
+      label,
+      WIDTH,
+      HEIGHT,
+      OFFSET + 15,
+      stroke,
+      1,
+    );
+  }
+};
+
 GraphSpectrumPlot._drawLowpassFilter = function (
   canvasCtx,
   frequency,
@@ -1710,18 +1761,8 @@ GraphSpectrumPlot._drawMousePosition = function (
 
     if (this._mouseMode === "gearRatio" && this._rotorGearRatios) {
       this._drawRotorRpmLines(canvasCtx, mouseFrequency, maximalFrequency, WIDTH, HEIGHT, OFFSET);
-    } else if (mouseFrequency >= 0 && mouseFrequency <= maximalFrequency) {
-      this._drawInterestFrequency(
-        canvasCtx,
-        mouseFrequency,
-        maximalFrequency,
-        "",
-        WIDTH,
-        HEIGHT,
-        OFFSET,
-        "rgba(0,255,0,0.50)",
-        3,
-      );
+    } else if (mouseFrequency >= 0) {
+      this._drawHarmonicLines(canvasCtx, mouseFrequency, maximalFrequency, WIDTH, HEIGHT, OFFSET);
     }
 
     // Y axis
