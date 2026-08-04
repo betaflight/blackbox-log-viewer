@@ -687,6 +687,15 @@ function BlackboxLogViewer() {
       graph.initializeCraftModel();
       updateCanvasSize();
     }
+    // Re-run Auto Trim so a change to its settings (on/off, start/stop event, offset) takes
+    // effect immediately on the currently open log, rather than only on the next log opened.
+    // Only the In/Out markers are updated here - unlike on initial log load, this doesn't also
+    // jump playback to the new in-point, since the user may be reviewing a specific position
+    // when they save these settings.
+    if (logStore.flightLog) {
+      applyAutoTrim(logStore.flightLog, userSettings);
+      invalidateGraph();
+    }
   };
   graphStore.applyGraphZoom = setGraphZoom;
   playbackStore.applyPlaybackRate = setPlaybackRate;
