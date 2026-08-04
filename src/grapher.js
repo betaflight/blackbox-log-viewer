@@ -466,7 +466,7 @@ export function FlightLogGrapher(
       yScale = -plotHeight / 2;
 
     canvasContext.strokeStyle = ThemeColors.getGraphGrid(); // Grid Color
-    canvasContext.setLineDash([1, 10]); // Make the grid line a dash
+    canvasContext.setLineDash([2, 4]); // Make the grid line a dash
     canvasContext.lineWidth = 1;
     canvasContext.beginPath();
 

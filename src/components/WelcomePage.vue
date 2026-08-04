@@ -4,7 +4,8 @@
     <div class="hero">
       <img :src="logoSrc" alt="Rotorflight" class="hero-logo" />
       <p class="hero-subtitle">Blackbox Explorer</p>
-      <p class="hero-tagline">Analyze flight logs recorded by Rotorflights's Blackbox feature</p>
+      <p class="hero-tagline">Analyze flight logs recorded by Rotorflights's Blackbox feature.</p>      
+      <p class="tag-version">{{ appStore.statusViewerVersion }}</p>
       <LogFileInput size="lg" label="Open log file / video" @files-selected="$emit('files-selected', $event)" />
     </div>
 
@@ -67,6 +68,11 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer info-->
+     <div class="footer">
+     <p><strong>Note:</strong> this isn't the official Rotorflight Blackbox viewer, it's a fork from the latest Betaflight Blackbox Viewer.</p>
+     </div>
   </div>
 </template>
 
@@ -107,6 +113,22 @@ const logoSrc = computed(() =>
   gap: 0.25rem;
 }
 
+
+.footer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+}
+
+.footer p{
+   font-size: 0.7rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  margin: -0.5rem 0 0.75rem;
+}
+
 .hero-logo {
   width: min(360px, 80vw);
   margin-bottom: 0.25rem;
@@ -125,6 +147,13 @@ const logoSrc = computed(() =>
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0 0 0.75rem;
+}
+
+.tag-version {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  margin: -0.5rem 0 0.75rem;
 }
 
 /* Info grid */
