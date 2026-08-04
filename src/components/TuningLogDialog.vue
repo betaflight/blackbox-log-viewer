@@ -587,9 +587,14 @@ const isPending = computed(() => !!(currentEntry.value && pendingEntryIds.value.
 const canAsk = computed(() => hasImage.value && isCurrentFlightLog.value);
 const hasApiKey = computed(() => !!settingsStore.userSettings.aiApiKey);
 
-const showAiPanel = computed(() => hasImage.value && (isCurrentFlightLog.value || hasConversation.value || isPending.value));
 const showAskInput = computed(() => canAsk.value && hasApiKey.value);
 const showNoApiKeyBanner = computed(() => canAsk.value && !hasApiKey.value && !tuningLogStore.apiKeyBannerDismissed);
+// Once the no-API-key banner has been dismissed on an entry with no conversation yet and no
+// request in flight, there'd be nothing left under the "PID tuning advice" heading (no banner, no
+// ask form, no conversation) - collapse the whole panel rather than leave an empty header showing.
+const showAiPanel = computed(
+  () => hasImage.value && (hasConversation.value || isPending.value || (isCurrentFlightLog.value && (hasApiKey.value || !tuningLogStore.apiKeyBannerDismissed))),
+);
 
 const conversationTurns = computed(() => {
   const conversation = currentEntry.value?.ai?.conversation || [];
