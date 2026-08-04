@@ -95,18 +95,20 @@
               >
                 <div class="font-medium flex items-center gap-1 pr-5">
                   {{ entry.id === currentFlightLogEntryId ? "Current" : formatTimestamp(entry.timestamp) }}
-                  <UIcon
+                  <UTooltip
                     v-if="isBehindLatest(entry)"
-                    name="i-lucide-triangle-alert"
-                    class="size-3 text-warning"
-                    title="The current log is not the latest entry in this tuning log"
-                  />
-                  <UIcon
+                    text="The current log is not the latest entry in this tuning log"
+                    :delay-duration="0"
+                  >
+                    <UIcon name="i-lucide-triangle-alert" class="size-3 text-warning" />
+                  </UTooltip>
+                  <UTooltip
                     v-if="entryHasAnalysis(entry)"
-                    name="i-lucide-check-circle-2"
-                    class="size-3 text-success"
-                    title="AI tuning advice has already been generated for this entry"
-                  />
+                    text="AI tuning advice has already been generated for this entry"
+                    :delay-duration="0"
+                  >
+                    <UIcon name="i-lucide-check-circle-2" class="size-3 text-success" />
+                  </UTooltip>
                 </div>
                 <div
                   v-if="entry.craftName"
