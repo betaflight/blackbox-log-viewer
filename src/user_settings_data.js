@@ -1,3 +1,7 @@
+// Read directly from ai_models.json (not tuning_ai.js) so this always-loaded module doesn't pull
+// the Anthropic SDK into the main bundle before the Tuning Log dialog is ever opened.
+import AI_MODELS from "./data/ai_models.json";
+
 // Mixer definitions — shared between settings dialog and renderers
 export const mixerList = [
   { name: "Tricopter", model: "tricopter", image: "tri", defaultMotorOrder: [0, 1, 2], defaultYawOffset: -Math.PI / 2 },
@@ -47,6 +51,11 @@ export const defaultUserSettings = {
   drawTime: true,
   drawEvents: true,
   drawAnalyser: true,
+  stepResponseAxes: { roll: true, pitch: true, yaw: true },
+  autoTrim: false,
+  autoTrimStartEvent: "govState:ACTIVE",
+  autoTrimStopEvent: "airborne:LANDING",
+  autoTrimOffset: 1,
   drawWatermark: false,
   drawLapTimer: false,
   drawGradient: false,
@@ -61,11 +70,18 @@ export const defaultUserSettings = {
   overdrawSpectrumType: 0,
   psdHeatmapMin: -40,
   psdHeatmapMax: 10,
-  craft: { left: "15%", top: "48%", size: "40%" },
+  craft: { left: "10%", top: "20%", size: "35%" },
   sticks: { left: "75%", top: "20%", size: "30%" },
   analyser: { left: "2%", top: "60%", size: "35%" },
   analyser_legend: { left: "88%", top: "7%", width: "10%" },
+  stepResponse: { left: "60%", top: "60%", size: "35%" },
   map: { left: "2%", top: "5%", size: "35%" },
   watermark: { left: "3%", top: "90%", size: "100%", transparency: "100%", logo: null },
   laptimer: { left: "5%", top: "50%", transparency: "40%" },
+  // AI Analysis Settings — used by the Tuning Log's "AI Analysis" feature (see tuning_ai.js).
+  // aiApiKey is stored locally only, and only ever sent to api.anthropic.com.
+  aiApiKey: "",
+  aiModel: AI_MODELS.defaultModel,
+  aiEffort: "high",
+  aiSkillId: "",
 };

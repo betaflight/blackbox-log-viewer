@@ -29,6 +29,8 @@ export const useGraphStore = defineStore("graph", () => {
   const hasAnalyser = ref(false);
   const hasAnalyserFullscreen = ref(false);
   const hasAnalyserSticks = ref(false);
+  const hasStepResponse = ref(false);
+  const hasStepResponseFullscreen = ref(false);
   const settingsStore = useSettingsStore();
   const hasCraft = computed(() => !!settingsStore.userSettings.drawCraft);
   const hasSticks = computed(() => !!settingsStore.userSettings.drawSticks);
@@ -51,6 +53,10 @@ export const useGraphStore = defineStore("graph", () => {
   const analyserLayout = shallowRef({ width: 0, height: 0, left: 0, top: 0 });
   const spectrumShiftActive = ref(false);
   const segmentLengthMax = ref(20);
+
+  // Step response
+  const stepResponseLayout = shallowRef({ width: 0, height: 0, left: 0, top: 0 });
+  const stepResponseShiftActive = ref(false);
 
   const isFullscreen = ref(false);
   const markerTime = ref(0);
@@ -157,6 +163,29 @@ export const useGraphStore = defineStore("graph", () => {
     invalidateGraph.value?.();
   }
 
+  function toggleStepResponse() {
+    hasStepResponse.value = !hasStepResponse.value;
+    if (!hasStepResponse.value) {
+      hasStepResponseFullscreen.value = false;
+      graph.value?.setStepResponse(false);
+    }
+    graph.value?.setDrawStepResponse(hasStepResponse.value);
+    prefs.set("hasStepResponse", hasStepResponse.value);
+    invalidateGraph.value?.();
+  }
+
+  function toggleStepResponseFullscreen() {
+    hasStepResponseFullscreen.value = hasStepResponse.value
+      ? !hasStepResponseFullscreen.value
+      : false;
+    graph.value?.setStepResponse(hasStepResponseFullscreen.value);
+    invalidateGraph.value?.();
+  }
+
+  function setStepResponseAxisEnabled(axis, state) {
+    graph.value?.setStepResponseAxisEnabled(axis, state);
+  }
+
   function toggleMap() {
     hasMap.value = !hasMap.value;
     prefs.set("hasMap", hasMap.value);
@@ -193,6 +222,8 @@ export const useGraphStore = defineStore("graph", () => {
     hasAnalyser,
     hasAnalyserFullscreen,
     hasAnalyserSticks,
+    hasStepResponse,
+    hasStepResponseFullscreen,
     hasCraft,
     hasSticks,
     hasMap,
@@ -208,6 +239,8 @@ export const useGraphStore = defineStore("graph", () => {
     analyserLayout,
     spectrumShiftActive,
     segmentLengthMax,
+    stepResponseLayout,
+    stepResponseShiftActive,
     isFullscreen,
     markerTime,
     seekBarMode,
@@ -231,6 +264,9 @@ export const useGraphStore = defineStore("graph", () => {
     legendVisibilityChange,
     toggleAnalyser,
     toggleAnalyserFullscreen,
+    toggleStepResponse,
+    toggleStepResponseFullscreen,
+    setStepResponseAxisEnabled,
     toggleMap,
     setGraphZoom,
     quickZoomToggle,

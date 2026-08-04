@@ -10,9 +10,8 @@ function getEventBarStyle() {
 }
 
 function getActivityBarStyle() {
-  return ThemeColors.isDarkTheme()
-    ? "rgba(200,200,255, 0.9)"
-    : "rgba(170,170,255, 0.9)";
+  // Matches the original Rotorflight/Betaflight blackbox viewer's seekbar.js exactly (not theme-dependent there)
+  return "rgba(170,170,255, 0.9)";
 }
 
 function getOutsideExportRangeStyle() {

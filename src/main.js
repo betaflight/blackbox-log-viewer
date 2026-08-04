@@ -5,8 +5,9 @@ import { FlightLogGrapher } from "./grapher.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
 import { SeekBar } from "./seekbar.js";
-import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
-import supaflyWorkspace from "./ws_supafly.json";
+//import workspace_ctzsnooze from "./data/ws_ctzsnooze.json";
+//import workspace_supafly from "./data/ws_supafly.json";
+import workspace_Ben from "./data/ws_ben.json";
 import { FlightLog } from "./flightlog.js";
 import {
   stringTimetoMsec,
@@ -19,6 +20,7 @@ import { upgradeWorkspaceFormat, saveWorkspaces, loadWorkspaces } from "./worksp
 import { exportCsv, exportGpx, exportSpectrumToCsv } from "./export_utils.js";
 import { syncLogToVideo, setVideoOffset, setVideoTime, setVideoInTime, setVideoOutTime, loadVideo, reportVideoError } from "./video_handler.js";
 import { renderLogFileInfo, renderSelectedLogInfo, setSeekBarMode } from "./log_lifecycle.js";
+import { applyAutoTrim } from "./auto_trim.js";
 import { invalidateGraph, updateCanvasSize, setGraphState, setCurrentBlackboxTime, setPlaybackRate, setGraphZoom, showConfigFile, showValueTable, logJumpBack, logJumpForward, logJumpStart, logJumpEnd, logPlayPause, setMarker, logSyncHere, logSyncBack, logSyncForward, logSmartSync, videoLoaded } from "./playback_controls.js";
 import { PrefStorage } from "./pref_storage.js";
 import { makeScreenshot } from "./screenshot.js";
@@ -60,6 +62,7 @@ function BlackboxLogViewer() {
   const video = document.getElementById("logVideo");
   const canvas = document.getElementById("graphCanvas");
   const analyserCanvas = document.getElementById("analyserCanvas");
+  const stepResponseCanvas = document.getElementById("stepResponseCanvas");
   const stickCanvas = document.getElementById("stickCanvas");
   const craftCanvas = document.getElementById("craftCanvas");
   let userSettings;
@@ -80,7 +83,7 @@ function BlackboxLogViewer() {
   graphStore.activeGraphConfig = new GraphConfig();
   graphStore.mapGrapher = mapGrapher;
   graphStore.seekBar = seekBar;
-  graphStore.canvasRefs = { canvas, analyserCanvas, stickCanvas, craftCanvas };
+  graphStore.canvasRefs = { canvas, analyserCanvas, stepResponseCanvas, stickCanvas, craftCanvas };
   playbackStore.videoElement = video;
 
 
@@ -141,12 +144,14 @@ function BlackboxLogViewer() {
       stickCanvas,
       craftCanvas,
       analyserCanvas,
+      stepResponseCanvas,
       userSettings,
     );
     graphStore.graph = graph;
 
     setVideoInTime(false);
     setVideoOutTime(false);
+    const autoTrimmed = applyAutoTrim(logStore.flightLog, userSettings);
 
     graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
@@ -162,7 +167,11 @@ function BlackboxLogViewer() {
       invalidateGraph();
     };
 
-    if (logStore.hasVideo) {
+    if (autoTrimmed) {
+      // Jump to the trimmed-in point rather than the raw start of the log/video, so playback
+      // opens right where Auto Trim decided the flight actually begins.
+      setCurrentBlackboxTime(playbackStore.videoExportInTime);
+    } else if (logStore.hasVideo) {
       syncLogToVideo();
     } else {
       // Start at beginning:
@@ -344,7 +353,7 @@ function BlackboxLogViewer() {
       if (item) {
         workspaceStore.workspaceGraphConfigs = upgradeWorkspaceFormat(item);
       } else {
-        workspaceStore.workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
+        workspaceStore.workspaceGraphConfigs = structuredClone(workspace_Ben);
       }
     });
 
@@ -630,7 +639,7 @@ function BlackboxLogViewer() {
     };
     workspaceStore.saveWorkspace = (id, title) => onSaveWorkspace(id, title);
     workspaceStore.applyDefaultWorkspace = (index) => {
-      const presets = [null, structuredClone(ctzsnoozeWorkspace), structuredClone(supaflyWorkspace)];
+      const presets = [null, structuredClone(workspace_Ben)/*,structuredClone(workspace_ctzsnooze), structuredClone(workspace_supafly)*/];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
       }
@@ -678,6 +687,15 @@ function BlackboxLogViewer() {
       graph.refreshLogo();
       graph.initializeCraftModel();
       updateCanvasSize();
+    }
+    // Re-run Auto Trim so a change to its settings (on/off, start/stop event, offset) takes
+    // effect immediately on the currently open log, rather than only on the next log opened.
+    // Only the In/Out markers are updated here - unlike on initial log load, this doesn't also
+    // jump playback to the new in-point, since the user may be reviewing a specific position
+    // when they save these settings.
+    if (logStore.flightLog) {
+      applyAutoTrim(logStore.flightLog, userSettings);
+      invalidateGraph();
     }
   };
   graphStore.applyGraphZoom = setGraphZoom;

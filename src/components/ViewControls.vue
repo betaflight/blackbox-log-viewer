@@ -51,7 +51,7 @@
       <UButton
         variant="ghost"
         :color="craftActive ? 'primary' : 'neutral'"
-        icon="i-lucide-plane"
+        icon="i-lucide-helicopter"
         size="xs"
         :aria-label="craftActive ? 'Hide craft' : 'Show craft'"
         :aria-pressed="craftActive"
@@ -80,6 +80,16 @@
       />
       <UButton
         variant="ghost"
+        :color="stepResponseActive ? 'primary' : 'neutral'"
+        icon="i-lucide-chart-spline"
+        size="xs"
+        :aria-label="stepResponseActive ? 'Hide step response' : 'Show step response'"
+        :aria-pressed="stepResponseActive"
+        title="Step Response"
+        @click="$emit('toggle-step-response')"
+      />
+      <UButton
+        variant="ghost"
         :color="mapActive ? 'primary' : 'neutral'"
         icon="i-lucide-map-pin"
         size="xs"
@@ -100,6 +110,7 @@ defineProps({
   craftActive: { type: Boolean, default: false },
   sticksActive: { type: Boolean, default: false },
   analyserActive: { type: Boolean, default: false },
+  stepResponseActive: { type: Boolean, default: false },
   mapActive: { type: Boolean, default: false },
 });
 
@@ -111,6 +122,7 @@ defineEmits([
   "toggle-craft",
   "toggle-sticks",
   "toggle-analyser",
+  "toggle-step-response",
   "toggle-map",
 ]);
 </script>

@@ -48,6 +48,7 @@ export function FlightLogIndex(logData) {
         avgThrottle: [],
         maxRC: [],
         maxMotorDiff: [],
+        collective: [],
         initialIMU: [],
         initialSlow: [],
         initialGPSHome: [],
@@ -116,6 +117,9 @@ export function FlightLogIndex(logData) {
           }
         }
 
+        // Collective stick position (Rotorflight), used as an activity summary alternative to motor throttle
+        const collectiveField = mainFrameDef.nameToIndex["rcCommand[3]"];
+
         // Do we have mag fields? If not mark that data as absent
         if (magADC[0] === undefined) {
           magADC = false;
@@ -178,6 +182,9 @@ export function FlightLogIndex(logData) {
                     }
 
                     intraIndex.maxRC.push(rcTotal);
+                  }
+                  if (collectiveField !== undefined) {
+                    intraIndex.collective.push(frame[collectiveField]);
                   }
 
                   /* To enable seeking to an arbitrary point in the log without re-reading anything

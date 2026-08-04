@@ -8,9 +8,15 @@ export const useAppStore = defineStore("app", () => {
 
   // Filename of loaded log (pushed from legacy code)
   const logFilename = ref("");
+  // File.lastModified (epoch ms) of the loaded log file - used as a fallback timestamp source by
+  // the Tuning Log feature when a flight controller has no RTC (see tuning_log.js:logTimestamp).
+  const logFileLastModified = ref(null);
 
   // Status bar display strings (pushed from legacy code)
-  const statusVersion = ref("-");
+  const statusCraftName = ref("");
+  const statusFirmwareInfo = ref("-");
+  const statusCraftNameStatus = ref(null); // null | "match" | "mismatch"
+  const statusCraftNameTooltip = ref("");
   const statusCells = ref("");
   const statusLooptime = ref("-");
   const statusLograte = ref("-");
@@ -26,6 +32,10 @@ export const useAppStore = defineStore("app", () => {
   const videoExportDialogOpen = ref(false);
   const settingsDialogOpen = ref(false);
   const keysDialogOpen = ref(false);
+  const craftConfigDialogOpen = ref(false);
+  const craftNameMismatchDialogOpen = ref(false);
+  const craftNameMismatchMessage = ref("");
+  const tuningLogDialogOpen = ref(false);
 
   // Callbacks registered by main.js (closure-dependent operations)
   const loadFiles = shallowRef(null);
@@ -53,7 +63,11 @@ export const useAppStore = defineStore("app", () => {
     viewVideo,
     darkThemeEnabled,
     logFilename,
-    statusVersion,
+    logFileLastModified,
+    statusCraftName,
+    statusFirmwareInfo,
+    statusCraftNameStatus,
+    statusCraftNameTooltip,
     statusCells,
     statusLooptime,
     statusLograte,
@@ -67,6 +81,10 @@ export const useAppStore = defineStore("app", () => {
     videoExportDialogOpen,
     settingsDialogOpen,
     keysDialogOpen,
+    craftConfigDialogOpen,
+    craftNameMismatchDialogOpen,
+    craftNameMismatchMessage,
+    tuningLogDialogOpen,
     loadFiles,
     newGraphConfig,
     exportCsv,

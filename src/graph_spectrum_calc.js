@@ -1,6 +1,7 @@
 import { FFTComplex } from "./fft_complex.js";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { useSettingsStore } from "./stores/settings.js";
+import { estimateBlackBoxRate } from "./tools.js";
 
 const FIELD_THROTTLE_NAME = ["rcCommands[3]"],
   FIELD_RPM_NAMES = [
@@ -16,7 +17,6 @@ const FIELD_THROTTLE_NAME = ["rcCommands[3]"],
   FREQ_VS_THR_CHUNK_TIME_MS = 300,
   FREQ_VS_THR_WINDOW_DIVISOR = 6,
   MAX_ANALYSER_LENGTH = 300 * 1000 * 1000, // 5min
-  WARNING_RATE_DIFFERENCE = 0.05,
   MAX_RPM_HZ_VALUE = 800,
   RPM_AXIS_TOP_MARGIN_PERCENT = 2,
   MIN_SPECTRUM_SAMPLES_COUNT = 2048;
@@ -42,26 +42,15 @@ export const GraphSpectrumCalc = {
 GraphSpectrumCalc.initialize = function (flightLog, sysConfig) {
   this._flightLog = flightLog;
   this._sysConfig = sysConfig;
-
-  const gyroRate = (1000000 / this._sysConfig["looptime"]).toFixed(0);
   this._motorPoles = flightLog.getSysConfig()["motor_poles"];
-  this._blackBoxRate =
-    (gyroRate * this._sysConfig["frameIntervalPNum"]) /
-    this._sysConfig["frameIntervalPDenom"];
-  if (this._sysConfig.pid_process_denom != null) {
-    this._blackBoxRate = this._blackBoxRate / this._sysConfig.pid_process_denom;
-  }
-  this._BetaflightRate = this._blackBoxRate;
 
-  const actualLoggedTime = this._flightLog.getActualLoggedTime(),
-    length = flightLog.getCurrentLogRowsCount();
-
-  this._actualeRate = (1e6 * length) / actualLoggedTime;
-  if (
-    Math.abs(this._BetaflightRate - this._actualeRate) / this._actualeRate >
-    WARNING_RATE_DIFFERENCE
-  )
-    this._blackBoxRate = Math.round(this._actualeRate);
+  const { rate, configuredRate, actualRate } = estimateBlackBoxRate(
+    flightLog,
+    sysConfig,
+  );
+  this._blackBoxRate = rate;
+  this._BetaflightRate = configuredRate;
+  this._actualeRate = actualRate;
 
   if (this._BetaflightRate !== this._blackBoxRate) {
     return {

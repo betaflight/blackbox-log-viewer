@@ -1,0 +1,32 @@
+{
+    "defaultModel": "claude-sonnet-5",
+    "models": [
+        {
+            "id": "claude-opus-4-8",
+            "displayName": "Claude Opus 4.8",
+            "description": "most capable",
+            "supportsAdaptiveThinking": true,
+            "supportsEffort": true,
+            "pricePerMillionInputTokens": 5.00,
+            "pricePerMillionOutputTokens": 25.00
+        },
+        {
+            "id": "claude-sonnet-5",
+            "displayName": "Claude Sonnet 5",
+            "description": "faster, cheaper",
+            "supportsAdaptiveThinking": true,
+            "supportsEffort": true,
+            "pricePerMillionInputTokens": 3.00,
+            "pricePerMillionOutputTokens": 15.00
+        },
+        {
+            "id": "claude-haiku-4-5",
+            "displayName": "Claude Haiku 4.5",
+            "description": "fastest, cheapest",
+            "supportsAdaptiveThinking": false,
+            "supportsEffort": false,
+            "pricePerMillionInputTokens": 1.00,
+            "pricePerMillionOutputTokens": 5.00
+        }
+    ]
+}

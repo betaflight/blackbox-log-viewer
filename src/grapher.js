@@ -5,10 +5,16 @@ import {
   FlightLogEvent,
   FLIGHT_LOG_FLIGHT_MODE_NAME,
   FLIGHT_LOG_DISARM_REASON,
+  FLIGHT_LOG_GOVSTATES,
+  FLIGHT_LOG_RESCUE_STATES,
+  FLIGHT_LOG_AIRBORNE_STATES,
+  FIRMWARE_TYPE_ROTORFLIGHT,
 } from "./flightlog_fielddefs";
 import { Craft2D } from "./craft_2d";
 import { Craft3D } from "./craft_3d";
+import { Craft3DHeli, heliModelHasAttitude } from "./craft_3d_heli";
 import { FlightLogAnalyser } from "./graph_spectrum";
+import { FlightLogStepResponse } from "./graph_stepresponse";
 import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
 import { ExpoCurve } from "./expo";
@@ -24,6 +30,7 @@ export function FlightLogGrapher(
   stickCanvas,
   craftCanvas,
   analyserCanvas,
+  stepResponseCanvas,
   options,
 ) {
   const graphStore = useGraphStore();
@@ -64,6 +71,7 @@ export function FlightLogGrapher(
     drawTime: true,
     drawAnalyser: true, // add an analyser option
     analyserSampleRate: 2000 /*Hz*/, // the loop time for the log
+    drawStepResponse: true, // add a step response option
     eraseBackground: true, // Set to false if you want the graph to draw on top of an existing canvas image
   };
   let windowWidthMicros = WINDOW_WIDTH_MICROS_DEFAULT,
@@ -76,11 +84,16 @@ export function FlightLogGrapher(
     craft3D = null,
     craft2D = null,
     analyser = null /* define a new spectrum analyser */,
+    stepResponse = null /* define a new step response graph */,
     watermarkLogo /* Watermark feature */;
   this.onSeek = null;
 
   this.getAnalyser = function () {
     return analyser;
+  };
+
+  this.getStepResponse = function () {
+    return stepResponse;
   };
 
   function extend(base, top) {
@@ -613,6 +626,33 @@ export function FlightLogGrapher(
           3,
         );
         break;
+      case FlightLogEvent.GOVERNOR_STATE:
+        drawEventLine(
+          x,
+          labelY,
+          `GovState: ${FlightLogFieldPresenter.presentEnum(event.data.govState, FLIGHT_LOG_GOVSTATES)}`,
+          "rgba(0,0,255,0.75)",
+          2,
+        );
+        break;
+      case FlightLogEvent.RESCUE_STATE:
+        drawEventLine(
+          x,
+          labelY,
+          `RescueState: ${FlightLogFieldPresenter.presentEnum(event.data.rescueState, FLIGHT_LOG_RESCUE_STATES)}`,
+          "rgba(0,0,255,0.75)",
+          2,
+        );
+        break;
+      case FlightLogEvent.AIRBORNE_STATE:
+        drawEventLine(
+          x,
+          labelY,
+          `Airborne: ${FlightLogFieldPresenter.presentEnum(event.data.airborneState, FLIGHT_LOG_AIRBORNE_STATES)}`,
+          "rgba(255,150,0,0.75)",
+          2,
+        );
+        break;
       case FlightLogEvent.DISARM:
         drawEventLine(
           x,
@@ -880,6 +920,8 @@ export function FlightLogGrapher(
 
     if (analyser != null) analyser.resize();
 
+    if (stepResponse != null) stepResponse.resize();
+
     // Calculate again the position/size of frame label
     frameLabelTextWidthFrameNumber = null;
     frameLabelTextWidthFrameTime = null;
@@ -1018,9 +1060,9 @@ export function FlightLogGrapher(
           );
         }
 
-        if (options.craftType === "3D") {
+        if (options.craftType === "3D" && craft3D) {
           craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
-        } else if (options.craftType === "2D") {
+        } else if (craft2D) {
           craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
         }
       }
@@ -1034,6 +1076,15 @@ export function FlightLogGrapher(
           analyser.plotSpectrum(field.index, field.curve, field.friendlyName);
         } catch (err) {
           console.log(`Cannot plot analyser ${err}`);
+        }
+      }
+
+      // Draw Step Response
+      if (options.drawStepResponse && stepResponse) {
+        try {
+          stepResponse.plot();
+        } catch (err) {
+          console.log(`Cannot plot step response ${err}`);
         }
       }
 
@@ -1132,7 +1183,11 @@ export function FlightLogGrapher(
     if (options.craftType === "3D") {
       if (craftCanvas) {
         try {
-          craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
+          craft3D =
+            flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_ROTORFLIGHT &&
+            heliModelHasAttitude(flightLog)
+              ? new Craft3DHeli(flightLog, craftCanvas)
+              : new Craft3D(flightLog, craftCanvas, idents.motorColors);
         } catch {
           //WebGL not supported, fall back to 2D rendering
           options.craftType = "2D";
@@ -1166,20 +1221,24 @@ export function FlightLogGrapher(
   this.setInTime = function (time) {
     inTime = time;
     analyser.setInTime(inTime);
+    if (stepResponse) stepResponse.setInTime(inTime);
 
     if (outTime <= inTime) {
       outTime = false;
       analyser.setOutTime(outTime);
+      if (stepResponse) stepResponse.setOutTime(outTime);
     }
   };
 
   this.setOutTime = function (time) {
     outTime = time;
     analyser.setOutTime(outTime);
+    if (stepResponse) stepResponse.setOutTime(outTime);
 
     if (inTime >= outTime) {
       inTime = false;
       analyser.setInTime(inTime);
+      if (stepResponse) stepResponse.setInTime(inTime);
     }
   };
 
@@ -1231,9 +1290,29 @@ export function FlightLogGrapher(
     analyser.setFullscreen(state);
   };
 
+  // Add option toggling
+  this.setDrawStepResponse = function (state) {
+    options.drawStepResponse = state;
+  };
+
+  // Add step response zoom toggling
+  this.setStepResponse = function (state) {
+    if (stepResponse) stepResponse.setFullscreen(state);
+  };
+
+  this.setStepResponseAxisEnabled = function (axis, state) {
+    if (stepResponse) stepResponse.setAxisEnabled(axis, state);
+  };
+
   // Update user options
   this.refreshOptions = function (newSettings) {
     options = { ...defaultOptions, ...newSettings };
+
+    // If 3D craft rendering isn't actually available (e.g. three.js failed to load), re-validate
+    // craftType instead of leaving options pointing at a renderer that was never constructed.
+    if (options.craftType === "3D" && !craft3D) {
+      this.initializeCraftModel();
+    }
   };
 
   this.refreshLogo = function () {
@@ -1262,6 +1341,9 @@ export function FlightLogGrapher(
 
   /* Create the FlightLogAnalyser object */
   analyser = new FlightLogAnalyser(flightLog, canvas, analyserCanvas);
+
+  /* Create the FlightLogStepResponse object */
+  stepResponse = new FlightLogStepResponse(flightLog, canvas, stepResponseCanvas);
 
   /* Create the Lap Timer object */
   const lapTimer = new LapTimer();

@@ -45,6 +45,8 @@ export const GraphSpectrumPlot = {
     x: 0,
     y: 0,
   },
+  _mouseMode: "harmonics", // "harmonics" (default) or "gearRatio" (CTRL-hover with a craft config loaded)
+  _rotorGearRatios: null, // {main, tail} multipliers from the loaded craft config, while CTRL-hovering
   _overdrawType: null,
   _spectrumType: null,
   _sysConfig: null,
@@ -152,9 +154,14 @@ GraphSpectrumPlot.setOverdraw = function (overdrawType) {
   this._invalidateCache();
 };
 
-GraphSpectrumPlot.setMousePosition = function (x, y) {
+GraphSpectrumPlot.setMousePosition = function (x, y, mode) {
   this._mousePosition.x = x;
   this._mousePosition.y = y;
+  this._mouseMode = mode || "harmonics";
+};
+
+GraphSpectrumPlot.setRotorGearRatios = function (rotorGearRatios) {
+  this._rotorGearRatios = rotorGearRatios;
 };
 
 GraphSpectrumPlot.draw = function () {
@@ -1421,6 +1428,109 @@ GraphSpectrumPlot._drawInterestFrequency = function (
   );
 };
 
+/**
+ * CTRL-hover: the hovered frequency is treated as the main rotor speed (the "key value"). The
+ * tail rotor and motor lines are derived from it using the gear ratios from the loaded craft
+ * config (see stores/craftConfig.js).
+ */
+GraphSpectrumPlot._drawRotorRpmLines = function (
+  canvasCtx,
+  mainFrequency,
+  maximalFrequency,
+  WIDTH,
+  HEIGHT,
+  OFFSET,
+) {
+  const ratios = this._rotorGearRatios;
+
+  const lines = [
+    { frequency: mainFrequency, label: "Main Rotor", stroke: "rgba(255,255,0,0.85)" },
+    {
+      frequency: ratios.tail != null ? mainFrequency * ratios.tail : null,
+      label: "Tail Rotor",
+      stroke: "rgba(0,200,255,0.85)",
+    },
+    // A 1:1 main gear ratio (direct drive) means the motor line would just duplicate the main rotor line
+    {
+      frequency: ratios.main != null && ratios.main !== 1 ? mainFrequency * ratios.main : null,
+      label: "Motor",
+      stroke: "rgba(255,0,255,0.85)",
+    },
+  ];
+
+  let labelOffset = OFFSET;
+  for (const line of lines) {
+    if (line.frequency == null || line.frequency < 0 || line.frequency > maximalFrequency) {
+      continue;
+    }
+
+    const label = ` ${line.label} (${Math.round(line.frequency * 60)}rpm)`;
+    this._drawVerticalMarkerLine(
+      canvasCtx,
+      line.frequency,
+      maximalFrequency,
+      label,
+      WIDTH,
+      HEIGHT,
+      labelOffset,
+      line.stroke,
+      2,
+    );
+    labelOffset += 15;
+  }
+};
+
+/**
+ * SHIFT-hover: draws the hovered frequency (1st harmonic) plus its 2nd, 3rd and 4th harmonics,
+ * each labelled with its own Hz and RPM value, so the user can line them up against peaks in the
+ * spectrum.
+ */
+GraphSpectrumPlot._drawHarmonicLines = function (
+  canvasCtx,
+  fundamentalFrequency,
+  maximalFrequency,
+  WIDTH,
+  HEIGHT,
+  OFFSET,
+) {
+  const stroke = "rgba(0,255,0,0.66)";
+
+  if (fundamentalFrequency <= maximalFrequency) {
+    const label = `${fundamentalFrequency.toFixed(1)}Hz (${Math.round(fundamentalFrequency * 60)}rpm)`;
+    this._drawVerticalMarkerLine(
+      canvasCtx,
+      fundamentalFrequency,
+      maximalFrequency,
+      label,
+      WIDTH,
+      HEIGHT,
+      OFFSET,
+      stroke,
+      1,
+    );
+  }
+
+  for (const harmonic of [2, 3, 4]) {
+    const frequency = fundamentalFrequency * harmonic;
+    if (frequency > maximalFrequency) {
+      continue;
+    }
+
+    const label = `${frequency.toFixed(1)}Hz (${Math.round(frequency * 60)}rpm)`;
+    this._drawVerticalMarkerLine(
+      canvasCtx,
+      frequency,
+      maximalFrequency,
+      label,
+      WIDTH,
+      HEIGHT,
+      OFFSET + 15,
+      stroke,
+      1,
+    );
+  }
+};
+
 GraphSpectrumPlot._drawLowpassFilter = function (
   canvasCtx,
   frequency,
@@ -1648,18 +1758,11 @@ GraphSpectrumPlot._drawMousePosition = function (
     const maximalFrequency = (0.5 * this._fftData.blackBoxRate) / this._zoomX;
 
     mouseFrequency = ((mouseX - marginLeft) / WIDTH) * maximalFrequency;
-    if (mouseFrequency >= 0 && mouseFrequency <= maximalFrequency) {
-      this._drawInterestFrequency(
-        canvasCtx,
-        mouseFrequency,
-        maximalFrequency,
-        "",
-        WIDTH,
-        HEIGHT,
-        OFFSET,
-        "rgba(0,255,0,0.50)",
-        3,
-      );
+
+    if (this._mouseMode === "gearRatio" && this._rotorGearRatios) {
+      this._drawRotorRpmLines(canvasCtx, mouseFrequency, maximalFrequency, WIDTH, HEIGHT, OFFSET);
+    } else if (mouseFrequency >= 0) {
+      this._drawHarmonicLines(canvasCtx, mouseFrequency, maximalFrequency, WIDTH, HEIGHT, OFFSET);
     }
 
     // Y axis

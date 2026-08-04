@@ -236,6 +236,38 @@ export function stringLoopTime(
   return returnString;
 }
 
+const RATE_MISMATCH_WARNING_THRESHOLD = 0.05;
+
+/**
+ * Estimates the effective blackbox sample rate (Hz) for a flight log.
+ *
+ * `configuredRate` comes from the log's declared looptime/decimation config; `actualRate` is
+ * measured directly from the logged row count over the actual logged time. Firmware timing
+ * drift or decimation quirks can make the two disagree, so `rate` (what callers should use for
+ * window-length/FFT math) falls back to the measured rate once the mismatch exceeds
+ * RATE_MISMATCH_WARNING_THRESHOLD.
+ */
+export function estimateBlackBoxRate(flightLog, sysConfig) {
+  const gyroRate = (1000000 / sysConfig["looptime"]).toFixed(0);
+  let configuredRate =
+    (gyroRate * sysConfig["frameIntervalPNum"]) / sysConfig["frameIntervalPDenom"];
+  if (sysConfig.pid_process_denom != null) {
+    configuredRate = configuredRate / sysConfig.pid_process_denom;
+  }
+
+  const actualLoggedTime = flightLog.getActualLoggedTime();
+  const rowCount = flightLog.getCurrentLogRowsCount();
+  const actualRate = (1e6 * rowCount) / actualLoggedTime;
+
+  const rate =
+    Math.abs(configuredRate - actualRate) / actualRate >
+    RATE_MISMATCH_WARNING_THRESHOLD
+      ? Math.round(actualRate)
+      : configuredRate;
+
+  return { rate, configuredRate, actualRate };
+}
+
 export function stringTimetoMsec(input) {
   try {
     const matches = input.match(/(-)?(\d+)(\D)*(\d+)*\D*(\d+)*/);

@@ -1,6 +1,6 @@
 /**
  * Theme System - CSS Variables
- * Based on betaflight-configurator's color scheme
+ * Rotorflight brand blue color scheme
  *
  * Only variables actually referenced by main.css or canvas JS are defined here.
  * Tailwind primary/neutral colors are defined separately in tailwind.css.
@@ -8,10 +8,10 @@
 
 :root {
   /* Primary Colors (used by main.css) */
-  --primary-400: #ffd03d;
-  --primary-500: #ffa724;
-  --primary-600: #e69400;
-  --primary-transparent-2: rgba(255, 167, 36, 0.2);
+  --primary-400: #2f8ed0;
+  --primary-500: #0850ac;
+  --primary-600: #073f86;
+  --primary-transparent-2: rgba(8, 80, 172, 0.2);
 
   /* Surface Colors - Light Mode */
   --surface-0: hsl(0, 0%, 100%);

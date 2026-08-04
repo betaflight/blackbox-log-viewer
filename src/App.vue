@@ -10,6 +10,8 @@
           @files-selected="onFilesSelected"
           @open-settings="onOpenSettings"
           @open-keys="onOpenKeys"
+          @open-craft-config="onOpenCraftConfig"
+          @open-tuning-log="onOpenTuningLog"
           @export-csv="onExportCsv"
           @export-gpx="onExportGpx"
           @export-video="onExportVideo"
@@ -29,6 +31,7 @@
           :craft-active="graphStore.hasCraft"
           :sticks-active="graphStore.hasSticks"
           :analyser-active="graphStore.hasAnalyser"
+          :step-response-active="graphStore.hasStepResponse"
           :map-active="graphStore.hasMap"
           @view-config="onViewConfig"
           @toggle-header="onToggleHeader"
@@ -37,6 +40,7 @@
           @toggle-craft="onToggleCraft"
           @toggle-sticks="onToggleSticks"
           @toggle-analyser="onToggleAnalyser"
+          @toggle-step-response="onToggleStepResponse"
           @toggle-map="onToggleMap"
         />
       </Teleport>
@@ -81,6 +85,9 @@
       <Teleport to="#vue-analyser">
         <SpectrumAnalyser />
       </Teleport>
+      <Teleport to="#vue-stepresponse">
+        <StepResponseAnalyser />
+      </Teleport>
       <Teleport to="#vue-legend-panel">
         <LegendPanel />
       </Teleport>
@@ -95,6 +102,12 @@
       <UserSettingsDialog
         v-model:open="appStore.settingsDialogOpen"
         @save="onSaveSettings"
+      />
+      <CraftConfigDialog v-model:open="appStore.craftConfigDialogOpen" />
+      <CraftNameMismatchDialog
+        v-model:open="appStore.craftNameMismatchDialogOpen"
+        :message="appStore.craftNameMismatchMessage"
+        @confirm="onOpenCraftConfig"
       />
       <GraphConfigDialog
         v-model:open="appStore.graphConfigDialogOpen"
@@ -115,18 +128,21 @@
         :videoConfig="playbackStore.videoConfig"
         @save-config="onSaveVideoConfig"
       />
+      <TuningLogDialog v-model:open="appStore.tuningLogDialogOpen" />
     </div>
   </UApp>
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from "vue";
 import { useGraphStore } from "./stores/graph.js";
 import { useAppStore } from "./stores/app.js";
 import { useLogStore, FIRMWARE_CLASSES } from "./stores/log.js";
 import { usePlaybackStore } from "./stores/playback.js";
 import { useSettingsStore } from "./stores/settings.js";
 import { useWorkspaceStore } from "./stores/workspace.js";
+import { useCraftConfigStore } from "./stores/craftConfig.js";
+import { recheckCraftConfigMatch } from "./log_lifecycle.js";
 import AppToolbar from "./components/AppToolbar.vue";
 import WelcomePage from "./components/WelcomePage.vue";
 import ViewControls from "./components/ViewControls.vue";
@@ -139,10 +155,14 @@ import WorkspacePanel from "./components/WorkspacePanel.vue";
 import StatusBar from "./components/StatusBar.vue";
 import KeysDialog from "./components/KeysDialog.vue";
 import UserSettingsDialog from "./components/UserSettingsDialog.vue";
+import CraftConfigDialog from "./components/CraftConfigDialog.vue";
+import CraftNameMismatchDialog from "./components/CraftNameMismatchDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
 import VideoExportDialog from "./components/VideoExportDialog.vue";
+import TuningLogDialog from "./components/TuningLogDialog.vue";
 import SpectrumAnalyser from "./components/SpectrumAnalyser.vue";
+import StepResponseAnalyser from "./components/StepResponseAnalyser.vue";
 import LegendPanel from "./components/LegendPanel.vue";
 import FieldValuesPanel from "./components/FieldValuesPanel.vue";
 import ConfigurationPanel from "./components/ConfigurationPanel.vue";
@@ -154,6 +174,14 @@ const logStore = useLogStore();
 const playbackStore = usePlaybackStore();
 const settingsStore = useSettingsStore();
 const workspaceStore = useWorkspaceStore();
+const craftConfigStore = useCraftConfigStore();
+
+// Re-check the currently displayed log against the craft config whenever it's loaded/cleared
+// (without prompting on a mismatch - that's only for when a *log* is newly opened).
+watch(
+  () => [craftConfigStore.hasConfig, craftConfigStore.craftName],
+  () => recheckCraftConfigMatch(),
+);
 
 // Centralized CSS class binding — replaces 27 imperative html.classList calls in main.js
 watchEffect(() => {
@@ -165,6 +193,8 @@ watchEffect(() => {
   cl.toggle("has-sticks", graphStore.hasSticks);
   cl.toggle("has-analyser", graphStore.hasAnalyser);
   cl.toggle("has-analyser-fullscreen", graphStore.hasAnalyserFullscreen);
+  cl.toggle("has-stepresponse", graphStore.hasStepResponse);
+  cl.toggle("has-stepresponse-fullscreen", graphStore.hasStepResponseFullscreen);
   cl.toggle("has-map", graphStore.hasMap);
   cl.toggle("has-marker", graphStore.hasMarker);
   cl.toggle("is-fullscreen", graphStore.isFullscreen);
@@ -197,6 +227,14 @@ function onOpenSettings() {
 
 function onOpenKeys() {
   appStore.keysDialogOpen = true;
+}
+
+function onOpenCraftConfig() {
+  appStore.craftConfigDialogOpen = true;
+}
+
+function onOpenTuningLog() {
+  appStore.tuningLogDialogOpen = true;
 }
 
 function onExportCsv() {
@@ -256,6 +294,10 @@ function onToggleSticks() {
 
 function onToggleAnalyser() {
   graphStore.toggleAnalyser();
+}
+
+function onToggleStepResponse() {
+  graphStore.toggleStepResponse();
 }
 
 function onToggleMap() {
