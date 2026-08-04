@@ -14,7 +14,9 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src",
-    "test": "vitest run"
+    "test": "vitest run",
+    "clean": "node -e \"require('fs').rmSync('node_modules/.vite', { recursive: true, force: true })\"",
+    "start:clean": "npm run clean && npm run start"
   },
   "repository": {
     "type": "git",
