@@ -124,16 +124,37 @@
                   {{ entry.id === currentFlightLogEntryId ? formatTimestamp(entry.timestamp) : "Read-only" }}
                   <template v-if="entryCost(entry)"> · {{ formatCost(entryCost(entry)) }}</template>
                 </div>
-                <UButton
-                  variant="ghost"
-                  :color="confirmDeleteId === entry.id ? 'error' : 'neutral'"
-                  size="2xs"
-                  :icon="confirmDeleteId === entry.id ? 'i-lucide-check' : 'i-lucide-trash-2'"
-                  :title="confirmDeleteId === entry.id ? 'Confirm delete' : 'Delete entry'"
-                  class="absolute top-1 right-1 opacity-0 group-hover:opacity-100"
-                  :class="{ 'opacity-100': confirmDeleteId === entry.id }"
-                  @click.stop="onDeleteClick(entry.id)"
-                />
+                <UPopover
+                  :open="confirmDeleteId === entry.id"
+                  :ui="{ content: 'z-[300]' }"
+                  @update:open="(v) => (confirmDeleteId = v ? entry.id : null)"
+                >
+                  <UButton
+                    variant="ghost"
+                    color="neutral"
+                    size="2xs"
+                    icon="i-lucide-trash-2"
+                    title="Delete entry"
+                    class="absolute top-1 right-1 opacity-0 group-hover:opacity-100"
+                    :class="{ 'opacity-100': confirmDeleteId === entry.id }"
+                    @click.stop
+                  />
+                  <template #content>
+                    <div class="p-3 flex flex-col gap-2 w-56" @click.stop>
+                      <p class="text-xs">Delete this tuning log entry? This cannot be undone.</p>
+                      <div class="flex justify-end gap-2">
+                        <UButton
+                          variant="outline"
+                          color="neutral"
+                          size="xs"
+                          label="Cancel"
+                          @click="confirmDeleteId = null"
+                        />
+                        <UButton color="error" size="xs" label="Delete" @click="deleteEntry(entry.id)" />
+                      </div>
+                    </div>
+                  </template>
+                </UPopover>
               </li>
             </ul>
           </div>
@@ -444,15 +465,11 @@ function selectEntry(id) {
   confirmDeleteId.value = null;
 }
 
-function onDeleteClick(id) {
-  if (confirmDeleteId.value === id) {
-    tuningLogStore.deleteEntry(id);
-    confirmDeleteId.value = null;
-    if (selectedEntryId.value === id) {
-      selectedEntryId.value = null;
-    }
-  } else {
-    confirmDeleteId.value = id;
+function deleteEntry(id) {
+  tuningLogStore.deleteEntry(id);
+  confirmDeleteId.value = null;
+  if (selectedEntryId.value === id) {
+    selectedEntryId.value = null;
   }
 }
 
