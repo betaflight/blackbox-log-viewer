@@ -176,6 +176,14 @@ html.has-log .log-graph-config {
   display: none;
 }
 
+/* Ported from https://github.com/bph838/rotorflight-blackbox-bellsandwhistles (css/main.css
+   #craftWrapper) - a translucent rounded backdrop so the craft model stands out against the
+   graph behind it. */
+#craftCanvas {
+  background-color: #89898973;
+  border-radius: 12px;
+}
+
 html.has-craft #craftCanvas,
 html.has-analyser #analyserCanvas,
 html.has-stepresponse #stepResponseCanvas,
