@@ -26,7 +26,7 @@
 
   /* Graph/Canvas Colors - Light Mode (read by theme_colors.js) */
   --graph-background: #000000;
-  --graph-grid: rgba(255, 255, 255, 0.15);
+  --graph-grid: rgba(255, 255, 255, 0.35);
   --graph-text: rgba(255, 255, 255, 0.9);
   --graph-text-secondary: rgba(255, 255, 255, 0.65);
   --graph-axis: rgba(255, 255, 255, 0.5);
@@ -57,7 +57,7 @@
   --text-inverse: hsl(0, 0%, 10%);
 
   --graph-background: #1a1a1a;
-  --graph-grid: rgba(255, 255, 255, 0.2);
+  --graph-grid: rgba(255, 255, 255, 0.4);
   --graph-text: rgba(255, 255, 255, 0.95);
   --graph-text-secondary: rgba(255, 255, 255, 0.75);
   --graph-axis: rgba(255, 255, 255, 0.6);
