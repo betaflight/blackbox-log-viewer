@@ -58,11 +58,11 @@
           size="xs"
           @click="$emit('export-gpx')"
         />
-      </div>
-      <div class="flex items-center gap-1">
+        <USeparator orientation="vertical" class="h-4" />
         <UButton
           variant="ghost"
           color="neutral"
+          label="Craft Config"
           icon="i-lucide-file-cog"
           size="xs"
           title="Load Rotorflight CLI configuration (dump/diff)"
@@ -71,11 +71,14 @@
         <UButton
           variant="ghost"
           color="neutral"
+          label="Tuning Log"
           icon="i-lucide-message-square"
           size="xs"
           title="Tuning Log: capture step response history and get AI tuning advice"
           @click="$emit('open-tuning-log')"
         />
+      </div>
+      <div class="flex items-center gap-1">
         <UButton
           variant="ghost"
           color="neutral"
