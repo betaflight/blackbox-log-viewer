@@ -71,6 +71,14 @@
         <UButton
           variant="ghost"
           color="neutral"
+          icon="i-lucide-message-square"
+          size="xs"
+          title="Tuning Log: capture step response history and get AI tuning advice"
+          @click="$emit('open-tuning-log')"
+        />
+        <UButton
+          variant="ghost"
+          color="neutral"
           icon="i-lucide-settings"
           size="xs"
           title="User Settings"
@@ -104,6 +112,7 @@ defineEmits([
   "open-settings",
   "open-keys",
   "open-craft-config",
+  "open-tuning-log",
 ]);
 
 const logStore = useLogStore();

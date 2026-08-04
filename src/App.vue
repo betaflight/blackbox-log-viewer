@@ -11,6 +11,7 @@
           @open-settings="onOpenSettings"
           @open-keys="onOpenKeys"
           @open-craft-config="onOpenCraftConfig"
+          @open-tuning-log="onOpenTuningLog"
           @export-csv="onExportCsv"
           @export-gpx="onExportGpx"
           @export-video="onExportVideo"
@@ -127,6 +128,7 @@
         :videoConfig="playbackStore.videoConfig"
         @save-config="onSaveVideoConfig"
       />
+      <TuningLogDialog v-model:open="appStore.tuningLogDialogOpen" />
     </div>
   </UApp>
 </template>
@@ -158,6 +160,7 @@ import CraftNameMismatchDialog from "./components/CraftNameMismatchDialog.vue";
 import GraphConfigDialog from "./components/GraphConfigDialog.vue";
 import HeaderDialog from "./components/HeaderDialog.vue";
 import VideoExportDialog from "./components/VideoExportDialog.vue";
+import TuningLogDialog from "./components/TuningLogDialog.vue";
 import SpectrumAnalyser from "./components/SpectrumAnalyser.vue";
 import StepResponseAnalyser from "./components/StepResponseAnalyser.vue";
 import LegendPanel from "./components/LegendPanel.vue";
@@ -228,6 +231,10 @@ function onOpenKeys() {
 
 function onOpenCraftConfig() {
   appStore.craftConfigDialogOpen = true;
+}
+
+function onOpenTuningLog() {
+  appStore.tuningLogDialogOpen = true;
 }
 
 function onExportCsv() {

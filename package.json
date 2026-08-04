@@ -23,6 +23,8 @@
   "author": "The Betaflight open source project.",
   "license": "GPL-3.0",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "dompurify": "^3.4.13",
     "html2canvas": "^1.0.0-rc.5",
     "leaflet": "^1.9.3",
     "leaflet-marker-rotation": "^0.4.0",

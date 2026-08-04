@@ -1,14 +1,18 @@
 import { STEP_RESPONSE_LEN_SEC } from "./graph_stepresponse_calc.js";
 
 // Ported from https://github.com/rotorflight/rotorflight-blackbox (js/graph_stepresponse_plot.js).
-// The upstream "AI Analyse" image-capture path (captureImage/_showLegend/_solidBackground/
-// AILINEWIDTH/AIFONTSIZE) isn't ported - that feature doesn't exist in this fork.
+// captureImage() (used by the Tuning Log's "AI Analysis" feature - see tuning_ai.js) is ported
+// from https://github.com/bph838/rotorflight-blackbox-bellsandwhistles (same file).
 
 const STEP_RESPONSE_MARGIN = 10,
   STEP_RESPONSE_MARGIN_BOTTOM = 18,
   STEP_RESPONSE_MARGIN_LEFT = 28,
   STEP_RESPONSE_Y_MAX = 2.0, // fixed y-axis scale (0 .. 2.0), 1.0 = perfect tracking
   STEP_RESPONSE_LINEWIDTH = 3,
+  STEP_RESPONSE_CAPTURE_WIDTH = 1400,
+  STEP_RESPONSE_CAPTURE_HEIGHT = 800,
+  STEP_RESPONSE_CAPTURE_LINEWIDTH = 4,
+  STEP_RESPONSE_CAPTURE_FONTSIZE = "14",
   STEP_RESPONSE_AXIS_COLORS = {
     roll: "#fb8072",
     pitch: "#8dd3c7",
@@ -31,6 +35,11 @@ export const StepResponsePlot = {
   _data: null,
   _isFullScreen: false,
   _lineWidth: STEP_RESPONSE_LINEWIDTH,
+  // True only while captureImage() is rendering to its offscreen canvas - an opaque background
+  // reads clearly wherever the captured PNG ends up (sent to the AI, downloaded, pasted
+  // elsewhere), whereas the normal translucent gradient background assumes it's sitting over the
+  // rest of the app's UI.
+  _solidBackground: false,
   _sysConfig: null,
   _axisVisible: { roll: true, pitch: true, yaw: true },
   _mousePosition: {
@@ -145,6 +154,12 @@ StepResponsePlot._drawGraph = function (canvasCtx) {
 };
 
 StepResponsePlot._drawBackground = function (canvasCtx, WIDTH, HEIGHT) {
+  if (this._solidBackground) {
+    canvasCtx.fillStyle = "rgb(20,20,20)";
+    canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+    return;
+  }
+
   const backgroundGradient = canvasCtx.createLinearGradient(0, 0, 0, HEIGHT);
 
   if (this._isFullScreen) {
@@ -354,4 +369,34 @@ StepResponsePlot._drawLabel = function (canvasCtx, text, X, Y, align, baseline, 
   canvasCtx.fillText(text, X, Y);
 
   canvasCtx.restore();
+};
+
+/**
+ * Renders the current step response data at a large fixed resolution (independent of the
+ * on-screen panel size) and returns it as a PNG data URL, for sending to the Tuning Log's AI
+ * Analysis feature.
+ */
+StepResponsePlot.captureImage = function () {
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = STEP_RESPONSE_CAPTURE_WIDTH;
+  tempCanvas.height = STEP_RESPONSE_CAPTURE_HEIGHT;
+
+  const wasFullScreen = this._isFullScreen;
+  const wasSolidBackground = this._solidBackground;
+  const wasLineWidth = this._lineWidth;
+  const wasFontSizeFullscreen = this._drawingParams.fontSizeLabelFullscreen;
+
+  this._isFullScreen = true;
+  this._solidBackground = true;
+  this._lineWidth = STEP_RESPONSE_CAPTURE_LINEWIDTH;
+  this._drawingParams.fontSizeLabelFullscreen = STEP_RESPONSE_CAPTURE_FONTSIZE;
+
+  this._drawGraph(tempCanvas.getContext("2d"));
+
+  this._isFullScreen = wasFullScreen;
+  this._solidBackground = wasSolidBackground;
+  this._lineWidth = wasLineWidth;
+  this._drawingParams.fontSizeLabelFullscreen = wasFontSizeFullscreen;
+
+  return tempCanvas.toDataURL("image/png");
 };

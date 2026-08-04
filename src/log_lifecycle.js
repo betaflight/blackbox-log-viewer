@@ -59,6 +59,7 @@ export function renderLogFileInfo(file) {
   const appStore = useAppStore(pinia);
 
   appStore.logFilename = file.name;
+  appStore.logFileLastModified = file.lastModified ?? null;
 
   const logCount = logStore.flightLog.getLogCount();
   const entries = [];

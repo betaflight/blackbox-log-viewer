@@ -1,3 +1,7 @@
+// Read directly from ai_models.json (not tuning_ai.js) so this always-loaded module doesn't pull
+// the Anthropic SDK into the main bundle before the Tuning Log dialog is ever opened.
+import AI_MODELS from "./ai_models.json";
+
 // Mixer definitions — shared between settings dialog and renderers
 export const mixerList = [
   { name: "Tricopter", model: "tricopter", image: "tri", defaultMotorOrder: [0, 1, 2], defaultYawOffset: -Math.PI / 2 },
@@ -74,4 +78,10 @@ export const defaultUserSettings = {
   map: { left: "2%", top: "5%", size: "35%" },
   watermark: { left: "3%", top: "90%", size: "100%", transparency: "100%", logo: null },
   laptimer: { left: "5%", top: "50%", transparency: "40%" },
+  // AI Analysis Settings — used by the Tuning Log's "AI Analysis" feature (see tuning_ai.js).
+  // aiApiKey is stored locally only, and only ever sent to api.anthropic.com.
+  aiApiKey: "",
+  aiModel: AI_MODELS.defaultModel,
+  aiEffort: "high",
+  aiSkillId: "",
 };

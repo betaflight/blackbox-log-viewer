@@ -111,6 +111,16 @@ export function FlightLogStepResponse(flightLog, canvas, stepResponseCanvas) {
       StepResponsePlot.draw();
     };
 
+    // Ensures data is loaded (mirrors this.plot()) before handing off to the offscreen capture -
+    // used by the Tuning Log's AI Analysis feature.
+    this.captureImage = function () {
+      if (dataReload || stepResponseData == null) {
+        dataReload = false;
+        dataLoad();
+      }
+      return StepResponsePlot.captureImage();
+    };
+
     function onMouseMoveStepResponse(e) {
       if (e.shiftKey) {
         graphStore.stepResponseShiftActive = true;

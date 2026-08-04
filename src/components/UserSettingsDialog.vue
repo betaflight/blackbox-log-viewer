@@ -159,6 +159,73 @@
             </div>
           </UiBox>
 
+          <!-- AI Analysis Settings -->
+          <UiBox title="AI Analysis Settings">
+            <div class="flex flex-col gap-1">
+              <label class="text-sm">Anthropic API Key</label>
+              <UInput
+                v-model="local.aiApiKey"
+                type="password"
+                autocomplete="off"
+                placeholder="sk-ant-..."
+                size="sm"
+                class="w-full"
+              />
+              <p class="text-xs text-dimmed">
+                Used by the Tuning Log's "AI Analysis" feature. Stored locally on this computer
+                only. Don't have a key, or need to buy credits? Get one at
+                <a
+                  href="https://platform.claude.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-primary underline"
+                  >platform.claude.com</a
+                >.
+              </p>
+            </div>
+            <SettingRow label="Model">
+              <USelect
+                v-model="local.aiModel"
+                :items="aiModelOptions"
+                :ui="{ content: 'z-[300]' }"
+                size="sm"
+                class="min-w-56"
+              />
+            </SettingRow>
+            <div class="flex flex-col gap-1">
+              <SettingRow label="Effort">
+                <USelect
+                  v-model="local.aiEffort"
+                  :items="aiEffortOptions"
+                  :ui="{ content: 'z-[300]' }"
+                  size="sm"
+                  class="min-w-44"
+                />
+              </SettingRow>
+              <p class="text-xs text-dimmed">
+                How much the model reasons before answering. Higher effort can give more thorough
+                tuning advice, at the cost of a slower, more expensive response. Ignored on models
+                that don't support it.
+              </p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-sm">Custom Skill ID (optional)</label>
+              <UInput
+                v-model="local.aiSkillId"
+                autocomplete="off"
+                placeholder="skill_..."
+                size="sm"
+                class="w-full"
+              />
+              <p class="text-xs text-dimmed">
+                ID of a custom Agent Skill already uploaded to your Anthropic account (Console
+                &rarr; Skills, or the Skills API) - not a Claude Code skill. When set, it's loaded
+                into every AI Analysis request via a code-execution container, which adds a small
+                amount of extra cost/latency. Leave blank to disable.
+              </p>
+            </div>
+          </UiBox>
+
           <!-- Map Settings -->
           <UiBox title="Map Settings">
             <SettingRow label="ACT" help="Use Altitude Colored Trail (slower at loading/changing logs)">
@@ -262,6 +329,7 @@ import PercentInput from "./PercentInput.vue";
 import { mixerList } from "../user_settings_data.js";
 import { useSettingsStore } from "../stores/settings.js";
 import { FLIGHT_LOG_GOVSTATES, FLIGHT_LOG_AIRBORNE_STATES } from "../flightlog_fielddefs.js";
+import AI_MODELS from "../ai_models.json";
 
 const open = defineModel("open", { type: Boolean, default: false });
 
@@ -343,6 +411,19 @@ const speedOptions = [
 const altitudeOptions = [
   { label: "meters", value: 1 },
   { label: "feet", value: 2 },
+];
+
+const aiModelOptions = AI_MODELS.models.map((m) => ({
+  label: m.displayName + (m.description ? ` (${m.description})` : ""),
+  value: m.id,
+}));
+
+const aiEffortOptions = [
+  { label: "Low (fastest, cheapest)", value: "low" },
+  { label: "Medium", value: "medium" },
+  { label: "High (default)", value: "high" },
+  { label: "X-High", value: "xhigh" },
+  { label: "Max (most thorough, slowest)", value: "max" },
 ];
 
 const darkModeOptions = [
