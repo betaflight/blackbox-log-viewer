@@ -3,7 +3,7 @@
   "productName": "Blackbox Explorer",
   "displayName": "Betaflight - Blackbox Explorer",
   "description": "Crossplatform blackbox analitics tool for Betaflight flight control system.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "main": "index.html",
   "default_locale": "en",
