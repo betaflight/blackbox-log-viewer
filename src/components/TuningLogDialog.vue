@@ -334,7 +334,7 @@ import { useAppStore } from "../stores/app.js";
 import { useSettingsStore } from "../stores/settings.js";
 import * as TuningLog from "../tuning_log.js";
 import * as TuningAI from "../tuning_ai.js";
-import AI_MODELS from "../ai_models.json";
+import AI_MODELS from "../data/ai_models.json";
 
 const open = defineModel("open", { type: Boolean, default: false });
 

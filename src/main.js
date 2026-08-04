@@ -5,8 +5,9 @@ import { FlightLogGrapher } from "./grapher.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
 import { SeekBar } from "./seekbar.js";
-import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
-import supaflyWorkspace from "./ws_supafly.json";
+//import workspace_ctzsnooze from "./data/ws_ctzsnooze.json";
+//import workspace_supafly from "./data/ws_supafly.json";
+import workspace_Ben from "./data/ws_ben.json";
 import { FlightLog } from "./flightlog.js";
 import {
   stringTimetoMsec,
@@ -352,7 +353,7 @@ function BlackboxLogViewer() {
       if (item) {
         workspaceStore.workspaceGraphConfigs = upgradeWorkspaceFormat(item);
       } else {
-        workspaceStore.workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
+        workspaceStore.workspaceGraphConfigs = structuredClone(workspace_Ben);
       }
     });
 
@@ -638,7 +639,7 @@ function BlackboxLogViewer() {
     };
     workspaceStore.saveWorkspace = (id, title) => onSaveWorkspace(id, title);
     workspaceStore.applyDefaultWorkspace = (index) => {
-      const presets = [null, structuredClone(ctzsnoozeWorkspace), structuredClone(supaflyWorkspace)];
+      const presets = [null, structuredClone(workspace_Ben)/*,structuredClone(workspace_ctzsnooze), structuredClone(workspace_supafly)*/];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
       }

@@ -1,6 +1,6 @@
 // Read directly from ai_models.json (not tuning_ai.js) so this always-loaded module doesn't pull
 // the Anthropic SDK into the main bundle before the Tuning Log dialog is ever opened.
-import AI_MODELS from "./ai_models.json";
+import AI_MODELS from "./data/ai_models.json";
 
 // Mixer definitions — shared between settings dialog and renderers
 export const mixerList = [

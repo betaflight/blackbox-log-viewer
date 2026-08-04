@@ -74,19 +74,20 @@ const workspaceItems = computed(() => {
 
   const presetItems = [
     {
-      label: "Preset: Ctzsnooze",
+      label: "Preset: Ben",
       icon: "i-lucide-layout-template",
       onSelect() {
         emit("apply-default", 1);
       },
-    },
+    }
+    /*,
     {
       label: "Preset: SupaflyFPV",
       icon: "i-lucide-layout-template",
       onSelect() {
         emit("apply-default", 2);
       },
-    },
+    },*/
   ];
 
   return [wsItems, presetItems];

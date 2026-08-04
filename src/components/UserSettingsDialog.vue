@@ -329,7 +329,7 @@ import PercentInput from "./PercentInput.vue";
 import { mixerList } from "../user_settings_data.js";
 import { useSettingsStore } from "../stores/settings.js";
 import { FLIGHT_LOG_GOVSTATES, FLIGHT_LOG_AIRBORNE_STATES } from "../flightlog_fielddefs.js";
-import AI_MODELS from "../ai_models.json";
+import AI_MODELS from "../data/ai_models.json";
 
 const open = defineModel("open", { type: Boolean, default: false });
 

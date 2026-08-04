@@ -6,7 +6,7 @@
 // stored locally (see stores/settings.js), never sent anywhere but api.anthropic.com.
 
 import Anthropic from "@anthropic-ai/sdk";
-import AI_MODELS from "./ai_models.json";
+import AI_MODELS from "./data/ai_models.json";
 
 const MODELS_BY_ID = {};
 for (const m of AI_MODELS.models) {
