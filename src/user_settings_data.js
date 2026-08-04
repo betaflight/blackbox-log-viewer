@@ -53,7 +53,7 @@ export const defaultUserSettings = {
   drawAnalyser: true,
   stepResponseAxes: { roll: true, pitch: true, yaw: true },
   autoTrim: false,
-  autoTrimStartEvent: "govState:THROTTLE_OFF",
+  autoTrimStartEvent: "govState:ACTIVE",
   autoTrimStopEvent: "airborne:LANDING",
   autoTrimOffset: 1,
   drawWatermark: false,
