@@ -150,7 +150,7 @@ function BlackboxLogViewer() {
 
     setVideoInTime(false);
     setVideoOutTime(false);
-    applyAutoTrim(logStore.flightLog, userSettings);
+    const autoTrimmed = applyAutoTrim(logStore.flightLog, userSettings);
 
     graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
@@ -166,7 +166,11 @@ function BlackboxLogViewer() {
       invalidateGraph();
     };
 
-    if (logStore.hasVideo) {
+    if (autoTrimmed) {
+      // Jump to the trimmed-in point rather than the raw start of the log/video, so playback
+      // opens right where Auto Trim decided the flight actually begins.
+      setCurrentBlackboxTime(playbackStore.videoExportInTime);
+    } else if (logStore.hasVideo) {
       syncLogToVideo();
     } else {
       // Start at beginning:
