@@ -20,7 +20,7 @@
           class="size-5 rounded text-[11px] leading-none font-medium"
           :class="
             cols === n
-              ? 'bg-primary text-black'
+              ? 'bg-primary text-white'
               : 'text-dimmed hover:text-highlighted hover:bg-elevated'
           "
           :title="`${n} columns`"

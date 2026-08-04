@@ -6,7 +6,7 @@
     <div v-if="title" class="flex items-center absolute top-0 left-4 right-4 translate-y-[-50%]">
       <div
         :class="[
-          'flex gap-2 items-center p-1 px-3 rounded-full text-black text-[13px] font-semibold',
+          'flex gap-2 items-center p-1 px-3 rounded-full text-white text-[13px] font-semibold',
           typeClass.pill,
           collapsible ? 'cursor-pointer select-none' : '',
         ]"
