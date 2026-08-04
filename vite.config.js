@@ -25,7 +25,7 @@ export default defineConfig({
             {
               color: "primary",
               variant: "solid",
-              class: "text-black",
+              class: "text-white",
             },
           ],
         },

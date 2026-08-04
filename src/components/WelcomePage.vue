@@ -58,12 +58,9 @@
           <h3>Links</h3>
         </div>
         <div class="info-links">
-          <a href="https://blackbox.rotorflight.org" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-globe" class="size-3.5" /> Latest release
-          </a>
-          <a href="https://master.blackbox.rotorflight.org/" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-git-branch" class="size-3.5" /> Development build
-          </a>
+          <a href="https://www.rotorflight.org" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-globe" class="size-3.5" /> Rotorflight
+          </a>          
           <a href="https://github.com/rotorflight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">
             <UIcon name="i-lucide-github" class="size-3.5" /> Source on GitHub
           </a>
