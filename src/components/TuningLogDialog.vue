@@ -210,11 +210,25 @@
               :class="imageExpanded ? 'w-full' : 'max-h-64 object-contain'"
             />
 
-            <pre
-              v-if="hasConfig && configVisible"
-              class="text-xs bg-elevated rounded p-2 max-h-64 overflow-y-auto whitespace-pre-wrap"
-              >{{ currentEntry.config }}</pre
-            >
+            <div v-if="hasConfig && configVisible">
+              <UInput
+                v-model="configFilter"
+                placeholder="Enter filter"
+                icon="i-lucide-search"
+                size="sm"
+                class="w-full"
+              />
+              <ul class="tuning-log-config-list">
+                <li v-for="(entry, i) in configFilteredLines" :key="i">
+                  <template v-if="entry.matchStart == null">{{ entry.text }}</template>
+                  <template v-else
+                    >{{ entry.text.slice(0, entry.matchStart)
+                    }}<b>{{ entry.text.slice(entry.matchStart, entry.matchStart + configFilter.length) }}</b
+                    >{{ entry.text.slice(entry.matchStart + configFilter.length) }}</template
+                  >
+                </li>
+              </ul>
+            </div>
 
             <div v-if="showNotes" class="flex flex-col gap-1">
               <label class="text-xs font-medium text-dimmed">Notes</label>
@@ -573,6 +587,32 @@ function onNotesBlur() {
   }
 }
 
+// Filterable config list, styled/behaving like CraftConfigDialog.vue's config viewer.
+const configFilter = ref("");
+watch(currentEntry, () => {
+  configFilter.value = "";
+});
+
+const configFilteredLines = computed(() => {
+  const query = configFilter.value.trim().toLowerCase();
+  const lines = (currentEntry.value?.config || "").split("\n");
+  const result = [];
+
+  for (const text of lines) {
+    if (!query) {
+      if (text.length === 0) continue;
+      result.push({ text, matchStart: null });
+      continue;
+    }
+
+    const idx = text.toLowerCase().indexOf(query);
+    if (idx === -1) continue;
+    result.push({ text, matchStart: idx });
+  }
+
+  return result;
+});
+
 async function onCopyImage() {
   if (!currentEntry.value?.image) return;
 
@@ -776,3 +816,26 @@ function formatCost(usd) {
   return `$${usd.toFixed(usd < 1 ? 4 : 2)}`;
 }
 </script>
+
+<style scoped>
+/* Matches CraftConfigDialog.vue's .craft-config-list, taller to make room for a full config dump. */
+.tuning-log-config-list {
+  height: 500px;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.375rem;
+  list-style: none;
+}
+
+.tuning-log-config-list li {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.7rem;
+  white-space: pre;
+}
+
+.tuning-log-config-list li:nth-child(even) {
+  background: var(--ui-bg-elevated);
+}
+</style>
