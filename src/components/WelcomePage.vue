@@ -4,7 +4,7 @@
     <div class="hero">
       <img :src="logoSrc" alt="Rotorflight" class="hero-logo" />
       <p class="hero-subtitle">Blackbox Explorer</p>
-      <p class="hero-tagline">Analyze flight logs recorded by Rotorflights's Blackbox feature.</p>      
+      <p class="hero-tagline">Analyze flight logs recorded by Rotorflights's Blackbox feature.</p>
       <p class="tag-version">{{ appStore.statusViewerVersion }}</p>
       <LogFileInput size="lg" label="Open log file / video" @files-selected="$emit('files-selected', $event)" />
     </div>
