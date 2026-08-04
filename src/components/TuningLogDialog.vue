@@ -238,10 +238,10 @@
                 <div
                   v-for="(turn, i) in conversationTurns"
                   :key="i"
-                  class="rounded p-2 text-xs"
+                  class="rounded p-2"
                   :class="
                     turn.role === 'user'
-                      ? 'bg-elevated self-end max-w-[85%] ml-auto'
+                      ? 'text-xs bg-elevated self-end max-w-[85%] ml-auto'
                       : 'bg-primary/10 prose prose-sm dark:prose-invert max-w-none'
                   "
                 >
@@ -250,7 +250,7 @@
                 </div>
                 <div
                   v-if="streamingText"
-                  class="rounded p-2 text-xs bg-primary/10 prose prose-sm dark:prose-invert max-w-none animate-pulse"
+                  class="rounded p-2 bg-primary/10 prose prose-sm dark:prose-invert max-w-none animate-pulse"
                   v-html="renderMarkdown(streamingText)"
                 />
               </div>

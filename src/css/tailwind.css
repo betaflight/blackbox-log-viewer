@@ -5,6 +5,7 @@
 
 @import "tailwindcss";
 @import "@nuxt/ui";
+@plugin "@tailwindcss/typography";
 
 @theme static {
   --color-primary-50: #eaf4fb;
