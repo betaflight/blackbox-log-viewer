@@ -12,6 +12,16 @@ a:hover {
   color: inherit;
 }
 
+/* Inline <code> (e.g. "dump all", ".json") - excludes <pre><code> blocks, which already get
+   their own styling from the markdown renderer (see TuningLogDialog.vue's prose classes). */
+code:not(pre > code) {
+  background: var(--ui-bg-elevated);
+  padding: 0.1em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 /* Add an extended wide size to the page container for large monitors */
 @media (min-width: 1400px) {
   .app-main-pane {
