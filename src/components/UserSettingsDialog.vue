@@ -362,10 +362,13 @@ function buildAutoTrimEventOptions() {
 }
 
 const autoTrimEventOptions = ref(buildAutoTrimEventOptions());
-const autoTrimOffsetOptions = [0, 1, 2, 3, 4, 5].map((seconds) => ({
-  label: `${seconds} second${seconds === 1 ? "" : "s"}`,
-  value: seconds,
-}));
+const autoTrimOffsetOptions = [
+  { label: "0 seconds", value: 0 },
+  { label: "1/4 second", value: 0.25 },
+  { label: "1/2 second", value: 0.5 },
+  { label: "1 second", value: 1 },
+  { label: "2 seconds", value: 2 },
+];
 
 // Re-clone when dialog opens to pick up any external changes
 watch(open, (val) => {
