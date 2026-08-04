@@ -135,7 +135,6 @@ const appStore = useAppStore();
 .toolbar-logo-img {
   height: 1.5rem;
   width: auto;
-  filter: brightness(0) invert(1);
 }
 
 .toolbar-logo-subtitle {

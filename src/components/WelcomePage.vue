@@ -2,7 +2,7 @@
   <div v-if="!logStore.hasLog" class="welcome-page">
     <!-- Hero -->
     <div class="hero">
-      <img src="/images/rf_logo_white.svg" alt="Betaflight" class="hero-logo" />
+      <img :src="logoSrc" alt="Rotorflight" class="hero-logo" />
       <p class="hero-subtitle">Blackbox Explorer</p>
       <p class="hero-tagline">Analyze flight logs recorded by Rotorflights's Blackbox feature</p>
       <LogFileInput size="lg" label="Open log file / video" @files-selected="$emit('files-selected', $event)" />
@@ -71,11 +71,21 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useLogStore } from "../stores/log.js";
+import { useAppStore } from "../stores/app.js";
 import LogFileInput from "./LogFileInput.vue";
 
 defineEmits(["files-selected"]);
 const logStore = useLogStore();
+const appStore = useAppStore();
+
+// rf_logo_white.svg/rf_logo_black.svg each have the "ROTOR" wordmark's blue baked in already -
+// pick whichever reads correctly against the current background instead of CSS-filtering a
+// single source file flat, which was wiping out that blue along with everything else.
+const logoSrc = computed(() =>
+  appStore.darkThemeEnabled ? "/images/rf_logo_white.svg" : "/images/rf_logo_black.svg",
+);
 </script>
 
 <style scoped>
@@ -100,11 +110,6 @@ const logStore = useLogStore();
 .hero-logo {
   width: min(360px, 80vw);
   margin-bottom: 0.25rem;
-  filter: brightness(0) invert(0);
-}
-
-:root.dark .hero-logo {
-  filter: brightness(0) invert(1);
 }
 
 .hero-subtitle {
