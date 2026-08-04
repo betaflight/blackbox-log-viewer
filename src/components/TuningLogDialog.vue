@@ -108,6 +108,18 @@
                     title="AI tuning advice has already been generated for this entry"
                   />
                 </div>
+                <div
+                  v-if="entry.craftName"
+                  class="italic truncate"
+                  :class="entryCraftMismatch(entry) ? 'text-error font-medium' : 'text-dimmed'"
+                  :title="
+                    entryCraftMismatch(entry)
+                      ? `Captured for “${entry.craftName}”, not this tuning log's craft (“${tuningLogStore.currentLog.craftName}”)`
+                      : undefined
+                  "
+                >
+                  {{ entry.craftName }}
+                </div>
                 <div class="text-dimmed">
                   {{ entry.id === currentFlightLogEntryId ? formatTimestamp(entry.timestamp) : "Read-only" }}
                   <template v-if="entryCost(entry)"> · {{ formatCost(entryCost(entry)) }}</template>
@@ -495,6 +507,16 @@ function isBehindLatest(entry) {
   const entries = tuningLogStore.entries;
   const latestId = entries.length ? entries[entries.length - 1].id : null;
   return entry.id === currentFlightLogEntryId.value && entry.id !== latestId;
+}
+
+// A tuning log is meant to track one craft's tuning over time - flag an entry whose own recorded
+// craft name (from whatever flight log was open when it was captured) doesn't match the craft
+// this tuning log was created for, so switching flight logs by mistake doesn't quietly mix data
+// from two different craft into the same history.
+function entryCraftMismatch(entry) {
+  const logCraftName = tuningLogStore.currentLog?.craftName;
+  if (!entry.craftName || !logCraftName) return false;
+  return entry.craftName.trim().toLowerCase() !== logCraftName.trim().toLowerCase();
 }
 
 // ---- Main panel ----

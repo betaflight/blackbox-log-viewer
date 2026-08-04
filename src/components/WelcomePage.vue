@@ -128,7 +128,7 @@ const logStore = useLogStore();
 /* Info grid */
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   width: 100%;
   max-width: 56rem;
