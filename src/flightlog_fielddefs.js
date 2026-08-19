@@ -550,9 +550,11 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
       MAG_HARDWARE.splice(MAG_HARDWARE.indexOf("LIS3MDL"), 0, "LIS2MDL");
       MAG_HARDWARE.push("IST8310");
     }
+
     if (semver.lt(firmwareVersion, "2025.12.0")) {
       DEBUG_MODE.splice(DEBUG_MODE.indexOf("D_MAX"), 1, "D_MIN");
     }
+
     if (semver.gte(firmwareVersion, "2025.12.0")) {
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("ADXL345"), 1);
       ACC_HARDWARE.splice(ACC_HARDWARE.indexOf("MMA8452"), 1);
@@ -588,8 +590,9 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
         "MAVLINK_TELEMETRY",
       );
     }
+
     if (semver.gte(firmwareVersion, "2025.12.0")) {
-      //rename DUAL_GYRO_ to MULTI_GYRO
+      // rename DUAL_GYRO_ to MULTI_GYRO
       DEBUG_MODE.splice(
         DEBUG_MODE.indexOf("DUAL_GYRO_RAW"),
         1,
@@ -606,10 +609,23 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
         "MULTI_GYRO_SCALED",
       );
     }
+
     if (semver.gte(firmwareVersion, "2026.6.0")) {
-      DEBUG_MODE.push("AUTOPILOT_PID");
+      DEBUG_MODE.splice(DEBUG_MODE.indexOf("AUTOPILOT_POSITION"), 1);
+
+      DEBUG_MODE.push(
+        "AUTOPILOT_PID",
+        "POSITION_NAV",
+        "AUTOPILOT_STOP",
+      );
     }
 
+    if (semver.gte(semver.coerce(firmwareVersion), "2026.12.0")) {
+      DEBUG_MODE.push(
+        "PITOT",
+        "POSITION_EST",
+      );
+    }
     ACC_HARDWARE = makeReadOnly(ACC_HARDWARE);
     MAG_HARDWARE = makeReadOnly(MAG_HARDWARE);
     DEBUG_MODE = makeReadOnly(DEBUG_MODE);

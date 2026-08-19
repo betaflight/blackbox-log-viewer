@@ -1539,11 +1539,11 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[all]": "Autopilot PID",
         "debug[0]": "XY Velocity",
         "debug[1]": "XY Distance Error",
-        "debug[2]": "P",
-        "debug[3]": "I",
-        "debug[4]": "D",
-        "debug[5]": "A",
-        "debug[6]": "F",
+        "debug[2]": "XY P",
+        "debug[3]": "XY I",
+        "debug[4]": "XY D",
+        "debug[5]": "XY A",
+        "debug[6]": "XY F",
         "debug[7]": "Status",
       };
     DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_NAV = {
