@@ -575,31 +575,15 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[1]": // Baro Alt
             case "debug[2]": // GPS Alt
             case "debug[3]": // Kalman Alt
-
-              return {
-                power: 1,
-                MinMax: {
-                  min: -100,
-                  max: 100,
-                },
-              };
- 
             case "debug[4]": // GPS Vel Up
             case "debug[5]": // Kalman Vel Up
-              return {
-                power: 1,
-                MinMax: {
-                  min: -500,
-                  max: 500,
-                },
-              };
             case "debug[6]": // AccelerometerUp
-            case "debug7]": // Kalman Accel Up
+            case "debug[7]": // Kalman Accel Up
               return {
                 power: 1,
                 MinMax: {
-                  min: -500,
-                  max: 500,
+                  min: -5,
+                  max: 5,
                 },
               };
             default:
@@ -1171,8 +1155,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
               return {
                 power: 1,
                 MinMax: {
-                  min: -1000,
-                  max: 10000,
+                  min: -10,
+                  max: 10,
                 },
               };
             case "debug[4]": // Heading
@@ -1439,9 +1423,23 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
 
         case "AUTOPILOT_ALTITUDE":
           switch (fieldName) {
-            case "debug[0]": // new throttle
             case "debug[1]": // TargetAltitude
             case "debug[2]": // CurrentAltitude
+              return {
+                power: 1,
+                MinMax: {
+                  min: -10,
+                  max: 10,
+                },
+              };
+            case "debug[0]": // new throttle
+              return {
+                power: 1,
+                MinMax: {
+                  min: 1000,
+                  max: 2000,
+                },
+              };
             case "debug[3]": // P
             case "debug[4]": // I
             case "debug[5]": // D
@@ -1466,13 +1464,20 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             case "debug[3]": // Vel East
             case "debug[4]": // Vel North
             case "debug[5]": // Raw Accelerometer
+              return {
+                power: 1,
+                MinMax: {
+                  min: -10,
+                  max: 10,
+                },
+              };
             case "debug[6]": // R GPSPos
             case "debug[7]": // R GPSVel
               return {
                 power: 1,
                 MinMax: {
-                  min: -500,
-                  max: 500,
+                  min:0,
+                  max: 1000,
                 },
               };
             default:
@@ -1483,6 +1488,12 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // VelErr East
             case "debug[1]": // VelErr North
+                power: 1,
+                MinMax: {
+                  min: -5,
+                  max: 5,
+                },
+              };
             case "debug[2]": // PidSum East
             case "debug[3]": // PidSum North
             case "debug[4]": // Angle Roll
@@ -1511,6 +1522,13 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // XY Velocity
             case "debug[1]": // Distance Error
+              return {
+                power: 1,
+                MinMax: {
+                  min: -10,
+                  max: 10,
+                },
+              };
             case "debug[2]": // P
             case "debug[3]": // I
             case "debug[4]": // D

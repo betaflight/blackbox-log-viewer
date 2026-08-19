@@ -1533,13 +1533,13 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[4]": "Alt I",
         "debug[5]": "Alt D",
         "debug[6]": "Alt A",
-        "debug[7]": "AltF",
+        "debug[7]": "Alt F",
       };
     DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_PID = {
         "debug[all]": "Autopilot PID",
         "debug[0]": "XY Velocity",
         "debug[1]": "XY Distance Error",
-        "debug[2]": " P",
+        "debug[2]": "P",
         "debug[3]": "I",
         "debug[4]": "D",
         "debug[5]": "A",
@@ -1550,7 +1550,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[all]": "Autopilot Nav",
         "debug[0]": "Target Velocity",
         "debug[1]": "Velocity",
-        "debug[2]": " VelocityError",
+        "debug[2]": "VelocityError",
         "debug[3]": "P",
         "debug[4]": "I",
         "debug[5]": "D",
@@ -1558,10 +1558,10 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Status",
       };
     DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_STOP = {
-        "debug[all]": " Autopilot Stop",
+        "debug[all]": "Autopilot Stop",
         "debug[0]": "East Vel Error",
         "debug[1]": "North Vel Error",
-        "debug[2]": " East PIDsum",
+        "debug[2]": "East PIDsum",
         "debug[3]": "North PIDsum",
         "debug[4]": "Roll Angle",
         "debug[5]": "Pitch Angle",
@@ -1569,10 +1569,10 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "Status", // unused
       };
     DEBUG_FRIENDLY_FIELD_NAMES.PITOT = {
-        "debug[all]": " Pitot",
+        "debug[all]": "Pitot",
         "debug[0]": "Airspeed",
         "debug[1]": "Diff Pressure",
-        "debug[2]": " Pressure Pa",
+        "debug[2]": "Pressure Pa",
         "debug[3]": "Temperature",
         "debug[4]": "-", // unused
         "debug[5]": "-", // unused
@@ -1580,10 +1580,10 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[7]": "-", // unused
       };
     DEBUG_FRIENDLY_FIELD_NAMES.POSITION_EST = {
-        "debug[all]": " Position Estimate",
+        "debug[all]": "Position Estimate",
         "debug[0]": "Position",
         "debug[1]": "Velocity",
-        "debug[2]": " Acceleration",
+        "debug[2]": "Acceleration",
         "debug[3]": "velEast", // temporary
         "debug[4]": "velNorth", // temporary
         "debug[5]": "AccelRaw", // temporary
@@ -2066,6 +2066,12 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             case "debug[2]": // GPS Altitude cm
             case "debug[3]": // Kalman Altitude cm
               return `${(value / 100).toFixed(2)} m`;
+            case "debug[4]": // GPS Velocity
+            case "debug[5]": // Kalman Velocity
+              return `${(value / 100).toFixed(2)} m/s`;
+            case "debug[6]": // Accelerometer
+            case "debug[7]": // Kalman Acceleration
+              return `${(value / 100).toFixed(2)} m/s/s`;
             default:
               return value.toFixed(0);
           }
@@ -2080,6 +2086,7 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
             default:
               return value.toFixed(0);
           }
+        }
 
       case "POSITION_EST":
         switch (fieldName) {
@@ -2899,11 +2906,11 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             case "debug[1]": // Baro Altitude cm
             case "debug[2]": // GPS Altitude cm
             case "debug[3]": // Kalman Altitude cm
-              return toFriendly ? value / 100 : value * 100;
             case "debug[4]": // GPS Velocity
             case "debug[5]": // Kalman Velocity
             case "debug[6]": // Accelerometer
             case "debug[7]": // Kalman Acceleration
+              return toFriendly ? value / 100 : value * 100;
             default:
               return value;
           }
