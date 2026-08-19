@@ -7,6 +7,24 @@
 [![Join us on Discord!](https://img.shields.io/discord/868013470023548938)](https://discord.gg/n4E6ak4u3c)
 
 
+> [!IMPORTANT]
+> **This project has moved into the Betaflight App and is now feature frozen.**
+>
+> Blackbox Explorer is built into the Betaflight App as the **Blackbox Viewer**
+> tab, available at [app.betaflight.com](https://app.betaflight.com) and in the
+> desktop and mobile builds. It has shipped there since the 2026.6 release.
+>
+> - **No further development happens in this repository.** Please raise bugs and
+>   feature requests against
+>   [betaflight-configurator](https://github.com/betaflight/betaflight-configurator/issues).
+> - **This repository will be archived on 1 December 2026**, after which it
+>   becomes read-only.
+> - [blackbox.betaflight.com](https://blackbox.betaflight.com) stays online as a
+>   frozen, unmaintained build of the last standalone release. It will not
+>   receive fixes or new features.
+>
+> Everything below describes the standalone viewer and is kept for reference.
+
 ![Main explorer interface](screenshots/main-interface.jpg)
 
 This tool allows you to open logs recorded by Betaflight's Blackbox feature in
@@ -24,11 +42,19 @@ would.
 
 ### Latest stable version
 
-For the latest stable released version visit https://blackbox.betaflight.com/
+The maintained version is the **Blackbox Viewer** tab in the Betaflight App at
+https://app.betaflight.com/
+
+The final standalone release remains available, frozen and unmaintained, at
+https://blackbox.betaflight.com/
 
 ### Unstable testing versions
 
-The latest master build is always available at https://master.blackbox.betaflight.com/
+The latest master build of the Betaflight App, including the Blackbox Viewer
+tab, is always available at https://master.app.betaflight.com/
+
+The standalone master build at https://master.blackbox.betaflight.com/ is no
+longer updated.
 
 **Be aware that these versions are intended for testing / feedback only, and may be buggy or broken. Caution is advised when using these versions.**
 
