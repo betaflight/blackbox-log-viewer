@@ -1,3 +1,4 @@
+import semver from "semver";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
