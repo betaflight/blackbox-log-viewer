@@ -570,24 +570,56 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             },
           };
         case "ALTITUDE":
-          switch (fieldName) {
-            case "debug[0]": // GPS Trust / RangeFinderAlt
-            case "debug[1]": // Baro Alt
-            case "debug[2]": // GPS Alt
-            case "debug[3]": // Kalman Alt
-            case "debug[4]": // GPS Vel Up
-            case "debug[5]": // Kalman Vel Up
-            case "debug[6]": // AccelerometerUp
-            case "debug[7]": // Kalman Accel Up
-              return {
-                power: 1,
-                MinMax: {
-                  min: -5,
-                  max: 5,
-                },
-              };
-            default:
-              return getCurveForMinMaxFields(fieldName);
+          if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2026.6.0")) {
+            switch (fieldName) {
+              case "debug[0]": // RangeFinder Alt
+              case "debug[1]": // Baro Alt
+              case "debug[2]": // GPS Alt
+              case "debug[3]": // Kalman Alt
+              case "debug[4]": // GPS Vel Up
+              case "debug[5]": // Kalman Vel Up
+              case "debug[6]": // Accelerometer Up
+              case "debug[7]": // Kalman Accel Up
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -5,
+                    max: 5,
+                  },
+                };
+              default:
+                return getCurveForMinMaxFields(fieldName);
+            }
+          } else {
+            switch (fieldName) {
+              case "debug[0]": // GPS Trust
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -200,
+                    max: 200,
+                  },
+                };
+              case "debug[1]": // Baro Alt
+              case "debug[2]": // GPS Alt
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -50,
+                    max: 50,
+                  },
+                };
+              case "debug[3]": // Vario
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -5,
+                    max: 5,
+                  },
+                };
+              default:
+                return getCurveForMinMaxFields(fieldName);
+            }
           }
         case "FFT":
           switch (fieldName) {

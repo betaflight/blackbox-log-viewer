@@ -1550,7 +1550,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[all]": "Autopilot Nav",
         "debug[0]": "Target Velocity",
         "debug[1]": "Velocity",
-        "debug[2]": "VelocityError",
+        "debug[2]": "Velocity Error",
         "debug[3]": "P",
         "debug[4]": "I",
         "debug[5]": "D",
@@ -1566,7 +1566,7 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         "debug[4]": "Roll Angle",
         "debug[5]": "Pitch Angle",
         "debug[6]": "Status",
-        "debug[7]": "Status", // unused
+        "debug[7]": "-", // unused
       };
     DEBUG_FRIENDLY_FIELD_NAMES.PITOT = {
         "debug[all]": "Pitot",
