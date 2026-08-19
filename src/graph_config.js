@@ -1488,6 +1488,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // VelErr East
             case "debug[1]": // VelErr North
+              return {
                 power: 1,
                 MinMax: {
                   min: -5,
