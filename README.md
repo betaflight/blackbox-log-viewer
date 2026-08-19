@@ -18,7 +18,7 @@
 >   feature requests against
 >   [betaflight-configurator](https://github.com/betaflight/betaflight-configurator/issues).
 > - **This repository will be archived on 1 December 2026**, after which it
->   becomes read only.
+>   becomes read-only.
 > - [blackbox.betaflight.com](https://blackbox.betaflight.com) stays online as a
 >   frozen, unmaintained build of the last standalone release. It will not
 >   receive fixes or new features.
