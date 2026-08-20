@@ -3195,37 +3195,34 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         switch (fieldName) {
           case "debug[0]": // Pitch P degrees * 100
           case "debug[1]": // Pitch D degrees * 100
-            return toFriendly ? value / 100 : value * 100; // °
           case "debug[2]": // velocity to home cm/s
           case "debug[3]": // velocity target cm/s
-            return toFriendly ? value / 100 : value * 100; // m/s
+            return toFriendly ? value / 100 : value * 100;
           default:
             return value;
         }
       case "GPS_RESCUE_HEADING":
         switch (fieldName) {
           case "debug[0]": // Ground speed cm/s
+          case "debug[6]": // Roll Added deg * 100
             return toFriendly ? value / 100 : value * 100; // m/s
           case "debug[1]": // GPS Ground course degrees * 10
           case "debug[2]": // Attitude in degrees * 10
           case "debug[3]": // Angle to home in degrees * 10
           case "debug[4]": // magYaw in degrees * 10
             return toFriendly ? value / 10 : value * 10; //°
-          case "debug[6]": // Roll Added deg * 100
-            return toFriendly ? value / 100 : value * 100; // °
           case "debug[5]": // Roll Mix Att
           case "debug[7]": // Rescue Yaw Rate
           default:
             return value;
         }
-      case "GPS_RESCUE_TRACKING":
+      case "    ":
         switch (fieldName) {
           case "debug[0]": // velocity to home cm/s
           case "debug[1]": // velocity target cm/s
-            return toFriendly ? value / 100 : value * 100; // m/s
           case "debug[2]": // altitude cm
           case "debug[3]": // altitude target cm
-            return toFriendly ? value / 100 : value * 100;
+            return toFriendly ? value / 100 : value * 100; // m/s
           default:
             return value;
         }
