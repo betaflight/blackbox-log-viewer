@@ -2901,19 +2901,15 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         return value; // " °C";
       case "ALTITUDE":
         if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2026.6.0")) {
-          switch (fieldName) {
-            case "debug[0]": // RangeFinder Altitude cm
-            case "debug[1]": // Baro Altitude cm
-            case "debug[2]": // GPS Altitude cm
-            case "debug[3]": // Kalman Altitude cm
-            case "debug[4]": // GPS Velocity
-            case "debug[5]": // Kalman Velocity
-            case "debug[6]": // Accelerometer
-            case "debug[7]": // Kalman Acceleration
-              return toFriendly ? value / 100 : value * 100;
-            default:
-              return value;
-          }
+          // debug[0] = RangeFinder Altitude cm
+          // debug[1] = Baro Altitude cm
+          // debug[2] = GPS Altitude cm
+          // debug[3] = Kalman Altitude cm
+          // debug[4] = GPS Velocity
+          // debug[5] = Kalman Velocity
+          // debug[6] = Accelerometer
+          // debug[7] = Kalman Acceleration
+          return toFriendly ? value / 100 : value * 100;
         } else {
           switch (fieldName) {
             case "debug[0]": // GPS Trust * 100
@@ -2935,39 +2931,42 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           case "debug[4]": // Vel North
           case "debug[5]": // Raw Acceleration
             return toFriendly ? value / 100 : value * 100;
-          case "debug[6]": // GPS R Pos
-          case "debug[7]": // GPS R Vel
+          // debug[6] = GPS R Pos
+          // debug[7] = GPS R Vel
           default:
             return value;
         }
+
       case "AUTOPILOT_PID":
         switch (fieldName) {
           case "debug[0]": // Velocity
           case "debug[1]": // DistanceError
             return toFriendly ? value / 100 : value * 100;
-          case "debug[2]": // P
-          case "debug[3]": // I
-          case "debug[4]": // D
-          case "debug[5]": // A
-          case "debug[6]": // F
-          case "debug[7]": // Status
+          // debug[2] = P
+          // debug[3] = I
+          // debug[4] = D
+          // debug[5] = A
+          // debug[6] = F
+          // debug[7] = Status
           default:
             return value;
         }
+
       case "AUTOPILOT_ALTITUDE":
         switch (fieldName) {
           case "debug[1]": // Target Altitude
           case "debug[2]": // Current Altitude
             return toFriendly ? value / 100 : value * 100;
-          case "debug[3]": // P
-          case "debug[4]": // I
-          case "debug[5]": // D
-          case "debug[6]": // A
-          case "debug[7]": // F
-          case "debug[0]": // NewThrottle
+          // debug[0] = NewThrottle
+          // debug[3] = P
+          // debug[4] = I
+          // debug[5] = D
+          // debug[6] = A
+          // debug[7] = F
           default:
             return value;
         }
+
       case "AUTOPILOT_STOP":
         switch (fieldName) {
           case "debug[0]": // VelocityErrorEast
@@ -2976,10 +2975,10 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           case "debug[4]": // AngleRoll
           case "debug[5]": // AnglePitch
             return toFriendly ? value / 10 : value * 10;
-          case "debug[2]": // PidSumEast
-          case "debug[3]": // PidSumNorth
-          case "debug[6]": // Status
-          case "debug[7]": // Status
+          // debug[2] = PidSumEast
+          // debug[3] = PidSumNorth
+          // debug[6] = Status
+          // debug[7] = Status
           default:
             return value;
         }
@@ -3242,27 +3241,21 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value;
         }
       case "ATTITUDE":
-        switch (fieldName) {
-          case "debug[0]": // Roll Angle
-          case "debug[1]": // Pitch Angle
-          case "debug[2]": // Ground speed factor
-          case "debug[3]": // Heading error
-          case "debug[4]": // Velocity to home
-          case "debug[5]": // Ground speed error ratio
-          case "debug[6]": // Pitch forward angle
-          case "debug[7]": // dcmKp gain
-          default:
-            return value;
-        }
+        // debug[0] = Roll Angle
+        // debug[1] = Pitch Angle
+        // debug[2] = Ground speed factor
+        // debug[3] = Heading error
+        // debug[4] = Velocity to home
+        // debug[5] = Ground speed error ratio
+        // debug[6] = Pitch forward angle
+        // debug[7] = dcmKp gain
+        return value;
       case "VTX_MSP":
-        switch (fieldName) {
-          case "debug[0]": // packetCounter
-          case "debug[1]": // isCrsfPortConfig
-          case "debug[2]": // isLowPowerDisarmed
-          case "debug[3]": // mspTelemetryDescriptor
-          default:
-            return value;
-        }
+        // debug[0] = packetCounter
+        // debug[1] = isCrsfPortConfig
+        // debug[2] = isLowPowerDisarmed
+        // debug[3] = mspTelemetryDescriptor
+        return value;
       case "GPS_DOP":
         switch (fieldName) {
           case "debug[0]": // Number of Satellites
