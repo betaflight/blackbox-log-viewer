@@ -1103,12 +1103,12 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "GPS_RESCUE_HEADING":
           switch (fieldName) {
-            case "debug[0]": // Groundspeed cm/s
+            case "debug[0]": // Groundspeed
               return {
                 power: 1,
                 MinMax: {
-                  min: -100,
-                  max: 100,
+                  min: -20, // 20 m/s range
+                  max: 20,
                 },
               };
             case "debug[1]": // GPS GroundCourse
@@ -1119,31 +1119,23 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 power: 1,
                 MinMax: {
                   min: 0,
-                  max: 360,
+                  max: 360, // degrees
                 },
               };
-            case "debug[7]": // RescueYawRate
+            case "debug[6]": // roll angle deg
               return {
                 power: 1,
                 MinMax: {
-                  min: -20,
-                  max: 20,
-                },
-              };
-            case "debug[6]": // roll angle *100
-              return {
-                power: 1,
-                MinMax: {
-                  min: 0,
-                  max: 180,
+                  min: -5,
+                  max: 5,
                 },
               };
             case "debug[7]": // yaw rate deg/s
               return {
                 power: 1,
                 MinMax: {
-                  min: 0,
-                  max: 200,
+                  min: -100, // just the value sent
+                  max: 100,
                 },
               };
             default:
