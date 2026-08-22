@@ -1512,6 +1512,85 @@ FlightLogFieldPresenter.adjustDebugDefsList = function (
         ...DEBUG_FRIENDLY_FIELD_NAMES.GYRO_SAMPLE,
         "debug[4]": "Avg System Load %",
       };
+
+      DEBUG_FRIENDLY_FIELD_NAMES.ALTITUDE = {
+        "debug[all]": "Altitude",
+        "debug[0]": "RangeFinder Altitude",
+        "debug[1]": "Baro Altitude",
+        "debug[2]": "GPS Altitude",
+        "debug[3]": "Kalman Altitude",
+        "debug[4]": "GPS Velocity",
+        "debug[5]": "Kalman Velocity",
+        "debug[6]": "Accelerometer",
+        "debug[7]": "Kalman Acceleration",
+      };
+    DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_ALTITUDE = {
+        "debug[all]": "Autopilot Altitude",
+        "debug[0]": "newThrottle",
+        "debug[1]": "Target Altitude",
+        "debug[2]": "Current Altitude",
+        "debug[3]": "Alt P",
+        "debug[4]": "Alt I",
+        "debug[5]": "Alt D",
+        "debug[6]": "Alt A",
+        "debug[7]": "Alt F",
+      };
+    DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_PID = {
+        "debug[all]": "Autopilot PID",
+        "debug[0]": "XY Velocity",
+        "debug[1]": "XY Distance Error",
+        "debug[2]": "XY P",
+        "debug[3]": "XY I",
+        "debug[4]": "XY D",
+        "debug[5]": "XY A",
+        "debug[6]": "XY F",
+        "debug[7]": "Status",
+      };
+    DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_NAV = {
+        "debug[all]": "Autopilot Nav",
+        "debug[0]": "Target Velocity",
+        "debug[1]": "Velocity",
+        "debug[2]": "Velocity Error",
+        "debug[3]": "P",
+        "debug[4]": "I",
+        "debug[5]": "D",
+        "debug[6]": "A",
+        "debug[7]": "Status",
+      };
+    DEBUG_FRIENDLY_FIELD_NAMES.AUTOPILOT_STOP = {
+        "debug[all]": "Autopilot Stop",
+        "debug[0]": "East Vel Error",
+        "debug[1]": "North Vel Error",
+        "debug[2]": "East PIDsum",
+        "debug[3]": "North PIDsum",
+        "debug[4]": "Roll Angle",
+        "debug[5]": "Pitch Angle",
+        "debug[6]": "Status",
+        "debug[7]": "-", // unused
+      };
+    DEBUG_FRIENDLY_FIELD_NAMES.PITOT = {
+        "debug[all]": "Pitot",
+        "debug[0]": "Airspeed",
+        "debug[1]": "Diff Pressure",
+        "debug[2]": "Pressure Pa",
+        "debug[3]": "Temperature",
+        "debug[4]": "-", // unused
+        "debug[5]": "-", // unused
+        "debug[6]": "-", // unused
+        "debug[7]": "-", // unused
+      };
+    DEBUG_FRIENDLY_FIELD_NAMES.POSITION_EST = {
+        "debug[all]": "Position Estimate",
+        "debug[0]": "Position",
+        "debug[1]": "Velocity",
+        "debug[2]": "Acceleration",
+        "debug[3]": "velEast", // temporary
+        "debug[4]": "velNorth", // temporary
+        "debug[5]": "AccelRaw", // temporary
+        "debug[6]": "RGpsPos", // temporary
+        "debug[7]": "RGpsVel", // temporary
+      };
+
     }
   }
 };
@@ -1980,13 +2059,92 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
       case "ESC_SENSOR_TMP":
         return `${value.toFixed(0)} °C`;
       case "ALTITUDE":
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2026.6.0")) {
+          switch (fieldName) {
+            case "debug[0]": // RangeFinder Altitude cm
+            case "debug[1]": // Baro Altitude cm
+            case "debug[2]": // GPS Altitude cm
+            case "debug[3]": // Kalman Altitude cm
+              return `${(value / 100).toFixed(2)} m`;
+            case "debug[4]": // GPS Velocity
+            case "debug[5]": // Kalman Velocity
+              return `${(value / 100).toFixed(2)} m/s`;
+            case "debug[6]": // Accelerometer
+            case "debug[7]": // Kalman Acceleration
+              return `${(value / 100).toFixed(2)} m/s/s`;
+            default:
+              return value.toFixed(0);
+          }
+        } else {
+          switch (fieldName) {
+            case "debug[0]": // GPS Trust * 100
+              return value.toFixed(0);
+            case "debug[1]": // GPS Altitude cm
+            case "debug[2]": // OSD Altitude cm
+            case "debug[3]": // Control Altitude cm
+              return `${(value / 100).toFixed(2)} m`;
+            default:
+              return value.toFixed(0);
+          }
+        }
+
+      case "POSITION_EST":
         switch (fieldName) {
-          case "debug[0]": // GPS Trust * 100
-            return value.toFixed(0);
-          case "debug[1]": // GPS Altitude cm
-          case "debug[2]": // OSD Altitude cm
-          case "debug[3]": // Control Altitude
+          case "debug[0]": // Position (dist to home)
             return `${(value / 100).toFixed(2)} m`;
+          case "debug[1]": // Velocity
+          case "debug[3]": // Vel East
+          case "debug[4]": // Vel North
+            return `${(value / 100).toFixed(2)} m/s`;
+          case "debug[2]": // Kal Acceleration
+          case "debug[5]": // Raw Acceleration
+            return `${(value / 100).toFixed(2)} m/s/s`;
+          case "debug[6]": // GPS R Pos
+          case "debug[7]": // GPS R Vel
+          default:
+            return value.toFixed(0);
+        }
+      case "AUTOPILOT_PID":
+        switch (fieldName) {
+          case "debug[0]": // Velocity
+            return `${(value / 100).toFixed(2)} m/s`;
+          case "debug[1]": // DistanceError
+            return `${(value / 100).toFixed(2)} m`;
+          case "debug[2]": // P
+          case "debug[3]": // I
+          case "debug[4]": // D
+          case "debug[5]": // A
+          case "debug[6]": // F
+          case "debug[7]": // Status
+          default:
+            return value.toFixed(0);
+        }
+      case "AUTOPILOT_ALTITUDE":
+        switch (fieldName) {
+          case "debug[1]": // Target Altitude
+          case "debug[2]": // Current Altitude
+            return `${(value / 100).toFixed(2)} m`;
+          case "debug[3]": // P
+          case "debug[4]": // I
+          case "debug[5]": // D
+          case "debug[6]": // A
+          case "debug[7]": // F
+          case "debug[0]": // NewThrottle
+          default:
+            return value.toFixed(0);
+        }
+    case "AUTOPILOT_STOP":
+        switch (fieldName) {
+          case "debug[0]": // VelocityErrorEast
+          case "debug[1]": // VelocityErrorNorth
+            return `${(value / 100).toFixed(2)} m/s`;
+          case "debug[4]": // AngleRoll
+          case "debug[5]": // AnglePitch
+            return `${(value / 10).toFixed(1)} deg`;
+          case "debug[2]": // PidSumEast
+          case "debug[3]": // PidSumNorth
+          case "debug[6]": // Status
+          case "debug[7]": // Status
           default:
             return value.toFixed(0);
         }
@@ -2742,13 +2900,85 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
       case "ESC_SENSOR_TMP":
         return value; // " °C";
       case "ALTITUDE":
+        if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2026.6.0")) {
+          // debug[0] = RangeFinder Altitude cm
+          // debug[1] = Baro Altitude cm
+          // debug[2] = GPS Altitude cm
+          // debug[3] = Kalman Altitude cm
+          // debug[4] = GPS Velocity
+          // debug[5] = Kalman Velocity
+          // debug[6] = Accelerometer
+          // debug[7] = Kalman Acceleration
+          return toFriendly ? value / 100 : value * 100;
+        } else {
+          switch (fieldName) {
+            case "debug[0]": // GPS Trust * 100
+              return value;
+            case "debug[1]": // GPS Altitude cm
+            case "debug[2]": // OSD Altitude cm
+            case "debug[3]": // Control Altitude
+              return toFriendly ? value / 100 : value * 100;
+            default:
+              return value;
+          }
+        }
+      case "POSITION_EST":
         switch (fieldName) {
-          case "debug[0]": // GPS Trust * 100
+          case "debug[0]": // Position (dist to home)
+          case "debug[1]": // Velocity
+          case "debug[2]": // Kal Acceleration
+          case "debug[3]": // Vel East
+          case "debug[4]": // Vel North
+          case "debug[5]": // Raw Acceleration
+            return toFriendly ? value / 100 : value * 100;
+          // debug[6] = GPS R Pos
+          // debug[7] = GPS R Vel
+          default:
             return value;
-          case "debug[1]": // GPS Altitude cm
-          case "debug[2]": // OSD Altitude cm
-          case "debug[3]": // Control Altitude
-            return toFriendly ? value / 100 : value * 100; //  m
+        }
+
+      case "AUTOPILOT_PID":
+        switch (fieldName) {
+          case "debug[0]": // Velocity
+          case "debug[1]": // DistanceError
+            return toFriendly ? value / 100 : value * 100;
+          // debug[2] = P
+          // debug[3] = I
+          // debug[4] = D
+          // debug[5] = A
+          // debug[6] = F
+          // debug[7] = Status
+          default:
+            return value;
+        }
+
+      case "AUTOPILOT_ALTITUDE":
+        switch (fieldName) {
+          case "debug[1]": // Target Altitude
+          case "debug[2]": // Current Altitude
+            return toFriendly ? value / 100 : value * 100;
+          // debug[0] = NewThrottle
+          // debug[3] = P
+          // debug[4] = I
+          // debug[5] = D
+          // debug[6] = A
+          // debug[7] = F
+          default:
+            return value;
+        }
+
+      case "AUTOPILOT_STOP":
+        switch (fieldName) {
+          case "debug[0]": // VelocityErrorEast
+          case "debug[1]": // VelocityErrorNorth
+            return toFriendly ? value / 100 : value * 100;
+          case "debug[4]": // AngleRoll
+          case "debug[5]": // AnglePitch
+            return toFriendly ? value / 10 : value * 10;
+          // debug[2] = PidSumEast
+          // debug[3] = PidSumNorth
+          // debug[6] = Status
+          // debug[7] = Status
           default:
             return value;
         }
@@ -2964,24 +3194,22 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         switch (fieldName) {
           case "debug[0]": // Pitch P degrees * 100
           case "debug[1]": // Pitch D degrees * 100
-            return toFriendly ? value / 100 : value * 100; // °
           case "debug[2]": // velocity to home cm/s
           case "debug[3]": // velocity target cm/s
-            return toFriendly ? value / 100 : value * 100; // m/s
+            return toFriendly ? value / 100 : value * 100;
           default:
             return value;
         }
       case "GPS_RESCUE_HEADING":
         switch (fieldName) {
           case "debug[0]": // Ground speed cm/s
+          case "debug[6]": // Roll Added deg * 100
             return toFriendly ? value / 100 : value * 100; // m/s
           case "debug[1]": // GPS Ground course degrees * 10
           case "debug[2]": // Attitude in degrees * 10
           case "debug[3]": // Angle to home in degrees * 10
           case "debug[4]": // magYaw in degrees * 10
             return toFriendly ? value / 10 : value * 10; //°
-          case "debug[6]": // Roll Added deg * 100
-            return toFriendly ? value / 100 : value * 100; // °
           case "debug[5]": // Roll Mix Att
           case "debug[7]": // Rescue Yaw Rate
           default:
@@ -2991,10 +3219,9 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
         switch (fieldName) {
           case "debug[0]": // velocity to home cm/s
           case "debug[1]": // velocity target cm/s
-            return toFriendly ? value / 100 : value * 100; // m/s
           case "debug[2]": // altitude cm
           case "debug[3]": // altitude target cm
-            return toFriendly ? value / 100 : value * 100;
+            return toFriendly ? value / 100 : value * 100; // m/s
           default:
             return value;
         }
@@ -3014,27 +3241,21 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
             return value;
         }
       case "ATTITUDE":
-        switch (fieldName) {
-          case "debug[0]": // Roll Angle
-          case "debug[1]": // Pitch Angle
-          case "debug[2]": // Ground speed factor
-          case "debug[3]": // Heading error
-          case "debug[4]": // Velocity to home
-          case "debug[5]": // Ground speed error ratio
-          case "debug[6]": // Pitch forward angle
-          case "debug[7]": // dcmKp gain
-          default:
-            return value;
-        }
+        // debug[0] = Roll Angle
+        // debug[1] = Pitch Angle
+        // debug[2] = Ground speed factor
+        // debug[3] = Heading error
+        // debug[4] = Velocity to home
+        // debug[5] = Ground speed error ratio
+        // debug[6] = Pitch forward angle
+        // debug[7] = dcmKp gain
+        return value;
       case "VTX_MSP":
-        switch (fieldName) {
-          case "debug[0]": // packetCounter
-          case "debug[1]": // isCrsfPortConfig
-          case "debug[2]": // isLowPowerDisarmed
-          case "debug[3]": // mspTelemetryDescriptor
-          default:
-            return value;
-        }
+        // debug[0] = packetCounter
+        // debug[1] = isCrsfPortConfig
+        // debug[2] = isLowPowerDisarmed
+        // debug[3] = mspTelemetryDescriptor
+        return value;
       case "GPS_DOP":
         switch (fieldName) {
           case "debug[0]": // Number of Satellites

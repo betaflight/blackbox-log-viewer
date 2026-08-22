@@ -1,3 +1,4 @@
+import semver from "semver";
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
 import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
@@ -570,34 +571,56 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
             },
           };
         case "ALTITUDE":
-          switch (fieldName) {
-            case "debug[0]": // GPS Trust
-              return {
-                power: 1,
-                MinMax: {
-                  min: -200,
-                  max: 200,
-                },
-              };
-            case "debug[1]": // Baro Alt
-            case "debug[2]": // GPS Alt
-              return {
-                power: 1,
-                MinMax: {
-                  min: -50,
-                  max: 50,
-                },
-              };
-            case "debug[3]": // vario
-              return {
-                power: 1,
-                MinMax: {
-                  min: -5,
-                  max: 5,
-                },
-              };
-            default:
-              return getCurveForMinMaxFields(fieldName);
+          if (semver.gte(flightLog.getSysConfig().firmwareVersion, "2026.6.0")) {
+            switch (fieldName) {
+              case "debug[0]": // RangeFinder Alt
+              case "debug[1]": // Baro Alt
+              case "debug[2]": // GPS Alt
+              case "debug[3]": // Kalman Alt
+              case "debug[4]": // GPS Vel Up
+              case "debug[5]": // Kalman Vel Up
+              case "debug[6]": // Accelerometer Up
+              case "debug[7]": // Kalman Accel Up
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -5,
+                    max: 5,
+                  },
+                };
+              default:
+                return getCurveForMinMaxFields(fieldName);
+            }
+          } else {
+            switch (fieldName) {
+              case "debug[0]": // GPS Trust
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -200,
+                    max: 200,
+                  },
+                };
+              case "debug[1]": // Baro Alt
+              case "debug[2]": // GPS Alt
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -50,
+                    max: 50,
+                  },
+                };
+              case "debug[3]": // Vario
+                return {
+                  power: 1,
+                  MinMax: {
+                    min: -5,
+                    max: 5,
+                  },
+                };
+              default:
+                return getCurveForMinMaxFields(fieldName);
+            }
           }
         case "FFT":
           switch (fieldName) {
@@ -809,7 +832,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 power: 1,
                 MinMax: {
                   min: 0,
-                  max: 1200,
+                  max: 1000,
                 },
               };
             default:
@@ -1062,35 +1085,30 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           }
         case "GPS_RESCUE_VELOCITY":
           switch (fieldName) {
-            case "debug[0]": // Pitch P deg * 100
-            case "debug[1]": // Pitch D deg * 100
+            case "debug[0]": // TargetVelocity
+            case "debug[1]": // Velocity
+            case "debug[2]": // Step East *100
+            case "debug[3]": // Step North*100
               return {
                 power: 1,
                 MinMax: {
-                  min: -20,
-                  max: 20,
+                  min: -1000,
+                  max: 1000,
                 },
               };
-            case "debug[2]": // Velocity in cm/s
-            case "debug[3]": // Velocity to home in cm/s
-              return {
-                power: 1,
-                MinMax: {
-                  min: -5,
-                  max: 5,
-                },
-              };
+              case "debug[4]": // Phase
+              case "debug[5]": // Distance to home cm
             default:
               return getCurveForMinMaxFields(fieldName);
           }
         case "GPS_RESCUE_HEADING":
           switch (fieldName) {
-            case "debug[0]": // Groundspeed cm/s
+            case "debug[0]": // Groundspeed
               return {
                 power: 1,
                 MinMax: {
-                  min: -100,
-                  max: 100,
+                  min: -20, // 20 m/s range
+                  max: 20,
                 },
               };
             case "debug[1]": // GPS GroundCourse
@@ -1101,31 +1119,23 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 power: 1,
                 MinMax: {
                   min: 0,
-                  max: 360,
+                  max: 360, // degrees
                 },
               };
-            case "debug[5]": // magYaw * 10
+            case "debug[6]": // roll angle deg
               return {
                 power: 1,
                 MinMax: {
-                  min: 0,
-                  max: 20,
-                },
-              };
-            case "debug[6]": // roll angle *100
-              return {
-                power: 1,
-                MinMax: {
-                  min: 0,
-                  max: 180,
+                  min: -5,
+                  max: 5,
                 },
               };
             case "debug[7]": // yaw rate deg/s
               return {
                 power: 1,
                 MinMax: {
-                  min: 0,
-                  max: 200,
+                  min: -100, // just the value sent
+                  max: 100,
                 },
               };
             default:
@@ -1165,6 +1175,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           switch (fieldName) {
             case "debug[0]": // velocity to home cm/s
             case "debug[1]": // target velocity cm/s
+            case "debug[2]": // altitude cm
+            case "debug[3]": // Target altitude cm
               return {
                 power: 1,
                 MinMax: {
@@ -1172,13 +1184,13 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                   max: 10,
                 },
               };
-            case "debug[2]": // altitude m
-            case "debug[3]": // Target altitude m
+            case "debug[4]": // Heading
+            case "debug[5]": // Bearing
               return {
                 power: 1,
                 MinMax: {
-                  min: -50,
-                  max: 50,
+                  min: 0,
+                  max: 360,
                 },
               };
             default:
@@ -1428,6 +1440,139 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
                 MinMax: {
                   min: 0,
                   max: 100,
+                },
+              };
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
+
+        case "AUTOPILOT_ALTITUDE":
+          switch (fieldName) {
+            case "debug[1]": // TargetAltitude
+            case "debug[2]": // CurrentAltitude
+              return {
+                power: 1,
+                MinMax: {
+                  min: -10,
+                  max: 10,
+                },
+              };
+            case "debug[0]": // new throttle
+              return {
+                power: 1,
+                MinMax: {
+                  min: 1000,
+                  max: 2000,
+                },
+              };
+            case "debug[3]": // P
+            case "debug[4]": // I
+            case "debug[5]": // D
+            case "debug[6]": // A
+            case "debug[7]": // F
+              return {
+                power: 1,
+                MinMax: {
+                  min: -500,
+                  max: 500,
+                },
+              };
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
+
+        case "POSITION_EST":
+          switch (fieldName) {
+            case "debug[0]": // Position
+            case "debug[1]": // Velocity
+            case "debug[2]": // Acceleration
+            case "debug[3]": // Vel East
+            case "debug[4]": // Vel North
+            case "debug[5]": // Raw Accelerometer
+              return {
+                power: 1,
+                MinMax: {
+                  min: -10,
+                  max: 10,
+                },
+              };
+            case "debug[6]": // R GPSPos
+            case "debug[7]": // R GPSVel
+              return {
+                power: 1,
+                MinMax: {
+                  min:0,
+                  max: 1000,
+                },
+              };
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
+
+        case "AUTOPILOT_STOP":
+          switch (fieldName) {
+            case "debug[0]": // VelErr East
+            case "debug[1]": // VelErr North
+              return {
+                power: 1,
+                MinMax: {
+                  min: -5,
+                  max: 5,
+                },
+              };
+            case "debug[2]": // PidSum East
+            case "debug[3]": // PidSum North
+            case "debug[4]": // Angle Roll
+            case "debug[5]": // Angle Pitch
+              return {
+                power: 1,
+                MinMax: {
+                  min: -500,
+                  max: 500,
+                },
+              };
+            case "debug[6]": // Status, one sided 0-250
+            case "debug[7]": // Status, one sided 0-250
+              return {
+                power: 1,
+                MinMax: {
+                  min: 0,
+                  max: 500,
+                },
+              };
+            default:
+              return getCurveForMinMaxFields(fieldName);
+          }
+
+        case "AUTOPILOT_PID":
+          switch (fieldName) {
+            case "debug[0]": // XY Velocity
+            case "debug[1]": // Distance Error
+              return {
+                power: 1,
+                MinMax: {
+                  min: -10,
+                  max: 10,
+                },
+              };
+            case "debug[2]": // P
+            case "debug[3]": // I
+            case "debug[4]": // D
+            case "debug[5]": // A
+            case "debug[6]": // F
+              return {
+                power: 1,
+                MinMax: {
+                  min: -500,
+                  max: 500,
+                },
+              };
+            case "debug[7]": // Status, one sided 0-250
+              return {
+                power: 1,
+                MinMax: {
+                  min: 0,
+                  max: 500,
                 },
               };
             default:
