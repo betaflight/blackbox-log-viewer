@@ -3215,7 +3215,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
           default:
             return value;
         }
-      case "    ":
+      case "GPS_RESCUE_TRACKING":
         switch (fieldName) {
           case "debug[0]": // velocity to home cm/s
           case "debug[1]": // velocity target cm/s
