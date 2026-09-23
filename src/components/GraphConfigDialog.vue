@@ -408,7 +408,7 @@ function convertToConfig() {
 }
 
 function friendlyName(fieldName) {
-  const debugMode = props.flightLog?.getSysConfig()?.debug_mode;
+  const debugMode = FlightLogFieldPresenter.debugModeName(props.flightLog?.getSysConfig());
   return FlightLogFieldPresenter.fieldNameToFriendly(fieldName, debugMode);
 }
 

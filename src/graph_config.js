@@ -1,5 +1,5 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
+import { RATES_TYPE } from "./flightlog_fielddefs";
 import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
@@ -67,7 +67,7 @@ export function GraphConfig(graphConfig) {
                 name: fieldName,
                 friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(
                   fieldName,
-                  flightLog.getSysConfig().debug_mode,
+                  FlightLogFieldPresenter.debugModeName(flightLog.getSysConfig()),
                 ),
               },
               forceNewCurve,
@@ -84,7 +84,7 @@ export function GraphConfig(graphConfig) {
             { ...field, curve: { ...field.curve },
               friendlyName: FlightLogFieldPresenter.fieldNameToFriendly(
                 field.name,
-                flightLog.getSysConfig().debug_mode,
+                FlightLogFieldPresenter.debugModeName(flightLog.getSysConfig()),
               ),
             },
           ),
@@ -429,7 +429,7 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
         },
       };
     } else if (fieldName.match(/^debug.*/) && sysConfig.debug_mode != null) {
-      const debugModeName = DEBUG_MODE[sysConfig.debug_mode];
+      const debugModeName = FlightLogFieldPresenter.debugModeName(sysConfig);
       switch (debugModeName) {
         case "CYCLETIME":
           switch (fieldName) {

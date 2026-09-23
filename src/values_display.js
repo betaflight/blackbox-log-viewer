@@ -54,7 +54,7 @@ export function updateValuesChart(logStore, graphStore, appStore, userSettings) 
     frame[logStore.flightLog.getMainFieldIndexByName("flightModeFlags")];
 
   if (graphStore.hasTableOverlay) {
-    const debugMode = logStore.flightLog.getSysConfig().debug_mode;
+    const debugMode = FlightLogFieldPresenter.debugModeName(logStore.flightLog.getSysConfig());
     const values = [];
 
     for (let i = 0; i < fieldNames.length; i++) {

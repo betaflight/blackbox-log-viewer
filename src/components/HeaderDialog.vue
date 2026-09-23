@@ -512,7 +512,7 @@ const generalParams = computed(() => {
     param("Loop Time", fmtVal(s.looptime, 0)),
     param("Gyro Sync", fmtVal(s.gyro_sync_denom, 0)),
     param("PID Denom", fmtVal(s.pid_process_denom, 0)),
-    param("Debug Mode", selectVal(s.debug_mode, DEBUG_MODE)),
+    param("Debug Mode", s.debug_mode_name ?? selectVal(s.debug_mode, DEBUG_MODE)),
     param("Deadband", fmtVal(s.deadband, 0)),
     param("Yaw Deadband", fmtVal(s.yaw_deadband, 0)),
     param("Vbat Scale", fmtVal(s.vbatscale, 0)),

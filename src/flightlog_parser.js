@@ -275,6 +275,7 @@ export function FlightLogParser(logData) {
       gyro_soft_type: null, // Gyro soft filter type (PT1, BIQUAD, PT2, PT3)
       gyro_soft2_type: null, // Gyro soft filter 2 type (PT1, BIQUAD, PT2, PT3)
       debug_mode: null, // Selected Debug Mode
+      debug_mode_name: null, // Name of the selected debug mode, written by firmware since 2026.12 (betaflight#15718)
       features: null, // Activated features (e.g. MOTORSTOP etc)
       Craft_name: null, // Craft Name
       motorOutput: [null, null], // Minimum and maximum outputs to motor's
@@ -609,7 +610,7 @@ export function FlightLogParser(logData) {
   // Fields stored as raw string values
   const STRING_FIELDS = new Set([
     "Product", "Blackbox version", "Firmware date", "Board information",
-    "Craft name", "Log start datetime",
+    "Craft name", "Log start datetime", "debug_mode_name",
   ]);
 
   // Fields where parseInt value is divided by 1000 on newer firmware

@@ -42,6 +42,16 @@ const FRIENDLY_FIELD_NAMES = {
   "axisS[1]": "PID S [pitch]",
   "axisS[2]": "PID S [yaw]",
 
+  // ADRC control law (betaflight#15400)
+  "adrcPidSum[all]": "ADRC PID Sum (x10)",
+  "adrcPidSum[0]": "ADRC PID Sum [roll] (x10)",
+  "adrcPidSum[1]": "ADRC PID Sum [pitch] (x10)",
+  "adrcPidSum[2]": "ADRC PID Sum [yaw] (x10)",
+  "adrcCommandedCollective": "ADRC Commanded Collective (x1000)",
+  "adrcAppliedCollective": "ADRC Applied Collective (x1000)",
+  "adrcState": "ADRC State (bits: liftoff=1, throttle idle=2, z3 inhibited RPY=4|8|16, gate cause>>5)",
+  "adrcGateResetCount": "ADRC Gate Reset Count",
+
   //Virtual field
   "axisSum[all]": "PID Sum",
   "axisSum[0]": "PID Sum [roll]",
@@ -159,6 +169,17 @@ const DEBUG_FRIENDLY_FIELD_NAMES_INITIAL = {
     "debug[5]": "Debug [5]",
     "debug[6]": "Debug [6]",
     "debug[7]": "Debug [7]",
+  },
+  ADRC: {
+    "debug[all]": "Debug ADRC observer",
+    "debug[0]": "ESO z1 rate estimate [roll]",
+    "debug[1]": "ESO z2 acceleration estimate [roll]",
+    "debug[2]": "ESO z3 disturbance estimate [roll] (/adrc_z3_log_scale)",
+    "debug[3]": "ESO z1 rate estimate [pitch]",
+    "debug[4]": "ESO z2 acceleration estimate [pitch]",
+    "debug[5]": "ESO z3 disturbance estimate [pitch] (/adrc_z3_log_scale)",
+    "debug[6]": "ESO z3 disturbance estimate [yaw] (/adrc_z3_log_scale)",
+    "debug[7]": "b0 throttle scale x100 (negative = liftoff gate closed)",
   },
   CYCLETIME: {
     "debug[all]": "Debug Cycle Time",
@@ -1893,13 +1914,23 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
   }
 };
 
+// The debug mode's name. Newer firmware writes it to the log header (debug_mode_name, betaflight#15718),
+// which is authoritative: the numeric debug_mode is an enum ordinal and drifts between firmware versions and
+// forks. Older logs fall back to the version-adjusted DEBUG_MODE table.
+FlightLogFieldPresenter.debugModeName = function (sysConfig, debugMode) {
+  if (sysConfig?.debug_mode_name) {
+    return sysConfig.debug_mode_name;
+  }
+  return DEBUG_MODE[debugMode ?? sysConfig?.debug_mode];
+};
+
 FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
   flightLog,
   fieldName,
   value,
 ) {
   if (flightLog) {
-    const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
+    const debugModeName = FlightLogFieldPresenter.debugModeName(flightLog.getSysConfig());
     switch (debugModeName) {
       case "NONE":
       case "AIRMODE":
@@ -2379,25 +2410,23 @@ FlightLogFieldPresenter.decodeDebugFieldToFriendly = function (
   return value.toFixed(0);
 };
 
+// debugMode: the mode name (string) or, for callers that only have the header ordinal, the number.
+function debugFieldToFriendly(fieldName, debugMode) {
+  const debugModeName = typeof debugMode === "string" ? debugMode : DEBUG_MODE[debugMode];
+  const debugFields = debugModeName ? DEBUG_FRIENDLY_FIELD_NAMES[debugModeName] : undefined;
+
+  if (debugFields) {
+    return debugFields[fieldName] ?? fieldName;
+  }
+  if (fieldName === "debug[all]") {
+    return `Debug (${debugModeName || debugMode})`;
+  }
+  return DEBUG_FRIENDLY_FIELD_NAMES[DEBUG_MODE[0]][fieldName] ?? fieldName;
+}
+
 FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
-  if (debugMode) {
-    if (fieldName.includes("debug")) {
-      const debugModeName = DEBUG_MODE[debugMode];
-      let debugFields;
-
-      if (debugModeName) {
-        debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugModeName];
-      }
-
-      if (!debugFields) {
-        if (fieldName === "debug[all]") {
-          return `Debug (${debugModeName || debugMode})`;
-        }
-        debugFields = DEBUG_FRIENDLY_FIELD_NAMES[DEBUG_MODE[0]];
-      }
-
-      return debugFields[fieldName] ?? fieldName;
-    }
+  if (debugMode != null && fieldName.includes("debug")) {
+    return debugFieldToFriendly(fieldName, debugMode);
   }
   if (FRIENDLY_FIELD_NAMES[fieldName]) {
     return FRIENDLY_FIELD_NAMES[fieldName];
@@ -2655,7 +2684,7 @@ FlightLogFieldPresenter.ConvertDebugFieldValue = function (
   value,
 ) {
   if (flightLog) {
-    const debugModeName = DEBUG_MODE[flightLog.getSysConfig().debug_mode]; // convert to recognisable name
+    const debugModeName = FlightLogFieldPresenter.debugModeName(flightLog.getSysConfig());
     switch (debugModeName) {
       case "NONE":
       case "AIRMODE":
