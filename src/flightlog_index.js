@@ -1,8 +1,26 @@
 import { FlightLogParser } from "./flightlog_parser";
-import { FlightLogEvent } from "./flightlog_fielddefs";
+import { AXIS, FlightLogEvent } from "./flightlog_fielddefs";
 import { IMU } from "./imu";
 import { ArrayDataStream } from "./datastream";
 import "./decoders";
+
+/**
+ * Logs with an `rc_command_scale` header carry rcCommand as roll/pitch/yaw -1..1 and throttle 0..1 times
+ * that scale. The viewer reads rcCommand in the units logged before it: roll/pitch/yaw -500..500 and
+ * throttle 1000..2000, both times the high resolution scale. Returns the gain and offset from the logged
+ * value to those units, or null for a log without the header.
+ */
+export function legacyRcCommandScale(sysConfig, axis) {
+  const scale = Number(sysConfig.rc_command_scale);
+  if (Number.isNaN(scale) || scale <= 0) {
+    return null;
+  }
+  if (axis === AXIS.YAW + 1) {
+    const highResolutionScale = sysConfig.blackbox_high_resolution > 0 ? 10 : 1;
+    return { gain: 1000 / scale, offset: 1000 * highResolutionScale };
+  }
+  return { gain: 500 / scale, offset: 0 };
+}
 
 export function FlightLogIndex(logData) {
   //Private:
@@ -97,6 +115,8 @@ export function FlightLogIndex(logData) {
           mainFrameDef.nameToIndex["magADC[1]"],
           mainFrameDef.nameToIndex["magADC[2]"],
         ];
+        const rcCommandGain =
+          legacyRcCommandScale(sysConfig, AXIS.ROLL)?.gain ?? 1;
         let lastSlow = [];
         let lastGPSHome = [];
         let lastGPS = [];
@@ -174,7 +194,10 @@ export function FlightLogIndex(logData) {
                   if (maxRCFields.length) {
                     rcTotal = 0;
                     for (const rcfo of maxRCFields) {
-                      rcTotal += Math.max(rcTotal, Math.abs(frame[rcfo]));
+                      rcTotal += Math.max(
+                        rcTotal,
+                        Math.abs(frame[rcfo]) * rcCommandGain,
+                      );
                     }
 
                     intraIndex.maxRC.push(rcTotal);

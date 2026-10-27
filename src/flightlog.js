@@ -1,5 +1,5 @@
 import semver from "semver";
-import { FlightLogIndex } from "./flightlog_index";
+import { FlightLogIndex, legacyRcCommandScale } from "./flightlog_index";
 import { FlightLogParser } from "./flightlog_parser";
 import { GPS_transform } from "./gps_transform";
 import {
@@ -22,6 +22,18 @@ import {
   validate,
   firmwareGreaterOrEqual,
 } from "./tools";
+
+function legacyRcCommandRescale(sysConfig, nameToIndex) {
+  const rescale = [];
+  for (let axis = 0; axis < 4; axis++) {
+    const index = nameToIndex[`rcCommand[${axis}]`];
+    const scale = legacyRcCommandScale(sysConfig, axis);
+    if (index !== undefined && scale) {
+      rescale.push({ index, ...scale });
+    }
+  }
+  return rescale;
+}
 
 /*
  * Double check that the indexes of each chunk in the array are in increasing order (bugcheck).
@@ -56,6 +68,7 @@ export function FlightLog(logData) {
     numMotors = false;
   let fieldNames = [],
     fieldNameToIndex = {};
+  let rcCommandRescale = [];
   const chunkCache = new FIFOCache(2);
   // Map from field indexes to smoothing window size in microseconds
   let fieldSmoothing = {},
@@ -121,6 +134,12 @@ export function FlightLog(logData) {
             rawStats.frame.P.field[i].max,
           ),
         };
+      }
+
+      for (const { index, gain, offset } of rcCommandRescale) {
+        const range = rawStats.field[index];
+        range.min = range.min * gain + offset;
+        range.max = range.max * gain + offset;
       }
 
       if (rawStats.frame.S) {
@@ -476,6 +495,9 @@ export function FlightLog(logData) {
                 // Copy the main frame data in
                 for (let i = 0; i < frame.length; i++) {
                   destFrame[i] = frame[i];
+                }
+                for (const { index, gain, offset } of rcCommandRescale) {
+                  destFrame[index] = frame[index] * gain + offset;
                 }
 
                 destFrame_currentIndex = frame.length; // Keeps track of where to place direct data in the destFrame.
@@ -1351,6 +1373,10 @@ export function FlightLog(logData) {
     );
 
     buildFieldNames();
+    rcCommandRescale = legacyRcCommandRescale(
+      this.getSysConfig(),
+      fieldNameToIndex,
+    );
 
     estimateNumMotors();
     estimateNumCells();
